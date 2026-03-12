@@ -78,8 +78,10 @@ let test_conditions =
       [LPAR; a; EQ; a_; RPAR]                (ae ==. al);
     chk "A = \"a\" OR NOT B"
       [a; EQ; a_; OR; NOT; b]                ((ae ==. al) ||. !.(ae ==. be));
-    chk "A = \"a\" OR (NOT B)"
-      [a; EQ; a_; OR; LPAR; NOT; b; RPAR]    ((ae ==. al) ||. !.(Expr be));
+    (* GnuCOBOL and MF do not agree on this example.
+       We would need a source for an explanation of MF's behaviour. *)
+    (*chk "A = \"a\" OR (NOT B)"
+      [a; EQ; a_; OR; LPAR; NOT; b; RPAR]    ((ae ==. al) ||. !.(Expr be));*)
     chk "(A = \"a\") AND NOT B"
       [LPAR; a; EQ; a_; RPAR; AND; NOT; b]   ((ae ==. al) &&. !.(Expr be));
     chk "(A >= B) AND (A <= C)"
@@ -102,15 +104,14 @@ let test_conditions =
        OR; DIGITS "2"]                       ((ae ==. one) ||. (ae ==. two));
     chk "A = 1 OR 2 OR 2 = B"
       [a; EQ; DIGITS "1"; OR;
-       DIGITS "2"; OR; DIGITS "2"; EQ; b]    ((ae ==. one) ||.
-                                              ((ae ==. two) ||. (two ==. be)));
+       DIGITS "2"; OR; DIGITS "2"; EQ; b]    (((ae ==. one) ||. (ae ==. two)) ||.
+                                              (two ==. be));
     chk "A = 1 OR 1 + 1 OR 1 + 1 = B"
       [a; EQ; DIGITS "1";
        OR; DIGITS "1"; PLUS_SIGN; DIGITS "1";
        OR; DIGITS "1"; PLUS_SIGN; DIGITS "1";
-       EQ; b]                                ((ae ==. one) ||.
-                                              ((ae ==. (one +. one)) ||.
-                                               ((one +. one) ==. be)));
+       EQ; b]                                (((ae ==. one) ||. (ae ==. (one +. one))) ||.
+                                               ((one +. one) ==. be));
 
     fail "NOT NOT A"           [NOT; NOT; a];
     fail "A AND AND B"         [a; AND; AND; b];
@@ -130,6 +131,23 @@ let test_conditions =
       [NOT; LPAR; a; NOT; GT; b;
        AND; c; AND; NOT; d; RPAR]            !.(((ae <=. be) &&. (ae <=. ce)) &&.
                                                 !.(ae <=. de));
+
+    (* MicroFocus OSVS: https://www.microfocus.com/documentation/reuze/60d/lhpdf60q.htm *)
+    chk "a = (1 OR 2)"
+      [a; EQUAL; LPAR; DIGITS "1"; OR; DIGITS "2"; RPAR]
+      ((ae ==. one) ||. (ae ==. two));
+    chk "a > b OR (c AND d)"
+      [a; GT; b; OR; c; AND; d]
+      ((ae >. be) ||. ((ae >. ce) &&. (ae >. de)));
+    chk "a > (b OR c) AND d"
+      [a; GT; LPAR; b; OR; c; RPAR; AND; d]
+      (((ae >. be) ||. (ae >. ce)) &&. (ae >. de));
+    chk "a (= b OR > c)"
+      [a; LPAR_BEFORE_RELOP; EQUAL; b; OR; GT; c; RPAR]
+      ((ae ==. be) ||. (ae >. ce));
+    chk "a = b AND (> c OR < d)"
+      [a; EQUAL; b; AND; LPAR_BEFORE_RELOP; GT; c; OR; LT; d; RPAR]
+      ((ae ==. be) &&. ((ae >. ce) ||. (ae <. de)));
   ];;
 
 (* --- *)

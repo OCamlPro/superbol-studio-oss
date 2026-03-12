@@ -84,13 +84,14 @@ let package =
       "@types/node", "^20.3.2";
     ]
 
-let cob_extensions_pattern = "[cC]{ob,OB,bl,BL,py,PY,bx,BX,bsql}"
+let cob_extensions_pattern = [ "[cC]{ob,OB,bl,BL,py,PY,bx,BX,bsql}"; "[pP]{co,CO}" ]
+
 let contributes =
   Manifest.contributes ()
     ~languages: [
       Manifest.language "cobol"
         ~aliases: ["COBOL"]
-        ~filenamePatterns: ["*." ^ cob_extensions_pattern]
+        ~filenamePatterns:(List.map (fun elt -> "*." ^ elt) cob_extensions_pattern)
         ~configuration: "./syntaxes/language-configuration.json";
       Manifest.language "COBOL_GNU_LISTFILE"
         ~aliases: ["LISTFILE"]
@@ -187,6 +188,11 @@ let contributes =
                                         "markdownDescription": "Debug the target as a module of `cobcrun`",
                                         "default": false
                                 },
+                                "cobcrunPath": {
+                                        "type": "string",
+                                        "markdownDescription": "Path to the GnuCOBOL runtime (typically `cobcrun`)",
+                                        "default": null
+                                },
                                 "sourceDirs": {
                                         "type": "array",
                                         "markdownDescription": "Where to find the source code, in addition to the current directory.\n\nExample: `[ \"/usr/share/cobol/sources\" ]`",
@@ -235,6 +241,16 @@ let contributes =
                                 "remoteDebugger": {
                                         "type": "string",
                                         "description": "GDB Server host:port",
+                                        "default": null
+                                },
+                                "useCobcrun": {
+                                        "type": "boolean",
+                                        "markdownDescription": "Debug the target as a module of `cobcrun`",
+                                        "default": false
+                                },
+                                "cobcrunPath": {
+                                        "type": "string",
+                                        "markdownDescription": "Path to the GnuCOBOL runtime (typically `cobcrun`)",
                                         "default": null
                                 },
                                 "sourceDirs": {
@@ -331,6 +347,23 @@ let contributes =
              ~default:(`String "auto")
              ~order:2;
 
+           Manifest.property "superbol.cobol.sourceFormatByExtension"
+             ~title:"Source Format by File Extension"
+             ~type_:(`String "object")
+             ~additionalProperties:(`O [
+                 "type", `String "string";
+                 "enum", `A (List.map (fun s -> `String s)
+                               Cobol_config.Options.all_format_names);
+               ])
+             ~default:(`O [])
+             ~markdownDescription:
+               (with_superbol_toml_note
+                  "Per-extension source reference-format overrides. \
+                   Each entry maps a file extension (without dot, e.g. \
+                   `cbl`, `cob`) to a source format, taking precedence \
+                   over the global `#superbol.cobol.sourceFormat#` setting.")
+             ~order:3;
+
            Manifest.PROPERTY.array "superbol.cobol.copybooks"
              ~title:"Copybook Paths"
              ~items:(`O [
@@ -354,14 +387,14 @@ let contributes =
                ])
              ~markdownDescription:
                (with_superbol_toml_note "List of paths to copybooks.")
-             ~order:3;
+             ~order:4;
 
            Manifest.PROPERTY.strings "superbol.cobol.copyexts"
              ~markdownDescription:
                (with_superbol_toml_note
                   "File extensions for copybook resolution")
              ~default:Cobol_common.Copybook.copybook_extensions
-             ~order:4;
+             ~order:5;
 
            (* Paths *)
 
@@ -617,15 +650,16 @@ let manifest =
     package
     ~marketplace
     ~engines: ("^" ^ vscode_engine)
-    ~activationEvents: [
-      "onLanguage:cobol"; (* Note: optional since VS Code 1.74, as in
+    ~activationEvents: (
+      "onLanguage:cobol" (* Note: optional since VS Code 1.74, as in
                              `contributes`) *)
       (* XXX: should we really expect mixed-case file extensions like
          `prog.coB`? *)
-      "workspaceContains:**/*." ^ cob_extensions_pattern;
+     ::(List.map (fun elt -> "workspaceContains:**/*." ^ elt) cob_extensions_pattern)
+      @ [
       "workspaceContains:{_superbol,superbol.toml}";
       (* "onDebug"; *) (* <- not relevant yet *)
-    ]
+    ])
     ~extensionKind: [
       "workspace";                                 (* <- run on the workspace *)
     ]

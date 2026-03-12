@@ -2,7 +2,41 @@
 
 ## [_] Next release
 
+### Fixed
+- Internal logic of the parser to limit the amount of text rescans [#544](https://github.com/OCamlPro/superbol-studio-oss/pull/544)
+
+
+## [0.3.0] Third release (2026-02-27)
+
 ### Added
+- Per-extension source reference-format overrides, via VSCode and `superbol.toml` settings [#538](https://github.com/OCamlPro/superbol-studio-oss/pull/538)
+- Support for multiple arguments in `SET` compiler directives [#536](https://github.com/OCamlPro/superbol-studio-oss/pull/536)
+- Handle OSVS parentheses in abbreviated combined relation conditions [#532](https://github.com/OCamlPro/superbol-studio-oss/pull/532)
+- Support STOP RUN RETURNING syntax with scalar argument [#529](https://github.com/OCamlPro/superbol-studio-oss/pull/529)
+- Support INDEXED BY and sort direction in any order in OCCURS clause [#526](https://github.com/OCamlPro/superbol-studio-oss/pull/526)
+- Support for debugging programs launched via custom COBOL runtimes [#522](https://github.com/OCamlPro/superbol-studio-oss/pull/522)
+- Parse `OR` in inspect regions [#519](https://github.com/OCamlPro/superbol-studio-oss/pull/519)
+- Support `NOT OPTIONAL` argument for `SELECT` [#517](https://github.com/OCamlPro/superbol-studio-oss/pull/517)
+- Handle redundant periods in `DATA DIVISION` [#521](https://github.com/OCamlPro/superbol-studio-oss/pull/521)
+- Support EXCLUSIVE lock mode [#514](https://github.com/OCamlPro/superbol-studio-oss/pull/514)
+- Support more compiler directive syntaxes [#515](https://github.com/OCamlPro/superbol-studio-oss/pull/515)
+- `CONFIGURATION SECTION` header is now optionnal [#513](https://github.com/OCamlPro/superbol-studio-oss/pull/513)
+- Extend syntax of `ORGANIZATION` to allow `RECORD` and `BINARY` optional prefix [#511](https://github.com/OCamlPro/superbol-studio-oss/pull/511)
+- Allow national literals to be used as arithmetic terms [#510](https://github.com/OCamlPro/superbol-studio-oss/pull/510)
+- Syntactic support for `EXIT PROGRAM RETURNING` [#506](https://github.com/OCamlPro/superbol-studio-oss/pull/506)
+- Support `OCCURS` with `COUNT IN` clause [#505](https://github.com/OCamlPro/superbol-studio-oss/pull/505)
+- Support `$set sourceformat(fmt)` syntax [#509](https://github.com/OCamlPro/superbol-studio-oss/pull/509)
+- Allow `LABEL RECORD` clause in `SD` entries [#508](https://github.com/OCamlPro/superbol-studio-oss/pull/508)
+- Support for empty `IF`/`ELSE` branches [#504](https://github.com/OCamlPro/superbol-studio-oss/pull/504)
+- Allow EQUAL as synonym of `=` in COMPUTE [#507](https://github.com/OCamlPro/superbol-studio-oss/pull/507)
+- Various minor improvements to the COBOL grammar [#501](https://github.com/OCamlPro/superbol-studio-oss/pull/501)
+- Support for `ADD` and `SUBTRACT` with `LENGTH OF` argument [#503](https://github.com/OCamlPro/superbol-studio-oss/pull/503)
+- Syntactic support for file and device clauses on `SELECT` [#495](https://github.com/OCamlPro/superbol-studio-oss/pull/495)
+- Support for `MOVE` with `LENGTH OF` sender [#494](https://github.com/OCamlPro/superbol-studio-oss/pull/494)
+- Support for Hexadecimal literals using `H` and `h` prefix [#499](https://github.com/OCamlPro/superbol-studio-oss/pull/499)
+- Support for `OCCURS N DEPENDING` syntax [#497](https://github.com/OCamlPro/superbol-studio-oss/pull/497)
+- Allow arbitrary number of spaces before `$`-prefixed compiler directives in fixed-width source formats [#498](https://github.com/OCamlPro/superbol-studio-oss/pull/498), [#512](https://github.com/OCamlPro/superbol-studio-oss/pull/512)
+- Support for extraneous periods at the end of `SET` or `SOURCE` compiler directives [#493](https://github.com/OCamlPro/superbol-studio-oss/pull/493)
 - Display reference count in hover information for data items [#429](https://github.com/OCamlPro/superbol-studio-oss/pull/429) (fix for [Issue #354](https://github.com/OCamlPro/superbol-studio-oss/issues/354))
 - Dedicated libraries for testing internal behaviors of the LSP server [#487](https://github.com/OCamlPro/superbol-studio-oss/pull/487)
 - Syntactic support for `LINE SEQUENTIAL` file organization [#485](https://github.com/OCamlPro/superbol-studio-oss/pull/485)
@@ -13,6 +47,8 @@
 - Basic language definition for toggling line comments [#463](https://github.com/OCamlPro/superbol-studio-oss/pull/463)
 
 ### Fixed
+- Issues with the debugger extension (*cf* latest changes [here](https://github.com/OCamlPro/superbol-vscode-debug/blob/5ff970d7d3ab905ce39f9ec267944615b05c9161/CHANGELOG.md))
+- Handling of concatenation characters that are not followed by a separator space [#500](https://github.com/OCamlPro/superbol-studio-oss/pull/500)
 - Name of VSIX file included in CI build artifacts [#480](https://github.com/OCamlPro/superbol-studio-oss/pull/480) (fix for [Issue #408](https://github.com/OCamlPro/superbol-studio-oss/issues/408))
 - Fallback to extension settings when `cobcPath` is not provided in task definitions [#468](https://github.com/OCamlPro/superbol-studio-oss/pull/468) (fix for [Issue #467](https://github.com/OCamlPro/superbol-studio-oss/issues/467))
 - Bug that made the extension hang when debugged programs displayed signed numbers [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)

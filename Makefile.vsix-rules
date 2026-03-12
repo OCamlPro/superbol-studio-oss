@@ -6,14 +6,19 @@ CP ?= cp -fl # ln -srf
 
 DUNE_BUILD_DIR ?= _build
 DUNE_BUILD_ARGS = ${DUNE_CROSS_ARGS}
-DUNE_BUILD_SRCDIR =							\
+ifneq ($(BUILD_PLAT),$(TARGET_PLAT))
+  DUNE_BUILD_DEFAULT =							\
 	${DUNE_BUILD_DIR}/default$(strip				\
 		$(if $(filter  win32,$(TARGET_PLAT)),.windows)		\
-		$(if $(filter darwin,$(TARGET_PLAT)),.osx)		\
-							  )/$(MAIN_SRCDIR)
+		$(if $(filter darwin,$(TARGET_PLAT)),.osx))
+else
+  DUNE_BUILD_DEFAULT =							\
+	${DUNE_BUILD_DIR}/default
+endif
+DUNE_BUILD_SRCDIR = ${DUNE_BUILD_DEFAULT}/${MAIN_SRCDIR}
 
-BUILD_PLAT = $(shell node --print process.platform)
-BUILD_ARCH = $(shell node --print process.arch)
+BUILD_PLAT = $(shell node --print process.platform 2>/dev/null || echo linux)
+BUILD_ARCH = $(shell node --print process.arch 2>/dev/null || echo x64)
 
 # TARGET_PLAT should already be defined in Makefile; conditionally assign anyway
 TARGET_PLAT ?= $(BUILD_PLAT)
@@ -23,6 +28,7 @@ ifeq ($(TARGET_PLAT),universal)
 else
   TARGET_SPEC = $(TARGET_PLAT)-$(TARGET_ARCH)
 endif
+DOT_EXE = $(if $(filter win32,$(TARGET_PLAT)),.exe)
 
 TARGET_PROFILE ?= release
 TARGET_VSIX = $(TARGET_NAME)-$(VERSION)-$(TARGET_SPEC)-$(TARGET_PROFILE).vsix
@@ -40,7 +46,6 @@ ifeq ($(TARGET_PLAT),universal)
   SUPERBOL_LSP_BUILT = ${DUNE_BUILD_SRCDIR}/$(SUPERBOL_LSP_JS)
   SUPERBOL_LSP_EXE = $(SUPERBOL_LSP).js
 else
-  DOT_EXE = $(if $(filter win32,$(TARGET_PLAT)),.exe)
   SUPERBOL_LSP_EXE = $(SUPERBOL_LSP)-$(TARGET_SPEC)$(DOT_EXE)
   ifeq ($(TARGET_PLAT)_$(BUILD_STATIC_EXECS),$(BUILD_PLAT)_true)
     SUPERBOL_LSP_BUILT = $(SUPERBOL_LSP)

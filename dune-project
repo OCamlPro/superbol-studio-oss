@@ -4,7 +4,7 @@
 (cram enable)
 (name superbol-studio-oss)
 (generate_opam_files false)
-(version 0.2.3)
+(version 0.3.1)
 (formatting (enabled_for ocaml reason))
 (using menhir 2.0)
 
@@ -12,10 +12,15 @@
  (name superbol-studio-oss)
  (synopsis "SuperBOL Studio OSS Project")
  (description "Virtual package that depends on both the VSCode extension and the LSP server.")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
-   (superbol-vscode-platform (= version))
-   (superbol-free (= version))
+   (superbol-vscode-platform (= :version))
+   (superbol-free (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
@@ -25,12 +30,17 @@
  (name superbol-vscode-lib)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
-   (vscode-languageclient-js-stubs (= version))
-   (vscode-js-stubs (= version))
+   (vscode-languageclient-js-stubs (= :version))
+   (vscode-js-stubs (= :version))
    (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
-   (node-js-stubs (= version))
+   (node-js-stubs (= :version))
    (jsonoo (and (>= 0.2.1) (< 1.0.0)))
    (js_of_ocaml ( >= 4 ))
    (js_of_ocaml-ppx ( >= 4 ))
@@ -43,9 +53,14 @@
  (name superbol-vscode-platform)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
-   (superbol-vscode-lib (= version))
+   (superbol-vscode-lib (= :version))
    (js_of_ocaml-ppx ( >= 4 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
@@ -56,6 +71,11 @@
  (name interop-js-stubs)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (js_of_ocaml ( >= 4 ))
@@ -72,11 +92,16 @@
  (name node-js-stubs)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
    (js_of_ocaml ( >= 4 ))
-   (interop-js-stubs (= version))
+   (interop-js-stubs (= :version))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
    (js_of_ocaml-ppx ( >= 4 ))
    odoc
@@ -90,12 +115,17 @@
  (name vscode-js-stubs)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (promise_jsoo (and ( >= 0.3.1 )( < 0.4 )))
    (jsonoo (and (>= 0.2.1) (< 1.0.0)))
    (js_of_ocaml ( >= 4 ))
-   (interop-js-stubs (= version))
+   (interop-js-stubs (= :version))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
    (js_of_ocaml-ppx ( >= 4 ))
    odoc
@@ -109,14 +139,19 @@
  (name vscode-languageclient-js-stubs)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
-   (vscode-js-stubs (= version))
+   (vscode-js-stubs (= :version))
    (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
-   (node-js-stubs (= version))
+   (node-js-stubs (= :version))
    (jsonoo (and (>= 0.2.1) (< 1.0.0)))
    (js_of_ocaml ( >= 4 ))
-   (interop-js-stubs (= version))
+   (interop-js-stubs (= :version))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
    (js_of_ocaml-ppx ( >= 4 ))
    odoc
@@ -130,6 +165,11 @@
  (name vscode-json)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (ppx_deriving_encoding (and (>= 0.3.0) (< 1.0.0)))
@@ -145,12 +185,17 @@
  (name vscode-debugadapter)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
-   (vscode-debugprotocol (= version))
-   (node-js-stubs (= version))
+   (vscode-debugprotocol (= :version))
+   (node-js-stubs (= :version))
    (js_of_ocaml ( >= 4 ))
-   (interop-js-stubs (= version))
+   (interop-js-stubs (= :version))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
    (js_of_ocaml-ppx ( >= 3.0 ))
    odoc
@@ -164,10 +209,15 @@
  (name vscode-debugprotocol)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (js_of_ocaml ( >= 4 ))
-   (interop-js-stubs (= version))
+   (interop-js-stubs (= :version))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
    (js_of_ocaml-ppx ( >= 3.0 ))
    odoc
@@ -181,9 +231,14 @@
  (name superbol-free)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
-   (superbol_free_lib (= version))
+   (superbol_free_lib (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
@@ -193,21 +248,26 @@
  (name superbol_free_lib)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
-   (vscode-json (= version))
-   (superbol_preprocs (= version))
-   (sql_preproc (= version))
+   (vscode-json (= :version))
+   (superbol_preprocs (= :version))
+   (sql_preproc (= :version))
    (lwt ( >= 5 ))
-   (ez_toml (= version))
+   (ez_toml (= :version))
    (ez_file ( >= 0.3 ))
    (ez_cmdliner (and (>= 0.3.0) (< 1.0.0)))
    (ez_api ( >= 2.0 ))
-   (cobol_typeck (= version))
-   (cobol_parser (= version))
-   (cobol_lsp (= version))
-   (cobol_indent (= version))
-   (cobol_common (= version))
+   (cobol_typeck (= :version))
+   (cobol_parser (= :version))
+   (cobol_lsp (= :version))
+   (cobol_indent (= :version))
+   (cobol_common (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
@@ -217,13 +277,19 @@
  (name superbol_preprocs)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
-   (sql_parser (= version))
-   (pretty (= version))
-   (cobol_preproc (= version))
-   (cobol_parser (= version))
-   (cobol_common (= version))
+   (sql_parser (= :version))
+   (pretty (= :version))
+   (cobol_typeck (= :version))
+   (cobol_preproc (= :version))
+   (cobol_parser (= :version))
+   (cobol_common (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
@@ -233,15 +299,20 @@
  (name superbol_project)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
-   (pretty (= version))
+   (pretty (= :version))
    (ocplib_stuff (and (>= 0.4.0) (< 1.0.0)))
-   (ezr_toml (= version))
+   (ezr_toml (= :version))
    (ez_file (and (>= 0.3.0) (< 1.0.0)))
-   (cobol_preproc (= version))
-   (cobol_config (= version))
-   (cobol_common (= version))
+   (cobol_preproc (= :version))
+   (cobol_config (= :version))
+   (cobol_common (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
@@ -251,9 +322,14 @@
  (name cobol_common)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
-   (pretty (= version))
+   (pretty (= :version))
    (ocplib_stuff (and (>= 0.4.0) (< 1.0.0)))
    (ppx_deriving ( >= 5.2.1 ))
    odoc
@@ -265,14 +341,19 @@
  (name cobol_parser)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (menhir ( >= 1.2 ))
    (ez_file ( >= 0.3 ))
-   (ebcdic_lib (= version))
-   (cobol_ptree (= version))
-   (cobol_preproc (= version))
-   (cobol_common (= version))
+   (ebcdic_lib (= :version))
+   (cobol_ptree (= :version))
+   (cobol_preproc (= :version))
+   (cobol_common (= :version))
    (ppx_deriving ( >= 5.2.1 ))
    (menhir (and ( >= 20231231 )( < 20240715 )))
    odoc
@@ -284,9 +365,14 @@
  (name cobol_ptree)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
-   (cobol_common (= version))
+   (cobol_common (= :version))
    (ppx_deriving ( >= 5.2.1 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
@@ -297,6 +383,11 @@
  (name ebcdic_lib)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    odoc
@@ -308,21 +399,26 @@
  (name cobol_lsp)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (toml (and (>= 7.1.0) (< 8.0.0)))
-   (superbol_project (= version))
-   (superbol_preprocs (= version))
-   (pretty (= version))
+   (superbol_project (= :version))
+   (superbol_preprocs (= :version))
+   (pretty (= :version))
    (lsp (and ( >= 1.18 )( < 1.19 )))
    (jsonrpc ( >= 1.15 ))
-   (cobol_typeck (= version))
-   (cobol_parser (= version))
-   (cobol_indent (= version))
-   (cobol_data (= version))
-   (cobol_config (= version))
-   (cobol_common (= version))
-   (cobol_cfg (= version))
+   (cobol_typeck (= :version))
+   (cobol_parser (= :version))
+   (cobol_indent (= :version))
+   (cobol_data (= :version))
+   (cobol_config (= :version))
+   (cobol_common (= :version))
+   (cobol_cfg (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
@@ -332,6 +428,11 @@
  (name ppx_cobcflags)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (ppxlib ( >= 0.15 ))
@@ -344,6 +445,11 @@
  (name pretty)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (fmt ( >= 0.9 ))
@@ -357,11 +463,16 @@
  (name cobol_config)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
-   (pretty (= version))
+   (pretty (= :version))
    (menhir ( >= 1.2 ))
-   (cobol_common (= version))
+   (cobol_common (= :version))
    (ppx_deriving ( >= 5.2.1 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
@@ -372,10 +483,15 @@
  (name cobol_indent)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (fmt ( >= 0.9 ))
-   (cobol_config (= version))
+   (cobol_config (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
@@ -385,11 +501,16 @@
  (name cobol_indent_old)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (fmt ( >= 0.9 ))
-   (cobol_preproc (= version))
-   (cobol_common (= version))
+   (cobol_preproc (= :version))
+   (cobol_common (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
@@ -399,14 +520,19 @@
  (name cobol_preproc)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (ppx_import ( >= 1 ))
    (ppx_deriving ( >= 5.2.1 ))
    (menhir ( >= 1.2 ))
-   (cobol_data (= version))
-   (cobol_config (= version))
-   (cobol_common (= version))
+   (cobol_data (= :version))
+   (cobol_config (= :version))
+   (cobol_common (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
@@ -416,13 +542,18 @@
  (name cobol_data)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (zarith_stubs_js ( >= 0.17 ))
    (zarith ( >= 1 ))
-   (cobol_ptree (= version))
-   (cobol_config (= version))
-   (cobol_common (= version))
+   (cobol_ptree (= :version))
+   (cobol_config (= :version))
+   (cobol_common (= :version))
    (ppx_deriving ( >= 5.2.1 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
@@ -433,15 +564,18 @@
  (name cobol_typeck)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
-   (superbol_preprocs (= version))
-   (sql_ast (= version))
-   (cobol_unit (= version))
-   (cobol_ptree (= version))
-   (cobol_parser (= version))
-   (cobol_data (= version))
-   (cobol_common (= version))
+   (cobol_unit (= :version))
+   (cobol_ptree (= :version))
+   (cobol_parser (= :version))
+   (cobol_data (= :version))
+   (cobol_common (= :version))
    (ppx_deriving ( >= 5.2.1 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
@@ -452,12 +586,17 @@
  (name cobol_unit)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
-   (cobol_ptree (= version))
-   (cobol_data (= version))
-   (cobol_config (= version))
-   (cobol_common (= version))
+   (cobol_ptree (= :version))
+   (cobol_data (= :version))
+   (cobol_config (= :version))
+   (cobol_common (= :version))
    (ppx_deriving ( >= 5.2.1 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
@@ -468,6 +607,11 @@
  (name ez_toml)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    ocplib_stuff
@@ -483,11 +627,16 @@
  (name ezr_toml)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
-   (pretty (= version))
+   (pretty (= :version))
    (ocplib_stuff (and (>= 0.4.0) (< 1.0.0)))
-   (ez_toml (= version))
+   (ez_toml (= :version))
    (ez_file (and (>= 0.3.0) (< 1.0.0)))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
@@ -498,14 +647,19 @@
  (name sql_preproc)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
-   (superbol_preprocs (= version))
+   (superbol_preprocs (= :version))
    (ppx_deriving ( >= 5.2.1 ))
    (ez_file ( >= 0.3 ))
-   (cobol_unit (= version))
-   (cobol_typeck (= version))
-   (cobol_indent (= version))
+   (cobol_unit (= :version))
+   (cobol_typeck (= :version))
+   (cobol_indent (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
@@ -515,11 +669,16 @@
  (name sql_ast)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
-   (pretty (= version))
+   (pretty (= :version))
    (ocplib_stuff (and (>= 0.4.0) (< 1.0.0)))
-   (cobol_common (= version))
+   (cobol_common (= :version))
    (ppx_deriving ( >= 5.2.1 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
@@ -530,15 +689,20 @@
  (name sql_parser)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
-   (sql_ast (= version))
+   (sql_ast (= :version))
    (menhir ( >= 1.2 ))
    (ez_file ( >= 0.3 ))
-   (ebcdic_lib (= version))
-   (cobol_preproc (= version))
-   (cobol_parser (= version))
-   (cobol_common (= version))
+   (ebcdic_lib (= :version))
+   (cobol_preproc (= :version))
+   (cobol_parser (= :version))
+   (cobol_common (= :version))
    (ppx_deriving ( >= 5.2.1 ))
    (menhir ( >= 20230415 ))
    odoc
@@ -550,10 +714,15 @@
  (name cobol_cfg)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (ocamlgraph (and (>= 2.1.0) (< 3.0.0)))
-   (cobol_typeck (= version))
+   (cobol_typeck (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )

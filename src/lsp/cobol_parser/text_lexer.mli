@@ -28,8 +28,8 @@ module IntrinsicHandles: Set.S with type elt = intrinsic_handle
 
 (* --- *)
 
-val show_token: Grammar_tokens.token -> string
-val show_token_of_handle: keyword_handle -> string
+val string_of_token: Grammar_tokens.token -> string
+val string_of_keyword_handle: keyword_handle -> string
 val pp_tokens_via_handles: TokenHandles.t Pretty.printer
 
 (** Only for debugging *)

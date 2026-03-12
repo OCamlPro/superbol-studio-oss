@@ -13,6 +13,7 @@
 
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
+module LIST = Cobol_common.Basics.LIST
 
 type error =
   | Copybook_lookup_error of { copyloc: srcloc option;
@@ -189,6 +190,7 @@ type warning =
 
 and ignored_item =
   | Compiler_directive
+  | Compiler_set_condition
 
 and incompatible_warning_stuff =
   | Types_in_compdir_condition of
@@ -225,6 +227,8 @@ let warning_loc = function
 let pp_ignored_item ppf = function
   | Compiler_directive ->
       Pretty.print ppf "compiler@ directive"
+  | Compiler_set_condition ->
+      Pretty.print ppf "compiler@ SET@ condition@ (assuming unset)"
 
 let pp_incompatible_warning_stuff ppf = function
   | Types_in_compdir_condition _ ->                     (* TODO: info on types *)
@@ -272,8 +276,8 @@ type diagnostics =
 type t = diagnostics
 let none = { errors = []; warnings = [] }
 let union d1 d2 =
-  { errors = d1.errors @ d2.errors;
-    warnings = d1.warnings @ d2.warnings }
+  { errors = LIST.append ~loc:__LOC__ d1.errors d2.errors;
+    warnings = LIST.append ~loc:__LOC__ d1.warnings d2.warnings }
 let add_error e diags = { diags with errors = e :: diags.errors }
 let add_warning w diags = { diags with warnings = w :: diags.warnings }
 let has_errors diags = diags.errors <> []

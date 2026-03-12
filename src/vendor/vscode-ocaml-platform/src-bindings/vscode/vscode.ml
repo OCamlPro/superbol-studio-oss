@@ -2195,6 +2195,37 @@ module MessageOptions = struct
     val create : ?modal:bool -> unit -> t [@@js.builder]]
 end
 
+module OpenDialogOptions = struct
+  include Interface.Make ()
+
+  include
+    [%js:
+    val canSelectFiles : t -> bool option [@@js.get]
+
+    val canSelectFolders : t -> bool option [@@js.get]
+
+    val canSelectMany : t -> bool option [@@js.get]
+
+    val defaultUri : t -> string option [@@js.get]
+
+    val filters : t -> string list Dict.t [@@js.get]
+
+    val openLabel : t -> string [@@js.get]
+
+    val title : t -> string option [@@js.get]
+
+    val create :
+         ?canSelectFiles:bool
+      -> ?canSelectFolders:bool
+      -> ?canSelectMany:bool
+      -> ?defaultUri:string
+      -> ?filters:(string list Dict.t)
+      -> ?openLabel:string
+      -> ?title:string
+      -> unit
+      -> t [@@js.builder]]
+end
+
 module Progress = struct
   include Interface.Make ()
 
@@ -3103,6 +3134,12 @@ module Window = struct
       -> unit
       -> MessageItem.t or_undefined Promise.t
       [@@js.global "vscode.window.showErrorMessage"]
+
+    val showOpenDialog :
+         ?options:OpenDialogOptions.t
+      -> unit
+      -> Uri.t array option Promise.t
+      [@@js.global "vscode.window.showOpenDialog"]
 
     val showQuickPickItems :
          choices:QuickPickItem.t list

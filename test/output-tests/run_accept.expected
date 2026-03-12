@@ -1,4 +1,3 @@
-Considering: import/gnucobol/tests/testsuite.src/run_accept.at:43:0
 Considering: import/gnucobol/tests/testsuite.src/run_accept.at:42:0
 run_accept.at-42-prog.cob:5.17:
    2          IDENTIFICATION DIVISION.
@@ -299,7 +298,6 @@ run_accept.at-260-prog.cob:113.11-113.22:
 
 Considering: import/gnucobol/tests/testsuite.src/run_accept.at:316:0
 Considering: import/gnucobol/tests/testsuite.src/run_accept.at:355:0
-Considering: import/gnucobol/tests/testsuite.src/run_accept.at:390:0
 Considering: import/gnucobol/tests/testsuite.src/run_accept.at:389:0
 run_accept.at-389-prog.cob:11.17:
    8              03  VALUE "Hello!" LINE 3 COL 3.

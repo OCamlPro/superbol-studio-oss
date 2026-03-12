@@ -11,7 +11,7 @@ set -o pipefail
 
 # Use `docker-alpine-image` field to replace ocamlpro/ocaml:4.14
 # and `docker-alpine-packages` to add more apk packages
-git ls-files -z | xargs -0 tar c | \
+git ls-files -z | xargs -0 tar c --exclude vendors/autofonce --exclude _build | \
 docker run --rm -i \
     !(docker-alpine-image:default:ocamlpro/ocaml:4.14) \
     sh -uexc \

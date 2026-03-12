@@ -18,18 +18,13 @@ let indent_range ~dialect ~source_format ~indent_config ~range ~filename ~conten
   let indent_config = Option.value ~default:Indent_config.default indent_config in
   let src_format =
     (* Note: this value doesn't actually matter, it will be overriden
-       immediately by [fold_source_lines] calling [on_initial_source_format]
+       immediately by [fold_source_lines] calling [on_change_of_source_format]
        below. *)
     Cobol_preproc.Src_format.from_config SFFixed
   in
   let state =
     Cobol_preproc.fold_source_lines ~dialect ~source_format
-      ~on_initial_source_format:(fun src_format st -> { st with src_format })
-      ~on_compiler_directive:(fun _ { payload = cd;  _} st ->
-          match cd with
-          | CDir_source { payload = src_format; _ } -> { st with src_format }
-          | _ -> st
-        )
+      ~on_change_of_source_format:(fun src_format st -> { st with src_format })
       ~skip_compiler_directives_text:true
       ~f:(fun _lnum line acc -> Indent_check.check_indentation line acc)
       (String { filename; contents })

@@ -46,7 +46,7 @@ gen-version = "version.ml"
 preprocess = "pps gen_js_api.ppx"
 
 # files to skip while updating at package level
-skip = []
+skip = [ "main.ml" ]
 
 # package library dependencies
 #   [dependencies]

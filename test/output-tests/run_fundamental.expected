@@ -1,75 +1,5 @@
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:50:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:92:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:137:0
-run_fundamental.at-137-dump.c:5.6-5.7:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > COB_EXT_EXPORT int
-----         ^
-   6   dump (unsigned char *data)
-   7   {
->> Error: Unexpected indicator: `T'
-
-run_fundamental.at-137-dump.c:5.7-5.8:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > COB_EXT_EXPORT int
-----          ^
-   6   dump (unsigned char *data)
-   7   {
->> Error: Invalid syntax
-
-run_fundamental.at-137-dump.c:6.6-6.7:
-   3   #include <libcob.h>
-   4   
-   5   COB_EXT_EXPORT int
-   6 > dump (unsigned char *data)
-----         ^
-   7   {
-   8     int i;
->> Error: Unexpected indicator: `u'
-
-run_fundamental.at-137-dump.c:8.6-8.7:
-   5   COB_EXT_EXPORT int
-   6   dump (unsigned char *data)
-   7   {
-   8 >   int i;
-----         ^
-   9     for (i = 0; i < 4; i++)
-  10       printf ("%02x", data[i]);
->> Error: Unexpected indicator: `i'
-
-run_fundamental.at-137-dump.c:9.6-9.7:
-   6   dump (unsigned char *data)
-   7   {
-   8     int i;
-   9 >   for (i = 0; i < 4; i++)
-----         ^
-  10       printf ("%02x", data[i]);
-  11     return 0;
->> Error: Unexpected indicator: `('
-
-run_fundamental.at-137-dump.c:10.6-10.7:
-   7   {
-   8     int i;
-   9     for (i = 0; i < 4; i++)
-  10 >     printf ("%02x", data[i]);
-----         ^
-  11     return 0;
-  12   }
->> Error: Unexpected indicator: `i'
-
-run_fundamental.at-137-dump.c:11.6-11.7:
-   8     int i;
-   9     for (i = 0; i < 4; i++)
-  10       printf ("%02x", data[i]);
-  11 >   return 0;
-----         ^
-  12   }
->> Error: Unexpected indicator: `r'
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:138:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:179:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:233:0
@@ -311,46 +241,6 @@ run_fundamental.at-3521-prog.cob:14.7-14.10:
 
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3553:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3552:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3585:0
-run_fundamental.at-3585-module.c:5.6-5.7:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > COB_EXT_EXPORT int
-----         ^
-   6   some (void)
-   7   {
->> Error: Unexpected indicator: `T'
-
-run_fundamental.at-3585-module.c:5.7-5.8:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > COB_EXT_EXPORT int
-----          ^
-   6   some (void)
-   7   {
->> Error: Invalid syntax
-
-run_fundamental.at-3585-module.c:6.6-6.7:
-   3   #include <libcob.h>
-   4   
-   5   COB_EXT_EXPORT int
-   6 > some (void)
-----         ^
-   7   {
-   8     return 0;
->> Error: Unexpected indicator: `v'
-
-run_fundamental.at-3585-module.c:8.6-8.7:
-   5   COB_EXT_EXPORT int
-   6   some (void)
-   7   {
-   8 >   return 0;
-----         ^
-   9   }
->> Error: Unexpected indicator: `r'
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3584:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3644:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3697:0
@@ -409,7 +299,7 @@ Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4357:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4398:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4399:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4424:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4455:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4456:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4480:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4504:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4528:0
@@ -438,101 +328,21 @@ Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5365:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5669:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5904:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6139:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6198:0
-run_fundamental.at-6198-dump.c:5.6-5.7:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > COB_EXT_EXPORT int
-----         ^
-   6   dump (char *p)
-   7   {
->> Error: Unexpected indicator: `T'
-
-run_fundamental.at-6198-dump.c:5.7-5.8:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > COB_EXT_EXPORT int
-----          ^
-   6   dump (char *p)
-   7   {
->> Error: Invalid syntax
-
-run_fundamental.at-6198-dump.c:6.6-6.7:
-   3   #include <libcob.h>
-   4   
-   5   COB_EXT_EXPORT int
-   6 > dump (char *p)
-----         ^
-   7   {
-   8     printf ("%c%c", p[0], p[1]);
->> Error: Unexpected indicator: `c'
-
-run_fundamental.at-6198-dump.c:8.6-8.7:
-   5   COB_EXT_EXPORT int
-   6   dump (char *p)
-   7   {
-   8 >   printf ("%c%c", p[0], p[1]);
-----         ^
-   9     return 0;
-  10   }
->> Error: Unexpected indicator: `t'
-
-run_fundamental.at-6198-dump.c:9.6-9.7:
-   6   dump (char *p)
-   7   {
-   8     printf ("%c%c", p[0], p[1]);
-   9 >   return 0;
-----         ^
-  10   }
->> Error: Unexpected indicator: `r'
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6199:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6489:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6535:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6587:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6635:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6675:0
-run_fundamental.at-6675-prog.cob:12.7-12.19:
+run_fundamental.at-6675-prog.cob:12.12-12.19:
    9                  05  misalign-1           PIC X.
   10                  05  ptr                  POINTER, SYNC.
   11                  05  ptr-num              REDEFINES ptr,
   12 >        >>IF P64 SET
-----          ^^^^^^^^^^^^
+----               ^^^^^^^
   13                                           USAGE BINARY-DOUBLE UNSIGNED.
   14          >>ELSE
->> Error: Malformed compiler directive
-
-run_fundamental.at-6675-prog.cob:14.7-14.13:
-  11                  05  ptr-num              REDEFINES ptr,
-  12          >>IF P64 SET
-  13                                           USAGE BINARY-DOUBLE UNSIGNED.
-  14 >        >>ELSE
-----          ^^^^^^
-  15                                           USAGE BINARY-LONG UNSIGNED.
-  16          >>END-IF
->> Error: Unexpected >>ELSE compiler directive
-
-run_fundamental.at-6675-prog.cob:15.40-15.45:
-  12          >>IF P64 SET
-  13                                           USAGE BINARY-DOUBLE UNSIGNED.
-  14          >>ELSE
-  15 >                                         USAGE BINARY-LONG UNSIGNED.
-----                                           ^^^^^
-  16          >>END-IF
-  17                  05  misalign-2           PIC X.
->> Error: Invalid syntax
-
-run_fundamental.at-6675-prog.cob:16.7-16.15:
-  13                                           USAGE BINARY-DOUBLE UNSIGNED.
-  14          >>ELSE
-  15                                           USAGE BINARY-LONG UNSIGNED.
-  16 >        >>END-IF
-----          ^^^^^^^^
-  17                  05  misalign-2           PIC X.
-  18   
->> Error: Unexpected >>END-IF compiler directive
+>> Warning: Ignored compiler SET condition (assuming unset)
 
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6772:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6801:0
@@ -656,138 +466,8 @@ Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8455:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8418:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8510:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8554:0
-run_fundamental.at-8554-prog.cob:13.26:
-  10          PROCEDURE DIVISION.
-  11          MAIN-PROGRAM SECTION.
-  12          INIZIO.
-  13 >            IF VAR1 = (VAR2 AND VAR3 AND VAR4)
-----                             ^
-  14                 DISPLAY "TRUE 1"
-  15              END-IF
->> Hint: Missing )
-
-run_fundamental.at-8554-prog.cob:13.27-13.30:
-  10          PROCEDURE DIVISION.
-  11          MAIN-PROGRAM SECTION.
-  12          INIZIO.
-  13 >            IF VAR1 = (VAR2 AND VAR3 AND VAR4)
-----                              ^^^
-  14                 DISPLAY "TRUE 1"
-  15              END-IF
->> Error: Invalid syntax
-
-run_fundamental.at-8554-prog.cob:13.44-13.45:
-  10          PROCEDURE DIVISION.
-  11          MAIN-PROGRAM SECTION.
-  12          INIZIO.
-  13 >            IF VAR1 = (VAR2 AND VAR3 AND VAR4)
-----                                               ^
-  14                 DISPLAY "TRUE 1"
-  15              END-IF
->> Error: Invalid syntax
-
-run_fundamental.at-8554-prog.cob:16.30:
-  13              IF VAR1 = (VAR2 AND VAR3 AND VAR4)
-  14                 DISPLAY "TRUE 1"
-  15              END-IF
-  16 >            IF VAR1 NOT = (VAR2 AND VAR3 AND VAR4)
-----                                 ^
-  17                 DISPLAY "TRUE 2"
-  18              END-IF
->> Hint: Missing )
-
-run_fundamental.at-8554-prog.cob:16.31-16.34:
-  13              IF VAR1 = (VAR2 AND VAR3 AND VAR4)
-  14                 DISPLAY "TRUE 1"
-  15              END-IF
-  16 >            IF VAR1 NOT = (VAR2 AND VAR3 AND VAR4)
-----                                  ^^^
-  17                 DISPLAY "TRUE 2"
-  18              END-IF
->> Error: Invalid syntax
-
-run_fundamental.at-8554-prog.cob:16.48-16.49:
-  13              IF VAR1 = (VAR2 AND VAR3 AND VAR4)
-  14                 DISPLAY "TRUE 1"
-  15              END-IF
-  16 >            IF VAR1 NOT = (VAR2 AND VAR3 AND VAR4)
-----                                                   ^
-  17                 DISPLAY "TRUE 2"
-  18              END-IF
->> Error: Invalid syntax
-
-run_fundamental.at-8554-prog.cob:19.30:
-  16              IF VAR1 NOT = (VAR2 AND VAR3 AND VAR4)
-  17                 DISPLAY "TRUE 2"
-  18              END-IF
-  19 >            IF VAR1 NOT > (VAR2 AND VAR3 AND VAR4)
-----                                 ^
-  20                 DISPLAY "TRUE 3"
-  21              END-IF
->> Hint: Missing )
-
-run_fundamental.at-8554-prog.cob:19.31-19.34:
-  16              IF VAR1 NOT = (VAR2 AND VAR3 AND VAR4)
-  17                 DISPLAY "TRUE 2"
-  18              END-IF
-  19 >            IF VAR1 NOT > (VAR2 AND VAR3 AND VAR4)
-----                                  ^^^
-  20                 DISPLAY "TRUE 3"
-  21              END-IF
->> Error: Invalid syntax
-
-run_fundamental.at-8554-prog.cob:19.48-19.49:
-  16              IF VAR1 NOT = (VAR2 AND VAR3 AND VAR4)
-  17                 DISPLAY "TRUE 2"
-  18              END-IF
-  19 >            IF VAR1 NOT > (VAR2 AND VAR3 AND VAR4)
-----                                                   ^
-  20                 DISPLAY "TRUE 3"
-  21              END-IF
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8629:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8833:0
-run_fundamental.at-8833-prog.cob:174.16-174.22:
- 171          CHECK-LENGTH.
- 172         *>-----------
- 173         *>
- 174 >            MOVE LENGTH OF P-PIC-1 TO W01-I .
-----                   ^^^^^^
- 175              IF W01-I NOT = 2
- 176              THEN
->> Error: Invalid syntax
-
-run_fundamental.at-8833-prog.cob:179.16-179.22:
- 176              THEN
- 177                  DISPLAY 'Error 1 size <' W01-I '> !=2' .
- 178         *>
- 179 >            MOVE LENGTH OF P-PIC-2 TO W01-I .
-----                   ^^^^^^
- 180              IF W01-I NOT = 2
- 181              THEN
->> Error: Invalid syntax
-
-run_fundamental.at-8833-prog.cob:184.16-184.22:
- 181              THEN
- 182                  DISPLAY 'Error 2 size <' W01-I '> !=2' .
- 183         *>
- 184 >            MOVE LENGTH OF P-PIC-3 TO W01-I .
-----                   ^^^^^^
- 185              IF W01-I NOT = 1
- 186              THEN
->> Error: Invalid syntax
-
-run_fundamental.at-8833-prog.cob:190.16-190.22:
- 187                  DISPLAY 'Error 3 size <' W01-I '> !=1' .
- 188         *>
- 189   
- 190 >            MOVE LENGTH OF P-PIC-4 TO W01-I .
-----                   ^^^^^^
- 191              IF W01-I NOT = 1
- 192              THEN
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8885:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8943:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8994:0

@@ -94,6 +94,7 @@ let pptoks_of_word (word: text_word Cobol_common.Srcloc.with_loc) acc =
     | Alphanum { knd = Bool | BoolX; str; _ }
       -> [BOOLIT str &@<- word]
     | Alphanum { knd = Hex; str; _ }
+    | Alphanum { knd = HexH; str; _ }
       -> [HEXLIT str &@<- word]
     | Alphanum { knd = NullTerm; str; _ }
       -> [NULLIT str &@<- word]

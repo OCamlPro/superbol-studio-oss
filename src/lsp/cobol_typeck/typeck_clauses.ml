@@ -261,7 +261,7 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
         | Ok pic ->
             diags, Some (Ok pic)
         | Error diags' ->
-            diags' @ diags, Some (Error picture_clause)
+            LIST.append ~loc:__LOC__ diags' diags, Some (Error picture_clause)
   in
   let usage_clause = match item_clauses.usage with
     | Some usage ->

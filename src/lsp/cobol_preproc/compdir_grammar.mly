@@ -29,6 +29,10 @@
 %token LT              "<"          [@keyword (* symbol *)  "<"]
 %token NE              "<>"         [@keyword (* symbol *) "<>"]
 
+%token PERIOD          "."
+%token LPAR            "("
+%token RPAR            ")"
+
 %token CDIR_DEFINE     [@keyword ">>DEFINE"]
 %token CDIR_ELIF       [@keyword ">>ELIF", "$ELIF"           (* GC extensions *)
                         , ">>ELSE-IF", "$ELSE-IF"]
@@ -42,6 +46,7 @@
 
 %token ADDRSV          [@keyword "ADDRSV", "ADD-RSV"]
 %token ADDSYN          [@keyword "ADDSYN", "ADD-SYN"]
+%token ANS85           [@keyword]
 %token AREACHECK       [@keyword "AREACHECK", "AREA-CHECK"]
 %token AS              [@keyword]
 %token ASSIGN          [@keyword]
@@ -57,10 +62,12 @@
 %token FORMAT          [@keyword]
 %token FREE            [@keyword]
 %token GREATER         [@keyword]
+%token INTLEVEL        [@keyword]
 %token IS              [@keyword]
 %token LESS            [@keyword]
 %token MAKESYN         [@keyword "MAKESYN", "MAKE-SYN"]
 %token NESTCALL        [@keyword]
+%token NOANS85         [@keyword "NOANS85", "NO-ANS85"]
 %token NOAREACHECK     [@keyword "NOAREACHECK", "NO-AREACHECK", "NO-AREA-CHECK"]
 %token NOBOUND         [@keyword "NOBOUND", "NO-BOUND"]
 %token NOCHECKNUM      [@keyword "NOCHECKNUM", "NO-CHECKNUM", "NO-CHECK-NUM"]
@@ -70,13 +77,16 @@
 %token NOSPZERO        [@keyword "NOSPZERO", "NO-SPZERO"]
 %token NOSSRANGE       [@keyword "NOSSRANGE", "NO-SSRANGE"]
 %token NOT             [@keyword]
+%token NSYMBOL         [@keyword]
 %token ODOSLIDE        [@keyword]
 %token OFF             [@keyword]
 %token OR              [@keyword]
 %token OVERRIDE        [@keyword]
 %token PARAMETER       [@keyword]
 %token REMOVE          [@keyword]
+%token SEQUENTIAL      [@keyword]
 %token SET             [@keyword]
+%token SIGN            [@keyword]
 %token SOURCEFORMAT    [@keyword "SOURCEFORMAT", "SOURCE-FORMAT"]
 %token SPZERO          [@keyword]
 %token SSRANGE         [@keyword]
@@ -105,9 +115,8 @@ let loc (X) ==
 (* --- Entry points --------------------------------------------------------- *)
 
 let compiler_directive :=
-  | CDIR_SOURCE; ~ = source_directive; <Lexing>
-  | CDIR_SET; ~ = set_sourceformat; <Lexing>
-  | CDIR_SET; ~ = set_directive; <Preproc>
+  | CDIR_SOURCE; ~ = source_directive; <Source>
+  | CDIR_SET; ~ = set_directive; <Set>
   | CDIR_DEFINE; ~ = define_directive; <Preproc>
   | CDIR_IF; ~ = if_directive; <Preproc>
   | CDIR_ELIF; ~ = elif_directive; <Preproc>
@@ -115,10 +124,10 @@ let compiler_directive :=
   | CDIR_END; EOL; { Preproc End }
   | CDIR_END_IF; EOL; { Preproc End_if }
 
-(* --- >>SOURCE | $ SET SOURCEFORMAT ---------------------------------------- *)
+(* --- >>SOURCE | $ SOURCE -------------------------------------------------- *)
 
 let source_directive :=
-  | ~ = source_format; EOL; < >
+  | ~ = source_format; PERIOD?; EOL; < >
 
 let source_format :=
   | FORMAT?; IS?; free = loc(FREE);
@@ -126,44 +135,57 @@ let source_format :=
   | FORMAT?; IS?; i = text_word;
     { Source_format_is i }
 
-let set_sourceformat :=
-  | SOURCEFORMAT; i = loc(ALPHANUM); EOL;       (* elementary_string_literal? *)
-    { Set_sourceformat i }
 
 (* --- >>SET ... | $ SET ... ------------------------------------------------ *)
 
 let set_directive :=
-  | ~ = set; EOL; < >
+  | ~ = nonempty_list(loc(set_directive_item)); PERIOD?; EOL; <>
 
-let set :=
-  | ~ = loc(set_operand); <Set>
+let set_directive_item :=
+  | ~ = set_operand; <Set_preproc>
+  | SOURCEFORMAT; ~ = string_value; <Set_source_format>
+
+let const_value :=
+  | ~ = loc(ALPHANUM);             <Alphanum>
+  | LPAR; ~ = loc(FIXEDLIT); RPAR; <Numeric>
+
+let string_value :=
+  | ~ = loc(ALPHANUM); <>
+  | LPAR; ~ = loc(TEXT_WORD); RPAR; <>
 
 let set_operand :=
-  | ADDRSV;         {Add_srv}
-  | ADDSYN;         {Add_syn}
-  | AREACHECK;      {Area_check true}
-  | ASSIGN;         {Assign}
-  | BOUND;          {Bound true}
-  | CALLFH;         {Call_FH}
-  | CHECKNUM;       {Check_num true}
-  | COMP1;          {Comp_1}
-  | CONSTANT;       {Constant}
-  | DPCINDATA;      {DPC_in_data true}
-  | FOLDCOPYNAME;   {Fold_copy_name true}
-  | MAKESYN;        {Make_syn}
-  | NESTCALL;       {Nest_call}
-  | NOAREACHECK;    {Area_check false}
-  | NOBOUND;        {Bound false}
-  | NOCHECKNUM;     {Check_num false}
-  | NODPC_IN_DATA;  {DPC_in_data false}
-  | NOFOLDCOPYNAME; {Fold_copy_name false}
-  | NOODOSLIDE;     {ODO_slide false}
-  | NOSPZERO;       {SP_zero false}
-  | NOSSRANGE;      {SS_range false}
-  | ODOSLIDE;       {ODO_slide true}
-  | REMOVE;         {Remove}
-  | SPZERO;         {SP_zero true}
-  | SSRANGE;        {SS_range true}
+  | ADDRSV;                                             {Add_srv}
+  | ADDSYN;                                             {Add_syn}
+  | ANS85;                                              {ANSI_85 true}
+  | AREACHECK;                                          {Area_check true}
+  | ASSIGN;                                             {Assign}
+  | BOUND;                                              {Bound true}
+  | CALLFH;                                             {Call_FH}
+  | CHECKNUM;                                           {Check_num true}
+  | COMP1;                                              {Comp_1}
+  | CONSTANT;       x = var; v = const_value;           {Constant (x, v)}
+  | CONSTANT; LPAR; x = var; v = const_value; RPAR;     {Constant (x, v)}
+  | DPCINDATA;                                          {DPC_in_data true}
+  | FOLDCOPYNAME;                                       {Fold_copy_name true}
+  | INTLEVEL; LPAR; l = loc(FIXEDLIT); RPAR;            {Int_level l}
+  | MAKESYN;                                            {Make_syn}
+  | NESTCALL;                                           {Nest_call}
+  | NOANS85;                                            {ANSI_85 false}
+  | NOAREACHECK;                                        {Area_check false}
+  | NOBOUND;                                            {Bound false}
+  | NOCHECKNUM;                                         {Check_num false}
+  | NODPC_IN_DATA;                                      {DPC_in_data false}
+  | NOFOLDCOPYNAME;                                     {Fold_copy_name false}
+  | NOODOSLIDE;                                         {ODO_slide false}
+  | NOSPZERO;                                           {SP_zero false}
+  | NOSSRANGE;                                          {SS_range false}
+  | NSYMBOL; v = string_value;                          {N_symbol v}
+  | ODOSLIDE;                                           {ODO_slide true}
+  | REMOVE;                                             {Remove}
+  | SEQUENTIAL; v = string_value;                       {Sequential v}
+  | SIGN; v = string_value;                             {Sign v}
+  | SPZERO;                                             {SP_zero true}
+  | SSRANGE;                                            {SS_range true}
 
 (* --- >>DEFINE ... | $ DEFINE ... ------------------------------------------- *)
 
@@ -201,6 +223,8 @@ let elif :=
 let boolexpr :=
   | var = var; IS?; neg_polarity = ibo(NOT); DEFINED;
     { Defined_condition { var; polarity = not neg_polarity } }
+  | var = var; IS?; neg_polarity = ibo(NOT); SET;
+    { Set_condition { var; polarity = not neg_polarity } }
   | neg_polarity = ibo(NOT); var = var;
     { Value_condition { var; polarity = not neg_polarity } }
   | var = var; IS?; neg_polarity = ibo(NOT); o = condition_operator; r = term;
@@ -242,37 +266,6 @@ let literal :=
 
 _unused_symbols:
   | INVALID_
-  | ADDRSV
-  | ADDSYN
-  | AREACHECK
-  | ASSIGN
-  | BOUND
-  | CALLFH
-  | CHECKNUM
-  | COMP1
-  | CONSTANT
-  | DPCINDATA
-  | EQUAL
-  | FOLDCOPYNAME
-  | GREATER
-  | LESS
-  | MAKESYN
-  | NOAREACHECK
-  | NOBOUND
-  | NOCHECKNUM
-  | NODPC_IN_DATA
-  | NOFOLDCOPYNAME
-  | NOODOSLIDE
-  | NOSPZERO
-  | NOSSRANGE
-  | ODOSLIDE
-  | OR
-  | REMOVE
-  | SET
-  | SPZERO
-  | SSRANGE
-  | THAN
-  | TO
 { () }
 
 %%

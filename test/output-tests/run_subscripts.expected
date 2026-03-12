@@ -11,49 +11,49 @@ Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:342:0
 Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:374:0
 Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:422:0
 Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:493:0
-run_subscripts.at-493-prog.cob:2.6-2.16:
+run_subscripts.at-493-prog.cob:2.11-2.16:
    1   
    2 >       $SET BOUND
-----         ^^^^^^^^^^
+----              ^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. prog.
 >> Warning: Ignored compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:494:0
-run_subscripts.at-494-progn.cob:2.6-2.18:
+run_subscripts.at-494-progn.cob:2.11-2.18:
    1   
    2 >       $SET NOBOUND
-----         ^^^^^^^^^^^^
+----              ^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. progn.
 >> Warning: Ignored compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:495:0
-run_subscripts.at-495-progn2.cob:2.6-2.19:
+run_subscripts.at-495-progn2.cob:2.11-2.19:
    1   
    2 >       $SET NO-BOUND
-----         ^^^^^^^^^^^^^
+----              ^^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. progn2.
 >> Warning: Ignored compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:532:0
-run_subscripts.at-532-prog.cob:13.6-13.20:
+run_subscripts.at-532-prog.cob:13.11-13.20:
   10          01  idx         PIC 99 VALUE 6.
   11   
   12          PROCEDURE DIVISION.
   13 >       $SET NOSSRANGE
-----         ^^^^^^^^^^^^^^
+----              ^^^^^^^^^
   14              DISPLAY y (idx)
   15         *> Note: MF says "sets BOUND"
 >> Warning: Ignored compiler directive
 
-run_subscripts.at-532-prog.cob:16.6-16.18:
+run_subscripts.at-532-prog.cob:16.11-16.18:
   13         $SET NOSSRANGE
   14              DISPLAY y (idx)
   15         *> Note: MF says "sets BOUND"
   16 >       $SET SSRANGE
-----         ^^^^^^^^^^^^
+----              ^^^^^^^
   17              DISPLAY y (idx)
   18              .
 >> Warning: Ignored compiler directive

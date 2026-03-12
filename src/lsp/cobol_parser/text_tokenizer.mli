@@ -19,7 +19,7 @@ open EzCompat
 
 (** Tokens passed to {!Parser}; can be obtained via {!tokenize_text}. *)
 type token = Grammar_tokens.token Cobol_ptree.with_loc
-type tokens = token list
+type tokens
 
 (* --- *)
 
@@ -59,7 +59,7 @@ val diagnostics
 
 val parsed_tokens
   : Cobol_common.Behaviors.eidetic state
-  -> tokens Lazy.t
+  -> token list Lazy.t
 
 val tokenize_text
   : source_format: Cobol_preproc.Src_format.any

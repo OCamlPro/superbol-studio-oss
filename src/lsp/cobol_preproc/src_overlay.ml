@@ -166,10 +166,12 @@ let join_limits: manager -> limit * limit -> srcloc = fun ctx (s, e) ->
     else try_cache_from s
   in
   let join_failure (s, e) =
-    Pretty.error "@[<2>%a:@ Internal@ warning:@ unable@ to@ join@ locations@ \
+    Pretty.error "@[<2>%a:%a:@ Internal@ warning:@ unable@ to@ join@ locations@ \
                   via@ limits@ in@ `%s.join_limits`@ [ctx=%s]@]@."
-      Cobol_common.Srcloc.pp_lexpos s __MODULE__ ctx.id;
-    (* Printexc.(print_raw_backtrace Stdlib.stderr @@ get_callstack 10); *)
+      Cobol_common.Srcloc.pp_lexpos s
+      Cobol_common.Srcloc.pp_lexpos e
+      __MODULE__ ctx.id;
+    (* Printexc.(print_raw_backtrace Stdlib.stderr @@ get_callstack 30); *)
     Cobol_common.Srcloc.raw (e, e)
   in
   try   (* first attempt assumes proper token limits: `s` is a left and `e` is a

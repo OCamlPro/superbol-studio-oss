@@ -203,12 +203,13 @@ type data_occurs_clause =
   | OccursFixed of
       {
         times: integer with_loc;
+        count_in: qualname with_loc option;
         key_is: sort_spec list;
         indexed_by: name with_loc list;
       }
   | OccursDepending of
       {
-        from: integer with_loc;
+        from: integer with_loc option;
         to_: integer with_loc;
         depending: qualname with_loc;
         key_is: sort_spec list;
@@ -252,14 +253,16 @@ let pp_indexed_by_opt ppf = function
 let pp_integer' = pp_with_loc pp_integer
 
 let pp_data_occurs_clause ppf = function
-  | OccursFixed { times; key_is; indexed_by } ->
-    Fmt.pf ppf "OCCURS %a%a%a"
+  | OccursFixed { times; count_in; key_is; indexed_by } ->
+    Fmt.pf ppf "OCCURS %a%a%a%a"
       pp_integer' times
+      Fmt.(option (any " COUNT IN " ++ pp_qualname')) count_in
       Fmt.(list ~sep:nop (sp ++ pp_sort_spec)) key_is
       pp_indexed_by_opt indexed_by
   | OccursDepending { from; to_; depending; key_is; indexed_by } ->
-    Fmt.pf ppf "OCCURS %a TO %a %a %a%a"
-      pp_integer' from pp_integer' to_
+    Fmt.pf ppf "OCCURS %a%a %a%a%a"
+      Fmt.(option (pp_integer' ++ any " TO ")) from
+      pp_integer' to_
       pp_depending_phrase depending
       Fmt.(list ~sep:nop (sp ++ pp_sort_spec)) key_is
       pp_indexed_by_opt indexed_by

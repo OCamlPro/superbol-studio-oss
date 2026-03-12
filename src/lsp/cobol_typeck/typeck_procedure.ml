@@ -154,24 +154,19 @@ let procedure_of_compilation_unit cu' =
 
 (* --- *)
 
-let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure =
+let references
+    ~(data_definitions: Cobol_unit.Types.data_definitions)
+    ~(fold_exec_block': Typeck_outputs.fold_exec_block') procedure =
 
-  let open struct
-    (* TODO: add a context, and gather references to procedures, etc. *)
-    type acc =
-      {
-        current_section: Cobol_unit.Types.procedure_section option;
-        refs: Typeck_outputs.references_in_unit;
-        diags: Typeck_diagnostics.t;
-      }
-    let init =
-      {
-        current_section = None;
-        refs = Typeck_outputs.no_refs;
-        diags = Typeck_diagnostics.none;
-      }
-    let references { refs; diags; _ } = refs, diags
-  end in
+  let open Typeck_outputs in (* for references_acc *)
+  let init =
+    {
+      current_section = None;
+      refs = Typeck_outputs.no_refs;
+      diags = Typeck_diagnostics.none;
+    } in
+  let references { refs; diags; _ } = refs, diags
+  in
 
   let baseloc_of_qualname: Cobol_ptree.qualname -> srcloc = function
     | Name name
@@ -181,36 +176,51 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
   let error acc err =
     { acc with diags = Proc_error err :: acc.diags }
   in
+  let register_name name acc =
+    let qn = Cobol_ptree.Name name in
+    let loc = name.loc in
+    begin try
+        let bnd = Qualmap.find_binding qn data_definitions.data_items.named in
+        { acc with
+          refs = Typeck_outputs.register_data_qualref
+              ~loc bnd.full_qn acc.refs }
+      with
+      | Not_found ->
+        acc  (* ignored for now, as we don't process all the DATA DIV. yet. *)
+      | Qualmap.Ambiguous (lazy matching_qualnames) ->
+        error acc @@ Ambiguous_data_name { given_qualname = qn &@ loc;
+                                           matching_qualnames }
+    end in
 
   let visitor = object (v)
-    inherit [acc] Cobol_unit.Visitor.folder
+    inherit [references_acc] Cobol_unit.Visitor.folder
 
     method! fold_qualname qn acc =                (* TODO: data_name' instead *)
       let loc = baseloc_of_qualname qn in
       Visitor.do_children @@
-      (* match Qualmap.find qn data_definitions.data_items.named with *)
-      (* | Data_field { def; _ } -> *)
-      (*     { acc with *)
-      (*       refs = Typeck_outputs.register_data_field_ref ~loc def acc.refs } *)
-      (* | Data_renaming { def; _ } -> *)
-      (*     { acc with *)
-      (*       refs = Typeck_outputs.register_data_renaming_ref ~loc def acc.refs } *)
-      (* | Data_condition { def; _ } -> *)
-      (*     { acc with *)
-      (*       refs = Typeck_outputs.register_condition_name_ref ~loc def acc.refs } *)
-      (* | Table_index { qualname = qn; _ } -> *)
-      (*     { acc with *)
-      (*       refs = Typeck_outputs.register_data_qualref ~loc ~&qn acc.refs } *)
+      (* match Qualmap.find qn data_definitions.data_items.named with
+         | Data_field { def; _ } ->
+             { acc with
+               refs = Typeck_outputs.register_data_field_ref ~loc def acc.refs }
+         | Data_renaming { def; _ } ->
+             { acc with
+               refs = Typeck_outputs.register_data_renaming_ref ~loc def acc.refs }
+         | Data_condition { def; _ } ->
+             { acc with
+               refs = Typeck_outputs.register_condition_name_ref ~loc def acc.refs }
+         | Table_index { qualname = qn; _ } ->
+             { acc with
+               refs = Typeck_outputs.register_data_qualref ~loc ~&qn acc.refs } *)
       try
         let bnd = Qualmap.find_binding qn data_definitions.data_items.named in
         { acc with
           refs = Typeck_outputs.register_data_qualref ~loc bnd.full_qn acc.refs }
       with
       | Not_found ->
-          acc  (* ignored for now, as we don't process all the DATA DIV. yet. *)
+        acc  (* ignored for now, as we don't process all the DATA DIV. yet. *)
       | Qualmap.Ambiguous (lazy matching_qualnames) ->
-          error acc @@ Ambiguous_data_name { given_qualname = qn &@ loc;
-                                             matching_qualnames }
+        error acc @@ Ambiguous_data_name { given_qualname = qn &@ loc;
+                                           matching_qualnames }
 
     method! fold_procedure_section ({ section_paragraphs; _ } as s)
         ({ current_section; _ } as acc) =
@@ -250,38 +260,7 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
       Visitor.skip_children acc
 
     method! fold_exec_block' exec_block acc =
-      let register_name name acc =
-        let qn = Cobol_ptree.Name name in
-        let loc = name.loc in
-        begin try
-            let bnd = Qualmap.find_binding qn data_definitions.data_items.named in
-            { acc with
-              refs = Typeck_outputs.register_data_qualref
-                  ~loc bnd.full_qn acc.refs }
-          with
-          | Not_found ->
-            acc  (* ignored for now, as we don't process all the DATA DIV. yet. *)
-          | Qualmap.Ambiguous (lazy matching_qualnames) ->
-            error acc @@ Ambiguous_data_name { given_qualname = qn &@ loc;
-                                               matching_qualnames }
-        end in
-      let acc = match exec_block.payload with
-        | Superbol_preprocs.Generic.Generic_exec_block _ ->
-            acc
-        | Superbol_preprocs.Esql.Esql_exec_block esql ->
-          let cob_var_extractor_folder = object
-            inherit [Sql_ast.cobolVarId list] Sql_ast.Visitor.folder
-            method! fold_cobol_var_id cob_var acc =
-              Cobol_common.Visitor.skip (cob_var::acc)
-          end in
-          let cobol_vars =
-            Sql_ast.Visitor.fold_esql_instruction cob_var_extractor_folder
-              esql []
-          in
-          List.fold_left begin fun acc cobol_var_id ->
-              register_name cobol_var_id acc
-          end acc cobol_vars
-        | _ -> acc
+      let acc = fold_exec_block' ~register_name exec_block acc
       in
       Visitor.skip_children acc
 
@@ -291,9 +270,9 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
 
 (* --- *)
 
-let of_compilation_unit ~data_definitions cu' =
+let of_compilation_unit ~data_definitions ~fold_exec_block' cu' =
   let procedure = procedure_of_compilation_unit cu' in
-  let references, diags = references ~data_definitions procedure in
+  let references, diags = references ~data_definitions ~fold_exec_block' procedure in
   {
     procedure;
     references;

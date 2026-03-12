@@ -59,7 +59,7 @@ let result ptree acc =
     }
     acc.diags
 
-let build_units _config = object
+let build_units ~fold_exec_block' _config = object
   inherit [acc] Cobol_ptree.Visitor.folder
 
   method! fold_compilation_unit' cu ({ parent_name; parent_config; _ } as acc) =
@@ -72,7 +72,9 @@ let build_units _config = object
 
     let unit_procedure, unit_procedure_diags
       = Typeck_procedure.of_compilation_unit cu
-        ~data_definitions:unit_data.definitions in
+        ~data_definitions:unit_data.definitions
+        ~fold_exec_block'
+    in
 
     let unit =
       {
@@ -121,9 +123,11 @@ end
 (** This function builds the internal representation of full compilation
     groups. *)
 let of_compilation_group
-  : Cobol_config.t -> Cobol_ptree.compilation_group ->
+  : Cobol_config.t ->
+    fold_exec_block':Typeck_outputs.fold_exec_block' ->
+    Cobol_ptree.compilation_group ->
     Typeck_outputs.t Typeck_results.with_diags =
-  fun config compilation_group_ptree ->
+  fun config ~fold_exec_block' compilation_group_ptree ->
   Cobol_ptree.Visitor.fold_compilation_group
-    (build_units config) compilation_group_ptree init |>
+    (build_units ~fold_exec_block' config) compilation_group_ptree init |>
   result compilation_group_ptree

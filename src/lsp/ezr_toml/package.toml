@@ -46,7 +46,7 @@ gen-version = "version.ml"
 # preprocess = "pps ppx_deriving.show"
 
 # files to skip while updating at package level
-skip = ["index.mld"]
+skip = ["index.mld", "main.ml"]
 
 # package library dependencies
 #   [dependencies]

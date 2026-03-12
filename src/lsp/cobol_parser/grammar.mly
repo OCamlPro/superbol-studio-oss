@@ -263,6 +263,7 @@ let any_permut4_nullable [@recovery (None, None, None, None, (A4, (A3, AB)))]
 (* --------------------- COMPILATION GROUPS AND UNITS ---------------------- *)
 
 let compilation_group :=
+  | ~=simple_program; EOF; < >
   | control_division = option(loc(control_division));
     ul = ll(loc(compilation_unit));
     pdo = loc(program_definition_no_end)?; EOF;
@@ -271,6 +272,16 @@ let compilation_group :=
           match pdo with
             | None -> ul
             | Some pd -> ul @ [((Program ~&pd): compilation_unit) &@<- pd] } }
+
+let simple_program := 
+  | opo = ro(loc(options_paragraph));
+    edo = ro(loc(environment_division));
+    ddo = ro(loc(non_empty_data_division));
+    pd = loc(program_procedure_division);
+    { { control_division = None;
+        compilation_units =
+          [ with_loc (build_simple_program opo edo ddo pd ~pos:$symbolstartpos) $sloc ];
+      } }
 
 (* --- CONTROL DIVISION --- *)
 
@@ -650,12 +661,27 @@ let environment_division :=
 (* ------------- ENVIRONMENT DIVISION / CONFIGURATION SECTION -------------- *)
 
 let configuration_section :=
- | CONFIGURATION; SECTION; ".";
+  | CONFIGURATION; SECTION; ".";
    permuted = any_permut4_nullable(
                           loc(source_computer_paragraph),
                           loc(object_computer_paragraph),
                           loc(special_names_paragraph),
                           loc(repository_paragraph));
+  { let (source_computer_paragraph,
+         object_computer_paragraph,
+         special_names_paragraph,
+         repository_paragraph,
+         conf_sec_order) = permuted in
+    { source_computer_paragraph;
+      object_computer_paragraph;
+      special_names_paragraph;
+      repository_paragraph;
+      conf_sec_order } }
+  | permuted = any_permut4(
+      loc(source_computer_paragraph),
+      loc(object_computer_paragraph),
+      loc(special_names_paragraph),
+      loc(repository_paragraph));
   { let (source_computer_paragraph,
          object_computer_paragraph,
          special_names_paragraph,
@@ -910,8 +936,13 @@ let file_control_paragraph :=
  | FILE_CONTROL; "." ; ~ = rl(select); < > (* COB85: non-empty list *)
  | ~ = rnel(select); < >
 
+let flag_optional ==
+ |                 { false }
+ | OPTIONAL;       { true }
+ | NOT; OPTIONAL;  { false }
+
 let select :=
- | SELECT; o = bo(OPTIONAL); i = name;
+ | SELECT; o = flag_optional; i = name;
    fcl = rnel(loc(select_clause)); ".";
    { { select_optional = o;
        select_name = i;
@@ -933,14 +964,34 @@ let select_clause :=                  (* Note: some can be used multiple times *
   | ~ = sharing_clause;              < >                    (* +COB2002 *)
 
 let assign_clause :=                                 (* USING added in COB2002 *)
-  | ASSIGN; TO?; _assign_external_?;
+  | ASSIGN; TO?; ed = external_dynamic?; fd = assign_file_or_device?;
     il = rnel(name_or_alphanum); io = ro(pf(USING,name));
-    { SelectAssign { to_ = il; using = io } }
+    { SelectAssign { to_ = { type_ = ed; file_device = fd; target = il }; using = io } }
   | ASSIGN; USING; i = name;
-    { SelectAssign { to_ = []; using = Some i; } }
+    { SelectAssign { to_ = { type_ = None; file_device = None; target = [] }; using = Some i; } }
 
-let _assign_external_ [@post.pending fun () -> "EXTERNAL"] :=
-  | EXTERNAL
+let external_dynamic :=
+  | EXTERNAL; { External }
+  | DYNAMIC;  { Dynamic }
+
+let assign_file_or_device :=
+  | af = assign_file;
+    { File af }
+  | ad = assign_device;
+    { Device ad }
+  | DISK; FROM; n = name;
+    { DiskFrom n }
+
+let assign_file :=
+  | LINE; ADVANCING; FILE?;          { LineAdvancing }
+  | MULTIPLE; or_(REEL,UNIT); FILE?; { MultipleUnitReel }
+
+let assign_device :=
+  | DISK;      { Disk }
+  | KEYBOARD;  { Keyboard }
+  | DISPLAY;   { Display }
+  | PRINTER_1; { Printer_1 }
+  | PRINTER_2; { Printer_2 }
 
 let access_mode_clause :=
   | ACCESS; MODE?; IS?; ~ = access_mode; <SelectAccessMode>
@@ -987,15 +1038,16 @@ let with_lock_clause [@recovery WithLockNone] :=
 let lock_mode :=
  | MANUAL;    {LockManual}
  | AUTOMATIC; {LockAutomatic}
+ | EXCLUSIVE; {LockExclusive}
 
 let organization_clause :=
  | io(ORGANIZATION; IS?; {}); ~ = organization; <SelectOrganization>
 
 let organization :=
- | INDEXED;          {OrganizationIndexed}
- | RELATIVE;         {OrganizationRelative}
- | SEQUENTIAL;       {OrganizationSequential}
- | LINE; SEQUENTIAL; {OrganizationLineSequential}      (* LINE for microfocus *)
+ | INDEXED;                       {OrganizationIndexed}
+ | RELATIVE;                      {OrganizationRelative}
+ | or_(RECORD, BINARY)?; SEQUENTIAL;  {OrganizationSequential}
+ | LINE; SEQUENTIAL;              {OrganizationLineSequential}     (* LINE for microfocus *)
 
 let padding_character_clause :=                                    (* -COB2002 *)
  | PADDING; CHARACTER?; IS?; ~ = qualname_or_alphanum;
@@ -1118,6 +1170,11 @@ type declaration entry =
 *)
 
 *)
+
+let non_empty_data_division :=
+  | l1 = rnel(data_division_sentence_1);
+    l2 = rll_rev(data_division_sentence_2);
+    { List.rev_append l1 l2 }
 
 let data_division :=
   | l1 = rl(data_division_sentence_1);
@@ -1266,6 +1323,7 @@ let file_descr_clause :=
 
 let sort_merge_file_descr_clause :=
  | ~ = record_clause; <FileSDRecord>
+ | ~ = label_clause;  <FileSDLabel>
  | ~ = data_clause;   <FileSDData>                                (* -COB2002 *)
  |     global_clause; {FileSDGlobal}
 
@@ -1630,21 +1688,44 @@ let data_occurs_clause :=
   | ~ = occurs_depending_clause; < >
   | ~ = occurs_dynamic_clause;   < >
 
+let count_in_phrase := COUNT; IN?; ~ = loc(reference); < >
+
+let occurs_key_indexed [@recovery ([], [])] [@symbol ""] :=
+  | k = key_is; kl = rl(key_is); ib = lo(indexed_by);
+    { (k :: kl, ib) }
+  | ib = indexed_by; kl = rl(key_is);
+    { (kl, ib) }
+  | (* empty *)
+    { ([], []) }
+
 let occurs_fixed_clause [@context occurs_clause] :=
-  | OCCURS; i = loc(integer); TIMES?; kl = rl(key_is); ib = lo(indexed_by);
-    { OccursFixed { times = i; key_is = kl; indexed_by = ib; } }
+  | OCCURS; i = loc(integer); TIMES?; ki = occurs_key_indexed;
+    { let kl, ib = ki in
+      OccursFixed { times = i; count_in = None;
+                    key_is = kl; indexed_by = ib; } }
+  | OCCURS; _from = loc(integer); TO; to_ = loc(integer); TIMES?;
+    co = count_in_phrase;
+    { OccursFixed { times = to_; count_in = Some co;
+                    key_is = []; indexed_by = []; } }
 
 let occurs_depending_clause [@context occurs_clause] :=
-  | OCCURS; i1 = loc(integer); TO; i2 = loc(integer); TIMES?;
-    d = depending_phrase; kl = rl(key_is); il = lo(indexed_by);
-    { OccursDepending { from = i1; to_ = i2; depending = d;
+  | OCCURS; from = loc(integer); TO; to_ = loc(integer); TIMES?;
+    d = depending_phrase; ki = occurs_key_indexed;
+    { let kl, il = ki in
+      OccursDepending { from = Some from; to_; depending = d;
+                        key_is = kl; indexed_by = il; } }
+  | OCCURS; i = loc(integer); TIMES?;
+    d = depending_phrase; ki = occurs_key_indexed;
+    { let kl, il = ki in
+      OccursDepending { from = None; to_ = i; depending = d;
                         key_is = kl; indexed_by = il; } }
 
 let occurs_dynamic_clause [@context occurs_clause] :=
   | OCCURS; DYNAMIC; co = ro(capacity_phrase);
     i1o = ro(pf(FROM,loc(integer))); i2o = ro(pf(TO,loc(integer)));
-    i = loc(bo(INITIALIZED)); kl = rl(key_is); il = lo(indexed_by);
-    { OccursDynamic { capacity_in = co; from = i1o; to_ = i2o;
+    i = loc(bo(INITIALIZED)); ki = occurs_key_indexed;
+    { let kl, il = ki in
+      OccursDynamic { capacity_in = co; from = i1o; to_ = i2o;
                       initialized = i; key_is = kl; indexed_by = il; } }
 
 let capacity_phrase := CAPACITY; IN?; ~ = name; < >
@@ -2003,7 +2084,7 @@ let procedure_division_header [@post.procedure_division_header] :=
 let procedure_division [@post.procedure_division] :=
  | procedure_division_header;
    procedure_args = ro(procedure_args);
-   ro = ro(returning);                                            (* +COB2002 *)
+   ro = ro(returning_ident);                                            (* +COB2002 *)
    rl = ilo(raising_phrase); ".";                                 (* +COB2002 *)
    dl = lo(declaratives);
    sl = rl(loc(section_paragraph));
@@ -2016,7 +2097,7 @@ let procedure_division [@post.procedure_division] :=
 let program_procedure_division [@post.procedure_division] :=
  | procedure_division_header;
    procedure_args = ro(procedure_args);
-   ro = ro(returning);                                            (* +COB2002 *)
+   ro = ro(returning_ident);                                            (* +COB2002 *)
    rl = ilo(raising_phrase); ".";                                 (* +COB2002 *)
    dl = lo(declaratives);
    sl = section_paragraphs;
@@ -2134,6 +2215,9 @@ let imp_stmts [@recovery []] [@symbol ""] :=
    { List.filter_map Result.to_option stmts }
 (* prec annotation needed to solve a conflict involving IF and WRITE *)
 
+let imp_stmts_opt [@default []] :=
+  | /* epsilon */ %prec lowest { []  }
+  | isl = imp_stmts;           { isl }
 
 let oterm_(X) == er(X | {} %prec no_term)              (* optional terminators *)
 
@@ -2382,8 +2466,8 @@ let scalar_ident [@symbol "<scalar identifier>"] [@recovery_with_pos dummy_ident
   | i = scalar_ident_; %prec below_RPAR { i }
   | i = scalar_ident_; r = refmod;      { ScalarRefMod (i, r) }
 
-(* let scalar_idents [@symbol "<scalar identifiers>"] [@recovery []] := *)
-(*   | ~ = rnel(scalar_ident); < > *)
+(* let scalar_idents [@symbol "<scalar identifiers>"] [@recovery []] :=
+  | ~ = rnel(scalar_ident); < > *)
 
 let length_of_expr :=
   | LENGTH; OF?; ~ = ident_or_literal; <LengthOf>
@@ -2451,14 +2535,12 @@ literal_no_all:
 
 
 
-
 let numeric_literal [@symbol "<numeric literal>"] :=
  | i = integer;  { Integer i : numlit }
  | f = fixedlit; { Fixed f }
  | f = floatlit; { Floating f }
  | ZERO;         { NumFig Zero }
 (* Note: numeric literals do NOT allow figurative constants with ALL *)
-
 
 
 
@@ -2526,18 +2608,17 @@ let qualname_or_literal :=
  | n = qualname; { UPCAST.qualname_with_literal n }
  | l = literal;  { UPCAST.literal_with_qualdatname l }
 
-(* Used in ADD, DIVIDE, MULTIPLY, PERFORM, SUBTRACT *)
-
-let ident_or_numeric :=
- | i = ident;           { UPCAST.ident_with_numeric i }
- | l = numeric_literal; { UPCAST.numeric_with_ident l }
-let idents_or_numerics == ~ = rnel(ident_or_numeric); < >
-
 let x == scalar                                       (* alias, as in GnuCOBOL *)
 let scalar :=
- | i = scalar_ident;    { UPCAST.scalar_ident_as_scalar i }
- | l = numeric_literal; { UPCAST.numeric_as_scalar l }
- | l = length_of_expr;  { l }
+ | i = scalar_ident;       { UPCAST.scalar_ident_as_scalar i }
+ | l = numeric_literal;    { UPCAST.numeric_as_scalar l }
+ | l = length_of_expr;     { l }
+
+(* Used in MOVE *)
+let scalar_or_nonnumeric :=
+ | i = scalar_ident;       { UPCAST.scalar_ident_as_scalar i }
+ | l = literal;            { UPCAST.literal_as_scalar l }
+ | l = length_of_expr;     { l }
 
 (* Used in CALL *)
 let name_or_string :=
@@ -2690,6 +2771,7 @@ let arithmetic_term :=                                            (* `arith_x` *
  | b = BOOLIT;               { Atom (Boolean b) } (* boolean *)
  | f = figurative_constant;  { Atom (Fig f) } (* numeric or boolean (NB: or strlits) *)
  | a = alphanum;             { Atom (Alphanum a) } (* NB: quick relaxation for now *)
+ | n = NATLIT;               { Atom (National n) }
  | l = length_of_expression; { Atom l }
 
 let arithmetic_term_no_all :=
@@ -2699,6 +2781,7 @@ let arithmetic_term_no_all :=
  | f = floatlit; { Atom (Floating f) }
  | b = BOOLIT;   { Atom (Boolean b) } (* boolean *)
  | a = alphanum; { Atom (Alphanum a) }         (* NB: quick relaxation for now *)
+ | n = NATLIT;   { Atom (National n) }
  | f = figurative_constant_no_all; { Atom (Fig f) } (* numeric or boolean (NB: or strlits) *)
  | l = length_of_expression; { Atom l }
 
@@ -2710,6 +2793,7 @@ let arithmetic_term_no_length :=
  | b = BOOLIT;               { Atom (Boolean b) }
  | f = figurative_constant;  { Atom (Fig f) }
  | a = alphanum;             { Atom (Alphanum a) }
+ | n = NATLIT;               { Atom (National n) }
 
 let length_of_expression ==
   | ~ = length_of_expr; < >
@@ -2723,34 +2807,51 @@ condition:
 
 complex_condition:
  | nonrel_condition { $1 }
- | flat_relation_condition %prec lowest { $1 }
+ | relation_condition %prec lowest { $1 }
  | complex_condition logop complex_condition { Logop ($1, $2, $3) }
 
 %inline logop:
  | AND           { LAnd }
  | OR            { LOr }
 
-%inline flat_relation_condition:
- | neg = ibo(NOT) c = relation_condition
-   suff = io (pair (logop, flat_combination_operand))
-   { relation_condition ~neg c suff }
+%inline any_lpar:
+ | LPAR              {}
+ | LPAR_BEFORE_RELOP {}
+
+%inline relation_condition:
+ | neg = ibo(NOT) e = expression pred = abbrev_relop_operand { relation_condition (neg, e, pred) }
 
 nonrel_condition:
  | n = ibo(NOT)     e = expression %prec lowest { neg_simple_cond ~neg:n @@ Expr e }
  | n = ibo(NOT)     c = extended_condition      { neg_condition ~neg:n c }
  | n = ibo(NOT) "(" c  = complex_condition ")"  { neg_condition ~neg:n c }
 
-flat_combination_operand:
- | r = io(relop)    e = expression             { FlatAmbiguous (r, e) }
- |         NOT      e = expression             { FlatNotExpr e }
- | n = ibo(NOT)     c = relation_condition     { FlatRel (n, c) }
- | n = ibo(NOT)     c = extended_condition     { FlatOther (neg_condition ~neg:n c) }
- | n = ibo(NOT) "(" c =  complex_condition ")" { FlatOther (neg_condition ~neg:n c) }
- | flat_combination_operand logop flat_combination_operand
-                                               { FlatComb ($1, $2, $3) }
+abbrev_relop_atom:
+ | r = relop             e = abbrev_object_atom          { AbbrevRelOp (r, e) }
+ |     LPAR_BEFORE_RELOP c = abbrev_relop_operand RPAR   { c }
+ | NOT LPAR_BEFORE_RELOP c = abbrev_relop_operand RPAR   { AbbrevNot c }
 
-relation_condition:
- | expression relop expression { $1, $2, $3 }
+abbrev_relop_operand:
+ | abbrev_relop_atom { $1 }
+ | abbrev_relop_operand logop abbrev_relation_operand    { AbbrevComb ($1, $2, $3) }
+
+abbrev_object_atom:
+ | n = ibo(NOT)     e = expression          %prec lowest { AbbrevObject (n, e) }
+ |      "(" c = abbrev_object_operand ")"                { c }
+ | NOT  "(" c = abbrev_object_operand ")"                { AbbrevNot c }
+
+abbrev_object_operand:
+ | abbrev_object_atom { $1 }
+ | abbrev_object_operand logop abbrev_relation_operand   { AbbrevComb ($1, $2, $3) }
+
+abbrev_relation_operand:
+ | r = relop    e = abbrev_object_atom                   { AbbrevRelOp (r, e) }
+ | n = ibo(NOT) e = expression              %prec lowest { AbbrevObject (n, e) }
+ | n = ibo(NOT) e = expression a = abbrev_relop_atom     { AbbrevSubject (n, e, a) }
+ | n = ibo(NOT) c = extended_condition                   { AbbrevOther (neg_condition ~neg:n c) }
+ |     any_lpar c = abbrev_relation_operand RPAR         { c }
+ | NOT any_lpar c = abbrev_relation_operand RPAR         { AbbrevNot c }
+ | abbrev_relation_operand logop abbrev_relation_operand { AbbrevComb ($1, $2, $3) }
 
 extended_condition:
  | e = expression io(IS) n = bo(NOT) c = class_condition
@@ -2861,7 +2962,7 @@ let rounding_mode :=
 
 (* ALLOCATE, CALL, INVOKE, Procedure division header *)
 
-let returning := RETURNING; ~ = loc(ident); < >
+let returning_ident := RETURNING; ~ = loc(ident); < >
 
 
 
@@ -3077,12 +3178,12 @@ let accept_with_clause [@recovery AcceptAttribute Highlight] [@symbol "<accept-w
 
 %public let unconditional_action := ~ = add_statement; < >
 add_statement:
- | ADD inl = idents_or_numerics TO irl = rounded_idents
+ | ADD inl = rnel(x) TO irl = rounded_idents
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR) end_add
    { Add { basic_arith_operands =
              ArithSimple { sources = inl; targets = irl };
            basic_arith_on_size_error = h } }
- | ADD inl = idents_or_numerics TO in_ = ident_or_numeric
+ | ADD inl = rnel(x) TO in_ = x
    GIVING irl = rounded_idents
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR) end_add
    { Add { basic_arith_operands =
@@ -3090,7 +3191,7 @@ add_statement:
                            to_or_from_item = in_;
                            targets = irl };
            basic_arith_on_size_error = h } }
- | ADD inl = idents_or_numerics (* Same as above without 'TO' *)
+ | ADD inl = rnel(x) (* Same as above without 'TO' *)
    GIVING irl = rounded_idents
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR) end_add
    { let in_, inl = split_last inl in
@@ -3112,11 +3213,11 @@ let end_add := oterm_(END_ADD)
 
 %public let unconditional_action := ~ = allocate_statement; < >
 let allocate_statement [@context allocate_stmt] :=
- | ALLOCATE; e = expression; CHARACTERS; ib = bo(INITIALIZED); r = returning;
+ | ALLOCATE; e = expression; CHARACTERS; ib = bo(INITIALIZED); r = returning_ident;
    { Allocate { allocate_kind = AllocateCharacters e;
                 allocate_initialized = ib;
                 allocate_returning = Some r } }
- | ALLOCATE; i = name; ib = bo(INITIALIZED); ro = ro(returning);
+ | ALLOCATE; i = name; ib = bo(INITIALIZED); ro = ro(returning_ident);
    { Allocate { allocate_kind = AllocateDataItem i;
                 allocate_initialized = ib;
                 allocate_returning = ro } }
@@ -3159,7 +3260,7 @@ let ident_or_nested :=
   | NESTED;    {CallProtoNested}
 
 let returning_or_giving :=
-  | ~ = returning; < >
+  | ~ = returning_ident; < >
   | GIVING; ~ = loc(ident); < > (* MF equivalent for RETURNING *)
 
 
@@ -3190,7 +3291,7 @@ let close_format :=
 
 %public let unconditional_action := ~ = compute_statement; < >
 let compute_statement :=
-  | COMPUTE; irl = rounded_idents; "="; e = expression;
+  | COMPUTE; irl = rounded_idents; or_(EQUAL, "="); e = expression;
     h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR);
     oterm_(END_COMPUTE);
     { Compute { compute_targets = irl; compute_expr = e;
@@ -3265,6 +3366,8 @@ let display_device_mnemonic :=
  | ENVIRONMENT_VALUE; {DisplayDeviceEnvValue}
  | ARGUMENT_NUMBER;   {DisplayDeviceArgNumber}
  | COMMAND_LINE;      {DisplayDeviceCommandLine}
+ | PRINTER;           {DisplayDevicePrinter}
+ | TERMINAL;          {DisplayDeviceTerminal}
 
 let display_with_clause [@recovery DisplayAttribute Highlight] [@symbol "<display-with-clause>"] := (* MF *)
   | ~ = screen_attribute_clause; <DisplayAttribute>
@@ -3419,12 +3522,28 @@ let when_other [@default []] :=
 
 (* EXIT STATEMENT *)
 
+let returning :=
+ | ~ = scalar;
+    <ReturningScalar>
+ | or_(GIVING, RETURNING); ~ = scalar;
+    <ReturningScalar>
+ | or_(GIVING, RETURNING); ADDRESS; OF?; ~ = qualident;
+    <ReturningAddress>
+ | or_(GIVING, RETURNING); v = integer; s = pf(SIZE; IS, integer);
+    { ReturningInt { value = Integer v;
+                     size = Some (Integer s) } }
+
+let program_exit_status [@default ExitDefault] :=
+ | { ExitDefault }
+ | ~ = returning; <ExitReturning>
+ | ~ = raising_exception; <ExitRaising>
+
 %public let unconditional_action := ~ = exit_statement; < >
 let exit_statement [@context exit_stmt] :=
  | EXIT; ~ = exit_spec; <Exit>
 let exit_spec [@recovery ExitSimple] :=
  | %prec lowest                          { ExitSimple }
- | PROGRAM; ro = ro(raising_exception);  { ExitProgram ro }
+ | PROGRAM; s = program_exit_status;     { ExitProgram s }
  | METHOD; ro = ro(raising_exception);   { ExitMethod ro }        (* COB2002+ *)
  | FUNCTION; ro = ro(raising_exception); { ExitFunction ro }      (* COB2002+ *)
  | PERFORM; c = bo(CYCLE);               { ExitPerform c }        (* COB2002+ *)
@@ -3487,10 +3606,9 @@ let if_statement :=
      If {condition = c; then_branch = sn; else_branch = sno} }
 (* COB2002: END IF mandatory on ELSE, NEXT SENTENCE archaic *)
 
-let if_body :=
- | isl = imp_stmts; %prec lowest             { isl, [] }
- | isl1 = imp_stmts; ELSE; isl2 = imp_stmts; { isl1, isl2 }
-
+let if_body [@default [], []] :=
+ | isl = imp_stmts_opt; %prec lowest                 { isl, [] }
+ | isl1 = imp_stmts_opt; ELSE; isl2 = imp_stmts_opt; { isl1, isl2 }
 
 
 (* INITIALIZE STATEMENT (+COB85) *)
@@ -3584,8 +3702,13 @@ let ident_after_before :=
    { { tallying_item = il; tallying_where = ab } }
 
 let inspect_where :=
- | AFTER;  INITIAL?; i = ident_or_nonnumeric_no_all; {InspectAfter, i}
- | BEFORE; INITIAL?; i = ident_or_nonnumeric_no_all; {InspectBefore, i}
+ | AFTER;  INITIAL?; i = inspect_reference; {InspectAfter, i}
+ | BEFORE; INITIAL?; i = inspect_reference; {InspectBefore, i}
+
+let inspect_reference :=
+  | i = ident_or_nonnumeric_no_all; is = rnell(pf(OR, ident_or_nonnumeric_no_all)); { NEL.of_list @@ i::is }
+  | i = ident_or_nonnumeric_no_all; { NEL.of_list @@ [ i ] }
+  (* ~ = separated_nonempty_list(OR, ~ = ident_or_nonnumeric_no_all; < >); < > *)
 
 let replacing_phrase :=
  | CHARACTERS; BY; il = ident_or_nonnumeric_no_all; abo = rl(inspect_where);
@@ -3607,7 +3730,7 @@ let ident_by_after_before :=
 %public let unconditional_action := ~ = invoke_statement; < >
 let invoke_statement :=
  | INVOKE; i = ident; is = ident_or_string;
-   ul = lo(pf(USING,rnel(loc(using_by)))); ro = ro(returning);
+   ul = lo(pf(USING,rnel(loc(using_by)))); ro = ro(returning_ident);
    { Invoke { invoke_target = i;
               invoke_method = is;
               invoke_using = ul;
@@ -3633,7 +3756,7 @@ let merge_statement :=
 
 %public let unconditional_action := ~ = move_statement; < >
 let move_statement :=
- | MOVE; from = ident_or_literal; TO; to_ = idents;
+ | MOVE; from = scalar_or_nonnumeric; TO; to_ = idents;
    { Move (MoveSimple { from; to_ }) }
  | MOVE; CORRESPONDING; from = ident; TO; to_ = idents;
    { Move (MoveCorresponding { from; to_ }) }
@@ -4105,21 +4228,11 @@ let stop_statement :=
   | STOP; ~ = stop_body; < >
 let stop_body [@context stop_stmt] := (* with context: should not accept empty *)
   | a = stop_with_arg; { StopArg (Some a) }             (* RM/COBOL extension *)
-  | RUN; ~ = o(stop_run_returning_body); <StopRun>
+  | RUN; { StopRun None }
+  | RUN; r = returning; { StopRun (Some (StopReturning r)) }
+  | RUN; s = with_status; { StopRun (Some (StopWithStatus s)) }
   | ERROR; { StopError }                                              (* GCOS *)
   | THREAD; ~ = o(qualident); <StopThread>
-
-let stop_run_returning_body :=
-  | ~ = scalar; <StopReturningScalar>
-  | or_(GIVING, RETURNING); o(ADDRESS; OF); ~ = qualident;
-    <StopReturningAddress>
-  | or_(GIVING, RETURNING); v = integer;
-    { StopReturningInt { value = Integer v;
-                         size = None } }
-  | or_(GIVING, RETURNING); v = integer; s = pf(SIZE; IS, integer);
-    { StopReturningInt { value = Integer v;
-                         size = Some (Integer s) } }
-  | ~ = with_status; <StopReturningStatus>
 
 let stop_with_arg :=
   | ~ = qualident; <StopWithQualIdent>                   (* ~COB85, -COB2002 *)
@@ -4163,12 +4276,12 @@ let s_delimited_by :=
 
 %public let unconditional_action := ~ = subtract_statement; < >
 let subtract_statement :=
- | SUBTRACT; inl = idents_or_numerics; FROM; irl = rounded_idents;
+ | SUBTRACT; inl = rnel(x); FROM; irl = rounded_idents;
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); end_subtract;
    { Subtract { basic_arith_operands =
                   ArithSimple { sources = inl; targets = irl };
                 basic_arith_on_size_error = h } }
- | SUBTRACT; inl = idents_or_numerics; FROM; in_ = ident_or_numeric;
+ | SUBTRACT; inl = rnel(x); FROM; in_ = x;
    GIVING; irl = rounded_idents;
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); end_subtract;
    { Subtract { basic_arith_operands =

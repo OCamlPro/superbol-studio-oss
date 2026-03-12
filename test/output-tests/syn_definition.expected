@@ -133,14 +133,6 @@ Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1205:0
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1227:0
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1264:0
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1323:0
-syn_definition.at-1323-prog1.cob:5.24-5.33:
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      prog1.
-   4          PROCEDURE        DIVISION.
-   5 >            EXIT PROGRAM RETURNING -1.
-----                           ^^^^^^^^^
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1323:0
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1323:0
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1323:0

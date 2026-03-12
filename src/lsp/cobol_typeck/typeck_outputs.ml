@@ -13,6 +13,7 @@
 
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
+module LIST = Cobol_common.Basics.LIST
 
 type qualrefmap = srcloc list Cobol_unit.Qual.MAP.t
 type references_in_unit =
@@ -42,6 +43,24 @@ type outputs =
   }
 type t = outputs
 
+
+(* An accumulator for fold_exec_block', used to collect references in
+   EXEC blocks *)
+type references_acc =
+  {
+    current_section: Cobol_unit.Types.procedure_section option;
+    refs: references_in_unit;
+    diags: Typeck_diagnostics.t;
+  }
+
+type fold_exec_block' =
+  register_name:(string
+                   Cobol_common.Srcloc.TYPES.with_loc ->
+                 references_acc -> references_acc) ->
+  Cobol_common.Exec_block.TYPES.exec_block
+    Cobol_common.Srcloc.TYPES.with_loc ->
+  references_acc -> references_acc
+
 (* --- *)
 
 let no_refs =
@@ -64,7 +83,7 @@ let none: t =
   }
 
 let merge_qualrefmaps: qualrefmap -> qualrefmap -> qualrefmap =
-  Cobol_unit.Qual.MAP.union (fun _ a b -> Some (b @ a))   (* keep reversed order *)
+  Cobol_unit.Qual.MAP.union (fun _ a b -> Some (LIST.append ~loc:__LOC__ b a))   (* keep reversed order *)
 
 let register_qualref qn ~loc refs =
   Cobol_unit.Qual.MAP.update qn

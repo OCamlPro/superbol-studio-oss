@@ -14,6 +14,8 @@
 open Common
 open Terms
 
+module LIST = Cobol_common.Basics.LIST
+
 (* Used in ENVIRONMENT, and SORT/MERGE statements *)
 
 type alphabet_specification =                      (* At least one is required *)
@@ -202,13 +204,13 @@ let pp_date_time ppf = function
 type basic_arithmetic_operands =
   | ArithSimple of
       {
-        sources: ident_or_numlit list;
+        sources: scalar list;
         targets: rounded_idents;
       }
   | ArithGiving of
       {
-        sources: ident_or_numlit list;
-        to_or_from_item: ident_or_numlit;
+        sources: scalar list;
+        to_or_from_item: scalar;
         targets: rounded_idents;
       }
   | ArithCorresponding of
@@ -229,13 +231,13 @@ let pp_giving targets =
   [ Fmt.(any "GIVING@ " ++ const (box pp_rounded_idents) targets) ]
 
 let pp_basic_arithmetic_operands ?(sep = "TO") ppf bao =
-  let pp_sources = Fmt.(list ~sep:sp pp_ident_or_numlit) in
+  let pp_sources = Fmt.(list ~sep:sp pp_scalar) in
   match bao with
   | ArithSimple { sources; targets } ->
     pp_arithmetic_operands ~sep pp_sources pp_rounded_idents
       ppf ((sources, targets), [])
   | ArithGiving { sources; to_or_from_item; targets } ->
-    pp_arithmetic_operands ~sep pp_sources pp_ident_or_numlit
+    pp_arithmetic_operands ~sep pp_sources pp_scalar
       ppf ((sources, to_or_from_item), pp_giving targets)
   | ArithCorresponding { source; target } ->
     pp_arithmetic_operands ~modifier:"CORRESPONDING" ~sep
@@ -282,7 +284,8 @@ let pp_divide_operands ppf = function
     let pair = if into then divisor, dividend else dividend, divisor in
     pp_arithmetic_operands ~sep:(if into then "INTO" else "BY")
       pp_scalar pp_scalar
-      ppf (pair, pp_giving giving @ pp_remainder_opt remainder)
+      ppf (pair, LIST.append ~loc:__LOC__ (pp_giving giving)
+             (pp_remainder_opt remainder))
 
 
 (* EVALUATE *)

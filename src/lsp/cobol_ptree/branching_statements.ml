@@ -281,6 +281,8 @@ and display_device_mnemonic =
  | DisplayDeviceEnvValue
  | DisplayDeviceArgNumber
  | DisplayDeviceCommandLine
+ | DisplayDevicePrinter
+ | DisplayDeviceTerminal
 
 and display_with_clause =
   | DisplayAttribute of Data_descr.screen_attribute_clause
@@ -542,6 +544,8 @@ let pp_display_device_mnemonic ppf = function
   | DisplayDeviceEnvValue -> Fmt.pf ppf "ENVIRONMENT-VALUE"
   | DisplayDeviceArgNumber -> Fmt.pf ppf "ARGUMENT-NUMBER"
   | DisplayDeviceCommandLine -> Fmt.pf ppf "COMMAND-LINE"
+  | DisplayDevicePrinter -> Fmt.pf ppf "PRINTER"
+  | DisplayDeviceTerminal -> Fmt.pf ppf "TERMINAL"
 
 let pp_display_target ppf = function
   | DisplayUponName nwl -> Fmt.pf ppf "UPON@ %a" (pp_with_loc pp_name) nwl

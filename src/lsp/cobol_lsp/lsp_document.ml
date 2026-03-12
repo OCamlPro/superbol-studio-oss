@@ -87,7 +87,8 @@ let rewindable_parse ({ project; textdoc; _ } as doc) =
       source_format = match language_id doc with
         | "COBOL_GNU_LISTFILE"
         | "COBOL_GNU_DUMPFILE" -> SF SFVariable
-        | _ -> project.config.source_format
+        | _ -> Superbol_project.Config.source_format_for
+                 ~filename:(Lsp.Uri.to_path (uri doc)) project.config
     } @@
   String { contents = Lsp.Text_document.text textdoc;
            filename = Lsp.Uri.to_path (uri doc) }
@@ -104,7 +105,9 @@ let check doc ptree =
                              diags = parsing_diags } = ptree in
   let Cobol_typeck.Results.{ result = checked;
                              diags = typecking_diags }
-    = Cobol_typeck.compilation_group ~config ptree in
+    = Cobol_typeck.compilation_group ~config
+      ~fold_exec_block':Superbol_preprocs.Esql.fold_exec_block'
+      ptree in
   let artifacts = Cobol_parser.artifacts ptree in
   let typecking_diags =
     (* Do not report typeck diagnostics in case of syntax or pre-processing
@@ -279,7 +282,7 @@ let of_cache ~project
         ~textDocument:(Lsp.Types.TextDocumentItem.create
                          ~languageId ~text ~uri ~version) in
     let doc = Lsp.Text_document.make ~position_encoding doc
-      |> blank ~project in
+              |> blank ~project in
     { doc with artifacts = { pplog; tokens = lazy tokens;
                              rev_comments; rev_ignored };
                parsing_diags;

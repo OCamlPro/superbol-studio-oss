@@ -417,7 +417,7 @@ let semtoks_from_ptree ~filename ?range ptree =
     method! fold_move' {payload = move_stmt; _} acc =
       match move_stmt with
       | MoveSimple { from; to_ } -> acc
-          |> fold_ident_or_literal self from
+          |> fold_scalar self from
           |> add_list add_ident to_ VarModif
           |> Visitor.skip_children
       | MoveCorresponding { from; to_ } -> acc

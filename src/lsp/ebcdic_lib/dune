@@ -17,7 +17,7 @@
 (rule
     (targets ebcdic_version.ml)
     (deps (:script ebcdic_version.mlt) package.toml)
-    (action (with-stdout-to %{targets} (run %{ocaml} unix.cma %{script}))))
+    (action (with-stdout-to %{targets} (run %{ocaml} -I +unix unix.cma %{script}))))
 
 (documentation
   (package ebcdic_lib))

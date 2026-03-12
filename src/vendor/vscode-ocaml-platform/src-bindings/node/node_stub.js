@@ -6,6 +6,9 @@ joo_global_object.fs = {
   readFile: promisify(fs.readFile),
   exists: promisify(fs.exists),
   existsSync: fs.existsSync,
+  writeFileSync: fs.writeFileSync,
+  mkdirSync: fs.mkdirSync,
+  unlinkSync: fs.unlinkSync,
 };
 
 joo_global_object.child_process = require("child_process");

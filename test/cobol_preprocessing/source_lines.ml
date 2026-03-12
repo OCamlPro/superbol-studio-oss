@@ -151,3 +151,51 @@ let%expect_test "hybrid-format-cdirs-with-cdir-markers-bis" =
     16:
     17: .
 |}];;
+
+let%expect_test "period-after-set-directive" =
+  Preproc_testing.show_source_lines
+    ~with_source_cdir_markers:true
+    ~with_line_numbers:true {|
+      >>SOURCE FORMAT IS FREE.
+>>SOURCE FORMAT IS FIXED.
+       >> SET SOURCEFORMAT "COBOLX".
+* comment line
+                *> floating comment
+>>    Source format free
+  *> another floating comment
+   >> SET                               SOURCEFORMAT                                     "FIXED"
+      * fixed comment
+      $ SET SOURCEFORMAT "XOpen" .
+/ comment line
+>>SET SOURCEFORMAT "CRT".
+/ still comment line
+>>   SOURCE IS FREE .
+                        *> ok let's terminate here
+  .
+  |};
+  [%expect {|
+    1:
+    2: >>SOURCE FORMAT IS FREE .
+    2: |new source format|
+    3: >>SOURCE FORMAT IS FIXED .
+    3: |new source format|
+    4: >>SET SOURCEFORMAT "COBOLX" .
+    4: |new source format|
+    5:
+    6:
+    7: >>Source format free
+    7: |new source format|
+    8:
+    9: >>SET SOURCEFORMAT "FIXED"
+    9: |new source format|
+    10:
+    11: $SET SOURCEFORMAT "XOpen" .
+    11: |new source format|
+    12:
+    13: >>SET SOURCEFORMAT "CRT" .
+    13: |new source format|
+    14:
+    15: >>SOURCE IS FREE .
+    15: |new source format|
+    16:
+    17: . |}]

@@ -471,6 +471,8 @@ let lsp_text_edit Cobol_indent.Types.{ lnum; offset_orig; offset_modif } =
     and the text selected must terminate in the same scope.
     Otherwise, unexpected result.
 *)
+(* Note: the source format is resolved via [source_format_for], which checks
+   for per-extension overrides before falling back to the global setting. *)
 let handle_range_formatting registry params =
   let open DocumentRangeFormattingParams in
   let { textDocument = doc; range = {start; end_}; _ } = params in
@@ -484,28 +486,34 @@ let handle_range_formatting registry params =
     }
   in
   let _edit_list, edit_ops =
+    let filename = Lsp.Uri.to_path doc.uri in
     Cobol_indent.Main.indent
       ~dialect:(Cobol_config.dialect project.config.cobol_config)
-      ~source_format:project.config.source_format
+      ~source_format:(Superbol_project.Config.source_format_for
+                        ~filename project.config)
       ~config:project.config.indent_config
-      ~filename:(Lsp.Uri.to_path doc.uri)
+      ~filename
       ~contents:(Lsp.Text_document.text textdoc)
       ~range:range_to_indent
       ()
   in
   Some ( to_textedits edit_ops ) (* (List.map lsp_text_edit edit_list) *)
 
+(* Note: the source format is resolved via [source_format_for], which checks
+   for per-extension overrides before falling back to the global setting. *)
 let handle_formatting registry params =
   let DocumentFormattingParams.{ textDocument = doc; _ } = params in
   let Lsp_document.{ project; textdoc; _ } =
     Lsp_server.find_document doc registry in
   try
+    let filename = Lsp.Uri.to_path doc.uri in
     let _editList, edit_ops =
       Cobol_indent.Main.indent
         ~dialect:(Cobol_config.dialect project.config.cobol_config)
-        ~source_format:project.config.source_format
+        ~source_format:(Superbol_project.Config.source_format_for
+                          ~filename project.config)
         ~config:project.config.indent_config
-        ~filename:(Lsp.Uri.to_path doc.uri)
+        ~filename
         ~contents:(Lsp.Text_document.text textdoc)
         ()
     in

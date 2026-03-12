@@ -42,28 +42,51 @@ let get_html_js_content ~extension_uri typ =
         | Graphviz -> "cfg-dot"
         | D3_arc_diagram -> "cfg-arc"
       in
-      let localResource =
-        VS.Uri.joinPath extension_uri ~pathSegments:["assets"; file_name ^ ".js"]
+      let vendor_scripts =
+        let vendor name =
+          VS.Uri.joinPath extension_uri
+            ~pathSegments:["assets"; "vendor"; name]
+        in
+        match typ with
+        | Graphviz ->
+          [vendor "d3.v7.min.js";
+           vendor "hpcc-wasm.v2.20.0.umd.js";
+           vendor "d3-graphviz.v5.6.0.js"]
+        | D3_arc_diagram ->
+          [vendor "d3.v7.min.js"]
       in
-      let localResource2 =
-        VS.Uri.joinPath extension_uri ~pathSegments:["assets"; file_name ^ ".css"]
-      in Ok( `IncompleteHtml (html, localResource, localResource2))
+      let localResource ext =
+        VS.Uri.joinPath extension_uri ~pathSegments:["assets"; file_name ^ ext]
+      in Ok (`IncompleteHtml (
+        html,
+        vendor_scripts,
+        localResource ".js",
+        localResource ".css"
+      ))
     with Sys_error e -> Error(e)
        | End_of_file -> Error("End_of_file")
 
 let setup_html_js_content ~webview ~typ html_js =
   match html_js with
   | `CompleteHtml html -> html
-  | `IncompleteHtml (html, js_path, css_path) ->
+  | `IncompleteHtml (html, vendor_scripts, js_path, css_path) ->
     let html_content =
+      let vendor_tags = String.concat ""
+          (List.map (fun uri ->
+               let src = VS.Uri.toString
+                   (VS.WebView.asWebviewUri webview ~localResource:uri) ()
+               in
+               Printf.sprintf "<script src=\"%s\"></script>" src)
+              vendor_scripts)
+      in
       let js_path = VS.Uri.toString
           (VS.WebView.asWebviewUri webview ~localResource:js_path) ()
       in
       let css_path = VS.Uri.toString
           (VS.WebView.asWebviewUri webview ~localResource:css_path) ()
-      in Printf.sprintf "%s<script src=\"%s\"></script>\
+      in Printf.sprintf "%s%s<script src=\"%s\"></script>\
                          <link rel=\"stylesheet\" type=\"text/css\" href=\"%s\"/>"
-        html js_path css_path
+        html vendor_tags js_path css_path
     in
     begin match typ with
       | Graphviz -> graphviz_html := Some (html_content)

@@ -47,3 +47,4 @@ let deactivate () =
 module Printer = Superbol_printer
 module Instance = Superbol_instance
 module Workspace = Superbol_workspace
+module Extension = Superbol_extension

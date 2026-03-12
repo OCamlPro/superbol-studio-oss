@@ -15,12 +15,7 @@ open Cobol_ptree
 
 module Overlay_manager: Cobol_preproc.Src_overlay.MANAGER
 
-val relation_condition
-  : neg: bool
-  -> Cobol_ptree.binary_relation
-  -> (Cobol_ptree.logop * Cobol_ptree.flat_combined_relation) option
-  -> Cobol_ptree.condition
-
+val relation_condition: Cobol_ptree.abbrev_combined_relation -> Cobol_ptree.condition
 
 type data_division_sentence =
   | S_DATA_DIVISION_HEADER of srcloc
@@ -36,3 +31,11 @@ type data_division_sentence =
 (* Takes a *reversed* list of sentences. *)
 val build_data_division: data_division_sentence list with_loc ->
   data_division with_loc option
+
+val build_simple_program:
+  Cobol_ptree.options_paragraph with_loc option ->
+  environment_division with_loc option ->
+  data_division_sentence list with_loc option ->
+  procedure_division with_loc ->
+  pos:Lexing.position ->
+  compilation_unit

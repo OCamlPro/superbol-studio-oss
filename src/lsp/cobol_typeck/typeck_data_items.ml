@@ -286,7 +286,8 @@ let item_range acc ~item_qualifier
         Some { range_span = Fixed_span { occurs_times = int times };
                range_indexes = List.map qualify_as_subordinate indexed_by }
     | Some OccursDepending { from; to_; depending; indexed_by; _ } ->
-        Some { range_span = Depending_span { occurs_depending_min = int from;
+        let min = match from with Some f -> int f | None -> 1 &@<- to_ in
+        Some { range_span = Depending_span { occurs_depending_min = min;
                                              occurs_depending_max = int to_;
                                              occurs_depending = depending };
                range_indexes = List.map qualify_as_subordinate indexed_by }

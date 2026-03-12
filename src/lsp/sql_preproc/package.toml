@@ -46,7 +46,7 @@ generators = ["ocamllex"]
 preprocess = "pps ppx_deriving.show"
 
 # files to skip while updating at package level
-# skip = []
+skip = ["main.ml"]
 
 # package library dependencies
 #   [dependencies]

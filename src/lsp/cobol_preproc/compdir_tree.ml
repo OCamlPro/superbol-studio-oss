@@ -25,16 +25,20 @@ type directive_kind =
   | Source_directive
 
 type directive =
-  | Lexing of lexing_directive
+  | Source of source_directive
+  | Set of set_directive_item with_loc list
   | Preproc of preproc_directive
 
-and lexing_directive =
+and source_directive =
   | Source_format_is_free of srcloc [@printer fun _ _ -> ()]
   | Source_format_is of Cobol_data.Literal.alphanum with_loc
-  | Set_sourceformat of Cobol_data.Literal.alphanum with_loc
+
+and set_directive_item =
+  | Set_source_format of Cobol_data.Literal.alphanum with_loc
+  | Set_preproc of set_operand
 
 and preproc_directive =
-  | Set of set_operand with_loc
+  | Set of set_operand
   | Define_off of var with_loc
   | Define of definition
   | If of boolexpr with_loc
@@ -83,25 +87,35 @@ and boolexpr =
         var: var with_loc;
         polarity: bool;                        (* false for `var NOT DEFINED' *)
       }
+  | Set_condition of
+      {
+        var: var with_loc;
+        polarity: bool;                        (* false for `var NOT SET' *)
+      }
 
 and condition_operator = Eq | Ge | Gt | Le | Lt | Ne
 
 and set_operand =
   | Add_srv
   | Add_syn
+  | ANSI_85 of bool
   | Area_check of bool
   | Assign
   | Bound of bool
   | Call_FH
   | Check_num of bool
   | Comp_1
-  | Constant
+  | Constant of var with_loc * literal
   | DPC_in_data of bool
   | Fold_copy_name of bool
+  | Int_level of Cobol_data.Literal.fixed with_loc
   | Make_syn
   | Nest_call
+  | N_symbol of string with_loc
   | ODO_slide of bool
   | Remove
+  | Sequential of string with_loc
+  | Sign of string with_loc
   | SP_zero of bool
   | SS_range of bool
 

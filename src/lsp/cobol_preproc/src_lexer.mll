@@ -102,6 +102,7 @@
       CDIR_SET;
       ADDRSV;
       ADDSYN;
+      ANS85;
       AREACHECK;
       ASSIGN;
       BOUND;
@@ -111,8 +112,10 @@
       CONSTANT;
       DPCINDATA;
       FOLDCOPYNAME;
+      INTLEVEL;
       MAKESYN;
       NESTCALL;
+      NOANS85;
       NOAREACHECK;
       NOBOUND;
       NOCHECKNUM;
@@ -121,9 +124,12 @@
       NOODOSLIDE;
       NOSPZERO;
       NOSSRANGE;
+      NSYMBOL;
       ODOSLIDE;
       OVERRIDE;
       REMOVE;
+      SEQUENTIAL;
+      SIGN;
       SOURCEFORMAT;
       SPZERO;
       SSRANGE;
@@ -205,7 +211,7 @@ let alphanum_lit =
   (('\'' alphanum_lit_content_spl* alphanum_lit_suffix_spl) |
    ('"'  alphanum_lit_content_dbl* alphanum_lit_suffix_dbl))
 let alphanum_lit_new =                               (* may lack G & GX still *)
-  ((['B' 'b' 'X' 'x' 'Z' 'z' 'N' 'n']
+  ((['B' 'b' 'X' 'x' 'H' 'h' 'Z' 'z' 'N' 'n']
    |['B' 'b' 'N' 'n'] ['X' 'x'])? alphanum_lit)
 let alphanum_lit_cont_double_apostrophes =
   ("''"    alphanum_lit_content_spl* alphanum_lit_suffix_spl)
@@ -224,19 +230,22 @@ let currency_sign_char =                                    (* as per ISO/IEC *)
               'A'-'E' 'N' 'P' 'R' 'S' 'V' 'X' 'Z'
               'a'-'e' 'n' 'p' 'r' 's' 'v' 'x' 'z'
                 ' ' '+' '-' ',' '.' '*' '/' ';' '(' ')' '\'' '"' '=']
-let text_char = nonblank # ['\'' '"']
+let text_char = nonblank # ['\'' '"' '&']
 let neq = text_char # ['=']
 let text_word =
   (* Note: accepts words that include floating comment markers `*>'; these are
      processed in `Src_lexing.text_word`. *)
-  (neq* '='? neq+)+ | '=' | ">=" | "<="
+  (neq* '='? neq+)+ | '=' | ">=" | "<=" | '&'
 
 let cdir_char =
   (letter | digit | ':')                            (* colon for pseudo-words *)
 let cdir_word_suffix =
-  (cdir_char ((cdir_char | '_' | '-') cdir_char*)*)? (* CHECKME: allow empty? *)
+  (cdir_char ((cdir_char | '_' | '-') cdir_char*)*)
 let cdir_word =
-  (">>" ' '* cdir_word_suffix)
+  (">>" ' '* cdir_word_suffix?) (* CHECKME: allow empty? *)
+
+let mf_cdir_word =
+  ('$' ' '* cdir_word_suffix)
 
 (* Fixed format *)
 
@@ -403,6 +412,10 @@ and fixed_nominal_line state
       {
         Src_lexing.separator ~char ~ktkd:gobble_line ~knom:fixed_nominal
           state lexbuf
+      }
+  | mf_cdir_word
+      {
+        Src_lexing.cdir_word ~ktkd:gobble_line ~knom:fixed_nominal state lexbuf
       }
   | cdir_word
       {
@@ -584,7 +597,7 @@ and free_line state
       {
         free_line state lexbuf
       }
-  | (cdir_word | '$' blanks? cdir_word_suffix)
+  | (cdir_word | mf_cdir_word)
       {
         Src_lexing.cdir_word' ~k:free_nominal
           (Src_lexing.flush_continued ~force:true state) lexbuf
@@ -693,7 +706,11 @@ and cdtoken keywords = parse
   | blanks
       { cdtoken keywords lexbuf }
 
-  | (nonblank+ as s)
+  | '.' { CDTok PERIOD }
+  | '(' { CDTok LPAR }
+  | ')' { CDTok RPAR }
+
+  | ((nonblank # ['.' '(' ')'])+ as s)
       { CDTok (try Hashtbl.find keywords (String.uppercase_ascii s)
                with Not_found -> TEXT_WORD s) }
 
@@ -705,13 +722,17 @@ and cdtoken_with_numerics keywords = parse
   | blanks
       { cdtoken_with_numerics keywords lexbuf }
 
+  | '.' { CDTok PERIOD }
+  | '(' { CDTok LPAR }
+  | ')' { CDTok RPAR }
+
   | (sign? digit+ as s)
       { CDInt s }
 
   | (sign? digit* as n) (['.' ','] as sep) (digit+ as d)
       { CDFxd (n, sep, d) }
 
-  | (nonblank+ as s)
+  | ((nonblank # ['.' '(' ')'])+ as s)
       { CDTok (try Hashtbl.find keywords (String.uppercase_ascii s)
                with Not_found -> TEXT_WORD s) }
 
@@ -755,6 +776,7 @@ and pptoken = parse
     | Else_directive
     | EndIf_directive
     | If_directive
+    | Set_directive
     (* | On_off/Turn_directive *)
     | Source_directive as d ->
         cdtoken_with_numerics (keywords_for_directive d)

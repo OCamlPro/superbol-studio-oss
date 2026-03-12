@@ -150,6 +150,13 @@ module Fs : sig
   val exists : string -> bool Promise.t
 
   val existsSync : string -> bool
+
+  val writeFileSync : string -> string -> unit
+
+  val mkdirSync : string -> recursive:bool -> unit
+
+  val unlinkSync : string -> unit
+
 end
 
 module Net : sig
