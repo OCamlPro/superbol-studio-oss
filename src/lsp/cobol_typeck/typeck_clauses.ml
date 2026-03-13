@@ -255,7 +255,7 @@ let auto_usage diags ~usage_clause picture =
   | PackedDecimal ->
       let diags, picture
         = ensure_picture diags ~only:`Numeric_category ~usage_clause picture in
-      diags, Some (Packed_decimal picture)
+      diags, Some (Packed_decimal { picture; with_sign_nibble = true })
   | _ ->
       diags, None
 
@@ -399,6 +399,12 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
         diags, Some Float_long
     | UsagePending `Comp3 ->                  (* == Packed_decimal in GnuCOBOL *)
         auto_usage diags ~usage_clause:PackedDecimal picture
+
+    | UsagePending `Comp6 ->                  (* == Packed_decimal without sign nibble *)
+        let diags, picture
+          = ensure_picture diags ~only:`Numeric_category
+              ~usage_clause:PackedDecimal picture in
+        diags, Some (Packed_decimal { picture; with_sign_nibble = false })
 
     | _ ->                         (* FIXME: we ignore the other cases for now *)
         diags, None

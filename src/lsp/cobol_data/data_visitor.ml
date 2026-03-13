@@ -68,7 +68,7 @@ let fold_usage (v: _ #folder) =
       | Bit pic
       | Display pic
       | National pic
-      | Packed_decimal pic ->
+      | Packed_decimal { picture = pic; _ } ->
           fold_picture v pic
       | Function_pointer name
       | Object_reference Some NamedClass { class_or_interface_name = name; _ }
