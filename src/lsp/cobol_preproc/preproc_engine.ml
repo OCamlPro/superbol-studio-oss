@@ -47,7 +47,7 @@ and preprocessor_persist =
     source_format: Src_format.any option;  (* to keep auto-detecting on reset *)
     exec_preprocs: exec_preprocessor EXEC_MAP.t;
     copybook_lookup_config: Cobol_common.Copybook.lookup_config;
-    platform: Cobol_common.Platform.TYPES.platform;
+    (* platform: Cobol_common.Platform.TYPES.platform;     (\* == reader.platform *\) *)
     show_if_verbose: [`Txt | `Src] list;
   }
 
@@ -109,24 +109,26 @@ let with_buff_n_pplog lp buff pplog =
 let with_replacing lp replacing =
   { lp with persist = { lp.persist with replacing } }
 
-let show tag { persist = { platform; show_if_verbose; _ }; _ } =
-  platform.verbosity > 0 && LIST.mem tag show_if_verbose
+let show tag { persist = { show_if_verbose; _ }; reader; _ } =
+  (Src_reader.input_platform reader).verbosity > 0 &&
+  LIST.mem tag show_if_verbose
 
 let source_format_config = function
   | Cobol_config.SF sf -> Some (Src_format.from_config sf)
   | Auto -> None
 
 let preprocessor input = function
-  | `WithOptions { platform; source_format; env;
+  | `WithOptions { source_format; env;
                    exec_preprocs; config = (module Config);
                    copybook_lookup_config } ->
       let module Om_name = struct let name = __MODULE__ end in
       let module Om = Src_overlay.New_manager (Om_name) () in
       let module Pp = Preproc_grammar.Make (Config) (Om) in
       let source_format = source_format_config source_format in
+      let reader = Src_reader.from input ?source_format in
       {
         buff = [];
-        reader = Src_reader.from input ?source_format;
+        reader;
         ppstate = Preproc_state.initial;
         pplog = Preproc_trace.empty;
         diags = Preproc_diagnostics.none;
@@ -143,7 +145,7 @@ let preprocessor input = function
             source_format;
             exec_preprocs;
             copybook_lookup_config;
-            platform;
+            (* platform = Src_reader.input_platform reader; *)
             show_if_verbose = [`Src];
           };
       }
@@ -247,7 +249,7 @@ and apply_preproc_directive ({ env; context; _ } as lp)
     when not (Preproc_logic.emitting lp.context) ->
       lp                                                            (* ignore *)
   | Define def ->
-      let platform = lp.persist.platform in
+      let platform = Src_reader.input_platform lp.reader in
       new_env lp @@ Preproc_logic.on_define ~platform ~loc def ~env
   | Define_off var ->
       new_env lp @@ Preproc_logic.on_define_off ~loc var ~env
@@ -435,11 +437,13 @@ and do_exec ?(partial = false) lp rev_prefix exec_block suffix =
 
 
 and read_lib ({ persist = { copybook_lookup_config;
-                            copybooks; platform; _ }; _ } as lp)
+                            copybooks; _ }; _ } as lp)
     loc { txtname; libname } =
+  let platform = Src_reader.input_platform lp.reader in
   let text, diags, pplog =
     match
-      platform.find_lib ~&txtname ?libname:~&?libname
+      platform.find_lib
+        ~&txtname ?libname:~&?libname
         ?fromfile:(input_file lp) ~lookup_config:copybook_lookup_config
     with
     | Ok filename when Cobol_common.Srcloc.mem_copy filename copybooks ->
@@ -451,7 +455,7 @@ and read_lib ({ persist = { copybook_lookup_config;
         if platform.verbosity>0 then
           platform.error "Reading library `%s'@." filename;
         let text, lp =             (* note: [lp] holds all prev and new diags *)
-          Src_input.from ~platform ~filename ~f:begin fun input ->
+          Src_input.from ~filename ~platform ~f:begin fun input ->
             full_text                                   (* likewise for pplog *)
               (preprocessor input (`Fork (lp, loc, filename)))
               ~postproc:(Cobol_common.Srcloc.copy_from ~filename ~copyloc:loc)
@@ -478,8 +482,9 @@ and full_text ?(item = "library") ?postproc lp : Text.text * preprocessor =
     if not (List.exists eofp text)
     then aux (text :: acc) lp
     else begin
-      if lp.persist.platform.verbosity>0 then
-        lp.persist.platform.error "Reached end of %s@." item;
+      let platform = Src_reader.input_platform lp.reader in
+      if platform.verbosity>0 then
+        platform.error "Reached end of %s@." item;
       List.(concat (rev (filter (fun p -> not(eofp p)) text :: acc))), lp
     end
   in
@@ -637,14 +642,14 @@ let text_of_input ~options input =
   let text, pp = full_text ~item:"file" @@ preprocessor ~options input in
   OUT.result text ~diags:(diags pp)
 
-let text_of_file ~options filename =
+let text_of_file ~platform ~options filename =
   Src_input.from ~filename ~f:(text_of_input ~options)
-    ~platform:options.platform
+    ~platform
 
 let preprocess_input ~options ?(ppf = default_oppf) input =
   text_of_input ~options input |>
   OUT.map_result ~f:(Pretty.print ppf "%a@." Text.pp_text)
 
-let preprocess_file ~options ?ppf filename =
+let preprocess_file ~platform ~options ?ppf filename =
   Src_input.from ~filename ~f:(preprocess_input ~options ?ppf)
-    ~platform:options.platform
+    ~platform

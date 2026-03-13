@@ -19,7 +19,6 @@ module EXEC_MAP = Stdlib.Map.Make (EXEC_LANG)
 
 type preproc_options =
   {
-    platform: Cobol_common.Platform.TYPES.platform;
     config: Cobol_config.t;
     copybook_lookup_config: Cobol_common.Copybook.lookup_config;
     source_format: Cobol_config.source_format_spec;
@@ -30,9 +29,8 @@ type preproc_options =
 and exec_preprocessor =
   | Text_preprocessor of (Text.t -> Text.t)
 
-let default ~platform =
+let default =
   {
-    platform;
     copybook_lookup_config = Cobol_common.Copybook.lookup_config [];
     config = Cobol_config.default;
     source_format = Cobol_config.Auto;

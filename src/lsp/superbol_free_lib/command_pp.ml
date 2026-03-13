@@ -82,7 +82,8 @@ let cmd =
                      output_file filename contents;
                      if !check then
                        match
-                         parse ~source_format:(SF SFFree) (String { filename; contents })
+                         parse ~source_format:(SF SFFree) @@
+                         Cobol_preproc.Input.string ~filename:file contents ~platform
                        with
                        | { result = Only (Some cg'); _ } ->
                            if Cobol_ptree.compare_compilation_group cg' cg <> 0 then (
@@ -102,8 +103,8 @@ let cmd =
                  let text =
                    let common = common_get () in
                    Cobol_preproc.Outputs.show_n_forget ~platform @@
-                   Cobol_preproc.text_of_file file
-                     ~options:common.preproc_options
+                   Cobol_preproc.text_of_file file ~options:common.preproc_options
+                     ~platform
                  in
                  let s =
                    Cobol_preproc.Text_printer.string_of_text

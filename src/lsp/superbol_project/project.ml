@@ -121,9 +121,9 @@ let file_contents_looks_like_a_copybook
   in
   match contents with
   | None ->
-      Cobol_preproc.Input.from ~platform ~filename ~f:decide
+      Cobol_preproc.Input.from ~filename ~f:decide ~platform
   | Some c ->
-      decide @@ Cobol_preproc.Input.string ~filename c
+      decide @@ Cobol_preproc.Input.string ~filename c ~platform
 
 let is_a_copybook_extension ext =
   List.mem (String.lowercase_ascii (EzString.after ext 1))    (* trim the `.` *)

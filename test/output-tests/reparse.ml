@@ -46,7 +46,10 @@ let reparse_file ~source_format ~config filename =
   | { result = Only Some cg; _ } -> (
       Format.printf "Parse: OK. ";
       let contents = print cg in
-      match parse ~source_format:(SF SFFree) (String { contents; filename }) with
+      match
+        parse ~source_format:(SF SFFree) @@
+        Cobol_preproc.Input.string ~filename contents ~platform
+      with
       | { result = Only Some cg'; _ } ->
         if Cobol_ptree.compare_compilation_group cg cg' = 0 then
           Format.printf "Reparse: OK."

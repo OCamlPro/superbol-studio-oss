@@ -19,14 +19,14 @@ type t
 
 (** {1 Creation} *)
 
-val from
-  : ?source_format: Src_format.any -> Src_input.t -> t
+val from: ?source_format: Src_format.any -> Src_input.t -> t
 
 (** {1 Queries} *)
 
 val diags: t -> Src_diagnostics.t
 val position: t -> Lexing.position
 val input_file: t -> string option
+val input_platform: t -> Cobol_common.Platform.TYPES.platform
 val source_format: t -> Src_format.any
 val rev_comments: t -> Text.comments
 val rev_ignored: t -> lexloc list

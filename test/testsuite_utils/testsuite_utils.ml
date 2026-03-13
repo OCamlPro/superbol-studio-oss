@@ -66,4 +66,4 @@ let pp_diagnostics =
   Cobol_common.Diagnostics.Set.pp ~platform
 
 let default_preproc_options =
-  Cobol_preproc.Options.default ~platform
+  Cobol_preproc.Options.default

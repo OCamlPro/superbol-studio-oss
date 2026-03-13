@@ -136,7 +136,7 @@ let setup_input ~filename contents =
   let oc = open_out filename in
   output_string oc contents;
   close_out oc;
-  Cobol_preproc.String { contents; filename }
+  Cobol_preproc.Input.string ~filename contents ~platform
 
 let delete_file ~filename =
   Ez_file.FileString.remove filename
@@ -199,7 +199,7 @@ let do_check_parse (test_filename, contents, _, { check_loc;
   let parse_simple input =
     input |>
     Cobol_preproc.preprocessor
-      ~options:{ (Cobol_preproc.Options.default ~platform) with
+      ~options:{ Cobol_preproc.Options.default with
                  source_format } |>
     Cobol_parser.parse_simple
       ~options:default_parser_options

@@ -47,7 +47,7 @@ val lex_input
   -> unit Preproc_outputs.with_diags
 
 val lex_file
-  : platform : Cobol_common.Platform.TYPES.platform
+  : platform: Cobol_common.Platform.TYPES.platform
   -> dialect: Cobol_config.dialect
   -> source_format: Cobol_config.source_format_spec
   -> ?ppf:Format.formatter
@@ -110,13 +110,15 @@ val preprocess_input
   -> unit Preproc_outputs.with_diags
 
 val preprocess_file
-  : options: Preproc_options.preproc_options
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> options: Preproc_options.preproc_options
   -> ?ppf:Format.formatter
   -> string
   -> unit Preproc_outputs.with_diags
 
 val text_of_file
-  : options: Preproc_options.preproc_options
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> options: Preproc_options.preproc_options
   -> string
   -> Text.t Preproc_outputs.with_diags
 

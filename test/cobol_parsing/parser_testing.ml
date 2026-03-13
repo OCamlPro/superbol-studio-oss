@@ -108,18 +108,16 @@ let rewindable_parse
     ?config
     prog
   =
-  let preproc_options =
-    Prog_preproc.default_preproc_options ~verbose:parser_options.verbose
-  in
   let { result = Only ptree, rewinder; diags } =
-    String { filename = "prog.cob"; contents = prog } |>
+    Cobol_preproc.Input.string ~filename:"prog.cob" prog
+      ~platform:(Prog_preproc.platform ~verbose:parser_options.verbose) |>
     Cobol_preproc.preprocessor
       ~options:Cobol_preproc.Options.{
-          preproc_options with
+          default with
           source_format;
           exec_preprocs = EXEC_MAP.empty;
           env = Cobol_preproc.Env.empty;
-          config = Option.value config ~default:preproc_options.config;
+          config = Option.value config ~default:parser_options.config;
         } |>
     Cobol_parser.rewindable_parse_simple
       ~options: {

@@ -18,7 +18,6 @@ let preprocess_n_then_cut_n_paste_right_of_indicator
     ?(filename = "prog.cob")
     ?(source_format = Cobol_config.Auto)
     fixed_format_contents =
-  let preproc_options = Prog_preproc.default_preproc_options ~verbose in
   let fixed_lines = EzString.split fixed_format_contents '\n' in
   let free_lines =
     List.map (fun l -> try EzString.after l 6 with Invalid_argument _ -> l)
@@ -27,9 +26,10 @@ let preprocess_n_then_cut_n_paste_right_of_indicator
   let free_format_contents = String.concat "\n" free_lines in
   Pretty.out "fixed: %a@." show_lines fixed_lines;
   Pretty.out " free: %a@." show_lines free_lines;
-  Cobol_preproc.Input.string ~filename fixed_format_contents |>
+  Cobol_preproc.Input.string ~filename fixed_format_contents
+    ~platform:(Prog_preproc.platform ~verbose) |>
   Cobol_preproc.preprocessor
-    ~options:{ preproc_options with source_format } |>
+    ~options:{ Cobol_preproc.Options.default with source_format } |>
   show_all_text |>
   Cobol_preproc.reset_preprocessor_for_string free_format_contents |>
   show_all_text |>
