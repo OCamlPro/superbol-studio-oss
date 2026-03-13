@@ -61,9 +61,10 @@ let make_cmd ?extensions () =
   in
   let storage = ref None in
   EZCMD.sub "lsp"
-    (run_lsp ~enable_caching:!caching
-       ~force_syntax_diagnostics:!syntax_diagnostics
-       ~storage:!storage ?extensions)
+    (fun () ->
+       run_lsp ~enable_caching:!caching
+         ~force_syntax_diagnostics:!syntax_diagnostics
+         ~storage:!storage ?extensions ())
     ~doc:"run LSP server"
     ~args: (caching_args @ syntax_diagnostics_args @ js_specific_args @ [
         ["storage-directory"], Arg.String (fun s -> storage := Some s),
