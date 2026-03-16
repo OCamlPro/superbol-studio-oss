@@ -47,13 +47,15 @@ module TYPES = struct
     mutable read_file : string -> string ;
     mutable getenv_opt : string -> string option ;
 
-    mutable autodetect_format :
-      ?source_contents:string -> string -> source_format_id ;
-    mutable find_lib :
-      lookup_config:Copybook.lookup_config ->
+    mutable autodetect_format:
+      ?source_contents:string ->
+      string ->                                                    (* filename *)
+      source_format_id;
+    mutable find_lib:
+      lookup_config:Copybook.TYPES.lookup_config ->
       ?fromfile:string ->
-      ?libname:Copybook.fileloc ->
-      Copybook.fileloc -> (string, Copybook.lookup_error) result ;
+      ?libname:Copybook.TYPES.fileloc ->
+      Copybook.TYPES.fileloc -> (string, Copybook.TYPES.lookup_error) result;
 
   }
 
@@ -61,14 +63,19 @@ end
 
 open TYPES
 
-let default = {
+(** The [innocuous] platform never performs any I/O operation other than on
+    [stdin] or [stdout]. *)
+let innocuous = {
   verbosity = 0;
   eprintf = Printf.eprintf;
   error = Pretty.error;
-  read_file = (fun file -> Ez_file.V1.EzFile.read_file file);
-  autodetect_format = (fun ?source_contents:_ _ -> SFFixed);
-  find_lib = Copybook.find_lib;
-  getenv_opt = (fun variable -> Sys.getenv_opt variable);
+  read_file = begin fun file ->
+    Pretty.string_to (fun msg -> raise (Sys_error msg))
+      "%s: Filesystem operations are unavailable" file
+  end;
+  autodetect_format = (fun ?source_contents:_ _filename -> SFFixed);
+  find_lib = Copybook.dummy_find_lib;
+  getenv_opt = (fun _variable -> None);
 }
 
 let copy ~dst ~src:{ verbosity; eprintf; error; read_file; autodetect_format;

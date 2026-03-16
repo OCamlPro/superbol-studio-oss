@@ -11,4 +11,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let record = Cobol_common.Platform.default
+let record = Cobol_common.Platform.innocuous

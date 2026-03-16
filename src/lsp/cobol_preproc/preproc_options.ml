@@ -21,7 +21,7 @@ type preproc_options =
   {
     config: Cobol_config.t;
     platform: Cobol_common.Platform.TYPES.platform;
-    copybook_lookup_config: Cobol_common.Copybook.lookup_config;
+    copybook_lookup_config: Cobol_common.Copybook.TYPES.lookup_config;
     source_format: Cobol_config.source_format_spec;
     exec_preprocs: exec_preprocessor EXEC_MAP.t;
     env: Preproc_env.t;

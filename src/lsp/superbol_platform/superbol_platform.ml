@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
-(*  Copyright (c) 2022-2026 OCamlPro SAS                                  *)
+(*  Copyright (c) 2022-2023 OCamlPro SAS                                  *)
 (*                                                                        *)
 (* All rights reserved.                                                   *)
 (* This source code is licensed under the GNU Affero General Public       *)
@@ -11,10 +11,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let platform = Superbol_platform.record
+open Cobol_common.Platform.TYPES
 
-(** Note: won't show detailed source locations as the openned file is not
-    actually on disk (that may be fixed later with a custom internal file
-    store). *)
-
-let pp_srcloc = Cobol_common.Srcloc.pp_srcloc_without_caret
+(* XXX: temporary *)
+let record =
+  {
+    verbosity = 0;
+    eprintf = Printf.eprintf;
+    error = Pretty.error;
+    read_file = (fun file -> Ez_file.V1.EzFile.read_file file);
+    autodetect_format = Heuristics.autodetect_format;
+    find_lib = Copybook_finder.find_lib;
+    getenv_opt = (fun variable -> Sys.getenv_opt variable);
+  }

@@ -59,9 +59,9 @@ val lex_lib
   : platform: Cobol_common.Platform.TYPES.platform
   -> dialect: Cobol_config.dialect
   -> source_format: Cobol_config.source_format_spec
-  -> lookup_config: Cobol_common.Copybook.lookup_config
+  -> lookup_config: Cobol_common.Copybook.TYPES.lookup_config
   -> ?ppf:Format.formatter
-  -> Cobol_common.Copybook.fileloc
+  -> Cobol_common.Copybook.TYPES.fileloc
   -> unit Preproc_outputs.with_diags
 
 (** [fold_source_lines ~dialect ~source_format ~skip_compiler_directives_text

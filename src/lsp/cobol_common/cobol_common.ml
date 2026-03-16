@@ -44,6 +44,7 @@ let init_default_exn_printers () =
 module Types = struct
   include Diagnostics.TYPES
   include Srcloc.TYPES
+  type platform = Platform.TYPES.platform
 end
 include Types
 

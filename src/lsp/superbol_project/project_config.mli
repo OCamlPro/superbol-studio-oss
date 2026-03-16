@@ -81,7 +81,7 @@ val source_format_for
 val copybook_lookup_config_for
   : filename: string
   -> t
-  -> Cobol_common.Copybook.lookup_config
+  -> Cobol_common.Copybook.TYPES.lookup_config
 
 (** {1 Intermediate conversion utilities}
 

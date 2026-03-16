@@ -39,6 +39,7 @@ let action ~numeric ~intext ~inplace ?suffix ?range
     in
 
     let edits, _ops = Cobol_indent.Main.indent
+        ~platform:Superbol_platform.record
         ~source_format
         ~config:project.config.indent_config
         ~dialect:Config.dialect

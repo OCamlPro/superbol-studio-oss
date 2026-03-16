@@ -13,7 +13,8 @@
 
 (*indent a range of file, with the user-defined or default indent_config*)
 val indent_range
-  : dialect: Cobol_config.dialect
+  : platform:Cobol_common.Platform.TYPES.platform
+  -> dialect: Cobol_config.dialect
   -> source_format:Cobol_config.source_format_spec
   -> indent_config:Indent_config.t option
   -> range:Indent_type.range option

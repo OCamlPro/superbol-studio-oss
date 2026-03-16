@@ -32,7 +32,7 @@ let () =
 (** {1 Server initialization} *)
 
 let platform =
-  Cobol_common.Platform.default
+  Superbol_platform.record
 and layout =
   Superbol_free_lib.Project.layout
 and cache_config =

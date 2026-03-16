@@ -46,7 +46,7 @@ and preprocessor_persist =
     dialect: Cobol_config.dialect;
     source_format: Src_format.any option;  (* to keep auto-detecting on reset *)
     exec_preprocs: exec_preprocessor EXEC_MAP.t;
-    copybook_lookup_config: Cobol_common.Copybook.lookup_config;
+    copybook_lookup_config: Cobol_common.Copybook.TYPES.lookup_config;
     platform: Cobol_common.Platform.TYPES.platform;     (* == reader.platform *)
     show_if_verbose: [`Txt | `Src] list;
   }

@@ -11,50 +11,37 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type fileloc = [ `Word of string | `Alphanum of string ]
+module TYPES: sig
 
-type lookup_config =
-  {
-    lookup_path: string list;
-    lookup_exts: string list;
-  }
+  type fileloc = [ `Word of string | `Alphanum of string ]
 
-val pp_lookup_config: lookup_config Pretty.printer
+  type lookup_config =
+    {
+      lookup_path: string list;
+      lookup_exts: string list;
+    }
 
-val lookup_config
-  : ?libexts: string list
-  -> string list
-  -> lookup_config
+  type lookup_error =
+    {
+      lookup_libname: string;
+      lookup_config: lookup_config;
+    }
 
-type lookup_error =
-  {
-    lookup_libname: string;
-    lookup_config: lookup_config;
-  }
+end
 
-val pp_lookup_error: lookup_error Pretty.printer
-
-(* --- *)
+open TYPES
 
 val copybook_extensions: string list
 val copybookonly_extensions: string list
 
-(** [find_lib ~lookup_config ?fromfile ?libname txtname] attempts to locate a
-    file containing the copybook [txtname], which is a file named [txtname],
-    possibly appended with an extension from [libexts] (considered in order), {e
-    unless} [txtname] is given as an alphanumeric literal ({i e.g, [txtname =
-    `Alphanum filname] --- in which case no extension is assumed).
+val lookup_config: ?libexts: string list -> string list -> lookup_config
 
-    If [libname] is not provided, then the file is searched within the
-    directories listed in [libpath] (considered in order).  Otherwise, a single
-    directory [libname] is considered; if [libname] is a relative path, it is
-    interpreted relative to the directory that contains [fromfile].
+val pp_lookup_config: lookup_config Pretty.printer
+val pp_lookup_error: lookup_error Pretty.printer
 
-    Lookup is performed in a case-insensitive way. Every directory in the path
-    is considered in order, and all extensions are tried for a given directory
-    of the path in the provided order.
- *)
-val find_lib
+(* --- *)
+
+val dummy_find_lib
   : lookup_config: lookup_config
   -> ?fromfile:string
   -> ?libname:fileloc

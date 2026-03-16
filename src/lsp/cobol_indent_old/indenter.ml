@@ -14,9 +14,9 @@
 open Indent_type
 
 (*indent a range of file, with the default indent_config*)
-let indent_range ~dialect ~source_format ~indent_config ~range ~filename ~contents =
+let indent_range ~platform ~dialect ~source_format ~indent_config ~range
+    ~filename ~contents =
   let indent_config = Option.value ~default:Indent_config.default indent_config in
-  let platform = Cobol_common.Platform.default in
   let src_format =
     (* Note: this value doesn't actually matter, it will be overriden
        immediately by [fold_source_lines] calling [on_change_of_source_format]

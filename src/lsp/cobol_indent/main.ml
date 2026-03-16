@@ -64,7 +64,7 @@
      indentation to the left
 *)
 
-open Ez_file.V1
+open Cobol_common.Platform.TYPES
 
 open Types
 
@@ -72,6 +72,7 @@ open Types
    state at a given position, and indent a range by starting at the
    closest line with a saved state. *)
 let indent
+    ~platform
     ~source_format
     ~config
     ~dialect (* why ? we usually don't care about the dialect to indent *)
@@ -85,7 +86,7 @@ let indent
   ignore ( config ) ;
   ignore ( dialect ) ;
   let contents = match contents with
-    | None -> EzFile.read_file filename
+    | None -> platform.read_file filename
     | Some contents -> contents
   in
 

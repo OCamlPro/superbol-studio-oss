@@ -11,6 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cobol_config.Types
+
 (* Paging *)
 
 type free = UnlimitedLines
@@ -154,5 +156,5 @@ let looks_like_fixed_format ?(tab_stop = 8) contents_prefix =
 
 let guess_from ~contents_prefix =
   if looks_like_fixed_format contents_prefix
-  then from_config SFFixed
-  else from_config SFFree
+  then SFFixed
+  else SFFree

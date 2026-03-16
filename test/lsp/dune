@@ -6,5 +6,5 @@
   (pps ppx_expect))
  (inline_tests
   (modes best)) ; add js for testing with nodejs
- (libraries cobol_lsp lsp superbol_free_lib superbol_testutils)
+ (libraries cobol_lsp lsp superbol_free_lib superbol_testutils superbol_platform)
  )

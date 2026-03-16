@@ -21,7 +21,7 @@ open Cobol_preproc.Options
 open Cobol_parser.Options
 
 type t = {
-  platform : Cobol_common.Platform.TYPES.platform;
+  platform: Cobol_common.Platform.TYPES.platform;
   preproc_options: preproc_options;
   parser_options: parser_options;
   pretty_verbose: 'a. 'a Pretty.proc;
@@ -128,7 +128,7 @@ let get ?(verbose_on = `Stdout) () =
   let get () =
     let verbose = !Globals.verbosity > 0 in
     let config =
-      DIAGS.show_n_forget ~platform:Cobol_common.Platform.default @@
+      DIAGS.show_n_forget ~platform:Superbol_platform.record @@
       match !conf, !dialect with
       | "", None ->
           DIAGS.result Cobol_config.default
@@ -169,7 +169,7 @@ let get ?(verbose_on = `Stdout) () =
       end !definitions Cobol_preproc.Env.empty
     in
     let platform =
-      { Cobol_common.Platform.default with verbosity = !Globals.verbosity }
+      { Superbol_platform.record with verbosity = !Globals.verbosity }
     in
     (* Pretty.error "@[Preprocessor environment:@;<1 2>@[%a@]@]@." *)
     (*   Cobol_preproc.Env.pp env; *)

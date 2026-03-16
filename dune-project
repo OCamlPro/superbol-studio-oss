@@ -257,6 +257,7 @@
    (ocaml (>= 4.14.0))
    (vscode-json (= :version))
    (superbol_preprocs (= :version))
+   (superbol_platform (= :version))
    (sql_preproc (= :version))
    (lwt ( >= 5 ))
    (ez_toml (= :version))
@@ -319,6 +320,26 @@
  )
 
 (package
+ (name superbol_platform)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (pretty (= :version))
+   (ez_file (and (>= 0.3.0) (< 1.0.0)))
+   (cobol_preproc (= :version))
+   (cobol_common (= :version))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
  (name cobol_common)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
@@ -330,7 +351,6 @@
  (depends
    (ocaml (>= 4.14.0))
    (pretty (= :version))
-   (ocplib_stuff (and (>= 0.4.0) (< 1.0.0)))
    (ppx_deriving ( >= 5.2.1 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))

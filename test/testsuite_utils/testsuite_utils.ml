@@ -56,7 +56,7 @@ let gixsql_testsuite = testsuites // "sql" // "gixsql_test"
 let gixsql_root = srcdir // gixsql_testsuite
 
 let platform =
-  Cobol_common.Platform.default
+  Superbol_platform.record
 
 let from_dialect dialect =
   Cobol_common.Diagnostics.show_n_forget ~platform @@

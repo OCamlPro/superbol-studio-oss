@@ -55,7 +55,7 @@ val rootdir_for: uri:Lsp.Uri.t -> layout:layout -> rootdir
 (** [copybook_lookup_config_for ~uri project] constructs a copybook lookup
     configuration for a source file at the given URI, in the given project. *)
 val copybook_lookup_config_for
-  : uri:Lsp.Uri.t -> t -> Cobol_common.Copybook.lookup_config
+  : uri:Lsp.Uri.t -> t -> Cobol_common.Copybook.TYPES.lookup_config
 
 (** [detect_copybook ~uri ?contents project] indicates whether a document at the
     given URI for [project] should be treated as a copybook. *)

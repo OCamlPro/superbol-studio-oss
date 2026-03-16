@@ -14,7 +14,7 @@
 open Ezcmd.V2
 open EZCMD.TYPES
 
-let platform = Cobol_common.Platform.default
+let platform = Superbol_platform.record
 
 let run_lsp ~enable_caching ~force_syntax_diagnostics ~storage
     ?(extensions = Cobol_lsp.default_extensions) () =

@@ -1,6 +1,6 @@
 
 # name of package
-name = "cobol_common"
+name = "superbol_platform"
 skeleton = "library"
 
 # version if different from project version
@@ -23,7 +23,7 @@ gen-version = "version.ml"
 
 # supported file generators are "ocamllex", "ocamlyacc" and "menhir" 
 # default is [ "ocamllex", "ocamlyacc" ] 
-generators = ["menhir"]
+# generators = [ "ocamllex", "menhir" ]
 
 # menhir options for the package
 #Example:
@@ -43,21 +43,23 @@ generators = ["menhir"]
 
 # preprocessing options
 #  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
-preprocess = "pps ppx_deriving.show ppx_deriving.ord"
+# preprocess = "pps ppx_deriving.show"
 
 # files to skip while updating at package level
-skip = ["main.ml", "index.mld"]
+skip = ["index.mld", "main.ml"]
 
 # package library dependencies
 #   [dependencies]
 #   ez_file = ">=0.1 <1.3"
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
+cobol_common = "version"
+cobol_preproc = "version"
+ez_file = "0.3.0"
 pretty = "version"
 
 # package tools dependencies
 [tools]
-ppx_deriving = ">=5.2.1"
 
 # package fields (depends on package skeleton)
 #Examples:
@@ -71,4 +73,4 @@ ppx_deriving = ">=5.2.1"
 #  dune-stanzas = "(flags (:standard (:include linking.sexp)))" 
 #  static-clibs = "unix" 
 [fields]
-dune-libraries = "str"
+# ...

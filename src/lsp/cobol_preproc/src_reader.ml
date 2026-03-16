@@ -264,18 +264,20 @@ let fill buff ~lookup_len (input: Src_input.t) =
       (try Buffer.add_channel buff ic lookup_len with End_of_file -> ());
       Stdlib.seek_in ic 0                        (* FIXME: may break on pipes *)
 
-let start_reading ?source_format ~platform:_ input =
+let start_reading ?source_format ~platform input =
   match source_format with
   | Some format ->
       (* TODO: read 3 bytes and skip any utf-8 BOM while shifting initial
          pos_cnum. *)
       format, input
   | None ->
-      let lookup_len = 20 in                             (* 20 as in GnuCOBOL *)
-      let buff = Buffer.create lookup_len in
-      fill buff ~lookup_len input;
-      (* TODO: skip any utf-8 BOM while shifting initial pos_cnum. *)
-      Src_format.guess_from ~contents_prefix:(Buffer.contents buff), input
+      let autodetected_format =
+        platform.autodetect_format input.filename
+          ?source_contents:(match input.Src_input.source with
+              | String source_contents -> Some source_contents
+              | Channel _ -> None)
+      in
+      Src_format.from_config autodetected_format, input
 
 let from ?source_format ~platform (input: Src_input.t) =
   let source_format, input = start_reading input ~platform ?source_format in
