@@ -48,7 +48,7 @@ module INPUT = struct
   let close_in ic = close_in ic.ic
 
   let error ?ic fmt =
-    Printf.kprintf (fun s ->
+    Printf.ksprintf (fun s ->
         begin
           match ic with
           | Some ic ->
@@ -61,7 +61,7 @@ module INPUT = struct
       ) fmt
 
   let warning ic fmt =
-    Printf.kprintf (fun s ->
+    Printf.ksprintf (fun s ->
         Printf.eprintf "Warning at %s:%d: %s\n%!"
                 ic.filename ic.line s;
       ) fmt

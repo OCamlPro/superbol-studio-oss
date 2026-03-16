@@ -71,7 +71,7 @@ let apply_edits ~contents ~range ~config ~filename ~edits ~symbolic =
     if nbefore > 0 then
       let c = contents.[pos] in
       if c = '\n' || c = '\r' then
-        Printf.kprintf failwith
+        Printf.ksprintf failwith
           "Cobol_indent.Editor.skip_before: char \\%3d at pos %d, line %d, skipping %d" (int_of_char c) pos line nbefore ;
 
       if c = '\t' then
