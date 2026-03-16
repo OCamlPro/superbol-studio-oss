@@ -15,6 +15,7 @@ open Ez_file.V1
 open Autofonce_lib
 open Autofonce_config
 open Autofonce_core.Types
+open Testsuite_utils
 
 let () =
   Cobol_common.init_default_exn_printers ();
@@ -23,8 +24,6 @@ let () =
   Stdlib.Printexc.record_backtrace false
 
 (* Preliminary utilities *)
-
-let platform = Cobol_common.Platform.default
 
 module STR = struct
   let contains s1 s2 =
@@ -136,7 +135,7 @@ let setup_input ~filename contents =
   let oc = open_out filename in
   output_string oc contents;
   close_out oc;
-  Cobol_preproc.Input.string ~filename contents ~platform
+  Cobol_preproc.Input.string ~filename contents
 
 let delete_file ~filename =
   Ez_file.FileString.remove filename
@@ -199,7 +198,7 @@ let do_check_parse (test_filename, contents, _, { check_loc;
   let parse_simple input =
     input |>
     Cobol_preproc.preprocessor
-      ~options:{ Cobol_preproc.Options.default with
+      ~options:{ default_preproc_options with
                  source_format } |>
     Cobol_parser.parse_simple
       ~options:default_parser_options

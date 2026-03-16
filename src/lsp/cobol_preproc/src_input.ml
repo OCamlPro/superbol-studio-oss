@@ -14,24 +14,21 @@
 open Cobol_common.Platform.TYPES
 
 type t =
-  { source: source; filename: string; platform: platform }
+  { source: source; filename: string }
 and source =
   | String of string
   | Channel of in_channel
 
-let string ~filename contents ~platform =
-  { source = String contents; filename; platform }
+let string ~filename contents =
+  { source = String contents; filename }
 
-let channel ~filename ic ~platform =
-  { source = Channel ic; filename; platform }
-
-let source_platform t =
-  t.platform
+let channel ~filename ic =
+  { source = Channel ic; filename }
 
 (** [from ~filename ~f] feeds [f] with the contents of a file named [filename];
     uses [stdin] if [filename = ""]. *)
 let from ~filename ~f ~platform =
   f @@
   if filename = ""
-  then channel ~filename stdin ~platform
-  else string ~filename ~platform @@ platform.read_file filename
+  then channel ~filename stdin
+  else string ~filename @@ platform.read_file filename

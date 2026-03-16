@@ -48,7 +48,7 @@ let reparse_file ~source_format ~config filename =
       let contents = print cg in
       match
         parse ~source_format:(SF SFFree) @@
-        Cobol_preproc.Input.string ~filename contents ~platform
+        Cobol_preproc.Input.string ~filename contents
       with
       | { result = Only Some cg'; _ } ->
         if Cobol_ptree.compare_compilation_group cg cg' = 0 then

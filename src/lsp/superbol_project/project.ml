@@ -115,15 +115,18 @@ let absolute_path_for ~filename { rootdir; _ } =
 let file_contents_looks_like_a_copybook
     ~platform ~filename ?contents { config; _ } =
   let decide input =
-    Cobol_preproc.scan_prefix_for_copybook input
-      ~dialect:(Cobol_config.dialect config.cobol_config)
-      ~source_format:(Project_config.source_format_for ~filename config) = `Copybook
+    let kind =
+      Cobol_preproc.scan_prefix_for_copybook input ~platform
+        ~dialect:(Cobol_config.dialect config.cobol_config)
+        ~source_format:(Project_config.source_format_for ~filename config)
+    in
+    kind = `Copybook
   in
   match contents with
   | None ->
       Cobol_preproc.Input.from ~filename ~f:decide ~platform
   | Some c ->
-      decide @@ Cobol_preproc.Input.string ~filename c ~platform
+      decide @@ Cobol_preproc.Input.string ~filename c
 
 let is_a_copybook_extension ext =
   List.mem (String.lowercase_ascii (EzString.after ext 1))    (* trim the `.` *)

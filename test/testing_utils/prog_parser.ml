@@ -11,16 +11,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let preproc
-    ?(filename = "prog.cob")
-    ?(source_format = Cobol_config.(SF SFFixed))
-    contents
-  =
+let preproc ?(filename = "prog.cob") ?source_format contents =
   Cobol_common.Srcloc.TESTING.register_file_contents ~filename contents;
-  Cobol_preproc.Input.string ~filename contents
-    ~platform:Prog_common.platform |>
+  Cobol_preproc.Input.string ~filename contents |>
   Cobol_preproc.preprocessor
-    ~options:{ Cobol_preproc.Options.default with source_format }
+    ~options:(Prog_preproc.options ~verbose:false ?source_format ())
 
 let options
     ?(verbose = false)

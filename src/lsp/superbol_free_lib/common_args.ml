@@ -174,7 +174,7 @@ let get ?(verbose_on = `Stdout) () =
     (* Pretty.error "@[Preprocessor environment:@;<1 2>@[%a@]@]@." *)
     (*   Cobol_preproc.Env.pp env; *)
     { platform ;
-      preproc_options = { config; source_format;
+      preproc_options = { platform; config; source_format;
                           exec_preprocs = EXEC_MAP.empty;
                           copybook_lookup_config =
                             Cobol_common.Copybook.lookup_config !libpath

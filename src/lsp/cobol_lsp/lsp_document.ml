@@ -77,7 +77,7 @@ let rewindable_parse ({ project; textdoc; _ } as doc) =
       } @@
   Cobol_preproc.preprocessor
     ~options:Cobol_preproc.Options.{
-        default with
+        (default ~platform:Lsp_platform.record) with
         copybook_lookup_config =
           Lsp_project.copybook_lookup_config_for ~uri:(uri doc) project;
         config = project.config.cobol_config;
@@ -87,9 +87,9 @@ let rewindable_parse ({ project; textdoc; _ } as doc) =
           | _ -> Superbol_project.Config.source_format_for
                    ~filename:(Lsp.Uri.to_path (uri doc)) project.config
       } @@
-  Cobol_preproc.Input.string (Lsp.Text_document.text textdoc)
-    ~filename:(Lsp.Uri.to_path (uri doc))
-    ~platform:Lsp_platform.record
+  Cobol_preproc.Input.string
+    ~filename:(Lsp.Uri.to_path (uri doc)) @@
+  Lsp.Text_document.text textdoc
 
 let no_artifacts =
   Cobol_parser.Outputs.{ tokens = lazy [];
