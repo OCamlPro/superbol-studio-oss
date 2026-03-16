@@ -250,6 +250,9 @@ let make make_lexing ?filename ~source_format input =
 
 let from_string = make Lexing.from_string
 let from_channel = make Lexing.from_channel
+let from_channel_no_tabs ?(tab_stop=8) =
+    make (Src_rewriting.from_channel_expanding_tabs ~tab_stop)
+
 
 let fill buff ~lookup_len (input: Src_input.t) =
   match input with
@@ -276,9 +279,9 @@ let from ?source_format (input: Src_input.t) =
   let source_format, input = start_reading input ?source_format in
   match input with
   | String { contents; filename } ->
-      from_string ~source_format ~filename contents
+      from_string ~source_format ~filename (Src_rewriting.expand_tabs contents)
   | Channel { ic; filename } ->
-      from_channel ~source_format ~filename ic
+      from_channel_no_tabs ~source_format ~filename ic
 
 (* --- *)
 
