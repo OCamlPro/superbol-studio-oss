@@ -28,7 +28,7 @@ let get_length cu name =
         with Cobol_data.Memory.NOT_SCALAR _ -> 0
       in
       begin match field_layout with
-        | Elementary_field { usage = Packed_decimal pic; _ } ->
+        | Elementary_field { usage = Packed_decimal { picture = pic; _ }; _ } ->
           begin match pic.category with
             | FixedNum { digits; _ } -> digits
             | _ -> size end
@@ -97,9 +97,9 @@ let get_type cu name =
       match x_info with
       | Data_field { def = { payload = { field_layout; _ }; _ }; _ } -> begin
         match field_layout with
-        | Elementary_field { usage = Packed_decimal picture; _ } ->
+        | Elementary_field { usage = Packed_decimal { picture; with_sign_nibble }; _ } ->
             (match picture.category with
-            | FixedNum { sign = Some _; _ } ->
+            | FixedNum { sign = Some _; _ } when with_sign_nibble ->
             COBOL_TYPE_SIGNED_NUMBER_PD
             | FixedNum _ ->
             COBOL_TYPE_UNSIGNED_NUMBER_PD
@@ -136,7 +136,7 @@ let get_scale cu name =
     match x_info with
     | Data_field { def = { payload = { field_layout; _ }; _ }; _ } -> begin
       match field_layout with
-      | Elementary_field { usage = Packed_decimal picture; _ }
+      | Elementary_field { usage = Packed_decimal { picture; _ }; _ }
       | Elementary_field { usage = Display picture; _ } -> (
         match picture.category with
         | FixedNum { scale; _ }

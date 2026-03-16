@@ -46,7 +46,11 @@ type usage =
   | Index
   | National of (* [any] *) picture
   | Object_reference of Cobol_ptree.object_reference_kind option       (* tmp *)
-  | Packed_decimal of (* [`numeric] *) picture
+  | Packed_decimal of
+      {
+        picture: (* [`numeric] *) picture;
+        with_sign_nibble: bool; (* distinguishes COMP-6 from COMP-3/PACKED-DECIMAL *)
+      }
   | Pointer of Cobol_ptree.name with_loc option                        (* tmp *)
   | Program_pointer of Cobol_ptree.name with_loc option                (* tmp *)
 and signedness = { signed: bool }

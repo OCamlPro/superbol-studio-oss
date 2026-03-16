@@ -2,6 +2,9 @@
 
 ## [_] Next release
 
+### Added
+- Support for COMP-6 usage [#548](https://github.com/OCamlPro/superbol-studio-oss/pull/548)
+
 ### Fixed
 - Parsing of LSP CLI arguments, that notably prevented caching in global storage [#549](https://github.com/OCamlPro/superbol-studio-oss/pull/549) (fix for [Issue #547](https://github.com/OCamlPro/superbol-studio-oss/issues/547))
 - Size reported for numeric items with `SIGN SEPARATE` clause [#545](https://github.com/OCamlPro/superbol-studio-oss/pull/545)

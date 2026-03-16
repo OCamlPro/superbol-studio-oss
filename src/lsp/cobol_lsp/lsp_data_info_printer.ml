@@ -111,8 +111,10 @@ let pp_usage: usage Pretty.printer =
         pp_usage_with_picture ppf "NATIONAL" picture
     | Object_reference _ ->
         Pretty.print ppf "Object reference"
-    | Packed_decimal picture ->
-        pp_usage_with_picture ppf "PACKED-DECIMAL" picture
+    | Packed_decimal { picture; with_sign_nibble } ->
+        pp_usage_with_picture ppf
+          (if with_sign_nibble then "PACKED-DECIMAL" else "PACKED-DECIMAL-NO-SIGN")
+          picture
     | Pointer _ ->
         Pretty.print ppf "Pointer"
     | Program_pointer _ ->
