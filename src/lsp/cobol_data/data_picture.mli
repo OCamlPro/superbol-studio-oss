@@ -23,7 +23,6 @@ module TYPES: sig
     sign_separate: bool;
   }
 
-  val default_sign_config: sign_config
   val pp_sign_config: sign_config option Pretty.printer
 
   type symbol =
@@ -152,7 +151,7 @@ module TYPES: sig
     max_pic_length : int;
     decimal_char: char;
     currency_signs: Cobol_common.Basics.CharSet.t;
-    sign_config: sign_config option;
+    sign_config: sign_config;
   }
 
   type error =
@@ -250,6 +249,9 @@ val error_diagnostics: loc:srcloc -> (error * (int * int)) list ->
 
 val pp_meaning_of_precedence_index
   : decimal_char: char -> Format.formatter -> int -> unit
+
+(** Default sign configuration: trailing, non-separate. *)
+val default_sign_config: sign_config
 
 (** Verifies that the picture string is interpreted as `expect`,
    i.e. the result of `pp_picture`. If not, displays the difference on

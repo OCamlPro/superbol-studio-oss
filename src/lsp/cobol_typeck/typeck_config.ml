@@ -29,7 +29,8 @@ type acc =
 let default_config =
   Cobol_unit.Types.{
     unit_decimal_point = '.';
-    unit_currency_signs = CharSet.empty
+    unit_currency_signs = CharSet.empty;
+    unit_sign_config = Cobol_data.Picture.default_sign_config;
   }
 
 let init config =
