@@ -96,7 +96,7 @@ let init (config: unit_config) =
         max_pic_length = 100;
         decimal_char = config.unit_decimal_point;
         currency_signs = config.unit_currency_signs;
-        sign_config = None;
+        sign_config = config.unit_sign_config;
       };
     diags = [];
   }

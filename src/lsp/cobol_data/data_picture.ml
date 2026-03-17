@@ -26,10 +26,6 @@ module TYPES = struct
   }
   [@@deriving ord]
 
-  (** Default sign configuration: trailing, non-separate. *)
-  let default_sign_config =
-    { sign_position = Trailing; sign_separate = false }
-
   type symbol =
     | A
     | B
@@ -250,7 +246,7 @@ module TYPES = struct
     max_pic_length : int;
     decimal_char: char;
     currency_signs: Cobol_common.Basics.CharSet.t;
-    sign_config: sign_config option;
+    sign_config: sign_config;
   }
 
   type error =
@@ -618,8 +614,7 @@ let append category ~sign_config ~after_v ({ symbol; symbol_occurences = n } as 
   | None, Nine ->
       Ok (numeric n 0)
   | None, S ->
-      let sign = Option.value ~default:default_sign_config sign_config in
-      Ok (numeric 0 0 ~sign:(Some sign))
+      Ok (numeric 0 0 ~sign:(Some sign_config))
   | None, V ->
       Ok (numeric 0 0)
   | None, P ->
@@ -1193,27 +1188,6 @@ let error_diagnostics ~loc errors =
     add_diags acc ~loc:(Srcloc.sub loc ~pos ~len) error
   end DIAGS.Set.none (List.rev errors)
 
-module Make (Config: Cobol_config.T) (Env: ENV) = struct
-
-  exception InvalidPicture of
-      string with_loc * Cobol_common.Diagnostics.diagnostics * picture
-
-  let of_string ({ payload; loc } as str) =
-
-    let config = {
-      max_pic_length = Config.pic_length#value;
-      decimal_char = Env.decimal_char;
-      currency_signs = Env.currency_signs;
-      sign_config = None;
-    } in
-    match of_string config payload with
-    | Ok pic ->
-        { payload = pic; loc }
-    | Error (errors, pic) ->
-        raise @@ InvalidPicture (str, error_diagnostics ~loc errors, pic)
-
-end
-
 (* --- *)
 
 (* Some easy-to-used constructors *)
@@ -1286,9 +1260,13 @@ let size pic = size pic.category
 
 (* --- *)
 
+(** Default sign configuration: trailing, non-separate. *)
+let default_sign_config =
+  { sign_position = Trailing; sign_separate = false }
+
 let config = { max_pic_length = 100; decimal_char = '.';
                currency_signs = CHARS.add '$' CHARS.empty;
-               sign_config = None }
+               sign_config = default_sign_config }
 
 let unit_test ?(config=config) ~expect picture =
   let ppf = Format.str_formatter in
@@ -1314,3 +1292,29 @@ let unit_test ?(config=config) ~expect picture =
   end
   else
     true
+
+
+(* --- *)
+
+(* TODO: get rid of that functor. *)
+
+module Make (Config: Cobol_config.T) (Env: ENV) = struct
+
+  exception InvalidPicture of
+      string with_loc * Cobol_common.Diagnostics.diagnostics * picture
+
+  let of_string ({ payload; loc } as str) =
+
+    let config = {
+      max_pic_length = Config.pic_length#value;
+      decimal_char = Env.decimal_char;
+      currency_signs = Env.currency_signs;
+      sign_config = default_sign_config;
+    } in
+    match of_string config payload with
+    | Ok pic ->
+        { payload = pic; loc }
+    | Error (errors, pic) ->
+        raise @@ InvalidPicture (str, error_diagnostics ~loc errors, pic)
+
+end

@@ -133,7 +133,8 @@ module Pictures = struct
       pic = [nine 1; a 1] }
 
   let pic_S99 =
-    { category = fixednum ~sign:(Some { sign_position = Trailing; sign_separate = false }) 2 0;
+    { category = fixednum ~sign:(Some { sign_position = Trailing;
+                                        sign_separate = false }) 2 0;
       pic = [s 1; nine 2] }
 
   (* let pic_S99p = *)
@@ -344,6 +345,11 @@ module Pictures = struct
     { category = fixednum 6 (-3);
       pic = [nine 3; p 3] }
 
+  let pic_SPPP9 =
+    { category = fixednum 4 4 ~sign:(Some { sign_position = Trailing;
+                                            sign_separate = false });
+      pic = [s 1; p 3; nine 1] }
+
   let pic_ZZZ999V99 =
     let zerorepl = { zero_replacement_symbol = Z;
                      zero_replacement_ranges = [{ floating_range_offset = 0;
@@ -529,6 +535,7 @@ let () =
       parse_ok ",,999,999.999"           pic_cc999c999v999;
       parse_ok "PPP999"                  pic_PPP999;
       parse_ok "999PPP"                  pic_999PPP;
+      parse_ok "SPPP9"                   pic_SPPP9;
       parse_ok "VP9B"                    pic_VP9B;
       parse_ok "B9P(3)"                  pic_B9PPP;
       parse_ok "+(5)P(3)"                pic_pppppPPP;

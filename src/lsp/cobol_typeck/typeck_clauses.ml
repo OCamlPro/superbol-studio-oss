@@ -149,12 +149,10 @@ let sign_config_of_clause
 
 
 let display_usage_from_literal: Cobol_ptree.literal -> usage =
-  let open Cobol_data.Picture.TYPES in
   (* TODO: `Display|`National *)
   let detect_sign i =
     if EzString.starts_with ~prefix:"-" i
-    then Some default_sign_config,
-         String.length i - 1
+    then Some Cobol_data.Picture.default_sign_config, String.length i - 1
     else None, String.length i
   in
   function
@@ -273,11 +271,13 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
     | None ->
         diags, None
   in
-  let sign_config =
-    Option.map (fun s -> sign_config_of_clause ~&s) item_clauses.sign
-  in
   let picture_config =
-    { picture_config with PIC.TYPES.sign_config }
+    match item_clauses.sign with
+    | Some sign_config ->
+        { picture_config with
+          PIC.TYPES.sign_config = sign_config_of_clause ~&sign_config }
+    | None ->
+        picture_config
   in
   let diags, picture =
     match item_clauses.picture with

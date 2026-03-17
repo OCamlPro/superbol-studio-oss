@@ -32,6 +32,7 @@ type unit_config =
   {
     unit_currency_signs: Cobol_common.Basics.CharSet.t;
     unit_decimal_point: char;
+    unit_sign_config: Cobol_data.Picture.TYPES.sign_config;
   }
 
 (* TODO: add a dedicated type to hold info from the INPUT-OUTPUT SECTION. Maybe
