@@ -11,8 +11,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open EzCompat
-
 module TYPES = struct
 
   type fileloc = [ `Word of string | `Alphanum of string ]
@@ -57,13 +55,6 @@ let pp_lookup_config ppf { lookup_path; lookup_exts } =
     "@[- search@ path:@ %a@]@;\
      @[- filename@ extensions:@ %a@]"
     pp_path lookup_path Fmt.(list ~sep:sp @@ fmt "%S") lookup_exts
-
-(* --- *)
-
-let dummy_find_lib ~lookup_config ?fromfile:_ ?libname:_ textname
-  : (string, lookup_error) result =
-  match textname with
-  | `Alphanum w | `Word w -> Error { lookup_libname = w; lookup_config }
 
 let pp_lookup_error ppf { lookup_libname; lookup_config } =
   Pretty.print ppf

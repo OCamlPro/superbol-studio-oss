@@ -405,9 +405,13 @@ let pp_raw_loc: ?platform:platform -> raw_loc Pretty.printer =
     Buffer.contents b
   in
   fun ?platform ppf raw_loc ->
-    let text = match platform with
+    let text =
+      match platform with
       | None -> ""
-      | Some platform -> try find_source ~platform raw_loc with _ -> "" in
+      | Some platform ->
+          try find_source ~platform raw_loc
+          with Sys_error _ | Failure _ | Unix.Unix_error _ -> ""
+    in
     Pretty.print ppf "%a:@\n@[@<0>%s@]" pp_file_loc raw_loc text
 
 let pp_raw_loc_without_caret =

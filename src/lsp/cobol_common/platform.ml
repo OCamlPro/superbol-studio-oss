@@ -74,7 +74,10 @@ let innocuous = {
       "%s: Filesystem operations are unavailable" file
   end;
   autodetect_format = (fun ?source_contents:_ _filename -> SFFixed);
-  find_lib = Copybook.dummy_find_lib;
+  find_lib = begin fun ~lookup_config ?fromfile:_ ?libname:_ (`Alphanum w |
+                                                              `Word w) ->
+    Error { lookup_libname = w; lookup_config }
+  end;
   getenv_opt = (fun _variable -> None);
 }
 

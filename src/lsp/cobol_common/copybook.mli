@@ -38,12 +38,3 @@ val lookup_config: ?libexts: string list -> string list -> lookup_config
 
 val pp_lookup_config: lookup_config Pretty.printer
 val pp_lookup_error: lookup_error Pretty.printer
-
-(* --- *)
-
-val dummy_find_lib
-  : lookup_config: lookup_config
-  -> ?fromfile:string
-  -> ?libname:fileloc
-  -> fileloc
-  -> (string, lookup_error) result
