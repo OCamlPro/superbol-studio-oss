@@ -12,7 +12,6 @@
 (**************************************************************************)
 
 open Cobol_common.Srcloc.TYPES
-open Cobol_common.Platform.TYPES
 
 (** {1 Source text reader} *)
 
@@ -22,7 +21,7 @@ type t
 
 val from
   : ?source_format: Src_format.any
-  -> platform:platform
+  -> platform:Cobol_common.Platform.TYPES.platform
   -> Src_input.t
   -> t
 

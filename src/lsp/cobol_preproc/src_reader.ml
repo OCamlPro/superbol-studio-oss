@@ -33,9 +33,9 @@ let rev_ignored (Plx (pl, _, _)) = Src_lexing.rev_ignored pl
 let rev_newline_cnums (Plx (pl, _, _)) = Src_lexing.rev_newline_cnums pl
 
 let chunks_reader lexer =
-  let rec next_line (state, lexbuf, input) =
+  let rec next_line (state, lexbuf, platform) =
     let state, pseutoks = lexer state lexbuf in
-    let reader = state, lexbuf, input in
+    let reader = state, lexbuf, platform in
     match pseutoks with
     | [] -> next_line reader                               (* skip blank lines *)
     | _ -> Line (reader, pseutoks)
@@ -52,11 +52,11 @@ let next_chunk (Plx pl) =
 (* Change of source format *)
 
 let with_source_format: Src_format.any with_loc -> t -> (t, error) result =
-  fun { payload = SF format; loc } ((Plx (s, lexbuf, input)) as pl) ->
+  fun { payload = SF format; loc } ((Plx (s, lexbuf, platform)) as pl) ->
   if Src_format.equal (Src_lexing.source_format s) format
   then Ok pl
   else match Src_lexing.change_source_format s format with
-    | Ok s -> Ok (Plx (s, lexbuf, input))
+    | Ok s -> Ok (Plx (s, lexbuf, platform))
     | Error () -> Error (Forbidden { loc; stuff = Change_of_source_format })
 
 (* --- *)
@@ -264,12 +264,12 @@ let fill buff ~lookup_len (input: Src_input.t) =
       (try Buffer.add_channel buff ic lookup_len with End_of_file -> ());
       Stdlib.seek_in ic 0                        (* FIXME: may break on pipes *)
 
-let start_reading ?source_format ~platform input =
+let decide_on_source_format ~platform ?source_format input =
   match source_format with
   | Some format ->
       (* TODO: read 3 bytes and skip any utf-8 BOM while shifting initial
          pos_cnum. *)
-      format, input
+      format
   | None ->
       let autodetected_format =
         platform.autodetect_format input.filename
@@ -277,10 +277,10 @@ let start_reading ?source_format ~platform input =
               | String source_contents -> Some source_contents
               | Channel _ -> None)
       in
-      Src_format.from_config autodetected_format, input
+      Src_format.from_config autodetected_format
 
 let from ?source_format ~platform (input: Src_input.t) =
-  let source_format, input = start_reading input ~platform ?source_format in
+  let source_format = decide_on_source_format ~platform ?source_format input in
   match input with
   | { source = String contents; filename } ->
       from_string ~source_format ~filename ~platform contents

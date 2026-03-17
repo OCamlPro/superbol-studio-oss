@@ -11,4 +11,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Note: fields of this record are further initialized when entering
+    `Lsp_server_loop.run` *)
 let record = Cobol_common.Platform.innocuous

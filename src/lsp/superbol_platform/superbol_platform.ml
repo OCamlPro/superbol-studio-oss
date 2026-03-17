@@ -13,7 +13,6 @@
 
 open Cobol_common.Platform.TYPES
 
-(* XXX: temporary *)
 let record =
   {
     verbosity = 0;
