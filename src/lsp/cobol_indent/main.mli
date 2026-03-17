@@ -12,6 +12,7 @@
 (**************************************************************************)
 
 val indent :
+  platform:Cobol_common.Types.platform ->
   source_format:Cobol_config.source_format_spec ->
   config: Types.unparsed_config ->
   dialect:'c ->

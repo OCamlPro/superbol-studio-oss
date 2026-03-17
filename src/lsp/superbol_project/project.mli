@@ -93,11 +93,16 @@ val rootdir: t -> rootdir
 val copybook_lookup_config_for
   : filename:string
   -> t
-  -> Cobol_common.Copybook.lookup_config
+  -> Cobol_common.Copybook.TYPES.lookup_config
 
 (** [detect_copybook ~filename project] indicates whether a document with the
     given [filename] should be treated as a copybook in [project]. *)
-val detect_copybook: filename:string -> ?contents:string -> t -> bool
+val detect_copybook
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> filename:string
+  -> ?contents:string
+  -> t
+  -> bool
 
 (** {1 Cached representation} *)
 

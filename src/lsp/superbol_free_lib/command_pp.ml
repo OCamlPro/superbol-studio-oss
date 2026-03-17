@@ -53,9 +53,11 @@ let cmd =
                in
                if filename = file then
                  Pretty.failwith "Source file conflicts with target %s" file;
+               let common = common_get () in
+               let platform = common.platform in
+               let pp_diagnostics = Cobol_common.Diagnostics.Set.pp ~platform in
                if !parse || !check then
                  let parse ?source_format input =
-                   let common = common_get () in
                    let preproc_options =
                      { common.preproc_options with
                        source_format =
@@ -66,9 +68,11 @@ let cmd =
                    Cobol_preproc.preprocessor ~options:preproc_options |>
                    Cobol_parser.parse_simple ~options:common.parser_options
                  in
-                 let my_text = Cobol_preproc.Input.from ~filename:file ~f:parse in
+                 let my_text =
+                   Cobol_preproc.Input.from ~filename:file ~f:parse ~platform
+                 in
                  let my_text = Cobol_parser.Outputs.translate_diags my_text in
-                 Format.eprintf "%a@." Cobol_common.Diagnostics.Set.pp my_text.diags;
+                 Format.eprintf "%a@." pp_diagnostics my_text.diags;
                  match my_text.result with
                  | Only (Some cg) -> (
                      let print =
@@ -78,7 +82,8 @@ let cmd =
                      output_file filename contents;
                      if !check then
                        match
-                         parse ~source_format:(SF SFFree) (String { filename; contents })
+                         parse ~source_format:(SF SFFree) @@
+                         Cobol_preproc.Input.string ~filename:file contents
                        with
                        | { result = Only (Some cg'); _ } ->
                            if Cobol_ptree.compare_compilation_group cg' cg <> 0 then (
@@ -87,8 +92,7 @@ let cmd =
                            )
                        | { diags; _ } ->
                            let diags = Cobol_parser.Diagnostics.ALL.translate diags in
-                           Format.eprintf "Reparse: %a@."
-                             Cobol_common.Diagnostics.Set.pp diags;
+                           Format.eprintf "Reparse: %a@." pp_diagnostics diags;
                            exit 1
                        | exception _ ->
                            Format.eprintf "Reparse: ERROR!!!@.";
@@ -98,9 +102,8 @@ let cmd =
                else
                  let text =
                    let common = common_get () in
-                   Cobol_preproc.Outputs.show_n_forget @@
-                   Cobol_preproc.text_of_file file
-                     ~options:common.preproc_options
+                   Cobol_preproc.Outputs.show_n_forget ~platform @@
+                   Cobol_preproc.text_of_file file ~options:common.preproc_options
                  in
                  let s =
                    Cobol_preproc.Text_printer.string_of_text

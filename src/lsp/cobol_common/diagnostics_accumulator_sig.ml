@@ -47,9 +47,13 @@ module type S = sig
   val translate_diags
     : 'a with_diags -> 'a Diagnostics.with_diags
   val show_n_forget
-    : ?set_status:bool -> ?min_level:Diagnostics.severity
+    : ?set_status:bool
+    -> ?min_level:Diagnostics.severity
+    -> ?platform:Platform.TYPES.platform
     -> ?ppf:Format.formatter -> 'a with_diags -> 'a
   val sink_result
-    : ?set_status:bool -> ?ppf:Format.formatter -> _ with_diags -> unit
+    : ?set_status:bool
+    -> ?platform:Platform.TYPES.platform
+    -> ?ppf:Format.formatter -> _ with_diags -> unit
 
 end

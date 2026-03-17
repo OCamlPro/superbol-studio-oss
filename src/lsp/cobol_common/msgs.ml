@@ -22,9 +22,10 @@ let error ?loc =
 
 (* --- *)
 
-let pp_msg ?loc ppf fmt =
+let pp_msg ?platform ?loc ppf fmt =
   (* Source text right above message for now: *)
-  Pretty.print ppf ("%a"^^fmt) (Pretty.option Srcloc.pp_srcloc) loc
+  Pretty.print ppf ("%a"^^fmt)
+    (Pretty.option @@ Srcloc.pp_srcloc_with_optional_caret ?platform) loc
 
 (* --- *)
 
@@ -35,9 +36,10 @@ let pp_kuncaught k exn fmt =
    `Cobol_common.catch_diagnostics` and co. *);;
 Stdlib.Printexc.register_printer begin
   let uncaught exn fmt =
-    pp_kuncaught Option.some (__MODULE__^exn) @@ fmt ^^
-      "@\n(Dev hint: this is probably due to a missing call to \
-       Cobol_common.catch_diagnostics)@."
+    pp_kuncaught Option.some (__MODULE__^exn) @@
+    fmt ^^
+    "@\n(Dev hint: this is probably due to a missing call to \
+     Cobol_common.catch_diagnostics)@."
   in
   function
   | LocalizedError (msg, loc, _) ->

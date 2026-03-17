@@ -12,6 +12,7 @@
 (**************************************************************************)
 
 open Cobol_common.Srcloc.TYPES
+open Cobol_common.Platform.TYPES
 open Cobol_common.Srcloc.INFIX
 open Preproc_outputs.TYPES
 open Preproc_options
@@ -45,8 +46,8 @@ and preprocessor_persist =
     dialect: Cobol_config.dialect;
     source_format: Src_format.any option;  (* to keep auto-detecting on reset *)
     exec_preprocs: exec_preprocessor EXEC_MAP.t;
-    copybook_lookup_config: Cobol_common.Copybook.lookup_config;
-    verbose: bool;
+    copybook_lookup_config: Cobol_common.Copybook.TYPES.lookup_config;
+    platform: Cobol_common.Platform.TYPES.platform;     (* == reader.platform *)
     show_if_verbose: [`Txt | `Src] list;
   }
 
@@ -108,15 +109,15 @@ let with_buff_n_pplog lp buff pplog =
 let with_replacing lp replacing =
   { lp with persist = { lp.persist with replacing } }
 
-let show tag { persist = { verbose; show_if_verbose; _ }; _ } =
-  verbose && LIST.mem tag show_if_verbose
+let show tag { persist = { show_if_verbose; platform; _ }; _ } =
+  platform.verbosity > 0 && LIST.mem tag show_if_verbose
 
 let source_format_config = function
   | Cobol_config.SF sf -> Some (Src_format.from_config sf)
   | Auto -> None
 
 let preprocessor input = function
-  | `WithOptions { verbose; source_format; env;
+  | `WithOptions { platform; source_format; env;
                    exec_preprocs; config = (module Config);
                    copybook_lookup_config } ->
       let module Om_name = struct let name = __MODULE__ end in
@@ -125,7 +126,7 @@ let preprocessor input = function
       let source_format = source_format_config source_format in
       {
         buff = [];
-        reader = Src_reader.from input ?source_format;
+        reader = Src_reader.from input ?source_format ~platform;
         ppstate = Preproc_state.initial;
         pplog = Preproc_trace.empty;
         diags = Preproc_diagnostics.none;
@@ -142,16 +143,17 @@ let preprocessor input = function
             source_format;
             exec_preprocs;
             copybook_lookup_config;
-            verbose;
+            platform;
             show_if_verbose = [`Src];
           };
       }
   | `Fork ({ persist; _ } as from, copyloc, copybook) ->
       let source_format = Src_reader.source_format from.reader in
+      let platform = persist.platform in
       {
         from with
         buff = [];
-        reader = Src_reader.from input ~source_format;
+        reader = Src_reader.from input ~source_format ~platform;
         rev_ignored = [];
         (* CHECKME: context and ignored? *)
         persist =
@@ -247,6 +249,7 @@ and apply_preproc_directive ({ env; context; _ } as lp)
       lp                                                            (* ignore *)
   | Define def ->
       new_env lp @@ Preproc_logic.on_define ~loc def ~env
+        ~platform:lp.persist.platform
   | Define_off var ->
       new_env lp @@ Preproc_logic.on_define_off ~loc var ~env
   | If condition ->
@@ -432,12 +435,13 @@ and do_exec ?(partial = false) lp rev_prefix exec_block suffix =
       emit lp exec_block                                  (* already reported *)
 
 
-and read_lib ({ persist = { copybook_lookup_config;
-                            copybooks; verbose; _ }; _ } as lp)
+and read_lib ({ persist = { copybook_lookup_config; platform;
+                            copybooks; _ }; _ } as lp)
     loc { txtname; libname } =
   let text, diags, pplog =
     match
-      Cobol_common.Copybook.find_lib ~&txtname ?libname:~&?libname
+      platform.find_lib
+        ~&txtname ?libname:~&?libname
         ?fromfile:(input_file lp) ~lookup_config:copybook_lookup_config
     with
     | Ok filename when Cobol_common.Srcloc.mem_copy filename copybooks ->
@@ -446,10 +450,10 @@ and read_lib ({ persist = { copybook_lookup_config;
           (Cyclic_copy { copyloc = loc; filename }) lp.diags,
         Preproc_trace.cyclic_copy ~loc ~filename lp.pplog
     | Ok filename ->
-        if verbose then
-          Pretty.error "Reading library `%s'@." filename;
+        if platform.verbosity>0 then
+          platform.error "Reading library `%s'@." filename;
         let text, lp =             (* note: [lp] holds all prev and new diags *)
-          Src_input.from ~filename ~f:begin fun input ->
+          Src_input.from ~filename ~platform ~f:begin fun input ->
             full_text                                   (* likewise for pplog *)
               (preprocessor input (`Fork (lp, loc, filename)))
               ~postproc:(Cobol_common.Srcloc.copy_from ~filename ~copyloc:loc)
@@ -476,8 +480,8 @@ and full_text ?(item = "library") ?postproc lp : Text.text * preprocessor =
     if not (List.exists eofp text)
     then aux (text :: acc) lp
     else begin
-      if lp.persist.verbose then
-        Pretty.error "Reached end of %s@." item;
+      if lp.persist.platform.verbosity>0 then
+        lp.persist.platform.error "Reached end of %s@." item;
       List.(concat (rev (filter (fun p -> not(eofp p)) text :: acc))), lp
     end
   in
@@ -539,37 +543,42 @@ let reset_preprocessor_for_string string ?new_position pp =
 
 (* --- *)
 
-let preprocessor ?(options = Preproc_options.default) input =
+let preprocessor ~(options: preproc_options) input =
   preprocessor input (`WithOptions options)
 
 (** Default pretty-printing formatter for {!lex_file}, {!lex_lib}, and
     {!preprocess_file}. *)
 let default_oppf = Fmt.stdout
 
-let lex_input ~dialect ~source_format ?(ppf = default_oppf) input =
+let lex_input ~platform ~dialect ~source_format ?(ppf = default_oppf) input =
   OUT.result @@
   Src_reader.print_lines ~dialect ~skip_compiler_directives_text:true ppf @@
   Src_reader.from input ?source_format:(source_format_config source_format)
+    ~platform
 
-let lex_file ~dialect ~source_format ?ppf filename =
-  Src_input.from ~filename ~f:(lex_input ~dialect ~source_format ?ppf)
+let lex_file ~platform ~dialect ~source_format ?ppf filename =
+  Src_input.from ~filename ~platform
+    ~f:(lex_input ~dialect ~source_format ~platform ?ppf)
 
-let lex_lib ~dialect ~source_format ~lookup_config ?(ppf = default_oppf) lib =
-  match Cobol_common.Copybook.find_lib ~lookup_config lib with
+let lex_lib ~platform ~dialect ~source_format ~lookup_config
+    ?(ppf = default_oppf) lib =
+  match platform.find_lib ~lookup_config lib with
   | Ok filename ->
-      Src_input.from ~filename ~f:begin fun input ->
+      Src_input.from ~platform ~filename ~f:begin fun input ->
         OUT.result @@
         Src_reader.print_lines ~dialect ~skip_compiler_directives_text:true ppf @@
         Src_reader.from input ?source_format:(source_format_config source_format)
+          ~platform
       end
   | Error lnf ->
       OUT.error_result () @@ Copybook_lookup_error { lnf; copyloc = None }
 
-let fold_source_lines ~dialect ~source_format ?on_change_of_source_format
-    ?skip_compiler_directives_text ?on_compiler_directive
-    ~f input acc =
+let fold_source_lines ~platform ~dialect ~source_format
+    ?on_change_of_source_format ?skip_compiler_directives_text
+    ?on_compiler_directive ~f input acc =
   let reader =
     Src_reader.from input ?source_format:(source_format_config source_format)
+      ~platform
   in
   let acc, on_compiler_directive = match on_change_of_source_format with
     | Some f ->
@@ -596,7 +605,7 @@ let fold_source_words ~dialect ~source_format ~f input acc =
       ListLabels.fold_left line ~init:acc ~f:(fun acc word -> f word acc)
     end
 
-let scan_prefix_for_copybook ~dialect ~source_format input =
+let scan_prefix_for_copybook ~platform ~dialect ~source_format input =
   let open struct
     exception Res of [`Program | `Copybook]
     type copybook_prefix_state =
@@ -615,7 +624,8 @@ let scan_prefix_for_copybook ~dialect ~source_format input =
       | _ -> false
   end in
   match
-    fold_source_words ~dialect ~source_format input Expect_first_digits
+    fold_source_words ~platform ~dialect ~source_format input
+      Expect_first_digits
       ~f:begin fun word -> function
         | Expect_first_digits when is_digits ~&word ->
             Expect_word
@@ -629,16 +639,18 @@ let scan_prefix_for_copybook ~dialect ~source_format input =
   | Expect_first_digits -> `Program                                  (* maybe? *)
   | Expect_word -> `Copybook                                         (* maybe? *)
 
-let text_of_input ?options input =
-  let text, pp = full_text ~item:"file" @@ preprocessor ?options input in
+let text_of_input ~options input =
+  let text, pp = full_text ~item:"file" @@ preprocessor ~options input in
   OUT.result text ~diags:(diags pp)
 
-let text_of_file ?options filename =
-  Src_input.from ~filename ~f:(text_of_input ?options)
+let text_of_file ~options filename =
+  Src_input.from ~filename ~f:(text_of_input ~options)
+    ~platform:options.platform
 
-let preprocess_input ?options ?(ppf = default_oppf) input =
-  text_of_input ?options input |>
+let preprocess_input ~options ?(ppf = default_oppf) input =
+  text_of_input ~options input |>
   OUT.map_result ~f:(Pretty.print ppf "%a@." Text.pp_text)
 
-let preprocess_file ?options ?ppf filename =
-  Src_input.from ~filename ~f:(preprocess_input ?options ?ppf)
+let preprocess_file ~options ?ppf filename =
+  Src_input.from ~filename ~f:(preprocess_input ~options ?ppf)
+    ~platform:options.platform

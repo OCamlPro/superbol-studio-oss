@@ -13,29 +13,32 @@
 
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
+open Cobol_common.Platform.TYPES
 open Text.TYPES
 open Preproc_diagnostics
 
-type 'k reader = 'k Src_lexing.state * Lexing.lexbuf
+type 'k reader = 'k Src_lexing.state * Lexing.lexbuf * platform
 type 'k line = Line: 'k reader * text -> 'k line
 type t = Plx: 'k reader -> t                                           [@@unboxed]
 
 (* --- *)
 
-let diags (Plx (pl, _)) = Src_lexing.diagnostics pl
-let position (Plx (_, lexbuf)) = lexbuf.Lexing.lex_curr_p
+let diags (Plx (pl, _, _)) = Src_lexing.diagnostics pl
+let position (Plx (_, lexbuf, _)) = lexbuf.Lexing.lex_curr_p
 let input_file r = match (position r).pos_fname with "" -> None | s -> Some s
-let source_format (Plx (pl, _)) = Src_format.SF (Src_lexing.source_format pl)
-let rev_comments (Plx (pl, _)) = Src_lexing.rev_comments pl
-let rev_ignored (Plx (pl, _)) = Src_lexing.rev_ignored pl
-let rev_newline_cnums (Plx (pl, _)) = Src_lexing.rev_newline_cnums pl
+let platform (Plx (_, _, platform)) = platform
+let source_format (Plx (pl, _, _)) = Src_format.SF (Src_lexing.source_format pl)
+let rev_comments (Plx (pl, _, _)) = Src_lexing.rev_comments pl
+let rev_ignored (Plx (pl, _, _)) = Src_lexing.rev_ignored pl
+let rev_newline_cnums (Plx (pl, _, _)) = Src_lexing.rev_newline_cnums pl
 
 let chunks_reader lexer =
-  let rec next_line (state, lexbuf) =
+  let rec next_line (state, lexbuf, platform) =
     let state, pseutoks = lexer state lexbuf in
+    let reader = state, lexbuf, platform in
     match pseutoks with
-    | [] -> next_line (state, lexbuf)                      (* skip blank lines *)
-    | _ -> Line ((state, lexbuf), pseutoks)
+    | [] -> next_line reader                               (* skip blank lines *)
+    | _ -> Line (reader, pseutoks)
   in
   next_line
 
@@ -49,11 +52,11 @@ let next_chunk (Plx pl) =
 (* Change of source format *)
 
 let with_source_format: Src_format.any with_loc -> t -> (t, error) result =
-  fun { payload = SF format; loc } ((Plx (s, lexbuf)) as pl) ->
+  fun { payload = SF format; loc } ((Plx (s, lexbuf, platform)) as pl) ->
   if Src_format.equal (Src_lexing.source_format s) format
   then Ok pl
   else match Src_lexing.change_source_format s format with
-    | Ok s -> Ok (Plx (s, lexbuf))
+    | Ok s -> Ok (Plx (s, lexbuf, platform))
     | Error () -> Error (Forbidden { loc; stuff = Change_of_source_format })
 
 (* --- *)
@@ -133,7 +136,9 @@ let try_compiler_directive ~dialect text =
       let error = Invalid { stuff = Compiler_directive_word w; loc } in
       Some (prefix, [], compdir_text, add_error error none)
   | Ok (prefix, compdir_kind, compdir_text) ->
-      let compdir, diags = decode_compiler_directive ~compdir_kind ~dialect compdir_text in
+      let compdir, diags =
+        decode_compiler_directive ~compdir_kind ~dialect compdir_text
+      in
       Some (prefix, compdir, compdir_text, diags)
 
 let fold_chunks
@@ -157,7 +162,7 @@ let fold_chunks
             in
             let acc = match on_compiler_directive with
               | None -> acc
-              | Some f -> List.fold_left (fun acc compdir -> f compdir acc) acc compdirs
+              | Some f -> List.fold_left (fun acc cdir -> f cdir acc) acc compdirs
             in
             aux (List.fold_left apply_compdir pl compdirs) acc
   and apply_compdir pl { payload = compdir; _ } = match compdir with
@@ -239,12 +244,12 @@ let print_lines ~dialect ?skip_compiler_directives_text ppf pl =
 
 (* --- *)
 
-let make make_lexing ?filename ~source_format input =
+let make make_lexing ?filename ~source_format ~platform input =
   let Src_format.SF source_format = source_format in
   (* Be sure to provide position informations *)
   let lexbuf = make_lexing ?with_positions:(Some true) input in
   Option.iter (Lexing.set_filename lexbuf) filename;
-  Plx (Src_lexing.init_state source_format, lexbuf)
+  Plx (Src_lexing.init_state source_format, lexbuf, platform)
 
 (* --- *)
 
@@ -252,33 +257,35 @@ let from_string = make Lexing.from_string
 let from_channel = make Lexing.from_channel
 
 let fill buff ~lookup_len (input: Src_input.t) =
-  match input with
-  | String { contents = str; _ } ->
+  match input.source with
+  | String str ->
       Buffer.add_substring buff str 0 (min lookup_len (String.length str))
-  | Channel { ic; _ } ->
+  | Channel ic ->
       (try Buffer.add_channel buff ic lookup_len with End_of_file -> ());
       Stdlib.seek_in ic 0                        (* FIXME: may break on pipes *)
 
-let start_reading ?source_format input =
+let decide_on_source_format ~platform ?source_format input =
   match source_format with
   | Some format ->
       (* TODO: read 3 bytes and skip any utf-8 BOM while shifting initial
          pos_cnum. *)
-      format, input
+      format
   | None ->
-      let lookup_len = 20 in                             (* 20 as in GnuCOBOL *)
-      let buff = Buffer.create lookup_len in
-      fill buff ~lookup_len input;
-      (* TODO: skip any utf-8 BOM while shifting initial pos_cnum. *)
-      Src_format.guess_from ~contents_prefix:(Buffer.contents buff), input
+      let autodetected_format =
+        platform.autodetect_format input.filename
+          ?source_contents:(match input.Src_input.source with
+              | String source_contents -> Some source_contents
+              | Channel _ -> None)
+      in
+      Src_format.from_config autodetected_format
 
-let from ?source_format (input: Src_input.t) =
-  let source_format, input = start_reading input ?source_format in
+let from ?source_format ~platform (input: Src_input.t) =
+  let source_format = decide_on_source_format ~platform ?source_format input in
   match input with
-  | String { contents; filename } ->
-      from_string ~source_format ~filename contents
-  | Channel { ic; filename } ->
-      from_channel ~source_format ~filename ic
+  | { source = String contents; filename } ->
+      from_string ~source_format ~filename ~platform contents
+  | { source = Channel ic; filename } ->
+      from_channel ~source_format ~filename ~platform ic
 
 (* --- *)
 
@@ -286,15 +293,15 @@ let from ?source_format (input: Src_input.t) =
     input, which {e must} also be at the beginning of a line.  If absent,
     restarts from first position.  File name is kept from the previous input. *)
 let restart make_lexing make_input ?source_format ?position
-    input (Plx (s, prev_lexbuf)) =
+    input (Plx (s, prev_lexbuf, platform)) =
   match position with
   | Some position when position.Lexing.pos_cnum > 0 ->
       let lexbuf = make_lexing ?with_positions:(Some true) input in
       Lexing.set_position lexbuf position;
       Lexing.set_filename lexbuf position.Lexing.pos_fname;        (* useful? *)
-      Plx (s, lexbuf)
+      Plx (s, lexbuf, platform)
   | Some _ | None ->
-      from ?source_format @@
+      from ?source_format ~platform @@
       make_input ~filename:prev_lexbuf.Lexing.lex_curr_p.pos_fname input
 
 let restart_on_string = restart Lexing.from_string Src_input.string

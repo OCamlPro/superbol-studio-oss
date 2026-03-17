@@ -17,7 +17,7 @@ module LIST = Cobol_common.Basics.LIST
 
 type error =
   | Copybook_lookup_error of { copyloc: srcloc option;
-                               lnf: Cobol_common.Copybook.lookup_error }
+                               lnf: Cobol_common.Copybook.TYPES.lookup_error }
   | Cyclic_copy of { copyloc: srcloc; filename: string }
   | Feature_error of Cobol_config.DIAG.error
   | Forbidden of { loc: srcloc; stuff: forbidden_stuff }

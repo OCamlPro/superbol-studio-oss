@@ -11,18 +11,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let preproc
-    ?(filename = "prog.cob")
-    ?(source_format = Cobol_config.(SF SFFixed))
-    contents
-  =
+let preproc ?(filename = "prog.cob") ?source_format contents =
   Cobol_common.Srcloc.TESTING.register_file_contents ~filename contents;
-  String { filename; contents } |>
+  Cobol_preproc.Input.string ~filename contents |>
   Cobol_preproc.preprocessor
-    ~options:Cobol_preproc.Options.{
-        default with
-        source_format
-      }
+    ~options:(Prog_preproc.options ~verbose:false ?source_format ())
 
 let options
     ?(verbose = false)
@@ -49,6 +42,7 @@ let show_diagnostics ?(parser_options = options ())
   preproc ?source_format ?filename contents |>
   Cobol_parser.parse_simple ~options:parser_options |>
   Cobol_parser.Outputs.sink_result ~set_status:false ~ppf:Fmt.stdout
+    ~platform:Prog_common.platform
 
 let parse ?(parser_options = options ())
     ?source_format ?filename contents =

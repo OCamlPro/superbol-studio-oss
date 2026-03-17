@@ -9,7 +9,7 @@
 (executable
  (name gnucobol)
  (modules Gnucobol)
- (libraries autofonce_lib superbol_testutils superbol_preprocs cobol_parser)
+ (libraries autofonce_lib superbol_testutils superbol_preprocs cobol_parser testsuite_utils)
  )
 
 (executable

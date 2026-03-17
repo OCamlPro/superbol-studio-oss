@@ -74,6 +74,7 @@ let copybook_lookup_config_for ~uri project =
 let detect_copybook ~uri ?contents project =
   Superbol_project.detect_copybook ~filename:(Lsp.Uri.to_path uri)
     ?contents project
+    ~platform:Lsp_platform.record
 
 let relative_path_for ~uri project =
   Superbol_project.relative_path_for ~filename:(Lsp.Uri.to_path uri) project

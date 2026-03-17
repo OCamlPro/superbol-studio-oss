@@ -21,6 +21,7 @@ module Visitor = Visitor
 module Behaviors = Behaviors
 module Tokenizing = Tokenizing
 module Symbolic = Symbolic           (* for now; may be moved elsewhere later *)
+module Platform = Platform
 
 exception FatalError of string
 val fatal: ('a, Format.formatter, unit, _) format4 -> 'a
@@ -28,6 +29,7 @@ val fatal: ('a, Format.formatter, unit, _) format4 -> 'a
 module Types: sig
   include module type of Diagnostics.TYPES
   include module type of Srcloc.TYPES
+  type platform = Platform.TYPES.platform
 end
 include module type of Types
   with type 'a with_diags = 'a Types.with_diags

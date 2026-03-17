@@ -16,7 +16,7 @@ open Cobol_common.Srcloc.TYPES
 type preprocessor
 
 val preprocessor
-  : ?options: Preproc_options.preproc_options
+  : options: Preproc_options.preproc_options
   -> Src_input.t
   -> preprocessor
 val reset_preprocessor_for_string
@@ -40,25 +40,28 @@ val next_chunk: preprocessor -> Text.text * preprocessor
 (** {2 High-level commands} *)
 
 val lex_input
-  : dialect: Cobol_config.dialect
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> dialect: Cobol_config.dialect
   -> source_format: Cobol_config.source_format_spec
   -> ?ppf:Format.formatter
   -> Src_input.t
   -> unit Preproc_outputs.with_diags
 
 val lex_file
-  : dialect: Cobol_config.dialect
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> dialect: Cobol_config.dialect
   -> source_format: Cobol_config.source_format_spec
   -> ?ppf:Format.formatter
   -> string
   -> unit Preproc_outputs.with_diags
 
 val lex_lib
-  : dialect: Cobol_config.dialect
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> dialect: Cobol_config.dialect
   -> source_format: Cobol_config.source_format_spec
-  -> lookup_config: Cobol_common.Copybook.lookup_config
+  -> lookup_config: Cobol_common.Copybook.TYPES.lookup_config
   -> ?ppf:Format.formatter
-  -> Cobol_common.Copybook.fileloc
+  -> Cobol_common.Copybook.TYPES.fileloc
   -> unit Preproc_outputs.with_diags
 
 (** [fold_source_lines ~dialect ~source_format ~skip_compiler_directives_text
@@ -84,7 +87,8 @@ val lex_lib
     Diagnostics resulting from lexing and parsing the input are attached to the
     returned accumulated value. *)
 val fold_source_lines
-  : dialect: Cobol_config.dialect
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> dialect: Cobol_config.dialect
   -> source_format: Cobol_config.source_format_spec
   -> ?on_change_of_source_format: (Src_format.any -> 'a -> 'a)
   -> ?skip_compiler_directives_text: bool
@@ -96,29 +100,30 @@ val fold_source_lines
   -> 'a
 
 val scan_prefix_for_copybook
-  : dialect: Cobol_config.dialect
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> dialect: Cobol_config.dialect
   -> source_format: Cobol_config.source_format_spec
   -> Src_input.t
   -> [`Program | `Copybook]
 
 val preprocess_input
-  : ?options: Preproc_options.preproc_options
+  : options: Preproc_options.preproc_options
   -> ?ppf:Format.formatter
   -> Src_input.t
   -> unit Preproc_outputs.with_diags
 
 val preprocess_file
-  : ?options: Preproc_options.preproc_options
+  : options: Preproc_options.preproc_options
   -> ?ppf:Format.formatter
   -> string
   -> unit Preproc_outputs.with_diags
 
 val text_of_file
-  : ?options: Preproc_options.preproc_options
+  : options: Preproc_options.preproc_options
   -> string
   -> Text.t Preproc_outputs.with_diags
 
 val text_of_input
-  : ?options: Preproc_options.preproc_options
+  : options: Preproc_options.preproc_options
   -> Src_input.t
   -> Text.t Preproc_outputs.with_diags

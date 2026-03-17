@@ -34,6 +34,7 @@ module Env = Preproc_env
 (** {1 Main entry points for the processor itself} *)
 
 type input = [%import: Src_input.t]
+and source = [%import: Src_input.source]
 
 module Input = Src_input
 module Options = Preproc_options

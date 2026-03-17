@@ -15,6 +15,7 @@ open Ez_file.V1
 open Autofonce_lib
 open Autofonce_config
 open Autofonce_core.Types
+open Testsuite_utils
 
 let () =
   Cobol_common.init_default_exn_printers ();
@@ -134,7 +135,7 @@ let setup_input ~filename contents =
   let oc = open_out filename in
   output_string oc contents;
   close_out oc;
-  Cobol_preproc.String { contents; filename }
+  Cobol_preproc.Input.string ~filename contents
 
 let delete_file ~filename =
   Ez_file.FileString.remove filename
@@ -197,7 +198,8 @@ let do_check_parse (test_filename, contents, _, { check_loc;
   let parse_simple input =
     input |>
     Cobol_preproc.preprocessor
-      ~options:Cobol_preproc.Options.{ default with source_format } |>
+      ~options:{ default_preproc_options with
+                 source_format } |>
     Cobol_parser.parse_simple
       ~options:default_parser_options
   in
@@ -205,10 +207,12 @@ let do_check_parse (test_filename, contents, _, { check_loc;
     let input = setup_input ~filename contents in
     match parse_simple input with
     | { result = Only Some _; _ } as res ->
-        Cobol_parser.Outputs.sink_result ~set_status:false ~ppf:Fmt.stdout res;
+        Cobol_parser.Outputs.sink_result ~set_status:false ~platform
+          ~ppf:Fmt.stdout res;
         terminate "ok"
     | res ->
-        Cobol_parser.Outputs.sink_result ~set_status:false ~ppf:Fmt.stdout res;
+        Cobol_parser.Outputs.sink_result ~set_status:false ~platform
+          ~ppf:Fmt.stdout res;
         terminate "ok (with errors)"
     | exception e ->
         Pretty.out "Failure (%s)@\n%s@\n" (Printexc.to_string e) contents;

@@ -49,7 +49,7 @@ let mk =
     incr current_stamp;
     { severity; message; location; stamp }
 
-let pp ppf { severity; message; location = loc; _ } =
+let pp ?platform ppf { severity; message; location = loc; _ } =
   let prefix, style = match severity with
     | Hint -> "Hint", `Fg `Cyan
     | Note -> "Note", `None
@@ -57,7 +57,7 @@ let pp ppf { severity; message; location = loc; _ } =
     | Warn -> "Warning", `Fg `Yellow
     | Error -> "Error", `Fg `Red
   in
-  Msgs.pp_msg ?loc ppf "%a" begin
+  Msgs.pp_msg ?platform ?loc ppf "%a" begin
     Pretty.styles [`Bold; style] @@ fun ppf ->
     Pretty.print ppf ">> %s: @[%t@]@\n" prefix
   end message
@@ -96,8 +96,9 @@ end
 module Now = struct
   (** Reporting module where each value is a procedure that prints a single
       diagnostic on a given formatter. *)
-  let diag severity ppf ?loc fmt =
-    Pretty.delayed_to (fun message -> pp ppf (mk severity loc message)) (fmt^^"@.")
+  let diag severity ppf ?platform ?loc fmt =
+    Pretty.delayed_to (fun message -> pp ?platform ppf (mk severity loc message))
+      (fmt^^"@.")
   let hint ppf = diag Hint ppf
   and note ppf = diag Note ppf
   and info ppf = diag Info ppf
@@ -136,11 +137,11 @@ module Set = struct
 
   (* TODO: order via locs and/or a global timestamp? something more
      intricate? *)
-  let pp ppf diags =
+  let pp ?platform ppf diags =
     Pretty.list ~fopen:"@[<v>" ~fclose:"@]@\n" ~fsep:"@\n" ~fempty:""
-      pp ppf (sort diags)
-  let pp_above ~level ppf diags =
-    pp ppf @@
+      (pp ?platform) ppf (sort diags)
+  let pp_above ~level ?platform ppf diags =
+    pp ?platform ppf @@
     List.filter (fun { severity; _ } -> compare_severity level severity <= 0) diags
   let none: t = []
   let one d = [d]
@@ -228,12 +229,12 @@ let forget_result { diags; _ } = diags
 (* let merge_results ~f r1 r2 = *)
 (*   result (f r1.result r2.result) ~diags:(Set.union r1.diags r2.diags) *)
 let show_n_forget ?(set_status = true) ?(min_level = Hint)
-    ?(ppf = Fmt.stderr) { result; diags } =
-  Set.pp_above ~level:min_level ppf diags;
+    ?platform ?(ppf = Fmt.stderr) { result; diags } =
+  Set.pp_above ~level:min_level ?platform ppf diags;
   if set_status && Set.has_errors diags then Exit_status.raise ();
   result
-let sink_result ?set_status ?ppf r =
-  ignore @@ show_n_forget ?set_status ?ppf r
+let sink_result ?set_status ?platform ?ppf r =
+  ignore @@ show_n_forget ?set_status ?platform ?ppf r
 
 
 let hint_result r = Cont.khint (with_diag r)

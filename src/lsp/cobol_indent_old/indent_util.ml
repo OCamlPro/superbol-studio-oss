@@ -28,7 +28,7 @@ let check_pos
     if print_errors then
       begin
         let newsrcloc = raw (pos,pos) in
-        Fmt.pr "%a" Cobol_common.Srcloc.pp_srcloc newsrcloc;
+        Fmt.pr "%a" Cobol_common.Srcloc.pp_srcloc_without_caret newsrcloc;
         Fmt.pr "Indentation error : the offset is %d, but expected offset is %d\n\n" real_offset offset
       end;
     {lnum = pos.pos_lnum;

@@ -488,6 +488,7 @@ let handle_range_formatting registry params =
   let _edit_list, edit_ops =
     let filename = Lsp.Uri.to_path doc.uri in
     Cobol_indent.Main.indent
+      ~platform:Lsp_platform.record
       ~dialect:(Cobol_config.dialect project.config.cobol_config)
       ~source_format:(Superbol_project.Config.source_format_for
                         ~filename project.config)
@@ -509,6 +510,7 @@ let handle_formatting registry params =
     let filename = Lsp.Uri.to_path doc.uri in
     let _editList, edit_ops =
       Cobol_indent.Main.indent
+        ~platform:Lsp_platform.record
         ~dialect:(Cobol_config.dialect project.config.cobol_config)
         ~source_format:(Superbol_project.Config.source_format_for
                           ~filename project.config)

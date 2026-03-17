@@ -112,15 +112,19 @@ let absolute_path_for ~filename { rootdir; _ } =
   then filename       (* in case the file is not within its project directory *)
   else rootdir // filename
 
-let file_contents_looks_like_a_copybook ~filename ?contents { config; _ } =
+let file_contents_looks_like_a_copybook
+    ~platform ~filename ?contents { config; _ } =
   let decide input =
-    Cobol_preproc.scan_prefix_for_copybook input
-      ~dialect:(Cobol_config.dialect config.cobol_config)
-      ~source_format:(Project_config.source_format_for ~filename config) = `Copybook
+    let kind =
+      Cobol_preproc.scan_prefix_for_copybook input ~platform
+        ~dialect:(Cobol_config.dialect config.cobol_config)
+        ~source_format:(Project_config.source_format_for ~filename config)
+    in
+    kind = `Copybook
   in
   match contents with
   | None ->
-      Cobol_preproc.Input.from ~filename ~f:decide
+      Cobol_preproc.Input.from ~filename ~f:decide ~platform
   | Some c ->
       decide @@ Cobol_preproc.Input.string ~filename c
 
@@ -137,13 +141,13 @@ let file_is_in_libpath ~filename ({ config; _ } as project) =
         EzString.ends_with ~suffix (Filename.dirname filename)
   end config.libpath
 
-let detect_copybook ~filename ?contents project =
+let detect_copybook ~platform ~filename ?contents project =
   let ext = Filename.extension filename in
   (if ext = "" (* assume files with no extension that appear in copybook paths
                   are copybooks *)
    then file_is_in_libpath ~filename project
    else is_a_copybook_extension ext) ||
-  file_contents_looks_like_a_copybook ~filename ?contents project
+  file_contents_looks_like_a_copybook ~platform ~filename ?contents project
 
 let save_config ?verbose { config_filename; config; _ } =
   Project_config.save ?verbose ~config_filename config

@@ -93,14 +93,17 @@ let config
     blocking (driven by standard input), and shutdown is triggered by a client
     request.  Returns [Ok ()] if the server ran and shut down properly, or
     [Error error_message] otherwise. *)
-let run ~config ~extensions:{ alternate_request_handers = alternate_handlers } =
+let run ~platform ~config
+    ~extensions:{ alternate_request_handers = alternate_handlers } =
+  Cobol_common.Platform.copy ~dst:Lsp_platform.record ~src:platform;
   Lsp_io.initialize_channels ();
   let rec loop state =
     match Lsp_io.read_message () with
     | Jsonrpc.Packet.Notification n ->
         continue @@ Lsp_notif.handle n state
     | Jsonrpc.Packet.Request r ->
-        continue @@ reply @@ Lsp_request.handle ~alternate_handlers r state
+        continue @@ reply @@
+        Lsp_request.handle ~alternate_handlers r state
     | Jsonrpc.Packet.Batch_call calls ->
         batch_calls calls state
     | Jsonrpc.Packet.Response r ->

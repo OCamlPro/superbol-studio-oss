@@ -61,12 +61,12 @@ struct
 
   let show_n_forget
       ?(set_status = true) ?(min_level = Diagnostics.Hint)
-      ?(ppf = Fmt.stderr) { result; diags } =
+      ?platform ?(ppf = Fmt.stderr) { result; diags } =
     let diags = Set.translate diags in
-    Diagnostics.Set.pp_above ~level:min_level ppf diags;
+    Diagnostics.Set.pp_above ~level:min_level ?platform ppf diags;
     if set_status && Diagnostics.Set.has_errors diags then Exit_status.raise ();
     result
 
-  let sink_result ?set_status ?ppf r =
-    ignore @@ show_n_forget ?set_status ?ppf r
+  let sink_result ?set_status ?platform ?ppf r =
+    ignore @@ show_n_forget ?set_status ?platform ?ppf r
 end

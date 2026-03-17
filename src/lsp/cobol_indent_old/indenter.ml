@@ -14,7 +14,8 @@
 open Indent_type
 
 (*indent a range of file, with the default indent_config*)
-let indent_range ~dialect ~source_format ~indent_config ~range ~filename ~contents =
+let indent_range ~platform ~dialect ~source_format ~indent_config ~range
+    ~filename ~contents =
   let indent_config = Option.value ~default:Indent_config.default indent_config in
   let src_format =
     (* Note: this value doesn't actually matter, it will be overriden
@@ -23,11 +24,11 @@ let indent_range ~dialect ~source_format ~indent_config ~range ~filename ~conten
     Cobol_preproc.Src_format.from_config SFFixed
   in
   let state =
-    Cobol_preproc.fold_source_lines ~dialect ~source_format
+    Cobol_preproc.fold_source_lines ~platform ~dialect ~source_format
       ~on_change_of_source_format:(fun src_format st -> { st with src_format })
       ~skip_compiler_directives_text:true
       ~f:(fun _lnum line acc -> Indent_check.check_indentation line acc)
-      (String { filename; contents })
+      (Cobol_preproc.Input.string ~filename contents)
       { src_format
       ; indent_config
       ; scope = BEGIN

@@ -41,7 +41,7 @@ and library =
     txtname: fileloc with_loc;
     libname: fileloc with_loc option;
   }
-and fileloc = Cobol_common.Copybook.fileloc
+and fileloc = Cobol_common.Copybook.TYPES.fileloc
 and replacing =
   | ReplaceExact of
       {

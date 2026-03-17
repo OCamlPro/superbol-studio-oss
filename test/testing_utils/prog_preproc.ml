@@ -13,30 +13,27 @@
 
 open Cobol_common.Srcloc.INFIX
 
-(** Note: won't show detailed source locations as the openned file is not
-    actually on disk (that may be fixed later with a custom internal file
-    store). *)
+let platform ~verbose =
+  { Prog_common.platform with verbosity = if verbose then 1 else 0 }
 
-let preprocess
-    ?(verbose = false)
-    ?(filename = "prog.cob")
-    ?(source_format = Cobol_config.(SF SFFixed))
-    contents =
+let options
+    ?(verbose = false) ?(source_format = Cobol_config.(SF SFFixed))
+    () =
+  { (Cobol_preproc.Options.default ~platform:(platform ~verbose)) with
+    source_format }
+
+let preprocess ?verbose ?(filename = "prog.cob") ?source_format contents =
   Cobol_preproc.Outputs.show_n_forget ~ppf:Fmt.stdout @@
   Cobol_preproc.preprocess_input
-    ~options:Cobol_preproc.Options.{ default with verbose; source_format } @@
-  Cobol_preproc.String { filename; contents }
+    ~options:(options ?verbose ?source_format ()) @@
+  Cobol_preproc.Input.string ~filename contents
 
-let show_text
-    ?(verbose = false)
-    ?(filename = "prog.cob")
-    ?(source_format = Cobol_config.(SF SFFixed))
-    contents =
+let show_text ?verbose ?(filename = "prog.cob") ?source_format contents =
   let text =
     Cobol_preproc.Outputs.show_n_forget ~ppf:Fmt.stdout @@
     Cobol_preproc.text_of_input
-      ~options:Cobol_preproc.Options.{ default with verbose; source_format } @@
-    Cobol_preproc.String { filename; contents }
+      ~options:(options ?verbose ?source_format ()) @@
+    Cobol_preproc.Input.string ~filename contents
   in
   Pretty.out "%a@\n" (Cobol_preproc.Text.pp_text' ~fsep:"@\n") text
 
@@ -49,11 +46,13 @@ let show_source_lines
     ?(source_format = Cobol_config.(SF SFFixed))
     contents
   =
+  let input = Cobol_preproc.Input.string ~filename contents in
   Cobol_preproc.fold_source_lines ~dialect ~source_format
+    ~platform:Prog_common.platform
     ~f:begin fun lnum line () ->
       if with_line_numbers then Pretty.out "@\n%u: " lnum else Pretty.out "@\n";
       Pretty.out "%a" Cobol_preproc.Text.pp_text line;
-    end (String { filename; contents }) ()
+    end input ()
     ~skip_compiler_directives_text:(not with_compiler_directives_text)
     ?on_compiler_directive:begin
       if not with_source_cdir_markers then None
