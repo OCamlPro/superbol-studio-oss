@@ -208,16 +208,26 @@ val is_numeric: picture -> bool
 val is_signed_numeric: picture -> bool
 
 (** Size of the underlying data; corresponds to the number of "characters" for
-    usage DISPLAY *)
+    usage DISPLAY; does not take the sign of numeric items into account. *)
 val data_size: picture -> int
 
-(** display size, after editions; corresponds to "size" in standards *)
+(** Actual storage size for items of usage DISPLAY. *)
+val display_size: picture -> int
+
+(** Display size after editions; corresponds to "size" in standards *)
+val edited_size: picture -> int
+
+(** Alias for {!edited_size}. *)
 val size: picture -> int
 
 val of_string: config -> string ->
   (picture,
    (error * (int * int))                        (* = (error, (pos, len)) *)
      list * picture) result
+
+val of_string': config -> string with_loc ->
+  (picture with_loc,
+   Cobol_common.Diagnostics.diagnostics * picture with_loc) result
 
 val alphanumeric: size: int -> picture
 val national: size: int -> picture
@@ -231,11 +241,9 @@ val fixed_numeric
   -> (* decimal_digits: *)int
   -> picture
 
+exception InvalidPicture of Cobol_common.Diagnostics.diagnostics * picture
+
 module Make (Config: Cobol_config.T) (Env: ENV) : sig
-
-  exception InvalidPicture of
-      string with_loc * Cobol_common.Diagnostics.diagnostics * picture
-
   val of_string: string with_loc -> t with_loc
 end
 

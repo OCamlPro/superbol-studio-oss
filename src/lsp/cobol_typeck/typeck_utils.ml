@@ -41,7 +41,7 @@ let size_of ~usage =
   | Bit picture ->                                     (* TODO: probably wrong *)
       MEM.(mult_int bit_size @@ PIC.data_size picture)
   | Display picture ->
-      MEM.(mult_int byte_size @@ PIC.data_size picture)
+      MEM.(mult_int byte_size @@ PIC.display_size picture)
   | Float_binary { width = `W32; _ } ->
       MEM.(mult_int byte_size 4)
   | Float_binary { width = `W64; _ } ->

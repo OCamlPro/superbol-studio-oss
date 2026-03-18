@@ -93,8 +93,8 @@ let rec from_item_descrs config prog_env data_group : _ with_diags =
     end in
     let module PIC = Cobol_data.Picture.Make (val config) (E) in
     try DIAGS.result @@ PIC.of_string s with
-      PIC.InvalidPicture (str, diags, dummy) ->
-        DIAGS.result ~diags (dummy &@<- str)
+      Cobol_data.Picture.InvalidPicture (diags, dummy) ->
+        DIAGS.result ~diags (dummy &@<- s)
   in
 
   let acc_occurs ~occurs_clause ~level ~loc element =
