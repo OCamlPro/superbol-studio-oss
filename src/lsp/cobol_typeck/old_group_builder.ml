@@ -87,14 +87,19 @@ let rec from_item_descrs config prog_env data_group : _ with_diags =
 
   let picture_of_string Cobol_data.PROG_ENV.{ decimal_point;
                                               currency_signs; _ } s =
-    let module E = struct
-      let decimal_char = decimal_point
-      let currency_signs = currency_signs
-    end in
-    let module PIC = Cobol_data.Picture.Make (val config) (E) in
-    try DIAGS.result @@ PIC.of_string s with
-      Cobol_data.Picture.InvalidPicture (diags, dummy) ->
-        DIAGS.result ~diags (dummy &@<- s)
+    let picture_config =
+      Cobol_data.Picture.TYPES.{
+        max_pic_length = Config.pic_length#value;
+        decimal_char = decimal_point;
+        currency_signs = currency_signs;
+        sign_config = Cobol_data.Picture.default_sign_config;
+      }
+    in
+    match Cobol_data.Picture.of_string' picture_config s with
+    | Ok pic ->
+        DIAGS.result pic
+    | Error (diags, dummy_pic) ->
+        DIAGS.result ~diags dummy_pic
   in
 
   let acc_occurs ~occurs_clause ~level ~loc element =

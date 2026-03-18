@@ -13,9 +13,9 @@
 
 open Cobol_common
 open Srcloc.TYPES
-module CHARS = Cobol_common.Basics.CharSet
-
 open Srcloc.INFIX
+
+module CHARS = Cobol_common.Basics.CharSet
 
 module TYPES = struct
 
@@ -272,11 +272,6 @@ module TYPES = struct
     | Missing_digits_in_exponent
     | Picture_describes_empty_data_item
     | Numeric_item_cannot_exceed_38_digits of int
-
-  module type ENV = sig
-    val decimal_char: char
-    val currency_signs: Cobol_common.Basics.CharSet.t
-  end
 
 end
 
@@ -1088,7 +1083,6 @@ let of_string config str =
   | [] -> Ok pic
   | errors -> Error (errors, pic)
 
-
 let pp_meaning_of_precedence_index ~decimal_char ppf = function
   | 0 -> Fmt.pf ppf "B, 0 or /"
   | 1 -> Fmt.pf ppf "grouping@ separator ('%c')"
@@ -1320,27 +1314,3 @@ let unit_test ?(config=config) ~expect picture =
   end
   else
     true
-
-
-(* --- *)
-
-(* TODO: get rid of that functor. *)
-
-exception InvalidPicture of Cobol_common.Diagnostics.diagnostics * picture
-
-module Make (Config: Cobol_config.T) (Env: ENV) = struct
-
-  let of_string str =
-    let config = {
-      max_pic_length = Config.pic_length#value;
-      decimal_char = Env.decimal_char;
-      currency_signs = Env.currency_signs;
-      sign_config = default_sign_config;
-    } in
-    match of_string' config str with
-    | Ok pic ->
-        pic
-    | Error (errors, pic) ->
-        raise @@ InvalidPicture (errors, ~&pic)
-
-end

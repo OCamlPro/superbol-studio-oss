@@ -148,7 +148,7 @@ module TYPES: sig
   [@@deriving show, ord]
 
   type config = {
-    max_pic_length : int;
+    max_pic_length: int;
     decimal_char: char;
     currency_signs: Cobol_common.Basics.CharSet.t;
     sign_config: sign_config;
@@ -175,13 +175,6 @@ module TYPES: sig
     | Missing_digits_in_exponent
     | Picture_describes_empty_data_item
     | Numeric_item_cannot_exceed_38_digits of int
-
-
-  (* Nicolas' style interface :-) *)
-  module type ENV = sig
-    val decimal_char: char
-    val currency_signs: Cobol_common.Basics.CharSet.t
-  end
 
 end
 
@@ -240,12 +233,6 @@ val fixed_numeric
   -> (* integral_digits: *)int
   -> (* decimal_digits: *)int
   -> picture
-
-exception InvalidPicture of Cobol_common.Diagnostics.diagnostics * picture
-
-module Make (Config: Cobol_config.T) (Env: ENV) : sig
-  val of_string: string with_loc -> t with_loc
-end
 
 val pp_error: error Pretty.printer
 
