@@ -13,6 +13,8 @@
 
 open Cobol_common
 open Srcloc.TYPES
+open Srcloc.INFIX
+
 module CHARS = Cobol_common.Basics.CharSet
 
 module TYPES = struct
@@ -243,7 +245,7 @@ module TYPES = struct
   [@@deriving show, ord]
 
   type config = {
-    max_pic_length : int;
+    max_pic_length: int;
     decimal_char: char;
     currency_signs: Cobol_common.Basics.CharSet.t;
     sign_config: sign_config;
@@ -270,11 +272,6 @@ module TYPES = struct
     | Missing_digits_in_exponent
     | Picture_describes_empty_data_item
     | Numeric_item_cannot_exceed_38_digits of int
-
-  module type ENV = sig
-    val decimal_char: char
-    val currency_signs: Cobol_common.Basics.CharSet.t
-  end
 
 end
 
@@ -331,18 +328,29 @@ let is_edited: category -> bool = function
   | FloatNum { editions = []; _ } -> false
   | _ -> true
 
+(** Size of the data, without taking the sign of numeric items into account. *)
 let data_size: category -> int = function
   | Alphabetic { length }
   | Boolean { length }
-  | Alphanumeric { length; _ } -> length
-  | National { length; _ } -> length * 2
-  | FixedNum { digits; sign; _ } ->
-      digits + (match sign with Some { sign_separate = true; _ } -> 1 | _ -> 0)
-  | FloatNum { digits; exponent_digits; _ } -> digits + exponent_digits
+  | Alphanumeric { length; _ } ->
+      length
+  | National { length; _ } ->
+      length * 2
+  | FixedNum { digits; _ } ->
+      digits
+  | FloatNum { digits; exponent_digits; _ } ->
+      digits + exponent_digits
 
-(** Display size including editing characters (insertion symbols, sign
-    position, etc.), as opposed to {!data_size} which gives the underlying
-    storage size (digits only for numerics). *)
+(** Actual storage size for items of usage DISPLAY. *)
+let display_size: category -> int = function
+  | FixedNum { digits; sign = Some { sign_separate = true; _ }; _ } ->
+      digits + 1
+  | category ->
+      data_size category
+
+(** Display size including editing characters (insertion symbols, sign position,
+    etc.), as opposed to {!data_size} which gives the underlying storage size
+    (digits only for numerics). *)
 let edited_size: category -> int =
   let simple_insertion_size { simple_insertion_symbols = symbols; _ } =
     symbols.symbol_occurences in
@@ -875,11 +883,11 @@ let of_string config str =
         None, acc
     | None ->
         None,
+        with_error acc (pos, 1) @@
         let c = str.[pos] in
         if c = '('
-        then with_error acc (pos,1)
-            Parenthesis_must_be_preceded_by_picture_symbol
-        else with_error acc (pos,1) (Unexpected_char c)
+        then Parenthesis_must_be_preceded_by_picture_symbol
+        else (Unexpected_char c)
     | Some (symbols, span) ->
         let pos' = pos + span in
         Some (symbols, (pos,span), pos'), acc
@@ -907,16 +915,21 @@ let of_string config str =
           | Error acc -> acc, false
         in
         if ok then
-          let category = append ~sign_config:config.sign_config ~after_v category symbols in
+          let category =
+            append ~sign_config:config.sign_config ~after_v category symbols
+          in
           let acc = match symbols.symbol with
             | V | DecimalSep when acc.v_idx = None ->
                 { acc with v_idx = Some idx }
             | P when acc.v_idx = None ->
                 let v_idx = match category with
                   | Ok c | Error (Some c, _)
-                    when data_size c = symbols.symbol_occurences -> idx - 1
-                  | Error (None, _) -> idx - 1
-                  | _ -> idx + symbols.symbol_occurences
+                    when data_size c = symbols.symbol_occurences ->
+                      idx - 1
+                  | Error (None, _) ->
+                      idx - 1
+                  | _ ->
+                      idx + symbols.symbol_occurences
                 in
                 { acc with v_idx = Some v_idx }
             | E ->
@@ -967,7 +980,8 @@ let of_string config str =
         let violations = Symbols.inter set acc.seen in
         if Symbols.is_empty violations then Ok acc else
           Result.error @@ Symbols.fold begin fun s acc ->
-            with_error acc loc (Symbols_are_mutually_exclusive (symbols.symbol, s))
+            with_error acc loc @@
+            Symbols_are_mutually_exclusive (symbols.symbol, s)
           end violations acc
 
   and check acc ~loc category' pic idx suff =
@@ -1068,7 +1082,6 @@ let of_string config str =
   match acc.errors with
   | [] -> Ok pic
   | errors -> Error (errors, pic)
-
 
 let pp_meaning_of_precedence_index ~decimal_char ppf = function
   | 0 -> Fmt.pf ppf "B, 0 or /"
@@ -1188,6 +1201,13 @@ let error_diagnostics ~loc errors =
     add_diags acc ~loc:(Srcloc.sub loc ~pos ~len) error
   end DIAGS.Set.none (List.rev errors)
 
+let of_string' config { payload; loc } =
+  match of_string config payload with
+  | Ok pic ->
+      Ok (pic &@ loc)
+  | Error (errors, pic) ->
+      Error (error_diagnostics ~loc errors, pic &@ loc)
+
 (* --- *)
 
 (* Some easy-to-used constructors *)
@@ -1256,6 +1276,8 @@ let is_signed_numeric pic = match pic.category with
   | FloatNum { with_sign; _ } -> with_sign
   | _ -> false
 let data_size pic = data_size pic.category
+let display_size pic = display_size pic.category
+let edited_size pic = edited_size pic.category
 let size pic = size pic.category
 
 (* --- *)
@@ -1292,29 +1314,3 @@ let unit_test ?(config=config) ~expect picture =
   end
   else
     true
-
-
-(* --- *)
-
-(* TODO: get rid of that functor. *)
-
-module Make (Config: Cobol_config.T) (Env: ENV) = struct
-
-  exception InvalidPicture of
-      string with_loc * Cobol_common.Diagnostics.diagnostics * picture
-
-  let of_string ({ payload; loc } as str) =
-
-    let config = {
-      max_pic_length = Config.pic_length#value;
-      decimal_char = Env.decimal_char;
-      currency_signs = Env.currency_signs;
-      sign_config = default_sign_config;
-    } in
-    match of_string config payload with
-    | Ok pic ->
-        { payload = pic; loc }
-    | Error (errors, pic) ->
-        raise @@ InvalidPicture (str, error_diagnostics ~loc errors, pic)
-
-end
