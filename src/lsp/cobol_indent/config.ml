@@ -228,6 +228,7 @@ let source_format format =
   in
   match source_format with
   | SFFixed -> fixed_format
+  | SFCOBOL85 -> fixed_format
   | SFFree -> free_format
   | SFVariable -> variable_format
   | SFxCard -> xcard_format

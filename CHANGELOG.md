@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Enforcement of Area A checks only when the source format is `COBOL85` [#555](https://github.com/OCamlPro/superbol-studio-oss/pull/555)
 - Support for COMP-6 usage [#548](https://github.com/OCamlPro/superbol-studio-oss/pull/548)
 
 ### Fixed

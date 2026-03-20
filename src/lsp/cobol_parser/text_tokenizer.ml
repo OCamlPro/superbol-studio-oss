@@ -47,10 +47,8 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
      deal with old-style informational paragraphs (COBOL85). *)
   let ( +@+ ) = Cobol_common.Srcloc.concat
   and start_pos = Cobol_common.Srcloc.start_pos in
-  let comment_entry_termination =
-    let Cobol_preproc.Src_format.SF sf = source_format in
-    Cobol_preproc.Src_format.comment_entry_termination sf
-  and info_word = function
+  let Cobol_preproc.Src_format.SF sf = source_format in
+  let info_word = function
     | WORD w ->
         INFO_WORD w
     | t ->
@@ -109,10 +107,10 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
     and comment_entry_after n =
       let acc, ((p, l) as suff) = skip acc (p, l) n in
       if p = [] then Result.Error `MissingInputs else
-        let consume_comment = match comment_entry_termination with
+        let consume_comment =
+          match Cobol_preproc.Src_format.comment_entry_termination sf with
           | Newline ->
-              comment_line ~init_pos:(Cobol_common.Srcloc.start_pos @@
-                                      LIST.hd l)
+              comment_line ~init_pos:(start_pos @@ LIST.hd l)
           | Period ->
               comment_paragraph ?stop_column:None
           | AreaB { first_area_b_column } ->
@@ -230,6 +228,11 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
     | [PICTURE] | [PICTURE; IS]      -> Error `MissingInputs
 
     | ALPHANUM_PREFIX { str; _ } :: _ -> missing_continuation_of str
+
+    | WORD_IN_AREA_A w as tok :: _    ->
+        if Cobol_preproc.Src_format.enforceable_area_a sf
+        then subst_n tok 1
+        else subst_n (WORD w) 1
 
     | tok :: _                        -> subst_n tok 1
 
@@ -370,6 +373,8 @@ let show tag { persist = { verbose; show_if_verbose; _ }; _ } =
 
 let distinguish_words: (Grammar_tokens.token with_loc as 't) -> 't = function
   | { payload = WORD w; loc } when loc_in_area_a loc ->
+      (* TODO: keep track of source format to filter this case out when Area A
+         checks are not enforceable. *)
       WORD_IN_AREA_A w &@ loc
   | t -> t
 

@@ -32,6 +32,7 @@ module TYPES = struct
   type source_format_id =
     | SFFree
     | SFFixed
+    | SFCOBOL85
     | SFVariable
     | SFXOpen
     | SFxCard
