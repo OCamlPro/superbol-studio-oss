@@ -167,7 +167,7 @@ let guess_source_format ~filename ~command =   (* hackish detection of format *)
     lazy (command_matchp free_flag_regexp),   Cobol_config.(SF SFFree);
     lazy (command_matchp fixd_format_regexp), Cobol_config.(SF SFFixed);
     lazy (command_matchp free_format_regexp), Cobol_config.(SF SFFree);
-    lazy (command_matchp cb85_format_regexp), Cobol_config.(SF SFFixed);
+    lazy (command_matchp cb85_format_regexp), Cobol_config.(SF SFCOBOL85);
     lazy (command_matchp vrbl_format_regexp), Cobol_config.(SF SFVariable);
     lazy (command_matchp xopn_format_regexp), Cobol_config.(SF SFXOpen);
     lazy (command_matchp xcrd_format_regexp), Cobol_config.(SF SFxCard);
