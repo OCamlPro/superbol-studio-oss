@@ -24,15 +24,19 @@ and fixed_paging_params =
   {
     cut_at_col: int;
     alphanum_padding: char option;
+    enforceable_area_a: bool;
   }
 
-let fixed_paging    = { cut_at_col = 72; alphanum_padding = Some ' ' }
+let fixed_paging    = { cut_at_col = 72; alphanum_padding = Some ' ';
+                        enforceable_area_a = false }
+let cobol85_paging  = { fixed_paging with enforceable_area_a = true }
 let variable_paging = { fixed_paging with cut_at_col = 250 }
 let xcard_paging    = { fixed_paging with cut_at_col = 255 }
 let xopen_paging    = xcard_paging
 let crt_paging      = { fixed_paging with cut_at_col = 320 }
 let terminal_paging = crt_paging
-let cobolx_paging   = { cut_at_col = 255; alphanum_padding = None }
+let cobolx_paging   = { cut_at_col = 255; alphanum_padding = None;
+                        enforceable_area_a = false }
 
 (* Actual format and indicator positioning *)
 
@@ -73,6 +77,7 @@ let from_config
   : Cobol_config.source_format -> any = function
   | SFFree     -> SF (   NoIndic, FreePaging)
   | SFFixed    -> SF (FixedIndic, FixedWidth    fixed_paging)
+  | SFCOBOL85  -> SF (FixedIndic, FixedWidth  cobol85_paging)
   | SFVariable -> SF (FixedIndic, FixedWidth variable_paging)
   | SFXOpen    -> SF (XOpenIndic, FixedWidth    xopen_paging)
   | SFxCard    -> SF (FixedIndic, FixedWidth    xcard_paging)
@@ -93,6 +98,7 @@ let decypher ~dialect format =
   | "FREE", Cobol_config.DIALECT.MicroFocus _ -> Cobol_config.SFXOpen
   | "FREE",                      _            -> SFFree
   | "FIXED",                     _            -> SFFixed
+  | "COBOL85",                   _            -> SFCOBOL85
   | "VARIABLE",                  _            -> SFVariable
   | "XOPEN",                     _            -> SFXOpen
   | "XCARD",                     _            -> SFxCard
@@ -135,10 +141,16 @@ let comment_entry_termination
   |(_         , FreePaging   ), _
   |(XOpenIndic, _            ), _
   |(_         , _            ), None   -> Newline
-  | (FixedIndic, FixedWidth _), Some c -> AreaB { first_area_b_column = c }
+  |(FixedIndic,  FixedWidth _), Some c -> AreaB { first_area_b_column = c }
   |((CRTIndic |
      TrmIndic |
      CBLXIndic), FixedWidth _), Some c -> AreaB { first_area_b_column = c }
+
+(* --- *)
+
+let enforceable_area_a (type k) : k source_format -> bool = function
+  | FixedIndic, FixedWidth { enforceable_area_a; _ } -> enforceable_area_a
+  | _ -> false
 
 (* --- *)
 

@@ -341,6 +341,7 @@ type standard =
 type source_format = Cobol_common.Platform.TYPES.source_format_id =
   | SFFree
   | SFFixed
+  | SFCOBOL85
   | SFVariable
   | SFXOpen
   | SFxCard

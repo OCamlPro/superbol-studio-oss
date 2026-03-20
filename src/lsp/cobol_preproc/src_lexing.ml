@@ -585,7 +585,7 @@ let fixed_alphanum_lit
     ({ config = { source_format; _ }; _ } as state)
     lexbuf
   =
-  let _, FixedWidth { cut_at_col; alphanum_padding } = source_format in
+  let _, FixedWidth { cut_at_col; alphanum_padding; _ } = source_format in
   let (_, start_pos, end_pos) as lexinf = lexeme_info lexbuf in
   let end_col = pos_column end_pos in
   assert (pos_column end_pos > 0);     (* should never have zero-length token *)

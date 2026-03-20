@@ -1748,6 +1748,16 @@ syn_misc.at-5103-prog.cob:7.16-7.24:
    9            25156c   "25156c".
 >> Error: Invalid syntax
 
+syn_misc.at-5103-prog.cob:9.18-9.26:
+   6          SPECIAL-NAMES.
+   7          SYMBOLIC CONSTANT
+   8            con-1  IS 1
+   9 >          25156c   "25156c".
+----                     ^^^^^^^^
+  10          DATA DIVISION.
+  11          WORKING-STORAGE SECTION.
+>> Error: Invalid syntax
+
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5295:0
 syn_misc.at-5295-prog.cob:8.26:
    5          WORKING-STORAGE SECTION.

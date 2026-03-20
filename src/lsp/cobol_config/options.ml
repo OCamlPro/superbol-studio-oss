@@ -90,7 +90,7 @@ let format_of_string s =
   match String.lowercase_ascii s with
   | "fixed" -> SF SFFixed
   | "free" -> SF SFFree
-  | "cobol85" -> SF SFFixed
+  | "cobol85" -> SF SFCOBOL85
   | "variable" -> SF SFVariable
   | "xopen" -> SF SFXOpen
   | "xcard" -> SF SFxCard
@@ -115,14 +115,15 @@ let all_format_names =
   ]
 
 let string_of_format = function
+  | SF SFCOBOLX -> "cobolx"
+  | SF SFCRT -> "crt"
   | SF SFFixed -> "fixed"
+  | SF SFCOBOL85 -> "cobol85"
   | SF SFFree -> "free"
+  | SF SFTrm -> "terminal"
   | SF SFVariable -> "variable"
   | SF SFXOpen -> "xopen"
   | SF SFxCard -> "xcard"
-  | SF SFCRT -> "crt"
-  | SF SFTrm -> "terminal"
-  | SF SFCOBOLX -> "cobolx"
   | Auto -> "auto"
 
 let format: source_format_spec value =
