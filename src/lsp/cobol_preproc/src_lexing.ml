@@ -119,7 +119,8 @@ let pos_column Lexing.{ pos_bol; pos_cnum; _ } =         (* count cols from 1 *)
 
 let raw_loc ~start_pos ~end_pos { newline; config = { source_format; _ }; _ } =
   let in_area_a =
-    newline && match Src_format.first_area_b_column source_format with
+    newline && Src_format.enforceable_area_a source_format &&
+    match Src_format.first_area_b_column source_format with
     | None -> false
     | Some c -> pos_column start_pos < c
   in

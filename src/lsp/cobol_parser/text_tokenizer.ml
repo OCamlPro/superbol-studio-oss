@@ -229,11 +229,6 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
 
     | ALPHANUM_PREFIX { str; _ } :: _ -> missing_continuation_of str
 
-    | WORD_IN_AREA_A w as tok :: _    ->
-        if Cobol_preproc.Src_format.enforceable_area_a sf
-        then subst_n tok 1
-        else subst_n (WORD w) 1
-
     | tok :: _                        -> subst_n tok 1
 
 
@@ -373,10 +368,9 @@ let show tag { persist = { verbose; show_if_verbose; _ }; _ } =
 
 let distinguish_words: (Grammar_tokens.token with_loc as 't) -> 't = function
   | { payload = WORD w; loc } when loc_in_area_a loc ->
-      (* TODO: keep track of source format to filter this case out when Area A
-         checks are not enforceable. *)
       WORD_IN_AREA_A w &@ loc
-  | t -> t
+  | t ->
+      t
 
 
 let scan_exec_block
