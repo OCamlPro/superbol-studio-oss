@@ -1,1 +1,1 @@
-jsoo_global_object.debugadapter = require("@vscode/debugadapter");
+joo_global_object.debugadapter = require("@vscode/debugadapter");

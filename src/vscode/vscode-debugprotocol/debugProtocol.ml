@@ -1347,6 +1347,8 @@ module SetFunctionBreakpointsResponse = struct
     } [@@js]
     type body = b or_undefined [@@js]
   end
+
+  include Response.Make (M) ()
 end
 
 module SetExceptionBreakpointsArguments = struct
@@ -1435,6 +1437,8 @@ module SetDataBreakpointsResponse = struct
       breakpoints: Breakpoint.t list
     } [@@js]
   end
+
+  include Response.Make (M) ()
 end
 
 module SetInstructionBreakpointsArguments = struct
@@ -1460,6 +1464,8 @@ module SetInstructionBreakpointsResponse = struct
       breakpoints: Breakpoint.t list
     } [@@js]
   end
+
+  include Response.Make (M) ()
 end
 
 module ContinueArguments = struct
