@@ -1,1 +1,1 @@
-joo_global_object.debugprotocol = "@vscode/debugprotocol"
+globalThis.debugprotocol = "@vscode/debugprotocol"
