@@ -50,7 +50,9 @@ module Process = struct
 
     val platform : string [@@js.global "process.platform"]
 
-    val arch : string [@@js.global "process.arch"]]
+    val arch : string [@@js.global "process.arch"]
+
+    val kill : int -> ?signal:string -> unit -> unit [@@js.call "process.kill"]]
 
   module Env = struct
     include [%js: val env : Ojs.t [@@js.global "process.env"]]
@@ -107,7 +109,13 @@ module Stream = struct
       [%js:
       val on : t -> string -> Ojs.t -> unit [@@js.call]
 
-      val write : t -> string -> unit [@@js.call]
+      val write :
+        t ->
+        string ->
+        ?encoding:string ->
+        ?callback:(JsError.t or_undefined -> unit) ->
+        unit ->
+        unit [@@js.call]
 
       val end_ : t -> unit [@@js.call]]
 
@@ -163,7 +171,9 @@ module Path = struct
 
     val isAbsolute : string -> bool [@@js.global "path.isAbsolute"]
 
-    val join : (string list[@js.variadic]) -> string [@@js.global "path.join"]]
+    val join : (string list[@js.variadic]) -> string [@@js.global "path.join"]
+
+    val resolve : (string list[@js.variadic]) -> string [@@js.global "path.resolve"]]
 
   let delimiter =
     assert (String.length delimiter = 1);
@@ -185,6 +195,8 @@ module Fs = struct
     val exists : string -> bool Promise.t [@@js.global "fs.exists"]
 
     val existsSync : string -> bool [@@js.global "fs.existsSync"]
+
+    val realpathSync : string -> string [@@js.global "fs.realpathSync"]
 
     val writeFileSync : string -> string -> unit [@@js.global "fs.writeFileSync"]
 
@@ -256,6 +268,8 @@ module ChildProcess = struct
     val get_stderr : t -> Stream.Readable.t [@@js.get "stderr"]
 
     val get_stdin : t -> Stream.Writable.t [@@js.get "stdin"]
+
+    val get_pid : t -> int [@@js.get "pid"]
 
     val kill : t -> ?signal:string -> unit -> unit [@@js.call]
 
@@ -329,7 +343,7 @@ module ChildProcess = struct
 
     match stdin with
     | Some text ->
-      Stream.Writable.write (get_stdin cp) text;
+      Stream.Writable.write (get_stdin cp) text ();
       Stream.Writable.end_ (get_stdin cp)
     | None -> ()
 

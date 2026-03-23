@@ -44,6 +44,8 @@ module Process : sig
 
   val arch : string
 
+  val kill : int -> ?signal:string -> unit -> unit
+
   module Env : sig
     val get : string -> string option
 
@@ -116,7 +118,13 @@ module Stream : sig
          ]
       -> unit
 
-    val write : t -> string -> unit
+    val write :
+      t ->
+      string ->
+      ?encoding:string ->
+      ?callback:(JsError.t or_undefined -> unit) ->
+      unit ->
+      unit
 
     val end_ : t -> unit
   end
@@ -136,6 +144,8 @@ module Path : sig
   val isAbsolute : string -> bool
 
   val join : string list -> string
+
+  val resolve : string list -> string
 end
 
 module Os : sig
@@ -150,6 +160,8 @@ module Fs : sig
   val exists : string -> bool Promise.t
 
   val existsSync : string -> bool
+
+  val realpathSync : string -> string
 
   val writeFileSync : string -> string -> unit
 
@@ -215,6 +227,10 @@ module ChildProcess : sig
   val get_stdout : t -> Stream.Readable.t
 
   val get_stderr : t -> Stream.Readable.t
+
+  val get_stdin : t -> Stream.Writable.t
+
+  val get_pid : t -> int
 
   val kill : t -> ?signal:string -> unit -> unit
 
