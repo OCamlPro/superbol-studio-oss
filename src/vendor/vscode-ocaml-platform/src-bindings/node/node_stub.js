@@ -6,6 +6,7 @@ globalThis.fs = {
   readFile: promisify(fs.readFile),
   exists: promisify(fs.exists),
   existsSync: fs.existsSync,
+  realpathSync: fs.realpathSync,
   writeFileSync: fs.writeFileSync,
   mkdirSync: fs.mkdirSync,
   unlinkSync: fs.unlinkSync,
