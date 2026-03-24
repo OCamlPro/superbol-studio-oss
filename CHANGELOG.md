@@ -7,6 +7,7 @@
 - Support for COMP-6 usage [#548](https://github.com/OCamlPro/superbol-studio-oss/pull/548)
 
 ### Fixed
+- Handling of queries about `LINKAGE` items given in `USING` phrases [#561](https://github.com/OCamlPro/superbol-studio-oss/pull/561)
 - Parsing of LSP CLI arguments, that notably prevented caching in global storage [#549](https://github.com/OCamlPro/superbol-studio-oss/pull/549) (fix for [Issue #547](https://github.com/OCamlPro/superbol-studio-oss/issues/547))
 - Size reported for numeric items with `SIGN SEPARATE` clause [#545](https://github.com/OCamlPro/superbol-studio-oss/pull/545) [#552](https://github.com/OCamlPro/superbol-studio-oss/pull/552) [#553](https://github.com/OCamlPro/superbol-studio-oss/pull/553)
 - Internal logic of the parser to limit the amount of text rescans [#544](https://github.com/OCamlPro/superbol-studio-oss/pull/544)

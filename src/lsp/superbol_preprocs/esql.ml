@@ -35,8 +35,8 @@ let scanner =
     Esql_exec_block (Sql_parser.parse text) , []
   )
 
-let fold_exec_block': Cobol_typeck.Outputs.fold_exec_block'
-  = fun ~register_name exec_block acc ->
+let fold_exec_block': Cobol_typeck.Outputs.exec_block_folder
+  = fun ~data_definitions exec_block acc ->
     match exec_block.payload with
     | Esql_exec_block esql ->
       let cob_var_extractor_folder = object
@@ -49,8 +49,7 @@ let fold_exec_block': Cobol_typeck.Outputs.fold_exec_block'
           esql []
       in
       List.fold_left begin fun acc cobol_var_id ->
-        register_name cobol_var_id acc
+        Cobol_typeck.References.register_name cobol_var_id acc
+          ~data_definitions
       end acc cobol_vars
     | _ -> acc
-
-

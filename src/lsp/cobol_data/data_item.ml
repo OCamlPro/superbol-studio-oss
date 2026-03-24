@@ -72,3 +72,24 @@ let def_qualname = function
       Some ~&(~&def.condition_name_qualname)
   | Table_index { qualname; _ } ->
       Some ~&qualname
+
+let def_record: data_definition -> record = function
+  | Data_field { record; _}
+  | Data_renaming { record; _}
+  | Data_condition { record; _}
+  | Table_index { record; _ } -> record
+
+let def_storage: data_definition -> data_storage = fun def ->
+  (def_record def).record_storage
+
+let def_size: data_definition -> Data_memory.size = function
+  | Data_field { def; _} -> ~&def.field_size
+  | Data_renaming { def; _} -> ~&def.renaming_size
+  | Data_condition { field; _} -> ~&field.field_size
+  | Table_index { table; _ } -> ~&table.table_size
+
+let def_offset: data_definition -> Data_memory.offset = function
+  | Data_field { def; _} -> ~&def.field_offset
+  | Data_renaming { def; _} -> ~&def.renaming_offset
+  | Data_condition { field; _} -> ~&field.field_offset
+  | Table_index { table; _ } -> ~&table.table_offset

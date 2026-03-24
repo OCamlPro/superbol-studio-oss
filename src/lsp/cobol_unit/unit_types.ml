@@ -25,6 +25,18 @@ type 'a named_n_ordered =
     list: 'a list;
   }
 
+type ('a, 'ref_name) resolved_reference =
+  {
+    resolved_name: 'ref_name;
+    resolved: 'a;                                  (* note: skipped in visitor *)
+  }
+
+type 'a resolved_name =
+  ('a, Cobol_ptree.name with_loc) resolved_reference
+
+type 'a resolved_qualname =
+  ('a, Cobol_ptree.qualname with_loc) resolved_reference
+
 (* config *)
 
 (** Corresponds to the contents of the CONFIGURATION SECTION. *)
@@ -64,7 +76,23 @@ type procedure_block =
   | Paragraph of procedure_paragraph with_loc
   | Section of procedure_section with_loc
 
-type procedure = procedure_block named_n_ordered
+type procedure_using = procedure_arg with_loc list
+
+and procedure_arg =
+  {
+    arg_data_definition: Cobol_data.Types.data_definition resolved_name;
+    arg_passing_style: arg_passing_style;
+  }
+
+and arg_passing_style =
+  | Arg_by_reference of { optional: bool }
+  | Arg_by_value
+
+type procedure =
+  {
+    procedure_blocks: procedure_block named_n_ordered;
+    procedure_using: procedure_using with_loc option;
+  }
 
 (* main *)
 

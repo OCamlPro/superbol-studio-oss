@@ -30,16 +30,18 @@ class virtual ['a] folder = object
   method fold_declarative'                : (declarative with_loc             , 'a) fold = default
   method fold_paragraph                   : (paragraph                        , 'a) fold = default
   method fold_paragraph'                  : (paragraph with_loc               , 'a) fold = default
-  method fold_procedure_by_clause         : (procedure_by_clause              , 'a) fold = default
-  method fold_procedure_by_clause'        : (procedure_by_clause with_loc     , 'a) fold = default
-  method fold_by_reference                : (by_reference                     , 'a) fold = default
+  method fold_procedure_args              : (procedure_args                   , 'a) fold = default
+  method fold_procedure_args'             : (procedure_args with_loc          , 'a) fold = default
+  method fold_procedure_by_reference_arg  : (procedure_by_reference_arg       , 'a) fold = default
+  method fold_procedure_by_value_arg      : (procedure_by_value_arg           , 'a) fold = default
   method fold_declarative_use             : (declarative_use                  , 'a) fold = default
   method fold_use_after_exception         : (use_after_exception              , 'a) fold = default
   method fold_use_for_debugging_target    : (use_for_debugging_target         , 'a) fold = default
   method fold_raising_phrase              : (raising_phrase                   , 'a) fold = default
   method fold_raising_phrase'             : (raising_phrase with_loc          , 'a) fold = default
   method fold_procedure_calling_style     : (procedure_calling_style          , 'a) fold = default
-  method fold_procedure_args              : (procedure_args                   , 'a) fold = default
+  method fold_procedure_using_phrase      : (procedure_using_phrase           , 'a) fold = default
+  method fold_procedure_using_phrase'     : (procedure_using_phrase with_loc  , 'a) fold = default
 end
 
 let fold_use_exception_on (v: _ #folder) = function
@@ -106,23 +108,29 @@ let fold_paragraph (v: _ #folder) =
 let fold_paragraph' (v: _ #folder) =
   handle' v#fold_paragraph' ~fold:fold_paragraph v
 
-let fold_by_reference (v: _ #folder) =
-  handle v#fold_by_reference
-    ~continue:begin fun { by_reference;
-                          by_reference_optional } x -> x
-      >> fold_name' v by_reference
-      >> fold_bool v by_reference_optional
+let fold_procedure_by_reference_arg (v: _ #folder) =
+  handle v#fold_procedure_by_reference_arg
+    ~continue:begin fun { by_reference_arg_name;
+                          by_reference_arg_optional } x -> x
+      >> fold_name' v by_reference_arg_name
+      >> fold_bool v by_reference_arg_optional
     end
 
-let fold_procedure_by_clause (v: _ #folder) =
-  handle v#fold_procedure_by_clause
+let fold_procedure_by_value_arg (v: _ #folder) =
+  handle v#fold_procedure_by_value_arg
+    ~continue:begin fun { by_value_arg_name } x -> x
+      >> fold_name' v by_value_arg_name
+    end
+
+let fold_procedure_args (v: _ #folder) =
+  handle v#fold_procedure_args
     ~continue:begin function
-      | ByReference l -> fold_list ~fold:fold_by_reference v l
-      | ByValue l -> fold_name'_list v l
+      | ByReference l -> fold_list ~fold:fold_procedure_by_reference_arg v l
+      | ByValue l -> fold_list ~fold:fold_procedure_by_value_arg v l
     end
 
-let fold_procedure_by_clause' (v: _ #folder) =
-  handle' v#fold_procedure_by_clause' ~fold:fold_procedure_by_clause v
+let fold_procedure_args' (v: _ #folder) =
+  handle' v#fold_procedure_args' ~fold:fold_procedure_args v
 
 let fold_raising_phrase (v: _ #folder) =
   handle v#fold_raising_phrase
@@ -137,20 +145,23 @@ let fold_raising_phrase' (v: _ #folder) =
 let fold_procedure_calling_style (v: _ #folder) =
   leaf v#fold_procedure_calling_style
 
-let fold_procedure_args (v: _ #folder) =
-  handle v#fold_procedure_args
+let fold_procedure_using_phrase (v: _ #folder) =
+  handle v#fold_procedure_using_phrase
     ~continue:begin fun { procedure_calling_style = style;
-                          procedure_by_clause = args } x -> x 
+                          procedure_args = args } x -> x
       >> fold' ~fold:fold_procedure_calling_style v style
-      >> fold_list ~fold:fold_procedure_by_clause' v args
+      >> fold_list ~fold:fold_procedure_args' v args
     end
+
+let fold_procedure_using_phrase' (v: _ #folder) =
+  handle' v#fold_procedure_using_phrase' ~fold:fold_procedure_using_phrase v
 
 let fold_procedure_division (v: _ #folder) =
   handle v#fold_procedure_division
-    ~continue:begin fun { procedure_args; procedure_returning;
+    ~continue:begin fun { procedure_using_phrase; procedure_returning;
                           procedure_raising_phrases; procedure_declaratives;
                           procedure_paragraphs } x -> x
-      >> fold_option ~fold:fold_procedure_args v procedure_args
+      >> fold_option ~fold:fold_procedure_using_phrase' v procedure_using_phrase
       >> fold_ident'_opt v procedure_returning
       >> fold_list ~fold:fold_raising_phrase' v procedure_raising_phrases
       >> fold_list ~fold:fold_declarative' v procedure_declaratives

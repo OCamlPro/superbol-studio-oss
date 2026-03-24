@@ -13,6 +13,7 @@
 
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
+open Cobol_common.Exec_block.TYPES
 module LIST = Cobol_common.Basics.LIST
 
 type qualrefmap = srcloc list Cobol_unit.Qual.MAP.t
@@ -43,9 +44,9 @@ type outputs =
   }
 type t = outputs
 
-
-(* An accumulator for fold_exec_block', used to collect references in
-   EXEC blocks *)
+(* TODO: move those types to a new `Typeck_external/plugins/extensions' module *)
+(* An accumulator for {!exec_block_folder}, used to collect references in EXEC
+   blocks *)
 type references_acc =
   {
     current_section: Cobol_unit.Types.procedure_section option;
@@ -53,13 +54,11 @@ type references_acc =
     diags: Typeck_diagnostics.t;
   }
 
-type fold_exec_block' =
-  register_name:(string
-                   Cobol_common.Srcloc.TYPES.with_loc ->
-                 references_acc -> references_acc) ->
-  Cobol_common.Exec_block.TYPES.exec_block
-    Cobol_common.Srcloc.TYPES.with_loc ->
-  references_acc -> references_acc
+type exec_block_folder
+  = data_definitions: Cobol_unit.Types.data_definitions
+  -> exec_block with_loc
+  -> references_acc
+  -> references_acc
 
 (* --- *)
 

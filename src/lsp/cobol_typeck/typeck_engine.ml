@@ -13,15 +13,12 @@
 
 (** Type-checking and validation of COBOL compilation groups *)
 
-module DIAGS = Cobol_common.Diagnostics
-
-let compilation_group
-    (type m) : ?config: _ ->
-  fold_exec_block': Typeck_outputs.fold_exec_block' ->
-  m Cobol_parser.Outputs.parsed_compilation_group -> _
-  = fun ?(config = Cobol_config.default) ~fold_exec_block' ->
-    function
-    | Only None | WithArtifacts (None, _) ->
+let compilation_group (type m) : ?config: _
+  -> fold_exec_block': Typeck_outputs.exec_block_folder
+  -> m Cobol_parser.Outputs.parsed_compilation_group
+  -> _ = fun ?(config = Cobol_config.default) ~fold_exec_block' ->
+  function
+  | Only None | WithArtifacts (None, _) ->
       Typeck_results.simple_result Typeck_outputs.none
-    | Only Some cg | WithArtifacts (Some cg, _) ->
+  | Only Some cg | WithArtifacts (Some cg, _) ->
       Typeck_units.of_compilation_group config ~fold_exec_block' cg

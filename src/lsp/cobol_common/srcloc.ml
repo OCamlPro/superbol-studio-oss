@@ -64,6 +64,9 @@ module TYPES = struct
   type 'a with_loc = { payload: 'a; loc: srcloc [@compare fun _ _ -> 0] }
   [@@ deriving ord]
 
+  let pp pe ppf e = pe ppf e.payload            (* ignore source localization *)
+  let pp_with_loc = pp
+  let show_with_loc pe l = Pretty.to_string "%a" (pp pe) l
 end
 include TYPES
 
@@ -684,8 +687,6 @@ let sub loc ~pos ~len =
 
 (** {2 Manipulating localized values} *)
 
-let pp pe ppf e = pe ppf e.payload              (* ignore source localization *)
-let pp_with_loc = pp
 let flagit payload loc = { payload; loc }
 let payload: 'a with_loc -> 'a = fun e -> e.payload
 let loc: 'a with_loc -> srcloc = fun e -> e.loc

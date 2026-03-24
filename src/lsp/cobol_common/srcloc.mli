@@ -15,7 +15,7 @@ module TYPES: sig
   type lexloc = Lexing.position * Lexing.position
   type srcloc
   type copylocs
-  type 'a with_loc = { payload: 'a; loc: srcloc; }                [@@deriving ord]
+  type 'a with_loc = { payload: 'a; loc: srcloc; }          [@@deriving ord, show]
 end
 type lexloc = TYPES.lexloc
 type srcloc = TYPES.srcloc

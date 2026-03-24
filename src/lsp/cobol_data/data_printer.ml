@@ -23,9 +23,15 @@ let pp_int' = Cobol_ptree.pp_with_loc Fmt.int
 let pp_int'_opt = Fmt.option pp_int'
 let pp_qualname'_opt = Fmt.option Cobol_ptree.pp_qualname'
 let pp_qualname'_list = Fmt.(hbox (list ~sep:comma Cobol_ptree.pp_qualname'))
-  (* Pretty.list ~fopen:"@[<h>" ~fsep:",@;" ~fclose:"@]" Cobol_ptree.pp_qualname' *)
+(* Pretty.list ~fopen:"@[<h>" ~fsep:",@;" ~fclose:"@]" Cobol_ptree.pp_qualname' *)
 let pp_literal'_opt = Fmt.option Cobol_ptree.pp_literal'
 let pp_literal'_list = Fmt.list Cobol_ptree.pp_literal'
+
+let pp_data_storage ppf = function
+  | File n -> Fmt.pf ppf "FILE@ %a" Cobol_ptree.pp_name' n
+  | Local_storage -> Fmt.string ppf "LOCAL-STORAGE"
+  | Working_storage -> Fmt.string ppf "WORKING-STORAGE"
+  | Linkage -> Fmt.string ppf "LINKAGE"
 
 (* usage *)
 
@@ -288,11 +294,11 @@ let pp_data_definition ppf = function
         I'(~&field.field_qualname <> None,
            Fmt.field "field" (fun () -> ~&field.field_qualname) pp_qualname'_opt,
            Fmt.field "field-offset" (fun () -> ~&field.field_offset) pp_offset);
-  T (Pretty.vfield "def" (fun () -> def) pp_condition_name');
+        T (Pretty.vfield "def" (fun () -> def) pp_condition_name');
       ] ppf ()
   | Table_index { table; record = { record_name; _ }; _ } ->
       Pretty.record_with_conditional_fields [
         T Fmt.(styled `Yellow @@ any "table index");
         T (Fmt.field "record" (fun () -> record_name) Fmt.string);
-  T (Pretty.vfield "table" (fun () -> table) pp_table_definition');
+        T (Pretty.vfield "table" (fun () -> table) pp_table_definition');
       ] ppf ()

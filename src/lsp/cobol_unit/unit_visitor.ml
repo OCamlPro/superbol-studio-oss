@@ -32,6 +32,11 @@ class ['a] folder = object
   method fold_procedure_paragraph: (procedure_paragraph, 'a) fold = default
   method fold_procedure_paragraph': (procedure_paragraph with_loc, 'a) fold = default
   method fold_procedure_block: (procedure_block, 'a) fold = default
+  method fold_resolved_name: 'x. ('x resolved_name, 'a) fold = default
+  (* method fold_resolved_qualname: 'x. ('x resolved_qualname, 'a) fold = default *)
+  method fold_procedure_arg: (procedure_arg, 'a) fold = default
+  method fold_procedure_using: (procedure_using, 'a) fold = default
+  method fold_procedure_using': (procedure_using with_loc, 'a) fold = default
   method fold_procedure: (procedure, 'a) fold = default
 end
 
@@ -73,9 +78,34 @@ let fold_procedure_block (v: _ #folder) =
       | Section s -> fold_procedure_section' v s
     end
 
+let fold_resolved_name ~fold (v: _ #folder) =
+  handle v#fold_resolved_name
+    ~continue:begin fun { resolved_name; resolved } x -> x
+      >> fold_string' v resolved_name
+      >> fold v resolved
+    end
+
+let fold_procedure_arg (v: _ #folder) =
+  handle v#fold_procedure_arg
+    ~continue:begin fun { arg_data_definition; arg_passing_style } x ->
+      ignore arg_passing_style;
+      x
+      >> fold_resolved_name v ~fold:(fun _ _ -> Fun.id) arg_data_definition
+    end
+
+let fold_procedure_using (v: _ #folder) =
+  handle v#fold_procedure_using
+    ~continue:(fold_with_loc_list v ~fold:fold_procedure_arg)
+
+let fold_procedure_using' (v: _ #folder) =
+  handle' v#fold_procedure_using' ~fold:fold_procedure_using v
+
 let fold_procedure (v: _ #folder) =
   handle v#fold_procedure                                     (* skip `named` *)
-    ~continue:(fun s -> fold_list v ~fold:fold_procedure_block s.list)
+    ~continue:begin fun { procedure_blocks; procedure_using } x -> x
+      >> fold_option ~fold:fold_procedure_using' v procedure_using
+      >> fold_list v ~fold:fold_procedure_block procedure_blocks.list
+    end
 
 let fold_cobol_unit (v: _ #folder) =
   handle v#fold_cobol_unit

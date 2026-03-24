@@ -426,13 +426,13 @@ CALL (id/lit AS)? NESTED/id USING...? RETURNING...? (program-prototype)
 and call_stmt =
   {
     call_static: bool;                                            (* GnuCOBOL *)
-    call_prefix: call_prefix;
+    call_target: call_target;
     call_using: call_using_clause with_loc list;
     call_returning: ident with_loc option;
     call_error_handler: call_error_handler option;
   }
 
-and call_prefix =
+and call_target =
   | CallGeneral of ident_or_strlit
   | CallProto of
       {
@@ -564,11 +564,12 @@ let pp_call_proto ppf = function
   | CallProtoIdent i -> pp_ident ppf i
   | CallProtoNested -> Fmt.pf ppf "NESTED"
 
-let pp_call_prefix ppf = function
-  | CallGeneral i -> pp_ident_or_strlit ppf i
+let pp_call_target ppf = function
+  | CallGeneral i ->
+      pp_ident_or_strlit ppf i
   | CallProto { called; prototype } ->
-    Fmt.(option (pp_ident_or_strlit ++ any "@ AS@ ")) ppf called;
-    pp_call_proto ppf prototype
+      Fmt.(option (pp_ident_or_strlit ++ any "@ AS@ ")) ppf called;
+      pp_call_proto ppf prototype
 
 let pp_dual_handler pp ?close ?(on = Fmt.any "ON EXCEPTION") ?off ppf
   { dual_handler_pos = p; dual_handler_neg = n }
@@ -851,7 +852,7 @@ and pp_basic_arithmetic_stmt ~sep op ppf
 
 and pp_call_stmt ppf
   { call_static = cs
-  ; call_prefix = cp
+  ; call_target = ct
   ; call_using = cu
   ; call_returning = returning
   ; call_error_handler = cho }
@@ -867,7 +868,7 @@ and pp_call_stmt ppf
   in
   Fmt.pf ppf "@[CALL %s"
     (if cs then "STATIC " else "");
-  pp_call_prefix ppf cp;
+  pp_call_target ppf ct;
   if cu != [] then
     Fmt.pf ppf "@ USING@ %a"
       Fmt.(list ~sep:sp (pp_with_loc pp_call_using_clause)) cu;

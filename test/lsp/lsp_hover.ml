@@ -1389,3 +1389,37 @@ let%expect_test "hover-data-division-ref-count-only" =
        7          PROCEDURE DIVISION.
        8             DISPLAY VAR.
     References: 3 |}]
+
+let%expect_test "hover-procedure-using" =
+  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  print_hovered server ~projdir @@ extract_position_markers {cobol|
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       LINKAGE SECTION.
+       01 ARG PIC X.
+       PROCEDURE DIVISION USING AR_|_G.
+          DISPLAY ARG.
+          STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    (line 6, character 34):
+    __rootdir__/prog.cob:7.32-7.35:
+       4          DATA DIVISION.
+       5          LINKAGE SECTION.
+       6          01 ARG PIC X.
+       7 >        PROCEDURE DIVISION USING ARG.
+    ----                                   ^^^
+       8             DISPLAY ARG.
+       9             STOP RUN.
+    ```cobol
+    ARG
+    ```
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
+    ALPHANUMERIC(1)
+    ---
+    References: 3 |}]
