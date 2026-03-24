@@ -19,7 +19,7 @@ type jumps =
   | Go of qualname
   | GoDepending of qualname
   | Perform of qualname
-  | Call of Cobol_ptree.call_prefix
+  | Call of Cobol_ptree.call_target
   | Entry of Cobol_ptree.entry_stmt
 
 module Jumps = Set.Make(struct
@@ -36,13 +36,13 @@ module Jumps = Set.Make(struct
       | Go qn1, Go qn2
       | GoDepending qn1, GoDepending qn2
       | Perform qn1, Perform qn2 -> Cobol_ptree.compare_qualname qn1 qn2
-      | Call cp1, Call cp2 -> Cobol_ptree.compare_call_prefix cp1 cp2
+      | Call cp1, Call cp2 -> Cobol_ptree.compare_call_target cp1 cp2
       | Entry en1 , Entry en2 -> Cobol_ptree.compare_entry_stmt en1 en2
       | _ -> to_int j2 - to_int j1
   end)
 
 let full_qn ~cu qn =
-  (Qualmap.find_binding qn cu.unit_procedure.named).full_qn
+  (Qualmap.find_binding qn cu.unit_procedure.procedure_blocks.named).full_qn
 
 let full_qn' ~cu qn = full_qn ~cu ~&qn
 
@@ -153,8 +153,8 @@ module JumpsCollector = struct
       let start = full_qn' ~cu payload.perform_target.procedure_start in
       skip { acc with jumps = Jumps.add (Perform start) acc.jumps }
 
-    method! fold_call' { payload = { call_prefix; _ }; _ } acc =
-      skip { acc with jumps = Jumps.add (Call call_prefix) acc.jumps }
+    method! fold_call' { payload = { call_target; _ }; _ } acc =
+      skip { acc with jumps = Jumps.add (Call call_target) acc.jumps }
 
     method! fold_entry' { payload; _ } acc =
       skip { acc with jumps = Jumps.add (Entry payload) acc.jumps }

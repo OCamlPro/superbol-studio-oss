@@ -168,7 +168,7 @@ let procedures_proposal ~filename pos group =
         List.map (fun s -> typ, s) @@ to_string qn
       | _ -> []
     in
-    cu.unit_procedure.list
+    cu.unit_procedure.procedure_blocks.list
     |> List.rev_map begin function
       | Cobol_unit.Types.Paragraph p ->
         to_string_with_type "Paragraph" p

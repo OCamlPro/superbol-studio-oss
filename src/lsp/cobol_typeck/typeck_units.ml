@@ -16,7 +16,6 @@ open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 
 module Visitor = Cobol_common.Visitor
-module DIAGS = Cobol_common.Diagnostics
 module CUs = Cobol_unit.Collections.SET
 module CUMap = Cobol_unit.Collections.MAP
 
@@ -124,7 +123,7 @@ end
     groups. *)
 let of_compilation_group
   : Cobol_config.t ->
-    fold_exec_block':Typeck_outputs.fold_exec_block' ->
+    fold_exec_block':Typeck_outputs.exec_block_folder ->
     Cobol_ptree.compilation_group ->
     Typeck_outputs.t Typeck_results.with_diags =
   fun config ~fold_exec_block' compilation_group_ptree ->

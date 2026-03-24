@@ -14,8 +14,6 @@
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 
-module DIAGS = Cobol_common.Diagnostics
-
 type error =
   | Invalid_picture_symbol of string with_loc
 

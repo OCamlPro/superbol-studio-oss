@@ -87,8 +87,7 @@ let pp_position ppf = function
 type call_using_clause =
   {
     call_using_by: call_using_by option;
-    call_using_expr: expression option;(* [@compare
-    fun a b -> Option.compare compare_expression a b] *)                (** OMITTED if [None] *)
+    call_using_expr: expression option with_loc;        (** OMITTED if [None] *)
   }
 [@@deriving ord]
 
@@ -105,7 +104,7 @@ let pp_call_using_by ppf = function
 
 let pp_call_using_clause ppf { call_using_by = cub; call_using_expr = cue } =
   Fmt.(option (pp_call_using_by ++ sp)) ppf cub;
-  Fmt.(option ~none:(const string "OMITTED") pp_expression) ppf cue
+  Fmt.(pp_with_loc @@ option ~none:(any "OMITTED") pp_expression) ppf cue
 
 
 (* DELETE, OPEN, REWRITE, WRITE, READ (through on_lock_or_retry) *)

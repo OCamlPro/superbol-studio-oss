@@ -83,4 +83,3 @@ let iter_trio trio tuple (fa, fb, fc) =
 let iter_quartet quartet tuple (fa, fb, fc, fd) =
   fold_quartet quartet tuple
     (unit_acc fa, unit_acc fb, unit_acc fc, unit_acc fd) ()
-

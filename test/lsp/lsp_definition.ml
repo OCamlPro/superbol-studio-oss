@@ -690,3 +690,29 @@ let%expect_test "definition-index" =
        9              SET I IN V-TAB TO 0
     6-missing (line 11, character 15):
     No definition found |}];;
+
+
+let%expect_test "definition-procedure-using" =
+  let { end_with_postproc; projdir }, server = make_lsp_project () in
+  print_definitions ~projdir server @@ extract_position_markers {cobol|
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       LINKAGE SECTION.
+       01 ARG PIC X.
+       PROCEDURE DIVISION USING AR_|1-arg|_G.
+          DISPLAY ARG.
+          STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    1-arg (line 6, character 34):
+    __rootdir__/prog.cob:6.10-6.13:
+       3          PROGRAM-ID. prog.
+       4          DATA DIVISION.
+       5          LINKAGE SECTION.
+       6 >        01 ARG PIC X.
+    ----             ^^^
+       7          PROCEDURE DIVISION USING ARG.
+       8             DISPLAY ARG. |}]

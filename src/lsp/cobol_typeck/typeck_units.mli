@@ -13,6 +13,6 @@
 
 val of_compilation_group
   : Cobol_config.t
-  -> fold_exec_block':Typeck_outputs.fold_exec_block'
+  -> fold_exec_block':Typeck_outputs.exec_block_folder
   -> Cobol_ptree.compilation_group
   -> Typeck_outputs.t Typeck_results.with_diags

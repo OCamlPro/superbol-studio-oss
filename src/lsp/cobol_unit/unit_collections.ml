@@ -19,6 +19,7 @@ open Cobol_common.Srcloc.INFIX
 
 let compare_with_name u name =
   String.compare ~&(~&u.unit_name) name
+
 let compare_by_name u1 u2 =
   String.compare ~&(~&u1.unit_name) ~&(~&u2.unit_name)
 
@@ -56,6 +57,7 @@ module MAP: sig
                  and type +'a t = 'a Map.Make (M).t
   val units: 'a t -> SET.t
   val find_by_name: string -> 'a t -> cobol_unit with_loc * 'a
+  val tabulate: (key -> 'a) -> SET.t -> 'a t
 end = struct
   include Map.Make (M)
   let units map =
@@ -63,4 +65,6 @@ end = struct
   let find_by_name name map =
     let u, v = find_first (fun u -> compare_with_name u name >= 0) map in
     if ~&(~&u.unit_name) = name then u, v else raise Not_found
+  let tabulate f set =
+    SET.fold (fun u map -> add u (f u) map) set empty
 end

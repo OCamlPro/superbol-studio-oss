@@ -15,6 +15,34 @@ open Unit_types
 
 open Cobol_common.Srcloc.INFIX
 
+let pp_resolved_name pp_resolved : _ resolved_name Fmt.t =
+  Pretty.record [
+    Fmt.(field "resolved-name" (fun x -> x.resolved_name) Cobol_ptree.pp_name');
+    Fmt.(field "resolved" (fun x -> x.resolved) pp_resolved);
+  ]
+
+let pp_resolved_qualname pp_resolved : _ resolved_qualname Fmt.t =
+  Pretty.record [
+    Fmt.(field "resolved-name" (fun x -> x.resolved_name) Cobol_ptree.pp_qualname');
+    Fmt.(field "resolved" (fun x -> x.resolved) pp_resolved);
+  ]
+
+let pp_arg_passing_style ppf = function
+  | Arg_by_value ->
+      Pretty.print ppf "by@ value"
+  | Arg_by_reference { optional = false } ->
+      Pretty.print ppf "by@ reference"
+  | Arg_by_reference { optional = true } ->
+      Pretty.print ppf "by@ reference,@ optional"
+
+let pp_procedure_arg =
+  Pretty.record [
+    Fmt.(field "arg-definition" (fun x -> x.arg_data_definition)
+           (pp_resolved_name Cobol_data.Printer.pp_data_definition));
+    Fmt.(field "passing-style" (fun x -> x.arg_passing_style)
+           pp_arg_passing_style);
+  ]
+
 let pp_cobol_unit ?(show_items = false) =
   Pretty.record_with_conditional_fields [
     T Fmt.(field "name" (fun x -> ~&(x.unit_name)) string);

@@ -14,7 +14,6 @@
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 
-module DIAGS = Cobol_common.Diagnostics
 module NEL = Cobol_data.Types.NEL
 
 type entry =
@@ -223,7 +222,7 @@ let pp_error ppf = function
                               or@ numeric-edited")
   | Item_not_allowed_in_section { level; section } ->
       Pretty.print ppf "%d-level@ item@ not@ allowed@ in@ %a@ section" ~&level
-        Cobol_data.Types.pp_data_storage section
+        Cobol_data.Printer.pp_data_storage section
   | Invalid_level_number { level } ->
       Pretty.print ppf "Invalid@ level@ number:@ %02d" ~&level
   | Unexpected_level_number { level; expected } ->

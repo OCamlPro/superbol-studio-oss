@@ -274,19 +274,18 @@ let semtoks_from_ptree ~filename ?range ptree =
       |> Visitor.skip_children
 
     (* procedure using *)
-    method! fold_by_reference { by_reference;
-                                by_reference_optional } acc = acc
-      |> add_name' by_reference Parameter
+    method! fold_procedure_by_reference_arg { by_reference_arg_name;
+                                              by_reference_arg_optional } acc =
+      acc
+      |> add_name' by_reference_arg_name Parameter
       (*|> Visitor.do_children*)
-      |> fold_bool self by_reference_optional
+      |> fold_bool self by_reference_arg_optional
       |> Visitor.skip_children
 
-    method! fold_procedure_by_clause = function
-      | ByReference _ ->
-          Visitor.do_children
-      | ByValue l -> fun x -> x
-        |> add_list add_name' l Parameter
-        |> Visitor.skip_children
+    method! fold_procedure_by_value_arg { by_value_arg_name } acc =
+      acc
+      |> add_name' by_value_arg_name Parameter
+      |> Visitor.skip_children
 
     (* inline call of function *)
     method! fold_inline_call c x = match c with
@@ -336,11 +335,11 @@ let semtoks_from_ptree ~filename ?range ptree =
       |> add_option add_ident' allocate_returning VarModif
       |> Visitor.skip_children
 
-    method! fold_call' {payload = { call_static; call_prefix;
+    method! fold_call' {payload = { call_static; call_target;
                                     call_using; call_returning;
                                     call_error_handler }; _} acc = acc
       |> fold_bool self call_static
-      |> fold_call_prefix self call_prefix
+      |> fold_call_target self call_target
       |> fold_list ~fold:fold_call_using_clause' self call_using
       |> add_option add_ident' call_returning VarModif
       |> fold_option ~fold:fold_call_error_handler self call_error_handler

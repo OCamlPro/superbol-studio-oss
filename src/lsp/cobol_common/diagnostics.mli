@@ -105,7 +105,7 @@ include module type of Cont
 (* --- *)
 
 val result: ?diags:diagnostics -> 'a -> 'a with_diags
-(* val result_only: 'a with_diags -> 'a *)
+val result_only: 'a with_diags -> 'a
 (* val with_diag: 'a -> diagnostic -> 'a with_diags *)
 (* val with_diags: 'a -> diagnostics -> 'a with_diags *)
 val with_more_diags: diags:diagnostics -> 'a with_diags -> 'a with_diags
@@ -118,8 +118,14 @@ val map_some_result: f:('a -> 'b) -> 'a option with_diags -> 'b option with_diag
 val more_result: f:('a -> 'b with_diags) -> 'a with_diags -> 'b with_diags
 val cons_option_result: 'a option with_diags -> 'a list with_diags -> 'a list with_diags
 val forget_result: _ with_diags -> diagnostics
+val forget_diags: 'a with_diags -> 'a
 (* val merge_results: f:('a -> 'b -> 'c) -> 'a with_diags -> 'b with_diags -> 'c with_diags *)
 val show_n_forget
+  : ?set_status:bool
+  -> ?min_level:severity
+  -> ?platform:platform
+  -> ?ppf:Format.formatter -> 'a with_diags -> 'a
+val show_diags
   : ?set_status:bool
   -> ?min_level:severity
   -> ?platform:platform

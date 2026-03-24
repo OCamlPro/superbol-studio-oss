@@ -107,7 +107,7 @@ let fold_call_using_clause (v: _ #folder) =
   handle v#fold_call_using_clause
     ~continue:begin fun { call_using_by; call_using_expr } x -> x
       >> fold_option ~fold:fold_call_using_by v call_using_by
-      >> fold_option ~fold:fold_expr v call_using_expr
+      >> fold' ~fold:(fold_option ~fold:fold_expr) v call_using_expr
     end
 
 let fold_call_using_clause' (v: _ #folder) =

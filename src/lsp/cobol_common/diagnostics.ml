@@ -208,7 +208,7 @@ include Cont
 (* --- *)
 
 let result ?(diags = Set.none) result = { result; diags }
-(* let result_only { result; _ } = result *)
+let result_only { result; _ } = result
 let with_diag r d = result ~diags:(Set.one d) r
 (* let with_diags r diags = result ~diags r *)
 let with_more_diags ~diags { result; diags = diags' } =
@@ -226,6 +226,7 @@ let cons_option_result = function
   | { result = None; diags } -> with_more_diags ~diags
   | { result = Some r; diags } -> more_result ~f:(fun tl -> result ~diags @@ r :: tl)
 let forget_result { diags; _ } = diags
+let forget_diags = result_only
 (* let merge_results ~f r1 r2 = *)
 (*   result (f r1.result r2.result) ~diags:(Set.union r1.diags r2.diags) *)
 let show_n_forget ?(set_status = true) ?(min_level = Hint)
@@ -233,6 +234,7 @@ let show_n_forget ?(set_status = true) ?(min_level = Hint)
   Set.pp_above ~level:min_level ?platform ppf diags;
   if set_status && Set.has_errors diags then Exit_status.raise ();
   result
+let show_diags = show_n_forget
 let sink_result ?set_status ?platform ?ppf r =
   ignore @@ show_n_forget ?set_status ?platform ?ppf r
 

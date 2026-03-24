@@ -11,6 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Typeck_outputs                                     (* for references_acc *)
+open Typeck_procedure_diagnostics
 open Cobol_unit.Types
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
@@ -24,7 +26,70 @@ type output =
     references: Typeck_outputs.references_in_unit;
   }
 
-let procedure_of_compilation_unit cu' =
+let baseloc_of_qualname: Cobol_ptree.qualname -> srcloc = function
+  | Name name
+  | Qual (name, _) -> ~@name
+
+let error acc err =
+  { acc with diags = Proc_error err :: acc.diags }
+
+let resolve_procedure_args ~data_definitions ~refs pa =
+  let open struct
+    type procedure_args_accumulator =
+      {
+        rev_args: procedure_arg with_loc list;
+        refs: references_acc;
+      }
+  end in
+
+  let error acc err = { acc with refs = error acc.refs err } in
+
+  let resolve_arg_name_ref ~arg_name ~arg_passing_style acc =
+    let register_linkage_record ~arg_data_definition acc =
+      match Cobol_data.Item.def_storage arg_data_definition.resolved with
+      | Linkage ->
+          { acc with
+            rev_args = ({ arg_data_definition;
+                          arg_passing_style } &@<- arg_name) :: acc.rev_args }
+      | actual_storage ->
+          error acc @@ Invalid_proc_arg_storage { arg_name; actual_storage }
+    in
+    match
+      (* CHECKME: may need to only lookup among records (maybe also only in
+         LINKAGE), not among every data def. *)
+      let arg_data_definition, refs =
+        Typeck_references.resolve_record_name arg_name acc.refs
+          ~data_definitions
+      in
+      { acc with refs }, arg_data_definition
+    with
+    | acc, Error () ->
+        acc                                                   (* skip arg def *)
+    | acc, Ok arg_data_definition ->
+        register_linkage_record ~arg_data_definition acc
+    | exception Not_found ->
+        error acc @@ Procedure_arg_record_not_found { arg_name }
+  in
+
+  Cobol_ptree.Visitor.fold_procedure_using_phrase object
+    inherit [procedure_args_accumulator] Cobol_ptree.Visitor.folder
+    method! fold_procedure_calling_style _ = Visitor.skip
+    method! fold_procedure_by_value_arg a acc =
+      Visitor.skip_children @@
+      resolve_arg_name_ref acc
+        ~arg_name:a.by_value_arg_name
+        ~arg_passing_style:Arg_by_value
+    method! fold_procedure_by_reference_arg a acc =
+      let optional = a.by_reference_arg_optional in
+      Visitor.skip_children @@
+      resolve_arg_name_ref acc
+        ~arg_name:a.by_reference_arg_name
+        ~arg_passing_style:(Arg_by_reference { optional })
+  end ~&pa { rev_args = []; refs } |>
+  fun acc -> Some (List.rev acc.rev_args &@<- pa), acc.refs
+
+
+let procedure_of_compilation_unit ~data_definitions ~refs cu' =
 
   let open struct
     type acc =
@@ -32,6 +97,7 @@ let procedure_of_compilation_unit cu' =
         blocks: procedure_block Qualmap.t;
         block_list: procedure_block list;
         current_section: section_under_construction with_loc option;
+        args: Cobol_ptree.procedure_using_phrase with_loc option;
       }
     and section_under_construction =
       {
@@ -44,13 +110,29 @@ let procedure_of_compilation_unit cu' =
         blocks = Qualmap.empty;
         block_list = [];
         current_section = None;
+        args = None;
       }
 
-    let procedure acc =
+    let procedure_blocks acc =
       {
         named = acc.blocks;
         list = List.rev acc.block_list;
       }
+
+    let procedure_using acc =
+      match acc.args with
+      | None ->
+          None, refs
+      | Some args ->
+          resolve_procedure_args ~data_definitions ~refs args
+
+    let procedure acc =
+      let procedure_using, references = procedure_using acc in
+      {
+        procedure_blocks = procedure_blocks acc;
+        procedure_using;
+      },
+      references
 
     let name n : Cobol_ptree.qualname = Name n
     let qual n q : Cobol_ptree.qualname = Qual (n, q)
@@ -88,7 +170,8 @@ let procedure_of_compilation_unit cu' =
       match acc.current_section with
       | Some ({ payload = { sec_name = qn; _ }; _ } as section) ->
           let section = section_block section in
-          { blocks = Qualmap.add ~&qn section acc.blocks;
+          { acc with
+            blocks = Qualmap.add ~&qn section acc.blocks;
             block_list = section :: acc.block_list;
             current_section = None }
       | None ->
@@ -116,7 +199,8 @@ let procedure_of_compilation_unit cu' =
             acc.block_list,
             Some ({ ~&s with sec_paragraphs } &@ loc)
       in
-      { blocks = Qualmap.add qn (paragraph_block p) acc.blocks;
+      { acc with
+        blocks = Qualmap.add qn (paragraph_block p) acc.blocks;
         block_list;
         current_section }
 
@@ -137,6 +221,9 @@ let procedure_of_compilation_unit cu' =
       Visitor.do_children_and_then acc
         commit_section                  (* be sure to handle the last section *)
 
+    method! fold_procedure_using_phrase' args acc =
+      Visitor.skip_children { acc with args = Some args }
+
     method! fold_paragraph' p acc =
       Visitor.skip_children @@ match ~&p with
       | { paragraph_is_section = true;
@@ -144,9 +231,7 @@ let procedure_of_compilation_unit cu' =
       | { paragraph_name = Some name; _ } -> named_paragraph name p acc
       | { paragraph_name = None; _ }      -> anonymous_paragraph p acc
 
-    (* TODO: nested programs... *)
-    method! fold_nested_programs _  = Visitor.skip
-
+    method! fold_nested_programs _  = Visitor.skip                    (* TODO *)
   end in
 
   Cobol_ptree.Visitor.fold_compilation_unit' visitor
@@ -154,73 +239,20 @@ let procedure_of_compilation_unit cu' =
 
 (* --- *)
 
-let references
+let collect_references
     ~(data_definitions: Cobol_unit.Types.data_definitions)
-    ~(fold_exec_block': Typeck_outputs.fold_exec_block') procedure =
-
-  let open Typeck_outputs in (* for references_acc *)
-  let init =
-    {
-      current_section = None;
-      refs = Typeck_outputs.no_refs;
-      diags = Typeck_diagnostics.none;
-    } in
-  let references { refs; diags; _ } = refs, diags
-  in
-
-  let baseloc_of_qualname: Cobol_ptree.qualname -> srcloc = function
-    | Name name
-    | Qual (name, _) -> ~@name
-  in
-
-  let error acc err =
-    { acc with diags = Proc_error err :: acc.diags }
-  in
-  let register_name name acc =
-    let qn = Cobol_ptree.Name name in
-    let loc = name.loc in
-    begin try
-        let bnd = Qualmap.find_binding qn data_definitions.data_items.named in
-        { acc with
-          refs = Typeck_outputs.register_data_qualref
-              ~loc bnd.full_qn acc.refs }
-      with
-      | Not_found ->
-        acc  (* ignored for now, as we don't process all the DATA DIV. yet. *)
-      | Qualmap.Ambiguous (lazy matching_qualnames) ->
-        error acc @@ Ambiguous_data_name { given_qualname = qn &@ loc;
-                                           matching_qualnames }
-    end in
+    ~(fold_exec_block': Typeck_outputs.exec_block_folder)
+    ~(refs: references_acc)
+    procedure =
 
   let visitor = object (v)
     inherit [references_acc] Cobol_unit.Visitor.folder
 
     method! fold_qualname qn acc =                (* TODO: data_name' instead *)
-      let loc = baseloc_of_qualname qn in
       Visitor.do_children @@
-      (* match Qualmap.find qn data_definitions.data_items.named with
-         | Data_field { def; _ } ->
-             { acc with
-               refs = Typeck_outputs.register_data_field_ref ~loc def acc.refs }
-         | Data_renaming { def; _ } ->
-             { acc with
-               refs = Typeck_outputs.register_data_renaming_ref ~loc def acc.refs }
-         | Data_condition { def; _ } ->
-             { acc with
-               refs = Typeck_outputs.register_condition_name_ref ~loc def acc.refs }
-         | Table_index { qualname = qn; _ } ->
-             { acc with
-               refs = Typeck_outputs.register_data_qualref ~loc ~&qn acc.refs } *)
-      try
-        let bnd = Qualmap.find_binding qn data_definitions.data_items.named in
-        { acc with
-          refs = Typeck_outputs.register_data_qualref ~loc bnd.full_qn acc.refs }
-      with
-      | Not_found ->
-        acc  (* ignored for now, as we don't process all the DATA DIV. yet. *)
-      | Qualmap.Ambiguous (lazy matching_qualnames) ->
-        error acc @@ Ambiguous_data_name { given_qualname = qn &@ loc;
-                                           matching_qualnames }
+      Typeck_references.register_data_qualname
+        ~data_definitions
+        (qn &@ baseloc_of_qualname qn) acc
 
     method! fold_procedure_section ({ section_paragraphs; _ } as s)
         ({ current_section; _ } as acc) =
@@ -235,46 +267,44 @@ let references
       Visitor.skip @@
       Cobol_ptree.Proc_division_visitor.fold_paragraph' v paragraph acc
 
-
     method! fold_procedure_name' qn
         ({ current_section = in_section; _ } as acc) =
       let register ?in_section qn acc =
         let loc = baseloc_of_qualname ~&qn in
         match Cobol_unit.Procedure.find ~&qn ?in_section procedure with
         | block ->
-          { acc with
-            refs = Typeck_outputs.register_procedure_ref ~loc block acc.refs }
+            { acc with
+              refs = Typeck_outputs.register_procedure_ref ~loc block acc.refs }
         | exception Not_found ->
-          error acc @@ Unknown_proc_name qn
+            error acc @@ Unknown_proc_name qn
         | exception Qualmap.Ambiguous (lazy matching_qualnames) ->
-          error acc @@ Ambiguous_proc_name { given_qualname = qn;
-                                             matching_qualnames }
+            error acc @@ Ambiguous_proc_name { given_qualname = qn;
+                                               matching_qualnames }
       in
       let acc = register ?in_section qn acc in
       let acc = match ~&qn with
         | Name _ -> acc
         | Qual (_, section_qn) ->
-          let loc = baseloc_of_qualname section_qn in
-          register (section_qn &@ loc) acc
+            register (section_qn &@ baseloc_of_qualname section_qn) acc
       in
       Visitor.skip_children acc
 
     method! fold_exec_block' exec_block acc =
-      let acc = fold_exec_block' ~register_name exec_block acc
-      in
-      Visitor.skip_children acc
+      Visitor.skip_children @@
+      fold_exec_block' ~data_definitions exec_block acc
 
   end in
 
-  Cobol_unit.Visitor.fold_procedure visitor procedure init |> references
+  Cobol_unit.Visitor.fold_procedure visitor procedure refs
 
 (* --- *)
 
 let of_compilation_unit ~data_definitions ~fold_exec_block' cu' =
-  let procedure = procedure_of_compilation_unit cu' in
-  let references, diags = references ~data_definitions ~fold_exec_block' procedure in
-  {
-    procedure;
-    references;
-  },
-  diags
+  let procedure, refs =
+    procedure_of_compilation_unit ~data_definitions cu'
+      ~refs:Typeck_references.empty_accumulator
+  in
+  let { refs = references; diags; _ } =
+    collect_references ~data_definitions ~fold_exec_block' ~refs procedure
+  in
+  { procedure; references }, diags

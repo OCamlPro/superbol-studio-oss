@@ -472,3 +472,69 @@ let%expect_test "references-requests-group-var" =
     ----                          ^
       12             MOVE 1 TO X.
       13             STOP RUN. |}]
+
+let%expect_test "references-requests-procedure-using" =
+  let { end_with_postproc; projdir }, server = make_lsp_project () in
+  print_references ~projdir server @@ extract_position_markers {cobol|
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       LINKAGE SECTION.
+       01 _|1-arg|_ARG PIC X.
+       PROCEDURE DIVISION USING AR_|2-arg|_G.
+          DISPLAY ARG.
+          STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    1-arg (line 5, character 10):
+    __rootdir__/prog.cob:6.10-6.13:
+       3          PROGRAM-ID. prog.
+       4          DATA DIVISION.
+       5          LINKAGE SECTION.
+       6 >        01 ARG PIC X.
+    ----             ^^^
+       7          PROCEDURE DIVISION USING ARG.
+       8             DISPLAY ARG.
+    __rootdir__/prog.cob:7.32-7.35:
+       4          DATA DIVISION.
+       5          LINKAGE SECTION.
+       6          01 ARG PIC X.
+       7 >        PROCEDURE DIVISION USING ARG.
+    ----                                   ^^^
+       8             DISPLAY ARG.
+       9             STOP RUN.
+    __rootdir__/prog.cob:8.18-8.21:
+       5          LINKAGE SECTION.
+       6          01 ARG PIC X.
+       7          PROCEDURE DIVISION USING ARG.
+       8 >           DISPLAY ARG.
+    ----                     ^^^
+       9             STOP RUN.
+      10
+    2-arg (line 6, character 34):
+    __rootdir__/prog.cob:6.10-6.13:
+       3          PROGRAM-ID. prog.
+       4          DATA DIVISION.
+       5          LINKAGE SECTION.
+       6 >        01 ARG PIC X.
+    ----             ^^^
+       7          PROCEDURE DIVISION USING ARG.
+       8             DISPLAY ARG.
+    __rootdir__/prog.cob:7.32-7.35:
+       4          DATA DIVISION.
+       5          LINKAGE SECTION.
+       6          01 ARG PIC X.
+       7 >        PROCEDURE DIVISION USING ARG.
+    ----                                   ^^^
+       8             DISPLAY ARG.
+       9             STOP RUN.
+    __rootdir__/prog.cob:8.18-8.21:
+       5          LINKAGE SECTION.
+       6          01 ARG PIC X.
+       7          PROCEDURE DIVISION USING ARG.
+       8 >           DISPLAY ARG.
+    ----                     ^^^
+       9             STOP RUN.
+      10 |}]

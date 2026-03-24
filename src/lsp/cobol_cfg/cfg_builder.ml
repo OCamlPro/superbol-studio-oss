@@ -191,7 +191,7 @@ let cfg_of ~(cu: cobol_unit) =
           build_node ~is_section ~cu p :: acc,
           false
         end (acc, true) section_paragraphs.list
-    end [] cu.unit_procedure.list
+    end [] cu.unit_procedure.procedure_blocks.list
   in
   List.rev nodes
   |> begin function (* adding entry point if not already present *)
@@ -225,7 +225,7 @@ let graph_material_of_doc ({ group; _ }: Cobol_typeck.Outputs.t) =
                 Cobol_ptree.pp_qualname' ~&sec.section_name
                 ((~&) cu.unit_name) in
             Some (name, `Section (cu, ~&sec))
-        end cu.unit_procedure.list in
+        end cu.unit_procedure.procedure_blocks.list in
       let cu_name = (~&)cu.unit_name in
       (cu_name, `Cu cu) :: section_graphs @ acc
     end group []

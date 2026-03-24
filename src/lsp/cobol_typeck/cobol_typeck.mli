@@ -27,3 +27,5 @@ module Outputs = Typeck_outputs
 module Diagnostics = Typeck_diagnostics
 module Results = Typeck_results
 include module type of Typeck_engine
+
+module References = Typeck_references

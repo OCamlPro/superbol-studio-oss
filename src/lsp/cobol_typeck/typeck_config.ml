@@ -16,7 +16,6 @@ open Cobol_common.Srcloc.INFIX
 
 module Visitor = Cobol_common.Visitor
 module CharSet = Cobol_common.Basics.CharSet
-module DIAGS = Cobol_common.Diagnostics
 
 type output = Cobol_unit.Types.unit_config
 

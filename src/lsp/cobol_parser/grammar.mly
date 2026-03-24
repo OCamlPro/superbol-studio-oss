@@ -273,7 +273,7 @@ let compilation_group :=
             | None -> ul
             | Some pd -> ul @ [((Program ~&pd): compilation_unit) &@<- pd] } }
 
-let simple_program := 
+let simple_program :=
   | opo = ro(loc(options_paragraph));
     edo = ro(loc(environment_division));
     ddo = ro(loc(non_empty_data_division));
@@ -2083,12 +2083,12 @@ let procedure_division_header [@post.procedure_division_header] :=
 
 let procedure_division [@post.procedure_division] :=
  | procedure_division_header;
-   procedure_args = ro(procedure_args);
+   procedure_using_phrase = ro(loc(procedure_using_clause));
    ro = ro(returning_ident);                                            (* +COB2002 *)
    rl = ilo(raising_phrase); ".";                                 (* +COB2002 *)
    dl = lo(declaratives);
    sl = rl(loc(section_paragraph));
-   { { procedure_args;
+   { { procedure_using_phrase;
        procedure_returning = ro;
        procedure_raising_phrases = rl;
        procedure_declaratives = dl;
@@ -2096,21 +2096,21 @@ let procedure_division [@post.procedure_division] :=
 
 let program_procedure_division [@post.procedure_division] :=
  | procedure_division_header;
-   procedure_args = ro(procedure_args);
+   procedure_using_phrase = ro(loc(procedure_using_clause));
    ro = ro(returning_ident);                                            (* +COB2002 *)
    rl = ilo(raising_phrase); ".";                                 (* +COB2002 *)
    dl = lo(declaratives);
    sl = section_paragraphs;
-   { { procedure_args;
+   { { procedure_using_phrase;
        procedure_returning = ro;
        procedure_raising_phrases = rl;
        procedure_declaratives = dl;
        procedure_paragraphs = sl } }
 
-let procedure_args :=
+let procedure_using_clause :=
  | style = loc(procedure_calling_style); args = rnel(loc(procedure_by_clause));
   { { procedure_calling_style = style;
-      procedure_by_clause = args} }
+      procedure_args = args} }
 
 let procedure_calling_style ==
  | USING; { ProcedureArgsUsed }
@@ -2122,10 +2122,11 @@ let object_procedure_division [@post.method_definitions] := (* +COB2002 *)
 (* COB85: only USING ident+ (in the IPC module, P541) *)
 let procedure_by_clause :=
  | io(BY?; REFERENCE);
-   ~ = nell(o = ibo(OPTIONAL); n = name; { { by_reference_optional = o;
-                                             by_reference = n } });
-   %prec lowest                             <ByReference>
- | BY?; VALUE; ~ = nell(name); %prec lowest <ByValue>
+   ~ = nell(o = ibo(OPTIONAL); n = name; { { by_reference_arg_optional = o;
+                                             by_reference_arg_name = n } });
+   %prec lowest <ByReference>
+ | BY?; VALUE; ~ = nell(n = name; { { by_value_arg_name = n } });
+   %prec lowest <ByValue>
 
 (* Ambiguous, only class name may have factory *)
 let raising_phrase :=
@@ -2979,12 +2980,12 @@ COB2002:
 *)
 
 let using_by :=
- | b = call_using_by?; e = arithmetic_term;
+ | b = call_using_by?; e = loc(arithmetic_term);
+   { { call_using_by = b;                       (* COB85: ident, COB2002: exp *)
+       call_using_expr = Cobol_common.Srcloc.map_payload Option.some e } }
+ | b = call_using_by?; omitted = loc(OMITTED);
    { { call_using_by = b;
-       call_using_expr = Some e } }             (* COB85: ident, COB2002: exp *)
- | b = call_using_by?; OMITTED;
-   { { call_using_by = b;
-       call_using_expr = None } }                                 (* +COB2002 *)
+       call_using_expr = None &@<- omitted } }                    (* +COB2002 *)
 
 let call_using_by [@recovery CallUsingByReference] :=
  | BY?; REFERENCE; {CallUsingByReference}
@@ -3238,17 +3239,17 @@ let alter_statement :=
 
 %public let unconditional_action := ~ = call_statement; < >
 let call_statement [@context call_stmt] :=
-  | CALL; so = bo(STATIC); cp = call_prefix;
+  | CALL; so = bo(STATIC); cp = call_target;
     ul = lo(pf(USING,rnel(loc(using_by))));
     ro = ro(returning_or_giving); oeho = io(overflow_or_exception_handler);
     oterm_(END_CALL);
     { Call { call_static = so; (* STATIC is GnuCOBOL extension *)
-             call_prefix = cp;
+             call_target = cp;
              call_using = ul;
              call_returning = ro;
              call_error_handler = oeho } }
 
-let call_prefix :=
+let call_target :=
   | i = ident_or_string; <CallGeneral>
   | ian = ident_or_string; AS; in_ = ident_or_nested;
     { CallProto { called = Some ian; prototype = in_ } }

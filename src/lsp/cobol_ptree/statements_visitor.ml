@@ -37,7 +37,7 @@ class virtual ['a] folder = object
   method fold_accept_with_clause' : (accept_with_clause with_loc, 'a) fold = default
   method fold_allocate_kind       : (allocate_kind           , 'a) fold = default
   method fold_alter_operands'     : (alter_operands with_loc , 'a) fold = default
-  method fold_call_prefix         : (call_prefix             , 'a) fold = default
+  method fold_call_target         : (call_target             , 'a) fold = default
   method fold_call_proto          : (call_proto              , 'a) fold = default
   method fold_close_format        : (close_format            , 'a) fold = default
   method fold_close_phrase        : (close_phrase            , 'a) fold = default
@@ -199,8 +199,8 @@ let fold_call_proto (v: _ #folder) =
       | CallProtoNested -> Fun.id
     end
 
-let fold_call_prefix (v: _ #folder) =
-  handle v#fold_call_prefix
+let fold_call_target (v: _ #folder) =
+  handle v#fold_call_target
     ~continue:begin fun p x -> match p with
       | CallGeneral i -> x
           >> fold_ident_or_strlit v i
@@ -900,10 +900,10 @@ and fold_add' (v: _ #folder) : basic_arithmetic_stmt with_loc -> 'a -> 'a =
 
 and fold_call' (v: _ #folder) : call_stmt with_loc -> 'a -> 'a =
   handle' v#fold_call' v
-    ~fold:begin fun v { call_static; call_prefix; call_using;
+    ~fold:begin fun v { call_static; call_target; call_using;
                         call_returning; call_error_handler } x -> x
       >> fold_bool v call_static
-      >> fold_call_prefix v call_prefix
+      >> fold_call_target v call_target
       >> fold_list ~fold:fold_call_using_clause' v call_using
       >> fold_ident'_opt v call_returning
       >> fold_option ~fold:fold_call_error_handler v call_error_handler
