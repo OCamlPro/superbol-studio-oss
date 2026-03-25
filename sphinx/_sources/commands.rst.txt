@@ -105,6 +105,8 @@ Where options are:
 
 * :code:`--conf CONF_FILE`   Set the configuration file to be used
 
+* :code:`--config-dir DIR`   Add DIR to config search path
+
 * :code:`--dialect DIALECT` or :code:`--std DIALECT`   Set the dialect to bu used (overriden by `--conf` if used)
 
 * :code:`--ext EXT`   Add EXT as a filename extension for copybook resolution (default: `cpy` `cbl` `cob`)
@@ -117,6 +119,8 @@ Where options are:
 
 * :code:`--source-format SOURCE_FORMAT`   Set the format of source code; allowed values are: { FIXED (the default), FREE}
 Overrides `format` from configuration file if present.
+
+* :code:`--stdout`   Output errors/warnings to stdout
 
 
 main.exe ebcdic translate
@@ -252,6 +256,8 @@ Where options are:
 
 * :code:`--conf CONF_FILE`   Set the configuration file to be used
 
+* :code:`--config-dir DIR`   Add DIR to config search path
+
 * :code:`--dialect DIALECT` or :code:`--std DIALECT`   Set the dialect to bu used (overriden by `--conf` if used)
 
 * :code:`--ext EXT`   Add EXT as a filename extension for copybook resolution (default: `cpy` `cbl` `cob`)
@@ -373,6 +379,8 @@ Where options are:
 * :code:`--cobc`   Activate cobc specific features
 
 * :code:`--conf CONF_FILE`   Set the configuration file to be used
+
+* :code:`--config-dir DIR`   Add DIR to config search path
 
 * :code:`--dialect DIALECT` or :code:`--std DIALECT`   Set the dialect to bu used (overriden by `--conf` if used)
 
@@ -556,6 +564,8 @@ Where options are:
 * :code:`-I DIR`   Add DIR to library search path
 
 * :code:`--conf CONF_FILE`   Set the configuration file to be used
+
+* :code:`--config-dir DIR`   Add DIR to config search path
 
 * :code:`--copybooks`   Preprocess copybooks also (without REPLACING)
 
