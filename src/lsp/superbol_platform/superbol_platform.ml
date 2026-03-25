@@ -20,6 +20,7 @@ let record =
     error = Pretty.error;
     read_file = (fun file -> Ez_file.V1.EzFile.read_file file);
     autodetect_format = Heuristics.autodetect_format;
+    position_encoding_in_bytes = true;
     find_lib = Copybook_finder.find_lib;
     getenv_opt = (fun variable -> Sys.getenv_opt variable);
   }

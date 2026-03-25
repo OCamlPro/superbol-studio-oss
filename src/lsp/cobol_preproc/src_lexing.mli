@@ -13,12 +13,15 @@
 
 type 'k state
 
-val init_state: 'k Src_format.source_format -> 'k state
+val init_state
+  : position_encoding_in_bytes:bool
+  -> 'k Src_format.source_format -> 'k state
 val diagnostics: _ state -> Src_diagnostics.t
 val rev_comments: _ state -> Text.comments
 val rev_ignored: _ state -> Cobol_common.Srcloc.lexloc list
 val rev_newline_cnums: _ state -> int list
 val source_format: 'k state -> 'k Src_format.source_format
+val encodes_positions_in_bytes: _ state -> bool
 val change_source_format
   : 'k state -> 'c Src_format.source_format -> ('c state, unit) result
 val allow_debug: 'a state -> bool

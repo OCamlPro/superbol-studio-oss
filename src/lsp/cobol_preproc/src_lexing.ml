@@ -20,6 +20,15 @@ open Src_format
 
 (* --- *)
 
+(* Lexing positons manipulated in this module are expressed in bytes.
+
+   They are adjusted to match actual character positions before they are used to
+   build source locations (types `lexloc` and `srcloc`) that are attached to
+   emitted text words or other artifacts like ignored portions of source
+   text. *)
+
+(* --- *)
+
 let remove_blanks = Str.global_replace (Str.regexp " ") ""           (* '\t'? *)
 
 (* --- *)
@@ -58,9 +67,10 @@ and 'k config =
   {
     debug: bool;
     source_format: 'k source_format;
+    position_encoding_in_bytes: bool;
   }
 
-let init_state : 'k source_format -> 'k state = fun source_format ->
+let init_state ~position_encoding_in_bytes source_format : _ state =
   {
     lex_prods = [];
     continued = CNone;
@@ -76,6 +86,7 @@ let init_state : 'k source_format -> 'k state = fun source_format ->
       {
         debug = false;
         source_format;
+        position_encoding_in_bytes;
       }
   }
 
@@ -84,6 +95,7 @@ let rev_comments { comments; _ } = comments
 let rev_ignored { ignored; _ } = ignored
 let rev_newline_cnums { newline_cnums; _ } = newline_cnums
 let source_format { config = { source_format; _ }; _ } = source_format
+let encodes_positions_in_bytes { config; _ } = config.position_encoding_in_bytes
 let allow_debug { config = { debug; _ }; _ } = debug
 
 (** Flush buffered lexing productions, possibly holding onto one that may be
@@ -120,33 +132,56 @@ let change_source_format ({ config; _ } as state) sf =
 let pos_column { current_cpos_shift; _ } Lexing.{ pos_bol; pos_cnum; _ } =
   pos_cnum - pos_bol + 1 - current_cpos_shift            (* count cols from 1 *)
 
-let raw_loc ~start_pos ~end_pos ({ newline; config; _ } as state) =
+let adjust_postion { current_cpos_shift; config; _ } pos =
+  if current_cpos_shift = 0 || config.position_encoding_in_bytes
+  then pos
+  else Lexing.{ pos with pos_cnum = pos.pos_cnum - current_cpos_shift }
+
+let raw_loc ~start_pos ~end_pos ?end_state start_state =
   let in_area_a =
-    newline && Src_format.enforceable_area_a config.source_format &&
-    match Src_format.first_area_b_column config.source_format with
+    start_state.newline &&
+    Src_format.enforceable_area_a start_state.config.source_format &&
+    match Src_format.first_area_b_column start_state.config.source_format with
     | None -> false
-    | Some c -> pos_column state start_pos < c
+    | Some c -> pos_column start_state start_pos < c
   in
+  let end_state = Option.value end_state ~default:start_state in
+  let start_pos = adjust_postion start_state start_pos
+  and   end_pos = adjust_postion   end_state   end_pos in
   Cobol_common.Srcloc.raw ~in_area_a (start_pos, end_pos)
 
 type lexeme_info = string * Lexing.position * Lexing.position
-let lexeme_info { current_cpos_shift; _ } lexbuf : lexeme_info =
+let lexeme_info lexbuf : lexeme_info =
   let lexeme = Lexing.lexeme lexbuf
   and start_pos = Lexing.lexeme_start_p lexbuf
   and end_pos = Lexing.lexeme_end_p lexbuf in
-  let start_pos, end_pos =
-    if current_cpos_shift = 0
-    then start_pos, end_pos
-    else { start_pos with pos_cnum = start_pos.pos_cnum + current_cpos_shift },
-         {   end_pos with pos_cnum =   end_pos.pos_cnum + current_cpos_shift }
-  in
   lexeme, start_pos, end_pos
 
-let ignore_lexloc ~start_pos ~end_pos state =
-  { state with ignored = (start_pos, end_pos) :: state.ignored }
+let ignore_lexloc ~start_pos ~end_pos ?start_state end_state =
+  let start_state = Option.value start_state ~default:end_state in
+  let start_pos = adjust_postion start_state start_pos
+  and   end_pos = adjust_postion   end_state   end_pos in
+  { end_state with ignored = (start_pos, end_pos) :: end_state.ignored }
+
+let count_utf8_codepoints s =
+  let n = ref 0 in
+  String.iter (fun c -> if Char.code c land 0xc0 != 0x80 then incr n) s;
+  !n
+
+let lexeme_with_utf8_chars state lexbuf =
+  let (s, _start_pos, _end_pos) as lexinf = lexeme_info lexbuf in
+  let additional_shift = String.length s - count_utf8_codepoints s in
+  let end_cpos_shift = state.current_cpos_shift + additional_shift in
+  if end_cpos_shift == state.current_cpos_shift
+  then lexinf, state
+  else lexinf, { state with current_cpos_shift = end_cpos_shift }
 
 let skip state lexbuf =
-  let _, start_pos, end_pos = lexeme_info state lexbuf in
+  (* Note: we use `lexeme_with_utf8_chars` here in case skipped lexeme contain
+     extended characters; rules in Src_lexer.mll may need to be adjusted if we
+     wanted to avoid the additonal cost. *)
+  (* let _, start_pos, end_pos = lexeme_info lexbuf in *)
+  let (_, start_pos, end_pos), state = lexeme_with_utf8_chars state lexbuf in
   ignore_lexloc ~start_pos ~end_pos state
 
 let emit prod ({ pseudotext; cdir_seen; _ } as state) =
@@ -185,7 +220,7 @@ let sna ({ config = { source_format; _ }; _ } as state) lexbuf =
   let indicator_pos, FixedWidth _ = source_format in
   match indicator_pos with
   | FixedIndic ->
-      let _, start_pos, end_pos = lexeme_info state lexbuf in
+      let _, start_pos, end_pos = lexeme_info lexbuf in
       let lex_len = end_pos.pos_cnum - start_pos.pos_cnum in
       let sna_len = min 6 lex_len in
       let end_pos = { start_pos with
@@ -216,7 +251,7 @@ let unexpected
     ?(severity : [`Error | `Warn] = `Error)
     ~k state lexbuf =
   let loc =
-    let _, start_pos, end_pos = lexeme_info state lexbuf in
+    let _, start_pos, end_pos = lexeme_info lexbuf in
     raw_loc ~start_pos ~end_pos state
   in
   let state = match severity with
@@ -324,7 +359,7 @@ let flush_continued ?(force = false) state = match state.continued with
       emit (AlphanumPrefix { knd; qte; str } &@ loc) (reset_cont state)
 
 let eof state lexbuf =
-  let _, start_pos, end_pos = lexeme_info state lexbuf in
+  let _, start_pos, end_pos = lexeme_info lexbuf in
   let loc = raw_loc ~start_pos ~end_pos state in
   let state = flush_continued ~force:true state in  (* checks state.continued *)
   match state.pseudotext with                       (* and state.pseudotext  *)
@@ -372,16 +407,16 @@ type line_fitting = Nominal | Tacked
 
 let text_word ?(cont = false) ~start_pos ~end_pos ?(fitting = Nominal) w state =
   ignore fitting;
-  let w, end_pos, state = remove_floating_comment ~start_pos ~end_pos w state in
-  let wloc = raw_loc ~start_pos ~end_pos state in
+  let w, end_pos, state' = remove_floating_comment ~start_pos ~end_pos w state in
+  let wloc = raw_loc ~start_pos ~end_pos ~end_state:state' state in
   let w = w &@ wloc in
-  match state.continued with
+  match state'.continued with
   | CNone when cont ->
-      append (textword w) state
+      append (textword w) state'
   | CNone ->
-      emit (textword w) state
+      emit (textword w) state'
   | CText _ ->
-      let state = flush_continued ~force:true state in
+      let state = flush_continued ~force:true state' in
       let state = lex_error state @@ Unexpected { loc = wloc; item = Word } in
       emit (textword w) state
 
@@ -526,7 +561,7 @@ let extract_knd str state lexbuf =
         ~k:(fun state _lexbuf -> Str.string_after str 2, Basic, state)
 
 let comment ?(marker = "") ?(floating = false) state lexbuf =
-  let s, start_pos, end_pos = lexeme_info state lexbuf in
+  let s, start_pos, end_pos = lexeme_info lexbuf in
   let start_pos =                       (* include location of comment marker *)
     Lexing.{ start_pos with
              pos_cnum = start_pos.pos_cnum - String.length marker } in
@@ -545,15 +580,10 @@ let comment ?(marker = "") ?(floating = false) state lexbuf =
   in
   new_line { state with comments = comment :: state.comments } lexbuf
 
-let count_utf8_codepoints s =
-  let n = ref 0 in
-  String.iter (fun c -> if Char.code c land 0xc0 != 0x80 then incr n) s;
-  !n
-
-let prefix_buff = Buffer.create 42
+let prefix_buff = Buffer.create 42           (* Warning: shared mutable state *)
 let string_prefix_with_utf8_codepoints s up_to_index =
   let rec aux n i =
-    if i < up_to_index && i < String.length s then
+    if i < up_to_index then
       let u = String.get_utf_8_uchar s i in
       let l = Uchar.utf_decode_length u in
       Buffer.add_substring prefix_buff s i l;
@@ -566,25 +596,30 @@ let string_prefix_with_utf8_codepoints s up_to_index =
 let trunc_to_col n ((s, sp, ep) as info: lexeme_info) ~start_state ~end_state =
   let sc = pos_column start_state sp and ec = pos_column end_state ep in
   assert (sc <= n);        (* starts on last column (CHECKME: always avoided?) *)
-  if ec <= n
+  if ec <= n               (* ends before, or on, column n *)
   then
     info, (if ec = n + 1 then Tacked else Nominal), end_state
   else                  (* truncate lexeme and shift end position accordingly *)
   if start_state.current_cpos_shift == end_state.current_cpos_shift
-  then                            (* no extra shift: use regular substitution *)
+  then          (* no extra character postion shift: use regular substitution *)
     let s = String.sub s 0 (n - sc + 1) in
     let ep' = { ep with pos_cnum = ep.pos_cnum - ec + n + 1 } in
-    (s, sp, ep'), Tacked, ignore_lexloc ~start_pos:ep' ~end_pos:ep end_state
+    (s, sp, ep'), Tacked,
+    ignore_lexloc ~start_pos:ep' ~end_pos:ep end_state
   else                                             (* have to walk characters *)
     let s_len = String.length s in
     let s' = string_prefix_with_utf8_codepoints s (s_len - ec + n + 1) in
     let trunc_len = s_len - String.length s' in
     let ep' = { ep with pos_cnum = ep.pos_cnum - trunc_len } in
-    (s', sp, ep'), Tacked, ignore_lexloc ~start_pos:ep' ~end_pos:ep end_state
+    (* TODO: fix start_state, and then adjust sp? *)
+    (s', sp, ep'), Tacked,
+    ignore_lexloc ~start_pos:ep' ~end_pos:ep end_state
 
 let fixed_text mk ({ config = { source_format; _ }; _ } as state) lexbuf =
+  (* Note: assumes the current lexeme does not contain characters/codepoints
+     that occupy strictly more than a byte. *)
   let _, FixedWidth { cut_at_col; _ } = source_format in
-  let (_, start_pos, end_pos) as lexinf = lexeme_info state lexbuf in
+  let (_, start_pos, end_pos) as lexinf = lexeme_info lexbuf in
   if pos_column state start_pos > cut_at_col then
     ignore_lexloc ~start_pos ~end_pos state, Tacked
   else
@@ -617,32 +652,21 @@ let continuing_unclosed_ebcdics = function
       Lazy.force unclosed_ebcdics
   | _ -> false
 
-let fixed_alphanum_lit
-    ?(doubled_opener = false)
-    ({ config = { source_format; _ }; _ } as state)
-    lexbuf
-  =
+let fixed_alphanum_lit ?(doubled_opener = false)
+    ({ config = { source_format; _ }; _ } as start_state: fixed state) lexbuf =
   let _, FixedWidth { cut_at_col; alphanum_padding; _ } = source_format in
-  let (s, start_pos, end_pos) as lexinf = lexeme_info state lexbuf in
-  let counted_s_length = end_pos.pos_cnum - start_pos.pos_cnum in
-  let actual_s_length = count_utf8_codepoints s in
-  let state' =                                               (* fix end state *)
-    let new_col_shift =
-      state.current_cpos_shift + counted_s_length - actual_s_length
-    in
-    if new_col_shift == state.current_cpos_shift
-    then state
-    else { state with current_cpos_shift = new_col_shift }
+  let (_, start_pos, end_pos) as lexinf, end_state =
+    lexeme_with_utf8_chars start_state lexbuf
   in
-  let end_col = pos_column state' end_pos in
+  let end_col = pos_column end_state end_pos in
   assert (end_col > 0);                (* should never have zero-length token *)
-  if pos_column state start_pos > cut_at_col then
-    state', Tacked
+  if pos_column start_state start_pos > cut_at_col then
+    end_state, Tacked
   else
-    let (s, start_pos, end_pos), fitting, state =
-      trunc_to_col cut_at_col lexinf ~start_state:state ~end_state:state'
+    let (s, start_pos, end_pos), fitting, end_state =
+      trunc_to_col cut_at_col lexinf ~start_state ~end_state
     in
-    let s, knd, state = extract_knd s state lexbuf in
+    let s, knd, end_state = extract_knd s end_state lexbuf in
     let s, end_pos, fitting =
       (* Actually double the opening delimiter ('\'' or '"'), to have the
          doubled quote/apostrophe character prefix after stripping of opening
@@ -650,7 +674,7 @@ let fixed_alphanum_lit
       let s = if doubled_opener then String.sub s 0 1 ^ s else s in
       let length_to_right_col = cut_at_col - end_col + 1 in
       if closed_alphanum s || length_to_right_col <= 0 ||
-         continuing_unclosed_ebcdics state
+         continuing_unclosed_ebcdics start_state
       then s, end_pos, fitting
       else match alphanum_padding with
         | None ->
@@ -660,8 +684,8 @@ let fixed_alphanum_lit
             let end_pos = { end_pos with pos_cnum } in
             s ^ String.make length_to_right_col c, end_pos, Tacked
     in
-    let loc = raw_loc ~start_pos ~end_pos state in
-    quoted_alphanum ~fitting ~knd (s &@ loc) state', fitting
+    let loc = raw_loc ~start_pos ~end_pos start_state ~end_state in
+    quoted_alphanum ~fitting ~knd (s &@ loc) end_state, fitting
 
 (* --- *)
 
@@ -679,7 +703,7 @@ let alphanum_lit ?doubled_opener =
 (* Free-format versions: *)
 
 let free_srctok mk state lexbuf =
-  let s, start_pos, end_pos = lexeme_info state lexbuf in
+  let s, start_pos, end_pos = lexeme_info lexbuf in
   mk ~start_pos ~end_pos s state
 
 let free_text_word state =
@@ -702,7 +726,7 @@ let free_separator ~char state =
   end state
 
 let free_alphanum_lit state lexbuf =
-  let s, start_pos, end_pos = lexeme_info state lexbuf in
+  let s, start_pos, end_pos = lexeme_info lexbuf in
   let s, knd, state = extract_knd s state lexbuf in
   quoted_alphanum ~knd (s &@ raw_loc ~start_pos ~end_pos state) state
 

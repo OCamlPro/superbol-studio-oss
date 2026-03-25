@@ -21,7 +21,7 @@ type t
 
 val from
   : ?source_format: Src_format.any
-  -> platform:Cobol_common.Platform.TYPES.platform
+  -> platform: Cobol_common.Platform.TYPES.platform
   -> Src_input.t
   -> t
 

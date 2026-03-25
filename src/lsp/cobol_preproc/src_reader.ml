@@ -246,10 +246,12 @@ let print_lines ~dialect ?skip_compiler_directives_text ppf pl =
 
 let make make_lexing ?filename ~source_format ~platform input =
   let Src_format.SF source_format = source_format in
+  let position_encoding_in_bytes = platform.position_encoding_in_bytes in
   (* Be sure to provide position informations *)
   let lexbuf = make_lexing ?with_positions:(Some true) input in
   Option.iter (Lexing.set_filename lexbuf) filename;
-  Plx (Src_lexing.init_state source_format, lexbuf, platform)
+  Plx (Src_lexing.init_state ~position_encoding_in_bytes source_format,
+       lexbuf, platform)
 
 (* --- *)
 
