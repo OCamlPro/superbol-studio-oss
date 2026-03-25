@@ -8,6 +8,7 @@
  (name test_cobol_preproc)
  (modules source_lines
           compiler_directives
+          alphanums_with_utf8
           auto_sourceformat
           auto_sourceformat_rewind)
  (preprocess
