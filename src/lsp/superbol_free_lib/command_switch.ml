@@ -435,6 +435,7 @@ to your $HOME/.profile file.|};
     List.iter (fun (var, v) ->
         Printf.printf "%s='%s'; export %s;\n" var v var)
       [ "GNUCOBOL_DIR", switch_dir;
+        "COB_CONFIG_DIR", switch_dir // "share/gnucobol/config";
         set_path "PATH" "bin";
         set_path "LD_LIBRARY_PATH" "lib" ;
         set_path "MANPATH" "share/man" ;
