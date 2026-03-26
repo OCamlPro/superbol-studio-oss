@@ -2743,11 +2743,30 @@ module Debug : sig
     -> ?triggerKind: DebugConfigurationProviderTriggerKind.t
     -> unit
     -> Disposable.t
+
+  val registerDebugAdapterDescriptorFactory:
+    debugType: string
+    -> factory: DebugAdapterDescriptorFactory.t
+    -> unit
+    -> Disposable.t
+end
+
+module TaskFilter : sig
+  include Js.T
+
+  val type_ : t -> string or_undefined
+
+  val version : t -> string or_undefined
+
+  val create : ?type_:string -> ?version:string -> unit -> t
 end
 
 module Tasks : sig
   val registerTaskProvider :
     type_:string -> provider:Task.t TaskProvider.t -> Disposable.t
+
+  val fetchTasks :
+    ?filter:TaskFilter.t -> unit -> Task.t list Promise.t
 end
 
 module Env : sig

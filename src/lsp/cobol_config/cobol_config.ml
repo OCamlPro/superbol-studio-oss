@@ -77,9 +77,9 @@ let default_search_path =
   end
 
 let retrieve_search_path ?search_path () =
-  match search_path with
-  | Some p -> p
-  | None -> Lazy.force default_search_path
+  (match search_path with
+   | Some p -> p
+   | None -> []) @ Lazy.force default_search_path
 
 let find_file ~search_path filename =
   try EzFile.find_in_path search_path filename
@@ -226,6 +226,7 @@ let load_file (module Words: Words.S) ?search_path file =
   let search_path = retrieve_search_path ?search_path () in
   let search_path = EzFile.dirname file :: search_path in
   let rec load acc file =
+    let file = find_file ~search_path file in
     let options = parse_file file in
     List.fold_left begin fun acc option -> match option with
       | Conf_ast.Value _ ->
@@ -240,9 +241,9 @@ let load_file (module Words: Words.S) ?search_path file =
       | ReservedWords words ->
           let basename = String.lowercase_ascii words in
           let filename = EzFile.add_suffix basename ".words" in
-          load acc @@ find_file ~search_path filename
+          load acc filename
       | Include filename ->
-          load acc @@ find_file ~search_path filename
+          load acc filename
     end acc options
   in
   List.rev @@ load [] file
