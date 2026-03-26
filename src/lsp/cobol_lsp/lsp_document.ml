@@ -92,7 +92,6 @@ let rewindable_parse ({ project; textdoc; _ } as doc) =
           Lsp_project.copybook_lookup_config_for ~uri:(uri doc) project;
         config = project.config.cobol_config;
         source_format = source_format_for ~doc;
-        position_encoding_in_bytes = false;                    (* force false *)
       } @@
   Cobol_preproc.Input.string
     ~filename:(Lsp.Uri.to_path (uri doc)) @@

@@ -119,19 +119,14 @@ let source_format_config = function
 let preprocessor input = function
   | `WithOptions { platform; source_format; env;
                    exec_preprocs; config = (module Config);
-                   copybook_lookup_config;
-                   position_encoding_in_bytes } ->
+                   copybook_lookup_config } ->
       let module Om_name = struct let name = __MODULE__ end in
       let module Om = Src_overlay.New_manager (Om_name) () in
       let module Pp = Preproc_grammar.Make (Config) (Om) in
       let source_format = source_format_config source_format in
-      let reader =
-        Src_reader.from input ?source_format ~platform
-          ~position_encoding_in_bytes
-      in
       {
         buff = [];
-        reader;
+        reader = Src_reader.from input ?source_format ~platform;
         ppstate = Preproc_state.initial;
         pplog = Preproc_trace.empty;
         diags = Preproc_diagnostics.none;

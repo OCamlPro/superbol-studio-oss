@@ -67,10 +67,11 @@ and 'k config =
   {
     debug: bool;
     source_format: 'k source_format;
-    position_encoding_in_bytes: bool;
   }
 
-let init_state ?(position_encoding_in_bytes = true) source_format : _ state =
+let position_encoding_in_bytes = false
+
+let init_state source_format : _ state =
   {
     lex_prods = [];
     continued = CNone;
@@ -86,7 +87,6 @@ let init_state ?(position_encoding_in_bytes = true) source_format : _ state =
       {
         debug = false;
         source_format;
-        position_encoding_in_bytes;
       }
   }
 
@@ -95,7 +95,6 @@ let rev_comments { comments; _ } = comments
 let rev_ignored { ignored; _ } = ignored
 let rev_newline_cnums { newline_cnums; _ } = newline_cnums
 let source_format { config = { source_format; _ }; _ } = source_format
-let encodes_positions_in_bytes { config; _ } = config.position_encoding_in_bytes
 let allow_debug { config = { debug; _ }; _ } = debug
 
 (** Flush buffered lexing productions, possibly holding onto one that may be
@@ -132,8 +131,8 @@ let change_source_format ({ config; _ } as state) sf =
 let pos_column { current_cpos_shift; _ } Lexing.{ pos_bol; pos_cnum; _ } =
   pos_cnum - pos_bol + 1 - current_cpos_shift            (* count cols from 1 *)
 
-let adjust_postion { current_cpos_shift; config; _ } pos =
-  if current_cpos_shift = 0 || config.position_encoding_in_bytes
+let adjust_postion { current_cpos_shift; _ } pos =
+  if current_cpos_shift = 0 || position_encoding_in_bytes
   then pos
   else Lexing.{ pos with pos_cnum = pos.pos_cnum - current_cpos_shift }
 
