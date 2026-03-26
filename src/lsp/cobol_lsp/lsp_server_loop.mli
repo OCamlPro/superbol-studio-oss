@@ -29,10 +29,10 @@ val config
   -> ?force_syntax_diagnostics: bool
   -> ?fallback_storage_directory: string
   -> unit
-  -> Lsp_server.config
+  -> Lsp_types.config
 
 val run
   : platform: Cobol_common.Platform.TYPES.platform
-  -> config: Lsp_server.config
+  -> config: Lsp_types.config
   -> extensions: extensions
   -> Lsp_server.exit_status

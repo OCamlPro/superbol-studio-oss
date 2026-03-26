@@ -36,7 +36,7 @@ let platform =
 and layout =
   Superbol_free_lib.Project.layout
 and cache_config =
-  LSP.INTERNAL.Project_cache.{
+  LSP.Types.{
     cache_storage = No_storage;
     cache_verbose = false;
   }
@@ -57,7 +57,8 @@ let make_server ?(with_semantic_tokens = false) () =
                             workspace_folders = [];
                             with_semantic_tokens;
                             with_client_file_watcher = `no;
-                            with_client_config_watcher = false }
+                            with_client_config_watcher = false;
+                            position_encoding = `UTF16 }
 
 let add_cobol_doc server ~projdir filename text =
   let path = projdir // filename in

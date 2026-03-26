@@ -15,37 +15,21 @@ open Lsp_imports
 
 module TYPES: sig
 
-  type config = {
-    project_layout: Lsp_project.layout;
-    cache_config: Lsp_project_cache.config;
-    enable_client_configs: bool;
-    force_syntax_diagnostics: bool;
-  }
-
-  type params = {
-    config: config;
-    root_uri: Lsp.Types.DocumentUri.t option;
-    workspace_folders: Lsp.Types.DocumentUri.t list;     (* includes root_uri *)
-    with_semantic_tokens: bool;
-    with_client_config_watcher: bool;
-    with_client_file_watcher: [`no | `yes of [`absolute | `any]];
-  }
-
   type registry = private {
     projects: Lsp_project.SET.t;
     docs: Lsp_document.t URIMap.t;
     indirect_diags: Lsp_diagnostics.t URIMap.t;
     pending_tasks: pending_tasks;
     sub_state: sub_state;
-    params: params;
+    params: Lsp_types.params;
   }
 
   and sub_state
   and pending_tasks
 
   type state =
-    | NotInitialized of config
-    | Initialized of params
+    | NotInitialized of Lsp_types.config
+    | Initialized of Lsp_types.params
     | Running of registry
     | ShuttingDown
     | Exit of exit_status
@@ -61,9 +45,7 @@ module TYPES: sig
 
 end
 include module type of TYPES
-  with type config = TYPES.config
-   and type params = TYPES.params
-   and type sub_state = TYPES.sub_state
+  with type sub_state = TYPES.sub_state
    and type pending_tasks = TYPES.pending_tasks
    and type registry = TYPES.registry
    and type state = TYPES.state
@@ -73,7 +55,7 @@ include module type of TYPES
 type t = registry                                                    (* alias *)
 
 val init
-  : params: params
+  : params: Lsp_types.params
   -> t
 
 val on_change_workspace_folders

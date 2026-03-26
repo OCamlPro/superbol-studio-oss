@@ -57,7 +57,7 @@ let config
     ?(force_syntax_diagnostics = false)
     ?(fallback_storage_directory: string option)
     () =
-  let cache_storage: Lsp_project_cache.storage =
+  let cache_storage: Lsp_types.cache_storage =
     match project_layout.relative_work_dirname, fallback_storage_directory with
     | _ when not enable_caching ->
         No_storage
@@ -79,7 +79,7 @@ let config
           relative_filename = relative_work_dirname // "lsp-cache";
         }
   in
-  Lsp_server.{
+  Lsp_types.{
     cache_config = {
       cache_storage;
       cache_verbose = true;

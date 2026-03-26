@@ -12,29 +12,7 @@
 (**************************************************************************)
 
 open Lsp_imports
-
-module TYPES: sig
-  type storage =
-    | No_storage
-    | Store_in_file of
-        {
-          (** Name of cache file, relative to project root directory. *)
-          relative_filename: string;
-        }
-    | Store_in_shared_dir of
-        {
-          dirname: string;
-        }
-
-  type config =
-    {
-      cache_storage: storage;
-      cache_verbose: bool;
-    }
-end
-include module type of TYPES
-  with type storage = TYPES.storage
-   and type config = TYPES.config
+open Lsp_types
 
 (** [save ~config docs] saves the caches of all the given document's
     projects.
@@ -47,7 +25,7 @@ include module type of TYPES
     {!Lsp_io.send_notification}.  May raise some IO-related exceptions
     ([Sys_error], [Failure]). *)
 val save
-  : config: TYPES.config
+  : params: params
   -> Lsp_document.t URIMap.t
   -> unit
 
@@ -62,7 +40,7 @@ val save
     {!Lsp_io.send_notification}.  May raise some IO-related exceptions
     ([Sys_error], [Failure]). *)
 val load
-  : rootdir:Lsp_project.rootdir
-  -> layout: Lsp_project.layout
-  -> config: TYPES.config
+  : rootdir: Superbol_project.rootdir
+  -> layout: Superbol_project.layout
+  -> params: params
   -> Lsp_document.t URIMap.t
