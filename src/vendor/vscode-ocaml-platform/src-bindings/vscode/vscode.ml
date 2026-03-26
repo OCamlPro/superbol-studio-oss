@@ -3644,7 +3644,25 @@ module Debug = struct
       -> unit
       -> Disposable.t
         [@@js.global "vscode.debug.registerDebugConfigurationProvider"]
+
+    val registerDebugAdapterDescriptorFactory:
+         debugType: string
+      -> factory: DebugAdapterDescriptorFactory.t
+      -> unit
+      -> Disposable.t
+         [@@js.global "vscode.debug.registerDebugAdapterDescriptorFactory"]
     ]
+end
+
+module TaskFilter = struct
+  include Interface.Make ()
+
+  include
+    [%js:
+    val type_ : t -> string or_undefined [@@js.get]
+    val version : t -> string or_undefined [@@js.get]
+    val create :
+      ?type_:string -> ?version:string -> unit -> t [@@js.builder]]
 end
 
 module Tasks = struct
@@ -3652,7 +3670,11 @@ module Tasks = struct
     [%js:
     val registerTaskProvider :
       type_:string -> provider:TaskProvider.Default.t -> Disposable.t
-      [@@js.global "vscode.tasks.registerTaskProvider"]]
+      [@@js.global "vscode.tasks.registerTaskProvider"]
+
+    val fetchTasks :
+      ?filter:TaskFilter.t -> unit -> Task.t list Promise.t
+      [@@js.global "vscode.tasks.fetchTasks"]]
 end
 
 module Env = struct
