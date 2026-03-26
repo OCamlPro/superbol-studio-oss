@@ -164,7 +164,7 @@ let ignore_lexloc ~start_pos ~end_pos ?start_state end_state =
 
 let count_utf8_codepoints s =
   let n = ref 0 in
-  String.iter (fun c -> if Char.code c land 0xc0 != 0x80 then incr n) s;
+  String.iter (fun c -> if Char.code c land 0xC0 != 0x80 then incr n) s;
   !n
 
 let lexeme_with_utf8_chars state lexbuf =
@@ -406,16 +406,18 @@ type line_fitting = Nominal | Tacked
 
 let text_word ?(cont = false) ~start_pos ~end_pos ?(fitting = Nominal) w state =
   ignore fitting;
-  let w, end_pos, state' = remove_floating_comment ~start_pos ~end_pos w state in
-  let wloc = raw_loc ~start_pos ~end_pos ~end_state:state' state in
+  let w, end_pos, end_state =
+    remove_floating_comment ~start_pos ~end_pos w state
+  in
+  let wloc = raw_loc ~start_pos ~end_pos ~end_state state in
   let w = w &@ wloc in
-  match state'.continued with
+  match end_state.continued with
   | CNone when cont ->
-      append (textword w) state'
+      append (textword w) end_state
   | CNone ->
-      emit (textword w) state'
+      emit (textword w) end_state
   | CText _ ->
-      let state = flush_continued ~force:true state' in
+      let state = flush_continued ~force:true end_state in
       let state = lex_error state @@ Unexpected { loc = wloc; item = Word } in
       emit (textword w) state
 
@@ -601,18 +603,15 @@ let trunc_to_col n ((s, sp, ep) as info: lexeme_info) ~start_state ~end_state =
   else                  (* truncate lexeme and shift end position accordingly *)
   if start_state.current_cpos_shift == end_state.current_cpos_shift
   then          (* no extra character postion shift: use regular substitution *)
-    let s = String.sub s 0 (n - sc + 1) in
+    let s' = String.sub s 0 (n - sc + 1) in
     let ep' = { ep with pos_cnum = ep.pos_cnum - ec + n + 1 } in
-    (s, sp, ep'), Tacked,
-    ignore_lexloc ~start_pos:ep' ~end_pos:ep end_state
+    (s', sp, ep'), Tacked, ignore_lexloc ~start_pos:ep' ~end_pos:ep end_state
   else                                             (* have to walk characters *)
     let s_len = String.length s in
     let s' = string_prefix_with_utf8_codepoints s (s_len - ec + n + 1) in
     let trunc_len = s_len - String.length s' in
     let ep' = { ep with pos_cnum = ep.pos_cnum - trunc_len } in
-    (* TODO: fix start_state, and then adjust sp? *)
-    (s', sp, ep'), Tacked,
-    ignore_lexloc ~start_pos:ep' ~end_pos:ep end_state
+    (s', sp, ep'), Tacked, ignore_lexloc ~start_pos:ep' ~end_pos:ep end_state
 
 let fixed_text mk ({ config = { source_format; _ }; _ } as state) lexbuf =
   (* Note: assumes the current lexeme does not contain characters/codepoints
