@@ -101,7 +101,7 @@ dev-deps:
 test:
 	./scripts/before.sh test
 	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS} @runtest
-	${MAKE} test-syntax
+	${MAKE} test-syntax test-utf8
 	./scripts/after.sh test
 
 clean:

@@ -37,6 +37,11 @@ file = "test/syntax-todo/syntax.at"
 path = [ "test/syntax-todo"]
 env = "syntax"
 
+[testsuites.utf8]
+file = "test/syntax-todo/utf8.at"
+path = [ "test/syntax-todo"]
+env = "syntax"
+
 [envs]
 # env_name = """..."""
 # env_name = "<local-path-to-env-file"
