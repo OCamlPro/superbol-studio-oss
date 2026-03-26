@@ -14,7 +14,7 @@
 type 'k state
 
 val init_state
-  : position_encoding_in_bytes:bool
+  : ?position_encoding_in_bytes:bool
   -> 'k Src_format.source_format -> 'k state
 val diagnostics: _ state -> Src_diagnostics.t
 val rev_comments: _ state -> Text.comments

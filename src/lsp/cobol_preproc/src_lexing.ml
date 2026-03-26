@@ -70,7 +70,7 @@ and 'k config =
     position_encoding_in_bytes: bool;
   }
 
-let init_state ~position_encoding_in_bytes source_format : _ state =
+let init_state ?(position_encoding_in_bytes = true) source_format : _ state =
   {
     lex_prods = [];
     continued = CNone;

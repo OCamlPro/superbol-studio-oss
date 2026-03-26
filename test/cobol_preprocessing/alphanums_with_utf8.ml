@@ -12,8 +12,10 @@
 (**************************************************************************)
 
 let%expect_test "alphanumeric-with-utf8-items" =
-  Prog_common.platform.position_encoding_in_bytes <- true;
-  Prog_preproc.show_text ~source_format:(SF SFFixed) {cobol|
+  Prog_preproc.show_text
+    ~source_format:(SF SFFixed)
+    ~position_encoding_in_bytes:true
+    {cobol|
      2                                                               "AB|
      3-                                                             "CD"|
      4* Missing continuation not reported (cf Src_lexing.flush_continued)
@@ -60,8 +62,10 @@ let%expect_test "alphanumeric-with-utf8-items" =
                       right = <prog.cob:24-69|24-73> } |}]
 
 let%expect_test "alphanumeric-with-utf8-items" =
-  Prog_common.platform.position_encoding_in_bytes <- false;
-  Prog_preproc.show_text ~source_format:(SF SFFixed) {cobol|
+  Prog_preproc.show_text
+    ~source_format:(SF SFFixed)
+    ~position_encoding_in_bytes:false
+    {cobol|
      2                                                               "AB|
      3-                                                             "CD"|
      4* Missing continuation not reported (cf Src_lexing.flush_continued)

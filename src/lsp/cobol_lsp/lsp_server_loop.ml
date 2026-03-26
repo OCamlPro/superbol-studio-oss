@@ -96,7 +96,6 @@ let config
 let run ~platform ~config
     ~extensions:{ alternate_request_handers = alternate_handlers } =
   Cobol_common.Platform.copy ~dst:Lsp_platform.record ~src:platform;
-  Lsp_platform.record.position_encoding_in_bytes <- false;      (* force false *)
   Lsp_io.initialize_channels ();
   let rec loop state =
     match Lsp_io.read_message () with

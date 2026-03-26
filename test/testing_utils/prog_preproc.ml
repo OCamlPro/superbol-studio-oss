@@ -17,10 +17,13 @@ let platform ~verbose =
   { Prog_common.platform with verbosity = if verbose then 1 else 0 }
 
 let options
-    ?(verbose = false) ?(source_format = Cobol_config.(SF SFFixed))
+    ?(verbose = false)
+    ?(source_format = Cobol_config.(SF SFFixed))
+    ?(position_encoding_in_bytes = true)
     () =
   { (Cobol_preproc.Options.default ~platform:(platform ~verbose)) with
-    source_format }
+    source_format;
+    position_encoding_in_bytes }
 
 let preprocess ?verbose ?(filename = "prog.cob") ?source_format contents =
   Cobol_preproc.Outputs.show_n_forget ~ppf:Fmt.stdout @@
@@ -28,11 +31,14 @@ let preprocess ?verbose ?(filename = "prog.cob") ?source_format contents =
     ~options:(options ?verbose ?source_format ()) @@
   Cobol_preproc.Input.string ~filename contents
 
-let show_text ?verbose ?(filename = "prog.cob") ?source_format contents =
+let show_text ?verbose ?(filename = "prog.cob") ?source_format
+    ?position_encoding_in_bytes contents =
+  let options =
+    options ?verbose ?source_format ?position_encoding_in_bytes ()
+  in
   let text =
     Cobol_preproc.Outputs.show_n_forget ~ppf:Fmt.stdout @@
-    Cobol_preproc.text_of_input
-      ~options:(options ?verbose ?source_format ()) @@
+    Cobol_preproc.text_of_input ~options @@
     Cobol_preproc.Input.string ~filename contents
   in
   Pretty.out "%a@\n" (Cobol_preproc.Text.pp_text' ~fsep:"@\n") text

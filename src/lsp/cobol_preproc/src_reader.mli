@@ -22,6 +22,7 @@ type t
 val from
   : ?source_format: Src_format.any
   -> platform: Cobol_common.Platform.TYPES.platform
+  -> ?position_encoding_in_bytes: bool
   -> Src_input.t
   -> t
 

@@ -23,6 +23,7 @@ type preproc_options =
     platform: Cobol_common.Platform.TYPES.platform;
     copybook_lookup_config: Cobol_common.Copybook.TYPES.lookup_config;
     source_format: Cobol_config.source_format_spec;
+    position_encoding_in_bytes: bool;
     exec_preprocs: exec_preprocessor EXEC_MAP.t;
     env: Preproc_env.t;
   }
@@ -36,6 +37,7 @@ let default ~platform =
     platform;
     config = Cobol_config.default;
     source_format = Cobol_config.Auto;
+    position_encoding_in_bytes = true;
     exec_preprocs = EXEC_MAP.empty;
     env = Preproc_env.empty;
   }

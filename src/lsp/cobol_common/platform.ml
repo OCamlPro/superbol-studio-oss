@@ -47,7 +47,6 @@ module TYPES = struct
     mutable error :  'a. ('a, Format.formatter, unit) format -> 'a ;
     mutable read_file : string -> string ;
     mutable getenv_opt : string -> string option ;
-    mutable position_encoding_in_bytes: bool;
 
     mutable autodetect_format:
       ?source_contents:string ->
@@ -76,7 +75,6 @@ let innocuous = {
       "%s: Filesystem operations are unavailable" file
   end;
   autodetect_format = (fun ?source_contents:_ _filename -> SFFixed);
-  position_encoding_in_bytes = false;
   find_lib = begin fun ~lookup_config ?fromfile:_ ?libname:_ (`Alphanum w |
                                                               `Word w) ->
     Error { lookup_libname = w; lookup_config }
@@ -85,12 +83,11 @@ let innocuous = {
 }
 
 let copy ~dst ~src:{ verbosity; eprintf; error; read_file; autodetect_format;
-                     position_encoding_in_bytes; find_lib; getenv_opt }  =
+                     find_lib; getenv_opt }  =
   dst.verbosity <- verbosity;
   dst.eprintf <- eprintf;
   dst.error <- error;
   dst.read_file <- read_file;
   dst.autodetect_format <- autodetect_format;
-  dst.position_encoding_in_bytes <- position_encoding_in_bytes;
   dst.find_lib <- find_lib;
   dst.getenv_opt <- getenv_opt
