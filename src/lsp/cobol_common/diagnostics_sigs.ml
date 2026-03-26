@@ -46,7 +46,6 @@ end
 
 module type STATEFUL = sig
   include REPORT
-    with type 'a t := ?loc:Srcloc.srcloc -> 'a Pretty.proc
   type diagnostics
   type _ with_diags
   val add_all: diagnostics -> unit

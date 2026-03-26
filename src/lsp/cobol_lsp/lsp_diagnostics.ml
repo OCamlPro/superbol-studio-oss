@@ -39,6 +39,10 @@ let translate_one ?focus_on_main_doc ~rootdir ~uri (diag: DIAG.t) =
           | Note | Info -> Information
           | Warn -> Warning
           | Error -> Error)
+      ?tags:(match List.map (function
+          | DIAG.Unused -> Lsp.Types.DiagnosticTag.Unnecessary
+          | Deprecated -> Deprecated
+        ) (DIAG.tags diag) with [] -> None | tags -> Some tags)
       ~message:Pretty.(to_string "%a" DIAG.pp_msg diag)
   in
   URIMap.singleton uri [diag]

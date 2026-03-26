@@ -21,9 +21,14 @@ module TYPES = struct
     | Warn                                   (** warning *)
     | Error                                  (** unrecoverable error *)
 
+  type tag =
+    | Unused
+    | Deprecated
+
   type diagnostic =
     {
       severity: severity;
+      tags: tag list;
       message: Pretty.delayed;
       location: srcloc option;
       stamp: int;
@@ -44,10 +49,10 @@ type t = diagnostic
 
 let mk =
   let current_stamp = ref 0 in
-  fun severity location message ->
+  fun severity ?(tags = []) location message ->
     let stamp = !current_stamp in
     incr current_stamp;
-    { severity; message; location; stamp }
+    { severity; tags; message; location; stamp }
 
 let pp ?platform ppf { severity; message; location = loc; _ } =
   let prefix, style = match severity with
@@ -77,6 +82,7 @@ let compare_severity a b =
 let pp_msg ppf diag = diag.message ppf
 let message diag = diag.message
 let severity diag = diag.severity
+let tags diag = diag.tags
 let location diag = diag.location
 
 (* --- *)
@@ -84,21 +90,21 @@ let location diag = diag.location
 module One = struct
   (** Reporting module where each function builds and returns a single
       diagnostic. *)
-  let diag severity ?loc = Pretty.delayed_to (mk severity loc)
-  let hint ?loc fmt = diag Hint ?loc fmt
-  and note ?loc fmt = diag Note ?loc fmt
-  and info ?loc fmt = diag Info ?loc fmt
-  and warn ?loc fmt = diag Warn ?loc fmt
-  and error ?loc fmt = diag Error ?loc fmt
+  let diag severity ?tags ?loc = Pretty.delayed_to (mk severity ?tags loc)
+  let hint ?tags ?loc fmt = diag Hint ?tags ?loc fmt
+  and note ?tags ?loc fmt = diag Note ?tags ?loc fmt
+  and info ?tags ?loc fmt = diag Info ?tags ?loc fmt
+  and warn ?tags ?loc fmt = diag Warn ?tags ?loc fmt
+  and error ?tags ?loc fmt = diag Error ?tags ?loc fmt
   and blind = Fun.id
 end
 
 module Now = struct
   (** Reporting module where each value is a procedure that prints a single
       diagnostic on a given formatter. *)
-  let diag severity ppf ?platform ?loc fmt =
-    Pretty.delayed_to (fun message -> pp ?platform ppf (mk severity loc message))
-      (fmt^^"@.")
+  let diag severity ppf ?platform ?tags ?loc fmt =
+    Pretty.delayed_to (fun message -> 
+        pp ?platform ppf (mk severity ?tags loc message)) (fmt^^"@.")
   let hint ppf = diag Hint ppf
   and note ppf = diag Note ppf
   and info ppf = diag Info ppf
@@ -110,8 +116,8 @@ end
 module Cont = struct
   (** Reporting module where each function gives diagnostics to a continuation
       function. *)
-  let kdiag severity k ?loc =
-    Pretty.delayed_to (fun message -> k (mk severity loc message))
+  let kdiag severity k ?tags ?loc =
+    Pretty.delayed_to (fun message -> k (mk severity ?tags loc message))
   let khint s = kdiag Hint s
   and knote s = kdiag Note s
   and kinfo s = kdiag Info s
@@ -154,11 +160,11 @@ module Set = struct
   let fold f diags acc = List.fold_left (fun a d -> f d a) acc (sort diags)
 
   let diag s = Cont.kdiag s one
-  let hint ?loc = Cont.khint one ?loc
-  let note ?loc = Cont.knote one ?loc
-  let info ?loc = Cont.kinfo one ?loc
-  let warn ?loc = Cont.kwarn one ?loc
-  let error ?loc = Cont.kerror one ?loc
+  let hint ?tags ?loc = Cont.khint one ?tags ?loc
+  let note ?tags ?loc = Cont.knote one ?tags ?loc
+  let info ?tags ?loc = Cont.kinfo one ?tags ?loc
+  let warn ?tags ?loc = Cont.kwarn one ?tags ?loc
+  let error ?tags ?loc = Cont.kerror one ?tags ?loc
   let blind = Cont.kblind one
 
   (** Sets of diagnostics with values that do not contain any closure or module,
@@ -192,8 +198,8 @@ type diagnostics = Set.t
 module Acc = struct
   (** Reporting module where each functions adds diagnostics into a given
       set. *)
-  let diag severity (diags: diagnostics) ?loc =
-    Pretty.delayed_to (fun message -> Set.cons (mk severity loc message) diags)
+  let diag severity (diags: diagnostics) ?tags ?loc =
+    Pretty.delayed_to (fun message -> Set.cons (mk severity ?tags loc message) diags)
   let hint s = diag Hint s
   and note s = diag Note s
   and info s = diag Info s
@@ -251,12 +257,14 @@ let error_result r = Cont.kerror (with_diag r)
     See {!Cobol_common.catch_diagnostics} and
     {!Cobol_common.catch_n_show_diagnostics} for typical usage. *)
 module type STATEFUL = Diagnostics_sigs.STATEFUL
-  with type blind := t -> unit
+  with type 'a t := ?tags:tag list -> ?loc:Srcloc.srcloc -> 'a Pretty.proc
+   and type blind := t -> unit
    and type diagnostics := diagnostics
    and type 'a with_diags := 'a with_diags
 
 module type STATEFUL0 = Diagnostics_sigs.STATEFUL0
-  with type blind := t -> unit
+  with type 'a t := ?tags:tag list -> ?loc:Srcloc.srcloc -> 'a Pretty.proc
+   and type blind := t -> unit
    and type diagnostics := diagnostics
    and type 'a with_diags := 'a with_diags
 
@@ -270,13 +278,13 @@ module MakeStateful (H: sig val history: diagnostics end) = struct
     let res = !diags in
     if reset then diags := [];
     res
-  let diag severity ?loc =
-    Pretty.delayed_to (fun message -> blind (mk severity loc message))
-  let hint ?loc = diag Hint ?loc
-  and note ?loc = diag Note ?loc
-  and info ?loc = diag Info ?loc
-  and warn ?loc = diag Warn ?loc
-  and error ?loc = diag Error ?loc
+  let diag severity ?tags ?loc =
+    Pretty.delayed_to (fun message -> blind (mk severity ?tags loc message))
+  let hint ?tags ?loc = diag Hint ?tags ?loc
+  and note ?tags ?loc = diag Note ?tags ?loc
+  and info ?tags ?loc = diag Info ?tags ?loc
+  and warn ?tags ?loc = diag Warn ?tags ?loc
+  and error ?tags ?loc = diag Error ?tags ?loc
   let grab_diags { result; diags } = add_all diags; result
 end
 
