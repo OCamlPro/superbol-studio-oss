@@ -7,7 +7,7 @@
 - Support for COMP-6 usage [#548](https://github.com/OCamlPro/superbol-studio-oss/pull/548)
 
 ### Fixed
-- Handling of alphanumeric literals with UTF-8 characters in fixed-format COBOL code
+- Handling of alphanumeric literals with UTF-8 characters in fixed-format COBOL code [#564](https://github.com/OCamlPro/superbol-studio-oss/pull/564)
 - Handling of queries about `LINKAGE` items given in `USING` phrases [#561](https://github.com/OCamlPro/superbol-studio-oss/pull/561)
 - Parsing of LSP CLI arguments, that notably prevented caching in global storage [#549](https://github.com/OCamlPro/superbol-studio-oss/pull/549) (fix for [Issue #547](https://github.com/OCamlPro/superbol-studio-oss/issues/547))
 - Size reported for numeric items with `SIGN SEPARATE` clause [#545](https://github.com/OCamlPro/superbol-studio-oss/pull/545) [#552](https://github.com/OCamlPro/superbol-studio-oss/pull/552) [#553](https://github.com/OCamlPro/superbol-studio-oss/pull/553)
