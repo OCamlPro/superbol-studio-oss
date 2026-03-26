@@ -171,10 +171,9 @@ let eval_boolexpr env
   | Defined_condition { var; polarity } ->
       OUT.result (ENV.mem' var env = polarity)
   | Set_condition { var = _; polarity } ->
+      let item = Set_condition_directive { assumed_set = false } in
       OUT.result (not polarity)
-        ~diags:(warn diags (Ignored { loc = ~@e;
-                                      item = Compiler_set_condition }))
-            
+        ~diags:(warn diags (Ignored { loc = ~@e; item }))
   | Value_condition { var; polarity } ->
       begin
         match (ENV.definition_of ~var env).def_value with

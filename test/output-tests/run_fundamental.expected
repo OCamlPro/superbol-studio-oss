@@ -342,7 +342,7 @@ run_fundamental.at-6675-prog.cob:12.12-12.19:
 ----               ^^^^^^^
   13                                           USAGE BINARY-DOUBLE UNSIGNED.
   14          >>ELSE
->> Warning: Ignored compiler SET condition (assuming unset)
+>> Warning: Ignored compiler directing SET condition (assuming unset)
 
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6772:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6801:0

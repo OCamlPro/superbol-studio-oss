@@ -90,7 +90,7 @@ and boolexpr =
   | Set_condition of
       {
         var: var with_loc;
-        polarity: bool;                        (* false for `var NOT SET' *)
+        polarity: bool;                            (* false for `var NOT SET' *)
       }
 
 and condition_operator = Eq | Ge | Gt | Le | Lt | Ne
