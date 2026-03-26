@@ -13,6 +13,7 @@
 
 open Lsp_project.TYPES
 open Ez_file.V1
+open Lsp_types
 
 module DIAGS = Cobol_common.Diagnostics
 
@@ -68,6 +69,15 @@ type t = document
 let uri { textdoc; _ } = Lsp.Text_document.documentUri textdoc
 let language_id { textdoc; _ } = Lsp.Text_document.languageId textdoc
 
+let source_format_for ~doc =
+  match language_id doc with
+  | "COBOL_GNU_LISTFILE"
+  | "COBOL_GNU_DUMPFILE" ->
+      Cobol_config.SF SFVariable
+  | _ ->
+      Superbol_project.Config.source_format_for
+        ~filename:(Lsp.Uri.to_path (uri doc)) doc.project.config
+
 let rewindable_parse ({ project; textdoc; _ } as doc) =
   Cobol_parser.rewindable_parse_with_artifacts
     ~options:Cobol_parser.Options.{
@@ -81,11 +91,7 @@ let rewindable_parse ({ project; textdoc; _ } as doc) =
         copybook_lookup_config =
           Lsp_project.copybook_lookup_config_for ~uri:(uri doc) project;
         config = project.config.cobol_config;
-        source_format = match language_id doc with
-          | "COBOL_GNU_LISTFILE"
-          | "COBOL_GNU_DUMPFILE" -> SF SFVariable
-          | _ -> Superbol_project.Config.source_format_for
-                   ~filename:(Lsp.Uri.to_path (uri doc)) project.config
+        source_format = source_format_for ~doc;
       } @@
   Cobol_preproc.Input.string
     ~filename:(Lsp.Uri.to_path (uri doc)) @@
@@ -189,10 +195,10 @@ let blank ~project textdoc =
     copybook;
   }
 
-let position_encoding = `UTF8
-
-let load ~project doc =
-  let textdoc = Lsp.Text_document.make ~position_encoding doc in
+let load ~project ~params doc =
+  let textdoc =
+    Lsp.Text_document.make doc ~position_encoding:params.position_encoding
+  in
   let doc = blank ~project textdoc in
   try parse_and_analyze doc
   with e -> raise @@ Internal_error (doc, e, Printexc.get_raw_backtrace ())
@@ -258,7 +264,7 @@ let to_cache ({ project; textdoc; checked; parsing_diags; typecking_diags;
 (* NB: Note this checks against the actual file on disk, which may be different
    from what a client sends upon opening. *)
 (** Raises [Failure] in case of bad checksum. *)
-let of_cache ~project
+let of_cache ~project ~params
     { doc_cache_filename = filename;
       doc_cache_checksum = checksum;
       doc_cache_langid = languageId;
@@ -279,7 +285,10 @@ let of_cache ~project
     let doc = Lsp.Types.DidOpenTextDocumentParams.create
         ~textDocument:(Lsp.Types.TextDocumentItem.create
                          ~languageId ~text ~uri ~version) in
-    let doc = Lsp.Text_document.make ~position_encoding doc |> blank ~project in
+    let doc =
+      blank ~project @@
+      Lsp.Text_document.make doc ~position_encoding:params.position_encoding
+    in
     { doc with artifacts = { pplog; tokens = lazy tokens;
                              rev_comments; rev_ignored };
                parsing_diags;

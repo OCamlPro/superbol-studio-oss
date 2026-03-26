@@ -90,6 +90,10 @@ let initialize ~config (params: InitializeParams.t) =
   let capabilities = Lsp_capabilities.reply params.capabilities in
   let with_semantic_tokens =
     capabilities.semanticTokensProvider <> None
+  and position_encoding =
+    match capabilities.positionEncoding with
+    | Some UTF8 -> `UTF8
+    | _ -> `UTF16                                    (* use a sensible default *)
   in
   let with_client_config_watcher = match params.capabilities.workspace with
     | Some { didChangeConfiguration = Some { dynamicRegistration }; _ } ->
@@ -127,7 +131,8 @@ let initialize ~config (params: InitializeParams.t) =
   Ok (result, Initialized { root_uri; workspace_folders; config;
                             with_semantic_tokens;
                             with_client_config_watcher;
-                            with_client_file_watcher })
+                            with_client_file_watcher;
+                            position_encoding })
 
 
 (** {3 Shutdown} *)

@@ -16,13 +16,16 @@ open Lsp.Types
 let degraded =
   Sys.backend_type = Other "js_of_ocaml"
 
+let fallback_position_encoding =
+  PositionEncodingKind.UTF16               (* always mandated as per LSP spec *)
+
 (* Client capabilities are to be used for special request response, for example
    a definition request can be answered with a LocationLink iff the client
    supports it.
 
    NOTE: For now we don't use them because we don't have any special
    response. *)
-let reply (_: ClientCapabilities.t) =
+let reply (cp: ClientCapabilities.t) =
   let sync =
     TextDocumentSyncOptions.create ()
       ~openClose:true
@@ -50,8 +53,20 @@ let reply (_: ClientCapabilities.t) =
     in
     ServerCapabilities.create_workspace ()
       ~workspaceFolders
-  and codeLensProvider = CodeLensOptions.create () in
+  and codeLensProvider =
+    CodeLensOptions.create ()
+  and positionEncoding =
+    Option.map begin fun (c: GeneralClientCapabilities.t) ->
+      match c.positionEncodings with
+      | Some available_encodings
+        when List.mem PositionEncodingKind.UTF8 available_encodings ->
+          PositionEncodingKind.UTF8
+      | _ ->
+          fallback_position_encoding
+    end cp.general
+  in
   ServerCapabilities.create ()
+    ?positionEncoding
     ~textDocumentSync:(`TextDocumentSyncOptions sync)
     ~definitionProvider:(`Bool true)
     ~referencesProvider:(`Bool true)

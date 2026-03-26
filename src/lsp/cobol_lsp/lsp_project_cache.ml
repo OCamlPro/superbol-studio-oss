@@ -12,26 +12,9 @@
 (**************************************************************************)
 
 open Lsp_imports
+open Lsp_types
 open Ez_file.V1
 open Ez_file.V1.EzFile.OP
-
-module DIAGS = Cobol_common.Diagnostics
-
-module TYPES = struct
-
-  type storage =
-    | No_storage
-    | Store_in_file of { relative_filename: string }
-    | Store_in_shared_dir of { dirname: string }
-
-  type config =
-    {
-      cache_storage: storage;
-      cache_verbose: bool;
-    }
-
-end
-include TYPES
 
 (** Internal module used to hold a persistent representation of the set of
     opened document pertaining to a given project. *)
@@ -103,7 +86,7 @@ let save_project_cache ~config
   | None ->
       ()
 
-let save ~config docs =
+let do_save ~config docs =
   (* Pivot all active projects: associate projects with all their documents, and
      ignore any project that has none. *)
   URIMap.fold begin fun _ (Lsp_document.{ project; _ } as doc) ->
@@ -114,15 +97,26 @@ let save ~config docs =
   end docs Lsp_project.MAP.empty |>
   Lsp_project.MAP.iter (save_project_cache ~config)
 
+let save ~params:{ config = { cache_config = config; _ }; _ } docs =
+  try do_save ~config docs with
+  | Unix.Unix_error (e, op, args) ->
+      if config.cache_verbose then
+        Lsp_io.log_debug "While@ saving@ project@ caches:@ %s %s:@ %s"
+          op args (Unix.error_message e)
+  | e ->
+      Lsp_error.internal
+        "Exception@ caught@ while@ saving@ project@ caches:@ %a@." Fmt.exn e
+
 (** (Internal) *)
-let load_project ~rootdir ~layout ~config { cached_project; cached_docs; _ } =
+let load_project ~rootdir ~layout ~params { cached_project; cached_docs; _ } =
+  let config = params.config.cache_config in
   let project = Lsp_project.of_cache ~rootdir ~layout cached_project in
   Lsp_io.log_info "Successfully@ read@ project@ cache@ for@ %s"
     Lsp.Uri.(to_string @@ Lsp_project.rooturi project);
   let add_doc doc docs = URIMap.add (Lsp_document.uri doc) doc docs in
   CACHED_DOCS.fold begin fun cached_doc docs ->
     try
-      let doc = Lsp_document.of_cache ~project cached_doc in
+      let doc = Lsp_document.of_cache ~project ~params cached_doc in
       if config.cache_verbose then
         Lsp_io.log_info "Successfully@ read@ document@ cache@ for@ %s"
           (Lsp.Uri.to_string @@ Lsp_document.uri doc);
@@ -139,12 +133,13 @@ let load_project ~rootdir ~layout ~config { cached_project; cached_docs; _ } =
         docs
   end cached_docs URIMap.empty
 
-let load ~rootdir ~layout ~config =
+let load ~rootdir ~layout ~params =
   let fallback = URIMap.empty in
   let load_cache cache_file =
     let cached_project = Lsp_utils.read_from cache_file read_project_cache in
-    load_project ~rootdir ~layout ~config cached_project
+    load_project ~rootdir ~layout ~params cached_project
   in
+  let config = params.config.cache_config in
   match cache_filename ~config ~rootdir with
   | None ->
       fallback

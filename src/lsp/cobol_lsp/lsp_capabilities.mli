@@ -11,4 +11,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
+val fallback_position_encoding: Lsp.Types.PositionEncodingKind.t
+
 val reply: Lsp.Types.ClientCapabilities.t -> Lsp.Types.ServerCapabilities.t

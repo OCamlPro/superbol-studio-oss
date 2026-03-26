@@ -29,10 +29,10 @@ let preprocess ?verbose ?(filename = "prog.cob") ?source_format contents =
   Cobol_preproc.Input.string ~filename contents
 
 let show_text ?verbose ?(filename = "prog.cob") ?source_format contents =
+  let options = options ?verbose ?source_format () in
   let text =
     Cobol_preproc.Outputs.show_n_forget ~ppf:Fmt.stdout @@
-    Cobol_preproc.text_of_input
-      ~options:(options ?verbose ?source_format ()) @@
+    Cobol_preproc.text_of_input ~options @@
     Cobol_preproc.Input.string ~filename contents
   in
   Pretty.out "%a@\n" (Cobol_preproc.Text.pp_text' ~fsep:"@\n") text

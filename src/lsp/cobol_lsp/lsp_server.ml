@@ -13,27 +13,12 @@
 
 open Lsp_imports
 open Lsp.Types
+open Lsp_types
 
 module DIAGS = Cobol_common.Diagnostics
 module IMap = Map.Make (Int)
 
 module TYPES = struct
-
-  type config = {
-    project_layout: Lsp_project.layout;
-    cache_config: Lsp_project_cache.config;
-    enable_client_configs: bool;
-    force_syntax_diagnostics: bool;
-  }
-
-  type params = {
-    config: config;
-    root_uri: DocumentUri.t option;
-    workspace_folders: DocumentUri.t list;               (* includes root_uri *)
-    with_semantic_tokens: bool;
-    with_client_config_watcher: bool;
-    with_client_file_watcher: [`no | `yes of [`absolute | `any]];
-  }
 
   type registry = {                                                (* private *)
     projects: Lsp_project.SET.t;
@@ -352,23 +337,14 @@ let remove_project project r =
 (** {3 Per-project cache} *)
 
 
-let save_project_caches
-    { params = { config = { cache_config = config; _ }; _ };
-      docs; _ } =
-  try Lsp_project_cache.save ~config docs with
-  | Unix.Unix_error (e, op, args) ->
-      if config.cache_verbose then
-        Lsp_io.log_debug "While@ saving@ project@ caches:@ %s %s:@ %s"
-          op args (Unix.error_message e)
-  | e ->
-      Lsp_error.internal
-        "Exception@ caught@ while@ saving@ project@ caches:@ %a@." Fmt.exn e
+let save_project_caches { params; docs; _ } =
+  Lsp_project_cache.save ~params docs
+
 
 let load_project_cache ~rootdir
-    ({ params = { config = { project_layout = layout;
-                             cache_config = config; _ }; _ };
+    ({ params = { config = { project_layout = layout; _ }; _ } as params;
        docs = old_docs; _ } as registry) =
-  let new_docs = Lsp_project_cache.load ~config ~layout ~rootdir in
+  let new_docs = Lsp_project_cache.load ~params ~layout ~rootdir in
   let registry =
     { registry with
       docs = URIMap.union (fun _ _old new_ -> Some new_) old_docs new_docs }
@@ -678,7 +654,7 @@ let add ~doc:(DidOpenTextDocumentParams.{ textDocument = { uri; _ }; _ } as doc)
     registry =
   let add_in_project project registry =
     try
-      let doc = Lsp_document.load ~project doc in
+      let doc = Lsp_document.load ~project ~params:registry.params doc in
       let registry = dispatch_diagnostics doc registry in
       add_or_replace_doc doc registry
     with Lsp_document.Internal_error (doc, e, backtrace) ->

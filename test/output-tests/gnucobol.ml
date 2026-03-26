@@ -68,14 +68,17 @@ let pp_relloc ppf s =
 let make_n_enter_rundir () =
   Superbol_testutils.Tempdir.make_n_enter "superbol-gnucobol-tests"
 
-(* Read the testsuite. *)
+(* Read the testsuite: should be named `testsuite` in `.autofonce` file *)
 
 let _pconf, _tconf, testsuite =
   let toml = Filename.concat srcdir ".autofonce" in
   let contents = EzFile.read_file toml in
   let project_config =
     Project_config.from_string ~computed:false ~file:toml contents in
-  Testsuite.read project_config (List.hd project_config.project_testsuites)
+  Testsuite.read project_config @@
+  List.find begin fun (t: Autofonce_config.Types.testsuite_config) ->
+    t.config_name = "testsuite"
+  end project_config.project_testsuites
 
 (* let init_test_filter () = *)
 (*   let open Ezcmd.V2.EZCMD.TYPES in *)
