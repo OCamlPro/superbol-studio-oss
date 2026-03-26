@@ -190,7 +190,7 @@ type warning =
 
 and ignored_item =
   | Compiler_directive
-  | Compiler_set_condition
+  | Set_condition_directive of { assumed_set: bool }
 
 and incompatible_warning_stuff =
   | Types_in_compdir_condition of
@@ -227,8 +227,9 @@ let warning_loc = function
 let pp_ignored_item ppf = function
   | Compiler_directive ->
       Pretty.print ppf "compiler@ directive"
-  | Compiler_set_condition ->
-      Pretty.print ppf "compiler@ SET@ condition@ (assuming unset)"
+  | Set_condition_directive { assumed_set } ->
+      Pretty.print ppf "compiler@ directing@ SET@ condition@ (assuming@ %s)"
+        (if assumed_set then "set" else "unset")
 
 let pp_incompatible_warning_stuff ppf = function
   | Types_in_compdir_condition _ ->                     (* TODO: info on types *)
