@@ -4,7 +4,9 @@
   <span><span>[ <span>`Close of <span><span class="label">code</span>:int <span class="arrow">&#45;&gt;</span></span> <span><span class="optlabel">?signal</span>:string <span class="arrow">&#45;&gt;</span></span> <span>unit <span class="arrow">&#45;&gt;</span></span> unit</span>
   <span><span>| `Disconnect</span> of <span>unit <span class="arrow">&#45;&gt;</span></span> unit</span>
   <span><span>| `Error</span> of <span><span class="label">err</span>:<a href="../JsError/index.html#type-t">JsError.t</a> <span class="arrow">&#45;&gt;</span></span> unit</span>
-  <span><span>| `Exit</span> of <span><span class="label">code</span>:int <span class="arrow">&#45;&gt;</span></span> <span><span class="optlabel">?signal</span>:string <span class="arrow">&#45;&gt;</span></span> <span>unit <span class="arrow">&#45;&gt;</span></span> unit</span> ]</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>| `Exit</span> of <span><span class="label">code</span>:int <span class="arrow">&#45;&gt;</span></span> <span><span class="optlabel">?signal</span>:string <span class="arrow">&#45;&gt;</span></span> <span>unit <span class="arrow">&#45;&gt;</span></span> unit</span>
+  <span><span>| `Message</span> of <span><span class="label">message</span>:<span class="xref-unresolved">Ojs</span>.t <span class="arrow">&#45;&gt;</span></span> <span><span class="label">sendHandle</span>:<span class="xref-unresolved">Ojs</span>.t <span class="arrow">&#45;&gt;</span></span> unit</span>
+  <span><span>| `Spawn</span> of <span>unit <span class="arrow">&#45;&gt;</span></span> unit</span> ]</span> <span class="arrow">&#45;&gt;</span></span>
   unit</span></code></div></div><p>High-level API that waits for process to complete</p><div class="odoc-spec"><div class="spec value anchored" id="val-exec"><a href="#val-exec" class="anchor"></a><code><span><span class="keyword">val</span> exec : 
   <span><span class="optlabel">?logger</span>:<span>(<span><a href="#type-event">event</a> <span class="arrow">&#45;&gt;</span></span> unit)</span> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="optlabel">?stdin</span>:string <span class="arrow">&#45;&gt;</span></span>
