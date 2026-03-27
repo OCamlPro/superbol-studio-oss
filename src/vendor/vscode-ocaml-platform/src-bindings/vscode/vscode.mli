@@ -2509,10 +2509,44 @@ module Commands : sig
   val getCommands : ?filterInternal:bool -> unit -> string list Promise.t
 end
 
+module EvaluatableExpression : sig
+  include Js.T
+
+  val range: t -> Range.t
+
+  val expression: t -> string or_undefined
+
+  val create : range:Range.t -> ?expression:string -> unit -> t
+end
+
+module EvaluatableExpressionProvider : sig
+  include Js.T
+
+  val provideEvaluatableExpression :
+       t
+    -> document: TextDocument.t
+    -> position: Position.t
+    -> token: CancellationToken.t
+    -> EvaluatableExpression.t ProviderResult.t
+
+  val create :
+    provideEvaluatableExpression:
+         (document: TextDocument.t
+       -> position: Position.t
+       -> token: CancellationToken.t
+       -> EvaluatableExpression.t ProviderResult.t)
+    -> t
+end
+
 module Languages : sig
   val registerDocumentFormattingEditProvider :
        selector:DocumentSelector.t
     -> provider:DocumentFormattingEditProvider.t
+    -> Disposable.t
+
+  val registerEvaluatableExpressionProvider :
+       selector:DocumentSelector.t
+    -> provider:EvaluatableExpressionProvider.t
     -> Disposable.t
 
   val registerHoverProvider :
