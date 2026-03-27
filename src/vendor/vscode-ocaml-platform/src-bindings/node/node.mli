@@ -240,6 +240,8 @@ module ChildProcess : sig
        | `Disconnect of unit -> unit
        | `Error of err:JsError.t -> unit
        | `Exit of code:int -> ?signal:string -> unit -> unit
+       | `Message of message:Ojs.t -> sendHandle:Ojs.t -> unit
+       | `Spawn of unit -> unit
        ]
     -> unit
 

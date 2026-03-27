@@ -3334,6 +3334,39 @@ module Commands = struct
       [@@js.global "vscode.commands.getCommands"]]
 end
 
+module EvaluatableExpression = struct
+  include Interface.Make ()
+
+  include
+    [%js:
+    val range: t -> Range.t [@@js.get]
+    val expression: t -> string or_undefined [@@js.get]
+
+    val create :
+      range:Range.t -> ?expression:string -> unit -> t [@@js.builder]]
+end
+
+module EvaluatableExpressionProvider = struct
+  include Interface.Make ()
+
+  include
+    [%js:
+    val provideEvaluatableExpression:
+         t
+      -> document: TextDocument.t
+      -> position: Position.t
+      -> token: CancellationToken.t
+      -> EvaluatableExpression.t ProviderResult.t [@@js.call]
+
+    val create :
+      provideEvaluatableExpression:
+           (document: TextDocument.t
+         -> position: Position.t
+         -> token: CancellationToken.t
+         -> EvaluatableExpression.t ProviderResult.t)
+      -> t [@@js.builder]]
+end
+
 module Languages = struct
   include
     [%js:
@@ -3342,6 +3375,12 @@ module Languages = struct
       -> provider:DocumentFormattingEditProvider.t
       -> Disposable.t
       [@@js.global "vscode.languages.registerDocumentFormattingEditProvider"]
+
+    val registerEvaluatableExpressionProvider:
+         selector:DocumentSelector.t
+      -> provider:EvaluatableExpressionProvider.t
+      -> Disposable.t
+      [@@js.global "vscode.languages.registerEvaluatableExpressionProvider"]
 
     val registerHoverProvider :
       selector:DocumentSelector.t -> provider:HoverProvider.t -> Disposable.t
