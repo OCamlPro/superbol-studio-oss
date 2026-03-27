@@ -3351,7 +3351,7 @@ module EvaluatableExpressionProvider = struct
 
   include
     [%js:
-    val provideEvaluatableExpression:
+    val provideEvaluatableExpression :
          t
       -> document: TextDocument.t
       -> position: Position.t
@@ -3376,7 +3376,7 @@ module Languages = struct
       -> Disposable.t
       [@@js.global "vscode.languages.registerDocumentFormattingEditProvider"]
 
-    val registerEvaluatableExpressionProvider:
+    val registerEvaluatableExpressionProvider :
          selector:DocumentSelector.t
       -> provider:EvaluatableExpressionProvider.t
       -> Disposable.t
