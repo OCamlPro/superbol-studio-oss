@@ -5,6 +5,7 @@
 ### Added
 - Enforcement of Area A checks only when the source format is `COBOL85` [#555](https://github.com/OCamlPro/superbol-studio-oss/pull/555) [#556](https://github.com/OCamlPro/superbol-studio-oss/pull/556)
 - Support for COMP-6 usage [#548](https://github.com/OCamlPro/superbol-studio-oss/pull/548)
+- Warnings on unsupported usage, where the reported data item size may be be wrong [#570](https://github.com/OCamlPro/superbol-studio-oss/pull/570)
 
 ### Fixed
 - Handling of alphanumeric literals with UTF-8 characters in fixed-format COBOL code [#564](https://github.com/OCamlPro/superbol-studio-oss/pull/564)

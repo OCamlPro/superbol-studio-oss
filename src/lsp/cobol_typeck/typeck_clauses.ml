@@ -176,6 +176,7 @@ let display_usage_from_literal: Cobol_ptree.literal -> usage =
 
 
 let data_error diags e = Data_error e :: diags
+let data_warning diags e = Data_warning e :: diags
 
 
 let ensure_picture diags
@@ -290,11 +291,11 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
         | Error diags' ->
             LIST.append ~loc:__LOC__ diags' diags, Some (Error picture_clause)
   in
-  let usage_clause = match item_clauses.usage with
+  let usage_clause, usage_clause_loc = match item_clauses.usage with
     | Some usage ->
-        ~&usage
+        ~&usage, Some  ~@usage
     | None ->                      (* fallback to DISPLAY *)
-        Display                   (* TODO: NATIONAL in case value is a natlit *)
+        Display, None             (* TODO: NATIONAL in case value is a natlit *)
   in
   let signedness s =
     Cobol_data.Types.{ signed = s <> Some Cobol_ptree.Unsigned }
@@ -403,11 +404,15 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
     | UsagePending `Comp6 ->                  (* == Packed_decimal without sign nibble *)
         let diags, picture
           = ensure_picture diags ~only:`Numeric_category
-              ~usage_clause:PackedDecimal picture in
+            ~usage_clause:PackedDecimal picture in
         diags, Some (Packed_decimal { picture; with_sign_nibble = false })
 
-    | _ ->                         (* FIXME: we ignore the other cases for now *)
-        diags, None
+    | Type _
+    | UsagePending (`Comp10|`CompN|`Comp5|`Comp0|`Comp15|`CompX|`Comp9) ->
+        (* Note: `usage_clause_loc = None` implies `usage_clause = Display`,
+           unreachable here. *)
+        let usage_clause = usage_clause &@ Option.get usage_clause_loc in
+        data_warning diags @@ Unsupported_usage { usage_clause }, None
   in
   let diags = match usage, item_clauses.picture with
     | _, None

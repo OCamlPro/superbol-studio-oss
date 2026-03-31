@@ -154,6 +154,10 @@ and warning =
         second_loc: srcloc;
         clause_name: string;
       }
+  | Unsupported_usage of
+      {
+        usage_clause: Cobol_ptree.usage_clause with_loc;
+      }
   (* | Extraneous_clause of *)
   (*     { *)
   (*       clause_name: string; *)
@@ -194,7 +198,8 @@ let error_loc = function
 let warning_loc = function
   | Duplicate_clause { second_loc = loc; _ }
   | Mismatching_usage_in_group { item_usage = { loc; _ }; _ }
-  | Redefinition_of_table_item { redef_loc = loc; _ } ->
+  | Redefinition_of_table_item { redef_loc = loc; _ }
+  | Unsupported_usage { usage_clause = { loc; _ } } ->
       Some loc
 
 let pp_data_name'_opt
@@ -292,5 +297,8 @@ let pp_warning ppf = function
         Cobol_ptree.pp_usage_clause ~&group_usage
   | Duplicate_clause { clause_name; _ } ->   (* TODO: addendum with second loc *)
       Pretty.print ppf "Duplicate %s clause" clause_name
+  | Unsupported_usage { usage_clause = c } ->
+      Pretty.print ppf "Unsupported@ USAGE@ %a"
+        Cobol_ptree.pp_usage_clause ~&c
   (* | Extraneous_clause { clause_name; _ } -> *)
   (*     Pretty.print ppf "Extraneous %s clause" clause_name *)
