@@ -11,20 +11,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Platform.TYPES
-
-let record =
-  {
-    verbosity = 0;
-    eprintf = Printf.eprintf;
-    error = Pretty.error;
-    read_file = (fun file -> Ez_file.V1.EzFile.read_file file);
-    mk_temp_dir = Tempdir.create;
-    remove_dir = (fun ?all dir -> Ez_file.V1.EzFile.remove_dir ?all dir);
-    autodetect_format = Heuristics.autodetect_format;
-    find_lib = Copybook_finder.find_lib;
-    getenv_opt = (fun variable -> Sys.getenv_opt variable);
-  }
-
-module Tempdir = Tempdir
-module Caching = Caching
+val create: ?mode:int -> ?dir:string -> string -> string
