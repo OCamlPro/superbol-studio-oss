@@ -1,6 +1,6 @@
 (library
   (name superbol_testutils)
   (wrapped true)
-  (libraries autofonce_lib)
+  (libraries autofonce_lib superbol_platform)
   (flags (:standard)))
 

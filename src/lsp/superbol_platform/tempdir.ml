@@ -11,20 +11,26 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Platform.TYPES
+(* https://discuss.ocaml.org/t/how-to-create-a-temporary-directory-in-ocaml/1815/4 *)
+let rand_digits () =
+  Printf.sprintf "%06x" Random.State.(bits (make_self_init ()) land 0xFFFFFF)
 
-let record =
-  {
-    verbosity = 0;
-    eprintf = Printf.eprintf;
-    error = Pretty.error;
-    read_file = (fun file -> Ez_file.V1.EzFile.read_file file);
-    mk_temp_dir = Tempdir.create;
-    remove_dir = (fun ?all dir -> Ez_file.V1.EzFile.remove_dir ?all dir);
-    autodetect_format = Heuristics.autodetect_format;
-    find_lib = Copybook_finder.find_lib;
-    getenv_opt = (fun variable -> Sys.getenv_opt variable);
-  }
-
-module Tempdir = Tempdir
-module Caching = Caching
+let create ?(mode=0o700) ?dir pat =
+  let dir = match dir with
+    | Some d -> d
+    | None   -> Filename.get_temp_dir_name ()
+  in
+  let raise_err msg = raise (Sys_error msg) in
+  let rec loop count =
+    if count < 0
+    then
+      raise_err "mk_temp_dir: too many failing attemps"
+    else
+      let dir = Printf.sprintf "%s/%s%s" dir pat (rand_digits ()) in
+      try (Unix.mkdir dir mode; dir) with
+      | Unix.Unix_error (Unix.EEXIST, _, _) -> loop (count - 1)
+      | Unix.Unix_error (Unix.EINTR, _, _)  -> loop count
+      | Unix.Unix_error (e, _, _)           ->
+          raise_err ("mk_temp_dir: " ^ (Unix.error_message e))
+  in
+  loop 1000

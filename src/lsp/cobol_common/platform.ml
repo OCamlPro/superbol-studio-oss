@@ -47,6 +47,8 @@ module TYPES = struct
     mutable error :  'a. ('a, Format.formatter, unit) format -> 'a ;
     mutable read_file : string -> string ;
     mutable getenv_opt : string -> string option ;
+    mutable mk_temp_dir: ?mode:int -> ?dir:string -> string -> string;
+    mutable remove_dir: ?all:bool -> string -> unit;
 
     mutable autodetect_format:
       ?source_contents:string ->
@@ -74,6 +76,14 @@ let innocuous = {
     Pretty.string_to (fun msg -> raise (Sys_error msg))
       "%s: Filesystem operations are unavailable" file
   end;
+  mk_temp_dir = begin fun ?mode:_ ?dir:_ dirname ->
+    Pretty.string_to (fun msg -> raise (Sys_error msg))
+      "%s: Filesystem operations are unavailable" dirname
+  end;
+  remove_dir = begin fun ?all:_ dir ->
+    Pretty.string_to (fun msg -> raise (Sys_error msg))
+      "%s: Filesystem operations are unavailable" dir
+  end;
   autodetect_format = (fun ?source_contents:_ _filename -> SFFixed);
   find_lib = begin fun ~lookup_config ?fromfile:_ ?libname:_ (`Alphanum w |
                                                               `Word w) ->
@@ -82,12 +92,48 @@ let innocuous = {
   getenv_opt = (fun _variable -> None);
 }
 
-let copy ~dst ~src:{ verbosity; eprintf; error; read_file; autodetect_format;
-                     find_lib; getenv_opt }  =
+let copy ~dst ~src:{ verbosity; eprintf; error; read_file;
+                     mk_temp_dir; remove_dir;
+                     autodetect_format; find_lib; getenv_opt }  =
   dst.verbosity <- verbosity;
   dst.eprintf <- eprintf;
   dst.error <- error;
   dst.read_file <- read_file;
+  dst.mk_temp_dir <- mk_temp_dir;
+  dst.remove_dir <- remove_dir;
   dst.autodetect_format <- autodetect_format;
   dst.find_lib <- find_lib;
   dst.getenv_opt <- getenv_opt
+
+(* --- *)
+
+(** High-level filesystem operations *)
+module FS = struct
+
+  (** [with_temp_dir ~platform ?given_temp_dir f] creates a temporary directory
+      [temp_dir] and executes [f ~temp_dir] if [given_temp_dir] is [None], or
+      executes [f ~temp_dir:dir] if [given_temp_dir] is [Some dir].  [temp_dir] is
+      removed upon termination of [f] in the former case; otherwise, the directory
+      is left in place.
+
+      [default_pattern_prefix] is used to forge a name for the directory created,
+      if any. *)
+  let with_temp_dir ~platform ~default_pattern_prefix ?given_temp_dir f =
+    let temp_dir =
+      match given_temp_dir with
+      | None ->
+          platform.mk_temp_dir default_pattern_prefix
+      | Some dirname ->
+          dirname
+    in
+    let finalize () =
+      if given_temp_dir = None then
+        platform.remove_dir ~all:true temp_dir
+    in
+    match f ~temp_dir with
+    | res ->
+        finalize (); res
+    | exception e ->
+        finalize (); raise e
+
+end
