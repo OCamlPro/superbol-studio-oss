@@ -58,7 +58,7 @@ let bprint_key_path b key_path =
       else
       if String.contains key '"' then
         if String.contains key '\'' then
-          Printf.kprintf failwith
+          Printf.ksprintf failwith
             "Key %S cannot contain both simple and double quotes" key
         else
           Printf.bprintf b "'%s'" key
