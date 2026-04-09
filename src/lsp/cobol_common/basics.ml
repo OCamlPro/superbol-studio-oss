@@ -77,6 +77,9 @@ module LIST = struct
     List.rev l
   let hd = List.hd
   let tl = List.tl
+  let exists ?loc f l =
+    check_10 "exists" ~loc l;
+    List.exists f l
   let split ?loc l =
     check_10 "split" ~loc l;
     List.split l

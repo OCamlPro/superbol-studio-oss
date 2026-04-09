@@ -91,6 +91,7 @@ and field_definition =
     field_length_variability: length_variability;
     field_conditions: condition_names;
     field_redefinitions: item_redefinitions;
+    field_has_definition_issues: bool; (* TODO: generic warning/error flags? data_diags? *)
   }
 
 and field_layout =
@@ -113,6 +114,7 @@ and table_definition =
     table_init_values: Cobol_ptree.literal with_loc list;     (* list for now *)
     table_redefines: Cobol_ptree.qualname with_loc option;    (* redef only *)
     table_redefinitions: item_redefinitions;
+    table_has_definition_issues: bool; (* TODO: generic warning/error flags? data_diags? *)
   }
 and table_range =
   {

@@ -171,7 +171,8 @@ and fold_field_definition (v: _ #folder) =
                           field_leading_ranges;
                           field_offset; field_size; field_layout;
                           field_conditions; field_redefinitions;
-                          field_length_variability = _ } x -> x
+                          field_length_variability = _;
+                          field_has_definition_issues = _ } x -> x
       >> Cobol_ptree.Terms_visitor.fold_qualname'_opt v field_qualname
       >> Cobol_ptree.Terms_visitor.fold_qualname'_opt v field_redefines
       >> fold_list ~fold:fold_table_range v field_leading_ranges
@@ -199,7 +200,8 @@ and fold_table_definition (v: _ #folder) =
   handle v#fold_table_definition
     ~continue:begin fun { table_field; table_offset; table_size;
                           table_range; table_init_values;
-                          table_redefines; table_redefinitions } x -> x
+                          table_redefines; table_redefinitions;
+                          table_has_definition_issues = _ } x -> x
       >> fold_field_definition' v table_field
       >> fold_memory_offset v table_offset
       >> fold_memory_size v table_size

@@ -163,6 +163,8 @@ and pp_field_definition: field_definition Pretty.printer = fun ppf x ->
     I ((fun x -> x.field_qualname <> None),
        Fmt.field "qualname" (fun x -> x.field_qualname) pp_qualname'_opt,
        Fmt.(styled `Yellow @@ any "filler"));
+    C ((fun x -> x.field_has_definition_issues),
+       Fmt.any "/!\\ with_errors /!\\");
     C ((fun x -> x.field_redefines <> None),
        Fmt.field "redefines" (fun x -> x.field_redefines) pp_qualname'_opt);
     C ((fun x -> x.field_leading_ranges <> []),
@@ -204,6 +206,8 @@ and pp_field_layout: field_layout Pretty.printer = fun ppf -> function
 and pp_table_definition: table_definition Pretty.printer = fun ppf x ->
   Pretty.record_with_conditional_fields [
     T Fmt.(styled `Yellow @@ any "table");
+    C ((fun x -> x.table_has_definition_issues),
+       Fmt.any "/!\\ with_errors /!\\");
     C ((fun x -> x.table_redefines <> None),
        Fmt.field "redefines" (fun x -> x.table_redefines) pp_qualname'_opt);
     T (Fmt.field "offset" (fun x -> x.table_offset) pp_offset);

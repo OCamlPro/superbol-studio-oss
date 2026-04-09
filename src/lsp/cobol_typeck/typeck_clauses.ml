@@ -238,25 +238,25 @@ let auto_usage diags ~usage_clause picture =
   | Binary ->
       let diags, picture
         = ensure_picture diags ~only:`Numeric_category ~usage_clause picture in
-      diags, Some (Binary picture)
+      diags, Ok (Binary picture)
   | Bit ->
       let diags, picture
         = ensure_picture diags ~only:`Boolean_class ~usage_clause picture in
-      diags, Some (Bit picture)
+      diags, Ok (Bit picture)
   | Display ->
       let diags, picture
         = ensure_picture diags ~only:`Any_class ~usage_clause picture in
-      diags, Some (Display picture)
+      diags, Ok (Display picture)
   | National ->
       let diags, picture
         = ensure_picture diags ~only:`Nonalpha_class ~usage_clause picture in
-      diags, Some (National picture)
+      diags, Ok (National picture)
   | PackedDecimal ->
       let diags, picture
         = ensure_picture diags ~only:`Numeric_category ~usage_clause picture in
-      diags, Some (Packed_decimal { picture; with_sign_nibble = true })
+      diags, Ok (Packed_decimal { picture; with_sign_nibble = true })
   | _ ->
-      diags, None
+      diags, Error None
 
 
 
@@ -293,7 +293,7 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
   in
   let usage_clause, usage_clause_loc = match item_clauses.usage with
     | Some usage ->
-        ~&usage, Some  ~@usage
+        ~&usage, Some ~@usage
     | None ->                      (* fallback to DISPLAY *)
         Display, None             (* TODO: NATIONAL in case value is a natlit *)
   in
@@ -310,16 +310,16 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
         auto_usage diags ~usage_clause picture
 
     | BinaryChar s ->
-        diags, Some (Binary_char (signedness s))
+        diags, Ok (Binary_char (signedness s))
 
     | BinaryDouble s ->
-        diags, Some (Binary_double (signedness s))
+        diags, Ok (Binary_double (signedness s))
 
     | BinaryLong s ->
-        diags, Some (Binary_long (signedness s))
+        diags, Ok (Binary_long (signedness s))
 
     | BinaryShort s ->
-        diags, Some (Binary_short (signedness s))
+        diags, Ok (Binary_short (signedness s))
 
     | Bit ->
         auto_usage diags ~usage_clause picture
@@ -327,77 +327,77 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
     | Display ->
         begin match picture, value with
           | None, None ->
-              diags, None
+              diags, Error None
           | None, Some value ->
-              diags, Some (display_usage_from_literal ~&value)
+              diags, Ok (display_usage_from_literal ~&value)
           | Some _, _ ->
               auto_usage diags ~usage_clause picture
         end
 
     | FloatBinary32 e ->
-        diags, Some (Float_binary { width = `W32;
+        diags, Ok (Float_binary { width = `W32;
                                     endian = endian e })
 
     | FloatBinary64 e ->
-        diags, Some (Float_binary { width = `W64;
+        diags, Ok (Float_binary { width = `W64;
                                     endian = endian e })
 
     | FloatBinary128 e ->
-        diags, Some (Float_binary { width = `W128;
+        diags, Ok (Float_binary { width = `W128;
                                     endian = endian e })
 
     | FloatDecimal16 { endianness_mode = e;
                        encoding_mode = c } ->
-        diags, Some (Float_decimal { width = `W16;
+        diags, Ok (Float_decimal { width = `W16;
                                      endian = endian e;
                                      encoding = encoding c })
 
     | FloatDecimal34 { endianness_mode = e;
                        encoding_mode = c } ->
-        diags, Some (Float_decimal { width = `W34;
+        diags, Ok (Float_decimal { width = `W34;
                                      endian = endian e;
                                      encoding = encoding c })
 
     | FloatExtended ->
-        diags, Some Float_extended
+        diags, Ok Float_extended
 
     | FloatLong ->
-        diags, Some Float_long
+        diags, Ok Float_long
 
     | FloatShort ->
-        diags, Some Float_short
+        diags, Ok Float_short
 
     | FunctionPointer f ->
-        diags, Some (Function_pointer f)
+        diags, Ok (Function_pointer f)
 
     | ProcedurePointer ->
-        diags, Some Procedure_pointer
+        diags, Ok Procedure_pointer
 
     | Index ->                                 (* TODO: check value \in Z (N?) *)
-        diags, Some Index
+        diags, Ok Index
 
     | National -> (* <- TODO: better handling of NATIONAL (partial in GnuCOBOL) *)
         auto_usage diags ~usage_clause picture
 
     | ObjectReference r ->
-        diags, Some (Object_reference r)
+        diags, Ok (Object_reference r)
 
     | PackedDecimal ->
         auto_usage diags ~usage_clause picture
 
     | Pointer p ->
-        diags, Some (Pointer p)
+        diags, Ok (Pointer p)
 
     | ProgramPointer p ->
-        diags, Some (Program_pointer p)
+        diags, Ok (Program_pointer p)
 
     (* TODO: customizable USAGE mapping *)
     | UsagePending `BinaryCLong s ->
-        diags, Some (Binary_C_long (signedness s))
+        diags, Ok (Binary_C_long (signedness s))
     | UsagePending `Comp1 ->
-        diags, Some Float_short
+        diags, Ok Float_short
     | UsagePending `Comp2 ->
-        diags, Some Float_long
+        diags, Ok Float_long
     | UsagePending `Comp3 ->                  (* == Packed_decimal in GnuCOBOL *)
         auto_usage diags ~usage_clause:PackedDecimal picture
 
@@ -405,40 +405,41 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
         let diags, picture
           = ensure_picture diags ~only:`Numeric_category
             ~usage_clause:PackedDecimal picture in
-        diags, Some (Packed_decimal { picture; with_sign_nibble = false })
+        diags, Ok (Packed_decimal { picture; with_sign_nibble = false })
 
     | Type _
     | UsagePending (`Comp10|`CompN|`Comp5|`Comp0|`Comp15|`CompX|`Comp9) ->
         (* Note: `usage_clause_loc = None` implies `usage_clause = Display`,
            unreachable here. *)
         let usage_clause = usage_clause &@ Option.get usage_clause_loc in
-        data_warning diags @@ Unsupported_usage { usage_clause }, None
+        let warn = Typeck_data_diagnostics.Unsupported_usage { usage_clause } in
+        diags, Error (Some warn)
   in
   let diags = match usage, item_clauses.picture with
     | _, None
-    | None, Some _
-    | Some (Binary _ |
-            Bit _ |
-            Display _ |
-            National _ |
-            Packed_decimal _), Some _ ->
+    | Error _, Some _
+    | Ok (Binary _ |
+          Bit _ |
+          Display _ |
+          National _ |
+          Packed_decimal _), Some _ ->
         diags
-    | Some (Binary_C_long _ |
-            Binary_char _ |
-            Binary_double _ |
-            Binary_long _ |
-            Binary_short _ |
-            Float_binary _ |
-            Float_decimal _ |
-            Float_extended |
-            Float_long |
-            Float_short |
-            Function_pointer _ |
-            Procedure_pointer |
-            Index |
-            Object_reference _ |
-            Pointer _ |
-            Program_pointer _), Some picture ->
+    | Ok (Binary_C_long _ |
+          Binary_char _ |
+          Binary_double _ |
+          Binary_long _ |
+          Binary_short _ |
+          Float_binary _ |
+          Float_decimal _ |
+          Float_extended |
+          Float_long |
+          Float_short |
+          Function_pointer _ |
+          Procedure_pointer |
+          Index |
+          Object_reference _ |
+          Pointer _ |
+          Program_pointer _), Some picture ->
         data_error diags @@
         Unexpected_picture_clause { picture; item_name; item_loc;
                                     reason = `Item_with_usage usage_clause }

@@ -16,7 +16,19 @@ open Cobol_data.Types
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 
-let pp_size = Fmt.(any "Size: " ++ Cobol_data.Memory.pp_size ++ any " bits")
+let pp_readable_size ppf size =
+  try
+    let bits = Cobol_data.Memory.as_bits size in
+    if Int.rem bits 8 = 0 then
+      let bytes = bits / 8 in
+      Fmt.pf ppf "%u byte%s" bytes (if bytes > 1 then "s" else "")
+    else
+      Fmt.pf ppf "%u bit%s" bits (if bits > 1 then "s" else "")
+  with Cobol_data.Memory.NOT_SCALAR _ ->
+    Fmt.pf ppf "*variable*"
+
+let pp_size =
+  Fmt.(any "Size: " ++ pp_readable_size)
 
 let pp_int' = Cobol_ptree.pp_with_loc Fmt.int
 
@@ -176,8 +188,10 @@ and pp_field_definition: field_definition Pretty.printer = fun ppf x ->
     ++ any "\n\n"
     ++ const pp_field_layout x.field_layout
     ++ (match x.field_layout with
-    | Struct_field _ -> any "  \n" ++ const pp_size x.field_size
-    | _ -> nop)
+        | Struct_field _ when not x.field_has_definition_issues ->
+            any "  \n" ++ const pp_size x.field_size
+        | _ ->
+            nop)
     ++ any "  \n"
     ++ const (option (any "Redefines:\n" ++ pp_cobol_block Cobol_ptree.pp_qualname')) x.field_redefines)
   ppf x
