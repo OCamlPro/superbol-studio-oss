@@ -20,6 +20,7 @@ open Cobol_common.Srcloc.INFIX
 
 module Visitor = Cobol_common.Visitor
 module Qualmap = Cobol_unit.Qualmap
+module LIST = Cobol_common.Basics.LIST
 module NEL = Cobol_common.Basics.NEL
 module PIC = Cobol_data.Picture
 
@@ -63,6 +64,7 @@ and item_under_construction =               (* item currently being assembled *)
     item_rev_fields: Cobol_data.Types.item_definition with_loc list;
     item_rev_renames: Cobol_data.Types.record_renaming with_loc list;
     item_rev_conditions: Cobol_data.Types.condition_names;
+    item_diagnostics: Typeck_diagnostics.t;
   }
 
 and condition_name_under_construction =
@@ -104,11 +106,16 @@ let init (config: unit_config) =
 let error acc error = { acc with diags = Data_error error :: acc.diags }
 let warn acc d = { acc with diags = Data_warning d :: acc.diags }
 
+let data_errors acc l = List.fold_left error acc l
+
+let data_error e = Typeck_diagnostics.Data_error e
+let data_warning w = Typeck_diagnostics.Data_warning w
+
 let result { definitions = { data_items; data_records };
              references; diags; _ } : output * Typeck_diagnostics.t =
   { definitions =
-      { data_items = { data_items with list = List.rev data_items.list };
-        data_records = List.rev data_records };
+      { data_items = { data_items with list = LIST.rev data_items.list };
+        data_records = LIST.rev data_records };
     references },
   diags
 
@@ -211,19 +218,19 @@ let commit_record acc ~renamings (record_item: item_definition with_loc) =
             add_anonymous_def (Data_field { record; def })
       end
       ~table:begin fun table acc ->                             (* table indexes *)
-        List.fold_left begin fun acc qualname ->
+        LIST.fold_left begin fun acc qualname ->
           add_named_def qualname (Table_index { record; table; qualname }) acc
         end acc ~&table.table_range.range_indexes
       end
   in
   let data_items =                                      (* add renaming items *)
-    List.fold_left begin fun data_items def ->
+    LIST.fold_left begin fun data_items def ->
       add_named_def ~&def.renaming_name
         (Data_renaming { record; def }) data_items
     end data_items renamings
   in
   let data_items =                                     (* add condition names *)
-    List.fold_left begin fun data_items (def, field) ->
+    LIST.fold_left begin fun data_items (def, field) ->
       (* TODO: [validation] entries have no name.  (The current parse-tree does
          not allow those). *)
       add_named_def ~&def.condition_name_qualname
@@ -252,7 +259,7 @@ let commit_item_definition ~renamings def acc =
 
 
 
-let check_inherited_usage acc ~item_name item_clauses item_stack =
+let check_inherited_usage ~item_name item_clauses item_stack =
   let top_item_usage =
     match item_stack with
     | [] -> None
@@ -272,21 +279,22 @@ let check_inherited_usage acc ~item_name item_clauses item_stack =
   in
   match item_clauses.Typeck_clauses.usage, top_item_usage with
   | _, None ->
-      acc, item_clauses
+      [], item_clauses
   | None, (Some _ as usage) ->
-      acc, { item_clauses with usage }
+      [], { item_clauses with usage }
   | Some u, Some p ->
-      let acc =         (* check matching usage (according to the standard) *)
+      let diags =         (* check matching usage (according to the standard) *)
         if Cobol_ptree.compare_usage_clause ~&u ~&p <> 0 then
-          warn acc @@ Mismatching_usage_in_group { item_name;
-                                                   item_usage = u;
-                                                   group_usage = p }
-        else acc
+          [data_warning @@ Mismatching_usage_in_group { item_name;
+                                                        item_usage = u;
+                                                        group_usage = p }]
+        else
+          []
       in
-      acc, item_clauses
+      diags, item_clauses
 
 
-let item_range acc ~item_qualifier
+let item_range ~item_qualifier
     (item_clauses: Typeck_clauses.data_clauses) (item_stack: item_stack) =
   let qualify_as_subordinate n = qual n item_qualifier &@<- n in
   let qualify n = qualify n item_stack in                         (* CHECKME! *)
@@ -297,13 +305,13 @@ let item_range acc ~item_qualifier
         None
     | Some OccursFixed { times; indexed_by; _ } ->
         Some { range_span = Fixed_span { occurs_times = int times };
-               range_indexes = List.map qualify_as_subordinate indexed_by }
+               range_indexes = LIST.map qualify_as_subordinate indexed_by }
     | Some OccursDepending { from; to_; depending; indexed_by; _ } ->
         let min = match from with Some f -> int f | None -> 1 &@<- to_ in
         Some { range_span = Depending_span { occurs_depending_min = min;
                                              occurs_depending_max = int to_;
                                              occurs_depending = depending };
-               range_indexes = List.map qualify_as_subordinate indexed_by }
+               range_indexes = LIST.map qualify_as_subordinate indexed_by }
     | Some OccursDynamic { capacity_in; from; to_;
                            initialized; indexed_by; _ } ->
         let range_span
@@ -312,7 +320,7 @@ let item_range acc ~item_qualifier
                            occurs_dynamic_capacity_max = opt int to_;
                            occurs_dynamic_initialized = initialized } in
         Some { range_span;
-               range_indexes = List.map qualify_as_subordinate indexed_by }
+               range_indexes = LIST.map qualify_as_subordinate indexed_by }
   in
   let leading_ranges = match range, item_stack with
     | Some r, { item_rev_leading_ranges = l; _ } :: _ -> r :: l
@@ -320,7 +328,7 @@ let item_range acc ~item_qualifier
     | None, { item_rev_leading_ranges = l; _ } :: _ -> l
     | None, [] -> []
   in
-  acc, range, leading_ranges
+  range, leading_ranges
 
 
 let register_field_def acc (def: field_definition with_loc) =
@@ -331,66 +339,85 @@ let register_field_def acc (def: field_definition with_loc) =
   | None -> acc
 
 
-let error_if_picture ~item_name ~item_loc ~reason acc = function
+let error_if_picture ~item_name ~item_loc ~reason = function
   | None ->
-      acc
+      []
   | Some picture ->
-      error acc @@ Unexpected_picture_clause { picture; reason;
-                                               item_name; item_loc }
+      [data_error @@ Unexpected_picture_clause { picture; reason;
+                                                 item_name; item_loc }]
 
 
-let field_usage_n_value acc { item_name; item_loc; item_clauses; _ } =
-  let diags, usage, value =
-    Typeck_clauses.to_usage_n_value item_clauses ~item_name ~item_loc
-      ~picture_config:acc.picture_config
-  in
-  let acc = { acc with diags = Typeck_diagnostics.union acc.diags diags } in
-  acc, usage, value
-
-
-let field_layout_n_size acc ~usage ~init_value { item_name;
-                                                 item_loc;
-                                                 item_size;
-                                                 item_clauses;
-                                                 item_rev_fields; _ } =
+let field_layout_n_size ~usage ~init_value { item_name;
+                                             item_loc;
+                                             item_size;
+                                             item_clauses;
+                                             item_rev_fields; _ } =
   match item_rev_fields, usage with
-  | [], Some usage ->
-      acc,
+  | [], Ok usage ->
+      [],
       Elementary_field { usage; init_value },
       Typeck_utils.size_of ~usage
-  | [], None ->          (* missing usage (reported as missing pic string) *)
-      error acc @@
-      Missing_picture_clause_for_elementary_item { item_name; item_loc },
+  | [], Error Some diag ->                                    (* missing usage *)
+      [data_warning diag],
+      Elementary_field { usage = Display (PIC.alphanumeric ~size:1);
+                         init_value = None },
+      Cobol_data.Memory.byte_size
+  | [], Error None ->        (* missing usage (reported as missing pic string) *)
+      [data_error @@
+       Missing_picture_clause_for_elementary_item { item_name; item_loc }],
       Elementary_field { usage = Display (PIC.alphanumeric ~size:1);
                          init_value = None },
       Cobol_data.Memory.byte_size
   | flds, _ ->
-      error_if_picture ~item_name ~item_loc ~reason:`Group_item acc
+      error_if_picture ~item_name ~item_loc ~reason:`Group_item
         item_clauses.picture,
       Struct_field { subfields = NEL.of_rev_list flds },
       item_size                (* accumulated during commits of subfields *)
 
 
-let item_definition acc ({ item_loc;
+let subitem_fields_have_issues { item_rev_fields; _ } =
+  LIST.exists begin fun f -> match ~&f with
+    | Field { field_has_definition_issues; _ } -> field_has_definition_issues
+    | Table _ -> false
+  end item_rev_fields
+
+
+let item_definition acc ({ item_name;
+                           item_loc;
+                           item_clauses;
                            item_qualname;
                            item_redefines;
                            item_offset;
                            item_range;
                            item_rev_leading_ranges;
-                           item_rev_conditions; _ } as item) =
-  let acc, usage, init_value = field_usage_n_value acc item in
-  let acc, field_layout, field_size =
-    field_layout_n_size acc item ~usage ~init_value in
+                           item_rev_conditions;
+                           item_diagnostics; _ } as item) =
+  let diags, usage, init_value =
+    Typeck_clauses.to_usage_n_value item_clauses ~item_name ~item_loc
+      ~picture_config:acc.picture_config
+  in
+  let diags', field_layout, field_size =
+    field_layout_n_size item ~usage ~init_value
+  in
+  let item_diagnostics =
+    LIST.append ~loc:__LOC__ diags @@
+    LIST.append ~loc:__LOC__ diags' item_diagnostics in
+  let definition_issues =
+    item_diagnostics <> [] || subitem_fields_have_issues item
+  in
   let field =
     { field_qualname = item_qualname;
       field_redefines = None;
-      field_leading_ranges = List.rev item_rev_leading_ranges;
+      field_leading_ranges = LIST.rev item_rev_leading_ranges;
       field_layout;
       field_offset = item_offset;
       field_size;
       field_length_variability = Fixed_length;
-      field_conditions = List.rev item_rev_conditions;
-      field_redefinitions = [] } &@ item_loc
+      field_conditions = LIST.rev item_rev_conditions;
+      field_redefinitions = [];
+      field_has_definition_issues = definition_issues } &@ item_loc
+  and acc =
+    { acc with diags = Typeck_diagnostics.union acc.diags item_diagnostics }
   in
   match item_range with
   | None ->
@@ -408,7 +435,8 @@ let item_definition acc ({ item_loc;
               table_range = range;
               table_init_values = [];
               table_redefines = item_redefines;
-              table_redefinitions = [] } &@<- field
+              table_redefinitions = [];
+              table_has_definition_issues = definition_issues } &@<- field
   | Some ({ range_span = Depending_span { occurs_depending; _ }; _ } as range) ->
       let dep_size = Cobol_data.Memory.valof ~&occurs_depending in
       let table_size
@@ -420,7 +448,8 @@ let item_definition acc ({ item_loc;
               table_range = range;
               table_init_values = [];
               table_redefines = item_redefines;
-              table_redefinitions = [] } &@<- field
+              table_redefinitions = [];
+              table_has_definition_issues = definition_issues } &@<- field
   | Some ({ range_span = Dynamic_span _; _ } as range) ->
       register_field_def acc field,
       Table { table_field = field;
@@ -429,14 +458,15 @@ let item_definition acc ({ item_loc;
               table_range = range;
               table_init_values = [];
               table_redefines = item_redefines;
-              table_redefinitions = [] } &@<- field
+              table_redefinitions = [];
+              table_has_definition_issues = definition_issues } &@<- field
 
 
 let commit_conditions acc def { item_rev_conditions; _ } =
   match ~&def with
   | Field field ->
       let pending_conditions =
-        List.fold_left begin fun pcs cond_name ->
+        LIST.fold_left begin fun pcs cond_name ->
           (cond_name, field &@<- def) :: pcs
         end acc.pending_conditions item_rev_conditions
       in
@@ -446,11 +476,11 @@ let commit_conditions acc def { item_rev_conditions; _ } =
 
 
 let item_definitions acc items =
-  List.fold_left begin fun (acc, rev_defs, renamings) item ->
+  LIST.fold_left begin fun (acc, rev_defs, renamings) item ->
     let acc, def = item_definition acc item in
     commit_conditions acc def item,
     def :: rev_defs,
-    List.rev_append item.item_rev_renames renamings
+    LIST.rev_append item.item_rev_renames renamings
   end (acc, [], []) items
 
 
@@ -510,7 +540,7 @@ let find_in_current_record qualname acc =
     let res = Qualmap.find ~&qualname acc.current_qualmap in
     Ok (register_ref ~from:qualname ~to_:~&res.field_qualname acc, res)
   with Not_found ->
-    Error (error acc @@ Item_not_found { qualname })
+    Error (Typeck_data_diagnostics.Item_not_found { qualname })
 
 
 (* --- *)
@@ -562,7 +592,7 @@ let on_redefinition_item acc item_clauses
                                          table_item_name = redefined_qualname }
       in
       let acc =
-        List.fold_left begin fun acc field_def ->
+        LIST.fold_left begin fun acc field_def ->
           match ~&field_def with
           | Field { field_length_variability = Variable_length; _ }
           | Table { table_range = { range_span = Depending_span _; _ }; _ }
@@ -579,13 +609,13 @@ let on_redefinition_item acc item_clauses
               acc                                                       (* ok *)
         end acc redefined_item.item_rev_fields
       in
-      let acc, item_clauses =
-        check_inherited_usage acc ~item_name item_clauses base_stack
+      let item_diagnostics, item_clauses =
+        check_inherited_usage ~item_name item_clauses base_stack
       and item_qualname = qualname item_name base_stack
       and item_qualifier = qualifier item_name base_stack
       and item_redefines = Some (qualify redefined_name base_stack) in
-      let acc, item_range, item_rev_leading_ranges =
-        item_range acc ~item_qualifier item_clauses base_stack in
+      let item_range, item_rev_leading_ranges =
+        item_range ~item_qualifier item_clauses base_stack in
       { acc with                            (* push on stack, with same level *)
         item_stack = { item_level = expected_level;
                        item_name;
@@ -600,7 +630,8 @@ let on_redefinition_item acc item_clauses
                        item_rev_leading_ranges;
                        item_rev_fields = [];
                        item_rev_renames = [];
-                       item_rev_conditions = [] } :: acc.item_stack }
+                       item_rev_conditions = [];
+                       item_diagnostics } :: acc.item_stack }
 
 
 let on_item acc ~at_level
@@ -609,9 +640,7 @@ let on_item acc ~at_level
                               data_clauses }; loc }
   =
   let item_clauses = Typeck_clauses.of_data_item data_clauses in
-  let acc =
-    { acc with
-      diags = Typeck_diagnostics.union acc.diags item_clauses.clause_diags } in
+  let item_diagnostics = item_clauses.clause_diags in
   match item_clauses.redefines with
   | Some redefined_name ->
       on_redefinition_item acc item_clauses
@@ -628,12 +657,15 @@ let on_item acc ~at_level
         | _ ->
             acc
       in
-      let acc, item_clauses =
-        check_inherited_usage ~item_name acc item_clauses base_stack
+      let item_diagnostics', item_clauses =
+        check_inherited_usage ~item_name item_clauses base_stack
       and item_qualname = qualname item_name base_stack
       and item_qualifier = qualifier item_name base_stack in
-      let acc, item_range, item_rev_leading_ranges =
-        item_range acc ~item_qualifier item_clauses base_stack in
+      let item_range, item_rev_leading_ranges =
+        item_range ~item_qualifier item_clauses base_stack in
+      let item_diagnostics =
+        LIST.append ~loc:__LOC__ item_diagnostics item_diagnostics'
+      in
       { acc with
         item_stack = { item_level = ~&data_level;
                        item_name;
@@ -648,7 +680,8 @@ let on_item acc ~at_level
                        item_rev_leading_ranges;
                        item_rev_fields = [];
                        item_rev_renames = [];
-                       item_rev_conditions = [] } :: base_stack }
+                       item_rev_conditions = [];
+                       item_diagnostics } :: base_stack }
 
 
 let dummy_renamed_elementary =
@@ -669,13 +702,14 @@ let renaming acc
                               rename_from = from;
                               rename_thru = thru; _ };
       loc } =
+  let open Typeck_data_diagnostics in
   let renaming_name = qual name renaming_qualifier &@<- name in
   let from = requal ~&from renaming_qualifier &@<- from in
   let acc, from_item = match find_in_current_record from acc with
     | Ok (acc, def) ->
         report_occurs acc from def, Some def
-    | Error acc ->
-        acc, None
+    | Error diag ->
+        error acc diag, None
   in
   let acc, thru_item_n_name = match thru with
     | None ->
@@ -684,56 +718,58 @@ let renaming acc
         let thru = requal ~&thru renaming_qualifier &@<- thru in
         match find_in_current_record thru acc with
         | Ok (acc, def) ->
-            report_occurs acc thru def, Some (def, thru)
-        | Error acc ->
-            acc, None
+            report_occurs acc thru def, Some (Ok (def, thru))
+        | Error diag ->
+            error acc diag, Some (Error ())
   in
   match from_item, thru_item_n_name with
   | None, _ ->
       Error acc
-  | Some from_field, None ->
+  | Some from_field, (None | Some Error ()) ->
       let renaming_layout = match ~&from_field.field_layout with
         | Elementary_field { usage; _ } -> Renamed_elementary { usage }
         | Struct_field { subfields } -> Renamed_struct { subfields }
       in
+      let ko = thru_item_n_name = Some (Error ()) in
       Ok (acc, { renaming_name;
                  renaming_layout;
                  renaming_offset = ~&from_field.field_offset;
                  renaming_size = ~&from_field.field_size;
                  renaming_from = from;
-                 renaming_thru = None } &@ loc)
-  | Some from_field, Some (thru_field, thru_name) ->
+                 renaming_thru = None;
+                 renaming_has_definition_issues = ko } &@ loc)
+  | Some from_field, Some Ok (thru_field, thru_name) ->
       let from_offset = ~&from_field.field_offset
       and thru_offset = ~&thru_field.field_offset
       and thru_size = ~&thru_field.field_size in
       let end_ = Cobol_data.Memory.shift thru_offset ~by:thru_size in
       let size_ = Cobol_data.Memory.size ~from:from_offset ~to_:end_ in
-      let acc, renaming_layout =
+      let diags, renaming_layout =
         try
           let bits = Cobol_data.Memory.as_bits size_ in
           let size = bits / 8 in
           if size > 0 && bits mod 8 = 0 then
-            acc, Renamed_elementary { usage = Display (PIC.alphanumeric ~size) }
+            [], Renamed_elementary { usage = Display (PIC.alphanumeric ~size) }
           else if size > 0 then
-            error acc @@ Invalid_renaming_size { loc; from_field; thru_field;
-                                                 bits },
+            [Invalid_renaming_size { loc; from_field; thru_field; bits }],
             Renamed_elementary { usage = Display (PIC.alphanumeric ~size) }
           else
-            error acc @@ Invalid_renaming_range { loc; from_field; thru_field },
+            [Invalid_renaming_range { loc; from_field; thru_field }],
             dummy_renamed_elementary
         with Cobol_data.Memory.NOT_SCALAR (`Vars vars) ->
           let depending_vars =
             NEL.map vars ~f:(fun (Cobol_data.Memory.Valof qn) -> qn) in
-          error acc @@
-          Invalid_renaming_of_variable_length_range { loc; depending_vars },
+          [Invalid_renaming_of_variable_length_range { loc; depending_vars }],
           dummy_renamed_elementary
       in
-      Ok (acc, { renaming_name;
-                 renaming_layout;
-                 renaming_offset = from_offset;
-                 renaming_size = size_;
-                 renaming_from = from;
-                 renaming_thru = Some thru_name } &@ loc)
+      Ok (data_errors acc diags,
+          { renaming_name;
+            renaming_layout;
+            renaming_offset = from_offset;
+            renaming_size = size_;
+            renaming_from = from;
+            renaming_thru = Some thru_name;
+            renaming_has_definition_issues = diags <> [] } &@ loc)
 
 
 let on_rename ({ loc; _ } as rename_item) acc =

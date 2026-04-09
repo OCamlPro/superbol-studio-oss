@@ -222,9 +222,9 @@ let%expect_test "hover-replaced" =
     "B" "C"
     ``` |}];;
 
-(* Hover typedef vars *)
+(* Hover datadef vars *)
 
-let%expect_test "hover-typedef-vars" =
+let%expect_test "hover-datadef-vars" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
   print_hovered server ~projdir @@ extract_position_markers {cobol|
         IDENTIFICATION DIVISION.
@@ -293,7 +293,7 @@ let%expect_test "hover-typedef-vars" =
     STRUCT
     ```
     Group of 3 subfields
-    Size: 80 bits
+    Size: 10 bytes
     ---
     References: 2
     (line 7, character 31):
@@ -404,7 +404,7 @@ let%expect_test "hover-typedef-vars" =
     STRUCT
     ```
     Group of 3 subfields
-    Size: 80 bits
+    Size: 10 bytes
     ---
     References: 2
     (line 12, character 36):
@@ -466,7 +466,7 @@ let%expect_test "hover-typedef-vars" =
     ---
     References: 2 |}];;
 
-let%expect_test "hover-typedef-vars-usage" =
+let%expect_test "hover-datadef-vars-usage" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
   print_hovered server ~projdir @@ extract_position_markers {cobol|
         IDENTIFICATION DIVISION.
@@ -481,12 +481,15 @@ let%expect_test "hover-typedef-vars-usage" =
         01 _|_VAR7 USAGE POINTER.
         01 _|_VAR8 PIC 9 USAGE PACKED-DECIMAL.
         01 _|_VAR9 PIC $++/+.+B+.
+        01 _|_VARL PIC L9 DEPENDING ON VAR1.
+        01 _|_VAR10 PIC 99 USAGE COMP-0.
+        01 _|_VAR11.
         PROCEDURE DIVISION.
           STOP RUN.
     |cobol};
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[{"message":"Missing PICTURE clause for item 'VAR11'","range":{"end":{"character":17,"line":15},"start":{"character":8,"line":15}},"severity":1},{"message":"Unsupported USAGE COMP-0","range":{"end":{"character":36,"line":14},"start":{"character":24,"line":14}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     (line 5, character 11):
     __rootdir__/prog.cob:6.11-6.14:
        3           PROGRAM-ID. prog.
@@ -600,7 +603,7 @@ let%expect_test "hover-typedef-vars-usage" =
       12 >         01 VAR8 PIC 9 USAGE PACKED-DECIMAL.
     ----              ^^^^
       13           01 VAR9 PIC $++/+.+B+.
-      14           PROCEDURE DIVISION.
+      14           01 VARL PIC L9 DEPENDING ON VAR1.
     ```cobol
     VAR8
     ```
@@ -618,8 +621,8 @@ let%expect_test "hover-typedef-vars-usage" =
       12           01 VAR8 PIC 9 USAGE PACKED-DECIMAL.
       13 >         01 VAR9 PIC $++/+.+B+.
     ----              ^^^^
-      14           PROCEDURE DIVISION.
-      15             STOP RUN.
+      14           01 VARL PIC L9 DEPENDING ON VAR1.
+      15           01 VAR10 PIC 99 USAGE COMP-0.
     ```cobol
     VAR9
     ```
@@ -629,9 +632,57 @@ let%expect_test "hover-typedef-vars-usage" =
     NUMERIC(digits = 4, scale = 2, sign = unsigned)
     *e.g,* [`         `] (0), [`$+1/2.3 4`] (12.34)
     ---
+    References: 1
+    (line 13, character 11):
+    __rootdir__/prog.cob:14.11-14.15:
+      11           01 VAR7 USAGE POINTER.
+      12           01 VAR8 PIC 9 USAGE PACKED-DECIMAL.
+      13           01 VAR9 PIC $++/+.+B+.
+      14 >         01 VARL PIC L9 DEPENDING ON VAR1.
+    ----              ^^^^
+      15           01 VAR10 PIC 99 USAGE COMP-0.
+      16           01 VAR11.
+    ```cobol
+    VARL
+    ```
+    ```cobol
+    PIC L9 USAGE DISPLAY
+    ```
+    ALPHANUMERIC(2)
+    ---
+    References: 1
+    (line 14, character 11):
+    __rootdir__/prog.cob:15.11-15.16:
+      12           01 VAR8 PIC 9 USAGE PACKED-DECIMAL.
+      13           01 VAR9 PIC $++/+.+B+.
+      14           01 VARL PIC L9 DEPENDING ON VAR1.
+      15 >         01 VAR10 PIC 99 USAGE COMP-0.
+    ----              ^^^^^
+      16           01 VAR11.
+      17           PROCEDURE DIVISION.
+    ```cobol
+    VAR10
+    ```
+    *(layout omitted due to issues in item definition)*
+    ---
+    References: 1
+    (line 15, character 11):
+    __rootdir__/prog.cob:16.11-16.16:
+      13           01 VAR9 PIC $++/+.+B+.
+      14           01 VARL PIC L9 DEPENDING ON VAR1.
+      15           01 VAR10 PIC 99 USAGE COMP-0.
+      16 >         01 VAR11.
+    ----              ^^^^^
+      17           PROCEDURE DIVISION.
+      18             STOP RUN.
+    ```cobol
+    VAR11
+    ```
+    *(layout omitted due to issues in item definition)*
+    ---
     References: 1 |}];;
 
-let%expect_test "hover-typedef-filler-vars" =
+let%expect_test "hover-datadef-filler-vars" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
   print_hovered server ~projdir @@ extract_position_markers {cobol|
         IDENTIFICATION DIVISION.
@@ -667,15 +718,15 @@ let%expect_test "hover-typedef-filler-vars" =
     STRUCT
     ```
     Group of 2 subfields
-    Size: 32 bits
+    Size: 4 bytes
     ---
     References: 1
     (line 9, character 29):
     Hovering nothing worthy |}];;
 
-(* Hover typedef cond *)
+(* Hover datadef cond *)
 
-let%expect_test "hover-typedef-simple-condition" =
+let%expect_test "hover-datadef-simple-condition" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
   print_hovered server ~projdir @@ extract_position_markers {cobol|
         IDENTIFICATION DIVISION.
@@ -758,7 +809,7 @@ let%expect_test "hover-typedef-simple-condition" =
     ---
     References: 2 |}];;
 
-let%expect_test "hover-typedef-group-condition" =
+let%expect_test "hover-datadef-group-condition" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
   print_hovered server ~projdir @@ extract_position_markers {cobol|
         IDENTIFICATION DIVISION.
@@ -797,7 +848,7 @@ let%expect_test "hover-typedef-group-condition" =
     STRUCT
     ```
     Group of 2 subfields
-    Size: 16 bits
+    Size: 2 bytes
     ---
     References: 1
     (line 9, character 17):
@@ -845,7 +896,7 @@ let%expect_test "hover-typedef-group-condition" =
     ---
     References: 2 |}];;
 
-let%expect_test "hover-typedef-renames" =
+let%expect_test "hover-datadef-renames" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
   print_hovered server ~projdir @@ extract_position_markers {cobol|
         IDENTIFICATION DIVISION.
@@ -857,13 +908,14 @@ let%expect_test "hover-typedef-renames" =
           05 YY PIC XX.
           66 Z_|_ R_|_ENAMES _|_Y.
           66 Y-THRU-YY_|_ RENAMES Y THRU YY.
+          66 Y-THRU-_|_MISSING RENAMES Y THRU MISSING.
         PROCEDURE DIVISION.
             DISPLAY _|_Z.
             STOP RUN.
     |cobol};
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[{"message":"Item 'MISSING IN X' not found","range":{"end":{"character":50,"line":10},"start":{"character":43,"line":10}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     (line 8, character 14):
     __rootdir__/prog.cob:9.13-9.14:
        6           01 X.
@@ -872,7 +924,7 @@ let%expect_test "hover-typedef-renames" =
        9 >           66 Z RENAMES Y.
     ----                ^
       10             66 Y-THRU-YY RENAMES Y THRU YY.
-      11           PROCEDURE DIVISION.
+      11             66 Y-THRU-MISSING RENAMES Y THRU MISSING.
     ```cobol
     Z IN X
     RENAMES Y IN X
@@ -892,7 +944,7 @@ let%expect_test "hover-typedef-renames" =
        9 >           66 Z RENAMES Y.
     ----             ^^^^^^^^^^^^^^^
       10             66 Y-THRU-YY RENAMES Y THRU YY.
-      11           PROCEDURE DIVISION.
+      11             66 Y-THRU-MISSING RENAMES Y THRU MISSING.
     ```cobol
     Z IN X
     RENAMES Y IN X
@@ -912,7 +964,7 @@ let%expect_test "hover-typedef-renames" =
        9 >           66 Z RENAMES Y.
     ----                          ^
       10             66 Y-THRU-YY RENAMES Y THRU YY.
-      11           PROCEDURE DIVISION.
+      11             66 Y-THRU-MISSING RENAMES Y THRU MISSING.
     ```cobol
     Y IN X
     ```
@@ -922,7 +974,7 @@ let%expect_test "hover-typedef-renames" =
     NUMERIC(digits = 1, scale = 0, sign = unsigned)
     *e.g,* [`0`] (0), [`1`] (1)
     ---
-    References: 3
+    References: 4
     (line 9, character 22):
     __rootdir__/prog.cob:10.13-10.22:
        7             05 Y PIC 9.
@@ -930,8 +982,8 @@ let%expect_test "hover-typedef-renames" =
        9             66 Z RENAMES Y.
       10 >           66 Y-THRU-YY RENAMES Y THRU YY.
     ----                ^^^^^^^^^
-      11           PROCEDURE DIVISION.
-      12               DISPLAY Z.
+      11             66 Y-THRU-MISSING RENAMES Y THRU MISSING.
+      12           PROCEDURE DIVISION.
     ```cobol
     Y-THRU-YY IN X
     RENAMES Y IN X
@@ -943,15 +995,29 @@ let%expect_test "hover-typedef-renames" =
     ALPHANUMERIC(3)
     ---
     References: 1
-    (line 11, character 20):
-    __rootdir__/prog.cob:12.20-12.21:
+    (line 10, character 20):
+    __rootdir__/prog.cob:11.13-11.27:
+       8             05 YY PIC XX.
        9             66 Z RENAMES Y.
       10             66 Y-THRU-YY RENAMES Y THRU YY.
-      11           PROCEDURE DIVISION.
-      12 >             DISPLAY Z.
+      11 >           66 Y-THRU-MISSING RENAMES Y THRU MISSING.
+    ----                ^^^^^^^^^^^^^^
+      12           PROCEDURE DIVISION.
+      13               DISPLAY Z.
+    ```cobol
+    Y-THRU-MISSING IN X
+    ```
+    ---
+    References: 1
+    (line 12, character 20):
+    __rootdir__/prog.cob:13.20-13.21:
+      10             66 Y-THRU-YY RENAMES Y THRU YY.
+      11             66 Y-THRU-MISSING RENAMES Y THRU MISSING.
+      12           PROCEDURE DIVISION.
+      13 >             DISPLAY Z.
     ----                       ^
-      13               STOP RUN.
-      14
+      14               STOP RUN.
+      15
     ```cobol
     Z IN X
     RENAMES Y IN X
@@ -964,34 +1030,37 @@ let%expect_test "hover-typedef-renames" =
     ---
     References: 2 |}];;
 
-let%expect_test "hover-typedef-redefines" =
+let%expect_test "hover-datadef-redefines" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
   print_hovered server ~projdir @@ extract_position_markers {cobol|
         IDENTIFICATION DIVISION.
         PROGRAM-ID. prog.
         DATA DIVISION.
         WORKING-STORAGE SECTION.
+        01 S.
+          05 T PIC 9.
+          05 _|_U PIC X REDEFINES _|_T.
         01 X.
           05 Y PIC 9.
-          05 _|_Z REDEFINES Y_|_
+          05 _|_Z REDEFINES Y_|_.
         PROCEDURE DIVISION.
-            DISPLAY _|_Z.
+            DISPLAY _|_S _|_U _|_Z _|_X.
             STOP RUN.
     |cobol};
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[{"message":"Missing .","range":{"end":{"character":26,"line":7},"start":{"character":26,"line":7}},"severity":4},{"message":"Missing PICTURE clause for item 'Z'","range":{"end":{"character":26,"line":7},"start":{"character":10,"line":7}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[{"message":"Missing PICTURE clause for item 'Z'","range":{"end":{"character":27,"line":10},"start":{"character":10,"line":10}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     (line 7, character 13):
     __rootdir__/prog.cob:8.13-8.14:
        5           WORKING-STORAGE SECTION.
-       6           01 X.
-       7             05 Y PIC 9.
-       8 >           05 Z REDEFINES Y
+       6           01 S.
+       7             05 T PIC 9.
+       8 >           05 U PIC X REDEFINES T.
     ----                ^
-       9           PROCEDURE DIVISION.
-      10               DISPLAY Z.
+       9           01 X.
+      10             05 Y PIC 9.
     ```cobol
-    Z IN X
+    U IN S
     ```
     ```cobol
     PIC X USAGE DISPLAY
@@ -999,19 +1068,57 @@ let%expect_test "hover-typedef-redefines" =
     ALPHANUMERIC(1)
     Redefines:
     ```cobol
+    T IN S
+    ```
+    ---
+    References: 2
+    (line 7, character 31):
+    __rootdir__/prog.cob:8.31-8.32:
+       5           WORKING-STORAGE SECTION.
+       6           01 S.
+       7             05 T PIC 9.
+       8 >           05 U PIC X REDEFINES T.
+    ----                                  ^
+       9           01 X.
+      10             05 Y PIC 9.
+    ```cobol
+    T IN S
+    ```
+    ```cobol
+    PIC 9 USAGE DISPLAY
+    ```
+    NUMERIC(digits = 1, scale = 0, sign = unsigned)
+    *e.g,* [`0`] (0), [`1`] (1)
+    ---
+    References: 2
+    (line 10, character 13):
+    __rootdir__/prog.cob:11.13-11.14:
+       8             05 U PIC X REDEFINES T.
+       9           01 X.
+      10             05 Y PIC 9.
+      11 >           05 Z REDEFINES Y.
+    ----                ^
+      12           PROCEDURE DIVISION.
+      13               DISPLAY S U Z X.
+    ```cobol
+    Z IN X
+    ```
+    *(layout omitted due to issues in item definition)*
+    Redefines:
+    ```cobol
     Y IN X
     ```
     ---
     References: 2
-    (line 7, character 26):
-    __rootdir__/prog.cob:8.25-8.26:
-       5           WORKING-STORAGE SECTION.
-       6           01 X.
-       7             05 Y PIC 9.
-       8 >           05 Z REDEFINES Y
+    (line 10, character 26):
+    __rootdir__/prog.cob:11.25-11.26:
+       8             05 U PIC X REDEFINES T.
+       9           01 X.
+      10             05 Y PIC 9.
+      11 >           05 Z REDEFINES Y.
     ----                            ^
-       9           PROCEDURE DIVISION.
-      10               DISPLAY Z.
+      12           PROCEDURE DIVISION.
+      13               DISPLAY S U Z X.
     ```cobol
     Y IN X
     ```
@@ -1022,17 +1129,33 @@ let%expect_test "hover-typedef-redefines" =
     *e.g,* [`0`] (0), [`1`] (1)
     ---
     References: 2
-    (line 9, character 20):
-    __rootdir__/prog.cob:10.20-10.21:
-       7             05 Y PIC 9.
-       8             05 Z REDEFINES Y
-       9           PROCEDURE DIVISION.
-      10 >             DISPLAY Z.
+    (line 12, character 20):
+    __rootdir__/prog.cob:13.20-13.21:
+      10             05 Y PIC 9.
+      11             05 Z REDEFINES Y.
+      12           PROCEDURE DIVISION.
+      13 >             DISPLAY S U Z X.
     ----                       ^
-      11               STOP RUN.
-      12
+      14               STOP RUN.
+      15
     ```cobol
-    Z IN X
+    S
+    ```
+    Group of 1 subfield
+    Size: 1 byte
+    ---
+    References: 2
+    (line 12, character 22):
+    __rootdir__/prog.cob:13.22-13.23:
+      10             05 Y PIC 9.
+      11             05 Z REDEFINES Y.
+      12           PROCEDURE DIVISION.
+      13 >             DISPLAY S U Z X.
+    ----                         ^
+      14               STOP RUN.
+      15
+    ```cobol
+    U IN S
     ```
     ```cobol
     PIC X USAGE DISPLAY
@@ -1040,12 +1163,47 @@ let%expect_test "hover-typedef-redefines" =
     ALPHANUMERIC(1)
     Redefines:
     ```cobol
+    T IN S
+    ```
+    ---
+    References: 2
+    (line 12, character 24):
+    __rootdir__/prog.cob:13.24-13.25:
+      10             05 Y PIC 9.
+      11             05 Z REDEFINES Y.
+      12           PROCEDURE DIVISION.
+      13 >             DISPLAY S U Z X.
+    ----                           ^
+      14               STOP RUN.
+      15
+    ```cobol
+    Z IN X
+    ```
+    *(layout omitted due to issues in item definition)*
+    Redefines:
+    ```cobol
     Y IN X
     ```
     ---
+    References: 2
+    (line 12, character 26):
+    __rootdir__/prog.cob:13.26-13.27:
+      10             05 Y PIC 9.
+      11             05 Z REDEFINES Y.
+      12           PROCEDURE DIVISION.
+      13 >             DISPLAY S U Z X.
+    ----                             ^
+      14               STOP RUN.
+      15
+    ```cobol
+    X
+    ```
+    Group of 1 subfield
+    Size: 1 byte
+    ---
     References: 2 |}];;
 
-let%expect_test "hover-typedef-table-and-index" =
+let%expect_test "hover-datadef-table-and-index" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
   print_hovered server ~projdir @@ extract_position_markers {cobol|
         IDENTIFICATION DIVISION.
@@ -1057,16 +1215,26 @@ let%expect_test "hover-typedef-table-and-index" =
         01 T1_|_ PIC X OCCURS 10 TIMES INDEXED BY INDEX_|_1.
         01 T2 OCCURS 10 TIMES INDEXED BY IND_|_EX2,I_|_3.
           02 SUB-FIELD pic x.
+        01 T3_|_.
+          02 FILLER PIC 99 USAGE DISPLAY.
+        01 T4_|_. *> (no size shown yet, on purpose as COMP-0 is unsupported)
+          02 FILLER PIC 99 USAGE COMP-X.
         01 FILLER OCCURS 10 TO 20 TIMES DEPENDING CNT INDEXED BY I_|_4.
           02 SUB-FIELD pic 9.
+        01 VARTAB1.
+          02 VARTAB1-ELT PIC X OCCURS 1 TO 99 DEPENDING ON CNT.
+        01 VARTAB2.
+          02 VARTAB-SIZE PIC 99.
+          02 X PIC X OCCURS 1 TO 99 DEPENDING ON VARTAB-SIZE.
         PROCEDURE DIVISION.
             SET INDEX1 TO IDX.
             MOVE T1 (IND_|_EX1) TO T2(1).
+            DISPLAY VART_|_AB1 VART_|_AB1-ELT VARTAB_|_2.
             STOP RUN.
     |cobol};
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[{"message":"Unsupported USAGE COMP-X","range":{"end":{"character":39,"line":13},"start":{"character":27,"line":13}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     (line 5, character 18):
     __rootdir__/prog.cob:6.8-6.30:
        3           PROGRAM-ID. prog.
@@ -1132,7 +1300,7 @@ let%expect_test "hover-typedef-table-and-index" =
        9 >         01 T2 OCCURS 10 TIMES INDEXED BY INDEX2,I3.
     ----                                            ^^^^^^
       10             02 SUB-FIELD pic x.
-      11           01 FILLER OCCURS 10 TO 20 TIMES DEPENDING CNT INDEXED BY I4.
+      11           01 T3.
     Table
     ```cobol
     OCCURS 10 TIMES
@@ -1143,7 +1311,7 @@ let%expect_test "hover-typedef-table-and-index" =
     T2
     ```
     Group of 1 subfield
-    Size: 8 bits
+    Size: 1 byte
     ---
     References: 1
     (line 8, character 49):
@@ -1154,7 +1322,7 @@ let%expect_test "hover-typedef-table-and-index" =
        9 >         01 T2 OCCURS 10 TIMES INDEXED BY INDEX2,I3.
     ----                                                   ^^
       10             02 SUB-FIELD pic x.
-      11           01 FILLER OCCURS 10 TO 20 TIMES DEPENDING CNT INDEXED BY I4.
+      11           01 T3.
     Table
     ```cobol
     OCCURS 10 TIMES
@@ -1165,18 +1333,51 @@ let%expect_test "hover-typedef-table-and-index" =
     T2
     ```
     Group of 1 subfield
-    Size: 8 bits
+    Size: 1 byte
     ---
     References: 1
-    (line 10, character 66):
-    __rootdir__/prog.cob:11.65-11.67:
+    (line 10, character 13):
+    __rootdir__/prog.cob:11.11-11.13:
        8           01 T1 PIC X OCCURS 10 TIMES INDEXED BY INDEX1.
        9           01 T2 OCCURS 10 TIMES INDEXED BY INDEX2,I3.
       10             02 SUB-FIELD pic x.
-      11 >         01 FILLER OCCURS 10 TO 20 TIMES DEPENDING CNT INDEXED BY I4.
+      11 >         01 T3.
+    ----              ^^
+      12             02 FILLER PIC 99 USAGE DISPLAY.
+      13           01 T4. *> (no size shown yet, on purpose as COMP-0 is unsupported)
+    ```cobol
+    T3
+    ```
+    Group of 1 subfield
+    Size: 2 bytes
+    ---
+    References: 1
+    (line 12, character 13):
+    __rootdir__/prog.cob:13.11-13.13:
+      10             02 SUB-FIELD pic x.
+      11           01 T3.
+      12             02 FILLER PIC 99 USAGE DISPLAY.
+      13 >         01 T4. *> (no size shown yet, on purpose as COMP-0 is unsupported)
+    ----              ^^
+      14             02 FILLER PIC 99 USAGE COMP-X.
+      15           01 FILLER OCCURS 10 TO 20 TIMES DEPENDING CNT INDEXED BY I4.
+    ```cobol
+    T4
+    ```
+    Group of 1 subfield
+    ---
+     (no size shown yet, on purpose as COMP-0 is unsupported)
+    ---
+    References: 1
+    (line 14, character 66):
+    __rootdir__/prog.cob:15.65-15.67:
+      12             02 FILLER PIC 99 USAGE DISPLAY.
+      13           01 T4. *> (no size shown yet, on purpose as COMP-0 is unsupported)
+      14             02 FILLER PIC 99 USAGE COMP-X.
+      15 >         01 FILLER OCCURS 10 TO 20 TIMES DEPENDING CNT INDEXED BY I4.
     ----                                                                    ^^
-      12             02 SUB-FIELD pic 9.
-      13           PROCEDURE DIVISION.
+      16             02 SUB-FIELD pic 9.
+      17           01 VARTAB1.
     Table
     ```cobol
     OCCURS 10 TO 20 TIMES DEPENDING ON CNT
@@ -1187,18 +1388,18 @@ let%expect_test "hover-typedef-table-and-index" =
     FILLER
     ```
     Group of 1 subfield
-    Size: 8 bits
+    Size: 1 byte
     ---
     References: 1
-    (line 14, character 24):
-    __rootdir__/prog.cob:15.21-15.27:
-      12             02 SUB-FIELD pic 9.
-      13           PROCEDURE DIVISION.
-      14               SET INDEX1 TO IDX.
-      15 >             MOVE T1 (INDEX1) TO T2(1).
+    (line 23, character 24):
+    __rootdir__/prog.cob:24.21-24.27:
+      21             02 X PIC X OCCURS 1 TO 99 DEPENDING ON VARTAB-SIZE.
+      22           PROCEDURE DIVISION.
+      23               SET INDEX1 TO IDX.
+      24 >             MOVE T1 (INDEX1) TO T2(1).
     ----                        ^^^^^^
-      16               STOP RUN.
-      17
+      25               DISPLAY VARTAB1 VARTAB1-ELT VARTAB2.
+      26               STOP RUN.
     Table
     ```cobol
     OCCURS 10 TIMES
@@ -1213,9 +1414,59 @@ let%expect_test "hover-typedef-table-and-index" =
     ```
     ALPHANUMERIC(1)
     ---
-    References: 3 |}];;
+    References: 3
+    (line 24, character 24):
+    __rootdir__/prog.cob:25.20-25.27:
+      22           PROCEDURE DIVISION.
+      23               SET INDEX1 TO IDX.
+      24               MOVE T1 (INDEX1) TO T2(1).
+      25 >             DISPLAY VARTAB1 VARTAB1-ELT VARTAB2.
+    ----                       ^^^^^^^
+      26               STOP RUN.
+      27
+    ```cobol
+    VARTAB1
+    ```
+    Group of 1 subfield
+    Size: *variable*
+    ---
+    References: 2
+    (line 24, character 32):
+    __rootdir__/prog.cob:25.28-25.39:
+      22           PROCEDURE DIVISION.
+      23               SET INDEX1 TO IDX.
+      24               MOVE T1 (INDEX1) TO T2(1).
+      25 >             DISPLAY VARTAB1 VARTAB1-ELT VARTAB2.
+    ----                               ^^^^^^^^^^^
+      26               STOP RUN.
+      27
+    ```cobol
+    VARTAB1-ELT IN VARTAB1
+    ```
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
+    ALPHANUMERIC(1)
+    ---
+    References: 2
+    (line 24, character 46):
+    __rootdir__/prog.cob:25.40-25.47:
+      22           PROCEDURE DIVISION.
+      23               SET INDEX1 TO IDX.
+      24               MOVE T1 (INDEX1) TO T2(1).
+      25 >             DISPLAY VARTAB1 VARTAB1-ELT VARTAB2.
+    ----                                           ^^^^^^^
+      26               STOP RUN.
+      27
+    ```cobol
+    VARTAB2
+    ```
+    Group of 2 subfields
+    Size: *variable*
+    ---
+    References: 2 |}];;
 
-let%expect_test "hover-typedef-communication-section" =
+let%expect_test "hover-datadef-communication-section" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
   print_hovered server ~projdir @@ extract_position_markers {cobol|
         IDENTIFICATION DIVISION.
@@ -1273,7 +1524,7 @@ let%expect_test "hover-comment" =
     STRUCT
     ```
     Group of 2 subfields
-    Size: 16 bits
+    Size: 2 bytes
     ---
      inline comment
     ---
