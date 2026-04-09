@@ -8,7 +8,7 @@
 - Warnings on unsupported usage, where the reported data item size may be be wrong [#570](https://github.com/OCamlPro/superbol-studio-oss/pull/570)
 
 ### Fixed
-- Size shown on hover of data items with usages that are not (yet) supported [#575](https://github.com/OCamlPro/superbol-studio-oss/pull/575)
+- Details shown on hover of data items with definition issues [#575](https://github.com/OCamlPro/superbol-studio-oss/pull/575)
 - Handling of alphanumeric literals with UTF-8 characters in fixed-format COBOL code [#564](https://github.com/OCamlPro/superbol-studio-oss/pull/564)
 - Handling of queries about `LINKAGE` items given in `USING` phrases [#561](https://github.com/OCamlPro/superbol-studio-oss/pull/561)
 - Parsing of LSP CLI arguments, that notably prevented caching in global storage [#549](https://github.com/OCamlPro/superbol-studio-oss/pull/549) (fix for [Issue #547](https://github.com/OCamlPro/superbol-studio-oss/issues/547))

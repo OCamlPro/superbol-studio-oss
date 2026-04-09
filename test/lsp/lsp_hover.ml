@@ -483,12 +483,13 @@ let%expect_test "hover-datadef-vars-usage" =
         01 _|_VAR9 PIC $++/+.+B+.
         01 _|_VARL PIC L9 DEPENDING ON VAR1.
         01 _|_VAR10 PIC 99 USAGE COMP-0.
+        01 _|_VAR11.
         PROCEDURE DIVISION.
           STOP RUN.
     |cobol};
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[{"message":"Unsupported USAGE COMP-0","range":{"end":{"character":36,"line":14},"start":{"character":24,"line":14}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[{"message":"Missing PICTURE clause for item 'VAR11'","range":{"end":{"character":17,"line":15},"start":{"character":8,"line":15}},"severity":1},{"message":"Unsupported USAGE COMP-0","range":{"end":{"character":36,"line":14},"start":{"character":24,"line":14}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     (line 5, character 11):
     __rootdir__/prog.cob:6.11-6.14:
        3           PROGRAM-ID. prog.
@@ -640,7 +641,7 @@ let%expect_test "hover-datadef-vars-usage" =
       14 >         01 VARL PIC L9 DEPENDING ON VAR1.
     ----              ^^^^
       15           01 VAR10 PIC 99 USAGE COMP-0.
-      16           PROCEDURE DIVISION.
+      16           01 VAR11.
     ```cobol
     VARL
     ```
@@ -657,15 +658,27 @@ let%expect_test "hover-datadef-vars-usage" =
       14           01 VARL PIC L9 DEPENDING ON VAR1.
       15 >         01 VAR10 PIC 99 USAGE COMP-0.
     ----              ^^^^^
-      16           PROCEDURE DIVISION.
-      17             STOP RUN.
+      16           01 VAR11.
+      17           PROCEDURE DIVISION.
     ```cobol
     VAR10
     ```
+    *(layout omitted due to issues in item definition)*
+    ---
+    References: 1
+    (line 15, character 11):
+    __rootdir__/prog.cob:16.11-16.16:
+      13           01 VAR9 PIC $++/+.+B+.
+      14           01 VARL PIC L9 DEPENDING ON VAR1.
+      15           01 VAR10 PIC 99 USAGE COMP-0.
+      16 >         01 VAR11.
+    ----              ^^^^^
+      17           PROCEDURE DIVISION.
+      18             STOP RUN.
     ```cobol
-    PIC X USAGE DISPLAY
+    VAR11
     ```
-    ALPHANUMERIC(1)
+    *(layout omitted due to issues in item definition)*
     ---
     References: 1 |}];;
 
@@ -1009,27 +1022,30 @@ let%expect_test "hover-datadef-redefines" =
         PROGRAM-ID. prog.
         DATA DIVISION.
         WORKING-STORAGE SECTION.
+        01 S.
+          05 T PIC 9.
+          05 _|_U PIC X REDEFINES _|_T.
         01 X.
           05 Y PIC 9.
-          05 _|_Z REDEFINES Y_|_
+          05 _|_Z REDEFINES Y_|_.
         PROCEDURE DIVISION.
-            DISPLAY _|_Z.
+            DISPLAY _|_S _|_U _|_Z _|_X.
             STOP RUN.
     |cobol};
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[{"message":"Missing .","range":{"end":{"character":26,"line":7},"start":{"character":26,"line":7}},"severity":4},{"message":"Missing PICTURE clause for item 'Z'","range":{"end":{"character":26,"line":7},"start":{"character":10,"line":7}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[{"message":"Missing PICTURE clause for item 'Z'","range":{"end":{"character":27,"line":10},"start":{"character":10,"line":10}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     (line 7, character 13):
     __rootdir__/prog.cob:8.13-8.14:
        5           WORKING-STORAGE SECTION.
-       6           01 X.
-       7             05 Y PIC 9.
-       8 >           05 Z REDEFINES Y
+       6           01 S.
+       7             05 T PIC 9.
+       8 >           05 U PIC X REDEFINES T.
     ----                ^
-       9           PROCEDURE DIVISION.
-      10               DISPLAY Z.
+       9           01 X.
+      10             05 Y PIC 9.
     ```cobol
-    Z IN X
+    U IN S
     ```
     ```cobol
     PIC X USAGE DISPLAY
@@ -1037,19 +1053,57 @@ let%expect_test "hover-datadef-redefines" =
     ALPHANUMERIC(1)
     Redefines:
     ```cobol
+    T IN S
+    ```
+    ---
+    References: 2
+    (line 7, character 31):
+    __rootdir__/prog.cob:8.31-8.32:
+       5           WORKING-STORAGE SECTION.
+       6           01 S.
+       7             05 T PIC 9.
+       8 >           05 U PIC X REDEFINES T.
+    ----                                  ^
+       9           01 X.
+      10             05 Y PIC 9.
+    ```cobol
+    T IN S
+    ```
+    ```cobol
+    PIC 9 USAGE DISPLAY
+    ```
+    NUMERIC(digits = 1, scale = 0, sign = unsigned)
+    *e.g,* [`0`] (0), [`1`] (1)
+    ---
+    References: 2
+    (line 10, character 13):
+    __rootdir__/prog.cob:11.13-11.14:
+       8             05 U PIC X REDEFINES T.
+       9           01 X.
+      10             05 Y PIC 9.
+      11 >           05 Z REDEFINES Y.
+    ----                ^
+      12           PROCEDURE DIVISION.
+      13               DISPLAY S U Z X.
+    ```cobol
+    Z IN X
+    ```
+    *(layout omitted due to issues in item definition)*
+    Redefines:
+    ```cobol
     Y IN X
     ```
     ---
     References: 2
-    (line 7, character 26):
-    __rootdir__/prog.cob:8.25-8.26:
-       5           WORKING-STORAGE SECTION.
-       6           01 X.
-       7             05 Y PIC 9.
-       8 >           05 Z REDEFINES Y
+    (line 10, character 26):
+    __rootdir__/prog.cob:11.25-11.26:
+       8             05 U PIC X REDEFINES T.
+       9           01 X.
+      10             05 Y PIC 9.
+      11 >           05 Z REDEFINES Y.
     ----                            ^
-       9           PROCEDURE DIVISION.
-      10               DISPLAY Z.
+      12           PROCEDURE DIVISION.
+      13               DISPLAY S U Z X.
     ```cobol
     Y IN X
     ```
@@ -1060,17 +1114,33 @@ let%expect_test "hover-datadef-redefines" =
     *e.g,* [`0`] (0), [`1`] (1)
     ---
     References: 2
-    (line 9, character 20):
-    __rootdir__/prog.cob:10.20-10.21:
-       7             05 Y PIC 9.
-       8             05 Z REDEFINES Y
-       9           PROCEDURE DIVISION.
-      10 >             DISPLAY Z.
+    (line 12, character 20):
+    __rootdir__/prog.cob:13.20-13.21:
+      10             05 Y PIC 9.
+      11             05 Z REDEFINES Y.
+      12           PROCEDURE DIVISION.
+      13 >             DISPLAY S U Z X.
     ----                       ^
-      11               STOP RUN.
-      12
+      14               STOP RUN.
+      15
     ```cobol
-    Z IN X
+    S
+    ```
+    Group of 1 subfield
+    Size: 1 byte
+    ---
+    References: 2
+    (line 12, character 22):
+    __rootdir__/prog.cob:13.22-13.23:
+      10             05 Y PIC 9.
+      11             05 Z REDEFINES Y.
+      12           PROCEDURE DIVISION.
+      13 >             DISPLAY S U Z X.
+    ----                         ^
+      14               STOP RUN.
+      15
+    ```cobol
+    U IN S
     ```
     ```cobol
     PIC X USAGE DISPLAY
@@ -1078,8 +1148,43 @@ let%expect_test "hover-datadef-redefines" =
     ALPHANUMERIC(1)
     Redefines:
     ```cobol
+    T IN S
+    ```
+    ---
+    References: 2
+    (line 12, character 24):
+    __rootdir__/prog.cob:13.24-13.25:
+      10             05 Y PIC 9.
+      11             05 Z REDEFINES Y.
+      12           PROCEDURE DIVISION.
+      13 >             DISPLAY S U Z X.
+    ----                           ^
+      14               STOP RUN.
+      15
+    ```cobol
+    Z IN X
+    ```
+    *(layout omitted due to issues in item definition)*
+    Redefines:
+    ```cobol
     Y IN X
     ```
+    ---
+    References: 2
+    (line 12, character 26):
+    __rootdir__/prog.cob:13.26-13.27:
+      10             05 Y PIC 9.
+      11             05 Z REDEFINES Y.
+      12           PROCEDURE DIVISION.
+      13 >             DISPLAY S U Z X.
+    ----                             ^
+      14               STOP RUN.
+      15
+    ```cobol
+    X
+    ```
+    Group of 1 subfield
+    Size: 1 byte
     ---
     References: 2 |}];;
 
