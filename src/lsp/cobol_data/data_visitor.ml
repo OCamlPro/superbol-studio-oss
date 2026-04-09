@@ -251,7 +251,8 @@ let fold_record_renaming (v: _ #folder) =
   handle v#fold_record_renaming
     ~continue:begin fun { renaming_name; renaming_layout;
                           renaming_offset; renaming_size;
-                          renaming_from; renaming_thru } x -> x
+                          renaming_from; renaming_thru;
+                          renaming_has_definition_issues = _ } x -> x
       >> Cobol_ptree.Terms_visitor.fold_qualname' v renaming_name
       >> fold_renamed_item_layout v renaming_layout
       >> fold_memory_offset v renaming_offset

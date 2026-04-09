@@ -255,6 +255,8 @@ let pp_renamed_item_layout: renamed_item_layout Pretty.printer = fun ppf -> func
 let pp_record_renaming: record_renaming Pretty.printer =
   Pretty.record_with_conditional_fields [
     T (Fmt.field "qualname" (fun r -> r.renaming_name) Cobol_ptree.pp_qualname');
+    C ((fun r -> r.renaming_has_definition_issues),
+       Fmt.any "/!\\ with_errors /!\\");
     T (Fmt.field "from" (fun r -> r.renaming_from) Cobol_ptree.pp_qualname');
     C ((fun r -> r.renaming_thru <> None),
        Fmt.field "thru" (fun r -> r.renaming_thru) pp_qualname'_opt);

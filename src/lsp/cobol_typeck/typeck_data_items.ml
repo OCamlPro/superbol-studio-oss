@@ -106,6 +106,8 @@ let init (config: unit_config) =
 let error acc error = { acc with diags = Data_error error :: acc.diags }
 let warn acc d = { acc with diags = Data_warning d :: acc.diags }
 
+let data_errors acc l = List.fold_left error acc l
+
 let data_error e = Typeck_diagnostics.Data_error e
 let data_warning w = Typeck_diagnostics.Data_warning w
 
@@ -538,7 +540,7 @@ let find_in_current_record qualname acc =
     let res = Qualmap.find ~&qualname acc.current_qualmap in
     Ok (register_ref ~from:qualname ~to_:~&res.field_qualname acc, res)
   with Not_found ->
-    Error (error acc @@ Item_not_found { qualname })
+    Error (Typeck_data_diagnostics.Item_not_found { qualname })
 
 
 (* --- *)
@@ -700,13 +702,14 @@ let renaming acc
                               rename_from = from;
                               rename_thru = thru; _ };
       loc } =
+  let open Typeck_data_diagnostics in
   let renaming_name = qual name renaming_qualifier &@<- name in
   let from = requal ~&from renaming_qualifier &@<- from in
   let acc, from_item = match find_in_current_record from acc with
     | Ok (acc, def) ->
         report_occurs acc from def, Some def
-    | Error acc ->
-        acc, None
+    | Error diag ->
+        error acc diag, None
   in
   let acc, thru_item_n_name = match thru with
     | None ->
@@ -715,56 +718,58 @@ let renaming acc
         let thru = requal ~&thru renaming_qualifier &@<- thru in
         match find_in_current_record thru acc with
         | Ok (acc, def) ->
-            report_occurs acc thru def, Some (def, thru)
-        | Error acc ->
-            acc, None
+            report_occurs acc thru def, Some (Ok (def, thru))
+        | Error diag ->
+            error acc diag, Some (Error ())
   in
   match from_item, thru_item_n_name with
   | None, _ ->
       Error acc
-  | Some from_field, None ->
+  | Some from_field, (None | Some Error ()) ->
       let renaming_layout = match ~&from_field.field_layout with
         | Elementary_field { usage; _ } -> Renamed_elementary { usage }
         | Struct_field { subfields } -> Renamed_struct { subfields }
       in
+      let ko = thru_item_n_name = Some (Error ()) in
       Ok (acc, { renaming_name;
                  renaming_layout;
                  renaming_offset = ~&from_field.field_offset;
                  renaming_size = ~&from_field.field_size;
                  renaming_from = from;
-                 renaming_thru = None } &@ loc)
-  | Some from_field, Some (thru_field, thru_name) ->
+                 renaming_thru = None;
+                 renaming_has_definition_issues = ko } &@ loc)
+  | Some from_field, Some Ok (thru_field, thru_name) ->
       let from_offset = ~&from_field.field_offset
       and thru_offset = ~&thru_field.field_offset
       and thru_size = ~&thru_field.field_size in
       let end_ = Cobol_data.Memory.shift thru_offset ~by:thru_size in
       let size_ = Cobol_data.Memory.size ~from:from_offset ~to_:end_ in
-      let acc, renaming_layout =
+      let diags, renaming_layout =
         try
           let bits = Cobol_data.Memory.as_bits size_ in
           let size = bits / 8 in
           if size > 0 && bits mod 8 = 0 then
-            acc, Renamed_elementary { usage = Display (PIC.alphanumeric ~size) }
+            [], Renamed_elementary { usage = Display (PIC.alphanumeric ~size) }
           else if size > 0 then
-            error acc @@ Invalid_renaming_size { loc; from_field; thru_field;
-                                                 bits },
+            [Invalid_renaming_size { loc; from_field; thru_field; bits }],
             Renamed_elementary { usage = Display (PIC.alphanumeric ~size) }
           else
-            error acc @@ Invalid_renaming_range { loc; from_field; thru_field },
+            [Invalid_renaming_range { loc; from_field; thru_field }],
             dummy_renamed_elementary
         with Cobol_data.Memory.NOT_SCALAR (`Vars vars) ->
           let depending_vars =
             NEL.map vars ~f:(fun (Cobol_data.Memory.Valof qn) -> qn) in
-          error acc @@
-          Invalid_renaming_of_variable_length_range { loc; depending_vars },
+          [Invalid_renaming_of_variable_length_range { loc; depending_vars }],
           dummy_renamed_elementary
       in
-      Ok (acc, { renaming_name;
-                 renaming_layout;
-                 renaming_offset = from_offset;
-                 renaming_size = size_;
-                 renaming_from = from;
-                 renaming_thru = Some thru_name } &@ loc)
+      Ok (data_errors acc diags,
+          { renaming_name;
+            renaming_layout;
+            renaming_offset = from_offset;
+            renaming_size = size_;
+            renaming_from = from;
+            renaming_thru = Some thru_name;
+            renaming_has_definition_issues = diags <> [] } &@ loc)
 
 
 let on_rename ({ loc; _ } as rename_item) acc =

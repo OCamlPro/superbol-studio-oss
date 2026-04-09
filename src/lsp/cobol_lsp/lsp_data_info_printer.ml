@@ -250,16 +250,18 @@ let pp_renamed_item_layout: renamed_item_layout Pretty.printer = fun ppf x ->
 let pp_record_renaming: record_renaming Pretty.printer = fun ppf r ->
   let open Fmt in begin
     pp_cobol_block begin
-      const Cobol_ptree.pp_qualname' r.renaming_name
-      ++ any "\nRENAMES "
-      ++ const Cobol_ptree.pp_qualname' r.renaming_from
-      ++ const (option (any "\nTHRU " ++ Cobol_ptree.pp_qualname')) r.renaming_thru
-    end
-    ++ any "\n\n"
-    ++ const pp_renamed_item_layout r.renaming_layout
-    ++ (match r.renaming_layout with
-        | Renamed_struct _ -> any "  \n" ++ const pp_size r.renaming_size
-        | _ -> nop)
+      const Cobol_ptree.pp_qualname' r.renaming_name ++ any "\n" ++
+      if r.renaming_has_definition_issues then nop else
+        any "RENAMES " ++
+        const Cobol_ptree.pp_qualname' r.renaming_from ++
+        const (option (any "\nTHRU " ++ Cobol_ptree.pp_qualname'))
+          r.renaming_thru
+    end ++ any "\n\n" ++
+    if r.renaming_has_definition_issues then nop else
+      const pp_renamed_item_layout r.renaming_layout ++
+      match r.renaming_layout with
+      | Renamed_struct _ -> any "  \n" ++ const pp_size r.renaming_size
+      | _ -> nop
   end ppf r
 
 let pp_record_renaming': record_renaming with_loc Pretty.printer = fun ppf ->

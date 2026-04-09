@@ -908,13 +908,14 @@ let%expect_test "hover-datadef-renames" =
           05 YY PIC XX.
           66 Z_|_ R_|_ENAMES _|_Y.
           66 Y-THRU-YY_|_ RENAMES Y THRU YY.
+          66 Y-THRU-_|_MISSING RENAMES Y THRU MISSING.
         PROCEDURE DIVISION.
             DISPLAY _|_Z.
             STOP RUN.
     |cobol};
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[{"message":"Item 'MISSING IN X' not found","range":{"end":{"character":50,"line":10},"start":{"character":43,"line":10}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     (line 8, character 14):
     __rootdir__/prog.cob:9.13-9.14:
        6           01 X.
@@ -923,7 +924,7 @@ let%expect_test "hover-datadef-renames" =
        9 >           66 Z RENAMES Y.
     ----                ^
       10             66 Y-THRU-YY RENAMES Y THRU YY.
-      11           PROCEDURE DIVISION.
+      11             66 Y-THRU-MISSING RENAMES Y THRU MISSING.
     ```cobol
     Z IN X
     RENAMES Y IN X
@@ -943,7 +944,7 @@ let%expect_test "hover-datadef-renames" =
        9 >           66 Z RENAMES Y.
     ----             ^^^^^^^^^^^^^^^
       10             66 Y-THRU-YY RENAMES Y THRU YY.
-      11           PROCEDURE DIVISION.
+      11             66 Y-THRU-MISSING RENAMES Y THRU MISSING.
     ```cobol
     Z IN X
     RENAMES Y IN X
@@ -963,7 +964,7 @@ let%expect_test "hover-datadef-renames" =
        9 >           66 Z RENAMES Y.
     ----                          ^
       10             66 Y-THRU-YY RENAMES Y THRU YY.
-      11           PROCEDURE DIVISION.
+      11             66 Y-THRU-MISSING RENAMES Y THRU MISSING.
     ```cobol
     Y IN X
     ```
@@ -973,7 +974,7 @@ let%expect_test "hover-datadef-renames" =
     NUMERIC(digits = 1, scale = 0, sign = unsigned)
     *e.g,* [`0`] (0), [`1`] (1)
     ---
-    References: 3
+    References: 4
     (line 9, character 22):
     __rootdir__/prog.cob:10.13-10.22:
        7             05 Y PIC 9.
@@ -981,8 +982,8 @@ let%expect_test "hover-datadef-renames" =
        9             66 Z RENAMES Y.
       10 >           66 Y-THRU-YY RENAMES Y THRU YY.
     ----                ^^^^^^^^^
-      11           PROCEDURE DIVISION.
-      12               DISPLAY Z.
+      11             66 Y-THRU-MISSING RENAMES Y THRU MISSING.
+      12           PROCEDURE DIVISION.
     ```cobol
     Y-THRU-YY IN X
     RENAMES Y IN X
@@ -994,15 +995,29 @@ let%expect_test "hover-datadef-renames" =
     ALPHANUMERIC(3)
     ---
     References: 1
-    (line 11, character 20):
-    __rootdir__/prog.cob:12.20-12.21:
+    (line 10, character 20):
+    __rootdir__/prog.cob:11.13-11.27:
+       8             05 YY PIC XX.
        9             66 Z RENAMES Y.
       10             66 Y-THRU-YY RENAMES Y THRU YY.
-      11           PROCEDURE DIVISION.
-      12 >             DISPLAY Z.
+      11 >           66 Y-THRU-MISSING RENAMES Y THRU MISSING.
+    ----                ^^^^^^^^^^^^^^
+      12           PROCEDURE DIVISION.
+      13               DISPLAY Z.
+    ```cobol
+    Y-THRU-MISSING IN X
+    ```
+    ---
+    References: 1
+    (line 12, character 20):
+    __rootdir__/prog.cob:13.20-13.21:
+      10             66 Y-THRU-YY RENAMES Y THRU YY.
+      11             66 Y-THRU-MISSING RENAMES Y THRU MISSING.
+      12           PROCEDURE DIVISION.
+      13 >             DISPLAY Z.
     ----                       ^
-      13               STOP RUN.
-      14
+      14               STOP RUN.
+      15
     ```cobol
     Z IN X
     RENAMES Y IN X
