@@ -16,6 +16,7 @@ open Cobol_common.Srcloc.INFIX
 open Cobol_common.Exec_block.TYPES
 module LIST = Cobol_common.Basics.LIST
 
+(** Contains the locations of syntactic occurences for each qualified name *)
 type qualrefmap = srcloc list Cobol_unit.Qual.MAP.t
 type references_in_unit =
   {
@@ -38,9 +39,12 @@ type artifacts =
 
 type outputs =
   {
-    ptree: Cobol_ptree.compilation_group;
-    group: Cobol_unit.Types.group;
-    artifacts: artifacts;
+    ptree: Cobol_ptree.compilation_group; (** 
+      Parse tree (AST without typing information) copied in the typechecker output 
+      to ease its direct use by further passes in the analysis pipeline and queries 
+      in the LSP server. *)
+    group: Cobol_unit.Types.group; (** The typed AST view as an unordered set of cobol_unit *)
+    artifacts: artifacts; (** Other typing artifacts *)
   }
 type t = outputs
 
