@@ -28,6 +28,9 @@ type references_in_unit =
          - a indirect reference to A
       In the future we may need/want to split those 2 kind of references
      *)
+    (* TODO: Can we really have a one fits all notion of references_in_unit?
+       Is this only supposed to be references displayed in the LSP?
+       In that case shouldn't we drop indirect references altogether? *)
   }
 type references_in_group = references_in_unit Cobol_unit.Collections.MAP.t
 
@@ -38,9 +41,12 @@ type artifacts =
 
 type outputs =
   {
-    ptree: Cobol_ptree.compilation_group;
-    group: Cobol_unit.Types.group;
-    artifacts: artifacts;
+    ptree: Cobol_ptree.compilation_group; (** 
+      Parse tree (AST without typing information) copied in the typechecker output 
+      to ease its direct use by further passes in the analysis pipeline and queries 
+      in the LSP server. *)
+    group: Cobol_unit.Types.group; (** The typed AST view as an unordered set of cobol_unit *)
+    artifacts: artifacts; (** Other typing artifacts *)
   }
 type t = outputs
 
