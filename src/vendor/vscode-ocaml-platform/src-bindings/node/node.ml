@@ -52,6 +52,8 @@ module Process = struct
 
     val arch : string [@@js.global "process.arch"]
 
+    val pid : int [@@js.global "process.pid"]
+
     val kill : int -> ?signal:string -> unit -> unit [@@js.call "process.kill"]]
 
   module Env = struct
@@ -245,7 +247,13 @@ module ChildProcess = struct
 
     include
       [%js:
-      val create : ?cwd:string -> ?env:string Dict.t -> unit -> t [@@js.builder]]
+      val create :
+           ?cwd:string
+        -> ?env:string Dict.t
+        -> ?detached:bool
+        -> ?stdio:string
+        -> unit
+        -> t [@@js.builder]]
   end
 
   include

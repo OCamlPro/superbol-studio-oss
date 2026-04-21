@@ -44,6 +44,8 @@ module Process : sig
 
   val arch : string
 
+  val pid : int
+
   val kill : int -> ?signal:string -> unit -> unit
 
   module Env : sig
@@ -204,7 +206,13 @@ module ChildProcess : sig
   module Options : sig
     type t
 
-    val create : ?cwd:string -> ?env:string Interop.Dict.t -> unit -> t
+    val create :
+         ?cwd:string
+      -> ?env:string Interop.Dict.t
+      -> ?detached:bool
+      -> ?stdio:string
+      -> unit
+      -> t
   end
 
   type return =
