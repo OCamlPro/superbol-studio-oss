@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-a1443fc796f29694900cf6b50a70f37a:.
+0beba379592dbef6b4ddd540b5c3f2a8:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -15,7 +15,7 @@ a1443fc796f29694900cf6b50a70f37a:.
 
 # begin context for .gitignore
 # file .gitignore
-1ac4166aab2c29244a36f9ec1709c44b:.gitignore
+9d96794389778c361c613581836e76bb:.gitignore
 # end context for .gitignore
 
 # begin context for Makefile
@@ -50,7 +50,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-0f3612c70de571529566bb7752a9b72b:dune-project
+ebcae95eec16d7627be242ba90b6504b:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_cfg.opam
@@ -507,6 +507,16 @@ a5027007a5ed5a4b90598fcde0e6fc1b:src/lsp/superbol_preprocs/version.mlt
 # file src/lsp/superbol_project/version.mlt
 a5027007a5ed5a4b90598fcde0e6fc1b:src/lsp/superbol_project/version.mlt
 # end context for src/lsp/superbol_project/version.mlt
+
+# begin context for src/tramabol/libcob-idl/dune
+# file src/tramabol/libcob-idl/dune
+861e06212f08e72e463b43d8b8504222:src/tramabol/libcob-idl/dune
+# end context for src/tramabol/libcob-idl/dune
+
+# begin context for src/tramabol/libcob-idl/index.mld
+# file src/tramabol/libcob-idl/index.mld
+0048f004c2be359100552a002c6532bc:src/tramabol/libcob-idl/index.mld
+# end context for src/tramabol/libcob-idl/index.mld
 
 # begin context for src/vendor/ez_toml/dune
 # file src/vendor/ez_toml/dune

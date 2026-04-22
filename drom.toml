@@ -71,6 +71,10 @@ universal = { ocaml-flags = "-w -32-67-69" }
 #  dot-gitignore-trailer = "..."
 [fields]
 dune = "3.17.0"
+dune-project-trailer = """
+; used for auto-generated/checked libcob bindings
+(using ctypes 0.3)
+"""
 dot-gitignore-trailer = """
 # Edit drom.toml to change the following lines
 /superbol-free-*
@@ -282,3 +286,6 @@ dir = "src/lsp/sql_parser"
 
 [[package]]
 dir = "src/lsp/cobol_cfg"
+
+[[package]]
+dir = "src/tramabol/libcob-idl"
