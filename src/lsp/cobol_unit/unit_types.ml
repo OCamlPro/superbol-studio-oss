@@ -52,9 +52,15 @@ type unit_config =
 
 (* data items *)
 
+(** [data_definitions] exposes two views on the items (fields and tables) in DATA DIVISION: 
+   - [data_items] contains all the items with direct access by name.
+   - [data_records] is a list of record trees where each element represents 
+      a record definition (typically a level 01 or 77 data item) *)
 type data_definitions =
   {
-    data_items: Cobol_data.Types.data_definition named_n_ordered;
+    data_items: Cobol_data.Types.data_definition named_n_ordered; (* 
+      LATER: recheck if the list of ordered data_definition is useful here. 
+      All the structure information should already be accessible trhough [data_records]. *)
     data_records: Cobol_data.Types.record list;
   }
 
@@ -90,8 +96,8 @@ and arg_passing_style =
 
 type procedure =
   {
+    procedure_using: procedure_using with_loc option; (* PROCEDURE DIVISION USING ... *)
     procedure_blocks: procedure_block named_n_ordered;
-    procedure_using: procedure_using with_loc option;
   }
 
 (* main *)
