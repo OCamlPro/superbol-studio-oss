@@ -1,0 +1,20 @@
+; if you modify this file, add 'test' to the 'skip' field in drom.toml
+
+(executable
+ (name test)
+ (modules Test)
+ (libraries ez-cob ctypes))
+
+(alias
+ (name buildtest)
+ (deps test.exe))
+
+(rule
+ (action (with-stdin-from test.input
+         (with-stdout-to test.output
+         (run %{exe:test.exe})))))
+
+(rule
+ (alias runtest)
+ (action
+  (diff test.expected test.output)))
