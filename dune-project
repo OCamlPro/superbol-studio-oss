@@ -748,4 +748,42 @@
   )
  )
 
+(package
+ (name libcob-ctypes)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (ctypes ( >= 0.24 ))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name ez-cob)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (libcob-ctypes (= :version))
+   (fmt ( >= 0.9 ))
+   (ctypes ( >= 0.24 ))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+; used for auto-generated/checked libcob bindings
+(using ctypes 0.3)
 

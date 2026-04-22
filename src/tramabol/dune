@@ -1,0 +1,12 @@
+(data_only_dirs cobaux)
+(rule
+ (deps (source_tree cobaux))
+ (targets libcobaux.a dllcobaux.so)
+ (action
+ (no-infer
+  (progn
+   (run make -C cobaux
+             CPPFLAGS=-I%{env:GNUCOBOL_INCLUDE=/usr/local/include}
+             dllcobaux.so)
+   (copy cobaux/libcobaux.a libcobaux.a)
+   (copy cobaux/dllcobaux.so dllcobaux.so)))))
