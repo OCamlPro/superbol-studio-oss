@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
-(*  Copyright (c) 2022-2026 OCamlPro SAS                                  *)
+(*  Copyright (c) 2026 OCamlPro SAS                                       *)
 (*                                                                        *)
 (* All rights reserved.                                                   *)
 (* This source code is licensed under the GNU Affero General Public       *)
@@ -11,21 +11,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Platform.TYPES
+val expand_tabs: ?tab_stop:int -> ?starting_col:int -> string -> string
 
-let record =
-  {
-    verbosity = 0;
-    tab_stop = 8;
-    eprintf = Printf.eprintf;
-    error = Pretty.error;
-    read_file = (fun file -> Ez_file.V1.EzFile.read_file file);
-    mk_temp_dir = Tempdir.create;
-    remove_dir = (fun ?all dir -> Ez_file.V1.EzFile.remove_dir ?all dir);
-    autodetect_format = Heuristics.autodetect_format;
-    find_lib = Copybook_finder.find_lib;
-    getenv_opt = (fun variable -> Sys.getenv_opt variable);
-  }
+val from_channel_expanding_tabs:
+  ?with_positions:bool ->
+  ?tab_stop:int ->
+  in_channel ->
+  Lexing.lexbuf
 
-module Tempdir = Tempdir
-module Caching = Caching

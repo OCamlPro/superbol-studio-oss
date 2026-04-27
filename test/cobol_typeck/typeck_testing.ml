@@ -12,7 +12,7 @@
 (**************************************************************************)
 
 let show_diagnostics ?(show_data = false)
-    ?parser_options ?source_format ?filename contents =
+   ?parser_options ?source_format ?filename contents =
   Prog_typeck.typeck ?parser_options ?source_format ?filename contents |>
   Cobol_common.Diagnostics.show_n_forget ~set_status:false ~ppf:Fmt.stdout
     ~platform:Prog_common.platform |>

@@ -256,6 +256,10 @@ let make make_lexing ?filename ~source_format ~platform input =
 let from_string = make Lexing.from_string
 let from_channel = make Lexing.from_channel
 
+let from_channel_no_tabs ?filename ~source_format ~platform input =
+  make (Src_rewriting.from_channel_expanding_tabs ~tab_stop:platform.tab_stop)
+    ?filename ~source_format ~platform input
+
 let fill buff ~lookup_len (input: Src_input.t) =
   match input.source with
   | String str ->
@@ -283,9 +287,9 @@ let from ?source_format ~platform (input: Src_input.t) =
   let source_format = decide_on_source_format ~platform ?source_format input in
   match input with
   | { source = String contents; filename } ->
-      from_string ~source_format ~filename ~platform contents
+      from_string ~source_format ~filename ~platform (Src_rewriting.expand_tabs contents)
   | { source = Channel ic; filename } ->
-      from_channel ~source_format ~filename ~platform ic
+      from_channel_no_tabs ~source_format ~filename ~platform ic
 
 (* --- *)
 

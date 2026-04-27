@@ -42,6 +42,7 @@ module TYPES = struct
 
   type platform = {
     mutable verbosity : int ;
+    mutable tab_stop : int ;
 
     mutable eprintf :  'a. ('a, out_channel, unit) format -> 'a ;
     mutable error :  'a. ('a, Format.formatter, unit) format -> 'a ;
@@ -70,6 +71,7 @@ open TYPES
     [stdin] or [stdout]. *)
 let innocuous = {
   verbosity = 0;
+  tab_stop = 8;
   eprintf = Printf.eprintf;
   error = Pretty.error;
   read_file = begin fun file ->
@@ -92,10 +94,11 @@ let innocuous = {
   getenv_opt = (fun _variable -> None);
 }
 
-let copy ~dst ~src:{ verbosity; eprintf; error; read_file;
+let copy ~dst ~src:{ verbosity; tab_stop; eprintf; error; read_file;
                      mk_temp_dir; remove_dir;
                      autodetect_format; find_lib; getenv_opt }  =
   dst.verbosity <- verbosity;
+  dst.tab_stop <- tab_stop;
   dst.eprintf <- eprintf;
   dst.error <- error;
   dst.read_file <- read_file;
