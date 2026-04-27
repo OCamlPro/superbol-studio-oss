@@ -255,8 +255,9 @@ let make make_lexing ?filename ~source_format ~platform input =
 
 let from_string = make Lexing.from_string
 let from_channel = make Lexing.from_channel
-let from_channel_no_tabs ?(tab_stop=8) =
-    make (Src_rewriting.from_channel_expanding_tabs ~tab_stop)
+let from_channel_no_tabs ?filename ~source_format ~platform input =
+  make (Src_rewriting.from_channel_expanding_tabs ~tab_stop:platform.tab_stop)
+    ?filename ~source_format ~platform input
 
 
 let fill buff ~lookup_len (input: Src_input.t) =

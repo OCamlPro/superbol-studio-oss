@@ -16,6 +16,7 @@ open Cobol_common.Platform.TYPES
 let record =
   {
     verbosity = 0;
+    tab_stop = 8;
     eprintf = Printf.eprintf;
     error = Pretty.error;
     read_file = (fun file -> Ez_file.V1.EzFile.read_file file);

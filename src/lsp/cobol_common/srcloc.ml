@@ -363,8 +363,9 @@ let pp_file_loc ppf ((file, pos1, pos2): raw_loc) =
 
 (** Retrieve the character position of a column number in a line that was
       tab expanded *)
-let original_col_of_expanded ?(tab_stop = 8) ~platform ~fname ~line expanded_col =
+let original_col_of_expanded ~platform ~fname ~line expanded_col =
   try
+    let tab_stop = platform.tab_stop in
     let lines = retrieve_file_lines ~platform fname in
     let original_line = lines.(line - 1) in
     let n = String.length original_line in
@@ -433,9 +434,10 @@ let tab_underline_to_end ?(tab_stop = 8) ~lo line =
   Buffer.contents buf
 
 (** Note this should always end with a newline character *)
-let pp_raw_loc: ?tab_stop:int -> ?platform:platform -> raw_loc Pretty.printer =
+let pp_raw_loc: ?platform:platform -> raw_loc Pretty.printer =
   let b = lazy (Buffer.create 1000) in
-  let find_source ~tab_stop ~platform (file, pos1, pos2) =
+  let find_source ~platform (file, pos1, pos2) =
+    let tab_stop = platform.tab_stop in
     let line1 = fst pos1 in
     let line2 = fst pos2 in
     let col1 = snd pos1 in
@@ -469,12 +471,12 @@ let pp_raw_loc: ?tab_stop:int -> ?platform:platform -> raw_loc Pretty.printer =
     done;
     Buffer.contents b
   in
-  fun ?(tab_stop = 8) ?platform ppf raw_loc ->
+  fun ?platform ppf raw_loc ->
     let text =
       match platform with
       | None -> ""
       | Some platform ->
-          try find_source ~tab_stop ~platform raw_loc
+          try find_source ~platform raw_loc
           with Sys_error _ | Failure _ | Unix.Unix_error _ -> ""
     in
     Pretty.print ppf "%a:@\n@[@<0>%s@]" pp_file_loc raw_loc text
@@ -490,7 +492,7 @@ let to_raw_loc
             { pos_lnum = l2; pos_bol = b2; pos_cnum = c2; _ }) =
   pos_fname, (l1, c1 - b1), (l2, c2 - b2)
 
-let pp_srcloc_with_optional_caret: ?tab_stop:int -> ?platform:platform -> srcloc Pretty.printer =
+let pp_srcloc_with_optional_caret: ?platform:platform -> srcloc Pretty.printer =
   let pp_transform_operation ~partial ppf = function
     | `Cpy { filename; copyloc }
       when partial ->
@@ -529,15 +531,15 @@ let pp_srcloc_with_optional_caret: ?tab_stop:int -> ?platform:platform -> srcloc
         else List.cons (`Rpl replloc) acc
       end
   in
-  fun ?(tab_stop=8) ?platform ppf loc ->
+  fun ?platform ppf loc ->
     let toplevel_transforms, loc = toplevel_transform_stack loc in
     let lexloc = as_lexloc loc in
-    pp_raw_loc ~tab_stop ?platform ppf (to_raw_loc lexloc);
+    pp_raw_loc ?platform ppf (to_raw_loc lexloc);
     pp_transform_operations ~partial:false ppf toplevel_transforms;
     pp_transform_operations ~partial:true ppf (partial_transform_operations loc)
 
-let pp_srcloc_without_caret = pp_srcloc_with_optional_caret ?tab_stop:None ?platform:None
-let pp_srcloc ?tab_stop ~platform = pp_srcloc_with_optional_caret ?tab_stop ~platform
+let pp_srcloc_without_caret = pp_srcloc_with_optional_caret ?platform:None
+let pp_srcloc ~platform = pp_srcloc_with_optional_caret ~platform
 
 let pp_file_loc ppf loc =
   pp_file_loc ppf (to_raw_loc @@ as_lexloc loc)

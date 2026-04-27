@@ -41,9 +41,9 @@ end
 
 val pp_lexpos: Lexing.position Pretty.printer
 val pp_srcloc
-  : ?tab_stop:int -> platform:Platform.TYPES.platform -> srcloc Pretty.printer
+  : platform:Platform.TYPES.platform -> srcloc Pretty.printer
 val pp_srcloc_with_optional_caret
-  : ?tab_stop:int -> ?platform:Platform.TYPES.platform -> srcloc Pretty.printer
+  : ?platform:Platform.TYPES.platform -> srcloc Pretty.printer
 val pp_srcloc_without_caret
   : srcloc Pretty.printer
 val pp_srcloc_struct: srcloc Pretty.printer
@@ -106,8 +106,7 @@ val start_pos_in: filename: string -> srcloc -> Lexing.position
 val end_pos_in: filename: string -> srcloc -> Lexing.position
 
 val original_col_of_expanded
-  : ?tab_stop:int
-  -> platform:Platform.TYPES.platform
+  : platform:Platform.TYPES.platform
   -> fname:string
   -> line:int
   -> int
@@ -124,11 +123,10 @@ val sub : srcloc -> pos:int -> len:int -> srcloc
 val pp: 'a Pretty.printer -> 'a with_loc Pretty.printer
 val pp_with_loc: 'a Pretty.printer -> 'a with_loc Pretty.printer
 val pp_raw_loc
-  : ?tab_stop:int
-  -> ?platform:Platform.TYPES.platform
+  : ?platform:Platform.TYPES.platform
   -> (string * (int * int) * (int * int)) Pretty.printer
 val pp_raw_loc_without_caret
-  : ?tab_stop:int -> (string * (int * int) * (int * int)) Pretty.printer
+  : (string * (int * int) * (int * int)) Pretty.printer
 val flagit: 'a -> srcloc -> 'a with_loc
 val payload: 'a with_loc -> 'a
 val loc: 'a with_loc -> srcloc
