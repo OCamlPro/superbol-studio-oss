@@ -11,6 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** -- *)
+
 type 'k state
 
 val init_state: 'k Src_format.source_format -> 'k state
@@ -99,3 +101,4 @@ val unexpected
   -> ?severity: [`Error | `Warn]
   -> k: ('k state -> Lexing.lexbuf -> 'b)
   -> 'k state -> Lexing.lexbuf -> 'b
+

@@ -680,10 +680,10 @@ let ensure_sorted name ~filename cmp l =
   | Some (x, y) ->
       Pretty.error "@[<2>** Internal@ note:@ semantic@ tokens@ in@ %s@ are@ \
                     not@ sorted.@ Two@ offenders@ are:@]@\n%a%a@." name
-        Srcloc.pp_raw_loc_without_caret (filename,
+        (Srcloc.pp_raw_loc_without_caret) (filename,
                                          (x.line + 1, x.start),
                                          (x.line + 1, x.start + x.length))
-        Srcloc.pp_raw_loc_without_caret (filename,
+        (Srcloc.pp_raw_loc_without_caret) (filename,
                                          (y.line + 1, y.start),
                                          (y.line + 1, y.start + y.length));
       List.fast_sort cmp l
