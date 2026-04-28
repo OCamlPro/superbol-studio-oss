@@ -1208,6 +1208,12 @@ let%expect_test "chunk-by-chunk-incremental-small-5" =
 
 
     Cutting chunk 89/103 back @ 5:3-5:4 (" ")
+    prog.cob:5-7:prog.cob:5-33: Internal warning: unable to join locations via
+      limits in `Cobol_preproc__Src_overlay.join_limits`
+      [ctx=Cobol_parser__Grammar_utils-1]
+    prog.cob:4-7:prog.cob:5-33: Internal warning: unable to join locations via
+      limits in `Cobol_preproc__Src_overlay.join_limits`
+      [ctx=Cobol_parser__Grammar_utils-1]
     Parse-tree:
       PROGRAM-ID. prog.
 
@@ -1226,6 +1232,12 @@ let%expect_test "chunk-by-chunk-incremental-small-5" =
 
 
     Appending chunk 91/103 @ 5:5-5:7 ("  ")
+    prog.cob:5-7:prog.cob:5-33: Internal warning: unable to join locations via
+      limits in `Cobol_preproc__Src_overlay.join_limits`
+      [ctx=Cobol_parser__Grammar_utils-1]
+    prog.cob:4-7:prog.cob:5-33: Internal warning: unable to join locations via
+      limits in `Cobol_preproc__Src_overlay.join_limits`
+      [ctx=Cobol_parser__Grammar_utils-1]
     Parse-tree:
       PROGRAM-ID. prog.
 

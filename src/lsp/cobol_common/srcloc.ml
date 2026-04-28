@@ -364,46 +364,80 @@ let pp_file_loc ppf ((file, pos1, pos2): raw_loc) =
 (** Note this should always end with a newline character *)
 let pp_raw_loc: ?platform:platform -> raw_loc Pretty.printer =
   let b = lazy (Buffer.create 1000) in
+  let tab_width = 8 in
+  let expand_tabs line =
+    let buf = Buffer.create (String.length line + 16) in
+    let col = ref 0 in
+    String.iter (fun c ->
+      if c = '\t' then begin
+        let stop = tab_width - (!col mod tab_width) in
+        for _ = 1 to stop do Buffer.add_char buf ' ' done;
+        col := !col + stop
+      end else begin
+        Buffer.add_char buf c;
+        incr col
+      end
+    ) line;
+    Buffer.contents buf
+  in
+  (* col1: exclusive visual start, col2: inclusive visual end.
+     eol: extend underline to end of line with a trailing ^
+          (used for multiline-start and middle lines).
+     For single-line and multiline-end, eol=false and output is trimmed at col2. *)
+  let make_underline line col1 col2 eol =
+    let buf = Buffer.create (String.length line * 2 + 2) in
+    let vcol = ref 0 in
+    let len = String.length line in
+    for idx = 0 to len - 1 do
+      let c = line.[idx] in
+      if c = '\t' then begin
+        let ts = tab_width - (!vcol mod tab_width) in
+        for j = 0 to ts - 1 do
+          let v = !vcol + j in
+          if eol || v <= col2 then
+            Buffer.add_char buf (if v > col1 && v <= col2 then '^' else ' ')
+        done;
+        vcol := !vcol + ts
+      end else begin
+        if eol || !vcol <= col2 then
+          Buffer.add_char buf (if !vcol > col1 && !vcol <= col2 then '^' else ' ');
+        incr vcol
+      end
+    done;
+    if eol then
+      Buffer.add_char buf '^'
+    else if !vcol <= col2 then begin
+      (* col2 is past end of line: fill gap then place ^ *)
+      for v = !vcol to col2 - 1 do
+        Buffer.add_char buf (if v > col1 then '^' else ' ')
+      done;
+      Buffer.add_char buf '^'
+    end;
+    Buffer.contents buf
+  in
   let find_source ~platform (file, pos1, pos2) =
     let line1 = fst pos1 in
     let line2 = fst pos2 in
     let col1 = snd pos1 in
     let col2 = snd pos2 in
-    let col2, pad2 =
-      if line1 == line2 && col1 == col2 then succ col2, 1 else col2, 0 in
+    let col2 =
+      if line1 == line2 && col1 == col2 then succ col2 else col2 in
     let lines = retrieve_file_lines ~platform file in
     let b = Lazy.force b in
     Buffer.clear b;
     for l = max 1 (line1 - 3) to min (Array.length lines) (line2 + 2) do
       let line = lines.(l - 1) in
-      let len = String.length line in
       Printf.bprintf b "%4d %c %s\n" l
         (if l>=line1 && l<=line2 then '>' else ' ')
-        line;
+        (expand_tabs line);
       if l = line1 && l = line2 then
-        let str =
-          String.mapi
-            (fun idx c -> if idx > col1 && idx <= col2 then '^' else c)
-            (String.make (min (len + 1 + pad2) (col2 + 1)) ' ')
-        in
-        Printf.bprintf b "----  %s\n" str;
+        Printf.bprintf b "----  %s\n" (make_underline line col1 col2 false)
       else if l = line1 then
-        let str =
-          String.mapi
-            (fun idx c -> if idx > col1 then '^' else c)
-            (String.make (len + 1) ' ')
-        in
-        Printf.bprintf b "----  %s\n" str;
+        Printf.bprintf b "----  %s\n" (make_underline line col1 max_int true)
       else if l > line1 && l < line2 then
-        let str = String.make (len + 1) '^' in
-        Printf.bprintf b "----  %s\n" str;
+        Printf.bprintf b "----  %s\n" (make_underline line (-1) max_int true)
       else if l = line2 then
-        let str =
-          String.mapi
-            (fun idx c -> if idx <= col2 then '^' else c )
-            (String.make (min (len + 1 + pad2) (col2 + 1)) ' ')
-        in
-        Printf.bprintf b "----  %s\n" str;
+        Printf.bprintf b "----  %s\n" (make_underline line (-1) col2 false)
     done;
     Buffer.contents b
   in

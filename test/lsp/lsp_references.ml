@@ -538,3 +538,38 @@ let%expect_test "references-requests-procedure-using" =
     ----                     ^^^
        9             STOP RUN.
       10 |}]
+
+let%expect_test "reference-with-tabs" =
+  let { end_with_postproc; projdir }, server = make_lsp_project () in
+  print_references ~projdir server @@ extract_position_markers
+     "
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 _|1-res|_WS-RES PIC XXX.
+       01 WS-ORIG PIC X VALUE 8.
+       PROCEDURE DIVISION.
+       MAIN-PROC.
+       \t\tCOMPUTE WS-RES = WS-ORIG * 12.
+         STOP RUN.
+";
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    1-res (line 5, character 10):
+    __rootdir__/prog.cob:6.10-6.16:
+       3          PROGRAM-ID. prog.
+       4          DATA DIVISION.
+       5          WORKING-STORAGE SECTION.
+       6 >        01 WS-RES PIC XXX.
+    ----             ^^^^^^
+       7          01 WS-ORIG PIC X VALUE 8.
+       8          PROCEDURE DIVISION.
+    __rootdir__/prog.cob:10.24-10.30:
+       7          01 WS-ORIG PIC X VALUE 8.
+       8          PROCEDURE DIVISION.
+       9          MAIN-PROC.
+      10 >                 COMPUTE WS-RES = WS-ORIG * 12.
+    ----                           ^^^^^^
+      11            STOP RUN. |}]

@@ -202,7 +202,17 @@ let restart ?at ctx =
   WLnks.clear ctx.cache;
   match at with
   | Some right ->
-      clear_right_of @@ HLnks.find ctx.over_right_gap right
+      let next_left = HLnks.find ctx.over_right_gap right in
+      if Limit.equal next_left right then
+        (* Self-loop: adjacent tokens share the same adjusted pos_cnum (produced
+           by tab expansion or UTF-8 multi-byte chars).  The next token's
+           right_of entry is still valid — keep it.  Only clear from that
+           token's right limit onwards. *)
+        (match HLnks.find_opt ctx.right_of right with
+         | Some (_, next_right) -> clear_right_gap next_right
+         | None -> ())
+      else
+        clear_right_of next_left
   | None ->
       HLnks.clear  ctx.right_of;
       HLnks.clear  ctx.over_right_gap

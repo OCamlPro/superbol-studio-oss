@@ -2735,36 +2735,36 @@ Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7809:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7838:0
 syn_misc.at-7838-prog.cob:4.18-4.27:
    1   
-   2          CONTROL		DIVISION.
-   3          DEFAULT		SECTION.
+   2          CONTROL          DIVISION.
+   3          DEFAULT          SECTION.
    4 >            ACCEPT ALTERNATE CONSOLE
 ----                     ^^^^^^^^^
    5              DISPLAY IS TERMINAL
-   6   	   .
+   6              .
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7865:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7879:0
 syn_misc.at-7879-empty0.cob:5.18-5.27:
-   2          CONTROL		DIVISION.
-   3          SUBSTITUTION	SECTION.
-   4          DEFAULT		SECTION.
+   2          CONTROL          DIVISION.
+   3          SUBSTITUTION     SECTION.
+   4          DEFAULT          SECTION.
    5 >            ACCEPT ALTERNATE CONSOLE
 ----                     ^^^^^^^^^
-   6   	   .
+   6              .
    7          IDENTIFICATION   DIVISION.
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7898:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7922:0
 syn_misc.at-7922-prog.cob:8.18-8.27:
-   5   	           TERM BY TERMINAL
-   6   	           "KO" BY "OK".
-   7          DEFAULT		SECTION.
+   5                      TERM BY TERMINAL
+   6                      "KO" BY "OK".
+   7          DEFAULT          SECTION.
    8 >            ACCEPT ALTERNATE CONSOLE
 ----                     ^^^^^^^^^
    9              DISPLAY IISS TERM
-  10   	   .
+  10              .
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7955:0
