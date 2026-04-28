@@ -61,6 +61,7 @@
  (depends
    (ocaml (>= 4.14.0))
    (superbol-vscode-lib (= :version))
+   (superbol-debugger (= :version))
    (js_of_ocaml-ppx ( >= 4 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
@@ -224,6 +225,30 @@
   )
   (allow_empty)
 
+ )
+
+(package
+ (name superbol-debugger)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (vscode-js-stubs (= :version))
+   (vscode-debugprotocol (= :version))
+   (vscode-debugadapter (= :version))
+   (superbol-vscode-lib (= :version))
+   (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
+   (node-js-stubs (= :version))
+   (js_of_ocaml ( >= 4 ))
+   (js_of_ocaml-ppx ( >= 4 ))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
  )
 
 (package

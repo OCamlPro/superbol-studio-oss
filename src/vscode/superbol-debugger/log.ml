@@ -3,7 +3,7 @@
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
 (*                                                                        *)
-(*  Copyright (c) 2023 OCamlPro SAS                                       *)
+(*  Copyright (c) 2026 OCamlPro SAS                                       *)
 (*                                                                        *)
 (*  All rights reserved.                                                  *)
 (*  This source code is licensed under the MIT license found in the       *)
@@ -12,23 +12,33 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Promise.Syntax
+module Level = struct
+  type t = Debug | Info
+end
 
-let activate (extension: Vscode.ExtensionContext.t)
-  : (* Superbol_vscode_lib.Types.superbol_instance *)
-    Vscode_languageclient.LanguageClient.t option Promise.t =
-  let lsp_server_prefix = "superbol-free" in
-  let* instance = Superbol_vscode_lib.activate ~lsp_server_prefix extension in
-  let* () = Superbol_debugger.activate extension in
-  Promise.return (Superbol_vscode_lib.Instance.client instance)
+let level = ref Level.Info
 
-let deactivate () =
-  let* () = Superbol_debugger.deactivate () in
-  let* () = Superbol_vscode_lib.deactivate () in
-  Promise.return ()
+let setLevel l =
+  level := l
 
-(* see {{:https://code.visualstudio.com/api/references/vscode-api#Extension}
-   activate() *)
-let () =
-  Js_of_ocaml.Js.(export "activate" (wrap_callback activate));
-  Js_of_ocaml.Js.(export "deactivate" (wrap_callback deactivate))
+let channel = Vscode.Window.createOutputChannel ~name:"SuperBOL Debugger"
+
+let emit msg =
+  let value = String.concat "" msg in
+  let value =
+    if String.ends_with ~suffix:"\n" value then
+      String.sub value 0 (String.length value - 1)
+    else
+      value
+  in
+  Vscode.OutputChannel.appendLine channel ~value
+
+let info = emit
+
+let debug msg =
+  if !level = Level.Debug then
+    emit msg
+
+let error msg =
+  emit msg;
+  Vscode.OutputChannel.show channel ()

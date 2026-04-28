@@ -223,6 +223,11 @@ a56c08535ff344da81fab8d806e214f7:opam/node-js-stubs.opam
 77972b34451219fa2c66ee856a6ca4e7:opam/sql_preproc.opam
 # end context for opam/sql_preproc.opam
 
+# begin context for opam/superbol-debugger.opam
+# file opam/superbol-debugger.opam
+e509fdedd637f767bde5bef70343d2d9:opam/superbol-debugger.opam
+# end context for opam/superbol-debugger.opam
+
 # begin context for opam/superbol-free.opam
 # file opam/superbol-free.opam
 8cebd1bc1fbc9864089c785462c45d40:opam/superbol-free.opam
@@ -807,6 +812,16 @@ a5027007a5ed5a4b90598fcde0e6fc1b:src/vendor/vscode-ocaml-platform/src-bindings/v
 # file src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/version.mlt
 a5027007a5ed5a4b90598fcde0e6fc1b:src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/version.mlt
 # end context for src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/version.mlt
+
+# begin context for src/vscode/superbol-debugger/dune
+# file src/vscode/superbol-debugger/dune
+4041ac3af31192f839f94e55924e7fbe:src/vscode/superbol-debugger/dune
+# end context for src/vscode/superbol-debugger/dune
+
+# begin context for src/vscode/superbol-debugger/version.mlt
+# file src/vscode/superbol-debugger/version.mlt
+a5027007a5ed5a4b90598fcde0e6fc1b:src/vscode/superbol-debugger/version.mlt
+# end context for src/vscode/superbol-debugger/version.mlt
 
 # begin context for src/vscode/superbol-vscode-lib/dune
 # file src/vscode/superbol-vscode-lib/dune
