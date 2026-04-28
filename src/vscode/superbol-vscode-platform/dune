@@ -2,7 +2,7 @@
 
 (executable
   (name superbol_vscode_platform)
-  (libraries superbol-vscode-lib )
+  (libraries superbol-vscode-lib superbol-debugger )
   (modes js)
   (preprocess (pps gen_js_api.ppx))
    (js_of_ocaml (flags --disable=genprim))
