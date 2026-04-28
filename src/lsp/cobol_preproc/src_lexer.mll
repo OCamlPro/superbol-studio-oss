@@ -176,17 +176,17 @@
 
 let newline = '\r'* '\n'
 let nnl = _ # ['\r' '\n']                             (* anything but newline *)
-let sna = nnl nnl nnl nnl nnl nnl              (* 6 chars; TODO: exclude tabs *)
-let spaces = ([' ' '\t']*)
-let    blank        = [' ' '\009' '\r']
-let nonblank        = nnl # blank
-let    blanks       =(blank+ | '\t')
-let    blank_area_A = blank blank blank blanks | '\t'
+let nnl_no_tabs = nnl # [ '\t' ]
+let sna = nnl_no_tabs nnl_no_tabs nnl_no_tabs nnl_no_tabs nnl_no_tabs nnl_no_tabs              (* 6 chars; TODO: exclude tabs *)
+let spaces = ' '*
+let    blank        = [' ' '\r']
+let nonblank        = (nnl # blank) # [ '\t' ]
+let    blanks       = blank+
+let    blank_area_A = blank blank blank blanks
 let nonblank_area_A =(nonblank nnl nnl nnl |
                       blank nonblank nnl nnl |
                       blank blank nonblank nnl |
                       blank blank blank nonblank)
-let nonblank = nonblank # ['\t']    (* now, also exclude tab from blank chars *)
 let separator = [ ',' ';' ]
 let epsilon = ""
 let letter = [ 'a'-'z' 'A'-'Z' ]                      (* TODO: '\128'-'\255'? *)
@@ -257,7 +257,7 @@ rule fixed_line state
       }
   | '\t'
       {
-        fixed_nominal_line (Src_lexing.flush_continued state) lexbuf
+        Src_lexing.tab ~sna:fixed_indicator ~k:fixed_nominal_line state lexbuf
       }
   | (nnl* newline)                                  (* blank line (too short) *)
       {
@@ -269,9 +269,13 @@ rule fixed_line state
       }
 and fixed_indicator state
   = parse
-  | ' ' | '\t' (* second tab *)                                    (* nominal *)
+  | ' '
       {
         fixed_nominal_line (Src_lexing.flush_continued state) lexbuf
+      }
+  | '\t'
+      {
+        Src_lexing.tab ~k:fixed_nominal_line state lexbuf
       }
   | '-'                                                  (* continuation line *)
       {
@@ -360,9 +364,13 @@ and xopen_or_crt_or_acutrm_followup state
       }
 and cobolx_line state                                 (* COBOLX format (GCOS) *)
   = parse
-  | [' ' '\t']                                                     (* nominal *)
+  | ' '                                                     (* nominal *)
       {
         fixed_nominal_line (Src_lexing.flush_continued state) lexbuf
+      }
+  | '\t'
+      {
+        Src_lexing.tab ~k:fixed_nominal_line state lexbuf
       }
   | '-'                                                  (* continuation line *)
       {
@@ -404,6 +412,10 @@ and fixed_debug_line state
       }
 and fixed_nominal_line state
   = parse
+  | '\t'
+    {
+      Src_lexing.tab ~k:fixed_nominal_line state lexbuf
+    }
   | blanks
       {
         fixed_nominal_line state lexbuf
@@ -427,6 +439,10 @@ and fixed_nominal_line state
       }
 and fixed_nominal state
   = parse
+  | '\t'
+      {
+        Src_lexing.tab ~k:fixed_nominal state lexbuf
+      }
   | blanks
       {
         fixed_nominal state lexbuf
@@ -472,6 +488,10 @@ and fixed_cdir_line marker state          (* `>>`-prefixed compiler directive *)
       }
 and fixed_mf_cdir_line marker state   (* Micro-focus compiler directive (`$`) *)
   = parse
+  | '\t'
+    {
+      Src_lexing.tab ~k:(fixed_mf_cdir_line marker) state lexbuf
+    }
   | blanks? cdir_word_suffix
       {
         Src_lexing.cdir_word ~ktkd:gobble_line ~knom:fixed_nominal
@@ -494,6 +514,10 @@ and maybe_fixed_cdir_line c state (* we just read [c='>'] in indicator column *)
       }
 and fixed_continue_line state
   = parse
+  | '\t'
+    {
+      Src_lexing.tab ~k:fixed_continue_line state lexbuf
+    }
   | blank*
       {
         (* Special rule for double-quoted alphanum continuation and continuation
@@ -593,9 +617,13 @@ and fixed_continue_quoted_ebcdics state
 
 and free_line state
   = parse
-  | blanks | '\t'
+  | blanks
       {
         free_line state lexbuf
+      }
+  | '\t'
+      {
+        Src_lexing.tab ~k:free_line state lexbuf
       }
   | (cdir_word | mf_cdir_word)
       {
@@ -621,6 +649,10 @@ and free_nominal state
   | blanks
       {
         free_nominal state lexbuf
+      }
+  | '\t'
+      {
+        Src_lexing.tab ~k:free_nominal state lexbuf
       }
   | (separator as char) (blanks*)
       {

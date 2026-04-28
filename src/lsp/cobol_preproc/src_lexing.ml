@@ -67,6 +67,7 @@ and 'k config =
   {
     debug: bool;
     source_format: 'k source_format;
+    tab_stop: int;
   }
 
 let position_encoding_in_bytes = false
@@ -87,6 +88,7 @@ let init_state source_format : _ state =
       {
         debug = false;
         source_format;
+        tab_stop = 8;
       }
   }
 
@@ -356,6 +358,20 @@ let flush_continued ?(force = false) state = match state.continued with
       (* Missing continuation error is delayed until the final tokenization
          stage to account for quotes in comment paragraphs. *)
       emit (AlphanumPrefix { knd; qte; str } &@ loc) (reset_cont state)
+
+let tab ?sna ~k ({ config = { tab_stop; _}; _} as state) lexbuf =
+  let _, start_pos, _ = lexeme_info lexbuf in
+  let byte_col = start_pos.pos_cnum - start_pos.pos_bol in
+  let visual_col = byte_col + 1 - state.current_cpos_shift in    (* 1-indexed *)
+  let tab_len = ((visual_col - 1) mod tab_stop) + 1 - tab_stop in
+  let state =
+    { state with current_cpos_shift = state.current_cpos_shift + tab_len }
+  in
+  if visual_col <= 6 && Option.is_some sna then
+    (Option.value ~default:k sna) state lexbuf
+  else
+    k (flush_continued state) lexbuf
+
 
 let eof state lexbuf =
   let _, start_pos, end_pos = lexeme_info lexbuf in

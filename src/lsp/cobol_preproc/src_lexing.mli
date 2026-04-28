@@ -27,6 +27,11 @@ val flush_continued: ?force:bool -> 'a state -> 'a state
 val eof: 'a state -> Lexing.lexbuf -> 'a state
 val new_line: 'a state -> Lexing.lexbuf -> 'a state * Text.text
 val skip: 'a state -> Lexing.lexbuf -> 'a state
+val tab
+  : ?sna:('s -> Lexing.lexbuf -> 'b)
+  -> k:('s -> Lexing.lexbuf -> 'b)
+  -> ('a state as 's)
+  -> Lexing.lexbuf -> 'b
 
 val comment
   : ?marker:string
