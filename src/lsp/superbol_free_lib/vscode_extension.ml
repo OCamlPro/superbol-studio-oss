@@ -123,8 +123,6 @@ let contributes =
       Manifest.debugger "superbol-gdb"
         ~label: "SuperBOL Debugger for GnuCOBOL"
         ~languages: ["cobol"; "COBOL"]
-        ~program: "./_dist/superbol-vscode-gdb.js"
-        ~runtime: "node"
         ~configurationAttributes:
           (Manifest.any {| {
                 "launch": {
@@ -278,6 +276,21 @@ let contributes =
                                 }
                         } |};
           Manifest.any {| {
+                                "label": "SuperBOL: debug (launch module)",
+                                "description": "New SuperBOL launch module request",
+                                "body": {
+                                        "name": "${2:SuperBOL: debug (launch module)}",
+                                        "type": "superbol-gdb",
+                                        "request": "launch",
+                                        "preLaunchTask": "SuperBOL: build (module debug)",
+                                        "target": "$${_:{file}}",
+                                        "arguments": "",
+                                        "cwd": "$${_:{workspaceFolder}}",
+                                        "useCobcrun": true,
+                                        "gdbtty": true
+                                }
+                        } |};
+          Manifest.any {| {
                                 "label": "SuperBOL: debug (attach local)",
                                 "description": "Attach to a local debug session",
                                 "body": {
@@ -290,6 +303,19 @@ let contributes =
                                 }
                         } |};
           Manifest.any {| {
+                                "label": "SuperBOL: debug (attach local module)",
+                                "description": "Attach to a local debug session (module)",
+                                "body": {
+                                        "name": "${2:SuperBOL: debug (attach local module)}",
+                                        "type": "superbol-gdb",
+                                        "request": "attach",
+                                        "pid": "${3:0}",
+                                        "target": "$${_:{file}}",
+                                        "cwd": "$${_:{workspaceFolder}}",
+                                        "useCobcrun": true
+                                }
+                        } |};
+          Manifest.any {| {
                                 "label": "SuperBOL: debug (attach remote)",
                                 "description": "Attach to a remote debug session",
                                 "body": {
@@ -299,6 +325,19 @@ let contributes =
                                         "remoteDebugger": "${3:host:port}",
                                         "target": "$${_:{file}}",
                                         "cwd": "$${_:{workspaceFolder}}"
+                                }
+                        } |};
+          Manifest.any {| {
+                                "label": "SuperBOL: debug (attach remote module)",
+                                "description": "Attach to a remote debug session (module)",
+                                "body": {
+                                        "name": "${2:SuperBOL: debug (attach remote module)}",
+                                        "type": "superbol-gdb",
+                                        "request": "attach",
+                                        "remoteDebugger": "${3:host:port}",
+                                        "target": "$${_:{file}}",
+                                        "cwd": "$${_:{workspaceFolder}}",
+                                        "useCobcrun": true
                                 }
                         } |};
         ]
