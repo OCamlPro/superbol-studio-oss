@@ -18,5 +18,5 @@ let pp_libcob_call ppf = function
       Fmt.pf ppf "initialization@ of@ module@ %S" module_name
 
 let pp_error ppf = function
-  | Nonzero_status { during_call; status } ->
-      Fmt.pf ppf "%a@ returned@ status@ code@ %nd" pp_libcob_call during_call status
+  | Nonzero_status { call; status } ->
+      Fmt.pf ppf "%a@ returned@ status@ code@ %nd" pp_libcob_call call status
