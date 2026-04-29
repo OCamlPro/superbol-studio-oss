@@ -5,10 +5,6 @@
  (modules Test)
  (libraries ez-cob ctypes))
 
-(alias
- (name buildtest)
- (deps test.exe))
-
 (rule
  (action (with-stdin-from test.input
          (with-stdout-to test.output
@@ -16,5 +12,6 @@
 
 (rule
  (alias runtest)
+ (enabled_if %{env:TEST_LIBCOB_CTYPES=false})       ; <- /!\ disabled by default
  (action
   (diff test.expected test.output)))
