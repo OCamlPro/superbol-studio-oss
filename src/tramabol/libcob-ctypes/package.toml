@@ -92,8 +92,8 @@ dune-stanzas = """
   (generated_types Libcob_types_generated)
   (generated_entry_point V1))
 """
-opam-trailer = """
-depexts: [
-  ["libcob5-dev"] {os-family = "debian" | os-family = "ubuntu"}
-]
-"""
+# opam-trailer = """
+# depexts: [
+#   ["libcob5-dev"] {os-family = "debian" | os-family = "ubuntu"}
+# ]
+# """
