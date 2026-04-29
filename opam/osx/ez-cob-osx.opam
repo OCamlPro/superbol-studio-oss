@@ -4,7 +4,7 @@ opam-version: "2.0"
 name: "ez-cob"
 version: "0.3.1"
 license: "MIT"
-synopsis: "SuperBOL Studio OSS Project"
+synopsis: "Tiny abstraction layer on top of `libcob-ctypes`"
 description: "SuperBOL Studio OSS is a new platform for COBOL"
 authors: [
   "Nicolas Berthier <nicolas.berthier@ocamlpro.com>"

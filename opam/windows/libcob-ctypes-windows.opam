@@ -4,7 +4,7 @@ opam-version: "2.0"
 name: "libcob-ctypes"
 version: "0.3.1"
 license: "MIT"
-synopsis: "SuperBOL Studio OSS Project"
+synopsis: "`ctypes`-based bindings against `libcob`"
 description: "SuperBOL Studio OSS is a new platform for COBOL"
 authors: [
   "Nicolas Berthier <nicolas.berthier@ocamlpro.com>"
@@ -56,3 +56,6 @@ depends: [
   "dune" {>= "3.17.0" & < "3.19.0"}
 ]
 # Content of `opam-trailer` field:
+depexts: [
+  ["libcob5-dev"] {os-family = "debian" | os-family = "ubuntu"}
+]
