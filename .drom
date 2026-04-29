@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-7a0843994c03acc71a2414e4fa521d82:.
+3256daf741ff9d5e2ff21d16b48d062d:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -50,7 +50,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-43623739bb71ac88600ccc9f1fc2f033:dune-project
+7eeca9cf98c250728918956808e34a93:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_cfg.opam
@@ -120,7 +120,7 @@ c83776956f173548488df18f239157e6:opam/cobol_preproc.opam
 
 # begin context for opam/ez-cob.opam
 # file opam/ez-cob.opam
-23466bbc74f5f1bb306a0fb824d92d34:opam/ez-cob.opam
+4a08812966d0e06a15bba5d63d39c832:opam/ez-cob.opam
 # end context for opam/ez-cob.opam
 
 # begin context for opam/ez_toml.opam
@@ -140,7 +140,7 @@ f9717c572cb4a2cb42f05975f13e1c53:opam/interop-js-stubs.opam
 
 # begin context for opam/libcob-ctypes.opam
 # file opam/libcob-ctypes.opam
-813e9c6bbcdaa9a7376bce6d2bf45135:opam/libcob-ctypes.opam
+9183775c93872a2f2cd4bc016f74023f:opam/libcob-ctypes.opam
 # end context for opam/libcob-ctypes.opam
 
 # begin context for opam/node-js-stubs.opam

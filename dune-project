@@ -750,7 +750,7 @@
 
 (package
  (name libcob-ctypes)
- (synopsis "SuperBOL Studio OSS Project")
+ (synopsis "`ctypes`-based bindings against `libcob`")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
   (sites
@@ -767,7 +767,7 @@
 
 (package
  (name ez-cob)
- (synopsis "SuperBOL Studio OSS Project")
+ (synopsis "Tiny abstraction layer on top of `libcob-ctypes`")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
   (sites

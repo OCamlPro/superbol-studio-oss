@@ -7,7 +7,7 @@ skeleton = "library"
 # version = "0.1.0"
 
 # synopsis if different from project synopsis
-# synopsis = ...
+synopsis = "Tiny abstraction layer on top of `libcob-ctypes`"
 
 # description if different from project description
 # description = ...
