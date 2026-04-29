@@ -11,11 +11,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module V1 = struct
-  module Types = Types
-  module Printer = Printer
-  module Module = Module
-  module Field = Field
-  module Termio = Termio
-  module Numeric = Numeric
-end
+include Libcob_ctypes.V1.Numeric
+
+open Libcob_ctypes.V1.Types
+
+let add ?(number_store_flags = Number_store_flags.none) a b =
+  add a b number_store_flags
+
+let sub ?(number_store_flags = Number_store_flags.none) a b =
+  sub a b number_store_flags
