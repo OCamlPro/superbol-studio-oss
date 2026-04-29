@@ -72,6 +72,7 @@ ctypes = "0.24"
 [fields]
 dune-stanzas = """
  (foreign_archives ../cobaux)
+ (enabled_if %{env:HAVE_LIBCOB5=true})              ; <- /!\\ enabled by default
  (ctypes
   (external_library_name libcob)
   (build_flags_resolver
