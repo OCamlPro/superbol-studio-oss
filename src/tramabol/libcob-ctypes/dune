@@ -23,21 +23,11 @@
                      ; "-lcob -lgmp -lreadline -lxml2 -lcjson -lncursesw -ltinfo -lpanelw"
                      :standard)))
   (headers (include "libcob.h"))
-  (type_description
-   (instance Types)
-   (functor Libcob_types))
-  (function_description
-   (concurrency unlocked)
-   (instance Module)
-   (functor Libcob_module))
-  (function_description
-   (concurrency unlocked)
-   (instance Field)
-   (functor Libcob_field))
-  (function_description
-   (concurrency unlocked)
-   (instance Termio)
-   (functor Libcob_termio))
+  (type_description (instance Types) (functor Libcob_types))
+  (function_description (concurrency unlocked) (instance Module) (functor Libcob_module))
+  (function_description (concurrency unlocked) (instance Field) (functor Libcob_field))
+  (function_description (concurrency unlocked) (instance Termio) (functor Libcob_termio))
+  (function_description (concurrency unlocked) (instance Numeric) (functor Libcob_numeric))
   (generated_types Libcob_types_generated)
   (generated_entry_point V1))
 
