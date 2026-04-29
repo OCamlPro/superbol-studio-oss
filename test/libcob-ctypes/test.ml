@@ -44,5 +44,12 @@ let () =
   COB.Field.move foo bax;
   COB.Termio.display ~newline:true [|bax; foo|] ;
 
+  Bigarray.Array1.fill memory '1';
+  COB.Termio.display ~newline:true [|bar|] ;
+  COB.Numeric.add bar bar;
+  COB.Termio.display ~newline:true [|bar|] ;
+  COB.Numeric.sub bar bar;
+  COB.Termio.display ~newline:true [|bar|] ;
+
   COB.Module.leave cob_module
 ;;

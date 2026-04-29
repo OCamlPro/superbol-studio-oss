@@ -40,6 +40,8 @@ let alphanum_attrs ~byte_size : cob_field_attrs ptr =
   addr attrs
 
 let numeric_attrs ~digits ~scale : cob_field_attrs ptr =
+  (* Note: picture string seems optional for some field types (in which case we
+     could assign `pic` with `(from_voidp cob_pic_symbol null)`) *)
   let pic_symbols = alloc_pic_symbols 1 in
   Ctypes.setf (CArray.get pic_symbols 0) Pic_symbol.symbol '9';
   Ctypes.setf (CArray.get pic_symbols 0) Pic_symbol.times_repeated digits;
