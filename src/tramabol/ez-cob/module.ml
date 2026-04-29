@@ -20,5 +20,5 @@ let init ~name ~source =
   let module_ptr = Utils.nullptr cob_module in
   let globals_ptr = Utils.nullptr cob_global in
   let status = Libcob_ctypes.V1.Module.init module_ptr globals_ptr name source in
-  Utils.check_status status ~during_call:(Module_init { module_name = name });
+  Utils.check_status status ~call:(Module_init { module_name = name });
   !@module_ptr, !@globals_ptr
