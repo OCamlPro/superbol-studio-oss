@@ -17,6 +17,6 @@ open Ctypes
 let nullptr typ =
   allocate (ptr typ) (from_voidp typ null)
 
-let check_status ~during_call status =
+let check_status ~call status =
   if status <> 0n then
-    raise @@ Error (Nonzero_status { during_call; status })
+    raise @@ Error (Nonzero_status { call; status })

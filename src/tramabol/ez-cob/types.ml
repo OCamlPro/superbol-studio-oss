@@ -14,7 +14,7 @@
 include Libcob_ctypes.V1.Types
 
 type error =
-  | Nonzero_status of { during_call: libcob_call; status: nativeint }
+  | Nonzero_status of { call: libcob_call; status: nativeint }
 
 and libcob_call =
   | Module_init of { module_name: string }
