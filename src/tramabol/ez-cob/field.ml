@@ -32,7 +32,7 @@ let alphanum_attrs ~byte_size : cob_field_attrs ptr =
   Ctypes.setf (CArray.get pic_symbols 0) Pic_symbol.symbol 'X';
   Ctypes.setf (CArray.get pic_symbols 0) Pic_symbol.times_repeated byte_size;
   let attrs = Ctypes.make cob_field_attrs in
-  Ctypes.setf attrs Field_attrs.type_ Field_type.alphanum;
+  Ctypes.setf attrs Field_attrs.type_ ALPHANUMERIC;
   Ctypes.setf attrs Field_attrs.digits UShort.zero;
   Ctypes.setf attrs Field_attrs.scale 0;
   Ctypes.setf attrs Field_attrs.flags Field_flags.none;
@@ -44,7 +44,7 @@ let numeric_attrs ~digits ~scale : cob_field_attrs ptr =
   Ctypes.setf (CArray.get pic_symbols 0) Pic_symbol.symbol '9';
   Ctypes.setf (CArray.get pic_symbols 0) Pic_symbol.times_repeated digits;
   let attrs = Ctypes.make cob_field_attrs in
-  Ctypes.setf attrs Field_attrs.type_ Field_type.numeric;
+  Ctypes.setf attrs Field_attrs.type_ NUMERIC;
   Ctypes.setf attrs Field_attrs.digits (UShort.of_int digits);
   Ctypes.setf attrs Field_attrs.scale scale;
   Ctypes.setf attrs Field_attrs.flags Field_flags.none;
