@@ -5,22 +5,22 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-a1443fc796f29694900cf6b50a70f37a:.
+dcf123371f2e189df65575bf2edde21b:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-dda7214157d4a865566df7d86d72be4b:.github/workflows/workflow.yml
+d703a6755baa4f37322e78ce9e5260ec:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
 # file .gitignore
-1ac4166aab2c29244a36f9ec1709c44b:.gitignore
+9d96794389778c361c613581836e76bb:.gitignore
 # end context for .gitignore
 
 # begin context for Makefile
 # file Makefile
-4e0f08e8db8fd8afc912d7a08cbe65d1:Makefile
+68dca0ec63b773ef92d3184821b36a7e:Makefile
 # end context for Makefile
 
 # begin context for docs/README.txt
@@ -50,7 +50,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-0f3612c70de571529566bb7752a9b72b:dune-project
+7eeca9cf98c250728918956808e34a93:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_cfg.opam
@@ -118,6 +118,11 @@ c83776956f173548488df18f239157e6:opam/cobol_preproc.opam
 77f07ce4f7598ccb8b1c4503a870e4ca:opam/ebcdic_lib.opam
 # end context for opam/ebcdic_lib.opam
 
+# begin context for opam/ez-cob.opam
+# file opam/ez-cob.opam
+4a08812966d0e06a15bba5d63d39c832:opam/ez-cob.opam
+# end context for opam/ez-cob.opam
+
 # begin context for opam/ez_toml.opam
 # file opam/ez_toml.opam
 20c1fc4d1d465ac583c03d3ead4c343e:opam/ez_toml.opam
@@ -132,6 +137,11 @@ c83776956f173548488df18f239157e6:opam/cobol_preproc.opam
 # file opam/interop-js-stubs.opam
 f9717c572cb4a2cb42f05975f13e1c53:opam/interop-js-stubs.opam
 # end context for opam/interop-js-stubs.opam
+
+# begin context for opam/libcob-ctypes.opam
+# file opam/libcob-ctypes.opam
+9183775c93872a2f2cd4bc016f74023f:opam/libcob-ctypes.opam
+# end context for opam/libcob-ctypes.opam
 
 # begin context for opam/node-js-stubs.opam
 # file opam/node-js-stubs.opam
@@ -507,6 +517,26 @@ a5027007a5ed5a4b90598fcde0e6fc1b:src/lsp/superbol_preprocs/version.mlt
 # file src/lsp/superbol_project/version.mlt
 a5027007a5ed5a4b90598fcde0e6fc1b:src/lsp/superbol_project/version.mlt
 # end context for src/lsp/superbol_project/version.mlt
+
+# begin context for src/tramabol/ez-cob/dune
+# file src/tramabol/ez-cob/dune
+2dfad19f1ba5d34efacda790832e45e6:src/tramabol/ez-cob/dune
+# end context for src/tramabol/ez-cob/dune
+
+# begin context for src/tramabol/ez-cob/index.mld
+# file src/tramabol/ez-cob/index.mld
+48557dcdb6ddfb03539033d08fba423a:src/tramabol/ez-cob/index.mld
+# end context for src/tramabol/ez-cob/index.mld
+
+# begin context for src/tramabol/libcob-ctypes/dune
+# file src/tramabol/libcob-ctypes/dune
+fd981e4a757fd71f710ae2b15f069f88:src/tramabol/libcob-ctypes/dune
+# end context for src/tramabol/libcob-ctypes/dune
+
+# begin context for src/tramabol/libcob-ctypes/index.mld
+# file src/tramabol/libcob-ctypes/index.mld
+4cff0c64e03a5eae49c410b3f1a7c927:src/tramabol/libcob-ctypes/index.mld
+# end context for src/tramabol/libcob-ctypes/index.mld
 
 # begin context for src/vendor/ez_toml/dune
 # file src/vendor/ez_toml/dune

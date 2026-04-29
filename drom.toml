@@ -71,6 +71,10 @@ universal = { ocaml-flags = "-w -32-67-69" }
 #  dot-gitignore-trailer = "..."
 [fields]
 dune = "3.17.0"
+dune-project-trailer = """
+; used for auto-generated/checked libcob bindings
+(using ctypes 0.3)
+"""
 dot-gitignore-trailer = """
 # Edit drom.toml to change the following lines
 /superbol-free-*
@@ -94,6 +98,21 @@ github-workflow-before-opam = """
       - run: git submodule init
 
       - run: git submodule update
+
+      - name: Build and install GnuCOBOL 4.x
+        run: |
+          sudo apt-get install -y autoconf automake flex bison help2man texinfo wget libgmp-dev libdb-dev
+          bash scripts/install-gc4.sh import/gnucobol4 /opt/gnucobol-4.x
+          echo 'LD_LIBRARY_PATH=/opt/gnucobol-4.x/lib:"$LD_LIBRARY_PATH"' >> $GITHUB_ENV
+          echo 'GNUCOBOL_INCLUDE=/opt/gnucobol-4.x/include' >> $GITHUB_ENV
+          echo 'GNUCOBOL_LIBDIR=/opt/gnucobol-4.x/lib' >> $GITHUB_ENV
+          echo 'HAVE_LIBCOB5=true' >> $GITHUB_ENV
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+
+      - name: Skip build and install of GnuCOBOL 4.x
+        run: |
+          echo 'HAVE_LIBCOB5=false' >> $GITHUB_ENV
+        if: ${{ matrix.os != 'ubuntu-latest' }}
 """
 
 github-workflow-before-build = """
@@ -282,3 +301,9 @@ dir = "src/lsp/sql_parser"
 
 [[package]]
 dir = "src/lsp/cobol_cfg"
+
+[[package]]
+dir = "src/tramabol/libcob-ctypes"
+
+[[package]]
+dir = "src/tramabol/ez-cob"

@@ -1,0 +1,19 @@
+; if you modify this file, add 'test' to the 'skip' field in drom.toml
+
+(executable
+ (name test)
+ (modules Test)
+ (libraries ez-cob ctypes))
+
+(rule
+ (action (with-stdin-from test.input
+         (with-stdout-to test.output
+         (run %{exe:test.exe})))))
+
+; Note: add `export HAVE_LIBCOB5 := false` to `Makefile.config`
+; to disable this test and build of its dependencies.
+(rule
+ (alias runtest)
+ (enabled_if %{env:HAVE_LIBCOB5=true})               ; <- /!\ enabled by default
+ (action
+  (diff test.expected test.output)))
