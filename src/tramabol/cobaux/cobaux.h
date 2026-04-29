@@ -15,6 +15,7 @@
 #define __COBAUX_H__
 
 #include "libcob.h"
+#include "cobaux_typing_helper.h"
 
 /* cobaux_module.c */
 
