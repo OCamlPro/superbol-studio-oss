@@ -51,12 +51,14 @@ opam-cross:
 	rm -f opam/osx/*-js-*.opam
 	rm -f opam/osx/vscode-debug*.opam
 	rm -f opam/osx/*-vscode-*.opam
+	rm -f opam/osx/*-idl-*.opam
 	sed -i '/"superbol-vscode-platform-osx"/ d'		\
 		opam/osx/superbol-studio-oss-osx.opam
 	opam exec -- drom dep --cross windows
 	rm -f opam/windows/*-js-*.opam
 	rm -f opam/windows/vscode-debug*.opam
 	rm -f opam/windows/*-vscode-*.opam
+	rm -f opam/windows/*-idl-*.opam
 	sed -i '/"superbol-vscode-platform-windows"/ d'		\
 		opam/windows/superbol-studio-oss-windows.opam
 

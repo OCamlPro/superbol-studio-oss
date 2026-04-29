@@ -1,0 +1,56 @@
+/**************************************************************************/
+/*                                                                        */
+/*                        SuperBOL OSS Studio                             */
+/*                                                                        */
+/*  Copyright (c) 2022-2026 OCamlPro SAS                                  */
+/*                                                                        */
+/* All rights reserved.                                                   */
+/* This source code is licensed under the GNU Affero General Public       */
+/* License version 3 found in the LICENSE.md file in the root directory   */
+/* of this source tree.                                                   */
+/*                                                                        */
+/**************************************************************************/
+
+quote(c, "\n\
+#include \"cobaux_caml.h\"\n\
+")
+
+typedef [abstract] struct __cob_module* cob_module_ref;
+typedef [abstract] struct __cob_global* cob_global_ref;
+
+typedef [errorcode,errorcheck(camlidl_check_cob_status)] int cob_status;
+
+// ---
+
+[mlname(global_init)]
+void
+cob_init(const int argc,
+	 [size_is(argc),string*] char ** argv);
+
+[mlname(init)]
+cob_status
+cobaux_module_init ([out] cob_module_ref *module_ptr,
+		    [out] cob_global_ref *globals_ptr,
+		    [in,string] const char * const module_name,
+		    [in,string] const char * const module_source)
+quote(call,"{\n								\
+  *module_ptr = NULL;\n							\
+  *globals_ptr = NULL;\n						\
+  _res = cobaux_module_init (module_ptr, globals_ptr, module_name,	\
+                             module_source);\n				\
+  }");
+quote(mli, "\
+  val init: name:string -> source:string ->		\
+            cob_module_ref * cob_global_ref	\
+")
+quote(ml, "\
+  let init ~name ~source = init name source	\
+")
+
+[mlname(enter)]
+void
+cobaux_module_enter (cob_module_ref const module);
+
+[mlname(leave)]
+void
+cob_module_leave (cob_module_ref module);

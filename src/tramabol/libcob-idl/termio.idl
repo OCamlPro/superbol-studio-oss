@@ -1,0 +1,37 @@
+/**************************************************************************/
+/*                                                                        */
+/*                        SuperBOL OSS Studio                             */
+/*                                                                        */
+/*  Copyright (c) 2022-2026 OCamlPro SAS                                  */
+/*                                                                        */
+/* All rights reserved.                                                   */
+/* This source code is licensed under the GNU Affero General Public       */
+/* License version 3 found in the LICENSE.md file in the root directory   */
+/* of this source tree.                                                   */
+/*                                                                        */
+/**************************************************************************/
+
+import "field.idl";
+
+quote(c, "\n\
+#include \"cobaux_caml.h\"\n\
+")
+
+// ---
+
+[mlname(accept)]
+void
+cob_accept (cob_field_ref field);
+
+[mlname(display)]
+void
+cobaux_display (const int to_device, const int newline,
+		const int varcnt,
+		[size_is(varcnt)] cob_field_ref * fields);
+quote(mli, "\
+  val display: ?newline:bool -> Field.cob_field_ref array -> unit	\
+")
+quote(ml, "\
+  let display ?(newline = false) fields =				\
+      display 0 (if newline then 1 else 0) fields			\
+")
