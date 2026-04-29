@@ -54,7 +54,7 @@ jobs:
         id: cache-opam
         with:
           path: _opam
-          key: v4-${{ runner.os }}-!{name}-${{ matrix.ocaml-compiler }}-${{ hashFiles('opam/*.opam vendors/autofonce/opam/*.opam') }}-skip_tests=${{ matrix.skip_test }}-repo=!(opam-repo)
+          key: v4-${{ runner.os }}-!{name}-${{ matrix.ocaml-compiler }}-${{ hashFiles('opam/*.opam', 'vendors/autofonce/opam/*.opam') }}-skip_tests=${{ matrix.skip_test }}-repo=!(opam-repo)
 
       # use fields.opam-repo = "git+https://" to add an 'extra' opam repository
 ![if:field:opam-repo]
