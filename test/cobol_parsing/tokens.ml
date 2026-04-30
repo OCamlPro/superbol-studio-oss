@@ -146,3 +146,46 @@ let%expect_test "token-locations-with-missing-program-id" =
       WORD[x]@<prog.cob:11-20|11-21>
       .@<prog.cob:11-21|11-22>
       EOF@<prog.cob:11-22|11-22> |}];;
+
+let%expect_test "tokens-with-tabs" =
+  Parser_testing.show_parsed_tokens ~source_format:Auto
+    ~parser_options:(Parser_testing.options ~verbose:true ())
+     "
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-RES PIC XXX.
+       01 WS-ORIG PIC X VALUE 8.
+       PROCEDURE DIVISION.
+       MAIN-PROC.
+       \t\tCOMPUTE WS-RES = WS-ORIG * 12.
+         STOP RUN.
+";
+    [%expect {|
+      Tks: IDENTIFICATION, DIVISION, .
+      Tks: PROGRAM-ID, ., INFO_WORD[prog], .
+      Incoming: {RECURSIVE}
+      Tks': ., INFO_WORD[prog], .
+      Tks: DATA, DIVISION, .
+      Outgoing: {RECURSIVE}
+      Tks: WORKING-STORAGE, SECTION, .
+      Tks: DIGITS[01], WORD[WS-RES], PICTURE, PICTURE_STRING[XXX], .
+      Tks: DIGITS[01], WORD[WS-ORIG], PICTURE, PICTURE_STRING[X], VALUE, DIGITS[8],
+           .
+      Tks: PROCEDURE, DIVISION, .
+      Tks':
+      Tks: WORD[MAIN-PROC], .
+      Tks: COMPUTE, WORD[WS-RES], =, WORD[WS-ORIG], *, DIGITS[12], .
+      Tks: STOP, RUN, .
+      Incoming: {NORMAL}
+      Tks': .
+      Outgoing: {NORMAL}
+      Tks: EOF
+      Tks':
+      IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[prog], ., DATA,
+      DIVISION, ., WORKING-STORAGE, SECTION, ., DIGITS[01], WORD[WS-RES], PICTURE,
+      PICTURE_STRING[XXX], ., DIGITS[01], WORD[WS-ORIG], PICTURE,
+      PICTURE_STRING[X], VALUE, DIGITS[8], ., PROCEDURE, DIVISION, .,
+      WORD[MAIN-PROC], ., COMPUTE, WORD[WS-RES], =, WORD[WS-ORIG], *, DIGITS[12],
+      ., STOP, RUN, ., EOF |}];;
