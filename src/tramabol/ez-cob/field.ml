@@ -17,11 +17,13 @@ open Libcob_ctypes.V1.Types
 open Ctypes
 open Unsigned
 
-let alloc_memory ~size : memory =
+let alloc_memory ~size : cob_memory =
   Ctypes.bigarray_of_ptr Ctypes.array1 size Bigarray.Char @@
   Ctypes.allocate_n char ~count:size
 
 let alloc_pic_symbols n =
+  (* Note: arrays of picture symbols end with an element where the symbol is
+     null. *)
   let array = CArray.make cob_pic_symbol (n + 1) in
   Ctypes.setf (CArray.get array n) Pic_symbol.symbol '\000';
   Ctypes.setf (CArray.get array n) Pic_symbol.times_repeated 0;

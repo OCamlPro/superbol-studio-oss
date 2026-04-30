@@ -83,9 +83,11 @@ module Types (Foreign_types: Ctypes.TYPE) = struct
         NATIONAL_EDITED    , constant "COB_TYPE_NATIONAL_EDITED"     int64_t;
       ]
   end
+  let cob_field_type = Field_type.t
+  type cob_field_type = Field_type.enum
 
   module Field_flags = struct
-    let t = ushort                                    (* TODO: dedicated view *)
+    let t = ushort                                   (* TODO: dedicated view? *)
     let none = Unsigned.UShort.zero
     let have_sign      = constant "COB_FLAG_HAVE_SIGN"      t
     let sign_separate  = constant "COB_FLAG_SIGN_SEPARATE"  t
@@ -119,7 +121,7 @@ module Types (Foreign_types: Ctypes.TYPE) = struct
   let cob_field_attrs = typedef Field_attrs.t "cob_field_attr"
   type cob_field_attrs = Field_attrs.tag structure
 
-  type memory =
+  type cob_memory =
     (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t
 
   let cob_memory_ptr = ptr char
