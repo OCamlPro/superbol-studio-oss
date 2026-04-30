@@ -13,16 +13,6 @@
 
 (** Type-checking and validation of COBOL compilation groups *)
 
-module OLD: sig
-  include module type of Old_typeck_engine
-
-  (** {1 Access to independent builder modules} *)
-
-  module Env_builder = Old_env_builder
-  module Group_builder = Old_group_builder
-  module Prog_builder = Old_prog_builder
-end
-
 module Outputs = Typeck_outputs
 module Diagnostics = Typeck_diagnostics
 module Results = Typeck_results

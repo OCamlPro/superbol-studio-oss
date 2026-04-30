@@ -1,8 +1,3 @@
-(tests
-  (names test_qualified_map)
-  (modules test_qualified_map)
-  (libraries alcotest cobol_data))
-
 (library
  (name test_cobol_data)
  (modules test_memory)
