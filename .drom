@@ -173,6 +173,16 @@ bff32163e2b49b90242750acd6022ee5:opam/cobol_parser.opam
 378c57c3f07c999fa7af369477541c2e:opam/ez_win32.opam
 # end context for opam/ez_win32.opam
 
+# begin context for opam/ezlibcob.opam
+# file opam/ezlibcob.opam
+8df23d882d5baf06ee960acb9ade9cd2:opam/ezlibcob.opam
+# end context for opam/ezlibcob.opam
+
+# begin context for opam/ezlibcob_test.opam
+# file opam/ezlibcob_test.opam
+4d7c3dd7f267f710b26671eea6a03063:opam/ezlibcob_test.opam
+# end context for opam/ezlibcob_test.opam
+
 # begin context for opam/ezr_toml.opam
 # file opam/ezr_toml.opam
 2ae0006d49590bbdbb364466c0938fef:opam/ezr_toml.opam
@@ -713,9 +723,24 @@ a5027007a5ed5a4b90598fcde0e6fc1b:src/lsp/superbol_preprocs/version.mlt
 a5027007a5ed5a4b90598fcde0e6fc1b:src/lsp/superbol_project/version.mlt
 # end context for src/lsp/superbol_project/version.mlt
 
+# begin context for src/tramabol/ezlibcob/dune
+# file src/tramabol/ezlibcob/dune
+ac9f58f599ce95b6e3c7c0b4b552a757:src/tramabol/ezlibcob/dune
+# end context for src/tramabol/ezlibcob/dune
+
+# begin context for src/tramabol/ezlibcob/index.mld
+# file src/tramabol/ezlibcob/index.mld
+8dab7cddafae7f541a31059549a93225:src/tramabol/ezlibcob/index.mld
+# end context for src/tramabol/ezlibcob/index.mld
+
+# begin context for src/tramabol/ezlibcob/version.mlt
+# file src/tramabol/ezlibcob/version.mlt
+a5027007a5ed5a4b90598fcde0e6fc1b:src/tramabol/ezlibcob/version.mlt
+# end context for src/tramabol/ezlibcob/version.mlt
+
 # begin context for src/vendor/ez_toml/dune
 # file src/vendor/ez_toml/dune
-5b0adf2706d3d163581192a5fe88cf03:src/vendor/ez_toml/dune
+0778f52cc1225df698a5fcd42310b6ff:src/vendor/ez_toml/dune
 # end context for src/vendor/ez_toml/dune
 
 # begin context for src/vendor/ez_toml/index.mld
@@ -822,3 +847,8 @@ a5027007a5ed5a4b90598fcde0e6fc1b:src/vscode/vscode-debugprotocol/version.mlt
 # file src/vscode/vscode-json/version.mlt
 a5027007a5ed5a4b90598fcde0e6fc1b:src/vscode/vscode-json/version.mlt
 # end context for src/vscode/vscode-json/version.mlt
+
+# begin context for test/ezlibcob/dune
+# file test/ezlibcob/dune
+006be19bc8758ad251a7f3f0ce25f20a:test/ezlibcob/dune
+# end context for test/ezlibcob/dune

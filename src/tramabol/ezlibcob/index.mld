@@ -1,0 +1,7 @@
+{1 Library ezlibcob}
+
+SuperBOL Studio OSS is a new platform for COBOL
+
+
+The entry point of this library is the module: {!Ezlibcob}.
+

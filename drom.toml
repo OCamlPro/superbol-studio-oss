@@ -337,3 +337,6 @@ dir = "src/autofonce/ez_win32"
 
 [[package]]
 dir = "src/autofonce/ez_call"
+
+[[package]]
+dir = "src/tramabol/ezlibcob"
