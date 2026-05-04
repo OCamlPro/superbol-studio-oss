@@ -748,4 +748,20 @@
   )
  )
 
+(package
+ (name ezlibcob)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
 

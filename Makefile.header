@@ -5,6 +5,7 @@ MAIN_SRCDIR ?= src
 STUDIO = superbol_vscode_platform
 STUDIO_SRCDIR = $(MAIN_SRCDIR)/vscode/superbol-vscode-platform
 GNUCOBOL_SRCDIR = import/gnucobol
+GNUCOBOL4_SRCDIR = import/gnucobol4
 SUPERBOL_LSP_PKG = lsp/superbol-free
 
 JS_OUTDIR = _out
@@ -17,6 +18,8 @@ LSP_MODE_SRCDIR ?= ../lsp-mode
 
 MORE_DEV_OPAM_FILES := vendors/autofonce/opam/*.opam
 AUTOFONCE_EXE = dune exec -- vendors/autofonce/src/autofonce/main.exe
+
+GNUCOBOL4_INCLUDE ?= $(PWD)/$(GNUCOBOL4_SRCDIR)
 
 # ---
 

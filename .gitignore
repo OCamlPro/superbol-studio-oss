@@ -8,6 +8,7 @@
 /vscode-debugadapter
 /vscode-debugprotocol
 /superbol-free
+/ezlibcob
 *~
 _build
 .merlin

@@ -297,3 +297,6 @@ dir = "src/lsp/sql_parser"
 
 [[package]]
 dir = "src/lsp/cobol_cfg"
+
+[[package]]
+dir = "src/tramabol/ezlibcob"
