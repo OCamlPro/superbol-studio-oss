@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-5caeed843ccface6f71b221f5f215ba9:.
+57d943046b2e247d1df150308ca87dfc:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -15,12 +15,12 @@ d703a6755baa4f37322e78ce9e5260ec:.github/workflows/workflow.yml
 
 # begin context for .gitignore
 # file .gitignore
-1ac4166aab2c29244a36f9ec1709c44b:.gitignore
+7b74b080918d4a7f8129524c51577047:.gitignore
 # end context for .gitignore
 
 # begin context for Makefile
 # file Makefile
-4e0f08e8db8fd8afc912d7a08cbe65d1:Makefile
+cf6f5d05a510edfe82f882d0d0e9b2f8:Makefile
 # end context for Makefile
 
 # begin context for docs/README.txt
@@ -50,7 +50,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-0f3612c70de571529566bb7752a9b72b:dune-project
+37c7290517cf1fff66cdb151ad949be3:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_cfg.opam
@@ -122,6 +122,16 @@ c83776956f173548488df18f239157e6:opam/cobol_preproc.opam
 # file opam/ez_toml.opam
 20c1fc4d1d465ac583c03d3ead4c343e:opam/ez_toml.opam
 # end context for opam/ez_toml.opam
+
+# begin context for opam/ezlibcob.opam
+# file opam/ezlibcob.opam
+204b2fb202b827ced1a2a2240ef6f86c:opam/ezlibcob.opam
+# end context for opam/ezlibcob.opam
+
+# begin context for opam/ezlibcob_test.opam
+# file opam/ezlibcob_test.opam
+4d7c3dd7f267f710b26671eea6a03063:opam/ezlibcob_test.opam
+# end context for opam/ezlibcob_test.opam
 
 # begin context for opam/ezr_toml.opam
 # file opam/ezr_toml.opam
@@ -508,6 +518,21 @@ a5027007a5ed5a4b90598fcde0e6fc1b:src/lsp/superbol_preprocs/version.mlt
 a5027007a5ed5a4b90598fcde0e6fc1b:src/lsp/superbol_project/version.mlt
 # end context for src/lsp/superbol_project/version.mlt
 
+# begin context for src/tramabol/ezlibcob/dune
+# file src/tramabol/ezlibcob/dune
+88a2984c9c3e2b673603bc528239d3c7:src/tramabol/ezlibcob/dune
+# end context for src/tramabol/ezlibcob/dune
+
+# begin context for src/tramabol/ezlibcob/index.mld
+# file src/tramabol/ezlibcob/index.mld
+8dab7cddafae7f541a31059549a93225:src/tramabol/ezlibcob/index.mld
+# end context for src/tramabol/ezlibcob/index.mld
+
+# begin context for src/tramabol/ezlibcob/version.mlt
+# file src/tramabol/ezlibcob/version.mlt
+a5027007a5ed5a4b90598fcde0e6fc1b:src/tramabol/ezlibcob/version.mlt
+# end context for src/tramabol/ezlibcob/version.mlt
+
 # begin context for src/vendor/ez_toml/dune
 # file src/vendor/ez_toml/dune
 5b0adf2706d3d163581192a5fe88cf03:src/vendor/ez_toml/dune
@@ -617,3 +642,8 @@ a5027007a5ed5a4b90598fcde0e6fc1b:src/vscode/vscode-debugprotocol/version.mlt
 # file src/vscode/vscode-json/version.mlt
 a5027007a5ed5a4b90598fcde0e6fc1b:src/vscode/vscode-json/version.mlt
 # end context for src/vscode/vscode-json/version.mlt
+
+# begin context for test/ezlibcob/dune
+# file test/ezlibcob/dune
+006be19bc8758ad251a7f3f0ce25f20a:test/ezlibcob/dune
+# end context for test/ezlibcob/dune
