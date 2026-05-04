@@ -328,6 +328,14 @@ let pp_compilation_unit ppf = function
   | ClassDefinition cd -> pp_class_definition ppf cd
   | InterfaceDefinition id -> pp_interface_definition ppf id
 
+let name_of_compilation_unit: compilation_unit -> string with_loc = function
+  | Program { program_name = name; _ }
+  | Function { function_name = name; _ }
+  | ClassDefinition { class_name = name; _ }
+  | InterfaceDefinition { interface_name = name; _ } ->
+      let open Cobol_common.Srcloc.INFIX in
+      Pretty.to_string "%a" pp_name_or_literal ~&name &@<- name
+
 type control_division = unit                               (* nothing for now *)
 [@@deriving ord]
 
