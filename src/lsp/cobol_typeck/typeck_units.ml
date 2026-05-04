@@ -19,13 +19,6 @@ module Visitor = Cobol_common.Visitor
 module CUs = Cobol_unit.Collections.SET
 module CUMap = Cobol_unit.Collections.MAP
 
-let name_of_compilation_unit: Cobol_ptree.compilation_unit -> _ = function
-  | Program { program_name = name; _ }
-  | Function { function_name = name; _ }
-  | ClassDefinition { class_name = name; _ }
-  | InterfaceDefinition { interface_name = name; _ } ->
-      Pretty.to_string "%a" Cobol_ptree.pp_name_or_literal ~&name &@<- name
-
 type acc =
   {
     parent_name: string with_loc option;
@@ -77,7 +70,7 @@ let build_units ~fold_exec_block' _config = object
 
     let unit =
       {
-        unit_name = name_of_compilation_unit ~&cu;
+        unit_name = Cobol_ptree.name_of_compilation_unit ~&cu;
         unit_parent_name = parent_name;
         unit_config;
         unit_data = unit_data.definitions;
