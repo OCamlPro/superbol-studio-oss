@@ -77,13 +77,8 @@ dune-stanzas = """
   (external_library_name libcob)
   (build_flags_resolver
    (vendored
-    (c_flags "-I%{env:GNUCOBOL_INCLUDE=/usr/local/include}"
-             "-include" "../cobaux/cobaux.h"
-             :standard)
-    (c_library_flags "-L%{env:GNUCOBOL_LIBDIR=/usr/local/lib}"
-                     "-lcob"
-                     ; "-lcob -lgmp -lreadline -lxml2 -lcjson -lncursesw -ltinfo -lpanelw"
-                     :standard)))
+    (c_flags :standard (:include libcob_cflags) "-include" "../cobaux/cobaux.h")
+    (c_library_flags :standard (:include libcob_libs))))
   (headers (include "libcob.h"))
   (type_description (instance Types) (functor Libcob_types))
   (function_description (concurrency unlocked) (instance Module) (functor Libcob_module))
@@ -98,3 +93,26 @@ dune-stanzas = """
 #   ["libcob5-dev"] {os-family = "debian" | os-family = "ubuntu"}
 # ]
 # """
+dune-trailer = """
+(rule
+ (targets libcob_incdir)
+ ;(enabled_if (<> %{ocaml-config:system} mingw64))
+ (action (with-stdout-to %{targets}
+   (run %{env:GNUCOBOL4_CONFIG=cob-config} --includedir))))
+
+(rule
+ (targets libcob_cflags)
+ ;(enabled_if (<> %{ocaml-config:system} mingw64))
+ (action (with-stdout-to %{targets}
+  (progn (echo "(")
+         (run %{env:GNUCOBOL4_CONFIG=cob-config} --cflags)
+         (echo ")")))))
+
+(rule
+ (targets libcob_libs)
+ ;(enabled_if (<> %{ocaml-config:system} mingw64))
+ (action (with-stdout-to %{targets}
+  (progn (echo "(")
+         (run %{env:GNUCOBOL4_CONFIG=cob-config} --libs)
+         (echo ")")))))
+"""
