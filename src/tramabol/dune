@@ -7,7 +7,7 @@
   (progn
    (run make -C cobaux
              "CC=%{cc}"
-             "CPPFLAGS=-I%{env:GNUCOBOL_INCLUDE=/usr/local/include}"
+             "CPPFLAGS=-I%{read:libcob-ctypes/libcob_incdir}"
              dllcobaux.so)
    (copy cobaux/libcobaux.a libcobaux.a)
    (copy cobaux/dllcobaux.so dllcobaux.so)))))

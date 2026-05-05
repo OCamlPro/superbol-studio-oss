@@ -14,6 +14,6 @@
 ; to disable this test and build of its dependencies.
 (rule
  (alias runtest)
- (enabled_if %{env:HAVE_LIBCOB5=true})               ; <- /!\ enabled by default
+ (enabled_if %{env:HAVE_LIBCOB5=true})                   ; <- /!\ enabled by default
  (action
   (diff test.expected test.output)))
