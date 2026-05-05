@@ -107,6 +107,7 @@ CAMLprim value ml_cob_init (value args_v)
 	}
 	argv[argc] = NULL;
 	cob_init (argc, argv);
+	return Val_unit;
 }
 
 /*
@@ -387,15 +388,16 @@ CAMLprim value ml_cob_memcpy
 }
 
 CAMLprim value ml_cob_display (value to_device_v, value newline_v, value fields_v) {
-  CAMLparam1 (fields_v);
-  int to_device = Int_val (to_device_v);
-  int newline = Bool_val (newline_v);
-  int nfields = Wosize_val (fields_v);
-  int i;
-  for (i = 0; i < nfields; i++) {
-    cob_display (to_device, i == nfields - 1 && newline, 1,
-		 ML_COB_FIELD (Field (fields_v,i)));
-  }
+	CAMLparam1 (fields_v);
+	int to_device = Int_val (to_device_v);
+	int newline = Bool_val (newline_v);
+	int nfields = Wosize_val (fields_v);
+	int i;
+	for (i = 0; i < nfields; i++) {
+		cob_display (to_device, i == nfields - 1 && newline, 1,
+			     ML_COB_FIELD (Field (fields_v,i)));
+	}
+	return Val_unit;
 }	
 
 CAMLprim value ml_cob_module_free (value module_v)
@@ -737,4 +739,4 @@ value ml_cob_call_int2_COB_VA_FIELDN (cob_field* (*f)(const int, const int, COB_
 }
 
 /* The following line number should be offset +2 to its line number */
-#line 742 "_build/default/src/ezlibcob/libcob_stubs.c"
+#line 744 "_build/default/src/ezlibcob/libcob_stubs.c"

@@ -19,8 +19,6 @@ LSP_MODE_SRCDIR ?= ../lsp-mode
 MORE_DEV_OPAM_FILES := vendors/ANSITerminal/ANSITerminal.opam
 AUTOFONCE_EXE = dune exec -- src/autofonce/autofonce/main.exe
 
-GNUCOBOL4_INCLUDE ?= $(PWD)/$(GNUCOBOL4_SRCDIR)
-
 # ---
 
 include Makefile.vsix-rules
