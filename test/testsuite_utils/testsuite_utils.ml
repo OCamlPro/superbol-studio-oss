@@ -22,7 +22,7 @@ let find_dir anchor =
     else
       let path' = Filename.dirname path in
       if path = path' then
-        Printf.kprintf failwith "Anchor %S not found from %s" anchor curdir;
+        Printf.ksprintf failwith "Anchor %S not found from %s" anchor curdir;
       iter path'
   in
   iter curdir

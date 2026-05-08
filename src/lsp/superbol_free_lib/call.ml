@@ -19,14 +19,14 @@ module GLOBALS = struct
   let verbose _ = !debug
 end
 module ERROR = struct
-  let raise fmt = Printf.kprintf failwith fmt
+  let raise fmt = Printf.ksprintf failwith fmt
 end
 
 
 (* [BEGIN] The following part is similar to ocamlup:call.ml *)
 
 let command ?on_error fmt =
-  Printf.kprintf (fun cmd ->
+  Printf.ksprintf (fun cmd ->
       Printf.eprintf "%s\n%!" cmd;
       let retcode = Sys.command cmd in
       if retcode <> 0 then begin
