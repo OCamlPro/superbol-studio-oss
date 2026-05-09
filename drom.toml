@@ -197,6 +197,10 @@ dir = "src/vscode/vscode-debugadapter"
 dir = "src/vscode/vscode-debugprotocol"
 # edit 'src/vscode/vscode-debugprotocol/package.toml' for package-specific options
 
+[[package]]
+dir = "src/vscode/superbol-debugger"
+# edit 'src/vscode/superbol-debugger/package.toml' for package-specific options
+
 
 
 [[package]]
