@@ -97,18 +97,30 @@ github-workflow-before-opam = """
 
       - name: Build and install GnuCOBOL 4.x
         run: |
-          sudo apt-get install -y autoconf automake flex bison help2man texinfo wget libgmp-dev libdb-dev
-          bash scripts/install-gc4.sh import/gnucobol4 /opt/gnucobol-4.x
-          echo 'LD_LIBRARY_PATH=/opt/gnucobol-4.x/lib:"$LD_LIBRARY_PATH"' >> $GITHUB_ENV
-          echo 'GNUCOBOL_INCLUDE=/opt/gnucobol-4.x/include' >> $GITHUB_ENV
-          echo 'GNUCOBOL_LIBDIR=/opt/gnucobol-4.x/lib' >> $GITHUB_ENV
+          if ${{ matrix.os == 'ubuntu-latest' }}; then
+            sudo apt-get install -y autoconf automake flex bison help2man texinfo wget libgmp-dev libdb-dev
+            bash scripts/install-gc4.sh import/gnucobol4 /opt/gnucobol-4.x
+          elif ${{ matrix.os == 'macos-latest' }}; then
+            brew update
+            brew install autoconf automake libtool bison help2man texinfo berkeley-db@5 json-c libiconv
+            HOMEBREW_ROOT="$(brew --prefix)/opt"
+            export TERM=vt100
+            export PATH="$HOMEBREW_ROOT/bison/bin:${PATH}"
+            export LDFLAGS="-L$HOMEBREW_ROOT/berkeley-db@5/lib -L$HOMEBREW_ROOT/libiconv/lib ${LDFLAGS}"
+            export CPPFLAGS="-I$HOMEBREW_ROOT/berkeley-db@5/include -I$HOMEBREW_ROOT/libiconv/include ${CPPFLAGS}"
+            sudo mkdir -p /opt/gnucobol-4.x
+            sudo chmod a+rwx /opt/gnucobol-4.x
+            bash scripts/install-gc4.sh import/gnucobol4 /opt/gnucobol-4.x
+          fi
+          echo '/opt/gnucobol-4.x/bin' >> $GITHUB_PATH
+          echo 'LD_LIBRARY_PATH=/opt/gnucobol-4.x/lib:$LD_LIBRARY_PATH' >> $GITHUB_ENV
           echo 'HAVE_LIBCOB5=true' >> $GITHUB_ENV
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest' }}
 
       - name: Skip build and install of GnuCOBOL 4.x
         run: |
           echo 'HAVE_LIBCOB5=false' >> $GITHUB_ENV
-        if: ${{ matrix.os != 'ubuntu-latest' }}
+        if: ${{ matrix.os != 'ubuntu-latest' && matrix.os != 'macos-latest' }}
 """
 
 github-workflow-before-build = """
@@ -297,3 +309,6 @@ dir = "src/lsp/sql_parser"
 
 [[package]]
 dir = "src/lsp/cobol_cfg"
+
+[[package]]
+dir = "src/tramabol/ezlibcob"
