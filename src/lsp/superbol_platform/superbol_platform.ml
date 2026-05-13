@@ -29,6 +29,7 @@ let record =
     error = Pretty.error;
     getcwd = (fun () -> Ez_file.V1.Slashifier.slashify @@ Sys.getcwd ());
     read_text_file = (fun file -> Ez_file.V1.EzFile.read_text_file file);
+    with_stdin = (fun ~f -> f Stdlib.stdin);
     peek_channel_prefix;
     mk_temp_dir = Tempdir.create;
     remove_dir = (fun ?all dir -> Ez_file.V1.EzFile.remove_dir ?all dir);
