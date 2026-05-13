@@ -748,4 +748,42 @@
   )
  )
 
+(package
+ (name tramabol)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "Interpreter for COBOL programs (command-line program)")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (tramabol_lib (= :version))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name tramabol_lib)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "Interpreter for COBOL programs (main library)")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (superbol_platform (= :version))
+   (superbol_free_lib (= :version))
+   (pretty (= :version))
+   (ez_cmdliner (and (>= 0.3.0) (< 1.0.0)))
+   (cobol_common (= :version))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
 

@@ -24,6 +24,7 @@ let record =
     verbosity = 0;
     eprintf = Printf.eprintf;
     error = Pretty.error;
+    with_stdin = (fun ~f -> f Stdlib.stdin);
     read_file = (fun file -> Ez_file.V1.EzFile.read_file file);
     peek_channel_prefix;
     mk_temp_dir = Tempdir.create;
