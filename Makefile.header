@@ -6,6 +6,7 @@ STUDIO = superbol_vscode_platform
 STUDIO_SRCDIR = $(MAIN_SRCDIR)/vscode/superbol-vscode-platform
 GNUCOBOL_SRCDIR = import/gnucobol
 SUPERBOL_LSP_PKG = lsp/superbol-free
+TRAMABOL_PKG = tramabol/tramabol
 
 JS_OUTDIR = _out
 JS_TARGETS = $(addprefix $(JS_OUTDIR)/,superbol-vscode-platform-bundle.js	\
@@ -114,3 +115,26 @@ build-master:
 	$(MAKE) build-deps
 	$(MAKE) clean
 	$(MAKE)
+
+# ---
+
+# Note we cannot transpile the TramaBOL interpreter into JS as long as
+# it relies on bindigns against `libcob`.  So we do not define build
+# rule in case the target is "universal".
+
+TRAMABOL = $(basename $(notdir $(TRAMABOL_PKG)))
+ifneq ($(TARGET_PLAT),universal)
+  TRAMABOL_EXE = $(TRAMABOL)-$(TARGET_SPEC)$(DOT_EXE)
+  ifeq ($(TARGET_PLAT)_$(BUILD_STATIC_EXECS),$(BUILD_PLAT)_true)
+    TRAMABOL_BUILT = $(TRAMABOL)
+  else
+    TRAMABOL_BUILT = ${DUNE_BUILD_SRCDIR}/$(TRAMABOL_PKG)/main.exe
+  endif
+
+  .PHONY: tramabol-interpreter
+  all: tramabol-interpreter
+  tramabol-interpreter: $(TRAMABOL_BUILT)
+	$(CP) $(TRAMABOL_BUILT) $(TRAMABOL_EXE)
+
+  $(TRAMABOL_BUILT): build
+endif
