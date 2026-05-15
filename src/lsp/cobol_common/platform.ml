@@ -47,13 +47,14 @@ module TYPES = struct
     mutable error :  'a. ('a, Format.formatter, unit) format -> 'a ;
     mutable getcwd: unit -> string;
     mutable read_text_file : string -> string ;
+    mutable peek_channel_prefix: in_channel -> len:int -> string;
     mutable getenv_opt : string -> string option ;
     mutable mk_temp_dir: ?mode:int -> ?dir:string -> string -> string;
     mutable remove_dir: ?all:bool -> string -> unit;
 
     mutable autodetect_format:
-      ?source_contents:string ->
-      string ->                                                    (* filename *)
+      source_contents:string ->
+      filename:string ->                                           (* filename *)
       source_format_id;
     mutable find_lib:
       lookup_config:Copybook.TYPES.lookup_config ->
@@ -78,6 +79,10 @@ let innocuous = {
     Pretty.string_to (fun msg -> raise (Sys_error msg))
       "%s: Filesystem operations are unavailable" file
   end;
+  peek_channel_prefix = begin fun _ic ->
+    Pretty.string_to (fun msg -> raise (Sys_error msg))
+      "peek_channel_prefix: operation unavailable"
+  end;
   mk_temp_dir = begin fun ?mode:_ ?dir:_ dirname ->
     Pretty.string_to (fun msg -> raise (Sys_error msg))
       "%s: Filesystem operations are unavailable" dirname
@@ -86,7 +91,7 @@ let innocuous = {
     Pretty.string_to (fun msg -> raise (Sys_error msg))
       "%s: Filesystem operations are unavailable" dir
   end;
-  autodetect_format = (fun ?source_contents:_ _filename -> SFFixed);
+  autodetect_format = (fun ~source_contents:_ ~filename:_ -> SFFixed);
   find_lib = begin fun ~lookup_config ?fromfile:_ ?libname:_ (`Alphanum w |
                                                               `Word w) ->
     Error { lookup_libname = w; lookup_config }
@@ -95,6 +100,7 @@ let innocuous = {
 }
 
 let copy ~dst ~src:{ verbosity; eprintf; error; getcwd; read_text_file;
+                     peek_channel_prefix;
                      mk_temp_dir; remove_dir;
                      autodetect_format; find_lib; getenv_opt }  =
   dst.verbosity <- verbosity;
@@ -102,6 +108,7 @@ let copy ~dst ~src:{ verbosity; eprintf; error; getcwd; read_text_file;
   dst.error <- error;
   dst.getcwd <- getcwd;
   dst.read_text_file <- read_text_file;
+  dst.peek_channel_prefix <- peek_channel_prefix;
   dst.mk_temp_dir <- mk_temp_dir;
   dst.remove_dir <- remove_dir;
   dst.autodetect_format <- autodetect_format;
