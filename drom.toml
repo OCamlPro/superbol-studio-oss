@@ -74,6 +74,7 @@ dune = "3.17.0"
 dot-gitignore-trailer = """
 # Edit drom.toml to change the following lines
 /superbol-free-*
+/tramabol-*
 /_*
 /node_modules
 /yarn-error.log
@@ -86,6 +87,7 @@ ATTIC
 !.vscode/tasks.json
 !.vscode/launch.json
 *.vsix
+/*.js
 *.opam.locked
 /emacs/lsp-superbol-customs.el
 _superbol
@@ -94,6 +96,12 @@ github-workflow-before-opam = """
       - run: git submodule init
 
       - run: git submodule update
+
+      - name: Build and install GnuCOBOL 4.x for Windows
+        run: |
+          sudo apt-get install -y gcc-mingw-w64-x86-64
+          bash scripts/setup-win64-target.sh
+        if: ${{ matrix.os == 'ubuntu-latest' }}
 
       - name: Build and install GnuCOBOL 4.x
         run: |
@@ -297,3 +305,9 @@ dir = "src/lsp/sql_parser"
 
 [[package]]
 dir = "src/lsp/cobol_cfg"
+
+[[package]]
+dir = "src/tramabol/tramabol"
+
+[[package]]
+dir = "src/tramabol/tramabol_lib"
