@@ -97,6 +97,12 @@ github-workflow-before-opam = """
 
       - run: git submodule update
 
+      - name: Build and install GnuCOBOL 4.x for Windows
+        run: |
+          sudo apt-get install -y gcc-mingw-w64-x86-64
+          bash scripts/setup-win64-target.sh
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+
       - name: Build and install GnuCOBOL 4.x
         run: |
           sudo apt-get install -y autoconf automake flex bison help2man texinfo wget libgmp-dev libdb-dev
