@@ -10,7 +10,8 @@
           compiler_directives
           alphanums_with_utf8
           auto_sourceformat
-          auto_sourceformat_rewind)
+          auto_sourceformat_rewind
+          tabs)
  (preprocess
    (pps ppx_expect))
  (inline_tests

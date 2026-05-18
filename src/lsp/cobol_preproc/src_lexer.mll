@@ -177,7 +177,6 @@
 let newline = '\r'* '\n'
 let nnl = _ # ['\r' '\n']                             (* anything but newline *)
 let nnl_no_tabs = nnl # [ '\t' ]
-let sna = nnl_no_tabs nnl_no_tabs nnl_no_tabs nnl_no_tabs nnl_no_tabs nnl_no_tabs              (* 6 chars; TODO: exclude tabs *)
 let spaces = ' '*
 let    blank        = [' ' '\r']
 let nonblank        = (nnl # blank) # [ '\t' ]
@@ -251,19 +250,21 @@ let mf_cdir_word =
 
 rule fixed_line state
   = shortest
-  | sna                                                            (* nominal *)
-      {
-        fixed_indicator (Src_lexing.sna state lexbuf) lexbuf
-      }
   | '\t'
       {
         Src_lexing.tab ~sna:fixed_indicator ~k:fixed_nominal_line state lexbuf
       }
-  | (nnl* newline)                                  (* blank line (too short) *)
+  | nnl_no_tabs
+      {
+        Src_lexing.sna_blank ~k_continue:fixed_sna_continuation
+                             ~k_done:fixed_indicator
+                             6 state lexbuf
+      }
+  | (nnl* newline) (* NOTE: remove? other cases are already shorter *) (* blank line (too short) *)
       {
         Src_lexing.new_line (Src_lexing.sna state lexbuf) lexbuf
       }
-  | (nnl* eof)           (* blank line (too short), without newline character *)
+  | (nnl* eof) (* NOTE: ditto *) (* blank line (too short), without newline character *)
       {
         Src_lexing.(flush @@ eof (Src_lexing.sna state lexbuf) lexbuf)
       }
@@ -305,6 +306,29 @@ and fixed_indicator state
   | epsilon
       {
         gobble_line (Src_lexing.sna state lexbuf) lexbuf
+      }
+and fixed_sna_continuation remaining state
+  = parse
+  | '\t'    (* tab in SNA: check expanded col vs indicator position (col 7) *)
+      {
+        Src_lexing.sna_tab
+          ~k_indicator:fixed_indicator
+          ~k_nominal:fixed_nominal_line
+          state lexbuf
+      }
+  | nnl_no_tabs                                             (* SNA space/char *)
+      {
+        Src_lexing.sna_blank ~k_continue:fixed_sna_continuation
+                             ~k_done:fixed_indicator
+                             remaining state lexbuf
+      }
+  | newline                           (* line ends before 6 SNA chars: blank *)
+      {
+        Src_lexing.new_line state lexbuf
+      }
+  | eof
+      {
+        Src_lexing.(flush @@ eof state lexbuf)
       }
 and xopen_line state                                     (* X/Open free-form  *)
   = parse                            (* (note no continuation line indicator) *)
