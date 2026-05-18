@@ -108,13 +108,61 @@ let make_lsp_project ?toml () =
     then EzFile.remove_dir ~all:true projdir
     else Printf.eprintf "Leaving %s as is (does not look like a temporary \
                          directory)" projdir;
-    (* Filter and print out results *)
-    EzString.split expected_output_string '\n' |>
-    List.filter_map begin function
-      | s when String.trim s = "" -> None             (* ignore json RPC header: *)
-      | s when EzString.starts_with ~prefix:"Content-Length: " s -> None
-      | s -> Some (Str.global_replace projdir_regexp projdir_marker s)
-    end |>
+    let is_display_source_line s =
+      (* source display lines: "%4d %c %s" — units digit at [3] *)
+      String.length s > 7
+      && s.[3] >= '0' && s.[3] <= '9'
+      && s.[4] = ' ' && (s.[5] = ' ' || s.[5] = '>')
+      && s.[6] = ' '
+    in
+    let is_underline_line s =
+      String.length s >= 6
+      && s.[0] = '-' && s.[1] = '-' && s.[2] = '-' && s.[3] = '-'
+      && s.[4] = ' ' && s.[5] = ' '
+    in
+    (* Filter and print out results.  For underline lines that follow a
+       tab-containing source line, inject tabs at the same byte positions as in
+       the source content so that viewers expanding tabs see the ^ markers
+       visually aligned with the highlighted source text. *)
+    let filtered =
+      EzString.split expected_output_string '\n' |>
+      List.filter_map begin function
+        | s when String.trim s = "" -> None           (* ignore json RPC header: *)
+        | s when EzString.starts_with ~prefix:"Content-Length: " s -> None
+        | s -> Some (Str.global_replace projdir_regexp projdir_marker s)
+      end
+    in
+    let _, lines =
+      List.fold_left begin fun (last_tab_content, acc) s ->
+        if is_display_source_line s && String.contains s '\t' then
+          let content = String.sub s 7 (String.length s - 7) in
+          (Some content, s :: acc)
+        else if is_display_source_line s then
+          (None, s :: acc)
+        else if is_underline_line s then
+          let s' = match last_tab_content with
+            | None -> s
+            | Some src_content ->
+                let ul_content = String.sub s 6 (String.length s - 6) in
+                let ub = Bytes.of_string ul_content in
+                (* The source prefix is 7 chars (%4d %c %s) while the underline
+                   prefix is 6 chars (----  ), so a source tab at content byte j
+                   is at absolute display col 7+j, but underline position j would
+                   be at 6+j.  Injecting at j+1 puts the tab at display col 7+j
+                   in both lines, giving the same tab-stop expansion. *)
+                String.iteri begin fun j c ->
+                  if c = '\t' && j + 1 < Bytes.length ub
+                  && Bytes.get ub (j + 1) <> '^' then
+                    Bytes.set ub (j + 1) '\t'
+                end src_content;
+                "----  " ^ Bytes.to_string ub
+          in
+          (last_tab_content, s' :: acc)
+        else
+          (None, s :: acc)
+      end (None, []) filtered
+    in
+    List.rev lines |>
     String.concat "\n" |>
     print_endline
   in
