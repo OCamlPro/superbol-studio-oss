@@ -566,10 +566,10 @@ let%expect_test "reference-with-tabs" =
     ----             ^^^^^^
        7          01 WS-ORIG PIC X VALUE 8.
        8          PROCEDURE DIVISION.
-    __rootdir__/prog.cob:10.24-10.30:
+    __rootdir__/prog.cob:10.17-10.23:
        7          01 WS-ORIG PIC X VALUE 8.
        8          PROCEDURE DIVISION.
        9          MAIN-PROC.
-      10 >                 COMPUTE WS-RES = WS-ORIG * 12.
-    ----                           ^^^^^^
+      10 >        		COMPUTE WS-RES = WS-ORIG * 12.
+    ----          		        ^^^^^^
       11            STOP RUN. |}]
