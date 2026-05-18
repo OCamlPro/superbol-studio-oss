@@ -71,6 +71,15 @@ val eqeq'
 val sna
   : (Src_format.fixed state as 's)
   -> Lexing.lexbuf -> 's
+val sna_blank
+  : k_continue:(int -> (Src_format.fixed state as 's) -> Lexing.lexbuf -> 'b)
+  -> k_done:('s -> Lexing.lexbuf -> 'b)
+  -> int -> 's -> Lexing.lexbuf -> 'b
+val sna_tab
+  : k_indicator:('s -> Lexing.lexbuf -> 'b)
+  -> k_nominal:('s -> Lexing.lexbuf -> 'b)
+  -> (Src_format.fixed state as 's)
+  -> Lexing.lexbuf -> 'b
 val cdir_word
   : ?marker:string
   -> (Src_format.fixed state as 's)

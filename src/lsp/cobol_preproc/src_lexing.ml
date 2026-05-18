@@ -43,6 +43,7 @@ type 'k state =
     ignored: lexloc list;               (** lexical locations of ignored text *)
     cdir_seen: bool;
     current_cpos_shift: int;
+    tab_col_shift: int;        (** shift in columns induced by tabs *)
     newline: bool;
     newline_cnums: int list;    (** index of all newline characters encountered
                                     so far (in reverse order) *)
@@ -80,6 +81,7 @@ let init_state source_format : _ state =
     ignored = [];
     cdir_seen = false;
     current_cpos_shift = 0;
+    tab_col_shift = 0;
     newline = true;
     newline_cnums = [];
     diags = Src_diagnostics.none;
@@ -128,8 +130,8 @@ let change_source_format ({ config; _ } as state) sf =
   then Ok { state with config = { config with source_format = sf } }
   else Error ()
 
-let pos_column { current_cpos_shift; _ } Lexing.{ pos_bol; pos_cnum; _ } =
-  pos_cnum - pos_bol + 1 - current_cpos_shift            (* count cols from 1 *)
+let pos_column { current_cpos_shift; tab_col_shift; _ } Lexing.{ pos_bol; pos_cnum; _ } =
+  pos_cnum - pos_bol + 1 - current_cpos_shift + tab_col_shift  (* count cols from 1 *)
 
 let adjust_postion { current_cpos_shift; _ } pos =
   if current_cpos_shift = 0 || position_encoding_in_bytes
@@ -233,6 +235,7 @@ let new_line state lexbuf =
   let state =
     { state with
       current_cpos_shift = 0;
+      tab_col_shift = 0;
       newline = true;
       newline_cnums = Lexing.lexeme_end lexbuf :: state.newline_cnums }
   in
@@ -357,13 +360,68 @@ let flush_continued ?(force = false) state = match state.continued with
          stage to account for quotes in comment paragraphs. *)
       emit (AlphanumPrefix { knd; qte; str } &@ loc) (reset_cont state)
 
+(** Fixed tab stop positions (1-indexed columns).  Tabs advance to the next
+    listed column; once all stops are exhausted, the last interval (difference
+    between the final two entries) repeats indefinitely. *)
+let tab_stops = [7; 8; 16]
+
+(** Returns the 1-indexed column of the first character after a tab that is
+    currently at 1-indexed column [col].  Uses the explicit [tab_stops] list
+    and, once exhausted, extends with the last interval. *)
+let next_tab_stop col =
+  let rec go prev = function
+    | stop :: _ when stop > col -> stop
+    | [last] ->
+        let interval = max 1 (last - prev) in
+        last + ((col - last) / interval + 1) * interval
+    | stop :: rest -> go stop rest
+    | [] -> col + 1
+  in
+  go 0 tab_stops
+
+(** Computes the 0-indexed visual column of the first character after a tab at
+    [start_pos] and returns it together with the updated state. *)
+let compute_tab_shift state (start_pos: Lexing.position) =
+  let col      = pos_column state start_pos in   (* 1-indexed *)
+  let next_col = next_tab_stop col in
+  next_col - 1,
+  { state with tab_col_shift = state.tab_col_shift + next_col - col - 1 }
+
+(** Handles a non-tab blank character (space) in the SNA area: ignores it in
+    the produced locations and calls [~k_done state lexbuf] when [remaining]
+    reaches 1 (last SNA column), or [~k_continue (remaining-1) state lexbuf]
+    otherwise. *)
+let sna_blank ~k_continue ~k_done remaining state lexbuf =
+  let _, start_pos, end_pos = lexeme_info lexbuf in
+  let state = ignore_lexloc ~start_pos ~end_pos state in
+  if remaining <= 1
+  then k_done state lexbuf
+  else k_continue (remaining - 1) state lexbuf
+
+(** Handles a tab character in the SNA area: updates [tab_col_shift] and adds
+    the character to the ignored locations list, then dispatches to
+    [~k_indicator] if the expansion lands at or before the indicator column
+    (0-indexed column 6), or to [~k_nominal] (with [flush_continued] applied)
+    if the tab jumped past the indicator column. *)
+let sna_tab ~k_indicator ~k_nominal state lexbuf =
+  let _, start_pos, end_pos = lexeme_info lexbuf in
+  let next_stop, state = compute_tab_shift state start_pos in
+  let state = ignore_lexloc ~start_pos ~end_pos state in
+  if next_stop > 6
+  then k_nominal (flush_continued state) lexbuf
+  else k_indicator state lexbuf
+
 let tab ?sna ~k state lexbuf =
   let _, start_pos, _ = lexeme_info lexbuf in
-  let byte_col = start_pos.pos_cnum - start_pos.pos_bol in
-  if byte_col < 6 && Option.is_some sna then
-    (Option.value ~default:k sna) state lexbuf
-  else
-    k state lexbuf
+  let next_stop, state = compute_tab_shift state start_pos in
+  match sna with
+  | Some sna_f when next_stop <= 6 ->
+      sna_f state lexbuf
+  | Some _ ->
+      (* tab jumped over the indicator column; treat indicator as space *)
+      k (flush_continued state) lexbuf
+  | None ->
+      k state lexbuf
 
 
 let eof state lexbuf =
