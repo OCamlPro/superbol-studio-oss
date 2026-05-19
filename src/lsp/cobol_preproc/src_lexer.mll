@@ -252,7 +252,7 @@ rule fixed_line state
   = shortest
   | '\t'
       {
-        Src_lexing.tab ~sna:fixed_indicator ~k:fixed_nominal_line state lexbuf
+        Src_lexing.sna_tab ~k_indicator:fixed_indicator ~k_nominal:fixed_nominal_line state lexbuf
       }
   | nnl_no_tabs
       {

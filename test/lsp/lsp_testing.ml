@@ -133,11 +133,11 @@ let expand_carret_with_tabs lines =
                  is at absolute display col 7+j, but underline position j would
                  be at 6+j.  Injecting at j+1 puts the tab at display col 7+j
                  in both lines, giving the same tab-stop expansion. *)
-              String.iteri begin fun j c ->
+              String.iteri (fun j c ->
                 if c = '\t' && j + 1 < Bytes.length ub
                 && Bytes.get ub (j + 1) <> '^' then
-                  Bytes.set ub (j + 1) '\t'
-              end src_content;
+                  Bytes.set ub (j + 1) '\t' )
+              src_content;
               "----  " ^ Bytes.to_string ub
         in
         (last_tab_content, s' :: acc)
