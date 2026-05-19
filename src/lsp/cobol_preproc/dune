@@ -35,7 +35,7 @@
   (mode    promote)
   (action
     (with-stdout-to %{targets}
-       (run %{exe:../cobol_parser/keywords/gen_keywords.exe} %{deps}))))
+       (run %{exe:../grammarware/keywords/gen_keywords.exe} %{deps}))))
 
 (menhir (modules preproc_tokens grammar_common preproc_grammar)
         (merge_into preproc_grammar)
@@ -52,6 +52,6 @@
   (mode    promote)
   (action
     (with-stdout-to %{targets}
-       (run %{exe:../cobol_parser/keywords/gen_keywords.exe} %{deps}
+       (run %{exe:../grammarware/keywords/gen_keywords.exe} %{deps}
             --external-tokens Preproc_tokens))))
 
