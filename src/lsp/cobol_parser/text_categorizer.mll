@@ -22,12 +22,12 @@ type output =
 
 type pic_output =
   | PIC_string of string
+  | PIC_string_prefix of string
   | PIC_is
   | PIC_end
-  | PIC_unexpected of char
+  | PIC_unexpected of string * char
+  (* first component is any chars accumulated before the unexpected char *)
 
-let pic_buf = Buffer.create 32
-let in_pic_paren = ref false
 
 type alphanum_suffix = STR | EBCDIC
 type alphanum_content =
@@ -96,55 +96,43 @@ and pic_token = parse
       { PIC_is }
 
   | ((picstring '(') as s)
-      { Buffer.add_string pic_buf s;
-        pic_string true lexbuf }
+      { pic_string s true lexbuf }
 
   | (picstring as s)
-      { in_pic_paren := false;
-        PIC_string s }
+      { PIC_string s }
 
   | eof
       { PIC_end }
 
   | (_ as c)
-      { PIC_unexpected c }
+      { PIC_unexpected ("", c) }
 
-and pic_string in_paren = parse
+and pic_string acc in_paren = parse
 
   | blanks
-      { if not in_paren then begin
-          in_pic_paren := false;
-          let s = Buffer.contents pic_buf in
-          Buffer.clear pic_buf;
-          PIC_string s
-        end else
-          pic_string in_paren lexbuf }
+      { if not in_paren then PIC_string acc
+        else pic_string acc in_paren lexbuf }
 
   | (picchar+) as s
-      { Buffer.add_string pic_buf s;
-        pic_string in_paren lexbuf }
+      { pic_string (acc ^ s) in_paren lexbuf }
 
   | ')'
-      { Buffer.add_char pic_buf ')';
-        pic_string false lexbuf }
+      { pic_string (acc ^ ")") false lexbuf }
 
   | '('
       { if in_paren then
-          PIC_unexpected '('
-        else begin
-          Buffer.add_char pic_buf '(';
-          pic_string true lexbuf
-        end }
+          PIC_unexpected (acc, '(')
+        else
+          pic_string (acc ^ "(") true lexbuf }
 
   | eof
-      { in_pic_paren := in_paren;
-        let s = Buffer.contents pic_buf in
-        (* Don't clear the buffer when still inside parens; next word will continue *)
-        if not in_paren then Buffer.clear pic_buf;
-        PIC_string s }
+      { if in_paren then
+          PIC_string_prefix acc
+        else
+          PIC_string acc }
 
   | (_ as c)
-      { PIC_unexpected c }
+      { PIC_unexpected (acc, c) }
 
 (* TODO: distinguish lexing entry based on quotation *)
 and alphanum_string = parse
