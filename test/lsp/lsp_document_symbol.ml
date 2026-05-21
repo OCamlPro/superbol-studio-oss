@@ -60,7 +60,7 @@ let rec print_symbol_with_children ppf (doc_sym: DocumentSymbol.t) =
     pp_range doc_sym.range
     Fmt.(option (list ~sep:sp print_symbol_with_children)) doc_sym.children
 
-let document_symbol doc : string -> unit =
+let document_symbol doc : ?expand_carrets:bool -> string -> unit =
   let { end_with_postproc; projdir }, server = make_lsp_project () in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let params = DocumentSymbolParams.create () ~textDocument:prog in
@@ -500,5 +500,3 @@ let%expect_test "interface-symbol" =
             LINKAGE SECTION(Function)	15:4 -> 16:65
               01 outFactory(Variable)	16:4 -> 16:65
           PROCEDURE DIVISION(Function)	17:4 -> 17:44 |}]
-
-

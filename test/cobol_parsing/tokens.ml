@@ -159,7 +159,7 @@ let%expect_test "tokens-with-tabs" =
        01 WS-ORIG PIC X VALUE 8.
        PROCEDURE DIVISION.
        MAIN-PROC.
-       \t\tCOMPUTE WS-RES = WS-ORIG * 12.
+       \t\tCOMPUTE\tWS-RES\t= WS-ORIG * 12\t.
          STOP RUN.
 ";
     [%expect {|

@@ -17,7 +17,7 @@ module LSP = Cobol_lsp
 type test_project =
   {
     projdir: string;
-    end_with_postproc: string -> unit;
+    end_with_postproc: ?expand_carrets:bool -> string -> unit;
   }
 
 val make_lsp_project
