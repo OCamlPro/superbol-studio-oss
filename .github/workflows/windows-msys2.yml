@@ -111,13 +111,14 @@ jobs:
       #     path: _opam
       #     key: v5-4.14.3-${{ hashFiles('opam/*.opam', 'vendors/autofonce/opam/*.opam') }}
 
-      - run: opam install .\\opam\\*.opam vendors\\autofonce\\opam\\*.opam vendors\\ANSITerminal\\ANSITerminal.opam --deps-only
+      - run: |
+          opam install .\opam\*.opam vendors\autofonce\opam\*.opam .\vendors\ANSITerminal\ANSITerminal.opam .\test\opam\*.opam --deps-only --with-test
       # - run: make dev-deps DUNE_ARGS=
       # - run: make tramabol-interpreter DUNE_ARGS=
 
       - run: make DUNE_ARGS=
 
-      - run: opam exec -- dune runtest
+      # - run: opam exec -- dune runtest
 
       - run: make test DUNE_ARGS=
 
