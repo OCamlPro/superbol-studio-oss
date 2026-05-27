@@ -116,7 +116,10 @@ jobs:
 
       - run: make DUNE_ARGS=
 
-      # - run: opam exec -- dune runtest test\\tramabol
+      - run: opam exec -- dune runtest
+
+      - run: make test DUNE_ARGS=
+
 
       # - name: Cleanup local opam switch before caching
       #   run: |
