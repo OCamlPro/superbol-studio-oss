@@ -96,6 +96,10 @@ jobs:
         shell: msys2 {0}
         run: make -C import/gnucobol4/_build --jobs=$(($(nproc)+1)) install
 
+      - name: Manual install of opam depexts
+        shell: msys2 {0}
+        run: pacman -Su --noconfirm mingw-w64-x86_64-pkgconf
+
       - name: Set up OCaml & opam
         uses: ocaml/setup-ocaml@v3
         with:
@@ -104,12 +108,12 @@ jobs:
           ocaml-compiler: "4.14.2"
           opam-pin: false
 
-      # - name: Retrieve cache of local opam switch
-      #   uses: actions/cache@v5
-      #   id: cache-opam
-      #   with:
-      #     path: _opam
-      #     key: v5-4.14.3-${{ hashFiles('opam/*.opam', 'vendors/autofonce/opam/*.opam') }}
+      - name: Retrieve cache of local opam switch
+        uses: actions/cache@v5
+        id: cache-opam
+        with:
+          path: _opam
+          key: v5-4.14.2-msys2-${{ hashFiles('**/*.opam') }}
 
       - run: |
           opam install .\opam\*.opam vendors\autofonce\opam\*.opam .\vendors\ANSITerminal\ANSITerminal.opam .\test\opam\*.opam --deps-only --with-test
@@ -120,13 +124,12 @@ jobs:
 
       # - run: opam exec -- dune runtest
 
-      - run: make test DUNE_ARGS=
+      # - run: make test DUNE_ARGS=
 
-
-      # - name: Cleanup local opam switch before caching
-      #   run: |
-      #     opam pin remove . --yes || true
-      #     opam clean --switch-cleanup --logs
-      #     find _opam -type f -a \( -name '*.cmt' -o -name '*.cmti' \) -delete
-      #   shell: bash
-      #   if: steps.cache-opam.outputs.cache-hit != 'true'
+      - name: Cleanup local opam switch before caching
+        run: |
+          # opam pin remove . --yes || true
+          opam clean --switch-cleanup --logs
+          find _opam -type f -a \( -name '*.cmt' -o -name '*.cmti' \) -delete
+        shell: bash
+        if: steps.cache-opam.outputs.cache-hit != 'true'
