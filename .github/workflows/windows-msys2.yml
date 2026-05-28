@@ -22,15 +22,18 @@ jobs:
           # - { target: release, sys: mingw32, env: i686         }
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
       - name: Set git user
         run: |
           git config --global user.name github-actions
           git config --global user.email github-actions-bot@users.noreply.github.com
 
-      # Use fields.github-workflow-before-build to add something here
+      - name: Disable git autocrlf
+        run: |
+          git config --global core.autocrlf false
+
+      - name: Checkout code
+        uses: actions/checkout@v6
+
       - run: git submodule init
 
       - run: git submodule update
