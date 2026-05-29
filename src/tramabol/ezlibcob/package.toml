@@ -74,14 +74,14 @@ pretty = { version = "version", build = true }
 #  dune-stanzas = "(foreign_stubs (language c) (names mapfile_stubs))" 
 #  static-clibs = "unix" 
 [fields]
-dune-flags = "(:standard -ccopt -fPIC)"
+dune-flags = ":standard (:include flags)"
 dune-stanzas = """
 (modules V1)
 (enabled_if %{env:HAVE_LIBCOB5=true})              ; <- /!\\ enabled by default
 (foreign_stubs
   (language c)
   (names libcob_stubs)
-  (flags :standard -fPIC (:include libcob_cflags))
+  (flags (:standard (:include cflags) (:include libcob_cflags)))
   (include_dirs (include libcob_incdir)))
 (c_library_flags :standard (:include libcob_libs))
 """
@@ -97,26 +97,78 @@ dune-trailer = """
  (deps stubs.h libcob_stubs_header.c v1_header.ml v1_trailer.ml)
  (action (run %{exe:genstubs.exe} stubs.h v1.ml libcob_stubs.c)))
 
+
+(rule
+ (target flags)
+ (enabled_if (<> %{os_type} Win32))
+ (action (with-stdout-to %{target} (echo "(-ccopt -fPIC)"))))
+
+(rule
+ (target flags)
+ (enabled_if (= %{os_type} Win32))
+ (action (with-stdout-to %{target} (echo "()"))))
+
+(rule
+ (target cflags)
+ (enabled_if (<> %{os_type} Win32))
+ (action (with-stdout-to %{target} (echo "(-fPIC)"))))
+
+(rule
+ (target cflags)
+ (enabled_if (= %{os_type} Win32))
+ (action (with-stdout-to %{target} (echo "()"))))
+
+
 (rule
  (targets libcob_incdir)
- ;(enabled_if (<> %{ocaml-config:system} mingw64))
+ (enabled_if (<> %{os_type} Win32))
  (action (with-stdout-to %{targets}
    (run %{env:GNUCOBOL4_CONFIG=cob-config} --includedir))))
 
 (rule
+ (targets libcob_incdir)
+ (enabled_if (= %{os_type} Win32))
+ (action (with-stdout-to %{targets}
+   (pipe-stdout
+     (run sh %{env:GNUCOBOL4_CONFIG=cob-config} --includedir)
+     (run sed "s/\\\\\\\\/\\\\\\\\\\\\\\\\/g")))))
+
+
+(rule
  (targets libcob_cflags)
- ;(enabled_if (<> %{ocaml-config:system} mingw64))
+ (enabled_if (<> %{os_type} Win32))
  (action (with-stdout-to %{targets}
   (progn (echo "(")
          (run %{env:GNUCOBOL4_CONFIG=cob-config} --cflags)
          (echo ")")))))
 
 (rule
+ (targets libcob_cflags)
+ (enabled_if (= %{os_type} Win32))
+ (action (with-stdout-to %{targets}
+  (progn (echo "(")
+         (pipe-stdout
+           (run sh %{env:GNUCOBOL4_CONFIG=cob-config} --cflags)
+           (run sed "s/\\\\\\\\/\\\\\\\\\\\\\\\\/g"))
+         (echo ")")))))
+
+
+(rule
  (targets libcob_libs)
- ;(enabled_if (<> %{ocaml-config:system} mingw64))
+ (enabled_if (<> %{os_type} Win32))
  (action (with-stdout-to %{targets}
   (progn (echo "(")
          (run %{env:GNUCOBOL4_CONFIG=cob-config} --libs)
+         (echo ")")))))
+
+(rule
+ (targets libcob_libs)
+ (enabled_if (= %{os_type} Win32))
+ (action (with-stdout-to %{targets}
+  (progn (echo "(")
+         (pipe-stdout
+           (run sh %{env:GNUCOBOL4_CONFIG=cob-config} --libs)
+           (run sed "s/\\\\\\\\/\\\\\\\\\\\\\\\\/g"))
          (echo ")")))))
 
 """
