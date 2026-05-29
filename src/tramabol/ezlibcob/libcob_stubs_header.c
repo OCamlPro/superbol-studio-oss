@@ -71,7 +71,7 @@
 
 struct ml_module {
 	cob_module* module;
-	const char* module_name;
+	char* module_name;
 	const char *cob_module_path;
 };
 
@@ -123,9 +123,11 @@ CAMLprim value ml_cob_module_create (value module_name_v)
 	CAMLparam0();
 	CAMLlocal1(module_v);
 	struct ml_module* ms =
-		(struct ml_module*) calloc( sizeof(struct ml_module), 0 );
+		(struct ml_module*) calloc( 1, sizeof(struct ml_module) );
 
-	ms->module_name = String_val (module_name_v);
+	int len = caml_string_length (module_name_v);
+	ms->module_name = (char*) malloc ( len+1 );
+	strncpy (ms->module_name, String_val (module_name_v), len+1);
 
 	module_v = caml_alloc ( FIELD_MODULE_SIZE_OF, Abstract_tag );
 	Field (module_v, FIELD_MODULE_ML_MODULE) = (value)ms;
@@ -151,7 +153,7 @@ CAMLprim value ml_cob_module_enter (value module_v)
 
 	struct ml_module* ms = ML_MODULE( module_v );
 	struct ml_context* cs =
-		(struct ml_context*) calloc( sizeof(struct ml_context), 0 );
+		(struct ml_context*) calloc( 1, sizeof(struct ml_context) );
 
 	if (cob_module_global_enter (&ms->module,
 				     &cs->cob_glob_ptr, 0, /*entry*/0, 0)){
@@ -398,11 +400,13 @@ CAMLprim value ml_cob_display (value to_device_v, value newline_v, value fields_
 			     ML_COB_FIELD (Field (fields_v,i)));
 	}
 	return Val_unit;
-}	
+}
 
 CAMLprim value ml_cob_module_free (value module_v)
 {
-	free( ML_MODULE(module_v) );
+	struct ml_module* ms = ML_MODULE( module_v );
+	free( ms->module_name );
+	free( ms );
 	Field( module_v,0) = (value)NULL;
 	return Val_unit;
 }
@@ -739,4 +743,4 @@ value ml_cob_call_int2_COB_VA_FIELDN (cob_field* (*f)(const int, const int, COB_
 }
 
 /* The following line number should be offset +2 to its line number */
-#line 744 "_build/default/src/ezlibcob/libcob_stubs.c"
+#line 745 "_build/default/src/ezlibcob/libcob_stubs.c"
