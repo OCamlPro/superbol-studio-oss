@@ -4,7 +4,7 @@
   <span><span class="xref-unresolved">Cobol_typeck__.Typeck_procedure_diagnostics.error</span> <span class="arrow">&#45;&gt;</span></span>
   <span class="xref-unresolved">Cobol_typeck__.Typeck_outputs.references_acc</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-resolve_data_qualname"><a href="#val-resolve_data_qualname" class="anchor"></a><code><span><span class="keyword">val</span> resolve_data_qualname : 
   <span><span class="label">data_definitions</span>:<a href="../../../cobol_unit/Cobol_unit/Types/index.html#type-data_definitions">Cobol_unit.Types.data_definitions</a> <span class="arrow">&#45;&gt;</span></span>
-  <span><span class="optlabel">?strict</span>:bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?assume_partial_data_definitions</span>:bool <span class="arrow">&#45;&gt;</span></span>
   <span><span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-qualname">Cobol_ptree.qualname</a> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="xref-unresolved">Cobol_typeck__.Typeck_outputs.references_acc</span> <span class="arrow">&#45;&gt;</span></span>
   <span><span>(<span><span>(<a href="../../../cobol_data/Cobol_data/Types/index.html#type-data_definition">Cobol_data.Types.data_definition</a>,
@@ -12,7 +12,7 @@
      <a href="../../../cobol_unit/Cobol_unit/Types/index.html#type-resolved_reference">Cobol_unit.Types.resolved_reference</a></span>,
     unit)</span>
     <span class="xref-unresolved">Stdlib</span>.result</span>
-  * <span class="xref-unresolved">Cobol_typeck__.Typeck_outputs.references_acc</span></span></code></div><div class="spec-doc"><p>May raise <code>Not_found</code> when <code>strict = true</code> (the default)</p></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-resolve_record_name"><a href="#val-resolve_record_name" class="anchor"></a><code><span><span class="keyword">val</span> resolve_record_name : 
+  * <span class="xref-unresolved">Cobol_typeck__.Typeck_outputs.references_acc</span></span></code></div><div class="spec-doc"><p>Emits a warning diagnostic on undefined data-name unless <code>assume_partial_data_definitions</code> is explictly set to <code>true</code>.</p></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-resolve_record_name"><a href="#val-resolve_record_name" class="anchor"></a><code><span><span class="keyword">val</span> resolve_record_name : 
   <span><span class="label">data_definitions</span>:<a href="../../../cobol_unit/Cobol_unit/Types/index.html#type-data_definitions">Cobol_unit.Types.data_definitions</a> <span class="arrow">&#45;&gt;</span></span>
   <span><span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-name">Cobol_ptree.name</a> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="xref-unresolved">Cobol_typeck__.Typeck_outputs.references_acc</span> <span class="arrow">&#45;&gt;</span></span>
@@ -21,7 +21,7 @@
      <a href="../../../cobol_unit/Cobol_unit/Types/index.html#type-resolved_reference">Cobol_unit.Types.resolved_reference</a></span>,
     unit)</span>
     <span class="xref-unresolved">Stdlib</span>.result</span>
-  * <span class="xref-unresolved">Cobol_typeck__.Typeck_outputs.references_acc</span></span></code></div><div class="spec-doc"><p>May raise <code>Not_found</code></p></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-register_data_qualname"><a href="#val-register_data_qualname" class="anchor"></a><code><span><span class="keyword">val</span> register_data_qualname : 
+  * <span class="xref-unresolved">Cobol_typeck__.Typeck_outputs.references_acc</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-register_data_qualname"><a href="#val-register_data_qualname" class="anchor"></a><code><span><span class="keyword">val</span> register_data_qualname : 
   <span><span class="label">data_definitions</span>:<a href="../../../cobol_unit/Cobol_unit/Types/index.html#type-data_definitions">Cobol_unit.Types.data_definitions</a> <span class="arrow">&#45;&gt;</span></span>
   <span><span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-qualname">Cobol_ptree.qualname</a> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="xref-unresolved">Cobol_typeck__.Typeck_outputs.references_acc</span> <span class="arrow">&#45;&gt;</span></span>
