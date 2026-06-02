@@ -483,14 +483,13 @@ type merge_stmt =
 [@@deriving ord]
 
 and merge_or_sort_target =
-  | OutputProcedure of procedure_name with_loc procedure_range
+  | OutputProcedure of procedure_range
   | Giving of name with_loc list
 [@@deriving ord]
 
 let pp_merge_or_sort_target ppf = function
   | OutputProcedure pr ->
-    Fmt.pf ppf "OUTPUT@ PROCEDURE@ IS@ %a"
-      (pp_procedure_range pp_procedure_name') pr
+    Fmt.pf ppf "OUTPUT@ PROCEDURE@ IS@ %a" pp_procedure_range pr
   | Giving ns ->
     Fmt.pf ppf "GIVING@ %a" Fmt.(list ~sep:sp (pp_with_loc pp_name)) ns
 
@@ -785,14 +784,13 @@ type sort_stmt =
 [@@deriving ord]
 
 and sort_source =                                                (* SORT only *)
-  | SortInputProcedure of procedure_name with_loc procedure_range
+  | SortInputProcedure of procedure_range
   | SortUsing of name with_loc list
 [@@deriving ord]
 
 let pp_sort_source ppf = function
   | SortInputProcedure pr ->
-    Fmt.pf ppf "INPUT@ PROCEDURE@ %a"
-      (pp_procedure_range pp_procedure_name') pr
+    Fmt.pf ppf "INPUT@ PROCEDURE@ %a" pp_procedure_range pr
   | SortUsing ns ->
     Fmt.pf ppf "USING@ %a"
       Fmt.(list ~sep:sp (pp_with_loc pp_name)) ns
