@@ -222,7 +222,7 @@ let graph_material_of_doc ({ group; _ }: Cobol_typeck.Outputs.t) =
           | Paragraph _ -> None
           | Section sec ->
             let name = Pretty.to_string "%a (%s)"
-                Cobol_ptree.pp_qualname' ~&sec.section_name
+                Cobol_ptree.pp_name' ~&sec.section_name
                 ((~&) cu.unit_name) in
             Some (name, `Section (cu, ~&sec))
         end cu.unit_procedure.procedure_blocks.list in

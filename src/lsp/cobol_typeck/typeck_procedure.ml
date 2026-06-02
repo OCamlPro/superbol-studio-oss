@@ -101,7 +101,7 @@ let procedure_of_compilation_unit ~data_definitions ~refs cu' =
       }
     and section_under_construction =
       {
-        sec_name: Cobol_ptree.procedure_name with_loc;
+        sec_name: string with_loc;
         sec_paragraphs: procedure_paragraph with_loc list;
       }
 
@@ -156,8 +156,8 @@ let procedure_of_compilation_unit ~data_definitions ~refs cu' =
       | None, Some n ->
           { paragraph_name = Some (name n &@<- n);
             paragraph = p } &@<- p
-      | Some { payload = { sec_name = qn; _ }; _ }, Some n ->
-          { paragraph_name = Some (qual n ~&qn &@<- n);
+      | Some { payload = { sec_name; _ }; _ }, Some n ->
+          { paragraph_name = Some (qual n (name sec_name) &@<- n);
             paragraph = p } &@<- p
       | _, None ->
           { paragraph_name = None;
@@ -168,10 +168,10 @@ let procedure_of_compilation_unit ~data_definitions ~refs cu' =
 
     let commit_section acc =
       match acc.current_section with
-      | Some ({ payload = { sec_name = qn; _ }; _ } as section) ->
+      | Some ({ payload = { sec_name; _ }; _ } as section) ->
           let section = section_block section in
           { acc with
-            blocks = Resolver_map.add ~&qn section acc.blocks;
+            blocks = Resolver_map.add (name sec_name) section acc.blocks;
             block_list = section :: acc.block_list;
             current_section = None }
       | None ->
@@ -181,7 +181,7 @@ let procedure_of_compilation_unit ~data_definitions ~refs cu' =
       let acc = commit_section acc in
       let sec_paragraphs = [simple_paragraph s acc] in
       { acc with
-        current_section = Some ({ sec_name = name n &@<- n;
+        current_section = Some ({ sec_name = n;
                                   sec_paragraphs } &@<- s) }
 
     let named_paragraph n p acc =
@@ -195,7 +195,7 @@ let procedure_of_compilation_unit ~data_definitions ~refs cu' =
         | Some s ->
             let loc = Cobol_common.Srcloc.concat ~@s ~@p in
             let sec_paragraphs = p :: ~&s.sec_paragraphs in
-            qual n ~&(~&s.sec_name),
+            qual n (name (~&s.sec_name)),
             acc.block_list,
             Some ({ ~&s with sec_paragraphs } &@ loc)
       in

@@ -14,6 +14,7 @@
 (** Representation of COBOL compilation units *)
 
 open Cobol_common.Srcloc.TYPES
+open Cobol_common.Srcloc.INFIX
 
 (* utils *)
 
@@ -74,7 +75,7 @@ type procedure_paragraph =
 
 type procedure_section =
   {
-    section_name: Cobol_ptree.procedure_name with_loc;
+    section_name: Cobol_ptree.name with_loc;
     section_paragraphs: procedure_paragraph with_loc named_n_ordered;
   }
 
@@ -97,7 +98,11 @@ and arg_passing_style =
 type procedure =
   {
     procedure_using: procedure_using with_loc option; (* PROCEDURE DIVISION USING ... *)
-    procedure_blocks: procedure_block named_n_ordered;
+    procedure_blocks: procedure_block named_n_ordered; 
+    (* FIXME: We should probably replace the ordered part with a regular list of sections 
+       including the implicit anonymous section at begining of the file. 
+       I think we have bugs lurking around linked to this missing section and the 
+       processing irregularity that follows from that. *)
   }
 
 (* main *)
@@ -118,4 +123,4 @@ type t = cobol_unit with_loc
 
 let block_name: _ -> Cobol_ptree.qualname with_loc option = function
   | Paragraph { payload = p; _ } -> p.paragraph_name
-  | Section { payload = s; _ } -> Some s.section_name
+  | Section { payload = s; _ } -> Some (Cobol_ptree.Name s.section_name &@<- s.section_name)
