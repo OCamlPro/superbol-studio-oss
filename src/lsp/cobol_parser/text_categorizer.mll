@@ -96,7 +96,7 @@ and pic_token = parse
       { PIC_is }
 
   | ((picstring '(') as s)
-      { pic_string s true lexbuf }
+      { PIC_string_prefix s }
 
   | (picstring as s)
       { PIC_string s }
@@ -107,32 +107,28 @@ and pic_token = parse
   | (_ as c)
       { PIC_unexpected ("", c) }
 
-and pic_string acc in_paren = parse
+and pic_string_aux in_paren = parse
 
   | blanks
-      { if not in_paren then PIC_string acc
-        else pic_string acc in_paren lexbuf }
+      { if not in_paren then PIC_end
+        else pic_string_aux in_paren lexbuf }
 
   | (picchar+) as s
-      { pic_string (acc ^ s) in_paren lexbuf }
+      { PIC_string s }
 
   | ')'
-      { pic_string (acc ^ ")") false lexbuf }
+      { PIC_string ")" }
 
   | '('
-      { if in_paren then
-          PIC_unexpected (acc, '(')
-        else
-          pic_string (acc ^ "(") true lexbuf }
+      { if in_paren then PIC_unexpected ("", '(')
+        else PIC_string "(" }
 
   | eof
-      { if in_paren then
-          PIC_string_prefix acc
-        else
-          PIC_string acc }
+      { if in_paren then PIC_string_prefix ""
+        else PIC_end }
 
   | (_ as c)
-      { PIC_unexpected (acc, c) }
+      { PIC_unexpected ("", c) }
 
 (* TODO: distinguish lexing entry based on quotation *)
 and alphanum_string = parse
