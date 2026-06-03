@@ -365,24 +365,30 @@ let flush_continued ?(force = false) state = match state.continued with
          stage to account for quotes in comment paragraphs. *)
       emit (AlphanumPrefix { knd; qte; str } &@ loc) (reset_cont state)
 
-(** Fixed tab stop positions (1-indexed columns). Tabs advance to the next
-    listed column; once all stops are exhausted, the last interval repeats
-    indefinitely. *)
-let tab_stops = [8; 16]
+(** Tab stop widths, matching the semantics of GnuCOBOL's [-ftab-width] option:
+    each entry is the distance from the previous stop to the next, starting
+    from column 1.  The last entry repeats for all subsequent stops.
 
-(** Returns the 1-indexed column of the first character after a tab that is
-    currently at 1-indexed column [col].  Uses the explicit [tab_stops] list
-    and, once exhausted, extends with the last interval. *)
+    [7; 8] reproduces the classic fixed-format layout: first stop at column 8
+    (code area), then every 8 columns (16, 24, …).
+    [6; 1; 8] reproduces the fixed-format layout with the first stop leading
+    to the 7th column for indicator char. *)
+let tab_stops = [7; 8]
+
+(** Returns the column of the first character after a tab at column [col],
+    using [tab_stops] widths accumulated from column 1. *)
 let next_tab_stop col =
-  let rec go prev = function
-    | stop :: _ when stop > col -> stop
-    | [last] ->
-        let interval = max 1 (last - prev) in
-        last + ((col - last) / interval + 1) * interval
-    | stop :: rest -> go stop rest
+  let rec go pos = function
+    | [w] ->
+        if pos + w > col then pos + w
+        else pos + ((col - pos) / w + 1) * w
+    | w :: rest ->
+        let stop = pos + w in
+        if stop > col then stop
+        else go stop rest
     | [] -> col + 1
   in
-  go 0 tab_stops
+  go 1 tab_stops
 
 (** Computes the 0-indexed visual column of the first character after a tab at
     [start_pos] and returns it together with the updated state. *)

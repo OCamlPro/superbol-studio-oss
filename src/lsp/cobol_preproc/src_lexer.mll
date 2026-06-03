@@ -176,7 +176,6 @@
 
 let newline = '\r'* '\n'
 let nnl = _ # ['\r' '\n']                             (* anything but newline *)
-let nnl_no_tabs = nnl # [ '\t' ]
 let spaces = ' '*
 let    blank        = [' ' '\r']
 let nonblank        = (nnl # blank) # [ '\t' ]
@@ -250,24 +249,7 @@ let mf_cdir_word =
 
 rule fixed_line state
   = shortest
-  | '\t'
-      {
-        Src_lexing.sna_tab ~k_indicator:fixed_indicator ~k_nominal:fixed_nominal_line state lexbuf
-      }
-  | nnl_no_tabs
-      {
-        Src_lexing.sna_blank ~k_continue:fixed_sna_continuation
-                             ~k_done:fixed_indicator
-                             6 state lexbuf
-      }
-  | (nnl* newline) (* NOTE: remove? other cases are already shorter *) (* blank line (too short) *)
-      {
-        Src_lexing.new_line (Src_lexing.sna state lexbuf) lexbuf
-      }
-  | (nnl* eof) (* NOTE: ditto *) (* blank line (too short), without newline character *)
-      {
-        Src_lexing.(flush @@ eof (Src_lexing.sna state lexbuf) lexbuf)
-      }
+  | epsilon { fixed_sna_continuation 6 state lexbuf (*TODO: Parametrize 7 *)}
 and fixed_indicator state
   = parse
   | ' '
@@ -316,7 +298,7 @@ and fixed_sna_continuation remaining state
           ~k_nominal:fixed_nominal_line
           state lexbuf
       }
-  | nnl_no_tabs                                             (* SNA space/char *)
+  | nnl # [ '\t' ]                                             (* SNA space/char *)
       {
         Src_lexing.sna_blank ~k_continue:fixed_sna_continuation
                              ~k_done:fixed_indicator
