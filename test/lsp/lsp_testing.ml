@@ -95,10 +95,10 @@ let projdir_marker = "__rootdir__"
 type test_project =
   {
     projdir: string;
-    end_with_postproc: ?expand_carrets:bool -> string -> unit;
+    end_with_postproc: ?expand_carets:bool -> string -> unit;
   }
 
-let expand_carret_with_tabs lines =
+let expand_caret_with_tabs lines =
   let is_display_source_line s =
     (* source display lines: "%4d %c %s" — units digit at [3] *)
     String.length s > 7
@@ -151,12 +151,13 @@ let make_lsp_project ?toml () =
   let projdir = init_temp_project ?toml () in
   let projdir_regexp = Str.(regexp @@ quote projdir) in
   let temp_dir_name = Filename.get_temp_dir_name () in
-  let end_with_postproc ?(expand_carrets=false) expected_output_string =
+  let end_with_postproc ?(expand_carets=false) expected_output_string =
     (* Remove temporary project directory *)
     if EzString.starts_with ~prefix:temp_dir_name projdir
     then EzFile.remove_dir ~all:true projdir
     else Printf.eprintf "Leaving %s as is (does not look like a temporary \
                          directory)" projdir;
+    (* Filter and print out results *)
     let filtered =
       EzString.split expected_output_string '\n' |>
       List.filter_map begin function
@@ -165,10 +166,10 @@ let make_lsp_project ?toml () =
         | s -> Some (Str.global_replace projdir_regexp projdir_marker s)
         end
     in
-    let lines = if expand_carrets then
-      expand_carret_with_tabs filtered
+    let lines = if expand_carets then
+      expand_caret_with_tabs filtered
     else
-        filtered
+      filtered
     in
     String.concat "\n" lines |>
     print_endline

@@ -14,7 +14,7 @@
 open Lsp.Types
 open Lsp_testing
 
-let codelens doc : ?expand_carrets:bool -> string -> unit =
+let codelens doc : ?expand_carets:bool -> string -> unit =
   let { end_with_postproc; projdir }, server = make_lsp_project () in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let location_as_srcloc = new srcloc_resuscitator_cache in

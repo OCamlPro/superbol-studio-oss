@@ -554,7 +554,7 @@ let%expect_test "reference-with-tabs" =
        \t\tCOMPUTE WS-RES = WS-ORIG * 12.
          STOP RUN.
 ";
-  end_with_postproc ~expand_carrets:true [%expect.output];
+  end_with_postproc ~expand_carets:true [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     1-res (line 5, character 10):
