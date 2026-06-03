@@ -176,6 +176,8 @@
 
 let newline = '\r'* '\n'
 let nnl = _ # ['\r' '\n']                             (* anything but newline *)
+let nnl_nt = nnl # [ '\t' ]
+let sna = nnl_nt nnl_nt nnl_nt nnl_nt nnl_nt nnl_nt
 let spaces = ' '*
 let    blank        = [' ' '\r']
 let nonblank        = (nnl # blank) # [ '\t' ]
@@ -249,7 +251,11 @@ let mf_cdir_word =
 
 rule fixed_line state
   = shortest
-  | epsilon { fixed_sna_continuation 6 state lexbuf (*TODO: Parametrize 7 *)}
+  | sna (* sna fast path *)
+      {
+        fixed_indicator (Src_lexing.sna state lexbuf) lexbuf
+      }
+  | epsilon { fixed_sna_continuation 6 state lexbuf (*TODO: Parametrize 6 *)}
 and fixed_indicator state
   = parse
   | ' '
@@ -280,7 +286,7 @@ and fixed_indicator state
       {
         fixed_debug_line state lexbuf
       }
-  | (_#['\n' '\r'] as c)                                 (* unknown indicator *)
+  | (_ # ['\n' '\r'] as c)                                (* unknown indicator *)
       {
         Src_lexing.unexpected (Indicator_char c) state lexbuf
           ~k:(fun state -> fixed_nominal_line (Src_lexing.flush_continued state))
