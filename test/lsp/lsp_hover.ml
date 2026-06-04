@@ -466,6 +466,41 @@ let%expect_test "hover-datadef-vars" =
     ---
     References: 2 |}];;
 
+let%expect_test "hover-datadef-value-with-tab" =
+  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  print_hovered server ~projdir @@ extract_position_markers {cobol|
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. prog.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 TAB-_|_ITEM PIC X(10) VALUE "ABC	DEF".
+        PROCEDURE DIVISION.
+          DISPLAY TAB-ITEM
+          STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    (line 5, character 15):
+    __rootdir__/prog.cob:6.11-6.19:
+       3           PROGRAM-ID. prog.
+       4           DATA DIVISION.
+       5           WORKING-STORAGE SECTION.
+       6 >         01 TAB-ITEM PIC X(10) VALUE "ABC	DEF".
+    ----              ^^^^^^^^
+       7           PROCEDURE DIVISION.
+       8             DISPLAY TAB-ITEM
+    ```cobol
+    TAB-ITEM
+    ```
+    ```cobol
+    PIC X(10) USAGE DISPLAY
+    ```
+    ALPHANUMERIC(10)
+    VALUE "ABC	DEF"
+    ---
+    References: 2 |}]
+
 let%expect_test "hover-datadef-vars-usage" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
   print_hovered server ~projdir @@ extract_position_markers {cobol|
