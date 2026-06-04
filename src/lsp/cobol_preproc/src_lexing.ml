@@ -137,10 +137,9 @@ let adjust_position ?(base_cpos_shift = 0) { current_cpos_shift; _ } pos =
      added within the token, leaving the tab contribution (negative, in base)
      out of the position adjustment. *)
   let utf8_shift = current_cpos_shift - min 0 base_cpos_shift in
-  if utf8_shift = 0 || position_encoding_in_bytes then
-    pos
-  else
-    Lexing.{ pos with pos_cnum = pos.pos_cnum - utf8_shift }
+  if utf8_shift = 0 || position_encoding_in_bytes
+  then pos
+  else Lexing.{ pos with pos_cnum = pos.pos_cnum - utf8_shift }
 
 let raw_loc ~start_pos ~end_pos ?end_state start_state =
   let in_area_a =
@@ -396,13 +395,14 @@ let compute_tab_shift state (start_pos: Lexing.position) =
   let col      = pos_column state start_pos in   (* 1-indexed *)
   let next_col = next_tab_stop col in
   next_col - 1,
-  { state with current_cpos_shift = state.current_cpos_shift - (next_col - col - 1) }
+  { state with
+    current_cpos_shift = state.current_cpos_shift - (next_col - col - 1) }
 
-(** Handles a non-tab blank character (space) in the SNA area: ignores it in
-    the produced locations and calls [~k_done state lexbuf] when [remaining]
+(** Handles a non-tab character in the SNA area: ignores it in the produced
+    locations and calls [~k_done state lexbuf] when [remaining]
     reaches 1 (last SNA column), or [~k_continue (remaining-1) state lexbuf]
     otherwise. *)
-let sna_blank ~k_continue ~k_done remaining state lexbuf =
+let sna_char ~k_continue ~k_done remaining state lexbuf =
   let _, start_pos, end_pos = lexeme_info lexbuf in
   let state = ignore_lexloc ~start_pos ~end_pos state in
   if remaining <= 1 then
@@ -416,25 +416,17 @@ let sna_blank ~k_continue ~k_done remaining state lexbuf =
     (0-indexed column 6), or to [~k_nominal] (with [flush_continued] applied)
     if the tab jumped past the indicator column. *)
 let sna_tab ~k_indicator ~k_nominal state lexbuf =
-  let _, start_pos, end_pos = lexeme_info lexbuf in
+  let _, start_pos, _ = lexeme_info lexbuf in
   let next_stop, state = compute_tab_shift state start_pos in
-  let state = ignore_lexloc ~start_pos ~end_pos state in
   if next_stop > 6 then
     k_nominal (flush_continued state) lexbuf
   else
     k_indicator state lexbuf
 
-let tab ?sna ~k state lexbuf =
+let tab ~k state lexbuf =
   let _, start_pos, _ = lexeme_info lexbuf in
-  let next_stop, state = compute_tab_shift state start_pos in
-  match sna with
-  | Some sna_f when next_stop <= 6 ->
-      sna_f state lexbuf
-  | Some _ ->
-      (* tab jumped over the indicator column; treat indicator as space *)
-      k (flush_continued state) lexbuf
-  | None ->
-      k state lexbuf
+  let _, state = compute_tab_shift state start_pos in
+  k (flush_continued state) lexbuf
 
 let eof state lexbuf =
   let _, start_pos, end_pos = lexeme_info lexbuf in

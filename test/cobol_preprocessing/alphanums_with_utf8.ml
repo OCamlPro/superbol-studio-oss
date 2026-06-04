@@ -100,7 +100,7 @@ let%expect_test "alphanum-tab-in-sna-with-utf8" =
      Line 4*:   separator comment
      Line 5:    AlphanumPrefix — tab in SNA, no closing quote
      Line 6*:   missing continuation (flush of line 5's prefix)
-     Lines 7-8: tab in SNA, prefix; standard continuation closes it
+     Lines 7:   tab in SNA, prefix; standard continuation closes it
      Line 9*:   flush comment *)
   Prog_preproc.show_text ~source_format:(SF SFFixed) {cobol|
 	 "α"                                                              |
@@ -118,3 +118,23 @@ let%expect_test "alphanum-tab-in-sna-with-utf8" =
     "εζ                                                             @<prog.cob:5-2|5-66>
     "αβ                                                             γδ"@Cat {
     left = <prog.cob:7-2|7-66>; right = <prog.cob:8-68|8-72> } |}]
+
+let%expect_test "alphanum-tab-inside-literal-with-utf8" =
+  Prog_preproc.show_text ~source_format:(SF SFFixed) {cobol|
+       "α	β"
+       "	αβ"
+       "αβ	"
+       "α	β	γ"
+  |cobol};
+  [%expect {|
+    "α	β"@<prog.cob:2-7|2-12>
+    "	αβ"@<prog.cob:3-7|3-12>
+    "αβ	"@<prog.cob:4-7|4-12>
+    "α	β	γ"@<prog.cob:5-7|5-14> |}]
+
+let%expect_test "alphanum-outer-tab-and-inner-tab-with-utf8" =
+  Prog_preproc.show_text ~source_format:(SF SFFixed) {cobol|
+     2 	"α	β"
+  |cobol};
+  [%expect {|
+    "α	β"@<prog.cob:2-8|2-13> |}]

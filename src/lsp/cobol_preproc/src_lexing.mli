@@ -28,8 +28,7 @@ val eof: 'a state -> Lexing.lexbuf -> 'a state
 val new_line: 'a state -> Lexing.lexbuf -> 'a state * Text.text
 val skip: 'a state -> Lexing.lexbuf -> 'a state
 val tab
-  : ?sna:('s -> Lexing.lexbuf -> 'b)
-  -> k:('s -> Lexing.lexbuf -> 'b)
+  : k:('s -> Lexing.lexbuf -> 'b)
   -> ('a state as 's)
   -> Lexing.lexbuf -> 'b
 
@@ -71,7 +70,7 @@ val eqeq'
 val sna
   : (Src_format.fixed state as 's)
   -> Lexing.lexbuf -> 's
-val sna_blank
+val sna_char
   : k_continue:(int -> (Src_format.fixed state as 's) -> Lexing.lexbuf -> 'b)
   -> k_done:('s -> Lexing.lexbuf -> 'b)
   -> int -> 's -> Lexing.lexbuf -> 'b

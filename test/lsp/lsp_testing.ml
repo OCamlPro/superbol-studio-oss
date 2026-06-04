@@ -166,10 +166,8 @@ let make_lsp_project ?toml () =
         | s -> Some (Str.global_replace projdir_regexp projdir_marker s)
         end
     in
-    let lines = if expand_carets then
-      expand_caret_with_tabs filtered
-    else
-      filtered
+    let lines =
+      if expand_carets then expand_caret_with_tabs filtered else filtered
     in
     String.concat "\n" lines |>
     print_endline

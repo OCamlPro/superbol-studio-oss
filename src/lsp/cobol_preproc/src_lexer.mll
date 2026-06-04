@@ -255,7 +255,10 @@ rule fixed_line state
       {
         fixed_indicator (Src_lexing.sna state lexbuf) lexbuf
       }
-  | epsilon { fixed_sna_continuation 6 state lexbuf (*TODO: Parametrize 6 *)}
+  | epsilon
+      {
+        fixed_sna_continuation 6 state lexbuf (*TODO: Parametrize 6 *)
+      }
 and fixed_indicator state
   = parse
   | ' '
@@ -299,16 +302,15 @@ and fixed_sna_continuation remaining state
   = parse
   | '\t'    (* tab in SNA: check expanded col vs indicator position (col 7) *)
       {
-        Src_lexing.sna_tab
+        Src_lexing.sna_tab state lexbuf
           ~k_indicator:fixed_indicator
           ~k_nominal:fixed_nominal_line
-          state lexbuf
       }
   | nnl # [ '\t' ]                                             (* SNA space/char *)
       {
-        Src_lexing.sna_blank ~k_continue:fixed_sna_continuation
-                             ~k_done:fixed_indicator
-                             remaining state lexbuf
+        Src_lexing.sna_char remaining state lexbuf
+          ~k_continue:fixed_sna_continuation
+          ~k_done:fixed_indicator
       }
   | newline                           (* line ends before 6 SNA chars: blank *)
       {
