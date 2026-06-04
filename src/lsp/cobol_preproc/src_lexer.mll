@@ -306,7 +306,13 @@ and fixed_sna_continuation remaining state
           ~k_indicator:fixed_indicator
           ~k_nominal:fixed_nominal_line
       }
-  | nnl # [ '\t' ]                                             (* SNA space/char *)
+  | ' '                                                         (* SNA space *)
+      {
+        if remaining <= 1
+        then fixed_indicator state lexbuf
+        else fixed_sna_continuation (remaining - 1) state lexbuf
+      }
+  | nnl # [ '\t' ' ' ]                                           (* SNA char *)
       {
         Src_lexing.sna_char remaining state lexbuf
           ~k_continue:fixed_sna_continuation
