@@ -45,11 +45,15 @@ module TYPES = struct
     }
 
   (** Functional state for the lexer *)
+  type pic_state =
+    | Pic_unexpected
+    | Pic_expected
+    | Pic_started of string
+
   type lexer_state =
     {
-      expect_picture_string: bool;
+      pic_state: pic_state;
       decimal_point_is_comma: bool;
-      pic_prefix: string option;
     }
 
 end
@@ -239,18 +243,26 @@ let intrinsic_handles lexer : string list -> IntrinsicHandles.t = fun intrinsics
 
 let initial_state =
   {
-    expect_picture_string = false;
+    pic_state = Pic_unexpected;
     decimal_point_is_comma = false;
-    pic_prefix = None;
   }
 
-let expecting_picture_string state = state.expect_picture_string
+let expecting_picture_string = function
+  | { pic_state = Pic_expected | Pic_started _; _ } -> true
+  | _ -> false
 
-let cancel_picture_string_expectation state =
-  if not state.expect_picture_string && state.pic_prefix = None then
-    state
-  else
-    { state with expect_picture_string = false; pic_prefix = None }
+let cancel_picture_string_expectation ({ pic_state; _ } as state) =
+  if pic_state = Pic_unexpected
+  then state
+  else { state with pic_state = Pic_unexpected }
+
+let get_pic_prefix = function
+  | { pic_state = Pic_started prefix; _ } -> prefix
+  | _ -> ""
+
+let in_pic_paren = function
+  | { pic_state = Pic_started _; _} -> true
+  | _ -> false
 
 let decimal_point_is_comma state =
   { state with decimal_point_is_comma = true }
@@ -326,24 +338,28 @@ let read_tokens lexer state w =
       | Unexpected c ->
           append (INTERVENING_ c)
     else if in_pic_paren then
-      let pic_acc = Option.value ~default:"" state.pic_prefix in
-      pic_aux ~start_pos ~pic_acc ~loc ~expect_picture_string acc
+      let pic_acc = get_pic_prefix state in
+      pic_aux  pic_acc acc
+        ~start_pos ~loc ~expect_picture_string
     else
       match Text_categorizer.pic_token lexbuf with
       | PIC_end ->
-          List.rev acc, { state with expect_picture_string; pic_prefix = None }
+          List.rev acc,
+            { state with
+              pic_state = if expect_picture_string then Pic_expected else Pic_unexpected; }
       | PIC_is ->
           append IS ~expect_picture_string:true
       | PIC_string w ->
           append (PICTURE_STRING w) ~expect_picture_string:false ~in_pic_paren:false
       | PIC_string_prefix s ->
-          pic_aux ~start_pos ~pic_acc:s ~loc ~expect_picture_string acc
-      | PIC_unexpected (_, (',' | ';')) ->
+          pic_aux s acc
+            ~start_pos ~loc ~expect_picture_string
+      | PIC_unexpected (',' | ';') ->
           aux ~loc:(Cobol_common.Srcloc.trunc_prefix 1 loc) acc
             ~expect_picture_string ~in_pic_paren
-      | PIC_unexpected (_, c) ->
+      | PIC_unexpected c ->
           append (INTERVENING_ c)
-  and pic_aux ~start_pos ~pic_acc ~loc ~expect_picture_string acc =
+  and pic_aux ~start_pos ~loc ~expect_picture_string pic_acc acc =
     let open Grammar_tokens in
     let rec pic_string_loop ~acc ~in_paren =
       let open Text_categorizer in
@@ -359,12 +375,8 @@ let read_tokens lexer state w =
           PIC_string acc
       | PIC_string_prefix _ ->
           PIC_string_prefix acc
-      | PIC_unexpected ("", c) ->
-          PIC_unexpected (acc, c)
-      | PIC_is
-      | PIC_unexpected _ ->
-          (* pic_string only returns PIC_unexpected ("", c); PIC_is never occurs *)
-          assert false
+      | PIC_unexpected c ->
+          PIC_unexpected c
     in
     match pic_string_loop ~acc:pic_acc ~in_paren:true with
     | PIC_string s ->
@@ -372,24 +384,22 @@ let read_tokens lexer state w =
         aux ~loc ~expect_picture_string:false ~in_pic_paren:false
           ((PICTURE_STRING s &@ xloc) :: acc)
     | PIC_string_prefix s ->
-        List.rev acc, { state with expect_picture_string; pic_prefix = Some s }
-    | PIC_unexpected (partial, (',' | ';')) ->
+        List.rev acc, { state with pic_state = Pic_started s }
+    | PIC_unexpected (',' | ';') ->
         let start_pos = lexbuf.Lexing.lex_curr_pos in
-        pic_aux ~start_pos ~pic_acc:partial
-          ~loc:(Cobol_common.Srcloc.trunc_prefix 1 loc)
-          ~expect_picture_string acc
-    | PIC_unexpected (partial, c) ->
+        pic_aux "" acc
+          ~start_pos ~loc:(Cobol_common.Srcloc.trunc_prefix 1 loc) ~expect_picture_string
+    | PIC_unexpected c ->
         let xloc, loc = split_loc loc @@ lexbuf.Lexing.lex_curr_pos - start_pos in
         let start_pos = lexbuf.Lexing.lex_curr_pos in
-        pic_aux ~start_pos ~pic_acc:partial ~loc ~expect_picture_string
-          ((INTERVENING_ c &@ xloc) :: acc)
-    | PIC_end
-    | PIC_is ->
+        pic_aux "" ((INTERVENING_ c &@ xloc) :: acc)
+          ~start_pos ~loc ~expect_picture_string
+    | PIC_end ->
         (* pic_string_loop only returns PIC_string, PIC_string_prefix, or PIC_unexpected *)
         assert false
   in
-  aux ~loc:~@w [] ~expect_picture_string:state.expect_picture_string
-    ~in_pic_paren:(state.pic_prefix <> None)
+  aux ~loc:~@w [] ~expect_picture_string:(expecting_picture_string state)
+    ~in_pic_paren:(in_pic_paren state)
 
 
 (* --- Symbolic EBCDICs --- *)

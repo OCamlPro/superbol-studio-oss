@@ -25,9 +25,14 @@ type pic_output =
   | PIC_string_prefix of string
   | PIC_is
   | PIC_end
-  | PIC_unexpected of string * char
+  | PIC_unexpected of char
   (* first component is any chars accumulated before the unexpected char *)
 
+type pic_string_prefix =
+  | PIC_string of string
+  | PIC_string_prefix of string
+  | PIC_end
+  | PIC_unexpected of char
 
 type alphanum_suffix = STR | EBCDIC
 type alphanum_content =
@@ -105,7 +110,7 @@ and pic_token = parse
       { PIC_end }
 
   | (_ as c)
-      { PIC_unexpected ("", c) }
+      { PIC_unexpected (c) }
 
 and pic_string_aux in_paren = parse
 
@@ -120,7 +125,7 @@ and pic_string_aux in_paren = parse
       { PIC_string ")" }
 
   | '('
-      { if in_paren then PIC_unexpected ("", '(')
+      { if in_paren then PIC_unexpected ('(')
         else PIC_string "(" }
 
   | eof
@@ -128,7 +133,7 @@ and pic_string_aux in_paren = parse
         else PIC_end }
 
   | (_ as c)
-      { PIC_unexpected ("", c) }
+      { (PIC_unexpected (c): pic_string_prefix) }
 
 (* TODO: distinguish lexing entry based on quotation *)
 and alphanum_string = parse
