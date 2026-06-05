@@ -90,13 +90,22 @@ type warning =
         loc: srcloc;
         item: unexpected_stuff;
       }
+  | Tab_in_alphanum_literal of
+      {
+        loc: srcloc;
+      }
 
 let warning_loc = function
-  | Warn_unexpected { loc; _ } -> loc
+  | Warn_unexpected { loc; _ }
+  | Tab_in_alphanum_literal { loc } -> loc
 
 let pp_warning ppf = function
   | Warn_unexpected { item; _ } ->
       Pretty.print ppf "Unexpected@ %a" pp_unexpected_stuff item
+  | Tab_in_alphanum_literal _ ->
+      Pretty.print ppf "Tab@ character@ in@ alphanumeric@ literal:@ \
+                        visual@ column@ alignment@ may@ differ@ from@ \
+                        character@ column@ in@ fixed-format@ source"
 
 (* --- *)
 

@@ -736,6 +736,13 @@ let fixed_alphanum_lit ?(doubled_opener = false)
       trunc_to_col cut_at_col lexinf ~start_state ~end_state
     in
     let s, knd, end_state = extract_knd s end_state lexbuf in
+    let end_state =
+      if String.contains s '\t' then
+        lex_warn end_state @@
+        Tab_in_alphanum_literal { loc = raw_loc ~start_pos ~end_pos start_state ~end_state }
+      else
+        end_state
+    in
     let s, end_pos, fitting =
       (* Actually double the opening delimiter ('\'' or '"'), to have the
          doubled quote/apostrophe character prefix after stripping of opening

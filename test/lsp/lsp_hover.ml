@@ -480,7 +480,7 @@ let%expect_test "hover-datadef-value-with-tab" =
     |cobol};
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[{"message":"Tab character in alphanumeric literal: visual column alignment may differ from character column in fixed-format source","range":{"end":{"character":45,"line":5},"start":{"character":36,"line":5}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     (line 5, character 15):
     __rootdir__/prog.cob:6.11-6.19:
        3           PROGRAM-ID. prog.

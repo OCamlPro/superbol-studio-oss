@@ -127,6 +127,22 @@ let%expect_test "alphanum-tab-inside-literal-with-utf8" =
        "α	β	γ"
   |cobol};
   [%expect {|
+    prog.cob:2.7-2.12:
+    >> Warning: Tab character in alphanumeric literal: visual column alignment
+                may differ from character column in fixed-format source
+
+    prog.cob:3.7-3.12:
+    >> Warning: Tab character in alphanumeric literal: visual column alignment
+                may differ from character column in fixed-format source
+
+    prog.cob:4.7-4.12:
+    >> Warning: Tab character in alphanumeric literal: visual column alignment
+                may differ from character column in fixed-format source
+
+    prog.cob:5.7-5.14:
+    >> Warning: Tab character in alphanumeric literal: visual column alignment
+                may differ from character column in fixed-format source
+
     "α	β"@<prog.cob:2-7|2-12>
     "	αβ"@<prog.cob:3-7|3-12>
     "αβ	"@<prog.cob:4-7|4-12>
@@ -137,4 +153,8 @@ let%expect_test "alphanum-outer-tab-and-inner-tab-with-utf8" =
      2 	"α	β"
   |cobol};
   [%expect {|
+    prog.cob:2.8-2.13:
+    >> Warning: Tab character in alphanumeric literal: visual column alignment
+                may differ from character column in fixed-format source
+
     "α	β"@<prog.cob:2-8|2-13> |}]
