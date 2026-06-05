@@ -198,10 +198,14 @@ let%expect_test "signed-numeric-sizes" =
 let%expect_test "pic-with-space-in-parens" =
   dotest @@ prog "pic-with-space-in-parens"
   ~working_storage:{|
-            77 DB-REALM-NAME    PIC X( 30 ) IS EXTERNAL.
-            77 DB-RECORD-NAME   PIC X( 30 ) IS EXTERNAL.
-            77 DB-SET-NAME      PIC X( 30 ) IS EXTERNAL.
-            77 DB-KEY-NAME      PIC X( 30 ) IS EXTERNAL.
+            77 PAREN-PIC-0   PIC    X( 30 ).
+            77 PAREN-PIC-1   PIC    9( 10 ).
+            77 PAREN-PIC-2   PIC    X(2 ).
+            77 PAREN-PIC-3   PIC    9( 2 )V9( 2 ).
+            77 PAREN-PIC-4   PIC IS X( 30 ).
+            77 PAREN-PIC-5   PIC IS 9( 10 ).
+            77 PAREN-PIC-6   PIC IS X(2 ).
+            77 PAREN-PIC-7   PIC IS 9( 2 )V9( 2 ).
   |};
 [%expect {|
   prog.cob:4.7-4.51:
