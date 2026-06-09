@@ -95,28 +95,22 @@ let procedure_of_compilation_unit ~data_definitions ~refs cu' =
     type acc =
       {
         blocks: procedure_block Resolver_map.t;
-        block_list: procedure_block list;
+        section_list: procedure_section with_loc list;
         current_section: section_under_construction with_loc option;
         args: Cobol_ptree.procedure_using_phrase with_loc option;
       }
     and section_under_construction =
       {
-        sec_name: string with_loc;
+        sec_name: Cobol_ptree.name with_loc option;
         sec_paragraphs: procedure_paragraph with_loc list;
       }
 
     let init =
       {
         blocks = Resolver_map.empty;
-        block_list = [];
+        section_list = [];
         current_section = None;
         args = None;
-      }
-
-    let procedure_blocks acc =
-      {
-        named = acc.blocks;
-        list = List.rev acc.block_list;
       }
 
     let procedure_using acc =
@@ -129,7 +123,8 @@ let procedure_of_compilation_unit ~data_definitions ~refs cu' =
     let procedure acc =
       let procedure_using, references = procedure_using acc in
       {
-        procedure_blocks = procedure_blocks acc;
+        procedure_blocks = acc.blocks;
+        procedure_sections = List.rev acc.section_list;
         procedure_using;
       },
       references
@@ -137,76 +132,80 @@ let procedure_of_compilation_unit ~data_definitions ~refs cu' =
     let name n : Cobol_ptree.qualname = Name n
     let qual n q : Cobol_ptree.qualname = Qual (n, q)
 
-    let section_block
+    let procedure_section
         ({ payload = suc; loc }: section_under_construction with_loc) =
       let section_paragraphs =
-        List.fold_left begin fun ({ named; list } as paragraphs) paragraph ->
-          match ~&paragraph.paragraph_name with
-          | None ->
-              { paragraphs with list = paragraph :: list }
-          | Some qn ->
-              { named = Resolver_map.add ~&qn paragraph named;
-                list = paragraph :: list }
-        end { named = Resolver_map.empty; list = [] } suc.sec_paragraphs
+        (* The section is completely empty: add an empty paragraph to ensure 
+           that each section has at least one paragraph *)
+        if suc.sec_paragraphs = [] then
+          let empty_paragraph = Cobol_ptree.{ 
+            paragraph_name = suc.sec_name;
+            paragraph_is_section = true; 
+            paragraph_segment = None; 
+            paragraph_sentences = [] }
+          in
+          { named = Resolver_map.empty; 
+            list = [{ paragraph_name = None; paragraph = empty_paragraph &@ loc} &@ loc] }
+        else
+          List.fold_left (fun ({ named; list } as paragraphs) paragraph ->
+            match ~&paragraph.paragraph_name with
+            | None ->
+                { paragraphs with list = paragraph :: list }
+            | Some qn ->
+                { named = Resolver_map.add ~&qn paragraph named;
+                  list = paragraph :: list }
+            ) { named = Resolver_map.empty; list = [] } suc.sec_paragraphs
       in
-      Section ({ section_name = suc.sec_name; section_paragraphs } &@ loc)
-
-    let simple_paragraph (p: Cobol_ptree.paragraph with_loc) acc =
-      match acc.current_section, ~&p.paragraph_name with
-      | None, Some n ->
-          { paragraph_name = Some (name n &@<- n);
-            paragraph = p } &@<- p
-      | Some { payload = { sec_name; _ }; _ }, Some n ->
-          { paragraph_name = Some (qual n (name sec_name) &@<- n);
-            paragraph = p } &@<- p
-      | _, None ->
-          { paragraph_name = None;
-            paragraph = p } &@<- p
-
-    let paragraph_block p =
-      Paragraph p
+      { section_name = suc.sec_name; section_paragraphs } &@ loc
 
     let commit_section acc =
       match acc.current_section with
       | Some ({ payload = { sec_name; _ }; _ } as section) ->
-          let section = section_block section in
+          let section = procedure_section section in
+          let blocks = match sec_name with
+            | Some sec_name -> Resolver_map.add (name sec_name) (Section section) acc.blocks
+            | None -> acc.blocks
+          in
           { acc with
-            blocks = Resolver_map.add (name sec_name) section acc.blocks;
-            block_list = section :: acc.block_list;
+            blocks;
+            section_list = section :: acc.section_list;
             current_section = None }
       | None ->
           acc
 
-    let start_new_section n s acc =
+    let start_new_section p acc =
+      let n = Cobol_ptree.(~&p.paragraph_name) in
       let acc = commit_section acc in
-      let sec_paragraphs = [simple_paragraph s acc] in
-      { acc with
-        current_section = Some ({ sec_name = n;
-                                  sec_paragraphs } &@<- s) }
-
-    let named_paragraph n p acc =
-      let p = simple_paragraph p acc in
-      let qn, block_list, current_section =
-        match acc.current_section with
-        | None ->
-            name n,
-            paragraph_block p :: acc.block_list,
-            None
-        | Some s ->
-            let loc = Cobol_common.Srcloc.concat ~@s ~@p in
-            let sec_paragraphs = p :: ~&s.sec_paragraphs in
-            qual n (name (~&s.sec_name)),
-            acc.block_list,
-            Some ({ ~&s with sec_paragraphs } &@ loc)
+      let sec_paragraphs =
+        (* Avoid adding an empty section header paragraph if unneeded, and
+           remove section name from the location of the unnamed paragraph at
+           the begining of section. *)
+        match Cobol_common.Srcloc.concat_locs ~&p.paragraph_sentences with
+        | None -> [] (* when ~&p.paragraph_sentences = [] *)
+        | Some loc -> [{ paragraph_name = None; paragraph = p } &@ loc] 
       in
       { acc with
-        blocks = Resolver_map.add qn (paragraph_block p) acc.blocks;
-        block_list;
-        current_section }
+        current_section = Some ({ sec_name = n;
+                                  sec_paragraphs } &@<- p) }
 
-    let anonymous_paragraph p acc =         (* only at beginning of procedure *)
+    let paragraph_in_current_section (p: Cobol_ptree.paragraph with_loc) acc =
+      let s, loc = match acc.current_section with
+        | None -> { sec_name = None; sec_paragraphs = [] }, ~@p
+        | Some s -> ~&s, Cobol_common.Srcloc.concat ~@s ~@p
+      in
+      let paragraph_name = match ~&p.paragraph_name, s.sec_name with
+        | None, _ -> None (* For first paragraph of PROCEDURE DIVISION *)
+        | Some n, None -> Some (name n &@<- n)
+        | Some n, Some sn -> Some (qual n (name sn) &@<- n)
+      in
+      let p = { paragraph_name; paragraph = p } &@<- p in
+      let blocks = match paragraph_name with
+        | None -> acc.blocks
+        | Some qn -> Resolver_map.add ~&qn (Paragraph p) acc.blocks
+      in
       { acc with
-        block_list = paragraph_block (simple_paragraph p acc) :: acc.block_list }
+        blocks;
+        current_section = Some ({ s with sec_paragraphs = p :: s.sec_paragraphs } &@ loc) }
 
   end in
 
@@ -225,11 +224,11 @@ let procedure_of_compilation_unit ~data_definitions ~refs cu' =
       Visitor.skip_children { acc with args = Some args }
 
     method! fold_paragraph' p acc =
-      Visitor.skip_children @@ match ~&p with
-      | { paragraph_is_section = true;
-          paragraph_name = Some name; _ } -> start_new_section name p acc
-      | { paragraph_name = Some name; _ } -> named_paragraph name p acc
-      | { paragraph_name = None; _ }      -> anonymous_paragraph p acc
+      Visitor.skip_children @@ 
+        if ~&p.paragraph_is_section then
+          start_new_section p acc 
+        else 
+          paragraph_in_current_section p acc
 
     method! fold_nested_programs _  = Visitor.skip                    (* TODO *)
   end in
