@@ -100,8 +100,14 @@ and use_after_exception =
 
 and paragraph =
   {
-    paragraph_name: name with_loc option;
-    paragraph_is_section: bool;
+    paragraph_name: name with_loc option; (** Contains either:
+      - the paragraph name for a named paragraph
+      - the section name for the anonymous paragraph at the begining of 
+        a named section
+      - [None] for the anonymous paragraph at the begining of 
+        PROCEDURE DIVISION *)
+    paragraph_is_section: bool; (**
+      true when this paragraph is an anonymous paragraph at the begining of a section *)
     paragraph_segment: integer option;
     paragraph_sentences: statements with_loc list;
   }

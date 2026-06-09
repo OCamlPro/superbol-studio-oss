@@ -266,9 +266,9 @@ let find_proc_definition
   | Paragraph { payload = { paragraph_name = Some qn; _ }; _ }
     when focus_on_name_in_defintions ->
       [location_of qn]
-  | Section p
+  | Section { payload = { section_name = Some n; _ } ; _ }
     when focus_on_name_in_defintions ->
-      [location_of ~&p.section_name]
+      [location_of n]
   | Paragraph p ->
       [location_of p]
   | Section p ->

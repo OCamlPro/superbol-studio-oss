@@ -182,16 +182,12 @@ let build_edges nodes =
 
 let cfg_of ~(cu: cobol_unit) =
   reset_global_counter ();
-  let nodes = List.fold_left begin fun acc block ->
-      match block with
-      | Paragraph para ->
-        build_node ~cu para :: acc
-      | Section { payload = { section_paragraphs; _ }; _ } ->
+  let nodes = List.fold_left begin fun acc { payload = { section_paragraphs; _ }; _ } ->
         fst @@ List.fold_left begin fun (acc, is_section) p ->
           build_node ~is_section ~cu p :: acc,
           false
         end (acc, true) section_paragraphs.list
-    end [] cu.unit_procedure.procedure_blocks.list
+    end [] cu.unit_procedure.procedure_sections
   in
   List.rev nodes
   |> begin function (* adding entry point if not already present *)
@@ -218,14 +214,15 @@ let cfg_of_section ~cu ({ section_paragraphs; _ }: procedure_section) =
 let graph_material_of_doc ({ group; _ }: Cobol_typeck.Outputs.t) =
   Cobol_unit.Collections.SET.fold
     begin fun { payload = cu; _ } acc ->
-      let section_graphs = List.filter_map begin function
-          | Paragraph _ -> None
-          | Section sec ->
+      let section_graphs = List.filter_map begin fun (sec: procedure_section with_loc) ->
+          match ~&sec.section_name with
+          | None -> None
+          | Some section_name ->
             let name = Pretty.to_string "%a (%s)"
-                Cobol_ptree.pp_name' ~&sec.section_name
+                Cobol_ptree.pp_name' section_name
                 ((~&) cu.unit_name) in
             Some (name, `Section (cu, ~&sec))
-        end cu.unit_procedure.procedure_blocks.list in
+        end cu.unit_procedure.procedure_sections in
       let cu_name = (~&)cu.unit_name in
       (cu_name, `Cu cu) :: section_graphs @ acc
     end group []
