@@ -28,9 +28,9 @@ type usage =
   | Binary of (* [`numeric] *) picture
   | Binary_C_long of signedness                         (* GnuCOBOL *)
   | Binary_char of signedness                           (* +COB2002 *)
-  | Binary_double of signedness                         (* +COB2002 *)
-  | Binary_long of signedness                           (* +COB2002 *)
-  | Binary_short of signedness                          (* +COB2002 *)
+  | Binary_double of binary_range_properties            (* +COB2002 *)
+  | Binary_long of binary_range_properties              (* +COB2002 *)
+  | Binary_short of binary_range_properties             (* +COB2002 *)
   | Bit of (* [`boolean] *) picture
   | Display of (* [any] *) picture
   | Float_binary of { width: [`W32|`W64|`W128];                   (* +COB2002 *)
@@ -54,6 +54,12 @@ type usage =
   | Pointer of Cobol_ptree.name with_loc option                        (* tmp *)
   | Program_pointer of Cobol_ptree.name with_loc option                (* tmp *)
 and signedness = { signed: bool }
+and binary_range_properties =
+  {
+    signed: bool;
+    digits: int option;
+    scaling: int;
+  }
 
 type data_storage =
   | File of Cobol_ptree.name with_loc

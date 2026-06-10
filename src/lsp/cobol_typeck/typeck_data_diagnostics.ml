@@ -70,6 +70,11 @@ type error =
         item_name: Cobol_ptree.data_name with_loc option;
         item_loc: srcloc;
       }
+  | Missing_picture_clause_for_item_with_usage of
+      {
+        usage_clause: Cobol_ptree.usage_clause;
+        item_loc: srcloc;
+      }
   | Unexpected_picture_clause of
       {
         picture: Cobol_ptree.picture_clause with_loc;
@@ -117,6 +122,12 @@ type error =
         usage_clause: Cobol_ptree.usage_clause;
         expected: [`Numeric_category | `Boolean_class | `Nonalpha_class];
       }
+  | Invalid_picture_feature of
+      {
+        picture: Cobol_data.Picture.t with_loc;
+        feature: picture_feature;
+        usage_clause: Cobol_ptree.usage_clause;
+      }
   | Item_not_found of
       {
         qualname: Cobol_ptree.qualname with_loc;
@@ -132,6 +143,10 @@ type error =
         name: string;
         loc: srcloc;
       }
+
+and picture_feature =
+  | Digits of { given: int; min: int; max: int }
+  | Scaling of { given: int; min: int; max: int }
 
 and warning =
   | Redefinition_of_table_item of     (* in GnuCOBOL that's a warning as well *)
@@ -177,6 +192,7 @@ let pp_misplacement_explanation ppf = function
 let error_loc = function
   | Incompatible_picture { picture = { loc; _ }; _ }
   | Invalid_level_number { level = { loc; _ }; _ }
+  | Invalid_picture_feature { picture = { loc; _ }; _ }
   | Invalid_renaming_of_variable_length_range { loc; _ }
   | Invalid_renaming_range { loc; _ }
   | Invalid_renaming_size { loc; _ }
@@ -184,6 +200,7 @@ let error_loc = function
   | Item_not_found { qualname = { loc; _ } }
   | Misplaced { loc; _ }
   | Missing_picture_clause_for_elementary_item { item_loc = loc; _ }
+  | Missing_picture_clause_for_item_with_usage { item_loc = loc; _ }
   | Occurs_in_rename_operand { operand = { loc; _ }; _ }
   | Pending_feature { loc; _ }
   | Picture_error { error = { loc; _ }; _ }
@@ -214,6 +231,10 @@ let pp_one_of pp_e ppf = function                   (* assumes non-empty list *)
   | [s] -> pp_e ppf s
   | lst -> Fmt.(hbox @@ any "one of: " ++ list ~sep:comma pp_e) ppf lst
 
+let pp_picture_feature_kind ppf = function
+  | Digits _ -> Fmt.pf ppf "digits"
+  | Scaling _ -> Fmt.pf ppf "scaling"
+
 let pp_error ppf = function
   | Incompatible_picture { picture; usage_clause; expected } ->
       Pretty.print ppf "PICTURE@ of@ category@ %a@ is@ incompatible@ with@ \
@@ -224,7 +245,15 @@ let pp_error ppf = function
          | `Numeric_category -> "numeric"
          | `Boolean_class -> "boolean"
          | `Nonalpha_class -> "boolean,@ national,@ national-edited,@ numeric,@ \
-                              or@ numeric-edited")
+                               or@ numeric-edited")
+  | Invalid_picture_feature { feature = Digits { given; min; max }
+                                      | Scaling { given; min; max } as f;
+                              usage_clause; _ } ->
+      Pretty.print ppf "Invalid@ number@ of@ %a@ in@ PICTURE@ for@ item@ \
+                        with@ USAGE@ %a; got@ %u,@ expected@ in@ (%u..%u)."
+        pp_picture_feature_kind f
+        Cobol_ptree.pp_usage_clause usage_clause
+        given min max
   | Item_not_allowed_in_section { level; section } ->
       Pretty.print ppf "%d-level@ item@ not@ allowed@ in@ %a@ section" ~&level
         Cobol_data.Printer.pp_data_storage section
@@ -250,6 +279,9 @@ let pp_error ppf = function
   | Missing_picture_clause_for_elementary_item { item_name; _ } ->
       Pretty.print ppf "Missing@ PICTURE@ clause@ for@ %a"
         pp_data_name'_opt item_name
+  | Missing_picture_clause_for_item_with_usage { usage_clause; _ } ->
+      Pretty.print ppf "Missing@ PICTURE@ clause@ for@ item@ with@ USAGE@ %a"
+        Cobol_ptree.pp_usage_clause usage_clause
   | Unexpected_picture_clause { item_name; reason = `Group_item; _ } ->
       Pretty.print ppf "Unexpected@ PICTURE@ clause@ for@ group@ %a"
         pp_data_name'_opt item_name

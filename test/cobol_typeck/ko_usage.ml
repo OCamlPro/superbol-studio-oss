@@ -337,3 +337,156 @@ let%expect_test "unsupported-usage" =
         }
       }
     } |}];;
+
+
+
+let%expect_test "bad-pic-comps" =
+  dotest @@ prog "bad-pic-comps"
+    ~working_storage:{|
+       77 A COMP-5.
+       77 B COMP-5 PIC X(3).
+       77 C COMP-5 PIC 9(20).
+       77 D COMP-5 PIC S9(1)V9(18).
+    |};
+  [%expect {|
+    prog.cob:4.7-4.19:
+       1          PROGRAM-ID. bad-pic-comps.
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4 >        77 A COMP-5.
+    ----          ^^^^^^^^^^^^
+       5          77 B COMP-5 PIC X(3).
+       6          77 C COMP-5 PIC 9(20).
+    >> Error: Missing PICTURE clause for item 'A'
+
+    prog.cob:4.7-4.19:
+       1          PROGRAM-ID. bad-pic-comps.
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4 >        77 A COMP-5.
+    ----          ^^^^^^^^^^^^
+       5          77 B COMP-5 PIC X(3).
+       6          77 C COMP-5 PIC 9(20).
+    >> Error: Missing PICTURE clause for item with USAGE COMP-5
+
+    prog.cob:5.23-5.27:
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4          77 A COMP-5.
+       5 >        77 B COMP-5 PIC X(3).
+    ----                          ^^^^
+       6          77 C COMP-5 PIC 9(20).
+       7          77 D COMP-5 PIC S9(1)V9(18).
+    >> Error: PICTURE of category alphanumeric is incompatible with USAGE
+              COMP-5; expected a PICTURE for numeric data item
+
+    prog.cob:5.7-5.28:
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4          77 A COMP-5.
+       5 >        77 B COMP-5 PIC X(3).
+    ----          ^^^^^^^^^^^^^^^^^^^^^
+       6          77 C COMP-5 PIC 9(20).
+       7          77 D COMP-5 PIC S9(1)V9(18).
+    >> Error: Missing PICTURE clause for item 'B'
+
+    prog.cob:6.23-6.28:
+       3          WORKING-STORAGE SECTION.
+       4          77 A COMP-5.
+       5          77 B COMP-5 PIC X(3).
+       6 >        77 C COMP-5 PIC 9(20).
+    ----                          ^^^^^
+       7          77 D COMP-5 PIC S9(1)V9(18).
+       8          PROCEDURE DIVISION.
+    >> Error: Invalid number of digits in PICTURE for item with USAGE COMP-5; got
+              20, expected in (1..18).
+
+    prog.cob:7.23-7.34:
+       4          77 A COMP-5.
+       5          77 B COMP-5 PIC X(3).
+       6          77 C COMP-5 PIC 9(20).
+       7 >        77 D COMP-5 PIC S9(1)V9(18).
+    ----                          ^^^^^^^^^^^
+       8          PROCEDURE DIVISION.
+       9
+    >> Error: Invalid number of digits in PICTURE for item with USAGE COMP-5; got
+              19, expected in (1..18).
+
+    prog.cob:4.7-4.19:
+       1          PROGRAM-ID. bad-pic-comps.
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4 >        77 A COMP-5.
+    ----          ^^^^^^^^^^^^
+       5          77 B COMP-5 PIC X(3).
+       6          77 C COMP-5 PIC 9(20).
+    Item definition: {
+      qualname: A
+      /!\ with_errors /!\
+      offset: 0
+      size: 8
+      layout: {
+        elementary
+        usage: {
+          display
+          category: ALPHANUMERIC(1)
+        }
+      }
+    }
+    prog.cob:5.7-5.28:
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4          77 A COMP-5.
+       5 >        77 B COMP-5 PIC X(3).
+    ----          ^^^^^^^^^^^^^^^^^^^^^
+       6          77 C COMP-5 PIC 9(20).
+       7          77 D COMP-5 PIC S9(1)V9(18).
+    Item definition: {
+      qualname: B
+      /!\ with_errors /!\
+      offset: 0
+      size: 8
+      layout: {
+        elementary
+        usage: {
+          display
+          category: ALPHANUMERIC(1)
+        }
+      }
+    }
+    prog.cob:6.7-6.29:
+       3          WORKING-STORAGE SECTION.
+       4          77 A COMP-5.
+       5          77 B COMP-5 PIC X(3).
+       6 >        77 C COMP-5 PIC 9(20).
+    ----          ^^^^^^^^^^^^^^^^^^^^^^
+       7          77 D COMP-5 PIC S9(1)V9(18).
+       8          PROCEDURE DIVISION.
+    Item definition: {
+      qualname: C
+      /!\ with_errors /!\
+      offset: 0
+      size: 64
+      layout: {
+        elementary
+        usage: binary-double(range-extended)
+      }
+    }
+    prog.cob:7.7-7.35:
+       4          77 A COMP-5.
+       5          77 B COMP-5 PIC X(3).
+       6          77 C COMP-5 PIC 9(20).
+       7 >        77 D COMP-5 PIC S9(1)V9(18).
+    ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+       8          PROCEDURE DIVISION.
+       9
+    Item definition: {
+      qualname: D
+      /!\ with_errors /!\
+      offset: 0
+      size: 64
+      layout: {
+        elementary
+        usage: signed-binary-double(range-extended)
+      }
+    } |}];;
