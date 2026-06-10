@@ -30,7 +30,7 @@ let count l =
   List.fold_left begin fun acc (_, t) -> acc + List.length t end 0 l
 
 let rename_positions ?(abort_when_in_copybook = false) ?(copybooks = [])
-    (doc, positions) : string -> unit =
+    (doc, positions) : ?expand_carets:bool -> string -> unit =
   let { end_with_postproc; projdir }, server = make_lsp_project () in
   let server =
     List.fold_left begin fun server (name, document) ->

@@ -27,6 +27,10 @@ val flush_continued: ?force:bool -> 'a state -> 'a state
 val eof: 'a state -> Lexing.lexbuf -> 'a state
 val new_line: 'a state -> Lexing.lexbuf -> 'a state * Text.text
 val skip: 'a state -> Lexing.lexbuf -> 'a state
+val tab
+  : k:('s -> Lexing.lexbuf -> 'b)
+  -> ('a state as 's)
+  -> Lexing.lexbuf -> 'b
 
 val comment
   : ?marker:string
@@ -66,6 +70,15 @@ val eqeq'
 val sna
   : (Src_format.fixed state as 's)
   -> Lexing.lexbuf -> 's
+val sna_char
+  : k_continue:(int -> (Src_format.fixed state as 's) -> Lexing.lexbuf -> 'b)
+  -> k_done:('s -> Lexing.lexbuf -> 'b)
+  -> int -> 's -> Lexing.lexbuf -> 'b
+val sna_tab
+  : k_indicator:('s -> Lexing.lexbuf -> 'b)
+  -> k_nominal:('s -> Lexing.lexbuf -> 'b)
+  -> (Src_format.fixed state as 's)
+  -> Lexing.lexbuf -> 'b
 val cdir_word
   : ?marker:string
   -> (Src_format.fixed state as 's)
