@@ -237,6 +237,7 @@ let%expect_test "hover-datadef-vars" =
           02 STR_|_UCT-2 PICTURE X VALUE QUOTE.
           02 STRUCT-3 PICTURE X(6) VAL_|_UE "ABC456".
         01 BIG_|_ PIC X(38) VALUE "************************************".
+        77 DATA-N_|_AME-BIS PIC S9(9)V9(9) COMP-5.
         PROCEDURE DIVISION.
           DISPLAY _|_DATA-NAME STRUC_|_T S_|_TRUCT-1 STR_|_UCT-2 STR_|_UCT-3
           STOP RUN.
@@ -343,7 +344,7 @@ let%expect_test "hover-datadef-vars" =
       10 >           02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
     ----             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
       11           01 BIG PIC X(38) VALUE "************************************".
-      12           PROCEDURE DIVISION.
+      12           77 DATA-NAME-BIS PIC S9(9)V9(9) COMP-5.
     ```cobol
     STRUCT-3 IN STRUCT
     ```
@@ -361,8 +362,8 @@ let%expect_test "hover-datadef-vars" =
       10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
       11 >         01 BIG PIC X(38) VALUE "************************************".
     ----              ^^^
-      12           PROCEDURE DIVISION.
-      13             DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
+      12           77 DATA-NAME-BIS PIC S9(9)V9(9) COMP-5.
+      13           PROCEDURE DIVISION.
     ```cobol
     BIG
     ```
@@ -373,15 +374,32 @@ let%expect_test "hover-datadef-vars" =
     VALUE "************************************"
     ---
     References: 1
-    (line 12, character 18):
-    __rootdir__/prog.cob:13.18-13.27:
+    (line 11, character 17):
+    __rootdir__/prog.cob:12.11-12.24:
+       9             02 STRUCT-2 PICTURE X VALUE QUOTE.
       10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
       11           01 BIG PIC X(38) VALUE "************************************".
-      12           PROCEDURE DIVISION.
-      13 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
+      12 >         77 DATA-NAME-BIS PIC S9(9)V9(9) COMP-5.
+    ----              ^^^^^^^^^^^^^
+      13           PROCEDURE DIVISION.
+      14             DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
+    ```cobol
+    DATA-NAME-BIS
+    ```
+    ```cobol
+    USAGE BINARY-DOUBLE SIGNED
+    ```
+    ---
+    References: 1
+    (line 13, character 18):
+    __rootdir__/prog.cob:14.18-14.27:
+      11           01 BIG PIC X(38) VALUE "************************************".
+      12           77 DATA-NAME-BIS PIC S9(9)V9(9) COMP-5.
+      13           PROCEDURE DIVISION.
+      14 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
     ----                     ^^^^^^^^^
-      14             STOP RUN.
-      15
+      15             STOP RUN.
+      16
     ```cobol
     DATA-NAME
     ```
@@ -391,15 +409,15 @@ let%expect_test "hover-datadef-vars" =
     ALPHANUMERIC(1)
     ---
     References: 2
-    (line 12, character 33):
-    __rootdir__/prog.cob:13.28-13.34:
-      10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
+    (line 13, character 33):
+    __rootdir__/prog.cob:14.28-14.34:
       11           01 BIG PIC X(38) VALUE "************************************".
-      12           PROCEDURE DIVISION.
-      13 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
+      12           77 DATA-NAME-BIS PIC S9(9)V9(9) COMP-5.
+      13           PROCEDURE DIVISION.
+      14 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
     ----                               ^^^^^^
-      14             STOP RUN.
-      15
+      15             STOP RUN.
+      16
     ```cobol
     STRUCT
     ```
@@ -407,15 +425,15 @@ let%expect_test "hover-datadef-vars" =
     Size: 10 bytes
     ---
     References: 2
-    (line 12, character 36):
-    __rootdir__/prog.cob:13.35-13.43:
-      10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
+    (line 13, character 36):
+    __rootdir__/prog.cob:14.35-14.43:
       11           01 BIG PIC X(38) VALUE "************************************".
-      12           PROCEDURE DIVISION.
-      13 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
+      12           77 DATA-NAME-BIS PIC S9(9)V9(9) COMP-5.
+      13           PROCEDURE DIVISION.
+      14 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
     ----                                      ^^^^^^^^
-      14             STOP RUN.
-      15
+      15             STOP RUN.
+      16
     ```cobol
     STRUCT-1 IN STRUCT
     ```
@@ -427,15 +445,15 @@ let%expect_test "hover-datadef-vars" =
     VALUE 123
     ---
     References: 2
-    (line 12, character 47):
-    __rootdir__/prog.cob:13.44-13.52:
-      10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
+    (line 13, character 47):
+    __rootdir__/prog.cob:14.44-14.52:
       11           01 BIG PIC X(38) VALUE "************************************".
-      12           PROCEDURE DIVISION.
-      13 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
+      12           77 DATA-NAME-BIS PIC S9(9)V9(9) COMP-5.
+      13           PROCEDURE DIVISION.
+      14 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
     ----                                               ^^^^^^^^
-      14             STOP RUN.
-      15
+      15             STOP RUN.
+      16
     ```cobol
     STRUCT-2 IN STRUCT
     ```
@@ -446,15 +464,15 @@ let%expect_test "hover-datadef-vars" =
     VALUE QUOTE
     ---
     References: 2
-    (line 12, character 56):
-    __rootdir__/prog.cob:13.53-13.61:
-      10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
+    (line 13, character 56):
+    __rootdir__/prog.cob:14.53-14.61:
       11           01 BIG PIC X(38) VALUE "************************************".
-      12           PROCEDURE DIVISION.
-      13 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
+      12           77 DATA-NAME-BIS PIC S9(9)V9(9) COMP-5.
+      13           PROCEDURE DIVISION.
+      14 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
     ----                                                        ^^^^^^^^
-      14             STOP RUN.
-      15
+      15             STOP RUN.
+      16
     ```cobol
     STRUCT-3 IN STRUCT
     ```

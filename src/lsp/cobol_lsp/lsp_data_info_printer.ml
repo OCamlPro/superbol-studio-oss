@@ -74,8 +74,9 @@ let pp_usage: usage Pretty.printer =
       Cobol_data.Picture.pp_category picture.category
       pp_example_of picture
   and pp_usage_with_sign ppf name signed =
-    pp_cobol_block Fmt.(any "USAGE " ++ any name ++ any (if signed then " SIGNED" else " UNSIGNED"))
-    ppf ()
+    pp_cobol_block Fmt.(any "USAGE " ++ any name ++
+                        any (if signed then " SIGNED" else " UNSIGNED"))
+      ppf ()
   and pp_width_tag ppf tag =
     Fmt.int ppf @@
     match tag with `W16 -> 16 | `W32 -> 32 | `W34 -> 34 | `W64 -> 64 | `W128 -> 128
@@ -87,11 +88,11 @@ let pp_usage: usage Pretty.printer =
         pp_usage_with_sign ppf "BINARY-C-LONG" signed
     | Binary_char { signed } ->
         pp_usage_with_sign ppf "BINARY-CHAR" signed
-    | Binary_double { signed } ->
+    | Binary_double { signed; _ } ->
         pp_usage_with_sign ppf "BINARY-DOUBLE" signed
-    | Binary_long { signed } ->
+    | Binary_long { signed; _ } ->
         pp_usage_with_sign ppf "BINARY-LONG" signed
-    | Binary_short { signed } ->
+    | Binary_short { signed; _ } ->
         pp_usage_with_sign ppf "BINARY-SHORT" signed
     | Bit picture ->
         pp_usage_with_picture ppf "BIT" picture

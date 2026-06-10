@@ -47,6 +47,8 @@ let pp_usage: usage Pretty.printer =
   and pp_width_tag ppf tag =
     Fmt.int ppf @@
     match tag with `W16 -> 16 | `W32 -> 32 | `W34 -> 34 | `W64 -> 64 | `W128 -> 128
+  and pp_range_extended_tag ppf digits =
+    if digits = None then Fmt.string ppf "(range-extended)"
   in
   fun ppf -> function
     | Binary picture ->
@@ -55,12 +57,15 @@ let pp_usage: usage Pretty.printer =
         pp_usage_with_sign ppf "binary-c-long" signed
     | Binary_char { signed } ->
         pp_usage_with_sign ppf "binary-char" signed
-    | Binary_double { signed } ->
-        pp_usage_with_sign ppf "binary-double" signed
-    | Binary_long { signed } ->
-        pp_usage_with_sign ppf "binary-long" signed
-    | Binary_short { signed } ->
-        pp_usage_with_sign ppf "binary-short" signed
+    | Binary_double { signed; digits; _ } ->
+        pp_usage_with_sign ppf "binary-double" signed;
+        pp_range_extended_tag ppf digits
+    | Binary_long { signed; digits; _ } ->
+        pp_usage_with_sign ppf "binary-long" signed;
+        pp_range_extended_tag ppf digits
+    | Binary_short { signed; digits; _ } ->
+        pp_usage_with_sign ppf "binary-short" signed;
+        pp_range_extended_tag ppf digits
     | Bit picture ->
         pp_usage_with_picture ppf "bit" picture
     | Display picture ->

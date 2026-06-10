@@ -179,12 +179,38 @@ let data_error diags e = Data_error e :: diags
 let data_warning diags e = Data_warning e :: diags
 
 
+let guess_picture ~(usage_clause: Cobol_ptree.usage_clause) pic_hint =
+  let pic_len =
+    match pic_hint with
+    | `Picture pic -> PIC.data_size ~&pic
+    | `Length pic_len -> pic_len
+    | `None -> 1                                (* in case no picture is given *)
+  in
+  match usage_clause with
+  | Bit ->
+      PIC.boolean pic_len
+  | Binary
+  | PackedDecimal
+  | Index ->
+      PIC.digits pic_len
+  | Display ->
+      PIC.alphanumeric ~size:pic_len
+  | National ->
+      PIC.national ~size:pic_len
+  | _ ->                        (* TODO: recover with more advanced heuristics *)
+      PIC.alphanumeric ~size:pic_len                               (* for now *)
+
+
 let ensure_picture diags
     ?(only: [`Numeric_category |
              `Boolean_class |
              `Nonalpha_class |
              `Any_class] = `Any_class)
-    ~(usage_clause: Cobol_ptree.usage_clause) picture =
+    ?(required = false)
+    ~item_loc
+    ~(usage_clause: Cobol_ptree.usage_clause)
+    picture
+  =
   let pic = match picture with
     | Some Ok pic ->
         Ok pic
@@ -192,26 +218,6 @@ let ensure_picture diags
         Error (`Length (String.length ~&(~&pic.Cobol_ptree.picture_string)))
     | None ->
         Error `None
-  in
-  let guess_picture pic diags =
-    let pic_len = match pic with
-      | `Picture pic -> PIC.data_size ~&pic
-      | `Length pic_len -> pic_len
-      | `None -> 1                              (* in case no picture is given *)
-    in
-    diags, match usage_clause with
-    | Bit ->
-        PIC.boolean pic_len
-    | Binary
-    | PackedDecimal
-    | Index ->
-        PIC.digits pic_len
-    | Display ->
-        PIC.alphanumeric ~size:pic_len
-    | National ->
-        PIC.national ~size:pic_len
-    | _ ->                      (* TODO: recover with more advanced heuristics *)
-        PIC.alphanumeric ~size:pic_len                             (* for now *)
   in
   match pic, only with
   | Ok pic, `Numeric_category
@@ -226,38 +232,95 @@ let ensure_picture diags
   | Ok pic, `Any_class ->
       diags, ~&pic
   | Ok pic, (`Numeric_category | `Boolean_class | `Nonalpha_class as expected) ->
-      guess_picture (`Picture pic) @@
       data_error diags @@ Incompatible_picture { picture = pic; usage_clause;
-                                                 expected }
+                                                 expected },
+      guess_picture ~usage_clause @@ `Picture pic
   | Error pic_len, _ ->
-      guess_picture pic_len diags
+      let diags =
+        if required then
+          data_error diags @@
+          Missing_picture_clause_for_item_with_usage { usage_clause; item_loc }
+        else diags
+      in
+      diags, guess_picture ~usage_clause pic_len
 
 
-let auto_usage diags ~usage_clause picture =
+let auto_usage diags ~item_loc ~usage_clause picture =
   match (usage_clause: Cobol_ptree.usage_clause) with
   | Binary ->
       let diags, picture
-        = ensure_picture diags ~only:`Numeric_category ~usage_clause picture in
+        = ensure_picture diags ~only:`Numeric_category ~item_loc ~usage_clause
+          picture in
       diags, Ok (Binary picture)
   | Bit ->
       let diags, picture
-        = ensure_picture diags ~only:`Boolean_class ~usage_clause picture in
+        = ensure_picture diags ~only:`Boolean_class ~item_loc ~usage_clause
+          picture in
       diags, Ok (Bit picture)
   | Display ->
       let diags, picture
-        = ensure_picture diags ~only:`Any_class ~usage_clause picture in
+        = ensure_picture diags ~only:`Any_class ~item_loc ~usage_clause
+          picture in
       diags, Ok (Display picture)
   | National ->
       let diags, picture
-        = ensure_picture diags ~only:`Nonalpha_class ~usage_clause picture in
+        = ensure_picture diags ~only:`Nonalpha_class ~item_loc ~usage_clause
+          picture in
       diags, Ok (National picture)
   | PackedDecimal ->
       let diags, picture
-        = ensure_picture diags ~only:`Numeric_category ~usage_clause picture in
+        = ensure_picture diags ~only:`Numeric_category ~item_loc ~usage_clause
+          picture in
       diags, Ok (Packed_decimal { picture; with_sign_nibble = true })
   | _ ->
       diags, Error None
 
+
+let display_usage ~item_loc ?value ?picture diags =
+  match picture, value with
+  | None, None ->
+      diags, Error None
+  | None, Some value ->
+      diags, Ok (display_usage_from_literal ~&value)
+  | Some _, _ ->
+      auto_usage diags ~item_loc ~usage_clause:Display picture
+
+
+(** Items with USAGE COMP-5 *)
+let range_extended_usage diags ~item_loc given_picture =
+  let diags, picture
+    = ensure_picture diags ~only:`Numeric_category ~item_loc ~required:true
+      ~usage_clause:(UsagePending `Comp5) given_picture
+  in
+  match PIC.numeric_info picture with                   (* TODO: check scale? *)
+  | Ok { digits = 1 | 2 | 3 | 4; scale = scaling; signed } ->
+      diags, Ok (Binary_short { signed; digits = None; scaling })
+  | Ok { digits = 5 | 6 | 7; scale = scaling; signed } ->
+      diags, Ok (Binary_long { signed; digits = None; scaling })
+  | Ok { digits; scale = scaling; signed } when digits <= 18 ->
+      diags, Ok (Binary_double { signed; digits = None; scaling })
+  | Ok { digits = given; scale = scaling; signed } ->
+      let picture = Result.get_ok @@ Option.get given_picture in
+      data_error diags @@
+      Invalid_picture_feature { picture; usage_clause = UsagePending `Comp5;
+                                feature = Digits { given; min = 1; max = 18 } },
+      if given < 0
+      then Ok (Binary_short { signed; digits = None; scaling })
+      else Ok (Binary_double { signed; digits = None; scaling })
+  | Error _ ->
+      diags, Error None               (* already reported in `ensure_picture` *)
+
+
+let packed_decimal_usage diags ~item_loc ~picture usage =
+  let diags, picture
+    = ensure_picture diags ~item_loc ~only:`Numeric_category ~required:true
+      ~usage_clause:PackedDecimal picture
+  in                                              (* TODO: check digits <= 18 *)
+  match usage with
+  | `Comp3 ->                                 (* == Packed_decimal in GnuCOBOL *)
+      diags, Ok (Packed_decimal { picture; with_sign_nibble = true })
+  | `Comp6 ->                         (* == Packed_decimal without sign nibble *)
+      diags, Ok (Packed_decimal { picture; with_sign_nibble = false })
 
 
 let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
@@ -299,6 +362,9 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
   in
   let signedness s =
     Cobol_data.Types.{ signed = s <> Some Cobol_ptree.Unsigned }
+  and truncated_binary s =
+    Cobol_data.Types.{ signed = s <> Some Cobol_ptree.Unsigned;
+                       digits = None; scaling = 0 }
   and endian =     (* TODO: set default via FLOAT-BINARY in OPTIONS paragraph *)
     Option.value ~default:Cobol_ptree.HighOrderLeft
   and encoding =  (* TODO: set default via FLOAT-DECIMAL in OPTIONS paragraph *)
@@ -307,56 +373,49 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
   let diags, usage = match usage_clause with
 
     | Binary ->
-        auto_usage diags ~usage_clause picture
+        auto_usage diags ~item_loc ~usage_clause picture
 
     | BinaryChar s ->
         diags, Ok (Binary_char (signedness s))
 
     | BinaryDouble s ->
-        diags, Ok (Binary_double (signedness s))
+        diags, Ok (Binary_double (truncated_binary s))
 
     | BinaryLong s ->
-        diags, Ok (Binary_long (signedness s))
+        diags, Ok (Binary_long (truncated_binary s))
 
     | BinaryShort s ->
-        diags, Ok (Binary_short (signedness s))
+        diags, Ok (Binary_short (truncated_binary s))
 
     | Bit ->
-        auto_usage diags ~usage_clause picture
+        auto_usage diags ~item_loc ~usage_clause picture
 
     | Display ->
-        begin match picture, value with
-          | None, None ->
-              diags, Error None
-          | None, Some value ->
-              diags, Ok (display_usage_from_literal ~&value)
-          | Some _, _ ->
-              auto_usage diags ~usage_clause picture
-        end
+        display_usage diags ~item_loc ?picture ?value
 
     | FloatBinary32 e ->
         diags, Ok (Float_binary { width = `W32;
-                                    endian = endian e })
+                                  endian = endian e })
 
     | FloatBinary64 e ->
         diags, Ok (Float_binary { width = `W64;
-                                    endian = endian e })
+                                  endian = endian e })
 
     | FloatBinary128 e ->
         diags, Ok (Float_binary { width = `W128;
-                                    endian = endian e })
+                                  endian = endian e })
 
     | FloatDecimal16 { endianness_mode = e;
                        encoding_mode = c } ->
         diags, Ok (Float_decimal { width = `W16;
-                                     endian = endian e;
-                                     encoding = encoding c })
+                                   endian = endian e;
+                                   encoding = encoding c })
 
     | FloatDecimal34 { endianness_mode = e;
                        encoding_mode = c } ->
         diags, Ok (Float_decimal { width = `W34;
-                                     endian = endian e;
-                                     encoding = encoding c })
+                                   endian = endian e;
+                                   encoding = encoding c })
 
     | FloatExtended ->
         diags, Ok Float_extended
@@ -377,13 +436,13 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
         diags, Ok Index
 
     | National -> (* <- TODO: better handling of NATIONAL (partial in GnuCOBOL) *)
-        auto_usage diags ~usage_clause picture
+        auto_usage diags ~item_loc ~usage_clause picture
 
     | ObjectReference r ->
         diags, Ok (Object_reference r)
 
     | PackedDecimal ->
-        auto_usage diags ~usage_clause picture
+        auto_usage diags ~item_loc ~usage_clause picture
 
     | Pointer p ->
         diags, Ok (Pointer p)
@@ -394,21 +453,21 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
     (* TODO: customizable USAGE mapping *)
     | UsagePending `BinaryCLong s ->
         diags, Ok (Binary_C_long (signedness s))
+
     | UsagePending `Comp1 ->
         diags, Ok Float_short
+
     | UsagePending `Comp2 ->
         diags, Ok Float_long
-    | UsagePending `Comp3 ->                  (* == Packed_decimal in GnuCOBOL *)
-        auto_usage diags ~usage_clause:PackedDecimal picture
 
-    | UsagePending `Comp6 ->                  (* == Packed_decimal without sign nibble *)
-        let diags, picture
-          = ensure_picture diags ~only:`Numeric_category
-            ~usage_clause:PackedDecimal picture in
-        diags, Ok (Packed_decimal { picture; with_sign_nibble = false })
+    | UsagePending (`Comp3 | `Comp6 as usage) ->
+        packed_decimal_usage diags ~item_loc ~picture usage
+
+    | UsagePending `Comp5 ->
+        range_extended_usage diags ~item_loc picture
 
     | Type _
-    | UsagePending (`Comp10|`CompN|`Comp5|`Comp0|`Comp15|`CompX|`Comp9) ->
+    | UsagePending (`Comp10|`CompN|`Comp0|`Comp15|`CompX|`Comp9) ->
         (* Note: `usage_clause_loc = None` implies `usage_clause = Display`,
            unreachable here. *)
         let usage_clause = usage_clause &@ Option.get usage_clause_loc in
@@ -421,6 +480,9 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
     | Ok (Binary _ |
           Bit _ |
           Display _ |
+          Binary_double { digits = None; _ } |       (* range-extended/COMP-5 *)
+          Binary_long { digits = None; _ } |         (* range-extended/COMP-5 *)
+          Binary_short { digits = None; _ } |        (* range-extended/COMP-5 *)
           National _ |
           Packed_decimal _), Some _ ->
         diags

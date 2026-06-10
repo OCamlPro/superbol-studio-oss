@@ -147,6 +147,13 @@ module TYPES: sig
     }
   [@@deriving show, ord]
 
+  type common_numeric_info =
+    {
+      signed: bool;
+      digits: int;
+      scale: int;
+    }
+
   type config = {
     max_pic_length: int;
     decimal_char: char;
@@ -199,6 +206,8 @@ val is_national: picture -> bool
     numeric *)
 val is_numeric: picture -> bool
 val is_signed_numeric: picture -> bool
+val numeric_scale: picture -> (int, category) result
+val numeric_info: picture -> (common_numeric_info, category) result
 
 (** Size of the underlying data; corresponds to the number of "characters" for
     usage DISPLAY; does not take the sign of numeric items into account. *)
