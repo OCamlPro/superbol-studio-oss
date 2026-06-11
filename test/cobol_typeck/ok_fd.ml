@@ -106,7 +106,7 @@ let%expect_test "fd" =
             elementary
             usage: {
               display
-              category: NUMERIC(digits = 2, scale = 0, sign = unsigned)
+              category: NUMERIC(digits = 2, scale = 0, signed = false)
             }
             value: 0
           }

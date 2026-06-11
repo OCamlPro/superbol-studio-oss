@@ -95,19 +95,38 @@ type picture_config = Data_picture.TYPES.config
 type picture = Data_picture.t
 
 type usage =
-  | Binary of (* [`numeric] *) picture
-  | Binary_C_long of signedness                         (* GnuCOBOL *)
-  | Binary_char of signedness                           (* +COB2002 *)
-  | Binary_double of binary_range_properties            (* +COB2002 *)
-  | Binary_long of binary_range_properties              (* +COB2002 *)
-  | Binary_short of binary_range_properties             (* +COB2002 *)
+  | Alphanumeric of                                   (* ALPHANUMERIC DISPLAY *)
+      {
+        picture: picture;
+        size: int;
+      }
+  | Binary of
+      {
+        picture: (* [`numeric] *) picture option;
+        signed: bool;
+        scaling: int;
+        byte_size: byte_size;
+        truncation: binary_truncation;
+        (* always_bigendian: bool;             (\** always use big-endian representation *)
+        (*                                         (COMP-5/X) *\) *)
+      }
   | Bit of (* [`boolean] *) picture
-  | Display of (* [any] *) picture
-  | Float_binary of { width: [`W32|`W64|`W128];                   (* +COB2002 *)
-                      endian: Cobol_ptree.endianness_mode }
-  | Float_decimal of { width: [`W16 | `W34];                      (* +COB2002 *)
-                       endian: Cobol_ptree.endianness_mode;
-                       encoding: Cobol_ptree.encoding_mode }
+  | Display_numeric of
+      {
+        picture: picture;
+        sign: display_sign;
+      }
+  | Float_binary of
+      {
+        width: [`W32|`W64|`W128];                                 (* +COB2002 *)
+        endian: Cobol_ptree.endianness_mode;
+      }
+  | Float_decimal of
+      {
+        width: [`W16 | `W34];                                     (* +COB2002 *)
+        endian: Cobol_ptree.endianness_mode;
+        encoding: Cobol_ptree.encoding_mode;
+      }
   | Float_extended                                                (* +COB2002 *)
   | Float_long                                                    (* +COB2002 *)
   | Float_short                                                   (* +COB2002 *)
@@ -124,12 +143,26 @@ type usage =
   | Pointer of Cobol_ptree.name with_loc option                        (* tmp *)
   | Program_pointer of Cobol_ptree.name with_loc option                (* tmp *)
 and signedness = { signed: bool }
-and binary_range_properties =
+and binary_truncation =
+  | Truncate_to_digits of { digits: int }
+  | Truncate_to_native_size
+and byte_size =
+  | Byte_size
+  | Short_size
+  | Long_size
+  | Double_size
+  | Long_double_size
+  | C_long_size
+  (* | Custom_size *)
+and display_sign =
+  | Display_unsigned
+  | Display_signed of display_sign_config
+and display_sign_config =
   {
-    signed: bool;
-    digits: int option;
-    scaling: int;
+    sign_position: display_sign_position;
+    sign_separate: bool;         (** [true] = separate character (extra byte) *)
   }
+and display_sign_position = Leading | Trailing
 
 type data_storage =
   | Generic_file of

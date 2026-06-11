@@ -19,3 +19,8 @@ val of_compilation_unit
   : ?parent_config:Cobol_unit.Types.unit_config
   -> Cobol_ptree.compilation_unit with_loc
   -> output * Typeck_diagnostics.t
+
+(* Additional, temporary... *)
+
+(** Default sign positioning for DISPLAY items *)
+val default_display_sign_config: Cobol_data.Types.display_sign_config

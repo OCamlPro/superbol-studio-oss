@@ -469,7 +469,10 @@ let%expect_test "bad-pic-comps" =
       size: 64
       layout: {
         elementary
-        usage: binary-double(range-extended)
+        usage: {
+          binary-double
+          category: NUMERIC(digits = 20, scale = 0, signed = false)
+        }
       }
     }
     prog.cob:7.7-7.35:
@@ -487,6 +490,9 @@ let%expect_test "bad-pic-comps" =
       size: 64
       layout: {
         elementary
-        usage: signed-binary-double(range-extended)
+        usage: {
+          binary-double
+          category: NUMERIC(digits = 19, scale = 18, signed = true)
+        }
       }
     } |}];;

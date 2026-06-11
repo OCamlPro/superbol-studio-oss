@@ -15,6 +15,64 @@ open Prog_printer
 
 let dotest = Typeck_testing.show_data
 
+let%expect_test "usage-binary" =
+  dotest @@ prog "usage-binary"
+    ~working_storage:{|
+       77 A1 PIC 9 BINARY.
+       77 AX PIC 9 BINARY-CHAR.
+    |};
+  [%expect {|
+    prog.cob:5.17-5.18:
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4          77 A1 PIC 9 BINARY.
+       5 >        77 AX PIC 9 BINARY-CHAR.
+    ----                    ^
+       6          PROCEDURE DIVISION.
+       7
+    >> Warning: Ignored PICTURE clause given for item with USAGE BINARY-CHAR
+
+    prog.cob:4.7-4.26:
+       1          PROGRAM-ID. usage-binary.
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4 >        77 A1 PIC 9 BINARY.
+    ----          ^^^^^^^^^^^^^^^^^^^
+       5          77 AX PIC 9 BINARY-CHAR.
+       6          PROCEDURE DIVISION.
+    Item definition: {
+      qualname: A1
+      offset: 0
+      size: 8
+      layout: {
+        elementary
+        usage: {
+          binary
+          category: NUMERIC(digits = 1, scale = 0, signed = false)
+        }
+      }
+    }
+    prog.cob:5.7-5.31:
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4          77 A1 PIC 9 BINARY.
+       5 >        77 AX PIC 9 BINARY-CHAR.
+    ----          ^^^^^^^^^^^^^^^^^^^^^^^^
+       6          PROCEDURE DIVISION.
+       7
+    Item definition: {
+      qualname: AX
+      /!\ with_errors /!\
+      offset: 0
+      size: 8
+      layout: {
+        elementary
+        usage: {
+          binary-char
+        }
+      }
+    } |}];;
+
 let%expect_test "usage-index" =
   dotest @@ prog "usage-index"
     ~working_storage:{|
@@ -147,7 +205,10 @@ let%expect_test "usage-comps" =
       size: 16
       layout: {
         elementary
-        usage: binary-short(range-extended)
+        usage: {
+          binary-short
+          category: NUMERIC(digits = 1, scale = 0, signed = false)
+        }
       }
     }
     prog.cob:7.7-7.29:
@@ -164,7 +225,10 @@ let%expect_test "usage-comps" =
       size: 16
       layout: {
         elementary
-        usage: binary-short(range-extended)
+        usage: {
+          binary-short
+          category: NUMERIC(digits = 4, scale = 0, signed = false)
+        }
       }
     }
     prog.cob:8.7-8.29:
@@ -178,10 +242,13 @@ let%expect_test "usage-comps" =
     Item definition: {
       qualname: C5
       offset: 0
-      size: 64
+      size: 32
       layout: {
         elementary
-        usage: binary-double(range-extended)
+        usage: {
+          binary-long
+          category: NUMERIC(digits = 8, scale = 0, signed = false)
+        }
       }
     }
     prog.cob:9.7-9.30:
@@ -198,7 +265,10 @@ let%expect_test "usage-comps" =
       size: 64
       layout: {
         elementary
-        usage: binary-double(range-extended)
+        usage: {
+          binary-double
+          category: NUMERIC(digits = 18, scale = 0, signed = false)
+        }
       }
     }
     prog.cob:10.7-10.28:
@@ -215,7 +285,10 @@ let%expect_test "usage-comps" =
       size: 16
       layout: {
         elementary
-        usage: signed-binary-short(range-extended)
+        usage: {
+          binary-short
+          category: NUMERIC(digits = 1, scale = 0, signed = true)
+        }
       }
     }
     prog.cob:11.7-11.31:
@@ -232,7 +305,10 @@ let%expect_test "usage-comps" =
       size: 16
       layout: {
         elementary
-        usage: signed-binary-short(range-extended)
+        usage: {
+          binary-short
+          category: NUMERIC(digits = 4, scale = 0, signed = true)
+        }
       }
     }
     prog.cob:12.7-12.31:
@@ -246,10 +322,13 @@ let%expect_test "usage-comps" =
     Item definition: {
       qualname: SC5
       offset: 0
-      size: 64
+      size: 32
       layout: {
         elementary
-        usage: signed-binary-double(range-extended)
+        usage: {
+          binary-long
+          category: NUMERIC(digits = 8, scale = 0, signed = true)
+        }
       }
     }
     prog.cob:13.7-13.32:
@@ -266,7 +345,10 @@ let%expect_test "usage-comps" =
       size: 64
       layout: {
         elementary
-        usage: signed-binary-double(range-extended)
+        usage: {
+          binary-double
+          category: NUMERIC(digits = 18, scale = 0, signed = true)
+        }
       }
     }
     prog.cob:14.7-14.37:
@@ -283,7 +365,10 @@ let%expect_test "usage-comps" =
       size: 16
       layout: {
         elementary
-        usage: signed-binary-short(range-extended)
+        usage: {
+          binary-short
+          category: NUMERIC(digits = 4, scale = 2, signed = true)
+        }
       }
     }
     prog.cob:15.7-15.37:
@@ -297,10 +382,13 @@ let%expect_test "usage-comps" =
     Item definition: {
       qualname: SVC5
       offset: 0
-      size: 64
+      size: 32
       layout: {
         elementary
-        usage: signed-binary-double(range-extended)
+        usage: {
+          binary-long
+          category: NUMERIC(digits = 8, scale = 1, signed = true)
+        }
       }
     }
     prog.cob:16.7-16.38:
@@ -317,7 +405,10 @@ let%expect_test "usage-comps" =
       size: 64
       layout: {
         elementary
-        usage: signed-binary-double(range-extended)
+        usage: {
+          binary-double
+          category: NUMERIC(digits = 18, scale = 8, signed = true)
+        }
       }
     }
     prog.cob:17.7-17.38:
@@ -334,6 +425,9 @@ let%expect_test "usage-comps" =
       size: 64
       layout: {
         elementary
-        usage: signed-binary-double(range-extended)
+        usage: {
+          binary-double
+          category: NUMERIC(digits = 18, scale = 17, signed = true)
+        }
       }
     } |}];;

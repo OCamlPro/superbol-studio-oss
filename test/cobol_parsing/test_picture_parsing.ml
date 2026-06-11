@@ -32,12 +32,7 @@ let config =
     max_pic_length = 38;                      (* CHECKME: 63 in ISO/IEC 2014. *)
     decimal_char = '.';
     currency_signs = CHARS.singleton '$';
-    sign_config = Cobol_data.Picture.default_sign_config;
   }
-
-let config' =
-  { config with
-    sign_config = { sign_position = Trailing; sign_separate = true } }
 
 (* --- *)
 
@@ -98,12 +93,12 @@ module Pictures = struct
   let basic_national n =
     { category = National { length = n; insertions = [] };
       pic = [{symbol = N; symbol_occurences = n}] }
-  let fixednum ?(sign = None) ?(basics = []) ?floating ?zerorepl
+  let fixednum ?(sign = false) ?(basics = []) ?floating ?zerorepl
       digits scale =
-    FixedNum { digits; scale; sign;
+    FixedNum { digits; scale; signed = sign;
                editions = { basics; floating; zerorepl } }
-  let floatnum ?(with_sign = false) ?(basics = []) digits scale exp_digits =
-    FloatNum { digits; scale; with_sign; exponent_digits = exp_digits;
+  let floatnum ?(signed = false) ?(basics = []) digits scale exp_digits =
+    FloatNum { digits; scale; signed; exponent_digits = exp_digits;
                editions = basics; }
 
   (* --- *)
@@ -142,8 +137,7 @@ module Pictures = struct
       pic = [nine 1; a 1] }
 
   let pic_S99 =
-    { category = fixednum ~sign:(Some { sign_position = Trailing;
-                                        sign_separate = false }) 2 0;
+    { category = fixednum ~sign:true 2 0;
       pic = [s 1; nine 2] }
 
   (* let pic_S99p = *)
@@ -355,12 +349,7 @@ module Pictures = struct
       pic = [nine 3; p 3] }
 
   let pic_SPPP9 =
-    { category = fixednum 4 4 ~sign:(Some { sign_position = Trailing;
-                                            sign_separate = false });
-      pic = [s 1; p 3; nine 1] }
-  and pic_SPPP9' =
-    { category = fixednum 4 4 ~sign:(Some { sign_position = Trailing;
-                                            sign_separate = true });
+    { category = fixednum 4 4 ~sign:true;
       pic = [s 1; p 3; nine 1] }
 
   let pic_ZZZ999V99 =
@@ -549,7 +538,6 @@ let () =
       parse_ok "PPP999"                  pic_PPP999;
       parse_ok "999PPP"                  pic_999PPP;
       parse_ok "SPPP9"                   pic_SPPP9;
-      parse_ok "SPPP9"                   pic_SPPP9' ~config:config';
       parse_ok "VP9B"                    pic_VP9B;
       parse_ok "B9P(3)"                  pic_B9PPP;
       parse_ok "+(5)P(3)"                pic_pppppPPP;
