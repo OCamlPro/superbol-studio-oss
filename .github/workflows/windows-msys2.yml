@@ -1,0 +1,138 @@
+name: Windows MSYS2 TramaBOL build
+
+on:
+  pull_request:
+    branches: [ master ]
+  push:
+  # manual run in actions tab - for all branches
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: release, sys: mingw64, env: x86_64       }
+          # - { target: debug,   sys: mingw64, env: x86_64       }
+          # - { target: release, sys: ucrt64,  env: ucrt-x86_64  }
+          # - { target: release, sys: clang64, env: clang-x86_64 }
+          # - { target: release, sys: mingw32, env: i686         }
+
+    steps:
+      - name: Set git user
+        run: |
+          git config --global user.name github-actions
+          git config --global user.email github-actions-bot@users.noreply.github.com
+
+      - name: Disable git autocrlf
+        run: |
+          git config --global core.autocrlf false
+
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - run: git submodule init
+
+      - run: git submodule update
+
+      - run: dos2unix scripts/*.sh
+
+      - name: Install packages
+        uses: msys2/setup-msys2@v2
+        with:
+          release: false
+          update: true
+          msystem: ${{ matrix.sys }}
+          install: autoconf automake make libtool flex bison
+                   gettext gettext-devel help2man texinfo texinfo-tex
+                   mingw-w64-${{ matrix.env }}-cc
+                   mingw-w64-${{ matrix.env }}-gmp
+                   mingw-w64-${{ matrix.env }}-ncurses
+                   mingw-w64-${{ matrix.env }}-libxml2
+                   mingw-w64-${{ matrix.env }}-json-c
+                   mingw-w64-${{ matrix.env }}-db
+
+      # - name: Install BDB package
+      #   if: ${{ matrix.sys != 'mingw32' }}  # MSYS2 does not provide 32bit builds for it any more
+      #   uses: msys2/setup-msys2@v2
+      #   with:
+      #     msystem: ${{ matrix.sys }}
+      #     install: mingw-w64-${{ matrix.env }}-db
+
+      - name: Bootstrap GnuCOBOL
+        shell: msys2 {0}
+        run: import/gnucobol4/build_aux/bootstrap install
+
+      - name: Setup build environment
+        shell: pwsh
+        run: |
+          # If ("${{ matrix.target }}" -eq "release") {
+            echo CFGOPT="--with-pkgversion=GnuCOBOL-CI-MSYS2" >> $env:GITHUB_ENV
+          # } Else {
+          #   echo CFGOPT="--with-pkgversion=GnuCOBOL-CI-MSYS2-Debug --enable-debug --enable-cobc-internal-checks --enable-hardening" >> $env:GITHUB_ENV
+          # }
+          # Common options (dependencies)
+          echo CFGOPT="$env:CFGOPT --with-math=gmp --with-curses=ncursesw --with-xml2 --with-json=json-c" >> $env:GITHUB_ENV
+          # Conditional inclusion of --with-db (MSYS2 does not provide 32bit builds for BDB any more)
+          # If ("${{ matrix.sys }}" -ne "mingw32") {
+            echo CFGOPT="$env:CFGOPT --with-db --with-indexed=db" >> $env:GITHUB_ENV
+          # } Else {
+          #   echo CFGOPT="$env:CFGOPT --without-db" >> $env:GITHUB_ENV
+          # }
+
+      - name: Configure GnuCOBOL
+        shell: msys2 {0}
+        run: |
+          mkdir import/gnucobol4/_build && cd import/gnucobol4/_build
+          # Note: we add the path to git-bash so that we can use the diff
+          # command it provides, to workaround a diff bug under the MSYS2 CI
+          PATH="$PATH:/c/Program Files/Git/usr/bin" ../configure $CFGOPT CFLAGS=-std=c17
+
+      - name: Build GnuCOBOL
+        shell: msys2 {0}
+        run: make -C import/gnucobol4/_build --jobs=$(($(nproc)+1))
+
+      - name: Install GnuCOBOL
+        shell: msys2 {0}
+        run: make -C import/gnucobol4/_build --jobs=$(($(nproc)+1)) install
+
+      - name: Manual install of opam depexts
+        shell: msys2 {0}
+        run: pacman -Su --noconfirm mingw-w64-x86_64-pkgconf
+
+      - name: Set up OCaml & opam
+        uses: ocaml/setup-ocaml@v3
+        with:
+          windows-compiler: "mingw"
+          windows-environment: "msys2"
+          ocaml-compiler: "4.14.2"
+          opam-pin: false
+
+      - name: Retrieve cache of local opam switch
+        uses: actions/cache@v5
+        id: cache-opam
+        with:
+          path: _opam
+          key: v5-4.14.2-msys2-${{ hashFiles('**/*.opam') }}
+
+      - run: |
+          opam install .\opam\*.opam vendors\autofonce\opam\*.opam .\vendors\ANSITerminal\ANSITerminal.opam .\test\opam\*.opam --deps-only --with-test
+      # - run: make dev-deps DUNE_ARGS=
+      # - run: make tramabol-interpreter DUNE_ARGS=
+
+      - run: make DUNE_ARGS=
+
+      # - run: opam exec -- dune runtest
+
+      - run: make test DUNE_ARGS=
+
+      - name: Cleanup local opam switch before caching
+        run: |
+          # opam pin remove . --yes || true
+          opam clean --switch-cleanup --logs
+          find _opam -type f -a \( -name '*.cmt' -o -name '*.cmti' \) -delete
+        shell: bash
+        if: steps.cache-opam.outputs.cache-hit != 'true'
