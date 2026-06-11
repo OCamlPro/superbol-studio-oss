@@ -8,6 +8,7 @@
 /vscode-debugadapter
 /vscode-debugprotocol
 /superbol-free
+/tramabol
 *~
 _build
 .merlin
@@ -18,6 +19,7 @@ _build
 .drom.config
 # Edit drom.toml to change the following lines
 /superbol-free-*
+/tramabol-*
 /_*
 /node_modules
 /yarn-error.log
@@ -30,6 +32,7 @@ ATTIC
 !.vscode/tasks.json
 !.vscode/launch.json
 *.vsix
+/*.js
 *.opam.locked
 /emacs/lsp-superbol-customs.el
 _superbol

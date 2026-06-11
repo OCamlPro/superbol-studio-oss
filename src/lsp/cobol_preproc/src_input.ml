@@ -25,10 +25,9 @@ let string ~filename contents =
 let channel ~filename ic =
   { source = Channel ic; filename }
 
-(** [from ~filename ~f] feeds [f] with the contents of a file named [filename];
-    uses [stdin] if [filename = ""]. *)
+(** [from ~filename ~f ~platform] feeds [f] with the contents of a file named
+    [filename]; uses [stdin] (as per [platform]) if [filename = ""]. *)
 let from ~filename ~f ~platform =
-  f @@
   if filename = ""
-  then channel ~filename stdin
-  else string ~filename @@ platform.read_file filename
+  then platform.with_stdin ~f:(fun ic -> f @@ channel ~filename ic)
+  else f @@ string ~filename @@ platform.read_file filename

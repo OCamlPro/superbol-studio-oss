@@ -11,8 +11,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Platform.TYPES
-
-let autodetect_format ~source_contents ~filename:_ : source_format_id =
-  (* Note: for now we ignore the filename extension. *)
-  Cobol_preproc.Src_format.guess_from ~contents_prefix:source_contents
+let () = Tramabol_lib.Main.main ()
