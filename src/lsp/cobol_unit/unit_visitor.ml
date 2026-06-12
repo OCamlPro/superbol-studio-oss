@@ -64,7 +64,9 @@ let fold_procedure_paragraph' (v: _ #folder) =
 let fold_procedure_section (v: _ #folder) =
   handle v#fold_procedure_section
     ~continue:begin fun { section_name; section_paragraphs } x -> x
-      >> Cobol_ptree.Terms_visitor.fold_procedure_name' v section_name
+      >> Cobol_ptree.Terms_visitor.fold_procedure_name'_opt v 
+          (Option.map (fun sn -> 
+            Cobol_ptree.{ payload = Name sn; loc = sn.loc }) section_name)
       >> fold_list v section_paragraphs.list ~fold:fold_procedure_paragraph'
     end
 
@@ -102,9 +104,9 @@ let fold_procedure_using' (v: _ #folder) =
 
 let fold_procedure (v: _ #folder) =
   handle v#fold_procedure                                     (* skip `named` *)
-    ~continue:begin fun { procedure_blocks; procedure_using } x -> x
+    ~continue:begin fun { procedure_sections; procedure_using; _ } x -> x
       >> fold_option ~fold:fold_procedure_using' v procedure_using
-      >> fold_list v ~fold:fold_procedure_block procedure_blocks.list
+      >> fold_list v ~fold:fold_procedure_section' procedure_sections
     end
 
 let fold_cobol_unit (v: _ #folder) =

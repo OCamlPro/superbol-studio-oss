@@ -14,6 +14,7 @@
 (** Representation of COBOL compilation units *)
 
 open Cobol_common.Srcloc.TYPES
+open Cobol_common.Srcloc.INFIX
 
 (* utils *)
 
@@ -60,7 +61,7 @@ type data_definitions =
   {
     data_items: Cobol_data.Types.data_definition named_n_ordered; (* 
       LATER: recheck if the list of ordered data_definition is useful here. 
-      All the structure information should already be accessible trhough [data_records]. *)
+      All the structure information should already be accessible through [data_records]. *)
     data_records: Cobol_data.Types.record list;
   }
 
@@ -68,14 +69,27 @@ type data_definitions =
 
 type procedure_paragraph =
   {
-    paragraph_name: Cobol_ptree.procedure_name with_loc option;
+    paragraph_name: Cobol_ptree.procedure_name with_loc option; (** 
+      [None] for the unnamed paragraph at the begining of a section.
+      [Some qn] where [qn] is fully qualified otherwise. 
+      Note that [paragraph_name] is different than [~&paragraph.paragraph_name].
+      For an unnamed paragraph at the begining of a section 
+      [~&paragraph.paragraph_name] contains the (optionnal) section name whereas
+      [paragraph_name] contains [None] to indicate that the paragraph is
+      anonymous. *)
     paragraph: Cobol_ptree.paragraph with_loc;
   }
 
 type procedure_section =
   {
-    section_name: Cobol_ptree.procedure_name with_loc;
-    section_paragraphs: procedure_paragraph with_loc named_n_ordered;
+    section_name: Cobol_ptree.name with_loc option; (**
+      [None] for the unnamed section at the begining of PROCEDURE DIVISION
+      For convenience when collecting references to all procedure names, 
+      [section_name] is visited as a [procedure_name with_loc option]. *)
+    section_paragraphs: procedure_paragraph with_loc named_n_ordered; (**
+      Includes an anonymous empty paragraph if the section is empty.
+      However, this list does not start with an unnamed paragraph, 
+      when the section immediatley starts with a paragraph name. *)
   }
 
 type procedure_block =
@@ -96,8 +110,9 @@ and arg_passing_style =
 
 type procedure =
   {
-    procedure_using: procedure_using with_loc option; (* PROCEDURE DIVISION USING ... *)
-    procedure_blocks: procedure_block named_n_ordered;
+    procedure_using: procedure_using with_loc option; (** PROCEDURE DIVISION USING ... *)
+    procedure_sections: procedure_section with_loc list;
+    procedure_blocks: procedure_block Unit_resolver_map.t; 
   }
 
 (* main *)
@@ -118,4 +133,4 @@ type t = cobol_unit with_loc
 
 let block_name: _ -> Cobol_ptree.qualname with_loc option = function
   | Paragraph { payload = p; _ } -> p.paragraph_name
-  | Section { payload = s; _ } -> Some s.section_name
+  | Section { payload = s; _ } -> Option.map (fun s -> Cobol_ptree.Name s &@<- s) s.section_name
