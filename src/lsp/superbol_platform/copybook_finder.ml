@@ -52,9 +52,9 @@ let find_lib ~lookup_config:({ lookup_path = libpath;
   let try_file libname exts =
     let base = String.lowercase_ascii libname in
     let without_ext d =
-      Ok (Filename.concat d.dir @@ StringMap.find base d.files)
+      Ok (EzFile.concat d.dir @@ StringMap.find base d.files)
     and with_ext d ext =
-      Ok (Filename.concat d.dir @@ StringMap.find (base ^ "." ^ ext) d.files)
+      Ok (EzFile.concat d.dir @@ StringMap.find (base ^ "." ^ ext) d.files)
     in
     let rec iter_path path =
       match path with
@@ -64,8 +64,10 @@ let find_lib ~lookup_config:({ lookup_path = libpath;
       | d :: path -> iter_exts d path exts
     and iter_exts d path exts =
       match exts with
-      | [] -> (try without_ext d with Not_found -> iter_path path)
-      | ext :: exts -> (try with_ext d ext with Not_found -> iter_exts d path exts)
+      | [] -> 
+          (try without_ext d with Not_found -> iter_path path)
+      | ext :: exts ->
+          (try with_ext d ext with Not_found -> iter_exts d path exts)
     in
     iter_path libpath_files
   in

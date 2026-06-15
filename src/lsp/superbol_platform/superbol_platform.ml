@@ -13,6 +13,9 @@
 
 open Cobol_common.Platform.TYPES
 
+let () =                     (* force use of `/` instead of `\` in file names *)
+  Ez_file.Slashifier.enable ()
+
 let record =
   {
     verbosity = 0;

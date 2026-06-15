@@ -13,6 +13,10 @@
 
 open Ez_file.V1
 
+let () =
+  (* There is no need backslashify path names on windows. *)
+  Lsp.Uri.Private.win32 := false
+
 (** [relative_path uri absolute_path] returns the relative path of [uri] {i
     w.r.t} [absolute_path] if [absolute_path] is a prefix of [uri], and raises
     {!Invalid_argument} otherwise. *)

@@ -636,7 +636,7 @@
    (ocaml (>= 4.14.0))
    ocplib_stuff
    (menhirLib ( > 2019 ))
-   (ez_file ( >= 0.3 ))
+   (ez_file ( >= 0.4 ))
    (ISO8601 ( >= 0.2 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
