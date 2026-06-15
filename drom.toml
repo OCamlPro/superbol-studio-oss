@@ -30,7 +30,7 @@ bug-reports = "https://github.com/ocamlpro/superbol-studio-oss/issues"
 description = """SuperBOL Studio OSS is a new platform for COBOL"""
 
 [project]
-skip = ["@test", "@ocamlformat", "@ocp-indent", "README.md", "LICENSE.md", "CHANGES.md", "sphinx/index.rst", "sphinx/install.rst"]
+skip = ["@test", "@ocamlformat", "@ocp-indent", "README.md", "LICENSE.md", "CHANGES.md", "sphinx/index.rst", "sphinx/install.rst", "dune"]
 
 # project-wide library dependencies (not for package-specific deps)
 [dependencies]
