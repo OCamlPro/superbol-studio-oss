@@ -424,11 +424,7 @@ let acc_tokens_of_text_word (rev_prefix_tokens, state) { payload = c; loc } =
     then { state with lexer_state }
     else state
   in
-  let alphanum ~hexadecimal ?(repr = Cobol_ptree.Native_bytes) str qte =
-    let quotation: Cobol_ptree.alphanum_quote = match qte with
-      | Apostrophe -> Simple_quote
-      | Quote -> Double_quote
-    in
+  let alphanum ~hexadecimal ?(repr = Cobol_ptree.Native_bytes) str quotation =
     Cobol_ptree.{ str; hexadecimal; quotation; runtime_repr = repr }
   and boollit ~base str =
     Cobol_ptree.boolean_of_string ~base str

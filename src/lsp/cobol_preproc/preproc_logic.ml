@@ -74,8 +74,8 @@ let warn_undefined t ~loc stuff =
 
 
 let on_define_off ~loc var ~(env: ENV.t) =
-  if ENV.mem' var env
-  then OUT.result (ENV.undefine var env)
+  if ENV.mem_preproc_var' var env
+  then OUT.result (ENV.undefine_preproc_var var env)
   else OUT.result env ~diags:(undefined ~loc var)
 
 
@@ -84,22 +84,21 @@ let on_define ~platform ~loc Compdir_tree.{ var; value; override } ~env =
   try
     let value = match ~&value with
       | Literal_definition Alphanum l ->
-          ENV.Alphanum { pp_payload = ~&l;
-                         pp_loc = Source_location ~@l }
+          ENV.alphanum_literal_value l
       | Literal_definition Boolean l ->
-          ENV.Boolean { pp_payload = ~&l.bool_value;
-                        pp_loc = Source_location ~@l }
+          ENV.boolean_literal_value l
       | Literal_definition Numeric l ->
-          ENV.Numeric { pp_payload = ~&l.fixed_value;
-                        pp_loc = Source_location ~@l }
+          ENV.numeric_literal_value l
       | Parameter_definition ->                                (* [sys.getenv] *)
           let v = ENV.VAR.to_uppercase_string ~&var in
           match platform.getenv_opt v with
-          | Some value -> ENV.Alphanum { pp_payload = value;
-                                         pp_loc = Process_environment }
+          | Some value ->
+              let alphanum = Cobol_data.Value.alphanum_of_string value in
+              ENV.Alphanum { pp_payload = alphanum;
+                             pp_loc = Process_environment }
           | None -> raise KEEP_UNDEFINED
     in
-    OUT.result (ENV.define ~loc var value ~override env)
+    OUT.result (ENV.define_preproc_var ~loc var value ~override env)
   with
   | KEEP_UNDEFINED ->
       OUT.result env
@@ -113,7 +112,7 @@ let on_define ~platform ~loc Compdir_tree.{ var; value; override } ~env =
 let eval_term: Compdir_tree.term -> ENV.t -> ENV.value = fun term env ->
   match term with
   | Variable var ->
-      (ENV.definition_of ~var env).def_value
+      (ENV.preproc_var_definition_of ~var env).def_value
   | Literal Alphanum a ->
       Alphanum { pp_payload = ~&a;
                  pp_loc = Source_location ~@a }
@@ -129,9 +128,9 @@ exception TYPE_MISMATCH of ENV.value * ENV.value
 
 
 type matching_operands =
-  | Alpha of (Cobol_data.Value.alphanum as 'a) * 'a
-  | Bool of (Cobol_data.Value.boolean as 'b) * 'b
-  | Num of (Cobol_data.Value.fixed as 'c) * 'c
+  | Alpha of (Cobol_data.Types.alphanum_value as 'a) * 'a
+  | Bool of (Cobol_data.Types.boolean_value as 'b) * 'b
+  | Num of (Cobol_data.Types.fixed_value as 'c) * 'c
 
 
 let operands (a: ENV.value) (b: ENV.value) : matching_operands =
@@ -147,15 +146,15 @@ let eval_condition ~(operator: Compdir_tree.condition_operator) a b =
   | Alpha (a, b), Eq -> a = b
   | Alpha (a, b), Ne -> a <> b
   | Alpha (a, b), Le
-  | Alpha (b, a), Ge -> String.compare a b <= 0
+  | Alpha (b, a), Ge -> String.compare a.str b.str <= 0
   | Alpha (a, b), Lt
-  | Alpha (b, a), Gt -> String.compare a b < 0
-  | Bool (a, b), Eq -> Z.equal a.bool_value b.bool_value
-  | Bool (a, b), Ne -> not (Z.equal a.bool_value b.bool_value)
+  | Alpha (b, a), Gt -> String.compare a.str b.str < 0
+  | Bool (a, b), Eq -> Z.equal a.bool_bits b.bool_bits
+  | Bool (a, b), Ne -> not (Z.equal a.bool_bits b.bool_bits)
   | Bool (a, b), Le
-  | Bool (b, a), Ge -> Z.leq a.bool_value b.bool_value
+  | Bool (b, a), Ge -> Z.leq a.bool_bits b.bool_bits
   | Bool (a, b), Lt
-  | Bool (b, a), Gt -> Z.lt a.bool_value b.bool_value
+  | Bool (b, a), Gt -> Z.lt a.bool_bits b.bool_bits
   | Num (a, b), Eq -> Q.equal a b
   | Num (a, b), Ne -> not (Q.equal a b)
   | Num (a, b), Le
@@ -169,16 +168,16 @@ let eval_boolexpr env
   let diags = Preproc_diagnostics.none in
   match ~&e with
   | Defined_condition { var; polarity } ->
-      OUT.result (ENV.mem' var env = polarity)
+      OUT.result (ENV.mem_preproc_var' var env = polarity)
   | Set_condition { var = _; polarity } ->
       let item = Set_condition_directive { assumed_set = false } in
       OUT.result (not polarity)
         ~diags:(warn diags (Ignored { loc = ~@e; item }))
   | Value_condition { var; polarity } ->
       begin
-        match (ENV.definition_of ~var env).def_value with
+        match (ENV.preproc_var_definition_of ~var env).def_value with
         | Boolean b ->
-            OUT.result (Z.(equal zero) b.pp_payload.bool_value != polarity)
+            OUT.result (Z.(equal zero) b.pp_payload.bool_bits != polarity)
         | Alphanum _ | Numeric _ as value ->
             let stuff = Variable_type_in_compdir_condition { value } in
             OUT.result ~diags:(warn_unexpected diags ~loc:~@e stuff) false
@@ -264,3 +263,6 @@ let flush_contexts ~loc : context -> context * diagnostics =
         flush_context (add_error error diags) tl
   in
   flush_context Preproc_diagnostics.none
+
+
+(* --- *)

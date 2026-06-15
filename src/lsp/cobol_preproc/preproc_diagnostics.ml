@@ -45,6 +45,7 @@ and missing_stuff =
 
 and unexpected_stuff =
   | Alphanumeric_literal
+  | Constant_literal_kind of Cobol_ptree.literal with_loc
   | Elif_compiler_directive of { suggestion: suggested_missing option }
   | Else_compiler_directive of { suggestion: suggested_missing option }
   | EndIf_compiler_directive
@@ -116,6 +117,8 @@ let pp_missing_stuff ppf = function
 let pp_unexpected_stuff ppf = function
   | Alphanumeric_literal ->
       Pretty.print ppf "alphanumeric@ literal"
+  | Constant_literal_kind _lit ->
+      Pretty.print ppf "class@ of@ literal@ for@ constant@ definition"
   | Elif_compiler_directive { suggestion } ->
       Pretty.print ppf ">>ELIF@ compiler@ directive";
       Fmt.(option (any ";@ " ++ pp_suggestion)) ppf suggestion
@@ -293,6 +296,9 @@ let add_literal_diagnostics Cobol_data.Diagnostics.{ errors; _ } diags =
   List.fold_left begin fun diags error ->
     add_error (Literal_error error) diags
   end diags errors
+
+let literal_diagnostics diags =
+  add_literal_diagnostics diags none
 
 let translate ({ warnings; errors }: t) =
   let module DIAGS = Cobol_common.Diagnostics in

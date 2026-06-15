@@ -1484,6 +1484,82 @@ let%expect_test "hover-datadef-table-and-index" =
     ---
     References: 2 |}];;
 
+let%expect_test "hover-datadef-78" =
+  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  print_hovered server ~projdir @@ extract_position_markers {cobol|
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. prog.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        78 CO_|_NST VALUE "ABCD".
+       *Note: currently handled as hovering over `01 VAR ... CONST.`
+        77 VAR VALUE CON_|_ST.
+        PROCEDURE DIVISION.
+            DISPLAY "VAR: " _|_VAR ", CONST: " CON_|_ST
+            STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":66,"line":6},"start":{"character":61,"line":6}},"severity":1},{"message":"Invalid syntax","range":{"end":{"character":8,"line":6},"start":{"character":7,"line":6}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    (line 5, character 13):
+    Hovering nothing worthy
+    (line 7, character 24):
+    __rootdir__/prog.cob:8.8-8.27:
+       5           WORKING-STORAGE SECTION.
+       6           78 CONST VALUE "ABCD".
+       7          *Note: currently handled as hovering over `01 VAR ... CONST.`
+       8 >         77 VAR VALUE CONST.
+    ----           ^^^^^^^^^^^^^^^^^^^
+       9           PROCEDURE DIVISION.
+      10               DISPLAY "VAR: " VAR ", CONST: " CONST
+    ```cobol
+    VAR
+    ```
+    ```cobol
+    PIC X(4) USAGE DISPLAY
+    ```
+    ALPHANUMERIC(4)
+    VALUE "ABCD"
+    ---
+    References: 2
+    ---
+    Additional pre-processing:
+    ```cobol
+    "ABCD"
+    ```
+    (line 9, character 28):
+    __rootdir__/prog.cob:10.28-10.31:
+       7          *Note: currently handled as hovering over `01 VAR ... CONST.`
+       8           77 VAR VALUE CONST.
+       9           PROCEDURE DIVISION.
+      10 >             DISPLAY "VAR: " VAR ", CONST: " CONST
+    ----                               ^^^
+      11               STOP RUN.
+      12
+    ```cobol
+    VAR
+    ```
+    ```cobol
+    PIC X(4) USAGE DISPLAY
+    ```
+    ALPHANUMERIC(4)
+    VALUE "ABCD"
+    ---
+    References: 2
+    (line 9, character 47):
+    __rootdir__/prog.cob:10.44-10.49:
+       7          *Note: currently handled as hovering over `01 VAR ... CONST.`
+       8           77 VAR VALUE CONST.
+       9           PROCEDURE DIVISION.
+      10 >             DISPLAY "VAR: " VAR ", CONST: " CONST
+    ----                                               ^^^^^
+      11               STOP RUN.
+      12
+    ```cobol
+    "ABCD"
+    ```
+  |}];;
+
 let%expect_test "hover-datadef-communication-section" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
   print_hovered server ~projdir @@ extract_position_markers {cobol|

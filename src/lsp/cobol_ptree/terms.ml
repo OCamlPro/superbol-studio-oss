@@ -13,6 +13,8 @@
 
 open Common
 open Numericals
+open Alphanums
+
 open Cobol_common.Srcloc.INFIX
 
 type name = string
@@ -67,16 +69,6 @@ type complex_ = [ `Complex ]
 (* Attributes for distinguishing sign conditions *)
 type strict_ = [ `Strict ]
 type loose_ = [ `Loose ]
-
-type alphanum_quote =
-  | Simple_quote (* '...' *)
-  | Double_quote (* "..." *)
-[@@deriving ord]
-
-type alphanum_repr =
-  | Native_bytes
-  | Null_terminated_bytes
-[@@deriving ord]
 
 type intrinsic_name =
   | ABS
@@ -202,25 +194,6 @@ let show_intrinsic_name i =
 
 let pp_intrinsic_name ppf i =
   Pretty.string ppf (show_intrinsic_name i)
-
-type alphanum =
-  {
-    str: string;
-    quotation: alphanum_quote;
-    hexadecimal: bool;
-    runtime_repr: alphanum_repr;
-  }
-[@@deriving ord]
-
-let pp_alphanum ppf { hexadecimal; quotation; str; runtime_repr } =
-  if runtime_repr = Null_terminated_bytes then Fmt.char ppf 'Z';
-  if hexadecimal then Fmt.char ppf 'X';
-  match quotation with
-  | Simple_quote -> Fmt.pf ppf "'%s'" str
-  | Double_quote -> Fmt.pf ppf "\"%s\"" str
-
-type national = string                                             (* for now *)
-[@@deriving ord, show]
 
 (** Now comes the type of all/most terms *)
 type _ term =
@@ -1066,7 +1039,7 @@ module FMT = struct
   and pp_cond' ppf = pp_with_loc (pp_cond ~pos:true) ppf
 
   and pp_abbrev_combined_relation ppf (neg, e, a) =
-    fmt "%a%a@ %a" ppf not_ (not neg) pp_expr' e
+    fmt "@[<1>%a%a@ %a@]" ppf not_ (not neg) pp_expr' e
       pp_abbrev_relation_operand ~&a
 
   and pp_abbrev_relation_operand ppf = function

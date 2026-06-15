@@ -479,6 +479,70 @@ let%expect_test "definition-requests-refmod" =
     No definition found |}]
 
 
+let%expect_test "definition-requests-78" =
+  (* TODO *)
+  let { end_with_postproc; projdir }, server = make_lsp_project () in
+  print_definitions ~projdir server @@ extract_position_markers {cobol|
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       78 CONST VALUE "CONST".
+       77 VAR PIC A(5) VALUE C_|1-const-in-data-div|_ONST.
+       PROCEDURE DIVISION.
+           DISPLAY CON_|1-const-in-proc-div|_ST V_|2-var|_AR.
+  |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    1-const-in-data-div (line 5, character 30):
+    __rootdir__/prog.cob:6.10-6.13:
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5          78 CONST VALUE "CONST".
+       6 >        77 VAR PIC A(5) VALUE CONST.
+    ----             ^^^
+       7          PROCEDURE DIVISION.
+       8              DISPLAY CONST VAR.
+    1-const-in-proc-div (line 7, character 22):
+    No definition found
+    2-var (line 7, character 26):
+    __rootdir__/prog.cob:6.10-6.13:
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5          78 CONST VALUE "CONST".
+       6 >        77 VAR PIC A(5) VALUE CONST.
+    ----             ^^^
+       7          PROCEDURE DIVISION.
+       8              DISPLAY CONST VAR.
+ |}]
+
+let%expect_test "definition-requests-78-n-preproc" =
+  (* TODO *)
+  let { end_with_postproc; projdir }, server = make_lsp_project () in
+  print_definitions ~projdir server @@ extract_position_markers {cobol|
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       78 B VALUE 1.
+       >>IF _|1-b|_B = 1
+       78 R VALUE "OK".
+       >>ELSE
+       78 R VALUE "KO".
+       >>END-IF
+       PROCEDURE DIVISION.
+           DISPLAY _|2-b|_B _|3-r|_R.
+  |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    1-b (line 5, character 12):
+    No definition found
+    2-b (line 11, character 19):
+    No definition found
+    3-r (line 11, character 21):
+    No definition found
+ |}]
+
 let%expect_test "definition-requests-goto-section" =
   let { end_with_postproc; projdir }, server = make_lsp_project () in
   print_definitions ~projdir server @@ extract_position_markers {cobol|

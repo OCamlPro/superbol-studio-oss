@@ -15,36 +15,10 @@
 
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
+open Data_types
 
 module VAL = Data_value
 module OUT = Data_diagnostics
-
-type integer =
-  {
-    int_literal: Cobol_ptree.integer;                              (* option? *)
-    int_value: VAL.integer;
-  }
-
-type fixed =
-  {
-    fixed_literal: Cobol_ptree.fixed;                              (* option? *)
-    fixed_value: VAL.fixed;
-  }
-
-type floating =
-  {
-    float_literal: Cobol_ptree.floating;                           (* option? *)
-    float_value: VAL.floating;
-  }
-
-type alphanum = VAL.alphanum [@@deriving show]
-
-type boolean =
-  {
-    bool_literal: Cobol_ptree.boolean;                             (* option? *)
-    bool_value: VAL.boolean;
-  }
-[@@deriving show]
 
 (* --- *)
 
@@ -64,43 +38,57 @@ let with_invalid_chars ~loc ~literal_class diags chars v =
 
 (* --- *)
 
-let pp_integer ppf x =
-  VAL.pp_integer ppf x.int_value
-
-let integer ({ payload = literal; loc }: Cobol_ptree.integer with_loc)
-  : integer with_loc OUT.with_diags =
-  try
-    let int_value = VAL.integer_of_string literal in
-    OUT.result ({ int_literal = literal; int_value } &@ loc)
-  with VAL.INVALID_CHARS chars ->
-    with_invalid_chars ~loc OUT.none chars ~literal_class:Integer
-      { int_literal = literal; int_value = VAL.integer_zero }
+let alphanum = Cobol_ptree.alphanum_of_string
 
 (* --- *)
 
-let pp_fixed ppf x =
-  Q.pp_print ppf x.fixed_value
+let integer ({ payload = literal; loc }: Cobol_ptree.integer with_loc)
+  : integer_literal with_loc OUT.with_diags =
+  try
+    let int_value = VAL.integer_of_string literal in
+    OUT.result ({ int_ptree = literal; int_value } &@ loc)
+  with VAL.INVALID_CHARS chars ->
+    with_invalid_chars ~loc OUT.none chars ~literal_class:Integer
+      { int_ptree = literal; int_value = VAL.integer_zero }
+
+(* --- *)
 
 let fixed ({ payload = literal; loc }: Cobol_ptree.fixed with_loc)
-  : fixed with_loc OUT.with_diags =
+  : fixed_literal with_loc OUT.with_diags =
   try
     let fixed_value =
       VAL.fixed_of_strings
         ~integral:literal.fixed_integral
         ~fractional:literal.fixed_fractional
     in
-    OUT.result ({ fixed_literal = literal; fixed_value } &@ loc)
+    OUT.result ({ fixed_ptree = literal; fixed_value } &@ loc)
   with VAL.INVALID_CHARS chars ->
     with_invalid_chars ~loc OUT.none chars ~literal_class:Fixed
-      { fixed_literal = literal; fixed_value = VAL.fixed_zero }
+      { fixed_ptree = literal; fixed_value = VAL.fixed_zero }
+
+let fixed_zero: fixed_literal =
+  {
+    fixed_ptree = Cobol_ptree.fixed_zero;
+    fixed_value = VAL.fixed_of_strings ~integral:"0" ~fractional:"1";
+  }
+
+let of_fixed_value: fixed_value -> fixed_literal = fun v ->
+  {
+    fixed_ptree = VAL.to_ptree_fixed v;
+    fixed_value = v;
+  }
+
+let categorize_fixed: fixed_literal -> [`Z of integer_literal |
+                                        `Q of fixed_literal ]  = fun v ->
+  if v.fixed_ptree.fixed_fractional = "0"
+  then `Z { int_value = v.fixed_value.num;
+            int_ptree = v.fixed_ptree.fixed_integral }
+  else `Q v
 
 (* --- *)
 
-let pp_floating ppf x =
-  VAL.pp_floating ppf x.float_value
-
 let floating ({ payload = literal; loc }: Cobol_ptree.floating with_loc)
-  : floating with_loc OUT.with_diags =
+  : floating_literal with_loc OUT.with_diags =
   try
     let float_value =
       VAL.floating_of_strings
@@ -108,10 +96,10 @@ let floating ({ payload = literal; loc }: Cobol_ptree.floating with_loc)
         ~fractional:literal.float_significand.fixed_fractional
         ~exponent:literal.float_exponent
     in
-    OUT.result ({ float_literal = literal; float_value } &@ loc)
+    OUT.result ({ float_ptree = literal; float_value } &@ loc)
   with VAL.INVALID_CHARS chars ->
     with_invalid_chars ~loc OUT.none chars ~literal_class:Floating
-      { float_literal = literal; float_value = VAL.floating_zero }
+      { float_ptree = literal; float_value = VAL.floating_zero }
 
 
 (* --- *)
@@ -120,7 +108,7 @@ let boolean
     (* TODO deal with prefix length? *)
     ?(max_length = 8_191)                         (* as per ISO/IEC 1989:2014 *)
     Cobol_ptree.{ payload = { bool_base = base;
-                              bool_value = literal_string } as bool_literal;
+                              bool_value = literal_string } as bool_ptree;
                   loc } =
   let diags = OUT.none in
   let len = String.length literal_string in
@@ -130,10 +118,16 @@ let boolean
     else diags
   in
   try
-    let v = { bool_literal;
+    let v = { bool_ptree;
               bool_value = VAL.boolean_of_string ~base literal_string } in
     OUT.result ~diags (v &@ loc)
   with VAL.INVALID_CHARS chars ->
     with_invalid_chars ~loc diags chars
       ~literal_class:(if base = `Bool then Boolean else Hexadecimal)
-      { bool_literal; bool_value = VAL.boolean_zero }
+      { bool_ptree; bool_value = VAL.boolean_zero }
+
+let of_boolean_value b : boolean_literal =
+  {
+    bool_ptree = VAL.to_ptree_boolean b;
+    bool_value = b;
+  }

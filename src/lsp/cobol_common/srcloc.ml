@@ -562,6 +562,9 @@ let concat_srclocs: srcloc list -> srcloc option = fun l ->
     | Some acc -> Some (concat acc loc)
   end None l
 
+let append_srclocs: srcloc -> srcloc list -> srcloc = fun loc l ->
+  List.fold_left concat loc l
+
 (** Direction for {!take} and {!trunc} below (internal) *)
 type direction = Prefix | Suffix
 

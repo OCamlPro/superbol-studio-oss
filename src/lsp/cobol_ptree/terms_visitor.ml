@@ -12,6 +12,7 @@
 (**************************************************************************)
 
 open Common
+open Alphanums
 open Numericals
 open Terms
 

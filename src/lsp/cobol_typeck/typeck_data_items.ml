@@ -842,8 +842,7 @@ let data_definitions = object
   method! fold_report_section _  = Visitor.skip
   method! fold_screen_section _  = Visitor.skip
 
-  method! fold_data_item' ({ payload = { data_level; _ };
-                             loc } as item) acc =
+  method! fold_data_item' ({ payload = { data_level; _ }; _ } as item) acc =
     Visitor.skip_children @@ match ~&data_level, acc.current_storage with
     | l, _ when 1 <= l && l <= 49 ->
         on_item ~at_level:~&data_level acc item                    (* regular *)
@@ -852,7 +851,7 @@ let data_definitions = object
     | 77, section ->
         error acc (Item_not_allowed_in_section { level = data_level; section })
     | 78, _ ->
-        error acc (Pending_feature { name = "level 78 constant item"; loc })
+        acc                                       (* handled by parser engine *)
     | _, _ ->
         error acc (Invalid_level_number { level = data_level })
 

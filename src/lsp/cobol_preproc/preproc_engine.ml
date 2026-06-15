@@ -20,20 +20,25 @@ module LIST = Cobol_common.Basics.LIST
 
 module OUT = Preproc_outputs
 module ENV = Preproc_env
+module LIT = Cobol_data.Literal
 
 (* --- *)
+
+(* TODO: fields marked with `x` below should probably be moved to a
+   `preprocessor_cold` type as they are also less likely to change as often as
+   `buff`, and `reader` *)
 
 type preprocessor =
   {
     buff: Text.t;
     reader: Src_reader.t;
-    ppstate: Preproc_state.t;
-    pplog: Preproc_trace.log;
-    diags: Preproc_diagnostics.t;
-    env: Preproc_env.t;
-    context: Preproc_logic.context;
-    rev_ignored: Text.t;     (* text accumulated when not emitting (reversed) *)
-    persist: preprocessor_persist;
+    ppstate: Preproc_state.t;                                            (* x *)
+    pplog: Preproc_trace.log;                                            (* x *)
+    diags: Preproc_diagnostics.t;                                        (* x *)
+    env: Preproc_env.t;                                                  (* x *)
+    context: Preproc_logic.context;                                      (* x *)
+    rev_ignored: Text.t;   (* text accumulated when not emitting (reversed) x *)
+    persist: preprocessor_persist;                                       (* x *)
   }
 
 (** the preprocessor state that does not change very often *)
@@ -69,6 +74,39 @@ let source_format { reader; _ } = Src_reader.source_format reader
 let rev_log { pplog; _ } = pplog
 let rev_comments { reader; _ } = Src_reader.rev_comments reader
 let rev_ignored { reader; _ } = Src_reader.rev_ignored reader
+
+let bind_78_constant lp ~loc const_name (lit: Cobol_ptree.literal with_loc) =
+  let define ?diags value =
+    let env =
+      ENV.(define_compilation_var @@ var' const_name) ~loc value lp.env
+    and diags =
+      Option.fold diags
+        ~some:Preproc_diagnostics.literal_diagnostics
+        ~none:Preproc_diagnostics.none
+    in
+    add_diags { lp with env } diags
+  in
+  match ~&lit with
+  | Alphanum alphanum ->
+      define (ENV.alphanum_literal_value (alphanum &@<- lit))
+  | Boolean bool ->
+      let value = LIT.boolean (bool &@<- lit) in
+      define (ENV.boolean_literal_value value.result) ~diags:value.diags
+  | Integer integral ->
+      let fixed = Cobol_ptree.fixed_of_strings ~integral ~fractional:"0" in
+      let value = LIT.fixed (fixed &@<- lit) in
+      define (ENV.numeric_literal_value value.result) ~diags:value.diags
+  | Fixed fixed ->
+      let value = LIT.fixed (fixed &@<- lit) in
+      define (ENV.numeric_literal_value value.result) ~diags:value.diags
+  | NumFig Zero | Fig Zero ->
+      define (ENV.numeric_literal_value (LIT.fixed_zero &@<- lit))
+  | _ ->
+      add_error lp @@ Unexpected { loc = ~@lit;
+                                   stuff = Constant_literal_kind lit }
+
+let lookup_compilation_variable lp variable =
+  ENV.(find_compil_var @@ var variable) lp.env
 
 (** [position_at ~line ~char pp] computes a lexing position that corresponds to
     the given line and character indexes (all starting at 0) in the input
@@ -111,6 +149,9 @@ let with_replacing lp replacing =
 
 let show tag { persist = { show_if_verbose; platform; _ }; _ } =
   platform.verbosity > 0 && LIST.mem tag show_if_verbose
+
+let record_compilation_variable_substitution lp ~loc ~var ~def =
+  with_pplog lp @@ Preproc_trace.compvar_subst ~loc ~var ~def lp.pplog
 
 let source_format_config = function
   | Cobol_config.SF sf -> Some (Src_format.from_config sf)

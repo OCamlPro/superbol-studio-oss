@@ -37,6 +37,30 @@ val rev_ignored: preprocessor -> lexloc list
 
 val next_chunk: preprocessor -> Text.text * preprocessor
 
+(** {2 Environment access and manipulation} *)
+
+(** Binds 78-level constants; managed by the preprocessor as MF allows use of
+    such constants in compilation directives.
+
+    Given [loc] should correspond to the area in the source code where the
+    definition occurs. *)
+val bind_78_constant
+  : preprocessor
+  -> loc:srcloc
+  -> Cobol_ptree.name with_loc
+  -> Cobol_ptree.literal with_loc
+  -> preprocessor
+val lookup_compilation_variable
+  : preprocessor
+  -> Cobol_ptree.name
+  -> Preproc_env.compilation_var_definition option
+val record_compilation_variable_substitution
+  : preprocessor
+  -> loc:srcloc
+  -> var:(* Preproc_env.var *)string
+  -> def:Preproc_env.compilation_var_definition
+  -> preprocessor
+
 (** {2 High-level commands} *)
 
 val lex_input

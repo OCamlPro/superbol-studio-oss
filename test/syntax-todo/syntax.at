@@ -410,13 +410,12 @@ AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
 [Checking `prog.cob'
 ],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
-prog.cob:6.38-6.47:
-   3          working-storage section.
+prog.cob:7.27-7.38:
    4          78  GRID-SIZE           value 8.
    5          01  chessboard.
-   6 >            05  x-positions     occurs GRID-SIZE.
-----                                         ^^^^^^^^^
-   7                  10  cell    x-cell-name.
+   6              05  x-positions     occurs GRID-SIZE.
+   7 >                10  cell    x-cell-name.
+----                              ^^^^^^^^^^^
 >> Error: Invalid syntax
 
 ])
@@ -797,20 +796,10 @@ AT_DATA([prog.cob], [
        PROCEDURE DIVISION.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
 [Checking `prog.cob'
 ],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
-prog.cob:9.45-9.57:
-   6          01  customer-record.
-   7              03  file-c-order.
-   8                78  no-of-orders              VALUE 10.
-   9 >                05  file-c-order-entry OCCURS no-of-orders.
-----                                                ^^^^^^^^^^^^
-  10                      07  file-ord-no     PIC 9(6).
-  11                      07  file-ord-date   PIC 9(8).
->> Error: Invalid syntax
-
 ])
 
 AT_CLEANUP

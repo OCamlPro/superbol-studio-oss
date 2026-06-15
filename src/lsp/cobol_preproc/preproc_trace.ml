@@ -46,6 +46,12 @@ module TYPES = struct
           text: Text.text;
           ignored_loc: srcloc;
         }
+    | Compilation_variable_substitution of     (* Note: parser-specific event *)
+        {
+          loc: srcloc;
+          var: string; (* Preproc_env.var; *)
+          def: Preproc_env.compilation_var_definition;
+        }
 
   and copy_event_status =
     | CopyDone of string
@@ -76,6 +82,8 @@ let exec_block ~preamble_loc ?postamble_loc text : log -> log =
 let ignored text : log -> log =
   let ignored_loc = Option.get @@ Cobol_common.Srcloc.concat_locs text in
   List.cons @@ Ignored { text; ignored_loc }
+let compvar_subst ~loc ~var ~def : log -> log =
+  List.cons @@ Compilation_variable_substitution { loc; var; def }
 
 (* --- *)
 

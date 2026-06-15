@@ -71,6 +71,7 @@ let dual_handler_none =
 %[@post.tag procedure_division_header unit]
 %[@post.tag procedure_division Cobol_ptree.procedure_division]
 %[@post.tag method_definitions Cobol_ptree.method_definitions]
+%[@post.tag data_descr_entry Cobol_ptree.data_item]
 
 %[@post.tag pending string]
 
@@ -1269,9 +1270,9 @@ let report_descr_entry :=
        report_items = crl } }
 
 let constant_or_data_descr_entry :=
-  | e = constant;
+  | e = constant; ".";
     { Constant e }
-  | e = data_descr_entry;
+  | e = data_descr_entry; ".";
     { Data e }                                  (* including level 77 entries *)
   | l = loc(elementary_level); dn = name; RENAMES; ri = loc(qualname);
     to_ = o(THROUGH; ~ = loc(qualname); < >); ".";
@@ -1473,7 +1474,7 @@ let constant :=
   (* BYTE-LENGTH is sensitive throughout "constant entry" w.r.t ISO/IEC 2014.
      However, like in GnuCOBOL we restrict the scope to the only places where
      the keyword is relevant. *)
-  | l = loc(elementary_level); n = name; spec = constant_spec; ".";
+  | l = loc(elementary_level); n = name; spec = constant_spec;
     { let go, cv = spec in
       { constant_level = l;
         constant_name = n;
@@ -1497,10 +1498,10 @@ let constant_value_length [@context constant] :=
   | go = constant_spec_prefix; AS?; BYTE_LENGTH; {go, `ByteLength}
   | go = constant_spec_prefix; AS?; LENGTH;      {go, `Length}
 
-let data_descr_entry :=
+let data_descr_entry [@post.data_descr_entry] :=
   | l = loc(elementary_level);
     eno = ro(entry_name_clause);
-    dcl = rl(loc(data_descr_clause)); ".";
+    dcl = rl(loc(data_descr_clause));
     { { data_level = l;
         data_name = eno;
         data_clauses = dcl } }
@@ -2503,11 +2504,13 @@ let integer [@recovery integer_zero] [@symbol "<integer literal>"] :=
 
 let fixedlit [@recovery fixed_zero] [@cost 10]
       [@symbol "<fixed-point literal>"] :=
-  | (i, _, d) = FIXEDLIT; { Cobol_ptree.fixed_of_strings i d }
+  | (integral, _, fractional) = FIXEDLIT;
+    { Cobol_ptree.fixed_of_strings ~integral ~fractional }
 
 let floatlit [@recovery floating_zero] [@cost 10]
       [@symbol "<floating-point literal>"] :=
-  | (i, _, d, e) = FLOATLIT; { Cobol_ptree.floating_of_strings i d e }
+  | (integral, _, fractional, exponent) = FLOATLIT;
+    { Cobol_ptree.floating_of_strings ~integral ~fractional ~exponent }
 
 let alphanum [@recovery dummy_alphanum] [@symbol "<alphanumeric literal>"] :=
   | ~ = ALPHANUM; < >

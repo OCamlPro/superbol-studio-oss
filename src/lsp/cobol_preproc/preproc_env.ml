@@ -11,8 +11,24 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Environment for preprocessing and compilation.  Holds defintions of
+    preprocessor constants (preprocessor DEFINES, compulation process
+    variables), along with compilation variables (78-level constants).
+
+
+    Accepted values for these preprocessor variables are:
+    - Alphanumerics;
+    - Booleans;
+    - Fixed-point numerics (no plain Integer, nor floating-points).
+
+    For now, the set of values for compilation variables if equivalent to that
+    of preprocssor variables. *)
+
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
+open Cobol_data.Types
+
+module VAL = Cobol_data.Value
 
 (** Utility module that maps any string to a physically unique upper-cased
     internal representation. *)
@@ -40,25 +56,29 @@ end
 module MAP = Map.Make (VAR)
 
 module TYPES = struct
-  type env = definition MAP.t
+  type env =
+    {
+      preproc_vars: preproc_definition MAP.t;
+      compil_vars: compilation_var_definition MAP.t;
+    }
   and var = VAR.t
-  and definition =
+  and preproc_definition =
     {
       def_loc: definition_loc;
       def_value: value;
     }
-  and definition_loc = preproc_loc
   and 'a with_preproc_loc =
-    { pp_payload: 'a; pp_loc: preproc_loc }
-  and preproc_loc =
+    { pp_payload: 'a; pp_loc: definition_loc }
+  and definition_loc =
     | Source_location of srcloc
     | Process_parameter
     | Process_environment
     (* | Computed *)
   and value =
-    | Alphanum of Cobol_data.Value.alphanum with_preproc_loc
-    | Boolean of Cobol_data.Value.boolean with_preproc_loc
-    | Numeric of Cobol_data.Value.fixed with_preproc_loc
+    | Alphanum of alphanum_value with_preproc_loc
+    | Boolean of boolean_value with_preproc_loc
+    | Numeric of fixed_value with_preproc_loc
+  and compilation_var_definition = preproc_definition   (* for now (not sure) *)
 
   exception UNDEFINED of var with_loc
   exception REDEFINITION of { prev_def_loc: definition_loc }
@@ -70,9 +90,9 @@ type t = env
 (* pretty-printing *)
 
 let pp_value ppf = function
-  | Alphanum s -> Pretty.print ppf "%s" s.pp_payload
-  | Boolean b -> Pretty.print ppf "%a" Cobol_data.Value.pp_boolean b.pp_payload
-  | Numeric f -> Pretty.print ppf "%a" Cobol_data.Value.pp_fixed f.pp_payload
+  | Alphanum s -> Cobol_data.Printer.pp_alphanum_value ppf s.pp_payload
+  | Boolean b -> Cobol_data.Printer.pp_boolean_value ppf b.pp_payload
+  | Numeric f -> Cobol_data.Printer.pp_fixed_value ppf f.pp_payload
 
 let pp_definition ppf { def_value; _ } =
   pp_value ppf def_value
@@ -80,36 +100,80 @@ let pp_definition ppf { def_value; _ } =
 let pp: t Pretty.printer = fun ppf map ->
   Pretty.list ~fopen:"@[<2>@<1>⦃ " ~fsep:",@ " ~fclose:" @<1>⦄@]"
     Fmt.(box ~indent:2 @@ pair ~sep:(any " =>@ ") VAR.pp pp_definition)
-    ppf (MAP.bindings map)
+    ppf (MAP.bindings map.preproc_vars)
 
 (* constructors *)
 
-let empty = MAP.empty
+let empty =
+  {
+    preproc_vars = MAP.empty;
+    compil_vars = MAP.empty;
+  }
 
-let var = VAR.of_string
-let var' = Cobol_common.Srcloc.map_payload var
+let var: string -> var = VAR.of_string
+let var': string with_loc -> var with_loc = Cobol_common.Srcloc.map_payload var
 
-let mem v = MAP.mem v
-let mem' v = MAP.mem ~&v
+let mem_preproc_var v env = MAP.mem v env.preproc_vars
+let mem_preproc_var' v env = MAP.mem ~&v env.preproc_vars
+
+let mem_compil_var v env = MAP.mem v env.compil_vars
+let mem_compil_var' v env = MAP.mem ~&v env.compil_vars
+
+let mem_var v env = mem_preproc_var v env || mem_compil_var v env
+let mem_var' v env = mem_preproc_var ~&v env || mem_compil_var ~&v env
 
 (* higher-level operations *)
 
-let definition_of ~var env : definition =
-  match MAP.find_opt ~&var env with
-  | None -> raise @@ UNDEFINED var
-  | Some value -> value
+let preproc_var_definition_of ~var ?(try_compil_vars = true) env
+  : preproc_definition =
+  match MAP.find_opt ~&var env.preproc_vars with
+  | Some value ->
+      value
+  | None ->
+      if try_compil_vars then
+        match MAP.find_opt ~&var env.compil_vars with
+        | Some value -> value
+        | None -> raise @@ UNDEFINED var
+      else
+        raise @@ UNDEFINED var
 
-let define ~loc var value ?(override = false) (env: t) : t =
-  match MAP.find_opt ~&var env with
+let define_preproc_var ~loc var value ?(override = false) (env: t) : t =
+  match MAP.find_opt ~&var env.preproc_vars with
   | Some { def_loc; _ } when not override ->
       raise @@ REDEFINITION { prev_def_loc = def_loc }
   | Some _ | None ->
-      MAP.add ~&var { def_loc = Source_location loc;
-                      def_value = value } env
+      { env with
+        preproc_vars = MAP.add ~&var { def_loc = Source_location loc;
+                                       def_value = value } env.preproc_vars }
 
 let define_process_parameter var value (env: t) : t =      (* always override *)
-  MAP.add var { def_loc = Process_parameter;
-                def_value = value } env
+  { env with
+    preproc_vars = MAP.add var { def_loc = Process_parameter;
+                                 def_value = value } env .preproc_vars }
 
-let undefine var (env: t) : t =
-  MAP.remove ~&var env
+let undefine_preproc_var var (env: t) : t =
+  { env with
+    preproc_vars = MAP.remove ~&var env.preproc_vars }
+
+(* --- *)
+
+let define_compilation_var ~loc var value (env: t) : t =
+  { env with
+    compil_vars = MAP.add ~&var { def_loc = Source_location loc;
+                                  def_value = value } env.compil_vars }
+
+let find_compil_var v env = MAP.find_opt v env.compil_vars
+
+(* --- *)
+
+let alphanum_literal_value (a: alphanum_literal with_loc) : value =
+  Alphanum { pp_payload = ~&a;
+             pp_loc = Source_location ~@a }
+
+let boolean_literal_value (b: boolean_literal with_loc) : value =
+  Boolean { pp_payload = ~&b.bool_value;
+            pp_loc = Source_location ~@b }
+
+let numeric_literal_value (f: fixed_literal with_loc) : value =
+  Numeric { pp_payload = ~&f.fixed_value;
+            pp_loc = Source_location ~@f }

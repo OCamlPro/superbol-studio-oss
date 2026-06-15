@@ -644,7 +644,8 @@ let find_hovered_pplog_event ~filename position pplog =
     | Ignored _ ->
         false
     | Replacement { matched_loc = loc; _ }
-    | FileCopy { copyloc = loc; _ } ->
+    | FileCopy { copyloc = loc; _ }
+    | Compilation_variable_substitution { loc; _ } ->
         try           (* Some locations in the pre-processor log may not involve
                          [filename], so we need to catch those cases. *)
           Lsp_position.is_in_lexloc position
@@ -662,6 +663,8 @@ let preproc_info_on_hover ~filename position pplog =
       (match Lsp_platform.record.read_text_file lib with
        | "" -> None
        | text -> Some (cobol_code "%s" text, loc))
+  | Some Compilation_variable_substitution { loc; def; _ } ->
+      Some (cobol_code "%a" Cobol_preproc.Env.pp_value def.def_value, loc)
   | Some FileCopy { status = MissingCopy _; _ }
   | Some Replace _
   | Some CompilerDirective _

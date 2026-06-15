@@ -605,6 +605,9 @@ let semtoks_of_preproc_statements ~filename ?range pplog =
     | Cobol_preproc.Trace.Replace { replloc = loc }
     | Cobol_preproc.Trace.CompilerDirective { loc; _ } ->
         acc_semtoks TOKTYP.macro loc acc
+    | Cobol_preproc.Trace.Compilation_variable_substitution { loc; _ } ->
+        acc_semtoks TOKTYP.macro loc acc
+          ~tokmods:TOKMOD.(one readonly)
     | Cobol_preproc.Trace.Ignored { ignored_loc; _ } ->
         acc_semtoks TOKTYP.comment ignored_loc acc
     | Cobol_preproc.Trace.Exec_block { preamble_loc = loc;

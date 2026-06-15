@@ -107,6 +107,7 @@ val end_pos_in: filename: string -> srcloc -> Lexing.position
 
 val concat: srcloc -> srcloc -> srcloc
 val concat_srclocs: srcloc list -> srcloc option
+val append_srclocs: srcloc -> srcloc list -> srcloc
 val prefix: int -> srcloc -> srcloc
 val suffix: int -> srcloc -> srcloc
 val trunc_prefix: int -> srcloc -> srcloc

@@ -168,7 +168,7 @@ let get ?(verbose_on = `Stdout) () =
           (* TODO: Check numerics: i.e, no quotes & proper format. *)
           Cobol_preproc.Env.define_process_parameter
             (Cobol_preproc.Env.var var)
-            (Alphanum { pp_payload = def;
+            (Alphanum { pp_payload = Cobol_data.Value.alphanum_of_string def;
                         pp_loc = Process_parameter }) env
         with Not_found ->
           Pretty.failwith "Invalid argument `%s' given to flag `-D`" definition

@@ -40,6 +40,12 @@ module TYPES: sig
           text: Text.text;
           ignored_loc: Cobol_common.srcloc;
         }
+    | Compilation_variable_substitution of     (* Note: parser-specific event *)
+        {
+          loc: Cobol_common.srcloc;
+          var: (* Preproc_env.TYPES.var *)string;
+          def: Preproc_env.TYPES.compilation_var_definition;
+        }
 
   and copy_event_status =
     | CopyDone of string
@@ -84,6 +90,11 @@ val exec_block
   -> log -> log
 val ignored
   : Text.text                                                    (* non-empty *)
+  -> log -> log
+val compvar_subst
+  : loc: Cobol_common.srcloc
+  -> var: (* Preproc_env.var *)string
+  -> def: Preproc_env.compilation_var_definition
   -> log -> log
 
 (* --- *)
