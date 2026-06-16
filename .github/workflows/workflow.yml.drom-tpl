@@ -43,6 +43,10 @@ jobs:
           git config --global user.name github-actions
           git config --global user.email github-actions-bot@users.noreply.github.com
 
+      - name: Run apt update
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt update
+
       - name: Use OCaml ${{ matrix.ocaml-compiler }}
         uses: avsm/setup-ocaml@v3
         with:
