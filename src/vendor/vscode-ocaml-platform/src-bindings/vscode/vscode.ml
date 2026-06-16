@@ -15,7 +15,7 @@
 
 open Interop
 
-include [%js: val version : string [@@js.global "vscode.version"]]
+include [%js: val version : string [@@js.global "__SUPERBOL__.vscode.version"]]
 
 module Disposable = struct
   include Class.Make ()
@@ -23,9 +23,9 @@ module Disposable = struct
   include
     [%js:
     val from : (t list[@js.variadic]) -> t
-      [@@js.global "vscode.Disposable.from"]
+      [@@js.global "__SUPERBOL__.vscode.Disposable.from"]
 
-    val make : dispose:(unit -> unit) -> t [@@js.new "vscode.Disposable"]
+    val make : dispose:(unit -> unit) -> t [@@js.new "__SUPERBOL__.vscode.Disposable"]
 
     val dispose : t -> unit [@@js.call]]
 end
@@ -62,7 +62,7 @@ module Position = struct
 
     val character : t -> int [@@js.get]
 
-    val make : line:int -> character:int -> t [@@js.new "vscode.Position"]
+    val make : line:int -> character:int -> t [@@js.new "__SUPERBOL__.vscode.Position"]
 
     val isBefore : t -> other:t -> bool [@@js.call]
 
@@ -92,7 +92,7 @@ module Range = struct
     val end_ : t -> Position.t [@@js.get]
 
     val makePositions : start:Position.t -> end_:Position.t -> t
-      [@@js.new "vscode.Range"]
+      [@@js.new "__SUPERBOL__.vscode.Range"]
 
     val makeCoordinates :
          startLine:int
@@ -100,7 +100,7 @@ module Range = struct
       -> endLine:int
       -> endCharacter:int
       -> t
-      [@@js.new "vscode.Range"]
+      [@@js.new "__SUPERBOL__.vscode.Range"]
 
     val isEmpty : t -> bool [@@js.get]
 
@@ -163,15 +163,15 @@ module TextEdit = struct
   include
     [%js:
     val replace : range:Range.t -> newText:string -> t
-      [@@js.global "vscode.TextEdit.replace"]
+      [@@js.global "__SUPERBOL__.vscode.TextEdit.replace"]
 
     val insert : position:Position.t -> newText:string -> t
-      [@@js.global "vscode.TextEdit.insert"]
+      [@@js.global "__SUPERBOL__.vscode.TextEdit.insert"]
 
-    val delete : Range.t -> t [@@js.global "vscode.TextEdit.delete"]
+    val delete : Range.t -> t [@@js.global "__SUPERBOL__.vscode.TextEdit.delete"]
 
     val setEndOfLine : EndOfLine.t -> t
-      [@@js.global "vscode.TextEdit.setEndOfLine"]
+      [@@js.global "__SUPERBOL__.vscode.TextEdit.setEndOfLine"]
 
     val range : t -> Range.t [@@js.get]
 
@@ -179,7 +179,7 @@ module TextEdit = struct
 
     val newEol : t -> EndOfLine.t or_undefined [@@js.get]
 
-    val make : range:Range.t -> newText:string -> t [@@js.new "vscode.TextEdit"]]
+    val make : range:Range.t -> newText:string -> t [@@js.new "__SUPERBOL__.vscode.TextEdit"]]
 end
 
 module Uri = struct
@@ -200,12 +200,12 @@ module Uri = struct
   include
     [%js:
     val parse : string -> ?strict:bool -> unit -> t
-      [@@js.global "vscode.Uri.parse"]
+      [@@js.global "__SUPERBOL__.vscode.Uri.parse"]
 
-    val file : string -> t [@@js.global "vscode.Uri.file"]
+    val file : string -> t [@@js.global "__SUPERBOL__.vscode.Uri.file"]
 
     val joinPath : t -> pathSegments:(string list[@js.variadic]) -> t
-      [@@js.global "vscode.Uri.joinPath"]
+      [@@js.global "__SUPERBOL__.vscode.Uri.joinPath"]
 
     val scheme : t -> string [@@js.get]
 
@@ -332,7 +332,7 @@ module Selection = struct
     val active : t -> Position.t [@@js.get]
 
     val makePositions : anchor:Position.t -> active:Position.t -> t
-      [@@js.new "vscode.Selection"]
+      [@@js.new "__SUPERBOL__.vscode.Selection"]
 
     val makeCoordinates :
          anchorLine:int
@@ -340,7 +340,7 @@ module Selection = struct
       -> activeLine:int
       -> activeCharacter:int
       -> t
-      [@@js.new "vscode.Selection"]
+      [@@js.new "__SUPERBOL__.vscode.Selection"]
 
     val isReversed : t -> bool [@@js.get]]
 end
@@ -498,7 +498,7 @@ module MarkdownString = struct
     val supportThemeIcons : t -> bool or_undefined [@@js.get]
 
     val make : ?value:string -> ?supportThemeIcons:bool -> unit -> t
-      [@@js.new "vscode.MarkdownString"]
+      [@@js.new "__SUPERBOL__.vscode.MarkdownString"]
 
     val appendText : t -> value:string -> t [@@js.call]
 
@@ -511,7 +511,7 @@ end
 module ThemeColor = struct
   include Class.Make ()
 
-  include [%js: val make : id:string -> t [@@js.new "vscode.ThemeColor"]]
+  include [%js: val make : id:string -> t [@@js.new "__SUPERBOL__.vscode.ThemeColor"]]
 end
 
 module ThemableDecorationAttachmentRenderOptions = struct
@@ -663,7 +663,7 @@ module SnippetString = struct
     [%js:
     val value : t -> string [@@js.get]
 
-    val make : ?value:string -> unit -> t [@@js.new "vscode.SnippetString"]
+    val make : ?value:string -> unit -> t [@@js.new "__SUPERBOL__.vscode.SnippetString"]
 
     val appendText : t -> string:string -> t [@@js.call]
 
@@ -868,7 +868,7 @@ module WorkspaceEdit = struct
       -> unit
       [@@js.call]
 
-    val make : unit -> t [@@js.new "vscode.WorkspaceEdit"]]
+    val make : unit -> t [@@js.new "__SUPERBOL__.vscode.WorkspaceEdit"]]
 end
 
 module StatusBarAlignment = struct
@@ -1018,7 +1018,7 @@ module EventEmitter = struct
 
     include
       [%js:
-      val make : unit -> t [@@js.new "vscode.EventEmitter"]
+      val make : unit -> t [@@js.new "__SUPERBOL__.vscode.EventEmitter"]
 
       val event : t -> Event.t [@@js.get]
 
@@ -1196,7 +1196,7 @@ module Location = struct
       -> rangeOrPosition:
            ([ `Range of Range.t | `Position of Position.t ][@js.union])
       -> t
-      [@@js.new "vscode.Location"]]
+      [@@js.new "__SUPERBOL__.vscode.Location"]]
 end
 
 module ProgressLocation = struct
@@ -1256,7 +1256,7 @@ module DiagnosticRelatedInformation = struct
     val message : t -> string [@@js.get]
 
     val make : location:Location.t -> message:string -> t
-      [@@js.new "vscode.DiagnosticRelatedInformation"]]
+      [@@js.new "__SUPERBOL__.vscode.DiagnosticRelatedInformation"]]
 end
 
 module DiagnosticTag = struct
@@ -1325,7 +1325,7 @@ module Diagnostic = struct
       -> ?severity:DiagnosticSeverity.t
       -> unit
       -> t
-      [@@js.new "vscode.Diagnostic"]]
+      [@@js.new "__SUPERBOL__.vscode.Diagnostic"]]
 
   let make ?severity ~message range = make ~range ~message ?severity ()
 end
@@ -1470,7 +1470,7 @@ module Extensions = struct
   include
     [%js:
     val getExtension : string -> Extension.t or_undefined
-      [@@js.global "vscode.extensions.getExtension"]]
+      [@@js.global "__SUPERBOL__.vscode.extensions.getExtension"]]
 end
 
 module TerminalExitStatus = struct
@@ -1774,7 +1774,7 @@ module ShellExecution = struct
     [%js:
     val makeCommandLine :
       commandLine:string -> ?options:ShellExecutionOptions.t -> unit -> t
-      [@@js.new "vscode.ShellExecution"]
+      [@@js.new "__SUPERBOL__.vscode.ShellExecution"]
 
     val makeCommandArgs :
          command:shellString
@@ -1782,7 +1782,7 @@ module ShellExecution = struct
       -> ?options:ShellExecutionOptions.t
       -> unit
       -> t
-      [@@js.new "vscode.ShellExecution"]
+      [@@js.new "__SUPERBOL__.vscode.ShellExecution"]
 
     val commandLine : t -> string or_undefined [@@js.get]
 
@@ -1812,7 +1812,7 @@ module ProcessExecution = struct
     [%js:
     val makeProcess :
       process:string -> ?options:ProcessExecutionOptions.t -> unit -> t
-      [@@js.new "vscode.ProcessExecution"]
+      [@@js.new "__SUPERBOL__.vscode.ProcessExecution"]
 
     val makeProcessArgs :
          process:string
@@ -1820,7 +1820,7 @@ module ProcessExecution = struct
       -> ?options:ProcessExecutionOptions.t
       -> unit
       -> t
-      [@@js.new "vscode.ProcessExecution"]
+      [@@js.new "__SUPERBOL__.vscode.ProcessExecution"]
 
     val process : t -> string [@@js.get]
 
@@ -1854,7 +1854,7 @@ module CustomExecution = struct
          callback:
            (resolvedDefinition:TaskDefinition.t -> Pseudoterminal.t Promise.t)
       -> t
-      [@@js.new "vscode.CustomExecution"]]
+      [@@js.new "__SUPERBOL__.vscode.CustomExecution"]]
 end
 
 module RelativePattern = struct
@@ -1875,7 +1875,7 @@ module RelativePattern = struct
            [@js.union])
       -> pattern:string
       -> t
-      [@@js.new "vscode.RelativePattern"]]
+      [@@js.new "__SUPERBOL__.vscode.RelativePattern"]]
 end
 
 module GlobPattern = struct
@@ -1975,7 +1975,7 @@ module Hover = struct
             ]
            [@js.union])
       -> t
-      [@@js.new "vscode.Hover"]]
+      [@@js.new "__SUPERBOL__.vscode.Hover"]]
 end
 
 module HoverProvider = struct
@@ -2006,13 +2006,13 @@ module TaskGroup = struct
 
   include
     [%js:
-    val clean : t [@@js.global "vscode.TaskGroup.Clean"]
+    val clean : t [@@js.global "__SUPERBOL__.vscode.TaskGroup.Clean"]
 
-    val build : t [@@js.global "vscode.TaskGroup.Build"]
+    val build : t [@@js.global "__SUPERBOL__.vscode.TaskGroup.Build"]
 
-    val rebuild : t [@@js.global "vscode.TaskGroup.Rebuild"]
+    val rebuild : t [@@js.global "__SUPERBOL__.vscode.TaskGroup.Rebuild"]
 
-    val test : t [@@js.global "vscode.TaskGroup.Test"]]
+    val test : t [@@js.global "__SUPERBOL__.vscode.TaskGroup.Test"]]
 end
 
 module TaskScope = struct
@@ -2117,7 +2117,7 @@ module Task = struct
       -> ?problemMatchers:string list
       -> unit
       -> t
-      [@@js.new "vscode.Task"]
+      [@@js.new "__SUPERBOL__.vscode.Task"]
 
     val definition : t -> TaskDefinition.t [@@js.get]
 
@@ -2327,9 +2327,9 @@ module Workspace = struct
   include
     [%js:
     val workspaceFolders : unit -> WorkspaceFolder.t maybe_list
-      [@@js.get "vscode.workspace.workspaceFolders"]
+      [@@js.get "__SUPERBOL__.vscode.workspace.workspaceFolders"]
 
-    val name : unit -> string or_undefined [@@js.get "vscode.workspace.name"]
+    val name : unit -> string or_undefined [@@js.get "__SUPERBOL__.vscode.workspace.name"]
 
     val createFileSystemWatcher :
          GlobPattern.t
@@ -2338,58 +2338,58 @@ module Workspace = struct
       -> ?ignoreDeleteEvents:(bool[@js.default false])
       -> unit
       -> FileSystemWatcher.t
-      [@@js.global "vscode.workspace.createFileSystemWatcher"]
+      [@@js.global "__SUPERBOL__.vscode.workspace.createFileSystemWatcher"]
 
     val workspaceFile : unit -> Uri.t or_undefined
-      [@@js.get "vscode.workspace.workspaceFile"]
+      [@@js.get "__SUPERBOL__.vscode.workspace.workspaceFile"]
 
     val rootPath : unit -> string or_undefined
-      [@@js.get "vscode.workspace.rootPath"]
+      [@@js.get "__SUPERBOL__.vscode.workspace.rootPath"]
 
     val textDocuments : unit -> TextDocument.t list
-      [@@js.get "vscode.workspace.textDocuments"]
+      [@@js.get "__SUPERBOL__.vscode.workspace.textDocuments"]
 
     val onDidChangeConfiguration : ConfigurationChangeEvent.t Event.t
-      [@@js.global "vscode.workspace.onDidChangeConfiguration"]
+      [@@js.global "__SUPERBOL__.vscode.workspace.onDidChangeConfiguration"]
 
     val onDidChangeWorkspaceFolders : OnDidChangeWorkspaceFolders.t
-      [@@js.global "vscode.workspace.onDidChangeWorkspaceFolders"]
+      [@@js.global "__SUPERBOL__.vscode.workspace.onDidChangeWorkspaceFolders"]
 
     val getWorkspaceFolder : uri:Uri.t -> WorkspaceFolder.t or_undefined
-      [@@js.global "vscode.workspace.getWorkspaceFolder"]
+      [@@js.global "__SUPERBOL__.vscode.workspace.getWorkspaceFolder"]
 
     val onDidOpenTextDocument : OnDidOpenTextDocument.t
-      [@@js.global "vscode.workspace.onDidOpenTextDocument"]
+      [@@js.global "__SUPERBOL__.vscode.workspace.onDidOpenTextDocument"]
 
     val onDidSaveTextDocument : OnDidSaveTextDocument.t
-      [@@js.global "vscode.workspace.onDidSaveTextDocument"]
+      [@@js.global "__SUPERBOL__.vscode.workspace.onDidSaveTextDocument"]
 
     val onDidCloseTextDocument : OnDidCloseTextDocument.t
-      [@@js.global "vscode.workspace.onDidCloseTextDocument"]
+      [@@js.global "__SUPERBOL__.vscode.workspace.onDidCloseTextDocument"]
 
     val onDidChangeTextDocument : OnDidChangeTextDocument.t
-      [@@js.global "vscode.workspace.onDidChangeTextDocument"]
+      [@@js.global "__SUPERBOL__.vscode.workspace.onDidChangeTextDocument"]
 
     val applyEdit : edit:WorkspaceEdit.t -> bool Promise.t
-      [@@js.global "vscode.workspace.applyEdit"]
+      [@@js.global "__SUPERBOL__.vscode.workspace.applyEdit"]
 
     val registerTextDocumentContentProvider :
       scheme:string -> provider:TextDocumentContentProvider.t -> Disposable.t
-      [@@js.global "vscode.workspace.registerTextDocumentContentProvider"]
+      [@@js.global "__SUPERBOL__.vscode.workspace.registerTextDocumentContentProvider"]
 
     val asRelativePath :
          pathOrUri:([ `String of string | `Uri of Uri.t ][@js.union])
       -> ?includeWorkspaceFolder:bool
       -> unit
       -> string
-      [@@js.global "vscode.workspace.asRelativePath"]
+      [@@js.global "__SUPERBOL__.vscode.workspace.asRelativePath"]
 
     val getConfiguration :
          ?section:string
       -> ?scope:ConfigurationScope.t
       -> unit
       -> WorkspaceConfiguration.t
-      [@@js.global "vscode.workspace.getConfiguration"]
+      [@@js.global "__SUPERBOL__.vscode.workspace.getConfiguration"]
 
     val findFiles :
          includes:GlobPattern.t
@@ -2398,7 +2398,7 @@ module Workspace = struct
       -> ?token:CancellationToken.t
       -> unit
       -> Uri.t list Promise.t
-      [@@js.global "vscode.workspace.findFiles"]
+      [@@js.global "__SUPERBOL__.vscode.workspace.findFiles"]
 
     val openTextDocument :
          ([ `Uri of Uri.t
@@ -2407,14 +2407,14 @@ module Workspace = struct
           ]
          [@js.union])
       -> TextDocument.t Promise.t
-      [@@js.global "vscode.workspace.openTextDocument"]
+      [@@js.global "__SUPERBOL__.vscode.workspace.openTextDocument"]
 
     val updateWorkspaceFolders :
          start:int
       -> deleteCount:int or_undefined
       -> workspaceFoldersToAdd:(workspaceFolderToAdd list[@js.variadic])
       -> bool
-      [@@js.global "vscode.workspace.updateWorkspaceFolders"]]
+      [@@js.global "__SUPERBOL__.vscode.workspace.updateWorkspaceFolders"]]
 end
 
 module TreeItemCollapsibleState = struct
@@ -2464,11 +2464,11 @@ module ThemeIcon = struct
   include
     [%js:
     val make : id:string -> ?color:ThemeColor.t -> unit -> t
-      [@@js.new "vscode.ThemeIcon"]
+      [@@js.new "__SUPERBOL__.vscode.ThemeIcon"]
 
-    val file : t [@@js.global "vscode.ThemeIcon.File"]
+    val file : t [@@js.global "__SUPERBOL__.vscode.ThemeIcon.File"]
 
-    val folder : t [@@js.global "vscode.ThemeIcon.Folder"]
+    val folder : t [@@js.global "__SUPERBOL__.vscode.ThemeIcon.Folder"]
 
     val id : t -> string [@@js.get]
 
@@ -2563,14 +2563,14 @@ module TreeItem = struct
     [%js:
     val make_label :
       label:label -> ?collapsibleState:TreeItemCollapsibleState.t -> unit -> t
-      [@@js.new "vscode.TreeItem"]
+      [@@js.new "__SUPERBOL__.vscode.TreeItem"]
 
     val make_resource :
          resourceUri:Uri.t
       -> ?collapsibleState:TreeItemCollapsibleState.t
       -> unit
       -> t
-      [@@js.new "vscode.TreeItem"]
+      [@@js.new "__SUPERBOL__.vscode.TreeItem"]
 
     val label : t -> label or_undefined [@@js.get]
 
@@ -3071,36 +3071,36 @@ module Window = struct
   include
     [%js:
     val activeTextEditor : unit -> TextEditor.t or_undefined
-      [@@js.get "vscode.window.activeTextEditor"]
+      [@@js.get "__SUPERBOL__.vscode.window.activeTextEditor"]
 
     val visibleTextEditors : unit -> TextEditor.t list
-      [@@js.get "vscode.window.visibleTextEditors"]
+      [@@js.get "__SUPERBOL__.vscode.window.visibleTextEditors"]
 
     val onDidChangeActiveTextEditor : unit -> OnDidChangeActiveTextEditor.t
-      [@@js.get "vscode.window.onDidChangeActiveTextEditor"]
+      [@@js.get "__SUPERBOL__.vscode.window.onDidChangeActiveTextEditor"]
 
     val onDidChangeVisibleTextEditors : unit -> OnDidChangeVisibleTextEditors.t
-      [@@js.get "vscode.window.onDidChangeVisibleTextEditors"]
+      [@@js.get "__SUPERBOL__.vscode.window.onDidChangeVisibleTextEditors"]
 
     val onDidChangeTextEditorSelection : unit -> OnDidChangeTextEditorSelection.t
-      [@@js.get "vscode.window.onDidChangeTextEditorSelection"]
+      [@@js.get "__SUPERBOL__.vscode.window.onDidChangeTextEditorSelection"]
 
-    val terminals : unit -> Terminal.t list [@@js.get "vscode.window.terminals"]
+    val terminals : unit -> Terminal.t list [@@js.get "__SUPERBOL__.vscode.window.terminals"]
 
     val activeTerminal : unit -> Terminal.t or_undefined
-      [@@js.get "vscode.window.activeTerminal"]
+      [@@js.get "__SUPERBOL__.vscode.window.activeTerminal"]
 
     val activeColorTheme : unit -> ColorTheme.t
-      [@@js.get "vscode.window.activeColorTheme"]
+      [@@js.get "__SUPERBOL__.vscode.window.activeColorTheme"]
 
     val onDidChangeActiveTerminal : unit -> OnDidChangeActiveTerminal.t
-      [@@js.get "vscode.window.onDidChangeActiveTerminal"]
+      [@@js.get "__SUPERBOL__.vscode.window.onDidChangeActiveTerminal"]
 
     val onDidOpenTerminal : unit -> OnDidOpenTerminal.t
-      [@@js.get "vscode.window.onDidOpenTerminal"]
+      [@@js.get "__SUPERBOL__.vscode.window.onDidOpenTerminal"]
 
     val onDidCloseTerminal : unit -> OnDidCloseTerminal.t
-      [@@js.get "vscode.window.onDidCloseTerminal"]
+      [@@js.get "__SUPERBOL__.vscode.window.onDidCloseTerminal"]
 
     val showTextDocument :
          document:
@@ -3109,7 +3109,7 @@ module Window = struct
       -> ?preserveFocus:bool
       -> unit
       -> TextEditor.t Promise.t
-      [@@js.global "vscode.window.showTextDocument"]
+      [@@js.global "__SUPERBOL__.vscode.window.showTextDocument"]
 
     val showInformationMessage :
          message:string
@@ -3117,7 +3117,7 @@ module Window = struct
       -> items:(MessageItem.t list[@js.variadic])
       -> unit
       -> MessageItem.t or_undefined Promise.t
-      [@@js.global "vscode.window.showInformationMessage"]
+      [@@js.global "__SUPERBOL__.vscode.window.showInformationMessage"]
 
     val showWarningMessage :
          message:string
@@ -3125,7 +3125,7 @@ module Window = struct
       -> items:(MessageItem.t list[@js.variadic])
       -> unit
       -> MessageItem.t or_undefined Promise.t
-      [@@js.global "vscode.window.showWarningMessage"]
+      [@@js.global "__SUPERBOL__.vscode.window.showWarningMessage"]
 
     val showErrorMessage :
          message:string
@@ -3133,13 +3133,13 @@ module Window = struct
       -> items:(MessageItem.t list[@js.variadic])
       -> unit
       -> MessageItem.t or_undefined Promise.t
-      [@@js.global "vscode.window.showErrorMessage"]
+      [@@js.global "__SUPERBOL__.vscode.window.showErrorMessage"]
 
     val showOpenDialog :
          ?options:OpenDialogOptions.t
       -> unit
       -> Uri.t array option Promise.t
-      [@@js.global "vscode.window.showOpenDialog"]
+      [@@js.global "__SUPERBOL__.vscode.window.showOpenDialog"]
 
     val showQuickPickItems :
          choices:QuickPickItem.t list
@@ -3147,7 +3147,7 @@ module Window = struct
       -> ?token:CancellationToken.t
       -> unit
       -> QuickPickItem.t or_undefined Promise.t
-      [@@js.global "vscode.window.showQuickPick"]
+      [@@js.global "__SUPERBOL__.vscode.window.showQuickPick"]
 
     val showQuickPick :
          items:string list
@@ -3155,39 +3155,39 @@ module Window = struct
       -> ?token:CancellationToken.t
       -> unit
       -> string or_undefined Promise.t
-      [@@js.global "vscode.window.showQuickPick"]
+      [@@js.global "__SUPERBOL__.vscode.window.showQuickPick"]
 
     val showInputBox :
          ?options:InputBoxOptions.t
       -> ?token:CancellationToken.t
       -> unit
       -> string or_undefined Promise.t
-      [@@js.global "vscode.window.showInputBox"]
+      [@@js.global "__SUPERBOL__.vscode.window.showInputBox"]
 
     val createOutputChannel : name:string -> OutputChannel.t
-      [@@js.global "vscode.window.createOutputChannel"]
+      [@@js.global "__SUPERBOL__.vscode.window.createOutputChannel"]
 
     val setStatusBarMessage :
          text:string
       -> ?hide:([ `AfterTimeout of int ][@js.union])
       -> unit
       -> Disposable.t
-      [@@js.global "vscode.window.setStatusBarMessage"]
+      [@@js.global "__SUPERBOL__.vscode.window.setStatusBarMessage"]
 
     val withProgress : options:ProgressOptions.t -> task:Ojs.t -> Ojs.t
-      [@@js.global "vscode.window.withProgress"]
+      [@@js.global "__SUPERBOL__.vscode.window.withProgress"]
 
     val createStatusBarItem :
          ?alignment:StatusBarAlignment.t
       -> ?priority:int
       -> unit
       -> StatusBarItem.t
-      [@@js.global "vscode.window.createStatusBarItem"]
+      [@@js.global "__SUPERBOL__.vscode.window.createStatusBarItem"]
 
     val createTextEditorDecorationType :
          options:Ojs.t
       -> TextEditorDecorationType.t
-      [@@js.global "vscode.window.createTextEditorDecorationType"]
+      [@@js.global "__SUPERBOL__.vscode.window.createTextEditorDecorationType"]
 
     val createTerminal :
          ?name:string
@@ -3195,7 +3195,7 @@ module Window = struct
       -> ?shellArgs:([ `String of string | `Strings of string list ][@js.union])
       -> unit
       -> Terminal.t
-      [@@js.global "vscode.window.createTerminal"]
+      [@@js.global "__SUPERBOL__.vscode.window.createTerminal"]
 
     val createTerminalFromOptions :
          options:
@@ -3204,21 +3204,21 @@ module Window = struct
             ]
            [@js.union])
       -> Terminal.t
-      [@@js.global "vscode.window.createTerminal"]
+      [@@js.global "__SUPERBOL__.vscode.window.createTerminal"]
 
     val registerTreeDataProvider :
       viewId:string -> treeDataProvider:Ojs.t -> Disposable.t
-      [@@js.global "vscode.window.registerTreeDataProvider"]
+      [@@js.global "__SUPERBOL__.vscode.window.registerTreeDataProvider"]
 
     val createTreeView : viewId:string -> options:Ojs.t -> Ojs.t
-      [@@js.global "vscode.window.createTreeView"]
+      [@@js.global "__SUPERBOL__.vscode.window.createTreeView"]
 
     val createWebviewPanel :
          viewType:string
       -> title:string
       -> showOptions:ViewColumn.t
       -> WebviewPanel.t
-      [@@js.global "vscode.window.createWebviewPanel"]
+      [@@js.global "__SUPERBOL__.vscode.window.createWebviewPanel"]
 
     val registerCustomTextEditorProvider :
          viewType:string
@@ -3226,7 +3226,7 @@ module Window = struct
       -> ?options:RegisterCustomEditorProviderOptions.t
       -> unit
       -> Disposable.t
-      [@@js.global "vscode.window.registerCustomEditorProvider"]
+      [@@js.global "__SUPERBOL__.vscode.window.registerCustomEditorProvider"]
 
     val registerCustomReadonlyEditorProvider :
          viewType:string
@@ -3234,7 +3234,7 @@ module Window = struct
       -> ?options:RegisterCustomEditorProviderOptions.t
       -> unit
       -> Disposable.t
-      [@@js.global "vscode.window.registerCustomEditorProvider"]]
+      [@@js.global "__SUPERBOL__.vscode.window.registerCustomEditorProvider"]]
 
   let getChoices choices =
     choices
@@ -3312,7 +3312,7 @@ module Commands = struct
          command:string
       -> callback:(args:(Js.Any.t list[@js.variadic]) -> unit)
       -> Disposable.t
-      [@@js.global "vscode.commands.registerCommand"]
+      [@@js.global "__SUPERBOL__.vscode.commands.registerCommand"]
 
     val registerTextEditorCommand :
          command:string
@@ -3322,16 +3322,16 @@ module Commands = struct
             -> args:(Js.Any.t list[@js.variadic])
             -> unit)
       -> Disposable.t
-      [@@js.global "vscode.commands.registerTextEditorCommand"]
+      [@@js.global "__SUPERBOL__.vscode.commands.registerTextEditorCommand"]
 
     val executeCommand :
          command:string
       -> args:(Js.Any.t list[@js.variadic])
       -> Js.Any.t or_undefined Promise.t
-      [@@js.global "vscode.commands.executeCommand"]
+      [@@js.global "__SUPERBOL__.vscode.commands.executeCommand"]
 
     val getCommands : ?filterInternal:bool -> unit -> string list Promise.t
-      [@@js.global "vscode.commands.getCommands"]]
+      [@@js.global "__SUPERBOL__.vscode.commands.getCommands"]]
 end
 
 module EvaluatableExpression = struct
@@ -3374,23 +3374,23 @@ module Languages = struct
          selector:DocumentSelector.t
       -> provider:DocumentFormattingEditProvider.t
       -> Disposable.t
-      [@@js.global "vscode.languages.registerDocumentFormattingEditProvider"]
+      [@@js.global "__SUPERBOL__.vscode.languages.registerDocumentFormattingEditProvider"]
 
     val registerEvaluatableExpressionProvider :
          selector:DocumentSelector.t
       -> provider:EvaluatableExpressionProvider.t
       -> Disposable.t
-      [@@js.global "vscode.languages.registerEvaluatableExpressionProvider"]
+      [@@js.global "__SUPERBOL__.vscode.languages.registerEvaluatableExpressionProvider"]
 
     val registerHoverProvider :
       selector:DocumentSelector.t -> provider:HoverProvider.t -> Disposable.t
-      [@@js.global "vscode.languages.registerHoverProvider"]
+      [@@js.global "__SUPERBOL__.vscode.languages.registerHoverProvider"]
 
     val getDiagnostics : Uri.t -> Diagnostic.t list
-      [@@js.global "vscode.languages.getDiagnostics"]
+      [@@js.global "__SUPERBOL__.vscode.languages.getDiagnostics"]
 
     val getDiagnostics_all : unit -> (Uri.t * Diagnostic.t list) list
-      [@@js.global "vscode.languages.getDiagnostics"]]
+      [@@js.global "__SUPERBOL__.vscode.languages.getDiagnostics"]]
 end
 
 module DebugProtocolMessage = struct
@@ -3440,7 +3440,7 @@ module Breakpoint = struct
       -> ?logMessage: string
       -> unit
       -> t
-    [@@js.new "vscode.Breakpoint"]]
+    [@@js.new "__SUPERBOL__.vscode.Breakpoint"]]
 end
 
 module DebugSession = struct
@@ -3560,7 +3560,7 @@ module DebugAdapterExecutable = struct
         -> ?options: DebugAdapterExecutableOptions.t
         -> unit
         -> t
-      [@@js.new "vscode.DebugAdapterExecutable"]]
+      [@@js.new "__SUPERBOL__.vscode.DebugAdapterExecutable"]]
 end
 
 module DebugAdapterServer = struct
@@ -3576,7 +3576,7 @@ module DebugAdapterServer = struct
       -> ?host: string
       -> unit
       -> t
-    [@@js.new "vscode.DebugAdapterServer"]]
+    [@@js.new "__SUPERBOL__.vscode.DebugAdapterServer"]]
 end
 
 module DebugAdapterNamedPipeServer = struct
@@ -3585,7 +3585,7 @@ module DebugAdapterNamedPipeServer = struct
   include
     [%js:
       val path: t -> string [@@js.get]
-      val make: path:string -> t [@@js.new "vscode.DebugAdapterNamedPipeServer"]]
+      val make: path:string -> t [@@js.new "__SUPERBOL__.vscode.DebugAdapterNamedPipeServer"]]
 end
 
 module DebugAdapter = struct
@@ -3621,7 +3621,7 @@ module DebugAdapterInlineImplementation = struct
       val make:
         implementation: DebugAdapter.t
         -> t
-      [@@js.new "vscode.DebugAdapterInlineImplementation"]]
+      [@@js.new "__SUPERBOL__.vscode.DebugAdapterInlineImplementation"]]
 end
 
 module DebugAdapterDescriptor = struct
@@ -3682,14 +3682,14 @@ module Debug = struct
       -> ?triggerKind: DebugConfigurationProviderTriggerKind.t
       -> unit
       -> Disposable.t
-        [@@js.global "vscode.debug.registerDebugConfigurationProvider"]
+        [@@js.global "__SUPERBOL__.vscode.debug.registerDebugConfigurationProvider"]
 
     val registerDebugAdapterDescriptorFactory:
          debugType: string
       -> factory: DebugAdapterDescriptorFactory.t
       -> unit
       -> Disposable.t
-         [@@js.global "vscode.debug.registerDebugAdapterDescriptorFactory"]
+         [@@js.global "__SUPERBOL__.vscode.debug.registerDebugAdapterDescriptorFactory"]
     ]
 end
 
@@ -3709,13 +3709,13 @@ module Tasks = struct
     [%js:
     val registerTaskProvider :
       type_:string -> provider:TaskProvider.Default.t -> Disposable.t
-      [@@js.global "vscode.tasks.registerTaskProvider"]
+      [@@js.global "__SUPERBOL__.vscode.tasks.registerTaskProvider"]
 
     val fetchTasks :
       ?filter:TaskFilter.t -> unit -> Task.t list Promise.t
-      [@@js.global "vscode.tasks.fetchTasks"]]
+      [@@js.global "__SUPERBOL__.vscode.tasks.fetchTasks"]]
 end
 
 module Env = struct
-  include [%js: val shell : unit -> string [@@js.get "vscode.env.shell"]]
+  include [%js: val shell : unit -> string [@@js.get "__SUPERBOL__.vscode.env.shell"]]
 end
