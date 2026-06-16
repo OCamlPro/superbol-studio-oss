@@ -1,7 +1,7 @@
 
 # name of package
-name = "superbol-vscode-platform"
-skeleton = "js_program"
+name = "superbol-debugger"
+skeleton = "js_library"
 
 # version if different from project version
 # version = "0.1.0"
@@ -13,7 +13,7 @@ skeleton = "js_program"
 # description = ...
 
 # kind is either "library", "program" or "virtual"
-kind = "program"
+kind = "library"
 
 # authors if different from project authors
 # authors = [ "Me <me@metoo.org>" ]
@@ -23,14 +23,14 @@ gen-version = "version.ml"
 
 # supported file generators are "ocamllex", "ocamlyacc" and "menhir"
 # default is [ "ocamllex", "ocamlyacc" ]
-# generators = [ "ocamllex", "menhir" ]
+generators = [ "ocamllex", "menhir" ]
 
 # menhir options for the package
 #Example:
 #version = "2.0"
 #parser = { modules = ["parser"]; tokens = "Tokens" }
 #tokens = { modules = ["tokens"]}
-# menhir = ...
+modules = ["mi2Parser.mly"]
 
 # whether all modules should be packed/wrapped (default is true)
 # pack-modules = false
@@ -46,15 +46,20 @@ gen-version = "version.ml"
 preprocess = "pps gen_js_api.ppx"
 
 # files to skip while updating at package level
-skip = []
+skip = ["main.ml"]
 
 # package library dependencies
 #   [dependencies]
 #   ez_file = ">=0.1 <1.3"
 #   base-unix = { libname = "unix", version = ">=base" }
 [dependencies]
+js_of_ocaml = ">=4" # build
+node-js-stubs = "version"
+promise_jsoo = "0.3.1"
+vscode-js-stubs = "version"
+vscode-debugprotocol = "version"
+vscode-debugadapter = "version"
 superbol-vscode-lib = "version"
-superbol-debugger = "version"
 
 # package tools dependencies
 [tools]
@@ -69,19 +74,11 @@ js_of_ocaml-ppx = ">=4"
 #  no-opam-test = "yes"
 #  no-opam-doc = "yes"
 #  gen-opam = "some" | "all"
-#  dune-stanzas = "(flags (:standard (:include linking.sexp)))"
+#  dune-flags = "(:standard (:include linking.sexp))"
+#  dune-stanzas = "(foreign_stubs (language c) (names mapfile_stubs))"
 #  static-clibs = "unix"
 [fields]
+dune-libraries = "str"
 dune-stanzas = """
- (js_of_ocaml (flags --disable=genprim))
- (enabled_if (= %{context_name} \"default\"))
-"""
-# Hack to workaround the fact that Dune does not allow `enabled_if`
-# on `install` stanzas ; this is needed because we disable building
-# this executable (and all JS libraries) when cross-compiling
-dune-trailer = """
-(rule
- (target superbol_vscode_platform.bc.js)
- (action (write-file %{target} ""))
- (enabled_if (<> %{context_name} \"default\")))
+  (enabled_if (= %{context_name} \"default\"))
 """
