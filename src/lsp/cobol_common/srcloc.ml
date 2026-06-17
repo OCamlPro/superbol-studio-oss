@@ -347,7 +347,13 @@ let retrieve_file_lines, register_file_contents =
         then Array.sub lines 0 (Array.length lines - 1)
         else lines
       in
-      Cache.add file_cache file lines;
+      if Sys.win32 then          (* ez_file/read_file leaves CR characters... *)
+        Array.iteri begin fun i _ ->
+          match String.split_on_char '\r' lines.(i) with
+          | [l] | [l; _] -> lines.(i) <- l
+          | _ -> ()
+        end lines;
+      Cache.replace file_cache file lines;
       lines
   end,
   begin fun ~filename contents ->

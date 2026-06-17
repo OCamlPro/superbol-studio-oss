@@ -18,6 +18,8 @@ open Autofonce_core.Types
 open Testsuite_utils
 
 let () =
+  (* Be sure we can diff reference expected outputs: *)
+  Stdlib.set_binary_mode_out stdout true;
   Cobol_common.init_default_exn_printers ();
   (* Disable backtrace recording so `OCAMLRUNPARAM=b` has no effect on the
      output of tests that fail expectedly. *)
