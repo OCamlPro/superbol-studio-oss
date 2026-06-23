@@ -755,58 +755,61 @@ module Positions = Set.Make (struct
 let codelens_positions ~uri group =
   let filename = Lsp.Uri.to_path uri in
   let open struct
-    include Cobol_common.Visitor
-    include Cobol_data.Visitor
     type context =
       | ProcedureDiv
       | DataDiv
       | None
   end in
-  let set_context context (old, acc) =
-    do_children_and_then (context, acc) (fun (_, acc) -> (old, acc))
+  let enter_context context (prev_context, acc) =
+    Cobol_common.Visitor.do_children_and_then (context, acc)
+      (fun (_, acc) -> prev_context, acc)
   in
-  let take_when_in context { loc; _ } (current, acc) =
-    if context <> current
-    then skip (current, acc)
+  let take_when_in context { loc; _ } (current_context, acc) =
+    if context <> current_context then
+      Cobol_common.Visitor.skip (current_context, acc)
     else
       let range = Lsp_position.range_of_srcloc_in ~filename loc in
-      skip (context, Positions.add range.start acc)
+      Cobol_common.Visitor.skip (context, Positions.add range.start acc)
   in
-  Cobol_unit.Visitor.fold_unit_group
-    object (v)
-      inherit [_] Cobol_unit.Visitor.folder
-      method! fold_procedure _ = set_context ProcedureDiv
-      method! fold_data_definitions _ = set_context DataDiv
-      method! fold_paragraph' _ = skip
-      method! fold_procedure_name' = take_when_in ProcedureDiv
-      method! fold_qualname' = take_when_in DataDiv
-      method! fold_record_renaming { renaming_name; _ } =
-        take_when_in DataDiv renaming_name
-      method! fold_field_definition { field_qualname; field_redefines;
-                                      field_leading_ranges;
-                                      field_offset; field_size; field_layout;
-                                      field_conditions; field_redefinitions;
-                                      field_length_variability = _;
-                                      field_has_definition_issues = _ } acc =
-        ignore(field_redefines, field_leading_ranges, field_offset, field_size);
-        skip @@ begin acc
-          |> Cobol_ptree.Terms_visitor.fold_qualname'_opt v field_qualname
-          |> fold_field_layout v field_layout
-          |> fold_condition_names v field_conditions
-          |> fold_item_redefinitions v field_redefinitions
-        end
-      method! fold_table_definition { table_field; table_offset; table_size;
-                                      table_range; table_init_values;
-                                      table_redefines; table_redefinitions;
-                                      table_has_definition_issues } acc =
-        ignore(table_offset, table_size, table_init_values, table_redefines,
-               table_has_definition_issues);
-        skip @@ begin acc
-          |> fold_field_definition' v table_field
-          |> fold_table_range v table_range
-          |> fold_item_redefinitions v table_redefinitions
-        end
-    end group (None, Positions.empty)
+  Cobol_unit.Visitor.fold_unit_group object (v)
+    inherit [_] Cobol_unit.Visitor.folder
+    method! fold_procedure _ =
+      enter_context ProcedureDiv
+    method! fold_data_definitions _ =
+      enter_context DataDiv
+    method! fold_paragraph' _ =
+      Cobol_common.Visitor.skip
+    method! fold_procedure_name' =
+      take_when_in ProcedureDiv
+    method! fold_qualname' =
+      take_when_in DataDiv
+    method! fold_record_renaming { renaming_name; _ } =
+      take_when_in DataDiv renaming_name
+    method! fold_field_definition { field_qualname; field_redefines;
+                                    field_leading_ranges;
+                                    field_offset; field_size; field_layout;
+                                    field_conditions; field_redefinitions;
+                                    field_length_variability = _;
+                                    field_has_definition_issues = _ } acc =
+      ignore(field_redefines, field_leading_ranges, field_offset, field_size);
+      Cobol_common.Visitor.skip @@ begin acc
+        |> Cobol_ptree.Visitor.fold_qualname'_opt v field_qualname
+        |> Cobol_data.Visitor.fold_field_layout v field_layout
+        |> Cobol_data.Visitor.fold_condition_names v field_conditions
+        |> Cobol_data.Visitor.fold_item_redefinitions v field_redefinitions
+      end
+    method! fold_table_definition { table_field; table_offset; table_size;
+                                    table_range; table_init_values;
+                                    table_redefines; table_redefinitions;
+                                    table_has_definition_issues } acc =
+      ignore(table_offset, table_size, table_init_values, table_redefines,
+             table_has_definition_issues);
+      Cobol_common.Visitor.skip @@ begin acc
+        |> Cobol_data.Visitor.fold_field_definition' v table_field
+        |> Cobol_data.Visitor.fold_table_range v table_range
+        |> Cobol_data.Visitor.fold_item_redefinitions v table_redefinitions
+      end
+  end group (None, Positions.empty)
   |> snd
 
 let handle_codelens registry ({ textDocument; _ }: CodeLensParams.t) =
@@ -821,14 +824,14 @@ let handle_codelens registry ({ textDocument; _ }: CodeLensParams.t) =
         let params =
           ReferenceParams.create ~context ~position ~textDocument () in
         let ref_count =
+          Option.fold ~none:0 ~some:List.length @@
           lookup_references_in_doc ~rootdir params checked_doc
-          |> Option.fold ~none:0 ~some:List.length in
-        let title = string_of_int ref_count
-                    ^ " reference"
-                    ^ if ref_count > 1 then "s" else "" in
+        in
         let range = Range.create ~end_:position ~start:position in
         let uri = DocumentUri.yojson_of_t textDocument.uri in
-        let command = Command.create () ~title
+        let command = Command.create ()
+            ~title:(Pretty.to_string "%d reference%s"
+                      ref_count (if ref_count > 1 then "s" else ""))
             ~command:"superbol.editor.action.findReferences"
             ~arguments:[uri; Position.yojson_of_t position] in
         CodeLens.create ~command ~range ()
