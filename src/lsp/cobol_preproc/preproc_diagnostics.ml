@@ -129,7 +129,8 @@ let pp_unexpected_stuff ppf = function
 
 let pp_unterminated ppf = function
   | If_compiler_directive _ ->
-      Pretty.print ppf ">>IF@ compiler@ directive"
+      Pretty.print ppf ">>IF@ compiler@ directive@ (no@ matching@ >>END-IF@ \
+                        found)"
   | Exec_block ->
       Pretty.print ppf "EXEC/END-EXEC@ block"
 
