@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-17e1cf148564bf7af64c79148e200381:.
+eae6903b3d94480a5f8c2bd512207a9d:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -52,7 +52,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-2894b2788736aca5d3c62a61e4177e84:dune-project
+95a5c4276a8b69d50fc92f608404e796:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_cfg.opam
@@ -67,7 +67,7 @@ d102adfe37ba93db025555700a87c6a1:opam/cobol_cfg.opam
 
 # begin context for opam/cobol_config.opam
 # file opam/cobol_config.opam
-712e31133e6686851749d80c9231dfa3:opam/cobol_config.opam
+590fe115834b8607103fe70f9712c2b0:opam/cobol_config.opam
 # end context for opam/cobol_config.opam
 
 # begin context for opam/cobol_data.opam
@@ -92,12 +92,12 @@ f9340b04fb6fd5abf63bbd836b9fd0e3:opam/cobol_indent_old.opam
 
 # begin context for opam/cobol_parser.opam
 # file opam/cobol_parser.opam
-0a790d793c622a57afc5932d73636135:opam/cobol_parser.opam
+bff32163e2b49b90242750acd6022ee5:opam/cobol_parser.opam
 # end context for opam/cobol_parser.opam
 
 # begin context for opam/cobol_preproc.opam
 # file opam/cobol_preproc.opam
-c83776956f173548488df18f239157e6:opam/cobol_preproc.opam
+9b0a37b9ef7d2f48b49f43853c9e9618:opam/cobol_preproc.opam
 # end context for opam/cobol_preproc.opam
 
 # begin context for opam/cobol_ptree.opam
@@ -157,7 +157,7 @@ a56c08535ff344da81fab8d806e214f7:opam/node-js-stubs.opam
 
 # begin context for opam/sql_parser.opam
 # file opam/sql_parser.opam
-14c02400118beda008fe18f403b89696:opam/sql_parser.opam
+93f186ee117b9fe9c2ad244bb0053efa:opam/sql_parser.opam
 # end context for opam/sql_parser.opam
 
 # begin context for opam/sql_preproc.opam
@@ -222,7 +222,7 @@ ca7ebb08e8f1c37b7190537108882773:opam/vscode-debugprotocol.opam
 
 # begin context for opam/vscode-json.opam
 # file opam/vscode-json.opam
-4063d6063a6f67600ed8d945270d467e:opam/vscode-json.opam
+53383c4b93bfd30efca15b7852977fb6:opam/vscode-json.opam
 # end context for opam/vscode-json.opam
 
 # begin context for opam/vscode-languageclient-js-stubs.opam

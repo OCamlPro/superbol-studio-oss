@@ -175,7 +175,6 @@
    (ppx_deriving_encoding (and (>= 0.3.0) (< 1.0.0)))
    ezjsonm
    (ez_file (and (>= 0.3.0) (< 1.0.0)))
-   (ppx_deriving_encoding (and (>= 0.3.0) (< 1.0.0)))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
@@ -368,7 +367,7 @@
 
  (depends
    (ocaml (>= 4.14.0))
-   (menhir ( >= 1.2 ))
+   (menhirLib (and ( >= 20231231 )( < 20240715 )))
    (ez_file ( >= 0.3 ))
    (ebcdic_lib (= :version))
    (cobol_ptree (= :version))
@@ -491,7 +490,7 @@
  (depends
    (ocaml (>= 4.14.0))
    (pretty (= :version))
-   (menhir ( >= 1.2 ))
+   (menhirLib (and ( >= 20231231 )( < 20240715 )))
    (cobol_common (= :version))
    (ppx_deriving ( >= 5.2.1 ))
    odoc
@@ -549,7 +548,7 @@
    (ocaml (>= 4.14.0))
    (ppx_import ( >= 1 ))
    (ppx_deriving ( >= 5.2.1 ))
-   (menhir ( >= 1.2 ))
+   (menhirLib (and ( >= 20231231 )( < 20240715 )))
    (cobol_data (= :version))
    (cobol_config (= :version))
    (cobol_common (= :version))
@@ -717,7 +716,7 @@
  (depends
    (ocaml (>= 4.14.0))
    (sql_ast (= :version))
-   (menhir ( >= 1.2 ))
+   (menhirLib (and ( >= 20231231 )( < 20240715 )))
    (ez_file ( >= 0.3 ))
    (ebcdic_lib (= :version))
    (cobol_preproc (= :version))
