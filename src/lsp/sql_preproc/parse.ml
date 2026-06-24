@@ -8,7 +8,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Ez_file.V1
 open Cobol_indent.Types
 open Types
 
@@ -161,7 +160,7 @@ let parse ~config ~filename ~contents =
           Misc.warning ~loc "Could not locate copybook %S" file;
           iter tokens
         | filename ->
-          let contents = EzFile.read_file filename in
+          let contents = config.platform.read_text_file filename in
           sql_add_statement ~loc (COPY { end_loc; filename; contents });
           tokenize_file ~filename ~contents tokens
       end

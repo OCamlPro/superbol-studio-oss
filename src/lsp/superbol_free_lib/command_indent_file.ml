@@ -111,10 +111,12 @@ let action ~numeric ~intext ~inplace ?suffix ?range
         f filename
       ) files
 
-let generate_config () =
-  let config = Cobol_indent.Config.load
+let generate_config ~platform =
+  let config =
+    Cobol_indent.Config.load ~platform
       ~source_format:(Cobol_indent.Config.source_format Cobol_config.Types.(SF SFFixed))
-      ~filename:"file.cob" in
+      ~filename:"file.cob"
+  in
   Cobol_indent.Config.generate ~config ".superbol-indent"
 
 let cmd =
@@ -145,7 +147,8 @@ let cmd =
         [ "inplace" ], Arg.Set inplace,
         EZCMD.info "Modify files in place";
 
-        [ "gen-config" ], Arg.Unit generate_config,
+        [ "gen-config" ], Arg.Unit
+          (fun () -> generate_config ~platform:(common ()).platform),
         EZCMD.info "Generate a config file .superbol-indent in this directory";
 
         [ "suffix" ], Arg.String (fun s ->

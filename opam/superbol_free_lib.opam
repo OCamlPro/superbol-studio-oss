@@ -55,7 +55,7 @@ depends: [
   "sql_preproc" {= version}
   "lwt" {>= "5"}
   "ez_toml" {= version}
-  "ez_file" {>= "0.3"}
+  "ez_file" {>= "0.4"}
   "ez_cmdliner" {>= "0.3.0" & < "1.0.0"}
   "ez_api" {>= "2.0"}
   "cobol_typeck" {= version}

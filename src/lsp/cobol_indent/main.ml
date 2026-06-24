@@ -86,7 +86,7 @@ let indent
   ignore ( config ) ;
   ignore ( dialect ) ;
   let contents = match contents with
-    | None -> platform.read_file filename
+    | None -> platform.read_text_file filename
     | Some contents -> contents
   in
 
@@ -96,7 +96,7 @@ let indent
     | Some range -> range
   in
 
-  let config = Config.load ~source_format ~filename in
+  let config = Config.load ~platform ~source_format ~filename in
 
   if Engine.verbose then
     Printf.eprintf "Config: %s\n%!" (Config.to_string config);

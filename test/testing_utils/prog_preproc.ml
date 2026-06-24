@@ -15,21 +15,21 @@ open EzCompat
 open Cobol_common.Srcloc.INFIX
 
 let options
-    ?(verbose = false) 
+    ?(verbose = false)
     ?(source_format = Cobol_config.(SF SFFixed))
     ?(copybooks = [])
     () =
-  let platform = 
+  let platform =
       { Prog_common.platform with verbosity = if verbose then 1 else 0 }
   in
   let platform = if copybooks = [] then platform else
       let copy_map = StringMap.of_list copybooks in
-      { platform with 
-        read_file = (fun file ->
+      { platform with
+        read_text_file = (fun file ->
             match StringMap.find_opt file copy_map with
             | Some contents -> contents
-            | None -> platform.read_file file);
-        find_lib = (fun ~lookup_config ?fromfile ?libname textname -> 
+            | None -> platform.read_text_file file);
+        find_lib = (fun ~lookup_config ?fromfile ?libname textname ->
             match textname with
             | `Alphanum w
             | `Word w ->

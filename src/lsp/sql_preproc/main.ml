@@ -9,7 +9,7 @@
 (**************************************************************************)
 
 open EzCompat
-open Ez_file.V1
+open Cobol_common.Platform.TYPES
 open Cobol_indent.Types
 open Types
 
@@ -22,10 +22,16 @@ open Types
      indentation ;
 *)
 
-let preproc ~filename ?(sql_in_copybooks = false) ?(copy_path = [])
-    ?(copy_exts = []) ?(contents = EzFile.read_file filename) ~source_format 
+let preproc ~platform ~filename ?(sql_in_copybooks = false) ?(copy_path = [])
+    ?(copy_exts = []) ?contents ~source_format
     ~cobol_unit () =
-  let scanner_config = Cobol_indent.Config.load ~source_format ~filename in
+  let contents =
+    match contents with
+    | None -> platform.read_text_file filename
+    | Some c -> c
+  in
+  let scanner_config = Cobol_indent.Config.load ~platform
+      ~source_format ~filename in
 
   if scanner_config.verbosity > 0 then
     Printf.eprintf "Parsing file %S...\n%!" filename;
@@ -57,7 +63,8 @@ let preproc ~filename ?(sql_in_copybooks = false) ?(copy_path = [])
   in
 
   let config =
-    { scanner_config;
+    { platform;
+      scanner_config;
       sql_in_copybooks;
       copy_path;
       copy_exts;

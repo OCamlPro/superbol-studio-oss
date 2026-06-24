@@ -31,4 +31,4 @@ let from ~filename ~f ~platform =
   f @@
   if filename = ""
   then channel ~filename stdin
-  else string ~filename @@ platform.read_file filename
+  else string ~filename @@ platform.read_text_file filename

@@ -260,7 +260,7 @@
    (sql_preproc (= :version))
    (lwt ( >= 5 ))
    (ez_toml (= :version))
-   (ez_file ( >= 0.3 ))
+   (ez_file ( >= 0.4 ))
    (ez_cmdliner (and (>= 0.3.0) (< 1.0.0)))
    (ez_api ( >= 2.0 ))
    (cobol_typeck (= :version))
@@ -331,7 +331,7 @@
  (depends
    (ocaml (>= 4.14.0))
    (pretty (= :version))
-   (ez_file (and (>= 0.3.0) (< 1.0.0)))
+   (ez_file ( >= 0.5 ))
    (cobol_preproc (= :version))
    (cobol_common (= :version))
    odoc
@@ -680,6 +680,7 @@
    (cobol_unit (= :version))
    (cobol_typeck (= :version))
    (cobol_indent (= :version))
+   (cobol_common (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
