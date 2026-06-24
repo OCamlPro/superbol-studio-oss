@@ -65,6 +65,7 @@ depends: [
   "cobol_lsp-windows" {= version}
   "cobol_indent-windows" {= version}
   "cobol_common-windows" {= version}
+  "cmdliner" {< "2"}
   "odoc" {with-doc}
   "dune" {>= "3.17.0" & < "3.19.0"}
 ]

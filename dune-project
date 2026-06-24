@@ -268,6 +268,7 @@
    (cobol_lsp (= :version))
    (cobol_indent (= :version))
    (cobol_common (= :version))
+   (cmdliner ( < 2 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )

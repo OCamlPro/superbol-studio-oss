@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-eae6903b3d94480a5f8c2bd512207a9d:.
+479a8e4bddf7b21d0f75ee5acabcdbc1:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -53,6 +53,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 # begin context for dune-project
 # file dune-project
 95a5c4276a8b69d50fc92f608404e796:dune-project
+a25cfc34dd44d4d013702ab8ac434cee:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_cfg.opam
@@ -187,7 +188,7 @@ a56c08535ff344da81fab8d806e214f7:opam/node-js-stubs.opam
 
 # begin context for opam/superbol_free_lib.opam
 # file opam/superbol_free_lib.opam
-beea673c3e365e72d0ff922e9ab80b42:opam/superbol_free_lib.opam
+40d52aaab23b9e830bd9d3bfbdea19cf:opam/superbol_free_lib.opam
 # end context for opam/superbol_free_lib.opam
 
 # begin context for opam/superbol_platform.opam

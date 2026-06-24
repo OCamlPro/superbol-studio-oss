@@ -74,6 +74,8 @@ lwt = ">=5"
 
 # package tools dependencies
 [tools]
+# Ensure `cmdliner` accepts abberviated subcommands
+cmdliner = "<2"
 # ...
 
 # package fields (depends on package skeleton)
