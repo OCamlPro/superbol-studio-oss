@@ -18,6 +18,7 @@ open Parser_outputs                               (* import types for outputs *)
 
 module LIST = Cobol_common.Basics.LIST
 module OUT = Parser_outputs
+module DIAGS = Parser_diagnostics
 module TOK = Grammar_tokens
 
 module Tokzr = Text_tokenizer
@@ -205,24 +206,26 @@ let rec produce_tokens (ps: _ state as 's) : 's * Text_tokenizer.tokens =
   | Ok tokens, tokzr ->
       update_tokzr ps tokzr, tokens
 
-let try_compilation_variable_substitution ps w : (TOK.token * _) option =
-  (* TODO: record compilation variable substitutions, maybe in srcloc, maybe as
-     part of parser artifacts... *)
-  match Cobol_preproc.lookup_compilation_variable ps.preproc.pp w with
+let try_compilation_variable_substitution ps var : (TOK.token * _) option =
+  match Cobol_preproc.lookup_compilation_variable ps.preproc.pp var with
   | None ->
       None
-  | Some ({ def_value = Alphanum { pp_payload = a; _ }; _ } as def) ->
-      Some (TOK.ALPHANUM a, def)
-  | Some ({ def_value = Boolean { pp_payload = b; _ }; _ } as def) ->
-      Some (TOK.BOOLIT (Cobol_data.Literal.of_boolean_value b).bool_ptree, def)
-  | Some ({ def_value = Numeric { pp_payload = n; _ }; _ } as def) ->
-      match Cobol_data.Literal.(categorize_fixed @@ of_fixed_value n) with
-      | `Z { int_ptree = z; _ } ->
-          if String.starts_with ~prefix:"-" z
-          then Some (TOK.SINTLIT z, def)
-          else Some (TOK.DIGITS z, def)
-      | `Q { fixed_ptree = q; _ } ->
-          Some (TOK.FIXEDLIT (q.fixed_integral, '.', q.fixed_fractional), def)
+  | Some ({ pp_payload = { compvar_value; _ }; _ } as def) ->
+      match compvar_value with
+      | Alphanum { pp_payload = a; _ } ->
+          Some (TOK.ALPHANUM a, def)
+      | Boolean { pp_payload = b; _ } ->
+          let boollit = (Cobol_data.Literal.of_boolean_value b).bool_ptree in
+          Some (TOK.BOOLIT boollit, def)
+      | Numeric { pp_payload = n; _ } ->
+          match Cobol_data.Literal.(categorize_fixed @@ of_fixed_value n) with
+          | `Z { int_ptree = z; _ } ->
+              if String.starts_with ~prefix:"-" z
+              then Some (TOK.SINTLIT z, def)
+              else Some (TOK.DIGITS z, def)
+          | `Q { fixed_ptree = q; _ } ->
+              let fixedlit = q.fixed_integral, '.', q.fixed_fractional in
+              Some (TOK.FIXEDLIT fixedlit, def)
 
 let rec next_token ({ preproc = { tokzr; _ }; _ } as ps) tokens =
   match Tokzr.next_token tokzr tokens with
@@ -230,13 +233,14 @@ let rec next_token ({ preproc = { tokzr; _ }; _ } as ps) tokens =
       let ps, token =
         match ~&token with
         | WORD w | WORD_IN_AREA_A w ->
-            (match try_compilation_variable_substitution ps w with
+            let var = Cobol_preproc.Env.var w in
+            (match try_compilation_variable_substitution ps var with
              | None ->
                  ps, token
              | Some (token', def) ->
                  update_pp ps @@
                  Cobol_preproc.record_compilation_variable_substitution
-                   ~var:w ~loc:~@token ~def ps.preproc.pp,
+                   ~var ~loc:~@token ~def ps.preproc.pp,
                  token' &@<-token)
         | _ ->
             ps, token
@@ -422,18 +426,14 @@ let on_data_descr_entry (e: Cobol_ptree.data_item) ps token tokens =
               update_pp ps @@
               Cobol_preproc.bind_78_constant ps.preproc.pp ~loc name literal
           | Some { payload = ValueTable _; loc } ->
-              error ps @@
-              Unexpected { loc; stuff = Multiple_values_for_78_level_item dn }
+              let stuff = DIAGS.Multiple_values_for_78_level_item dn in
+              error ps @@ Unexpected { loc; stuff }
           | None ->
-              error ps @@ Missing { loc; stuff = Value_for_78_level_item dn }
+              let stuff = DIAGS.Value_for_78_level_item dn in
+              error ps @@ Missing { loc; stuff }
     else ps
   in
   ps, token, tokens
-
-let on_procedure_division_header ps token tokens =
-  let tokzr, token, tokens
-    = Tokzr.enable_intrinsics ps.preproc.tokzr token tokens in
-  update_tokzr ps tokzr, token, tokens
 
 let on_procedure_division_header ps token tokens =
   let tokzr, token, tokens

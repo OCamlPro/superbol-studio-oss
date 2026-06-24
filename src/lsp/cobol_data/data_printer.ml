@@ -297,6 +297,17 @@ let pp_record: record Pretty.printer =
        Pretty.vfield "renamings" (fun x -> x.record_renamings) pp_record_renamings);
   ]
 
+let pp_compilation_value ppf = function
+  | Alphanum s -> pp_alphanum_value ppf s.pp_payload
+  | Boolean b -> pp_boolean_value ppf b.pp_payload
+  | Numeric f -> pp_fixed_value ppf f.pp_payload
+
+let pp_compilation_variable_definition ppf { compvar_name; compvar_value } =
+  Pretty.record [
+    Fmt.field "name" (fun () -> compvar_name) Fmt.string;
+    Fmt.field "value" (fun () -> compvar_value) pp_compilation_value;
+  ] ppf ()
+
 let pp_data_definition ppf = function
   | Data_field { def; record = { record_name; _ } } ->
       Pretty.record [
@@ -324,4 +335,10 @@ let pp_data_definition ppf = function
         T Fmt.(styled `Yellow @@ any "table index");
         T (Fmt.field "record" (fun () -> record_name) Fmt.string);
         T (Pretty.vfield "table" (fun () -> table) pp_table_definition');
+      ] ppf ()
+  | Compilation_data { def } ->
+      Pretty.record [
+        Fmt.(styled `Yellow @@ any "compilation data (constant)");
+        Pretty.vfield "def" (fun () -> def.pp_payload)
+          pp_compilation_variable_definition;
       ] ppf ()

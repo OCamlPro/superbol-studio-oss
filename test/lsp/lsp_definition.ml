@@ -480,7 +480,6 @@ let%expect_test "definition-requests-refmod" =
 
 
 let%expect_test "definition-requests-78" =
-  (* TODO *)
   let { end_with_postproc; projdir }, server = make_lsp_project () in
   print_definitions ~projdir server @@ extract_position_markers {cobol|
        PROGRAM-ID. prog.
@@ -504,7 +503,14 @@ let%expect_test "definition-requests-78" =
        7          PROCEDURE DIVISION.
        8              DISPLAY CONST VAR.
     1-const-in-proc-div (line 7, character 22):
-    No definition found
+    __rootdir__/prog.cob:5.7-5.29:
+       2          PROGRAM-ID. prog.
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5 >        78 CONST VALUE "CONST".
+    ----          ^^^^^^^^^^^^^^^^^^^^^^
+       6          77 VAR PIC A(5) VALUE CONST.
+       7          PROCEDURE DIVISION.
     2-var (line 7, character 26):
     __rootdir__/prog.cob:6.10-6.13:
        3          DATA DIVISION.
@@ -517,7 +523,6 @@ let%expect_test "definition-requests-78" =
  |}]
 
 let%expect_test "definition-requests-78-n-preproc" =
-  (* TODO *)
   let { end_with_postproc; projdir }, server = make_lsp_project () in
   print_definitions ~projdir server @@ extract_position_markers {cobol|
        PROGRAM-ID. prog.
@@ -536,11 +541,32 @@ let%expect_test "definition-requests-78-n-preproc" =
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     1-b (line 5, character 12):
-    No definition found
+    __rootdir__/prog.cob:5.7-5.19:
+       2          PROGRAM-ID. prog.
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5 >        78 B VALUE 1.
+    ----          ^^^^^^^^^^^^
+       6          >>IF B = 1
+       7          78 R VALUE "OK".
     2-b (line 11, character 19):
-    No definition found
+    __rootdir__/prog.cob:5.7-5.19:
+       2          PROGRAM-ID. prog.
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5 >        78 B VALUE 1.
+    ----          ^^^^^^^^^^^^
+       6          >>IF B = 1
+       7          78 R VALUE "OK".
     3-r (line 11, character 21):
-    No definition found
+    __rootdir__/prog.cob:7.7-7.22:
+       4          WORKING-STORAGE SECTION.
+       5          78 B VALUE 1.
+       6          >>IF B = 1
+       7 >        78 R VALUE "OK".
+    ----          ^^^^^^^^^^^^^^^
+       8          >>ELSE
+       9          78 R VALUE "KO".
  |}]
 
 let%expect_test "definition-requests-goto-section" =

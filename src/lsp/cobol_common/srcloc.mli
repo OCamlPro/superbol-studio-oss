@@ -15,13 +15,25 @@ module TYPES: sig
   type lexloc = Lexing.position * Lexing.position
   type srcloc
   type copylocs
+  type preproc_loc =
+    | Source_location of (srcloc [@compare fun _ _ -> 0])
+    | Process_parameter
+    | Process_environment
   type 'a with_loc = { payload: 'a; loc: srcloc; }          [@@deriving ord, show]
+  type 'a with_preproc_loc =
+    {
+      pp_payload: 'a;
+      pp_loc: preproc_loc;
+    }                                                     [@@deriving ord, show]
 end
 type lexloc = TYPES.lexloc
 type srcloc = TYPES.srcloc
 type copylocs = TYPES.copylocs
+type preproc_loc = TYPES.preproc_loc
 type 'a with_loc = 'a TYPES.with_loc =
   { payload: 'a; loc: srcloc; }                                  [@@deriving ord]
+type 'a with_preproc_loc = 'a TYPES.with_preproc_loc =
+  { pp_payload: 'a; pp_loc: preproc_loc; }                       [@@deriving ord]
 
 module INFIX: sig
   (* Meaning of letters:
@@ -116,6 +128,7 @@ val sub : srcloc -> pos:int -> len:int -> srcloc
 
 val pp: 'a Pretty.printer -> 'a with_loc Pretty.printer
 val pp_with_loc: 'a Pretty.printer -> 'a with_loc Pretty.printer
+val pp_with_preproc_loc: 'a Pretty.printer -> 'a with_preproc_loc Pretty.printer
 val pp_raw_loc
   : ?platform:Platform.TYPES.platform
   -> (string * (int * int) * (int * int)) Pretty.printer

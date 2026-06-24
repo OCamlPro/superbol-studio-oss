@@ -48,6 +48,12 @@ val is_in_srcloc
   -> Cobol_common.Srcloc.srcloc
   -> bool
 
+val is_in_preproc_loc
+  : filename:string
+  -> Lsp.Types.Position.t
+  -> Cobol_common.Srcloc.preproc_loc
+  -> bool
+
 (* --- *)
 
 type translator =

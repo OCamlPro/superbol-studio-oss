@@ -19,8 +19,9 @@ open Preproc_diagnostics
 
 module ENV = Preproc_env
 module VAR = ENV.VAR
-module NEL = Cobol_common.Basics.NEL
 module OUT = Preproc_outputs
+module NEL = Cobol_common.Basics.NEL
+module LIST = Cobol_common.Basics.LIST
 
 module TYPES = struct
   type context = frame list
@@ -82,7 +83,8 @@ let on_define_off ~loc var ~(env: ENV.t) =
 let on_define ~platform ~loc Compdir_tree.{ var; value; override } ~env =
   let open struct exception KEEP_UNDEFINED end in
   try
-    let value = match ~&value with
+    let value =
+      match ~&value with
       | Literal_definition Alphanum l ->
           ENV.alphanum_literal_value l
       | Literal_definition Boolean l ->
@@ -94,8 +96,8 @@ let on_define ~platform ~loc Compdir_tree.{ var; value; override } ~env =
           match platform.getenv_opt v with
           | Some value ->
               let alphanum = Cobol_data.Value.alphanum_of_string value in
-              ENV.Alphanum { pp_payload = alphanum;
-                             pp_loc = Process_environment }
+              Alphanum { pp_payload = alphanum;
+                         pp_loc = Process_environment }
           | None -> raise KEEP_UNDEFINED
     in
     OUT.result (ENV.define_preproc_var ~loc var value ~override env)
@@ -109,19 +111,25 @@ let on_define ~platform ~loc Compdir_tree.{ var; value; override } ~env =
 (* Conditionals *)
 
 
-let eval_term: Compdir_tree.term -> ENV.t -> ENV.value = fun term env ->
+let compvar_eval ?def var =
+  Preproc_trace.Variable_evaluation { loc = ~@var; var = ~&var; def }
+
+
+let eval_term (term: Compdir_tree.term) env : (ENV.value, _) result * _ list =
   match term with
   | Variable var ->
-      (ENV.preproc_var_definition_of ~var env).def_value
+      (match ENV.preproc_var_definition_of ~var env with
+       | Ok def -> Ok def.pp_payload.compvar_value, [compvar_eval var ~def]
+       | Error `UNDEFINED as e -> e, [compvar_eval var])
   | Literal Alphanum a ->
-      Alphanum { pp_payload = ~&a;
-                 pp_loc = Source_location ~@a }
+      Ok (Alphanum { pp_payload = ~&a;
+                     pp_loc = Source_location ~@a }), []
   | Literal Boolean b ->
-      Boolean { pp_payload = ~&b.bool_value;
-                pp_loc = Source_location ~@b }
+      Ok (Boolean { pp_payload = ~&b.bool_value;
+                    pp_loc = Source_location ~@b }), []
   | Literal Numeric f ->
-      Numeric { pp_payload = ~&f.fixed_value;
-                pp_loc = Source_location ~@f }
+      Ok (Numeric { pp_payload = ~&f.fixed_value;
+                    pp_loc = Source_location ~@f }), []
 
 
 exception TYPE_MISMATCH of ENV.value * ENV.value
@@ -163,48 +171,82 @@ let eval_condition ~(operator: Compdir_tree.condition_operator) a b =
   | Num (b, a), Gt -> Q.lt a b
 
 
-let eval_boolexpr env
-  : Compdir_tree.boolexpr with_loc -> bool OUT.with_diags = fun e ->
+let eval_defined_condition var polarity env =
+  match ENV.preproc_var_definition_of ~try_compil_vars:false ~var env with
+  | Ok def ->
+      OUT.result (polarity, [compvar_eval var ~def])                  (* use! *)
+  | Error `UNDEFINED ->
+      OUT.result (not polarity, [compvar_eval var])                     (* use! *)
+
+let eval_set_conditon ~loc var polarity env =
   let diags = Preproc_diagnostics.none in
+  let item = Set_condition_directive { assumed_set = false } in
+  let def =
+    match ENV.preproc_var_definition_of ~try_compil_vars:false ~var env with
+    | Ok def ->
+        Some def
+    | Error `UNDEFINED ->
+        None
+  in
+  OUT.result (not polarity, [compvar_eval var ?def])
+    ~diags:(warn diags @@ Ignored { loc; item })
+
+let eval_value_condition ~loc var polarity env =
+  let diags = Preproc_diagnostics.none in
+  match ENV.preproc_var_definition_of ~var env with
+  | Ok ({ pp_payload = { compvar_value = Boolean b; _ }; _ } as def) ->
+      OUT.result
+        (Z.(equal zero) b.pp_payload.bool_bits != polarity,
+         [compvar_eval var ~def])
+  | Ok ({ pp_payload = { compvar_value = (Alphanum _ | Numeric _ as value); _ };
+          _ } as def) ->
+      let stuff = Variable_type_in_compdir_condition { value } in
+      OUT.result ~diags:(warn_unexpected diags ~loc stuff)
+        (false, [compvar_eval var ~def])
+  | Error `UNDEFINED ->
+      let stuff = Variable_in_compdir_condition { var } in
+      OUT.result ~diags:(warn_undefined diags ~loc:~@var stuff)
+        (false, [compvar_eval var])
+
+let eval_constant_conditions ~loc l r polarity operator env =
+  let l, log1 = eval_term l env
+  and r, log2 = eval_term r env in
+  let log = LIST.append log1 log2 in
+  match l, r with
+  | Error `UNDEFINED, Ok _
+  | Ok _, Error `UNDEFINED
+  | Error `UNDEFINED, Error `UNDEFINED ->
+      OUT.result (false, log)                             (* ignore undefined *)
+  | Ok l, Ok r ->
+      try
+        OUT.result (eval_condition ~operator l r = polarity, log)
+      with TYPE_MISMATCH (left, right) ->
+        let diags = Preproc_diagnostics.none in
+        let stuff = Types_in_compdir_condition { left; right } in
+        let diags = warn diags @@ Incompatible { loc; stuff } in
+        OUT.result ~diags (false, log)
+
+let eval_boolexpr env
+  : Compdir_tree.boolexpr with_loc -> (bool * _) OUT.with_diags = fun e ->
   match ~&e with
   | Defined_condition { var; polarity } ->
-      OUT.result (ENV.mem_preproc_var' var env = polarity)
-  | Set_condition { var = _; polarity } ->
-      let item = Set_condition_directive { assumed_set = false } in
-      OUT.result (not polarity)
-        ~diags:(warn diags (Ignored { loc = ~@e; item }))
+      eval_defined_condition var polarity env
+  | Set_condition { var; polarity } ->
+      eval_set_conditon ~loc:~@e var polarity env
   | Value_condition { var; polarity } ->
-      begin
-        match (ENV.preproc_var_definition_of ~var env).def_value with
-        | Boolean b ->
-            OUT.result (Z.(equal zero) b.pp_payload.bool_bits != polarity)
-        | Alphanum _ | Numeric _ as value ->
-            let stuff = Variable_type_in_compdir_condition { value } in
-            OUT.result ~diags:(warn_unexpected diags ~loc:~@e stuff) false
-        | exception ENV.UNDEFINED var ->
-            let stuff = Variable_in_compdir_condition { var } in
-            OUT.result ~diags:(warn_undefined diags ~loc:~@var stuff) false
-      end
+      eval_value_condition ~loc:~@e var polarity env
   | Constant_condition { left_operand = l; right_operand = r;
                          polarity; operator } ->
-      let l = try Ok (eval_term l env) with ENV.UNDEFINED _var -> Error `Undef
-      and r = try Ok (eval_term r env) with ENV.UNDEFINED _var -> Error `Undef in
-      begin
-        try OUT.result @@ match l, r with
-          | Ok l, Ok r -> eval_condition ~operator l r = polarity
-          | Error `Undef, Ok _ | Ok _, Error `Undef
-          | Error `Undef, Error `Undef -> false            (* ignore undefined *)
-        with TYPE_MISMATCH (left, right) ->
-          let stuff = Types_in_compdir_condition { left; right } in
-          let diags = warn diags @@ Incompatible { loc = ~@e; stuff } in
-          OUT.result ~diags false
-      end
+      eval_constant_conditions ~loc:~@e l r polarity operator env
 
 
 let on_if ~loc:if_loc ~condition ~env context =
   OUT.map_result (eval_boolexpr env condition)
-    ~f:(fun cond -> If_condition { condition; emitting = cond && emitting context;
-                                   if_loc; else_loc = None } :: context)
+    ~f:begin fun (cond, log) ->
+      If_condition { condition; emitting = cond && emitting context;
+                     if_loc; else_loc = None } :: context,
+      log
+    end
 
 
 let on_else ~loc context : context OUT.with_diags =
@@ -224,24 +266,26 @@ let on_else ~loc context : context OUT.with_diags =
                 Else_compiler_directive { suggestion = None })
 
 
-let on_elif ~loc ~condition ~env context : context OUT.with_diags =
-  match context with
-  | If_condition ({ else_loc = None; _ } as frame) :: parent_ctxt ->
-      OUT.map_result (eval_boolexpr env condition)
-        ~f:begin fun cond ->
-          let emitting = not frame.emitting && cond && emitting parent_ctxt in
-          If_condition { frame with emitting } :: parent_ctxt
-        end
-  | If_condition { else_loc = Some _; if_loc = initial_if_loc; _ } :: _ ->
-      let suggestion = EndIf_compiler_directive_missing { initial_if_loc } in
-      OUT.result context
-        ~diags:(unexpected ~loc @@
-                Elif_compiler_directive { suggestion = Some suggestion })
-  | _ ->
-      OUT.result context
-        ~diags:(unexpected ~loc @@
-                Elif_compiler_directive { suggestion = None })
-
+let on_elif ~loc ~condition ~env context : (context * _) OUT.with_diags =
+  (* We always evaluate the condition to gather logs. *)
+  (* CHECKME: whether that's useful... *)
+  let eval_result = eval_boolexpr env condition in
+  OUT.more_result eval_result ~f:begin fun (cond, log) ->
+    match context with
+    | If_condition ({ else_loc = None; _ } as frame) :: parent_ctxt ->
+        let emitting = not frame.emitting && cond && emitting parent_ctxt in
+        let context = If_condition { frame with emitting } :: parent_ctxt in
+        OUT.result (context, log)
+    | If_condition { else_loc = Some _; if_loc = initial_if_loc; _ } :: _ ->
+        let suggestion = EndIf_compiler_directive_missing { initial_if_loc } in
+        OUT.result (context, log)
+          ~diags:(unexpected ~loc @@
+                  Elif_compiler_directive { suggestion = Some suggestion })
+    | _ ->
+        OUT.result (context, log)
+          ~diags:(unexpected ~loc @@
+                  Elif_compiler_directive { suggestion = None })
+  end
 
 let on_endif ~loc : context -> context OUT.with_diags = function
   | If_condition _ :: context ->                                         (* pop *)

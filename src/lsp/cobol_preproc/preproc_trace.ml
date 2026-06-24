@@ -46,11 +46,23 @@ module TYPES = struct
           text: Text.text;
           ignored_loc: srcloc;
         }
-    | Compilation_variable_substitution of     (* Note: parser-specific event *)
+    | Variable_definition of
         {
           loc: srcloc;
-          var: string; (* Preproc_env.var; *)
+          var: Preproc_env.var;
           def: Preproc_env.compilation_var_definition;
+        }
+    | Variable_substitution of                 (* Note: parser-specific event *)
+        {
+          loc: srcloc;
+          var: Preproc_env.var;
+          def: Preproc_env.compilation_var_definition;
+        }
+    | Variable_evaluation of
+        {
+          loc: srcloc;
+          var: Preproc_env.var;
+          def: Preproc_env.compilation_var_definition option; (* [None] if undef *)
         }
 
   and copy_event_status =
@@ -67,6 +79,8 @@ include TYPES
 let empty = []
 let append =
   List.cons
+let append_entries: log_entry list -> log -> log = fun entries log ->
+  List.fold_left (fun log e -> append e log) log entries
 let new_compdir ~loc ~compdir : log -> log =
   List.cons @@ CompilerDirective { compdir; loc }
 let copy_done ~loc ~filename : log -> log =
@@ -82,9 +96,16 @@ let exec_block ~preamble_loc ?postamble_loc text : log -> log =
 let ignored text : log -> log =
   let ignored_loc = Option.get @@ Cobol_common.Srcloc.concat_locs text in
   List.cons @@ Ignored { text; ignored_loc }
+let compvar_def ~loc ~var ~def : log -> log =
+  List.cons @@ Variable_definition { loc; var; def }
 let compvar_subst ~loc ~var ~def : log -> log =
-  List.cons @@ Compilation_variable_substitution { loc; var; def }
+  List.cons @@ Variable_substitution { loc; var; def }
+let compvar_eval ~loc ~var ?def : log -> log =
+  List.cons @@ Variable_evaluation { loc; var; def }
 
 (* --- *)
 
 let events: log -> log_entry list = List.rev
+
+let fold: f:_ -> log -> 'a -> 'a = fun ~f log acc ->
+  List.fold_left (fun acc e -> f e acc) acc log

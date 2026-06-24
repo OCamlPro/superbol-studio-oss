@@ -76,15 +76,17 @@ let rev_comments { reader; _ } = Src_reader.rev_comments reader
 let rev_ignored { reader; _ } = Src_reader.rev_ignored reader
 
 let bind_78_constant lp ~loc const_name (lit: Cobol_ptree.literal with_loc) =
-  let define ?diags value =
-    let env =
-      ENV.(define_compilation_var @@ var' const_name) ~loc value lp.env
-    and diags =
+  let[@local] define ?diags value =
+    let var = ENV.var' const_name in
+    let env, def = ENV.define_compilation_var var ~loc value lp.env in
+    let diags =
       Option.fold diags
         ~some:Preproc_diagnostics.literal_diagnostics
         ~none:Preproc_diagnostics.none
+    and pplog =
+      Preproc_trace.compvar_def ~loc ~var:~&var ~def lp.pplog
     in
-    add_diags { lp with env } diags
+    add_diags { lp with env; pplog } diags
   in
   match ~&lit with
   | Alphanum alphanum ->
@@ -106,7 +108,7 @@ let bind_78_constant lp ~loc const_name (lit: Cobol_ptree.literal with_loc) =
                                    stuff = Constant_literal_kind lit }
 
 let lookup_compilation_variable lp variable =
-  ENV.(find_compil_var @@ var variable) lp.env
+  ENV.find_compilation_var variable lp.env
 
 (** [position_at ~line ~char pp] computes a lexing position that corresponds to
     the given line and character indexes (all starting at 0) in the input
@@ -283,6 +285,13 @@ and apply_preproc_directive ({ env; context; _ } as lp)
     if context != lp.context || diags != Preproc_diagnostics.none
     then { lp with context; diags = Preproc_diagnostics.union diags lp.diags }
     else lp
+  and new_context_n_log lp { result = (context, log); diags } =
+    if context != lp.context || diags != Preproc_diagnostics.none || log <> []
+    then { lp with
+           context;
+           diags = Preproc_diagnostics.union diags lp.diags;
+           pplog = Preproc_trace.append_entries log lp.pplog }
+    else lp
   in
   match ppdir with
   | Define _ | Define_off _ | Set _
@@ -294,9 +303,9 @@ and apply_preproc_directive ({ env; context; _ } as lp)
   | Define_off var ->
       new_env lp @@ Preproc_logic.on_define_off ~loc var ~env
   | If condition ->
-      new_context lp @@ Preproc_logic.on_if ~loc ~condition ~env context
+      new_context_n_log lp @@ Preproc_logic.on_if ~loc ~condition ~env context
   | Elif condition ->
-      new_context lp @@ Preproc_logic.on_elif ~loc ~condition ~env context
+      new_context_n_log lp @@ Preproc_logic.on_elif ~loc ~condition ~env context
   | Else ->
       new_context lp @@ Preproc_logic.on_else ~loc context
   | End

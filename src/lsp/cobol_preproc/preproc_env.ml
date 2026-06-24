@@ -32,6 +32,7 @@ module VAL = Cobol_data.Value
 
 (** Utility module that maps any string to a physically unique upper-cased
     internal representation. *)
+(* TODO: Maybe move that ot cobol_data as well *)
 module VAR: sig
   type t
   val pp: t Pretty.printer
@@ -63,25 +64,13 @@ module TYPES = struct
     }
   and var = VAR.t
   and preproc_definition =
-    {
-      def_loc: definition_loc;
-      def_value: value;
-    }
-  and 'a with_preproc_loc =
-    { pp_payload: 'a; pp_loc: definition_loc }
-  and definition_loc =
-    | Source_location of srcloc
-    | Process_parameter
-    | Process_environment
-    (* | Computed *)
+    Cobol_data.Types.compilation_variable_definition with_preproc_loc
+  and compilation_var_definition =
+    preproc_definition                                  (* for now (not sure) *)
   and value =
-    | Alphanum of alphanum_value with_preproc_loc
-    | Boolean of boolean_value with_preproc_loc
-    | Numeric of fixed_value with_preproc_loc
-  and compilation_var_definition = preproc_definition   (* for now (not sure) *)
+    Cobol_data.Types.compilation_value
 
-  exception UNDEFINED of var with_loc
-  exception REDEFINITION of { prev_def_loc: definition_loc }
+  exception REDEFINITION of { prev_def_loc: preproc_loc }
 end
 include TYPES
 
@@ -89,13 +78,8 @@ type t = env
 
 (* pretty-printing *)
 
-let pp_value ppf = function
-  | Alphanum s -> Cobol_data.Printer.pp_alphanum_value ppf s.pp_payload
-  | Boolean b -> Cobol_data.Printer.pp_boolean_value ppf b.pp_payload
-  | Numeric f -> Cobol_data.Printer.pp_fixed_value ppf f.pp_payload
-
-let pp_definition ppf { def_value; _ } =
-  pp_value ppf def_value
+let pp_definition ppf { pp_payload; _ } =
+  Cobol_data.Printer.pp_compilation_variable_definition ppf pp_payload
 
 let pp: t Pretty.printer = fun ppf map ->
   Pretty.list ~fopen:"@[<2>@<1>⦃ " ~fsep:",@ " ~fclose:" @<1>⦄@]"
@@ -125,44 +109,53 @@ let mem_var' v env = mem_preproc_var ~&v env || mem_compil_var ~&v env
 (* higher-level operations *)
 
 let preproc_var_definition_of ~var ?(try_compil_vars = true) env
-  : preproc_definition =
+  : (preproc_definition, [`UNDEFINED]) result =
   match MAP.find_opt ~&var env.preproc_vars with
   | Some value ->
-      value
+      Ok value
   | None ->
       if try_compil_vars then
         match MAP.find_opt ~&var env.compil_vars with
-        | Some value -> value
-        | None -> raise @@ UNDEFINED var
+        | Some value -> Ok value
+        | None -> Error `UNDEFINED
       else
-        raise @@ UNDEFINED var
+        Error `UNDEFINED
+
+let register_preproc_var ~pp_loc var value env =
+  let def =
+    { compvar_name = VAR.to_uppercase_string var;
+      compvar_value = value }
+  in
+  { env with
+    preproc_vars = MAP.add var { pp_loc; pp_payload = def } env.preproc_vars }
 
 let define_preproc_var ~loc var value ?(override = false) (env: t) : t =
   match MAP.find_opt ~&var env.preproc_vars with
-  | Some { def_loc; _ } when not override ->
-      raise @@ REDEFINITION { prev_def_loc = def_loc }
+  | Some { pp_loc; _ } when not override ->
+      raise @@ REDEFINITION { prev_def_loc = pp_loc }
   | Some _ | None ->
-      { env with
-        preproc_vars = MAP.add ~&var { def_loc = Source_location loc;
-                                       def_value = value } env.preproc_vars }
+      register_preproc_var ~&var value env ~pp_loc:(Source_location loc)
 
 let define_process_parameter var value (env: t) : t =      (* always override *)
-  { env with
-    preproc_vars = MAP.add var { def_loc = Process_parameter;
-                                 def_value = value } env .preproc_vars }
+  register_preproc_var var value env ~pp_loc:Process_parameter
 
 let undefine_preproc_var var (env: t) : t =
-  { env with
-    preproc_vars = MAP.remove ~&var env.preproc_vars }
+  { env with preproc_vars = MAP.remove ~&var env.preproc_vars }
 
 (* --- *)
 
-let define_compilation_var ~loc var value (env: t) : t =
-  { env with
-    compil_vars = MAP.add ~&var { def_loc = Source_location loc;
-                                  def_value = value } env.compil_vars }
+let define_compilation_var ~loc var value (env: t)
+  : t * compilation_var_definition =
+  let def =
+    { pp_loc = Source_location loc;
+      pp_payload = { compvar_name = VAR.to_uppercase_string ~&var;
+                     compvar_value = value } }
+  in
+  { env with compil_vars = MAP.add ~&var def env.compil_vars },
+  def
 
-let find_compil_var v env = MAP.find_opt v env.compil_vars
+let find_compilation_var v env =
+  MAP.find_opt v env.compil_vars
 
 (* --- *)
 

@@ -62,11 +62,27 @@ module TYPES = struct
 
   (** Values attached with a source location. *)
   type 'a with_loc = { payload: 'a; loc: srcloc [@compare fun _ _ -> 0] }
-  [@@ deriving ord]
+  [@@deriving ord]
+
+  type preproc_loc =
+    | Source_location of (srcloc [@compare fun _ _ -> 0])
+    | Process_parameter
+    | Process_environment
+  [@@deriving ord]
+
+  type 'a with_preproc_loc =
+    {
+      pp_payload: 'a;
+      pp_loc: preproc_loc [@compare fun _ _ -> 0];
+    }
+  [@@deriving ord]
 
   let pp pe ppf e = pe ppf e.payload            (* ignore source localization *)
   let pp_with_loc = pp
   let show_with_loc pe l = Pretty.to_string "%a" (pp pe) l
+  let pp' pe ppf e = pe ppf e.pp_payload                              (* same *)
+  let pp_with_preproc_loc = pp'
+  let show_with_preproc_loc pe l = Pretty.to_string "%a" (pp' pe) l
 end
 include TYPES
 

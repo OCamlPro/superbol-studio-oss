@@ -183,7 +183,7 @@ type warning =
       {
         loc: srcloc;
         var: Preproc_env.var with_loc;
-        prev_def_loc: Preproc_env.definition_loc;
+        prev_def_loc: preproc_loc;
       }
   (* | Compdir_warning of *)
   (*     { *)

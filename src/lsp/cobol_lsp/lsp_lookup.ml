@@ -43,6 +43,11 @@ module TYPES = struct
           qn: Cobol_ptree.qualname;
           in_section: Cobol_unit.Types.procedure_section option;
         }
+    | Compilation_variable of
+        {
+          def: Cobol_preproc.Env.compilation_var_definition;
+          use: [`Substitution | `Evaluation | `Definition];
+        }
 
   type name_definition =
     {
@@ -119,7 +124,10 @@ let rec qualname_at_pos ~filename (qn: Cobol_ptree.qualname) pos =
 
 (** [element_at_position pos group] seeks the compilation unit name and qualified
     name at the given position [pos], in typed compilation group [group]. *)
-let element_at_position ~uri pos group : element_at_position =
+let element_at_position ~uri pos
+    (group: Cobol_unit.Types.group)
+    (artifacts: Cobol_parser.Outputs.artifacts)
+  : element_at_position =
   let filename = Lsp.Uri.to_path uri in
   let open struct
 
@@ -138,8 +146,6 @@ let element_at_position ~uri pos group : element_at_position =
                 enclosing_compilation_unit_name = None };
         context = Data_decls;                       (* does not really matter *)
       }
-
-    let result acc = acc.elt
 
   end in
 
@@ -231,7 +237,28 @@ let element_at_position ~uri pos group : element_at_position =
       | _ ->                        (* unknow/unimplemented kind of EXEC block *)
           acc
 
-  end group init |> result
+  end group init |> function
+  | { elt = { element_at_position = None; _ } as elt; _ } ->
+      let compvar ~loc def use =
+        if Lsp_position.is_in_srcloc ~filename pos loc
+        then Some (Compilation_variable { def; use })
+        else None
+      in
+      let element_at_position =
+        List.find_map begin function
+          | Cobol_preproc.Trace.Variable_definition { loc; def; _ } ->
+              compvar ~loc def `Definition
+          | Cobol_preproc.Trace.Variable_substitution { loc; def; _ } ->
+              compvar ~loc def `Substitution
+          | Cobol_preproc.Trace.Variable_evaluation { loc; def = Some def; _ } ->
+              compvar ~loc def `Evaluation
+          | _ ->
+              None
+        end (Cobol_preproc.Trace.events artifacts.Cobol_parser.Outputs.pplog)
+      in
+      { elt with element_at_position }
+  | acc ->
+      acc.elt
 
 (* --- *)
 
@@ -250,6 +277,8 @@ let last_cobol_unit_before_pos ~filename pos group =
       then Visitor.skip_children @@ Some ~&cu
       else Visitor.skip_children acc
   end group None
+
+(* --- *)
 
 let copy_at_pos ~filename pos ptree =
   Cobol_ptree.Visitor.fold_compilation_group object

@@ -52,12 +52,12 @@ val bind_78_constant
   -> preprocessor
 val lookup_compilation_variable
   : preprocessor
-  -> Cobol_ptree.name
+  -> Preproc_env.var
   -> Preproc_env.compilation_var_definition option
 val record_compilation_variable_substitution
   : preprocessor
   -> loc:srcloc
-  -> var:(* Preproc_env.var *)string
+  -> var:Preproc_env.var
   -> def:Preproc_env.compilation_var_definition
   -> preprocessor
 

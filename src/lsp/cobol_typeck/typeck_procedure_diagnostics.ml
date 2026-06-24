@@ -33,6 +33,10 @@ type error =
         arg_name: Cobol_ptree.name with_loc;
         actual_storage: Cobol_data.Types.data_storage;
       }
+  | Proc_arg_is_a_constant of
+      {
+        arg_name: Cobol_ptree.name with_loc;
+      }
   | Procedure_arg_record_not_found of
       {
         arg_name: Cobol_ptree.name with_loc;
@@ -44,6 +48,7 @@ let error_loc = function
   | Ambiguous_data_name { given_qualname = { loc; _ }; _ }
   | Ambiguous_proc_name { given_qualname = { loc; _ }; _ }
   | Invalid_proc_arg_storage { arg_name = { loc; _ }; _ }
+  | Proc_arg_is_a_constant { arg_name = { loc; _ } }
   | Procedure_arg_record_not_found { arg_name = { loc; _ } } ->
       Some loc
 
@@ -68,6 +73,11 @@ let pp_error ppf = function
         "Invalid@ storage@ %a@ for@ PROCEDURE@ DIVISION@ argument@ %a@ (LINKAGE@ \
          expected)"
         Cobol_data.Printer.pp_data_storage actual_storage
+        Cobol_ptree.pp_name' arg_name
+  | Proc_arg_is_a_constant { arg_name } ->
+      Pretty.print ppf
+        "Invalid@ use@ of@ constant@ as@ PROCEDURE@ DIVISION@ argument@ %a@ \
+         (data@ item@ in@ LINKAGE@ expected)"
         Cobol_ptree.pp_name' arg_name
   | Procedure_arg_record_not_found { arg_name } ->
       Pretty.print ppf

@@ -45,9 +45,10 @@ let%expect_test "codelens" =
         01 ZZ OCCURS 5 TIMES INDEXED BY INDEX1.
           02 YY PIC X.
           88 YYcond value "a".
+        78 CONST VALUE "CONSTANT VALUE".
         PROCEDURE DIVISION.
             MOVE aa TO aA.
-            DISPLAY BB IN AA.
+            DISPLAY BB IN AA CONST.
             STOP RUN.
     |cobol} in
   end_with_postproc [%expect.output];
@@ -132,7 +133,7 @@ let%expect_test "codelens" =
       12 >           02 YY PIC X.
     ----                ^
       13             88 YYcond value "a".
-      14           PROCEDURE DIVISION.
+      14           78 CONST VALUE "CONSTANT VALUE".
     1 reference
     __rootdir__/prog.cob:13.13:
       10             66 ABCD RENAMES BB THRU DD.
@@ -140,9 +141,18 @@ let%expect_test "codelens" =
       12             02 YY PIC X.
       13 >           88 YYcond value "a".
     ----                ^
-      14           PROCEDURE DIVISION.
-      15               MOVE aa TO aA.
-    0 reference |}];;
+      14           78 CONST VALUE "CONSTANT VALUE".
+      15           PROCEDURE DIVISION.
+    0 reference
+    __rootdir__/prog.cob:14.8:
+      11           01 ZZ OCCURS 5 TIMES INDEXED BY INDEX1.
+      12             02 YY PIC X.
+      13             88 YYcond value "a".
+      14 >         78 CONST VALUE "CONSTANT VALUE".
+    ----           ^
+      15           PROCEDURE DIVISION.
+      16               MOVE aa TO aA.
+    2 references |}];;
 
 let%expect_test "codelens-procedure" =
   let end_with_postproc = codelens {cobol|

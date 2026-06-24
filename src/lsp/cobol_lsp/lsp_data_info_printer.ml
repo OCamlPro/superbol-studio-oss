@@ -280,6 +280,17 @@ let pp_record_renaming': record_renaming with_loc Pretty.printer = fun ppf ->
 (*        Pretty.vfield "renamings" (fun x -> x.record_renamings) pp_record_renamings); *)
 (*   ] *)
 
+let pp_compilation_data ppf { pp_payload; pp_loc } =
+  Fmt.pf ppf "Compilation@ variable@ with@ value@ %a%t"
+    Cobol_data.Printer.pp_compilation_value pp_payload.compvar_value
+    (fun ppf -> match pp_loc with
+       | Source_location _ ->
+           ()
+       | Process_parameter ->
+           Fmt.pf ppf "@ (given@ as@ process@ paramter)"
+       | Process_environment ->
+           Fmt.pf ppf "@ (defined@ in@ process@ environment)")
+
 let pp_data_definition ppf = function
   | Data_field { def; _ } ->
       pp_field_definition' ppf def
@@ -289,3 +300,5 @@ let pp_data_definition ppf = function
       Fmt.pf ppf "%a\n\n%a" pp_condition_name ~&def pp_field_definition ~&field
   | Table_index { table; _ } ->
       pp_table_definition' ppf table
+  | Compilation_data { def } ->
+      pp_compilation_data ppf def
