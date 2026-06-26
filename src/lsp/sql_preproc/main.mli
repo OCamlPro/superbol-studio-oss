@@ -9,6 +9,7 @@
 (**************************************************************************)
 
 val preproc :
+  platform:Cobol_common.Types.platform ->
   filename:string ->
   ?sql_in_copybooks:bool ->
   ?copy_path:string list ->

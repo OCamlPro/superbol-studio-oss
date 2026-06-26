@@ -175,7 +175,6 @@
    (ppx_deriving_encoding (and (>= 0.3.0) (< 1.0.0)))
    ezjsonm
    (ez_file (and (>= 0.3.0) (< 1.0.0)))
-   (ppx_deriving_encoding (and (>= 0.3.0) (< 1.0.0)))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
@@ -261,7 +260,7 @@
    (sql_preproc (= :version))
    (lwt ( >= 5 ))
    (ez_toml (= :version))
-   (ez_file ( >= 0.3 ))
+   (ez_file ( >= 0.4 ))
    (ez_cmdliner (and (>= 0.3.0) (< 1.0.0)))
    (ez_api ( >= 2.0 ))
    (cobol_typeck (= :version))
@@ -269,6 +268,7 @@
    (cobol_lsp (= :version))
    (cobol_indent (= :version))
    (cobol_common (= :version))
+   (cmdliner ( < 2 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
@@ -331,7 +331,7 @@
  (depends
    (ocaml (>= 4.14.0))
    (pretty (= :version))
-   (ez_file (and (>= 0.3.0) (< 1.0.0)))
+   (ez_file ( >= 0.5 ))
    (cobol_preproc (= :version))
    (cobol_common (= :version))
    odoc
@@ -368,7 +368,7 @@
 
  (depends
    (ocaml (>= 4.14.0))
-   (menhir ( >= 1.2 ))
+   (menhirLib (and ( >= 20231231 )( < 20240715 )))
    (ez_file ( >= 0.3 ))
    (ebcdic_lib (= :version))
    (cobol_ptree (= :version))
@@ -491,7 +491,7 @@
  (depends
    (ocaml (>= 4.14.0))
    (pretty (= :version))
-   (menhir ( >= 1.2 ))
+   (menhirLib (and ( >= 20231231 )( < 20240715 )))
    (cobol_common (= :version))
    (ppx_deriving ( >= 5.2.1 ))
    odoc
@@ -549,7 +549,7 @@
    (ocaml (>= 4.14.0))
    (ppx_import ( >= 1 ))
    (ppx_deriving ( >= 5.2.1 ))
-   (menhir ( >= 1.2 ))
+   (menhirLib (and ( >= 20231231 )( < 20240715 )))
    (cobol_data (= :version))
    (cobol_config (= :version))
    (cobol_common (= :version))
@@ -636,7 +636,7 @@
    (ocaml (>= 4.14.0))
    ocplib_stuff
    (menhirLib ( > 2019 ))
-   (ez_file ( >= 0.3 ))
+   (ez_file ( >= 0.4 ))
    (ISO8601 ( >= 0.2 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
@@ -680,6 +680,7 @@
    (cobol_unit (= :version))
    (cobol_typeck (= :version))
    (cobol_indent (= :version))
+   (cobol_common (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
@@ -717,7 +718,7 @@
  (depends
    (ocaml (>= 4.14.0))
    (sql_ast (= :version))
-   (menhir ( >= 1.2 ))
+   (menhirLib (and ( >= 20231231 )( < 20240715 )))
    (ez_file ( >= 0.3 ))
    (ebcdic_lib (= :version))
    (cobol_preproc (= :version))

@@ -67,7 +67,7 @@ module Process = struct
   end
 end
 
-module Os = [%js: val homedir : unit -> string [@@js.global "os.homedir"]]
+module Os = [%js: val homedir : unit -> string [@@js.global "__SUPERBOL__.os.homedir"]]
 
 module JsError = struct
   type t = Promise.error [@@js]
@@ -161,21 +161,21 @@ end
 module Path = struct
   include
     [%js:
-    val delimiter : string [@@js.global "path.delimiter"]
+    val delimiter : string [@@js.global "__SUPERBOL__.path.delimiter"]
 
-    val sep : string [@@js.global "path.sep"]
+    val sep : string [@@js.global "__SUPERBOL__.path.sep"]
 
-    val basename : string -> string [@@js.global "path.basename"]
+    val basename : string -> string [@@js.global "__SUPERBOL__.path.basename"]
 
-    val dirname : string -> string [@@js.global "path.dirname"]
+    val dirname : string -> string [@@js.global "__SUPERBOL__.path.dirname"]
 
-    val extname : string -> string [@@js.global "path.extname"]
+    val extname : string -> string [@@js.global "__SUPERBOL__.path.extname"]
 
-    val isAbsolute : string -> bool [@@js.global "path.isAbsolute"]
+    val isAbsolute : string -> bool [@@js.global "__SUPERBOL__.path.isAbsolute"]
 
-    val join : (string list[@js.variadic]) -> string [@@js.global "path.join"]
+    val join : (string list[@js.variadic]) -> string [@@js.global "__SUPERBOL__.path.join"]
 
-    val resolve : (string list[@js.variadic]) -> string [@@js.global "path.resolve"]]
+    val resolve : (string list[@js.variadic]) -> string [@@js.global "__SUPERBOL__.path.resolve"]]
 
   let delimiter =
     assert (String.length delimiter = 1);
@@ -189,22 +189,22 @@ end
 module Fs = struct
   include
     [%js:
-    val readDir : string -> string list Promise.t [@@js.global "fs.readDir"]
+    val readDir : string -> string list Promise.t [@@js.global "__SUPERBOL__.fs.readDir"]
 
     val readFile : string -> encoding:string -> string Promise.t
-      [@@js.global "fs.readFile"]
+      [@@js.global "__SUPERBOL__.fs.readFile"]
 
-    val exists : string -> bool Promise.t [@@js.global "fs.exists"]
+    val exists : string -> bool Promise.t [@@js.global "__SUPERBOL__.fs.exists"]
 
-    val existsSync : string -> bool [@@js.global "fs.existsSync"]
+    val existsSync : string -> bool [@@js.global "__SUPERBOL__.fs.existsSync"]
 
-    val realpathSync : string -> string [@@js.global "fs.realpathSync"]
+    val realpathSync : string -> string [@@js.global "__SUPERBOL__.fs.realpathSync"]
 
-    val writeFileSync : string -> string -> unit [@@js.global "fs.writeFileSync"]
+    val writeFileSync : string -> string -> unit [@@js.global "__SUPERBOL__.fs.writeFileSync"]
 
-    val mkdirSync : string -> recursive:bool -> unit [@@js.global "fs.mkdirSync"]
+    val mkdirSync : string -> recursive:bool -> unit [@@js.global "__SUPERBOL__.fs.mkdirSync"]
 
-    val unlinkSync : string -> unit [@@js.global "fs.unlinkSync"]]
+    val unlinkSync : string -> unit [@@js.global "__SUPERBOL__.fs.unlinkSync"]]
 
   let readDir path =
     readDir path
@@ -220,7 +220,7 @@ module Net = struct
 
     include
       [%js:
-      val make : unit -> t [@@js.new "net.Socket"]
+      val make : unit -> t [@@js.new "__SUPERBOL__.net.Socket"]
 
       val isPaused : t -> bool [@@js.call]
 
@@ -266,10 +266,10 @@ module ChildProcess = struct
       -> ?callback:(exec_result or_undefined -> string -> string -> unit)
       -> unit
       -> t
-      [@@js.global "child_process.exec"]
+      [@@js.global "__SUPERBOL__.child_process.exec"]
 
     val spawn : string -> string array -> ?options:Options.t -> unit -> t
-      [@@js.global "child_process.spawn"]
+      [@@js.global "__SUPERBOL__.child_process.spawn"]
 
     val get_stdout : t -> Stream.Readable.t [@@js.get "stdout"]
 
@@ -387,7 +387,7 @@ module Events = struct
         args:(Js.Any.t list [@js.variadic])
         -> unit
 
-      val create: ?options: EventEmitterOptions.t -> unit -> t [@@js.new "events.EventEmitter"]
+      val create: ?options: EventEmitterOptions.t -> unit -> t [@@js.new "__SUPERBOL__.events.EventEmitter"]
       val addListener:
            t
         -> eventName: string

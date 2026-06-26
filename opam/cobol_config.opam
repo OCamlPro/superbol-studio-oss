@@ -50,7 +50,7 @@ depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "3.17.0"}
   "pretty" {= version}
-  "menhir" {>= "1.2"}
+  "menhirLib" {>= "20231231" & < "20240715"}
   "cobol_common" {= version}
   "ppx_deriving" {>= "5.2.1"}
   "odoc" {with-doc}

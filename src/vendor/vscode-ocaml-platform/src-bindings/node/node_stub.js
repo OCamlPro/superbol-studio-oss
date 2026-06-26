@@ -1,7 +1,11 @@
 var fs = require("fs");
 var promisify = require("util").promisify;
 
-globalThis.fs = {
+if (globalThis.__SUPERBOL__ === undefined) {
+  globalThis.__SUPERBOL__ = new Object();
+}
+
+globalThis.__SUPERBOL__.fs = {
   readDir: promisify(fs.readdir),
   readFile: promisify(fs.readFile),
   exists: promisify(fs.exists),
@@ -12,12 +16,12 @@ globalThis.fs = {
   unlinkSync: fs.unlinkSync,
 };
 
-globalThis.child_process = require("child_process");
+globalThis.__SUPERBOL__.child_process = require("child_process");
 
-globalThis.path = require("path");
+globalThis.__SUPERBOL__.path = require("path");
 
-globalThis.os = require("os");
+globalThis.__SUPERBOL__.os = require("os");
 
-globalThis.net = require("net");
+globalThis.__SUPERBOL__.net = require("net");
 
-globalThis.events = require("events");
+globalThis.__SUPERBOL__.events = require("events");

@@ -55,9 +55,9 @@ skip = ["main.ml", "index.mld"]
 [dependencies]
 cobol_common = "version"
 pretty = "version"
-[dependencies.menhir]
+[dependencies.menhirLib]
 libname = "menhirLib"
-version = ">=1.2"
+version = ">=20231231 <20240715"
 
 # package tools dependencies
 [tools]

@@ -18,7 +18,6 @@ open Lsp_project.TYPES
 open Lsp_server.TYPES
 open Lsp_lookup.TYPES
 open Lsp.Types
-open Ez_file.V1
 
 module TYPES = struct
   type alternate_handler =
@@ -660,7 +659,7 @@ let preproc_info_on_hover ~filename position pplog =
   | Some Replacement { matched_loc = loc; replacement_text; _ } ->
       Some (cobol_code "%a" Cobol_preproc.Text.pp_text replacement_text, loc)
   | Some FileCopy { copyloc = loc; status = CopyDone lib | CyclicCopy lib } ->
-      (match EzFile.read_file lib with
+      (match Lsp_platform.record.read_text_file lib with
        | "" -> None
        | text -> Some (cobol_code "%s" text, loc))
   | Some FileCopy { status = MissingCopy _; _ }

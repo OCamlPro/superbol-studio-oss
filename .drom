@@ -5,12 +5,15 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-acf3b86f44ed7f6d70438038709ab961:.
+d102029921b0ec929a53d2647615c72f:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
 4ced1c3f9faeab833051c93726067b63:.github/workflows/workflow.yml
+421e4ddd01d6066fad944feb377ce83c:.github/workflows/workflow.yml
+d703a6755baa4f37322e78ce9e5260ec:.github/workflows/workflow.yml
+e3b97dd48b0cf76a4dbad08c06422b73:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
@@ -21,6 +24,7 @@ acf3b86f44ed7f6d70438038709ab961:.
 # begin context for Makefile
 # file Makefile
 68dca0ec63b773ef92d3184821b36a7e:Makefile
+fbe8f720a7cc84e925880ad46b12a296:Makefile
 # end context for Makefile
 
 # begin context for docs/README.txt
@@ -51,6 +55,9 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 # begin context for dune-project
 # file dune-project
 7eeca9cf98c250728918956808e34a93:dune-project
+95a5c4276a8b69d50fc92f608404e796:dune-project
+a25cfc34dd44d4d013702ab8ac434cee:dune-project
+24b8e94c4444bb740598c7a7184c42c1:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_cfg.opam
@@ -65,7 +72,7 @@ d102adfe37ba93db025555700a87c6a1:opam/cobol_cfg.opam
 
 # begin context for opam/cobol_config.opam
 # file opam/cobol_config.opam
-712e31133e6686851749d80c9231dfa3:opam/cobol_config.opam
+590fe115834b8607103fe70f9712c2b0:opam/cobol_config.opam
 # end context for opam/cobol_config.opam
 
 # begin context for opam/cobol_data.opam
@@ -90,12 +97,12 @@ f9340b04fb6fd5abf63bbd836b9fd0e3:opam/cobol_indent_old.opam
 
 # begin context for opam/cobol_parser.opam
 # file opam/cobol_parser.opam
-0a790d793c622a57afc5932d73636135:opam/cobol_parser.opam
+bff32163e2b49b90242750acd6022ee5:opam/cobol_parser.opam
 # end context for opam/cobol_parser.opam
 
 # begin context for opam/cobol_preproc.opam
 # file opam/cobol_preproc.opam
-c83776956f173548488df18f239157e6:opam/cobol_preproc.opam
+9b0a37b9ef7d2f48b49f43853c9e9618:opam/cobol_preproc.opam
 # end context for opam/cobol_preproc.opam
 
 # begin context for opam/cobol_ptree.opam
@@ -125,7 +132,7 @@ c83776956f173548488df18f239157e6:opam/cobol_preproc.opam
 
 # begin context for opam/ez_toml.opam
 # file opam/ez_toml.opam
-20c1fc4d1d465ac583c03d3ead4c343e:opam/ez_toml.opam
+54bf97c02eeb76be96b88e2ff18a0c65:opam/ez_toml.opam
 # end context for opam/ez_toml.opam
 
 # begin context for opam/ezr_toml.opam
@@ -165,12 +172,12 @@ a56c08535ff344da81fab8d806e214f7:opam/node-js-stubs.opam
 
 # begin context for opam/sql_parser.opam
 # file opam/sql_parser.opam
-14c02400118beda008fe18f403b89696:opam/sql_parser.opam
+93f186ee117b9fe9c2ad244bb0053efa:opam/sql_parser.opam
 # end context for opam/sql_parser.opam
 
 # begin context for opam/sql_preproc.opam
 # file opam/sql_preproc.opam
-33cccb47844dc5b7e7764f3b34d9065e:opam/sql_preproc.opam
+77972b34451219fa2c66ee856a6ca4e7:opam/sql_preproc.opam
 # end context for opam/sql_preproc.opam
 
 # begin context for opam/superbol-free.opam
@@ -195,12 +202,12 @@ a56c08535ff344da81fab8d806e214f7:opam/node-js-stubs.opam
 
 # begin context for opam/superbol_free_lib.opam
 # file opam/superbol_free_lib.opam
-beea673c3e365e72d0ff922e9ab80b42:opam/superbol_free_lib.opam
+035795a825caf209da5aa600543b58bf:opam/superbol_free_lib.opam
 # end context for opam/superbol_free_lib.opam
 
 # begin context for opam/superbol_platform.opam
 # file opam/superbol_platform.opam
-a80190611f9f16acbd1a52dd82d58f27:opam/superbol_platform.opam
+375e54a1129f98e0b202af7819124832:opam/superbol_platform.opam
 # end context for opam/superbol_platform.opam
 
 # begin context for opam/superbol_preprocs.opam
@@ -230,7 +237,7 @@ ca7ebb08e8f1c37b7190537108882773:opam/vscode-debugprotocol.opam
 
 # begin context for opam/vscode-json.opam
 # file opam/vscode-json.opam
-4063d6063a6f67600ed8d945270d467e:opam/vscode-json.opam
+53383c4b93bfd30efca15b7852977fb6:opam/vscode-json.opam
 # end context for opam/vscode-json.opam
 
 # begin context for opam/vscode-languageclient-js-stubs.opam
@@ -455,7 +462,7 @@ a5027007a5ed5a4b90598fcde0e6fc1b:src/lsp/sql_parser/version.mlt
 
 # begin context for src/lsp/sql_preproc/dune
 # file src/lsp/sql_preproc/dune
-75154167098c84baaebdedad635bb22a:src/lsp/sql_preproc/dune
+7acabe6322126d70b0449895c8e7959e:src/lsp/sql_preproc/dune
 # end context for src/lsp/sql_preproc/dune
 
 # begin context for src/lsp/sql_preproc/index.mld

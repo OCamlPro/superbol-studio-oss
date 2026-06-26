@@ -44,6 +44,10 @@ jobs:
           git config --global user.name github-actions
           git config --global user.email github-actions-bot@users.noreply.github.com
 
+      - name: Run apt update
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt update
+
       - name: Use OCaml ${{ matrix.ocaml-compiler }}
         uses: avsm/setup-ocaml@v3
         with:
@@ -55,7 +59,7 @@ jobs:
         id: cache-opam
         with:
           path: _opam
-          key: v4-${{ runner.os }}-superbol-studio-oss-${{ matrix.ocaml-compiler }}-${{ hashFiles('opam/*.opam', 'vendors/autofonce/opam/*.opam') }}-skip_tests=${{ matrix.skip_test }}-repo=
+          key: v4-${{ runner.os }}-superbol-studio-oss-${{ matrix.ocaml-compiler }}-${{ hashFiles('opam/*.opam', 'vendors/autofonce/opam/*.opam', 'vendors/ANSITerminal/*.opam') }}-skip_tests=${{ matrix.skip_test }}-repo=
 
       # use fields.opam-repo = "git+https://" to add an 'extra' opam repository
 
