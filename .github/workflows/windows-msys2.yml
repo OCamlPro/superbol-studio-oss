@@ -15,11 +15,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { target: release, sys: mingw64, env: x86_64       }
-          # - { target: debug,   sys: mingw64, env: x86_64       }
+          # - { target: release, sys: mingw64, env: x86_64       }
+          - { target: debug,   sys: mingw64, env: x86_64       }
           # - { target: release, sys: ucrt64,  env: ucrt-x86_64  }
           # - { target: release, sys: clang64, env: clang-x86_64 }
-          # - { target: release, sys: mingw32, env: i686         }
 
     steps:
       - name: Set git user
@@ -55,13 +54,6 @@ jobs:
                    mingw-w64-${{ matrix.env }}-json-c
                    mingw-w64-${{ matrix.env }}-db
 
-      # - name: Install BDB package
-      #   if: ${{ matrix.sys != 'mingw32' }}  # MSYS2 does not provide 32bit builds for it any more
-      #   uses: msys2/setup-msys2@v2
-      #   with:
-      #     msystem: ${{ matrix.sys }}
-      #     install: mingw-w64-${{ matrix.env }}-db
-
       - name: Bootstrap GnuCOBOL
         shell: msys2 {0}
         run: import/gnucobol4/build_aux/bootstrap install
@@ -69,19 +61,14 @@ jobs:
       - name: Setup build environment
         shell: pwsh
         run: |
-          # If ("${{ matrix.target }}" -eq "release") {
+          If ("${{ matrix.target }}" -eq "release") {
             echo CFGOPT="--with-pkgversion=GnuCOBOL-CI-MSYS2" >> $env:GITHUB_ENV
-          # } Else {
-          #   echo CFGOPT="--with-pkgversion=GnuCOBOL-CI-MSYS2-Debug --enable-debug --enable-cobc-internal-checks --enable-hardening" >> $env:GITHUB_ENV
-          # }
+          } Else {
+            echo CFGOPT="--with-pkgversion=GnuCOBOL-CI-MSYS2-Debug --enable-debug --enable-cobc-internal-checks --enable-hardening" >> $env:GITHUB_ENV
+          }
           # Common options (dependencies)
           echo CFGOPT="$env:CFGOPT --with-math=gmp --with-curses=ncursesw --with-xml2 --with-json=json-c" >> $env:GITHUB_ENV
-          # Conditional inclusion of --with-db (MSYS2 does not provide 32bit builds for BDB any more)
-          # If ("${{ matrix.sys }}" -ne "mingw32") {
-            echo CFGOPT="$env:CFGOPT --with-db --with-indexed=db" >> $env:GITHUB_ENV
-          # } Else {
-          #   echo CFGOPT="$env:CFGOPT --without-db" >> $env:GITHUB_ENV
-          # }
+          echo CFGOPT="$env:CFGOPT --with-db --with-indexed=db" >> $env:GITHUB_ENV
 
       - name: Configure GnuCOBOL
         shell: msys2 {0}
@@ -120,14 +107,10 @@ jobs:
 
       - run: |
           opam install .\opam\*.opam vendors\autofonce\opam\*.opam .\vendors\ANSITerminal\ANSITerminal.opam .\test\opam\*.opam --deps-only --with-test
-      # - run: make dev-deps DUNE_ARGS=
-      # - run: make tramabol-interpreter DUNE_ARGS=
 
-      - run: make DUNE_ARGS=
+      - run: make
 
-      # - run: opam exec -- dune runtest
-
-      - run: make test DUNE_ARGS=
+      - run: make test
 
       - name: Cleanup local opam switch before caching
         run: |

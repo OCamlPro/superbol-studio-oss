@@ -9,7 +9,8 @@
 )
 (dirs share src test vendors )
 
+; Ignore ANSITerminal, that we vendor ourself in vendors/ANSITerminal:
 (subdir vendors
   (subdir autofonce
     (subdir vendors
-      (dirs :standard \ *))))
+      (dirs :standard \ ANSITerminal))))
