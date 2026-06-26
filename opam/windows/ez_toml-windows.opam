@@ -53,7 +53,7 @@ depends: [
   "dune" {>= "3.17.0"}
   "ocplib_stuff-windows" {}
   "menhirLib-windows" {> "2019"}
-  "ez_file-windows" {>= "0.3"}
+  "ez_file-windows" {>= "0.4"}
   "ISO8601-windows" {>= "0.2"}
   "odoc" {with-doc}
   "dune" {>= "3.17.0" & < "3.19.0"}

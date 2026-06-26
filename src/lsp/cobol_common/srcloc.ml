@@ -337,7 +337,7 @@ let retrieve_file_lines, register_file_contents =
     let file_cache = Lazy.force file_cache in
     try Cache.find file_cache file
     with Not_found ->
-      let contents = platform.read_file file in
+      let contents = platform.read_text_file file in
       let lines = String.split_on_char '\n' contents in
       let lines = Array.of_list lines in
       let lines =
@@ -347,7 +347,7 @@ let retrieve_file_lines, register_file_contents =
         then Array.sub lines 0 (Array.length lines - 1)
         else lines
       in
-      Cache.add file_cache file lines;
+      Cache.replace file_cache file lines;
       lines
   end,
   begin fun ~filename contents ->

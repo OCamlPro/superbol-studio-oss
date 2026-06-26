@@ -58,9 +58,9 @@ cobol_config = "version"
 cobol_data = "version"
 ppx_deriving = ">=5.2.1"
 ppx_import = "1"
-[dependencies.menhir]
+[dependencies.menhirLib]
 libname = "menhirLib"
-version = ">=1.2"
+version = ">=20231231 <20240715"
 
 # package tools dependencies
 [tools]

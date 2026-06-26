@@ -45,7 +45,8 @@ module TYPES = struct
 
     mutable eprintf :  'a. ('a, out_channel, unit) format -> 'a ;
     mutable error :  'a. ('a, Format.formatter, unit) format -> 'a ;
-    mutable read_file : string -> string ;
+    mutable getcwd: unit -> string;
+    mutable read_text_file : string -> string ;
     mutable getenv_opt : string -> string option ;
     mutable mk_temp_dir: ?mode:int -> ?dir:string -> string -> string;
     mutable remove_dir: ?all:bool -> string -> unit;
@@ -72,7 +73,8 @@ let innocuous = {
   verbosity = 0;
   eprintf = Printf.eprintf;
   error = Pretty.error;
-  read_file = begin fun file ->
+  getcwd = Sys.getcwd;                                             (* CHECKME *)
+  read_text_file = begin fun file ->
     Pretty.string_to (fun msg -> raise (Sys_error msg))
       "%s: Filesystem operations are unavailable" file
   end;
@@ -92,13 +94,14 @@ let innocuous = {
   getenv_opt = (fun _variable -> None);
 }
 
-let copy ~dst ~src:{ verbosity; eprintf; error; read_file;
+let copy ~dst ~src:{ verbosity; eprintf; error; getcwd; read_text_file;
                      mk_temp_dir; remove_dir;
                      autodetect_format; find_lib; getenv_opt }  =
   dst.verbosity <- verbosity;
   dst.eprintf <- eprintf;
   dst.error <- error;
-  dst.read_file <- read_file;
+  dst.getcwd <- getcwd;
+  dst.read_text_file <- read_text_file;
   dst.mk_temp_dir <- mk_temp_dir;
   dst.remove_dir <- remove_dir;
   dst.autodetect_format <- autodetect_format;

@@ -19,6 +19,8 @@ open Ez_file.V1
 let relative_path ~filename:path absolute_path =
   match EzString.chop_prefix ~prefix:absolute_path path with
   | Some "" -> "."
-  | Some path when path.[0] = FileOS.dir_separator -> EzString.after path 0
-  | Some path -> path
+  | Some path ->
+      if path.[0] = Slashifier.get_dir_separator ()
+      then EzString.after path 0
+      else path
   | None -> Fmt.invalid_arg "%s is not contained within %s" path absolute_path

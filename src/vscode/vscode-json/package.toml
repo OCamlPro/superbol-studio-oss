@@ -59,7 +59,6 @@ ppx_deriving_encoding = "0.3.0"
 
 # package tools dependencies
 [tools]
-ppx_deriving_encoding = "0.3.0"
 
 # package fields (depends on package skeleton)
 #Examples:

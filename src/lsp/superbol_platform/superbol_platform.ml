@@ -13,12 +13,16 @@
 
 open Cobol_common.Platform.TYPES
 
+let () =                     (* force use of `/` instead of `\` in file names *)
+  Ez_file.Slashifier.enable ()
+
 let record =
   {
     verbosity = 0;
     eprintf = Printf.eprintf;
     error = Pretty.error;
-    read_file = (fun file -> Ez_file.V1.EzFile.read_file file);
+    getcwd = (fun () -> Ez_file.V1.Slashifier.slashify @@ Sys.getcwd ());
+    read_text_file = (fun file -> Ez_file.V1.EzFile.read_text_file file);
     mk_temp_dir = Tempdir.create;
     remove_dir = (fun ?all dir -> Ez_file.V1.EzFile.remove_dir ?all dir);
     autodetect_format = Heuristics.autodetect_format;

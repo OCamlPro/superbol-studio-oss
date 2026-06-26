@@ -55,6 +55,7 @@ skip = ["main.ml"]
 [dependencies]
 ppx_deriving = ">=5.2.1"
 ez_file = "0.3"
+cobol_common = "version"
 cobol_indent = "version"
 cobol_typeck = "version"
 cobol_unit = "version"

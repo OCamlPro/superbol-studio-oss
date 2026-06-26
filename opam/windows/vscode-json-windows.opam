@@ -54,7 +54,6 @@ depends: [
   "ppx_deriving_encoding-windows" {>= "0.3.0" & < "1.0.0"}
   "ezjsonm-windows" {}
   "ez_file-windows" {>= "0.3.0" & < "1.0.0"}
-  "ppx_deriving_encoding" {>= "0.3.0" & < "1.0.0"}
   "odoc" {with-doc}
   "dune" {>= "3.17.0" & < "3.19.0"}
 ]
