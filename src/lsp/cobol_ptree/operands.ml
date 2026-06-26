@@ -706,13 +706,13 @@ let pp_unstring_target ppf
 
 (* --- generics --- *)
 
-type 'a procedure_range =
+type procedure_range =
   {
-    procedure_start: 'a;
-    procedure_end: 'a option;
+    procedure_start: procedure_name with_loc;
+    procedure_end: procedure_name with_loc option;
   }
 [@@deriving ord]
 
-let pp_procedure_range pp ppf { procedure_start; procedure_end } =
-  pp ppf procedure_start;
-  Fmt.(option (sp ++ const string "THROUGH" ++ sp ++ pp)) ppf procedure_end
+let pp_procedure_range ppf { procedure_start; procedure_end } =
+  pp_procedure_name' ppf procedure_start;
+  Fmt.(option (sp ++ const string "THROUGH" ++ sp ++ pp_procedure_name')) ppf procedure_end

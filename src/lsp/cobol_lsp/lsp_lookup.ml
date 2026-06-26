@@ -539,7 +539,7 @@ let proc_at_pos ~filename (pos: Lsp.Types.Position.t) group : procedure_at_posit
       let proc_name = match cu, paragraph_name with
         | Some cu, Some qn ->
           Some (Cobol_unit.Resolver_map.find_binding
-                  ~&qn cu.unit_procedure.procedure_blocks.named).full_qn
+                  ~&qn cu.unit_procedure.procedure_blocks).full_qn
         | _ -> None
       in
       skip { cu; proc_name }
