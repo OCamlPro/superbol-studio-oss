@@ -16,9 +16,9 @@ jobs:
       matrix:
         include:
           # - { target: release, sys: mingw64, env: x86_64       }
-          - { target: debug,   sys: mingw64, env: x86_64       }
-          # - { target: release, sys: ucrt64,  env: ucrt-x86_64  }
-          # - { target: release, sys: clang64, env: clang-x86_64 }
+          - { target: debug, sys: mingw64, env: x86_64       }
+          - { target: debug, sys: ucrt64,  env: ucrt-x86_64  }
+          - { target: debug, sys: clang64, env: clang-x86_64 }
 
     steps:
       - name: Set git user
@@ -103,7 +103,7 @@ jobs:
         id: cache-opam
         with:
           path: _opam
-          key: v5-4.14.2-msys2-${{ hashFiles('**/*.opam') }}
+          key: v5-4.14.2-msys2-${{ matrix.sys }}-${{ hashFiles('**/*.opam') }}
 
       - run: |
           opam install .\opam\*.opam vendors\autofonce\opam\*.opam .\vendors\ANSITerminal\ANSITerminal.opam .\test\opam\*.opam --deps-only --with-test
