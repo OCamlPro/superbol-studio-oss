@@ -17,7 +17,6 @@ open Manifest
 
 let vscode_engine = "1.64.0"
 
-
 let marketplace =
   Manifest.marketplace
     "OCamlPro"
@@ -86,47 +85,51 @@ let package =
 
 let cob_extensions_pattern = [ "[cC]{ob,OB,bl,BL,py,PY,bx,BX,bsql}"; "[pP]{co,CO}" ]
 
-let contributes =
-  Manifest.contributes ()
-    ~languages: [
-      Manifest.language "cobol"
-        ~aliases: ["COBOL"]
-        ~filenamePatterns:(List.map (fun elt -> "*." ^ elt) cob_extensions_pattern)
-        ~configuration: "./syntaxes/language-configuration.json";
-      Manifest.language "COBOL_GNU_LISTFILE"
-        ~aliases: ["LISTFILE"]
-        ~extensions: [".lst"]
-        ~configuration: "./syntaxes/list-n-dump-configuration.json";
-      Manifest.language "COBOL_GNU_DUMPFILE"
-        ~aliases: ["DUMPFILE"]
-        ~extensions: [".dump"]
-        ~configuration: "./syntaxes/list-n-dump-configuration.json";
-    ]
-    ~grammars: [
-      Manifest.grammar ()
-        ~language: "cobol"
-        ~scopeName: "source.cobol"
-        ~path: "./syntaxes/COBOL.tmLanguage.json"
-        ~embeddedLanguages: [
-          "meta.embedded.block.sql", "sql";
-        ];
-      Manifest.grammar ()
-        ~language: "COBOL_GNU_LISTFILE"
-        ~scopeName: "source.gnucobol_listfile"
-        ~path: "./syntaxes/listfile.tmLanguage.json";
-      Manifest.grammar ()
-        ~language: "COBOL_GNU_DUMPFILE"
-        ~scopeName: "source.gnucobol_dumpfile"
-        ~path: "./syntaxes/dumpfile.tmLanguage.json"
-    ]
-    ~debuggers: [
-      Manifest.debugger "superbol-gdb"
-        ~label: "SuperBOL Debugger for GnuCOBOL"
-        ~languages: ["cobol"; "COBOL"]
-        ~program: "./_dist/superbol-vscode-gdb.js"
-        ~runtime: "node"
-        ~configurationAttributes:
-          (Manifest.any {| {
+let languages =
+  [
+    Manifest.language "cobol"
+      ~aliases: ["COBOL"]
+      ~filenamePatterns:(List.map (fun elt -> "*." ^ elt) cob_extensions_pattern)
+      ~configuration: "./syntaxes/language-configuration.json";
+    Manifest.language "COBOL_GNU_LISTFILE"
+      ~aliases: ["LISTFILE"]
+      ~extensions: [".lst"]
+      ~configuration: "./syntaxes/list-n-dump-configuration.json";
+    Manifest.language "COBOL_GNU_DUMPFILE"
+      ~aliases: ["DUMPFILE"]
+      ~extensions: [".dump"]
+      ~configuration: "./syntaxes/list-n-dump-configuration.json";
+  ]
+
+let grammars =
+  [
+    Manifest.grammar ()
+      ~language: "cobol"
+      ~scopeName: "source.cobol"
+      ~path: "./syntaxes/COBOL.tmLanguage.json"
+      ~embeddedLanguages: [
+        "meta.embedded.block.sql", "sql";
+      ];
+    Manifest.grammar ()
+      ~language: "COBOL_GNU_LISTFILE"
+      ~scopeName: "source.gnucobol_listfile"
+      ~path: "./syntaxes/listfile.tmLanguage.json";
+    Manifest.grammar ()
+      ~language: "COBOL_GNU_DUMPFILE"
+      ~scopeName: "source.gnucobol_dumpfile"
+      ~path: "./syntaxes/dumpfile.tmLanguage.json"
+  ]
+
+
+let debuggers =
+  [
+    Manifest.debugger "superbol-gdb"
+      ~label: "SuperBOL Debugger for GnuCOBOL"
+      ~languages: ["cobol"; "COBOL"]
+      ~program: "./_dist/superbol-vscode-gdb.js"
+      ~runtime: "node"
+      ~configurationAttributes:
+        (Manifest.any {| {
                 "launch": {
                         "required": [],
                         "properties": {
@@ -258,12 +261,11 @@ let contributes =
                                         "markdownDescription": "Where to find the source code, in addition to the current directory.\n\nExample: `[ \"/usr/share/cobol/sources\" ]`",
                                         "default": []
                                 }
-
                         }
                 }
         } |})
-        ~configurationSnippets: [
-          Manifest.any {| {
+      ~configurationSnippets: [
+        Manifest.any {| {
                                 "label": "SuperBOL: debug (launch)",
                                 "description": "New SuperBOL launch request",
                                 "body": {
@@ -277,7 +279,7 @@ let contributes =
                                         "gdbtty": true
                                 }
                         } |};
-          Manifest.any {| {
+        Manifest.any {| {
                                 "label": "SuperBOL: debug (attach local)",
                                 "description": "Attach to a local debug session",
                                 "body": {
@@ -289,7 +291,7 @@ let contributes =
                                         "cwd": "$${_:{workspaceFolder}}"
                                 }
                         } |};
-          Manifest.any {| {
+        Manifest.any {| {
                                 "label": "SuperBOL: debug (attach remote)",
                                 "description": "Attach to a remote debug session",
                                 "body": {
@@ -301,232 +303,353 @@ let contributes =
                                         "cwd": "$${_:{workspaceFolder}}"
                                 }
                         } |};
-        ]
-    ]
-    ~breakpoints: [
-      Manifest.breakpoint "cobol";
-    ]
-    ~configuration:
-      (let with_superbol_toml_note md =
-         md ^ "\n\n*(May be overriden in project-specific `superbol.toml` files)*."
-       and with_extra_keyword_commment md =
-         (* Be sure to include "COBOL" in descriptions, as users are more likely
-            to type "cobol" than "superbol" when searching for extension
-            settings. *)
-         md ^ "\n<!-- COBOL -->"
-       in
-       Manifest.configuration ~title:"SuperBOL"
-         [
-
-           (* Note: entries that belong to the `superbol.cobol` section is
-              transmitted to the LSP server, and needs to exactly mirror the
-              `[cobol]` section in `superbol.toml`.  There, convention for keys
-              is to use dash-separated words in lowercase in order to keep
-              consistency with GnuCOBOL's configurations.  *)
-
-           Manifest.PROPERTY.string "superbol.cobol.dialect"
-             ~markdownDescription:
-               (with_superbol_toml_note
-                  @@ Pretty.to_string "Default COBOL dialect; `default` is equivalent to `gnucobol`. \
-                  The available dialects are %a. \
-                  The `-strict` version of a dialect permits using reserved words from \
-                  all other dialects as custom COBOL words, as the non-strict version also \
-                  reserve these words. \
-                  You may also specify an absolute path to a custom GnuCOBOL dialect \
-                  configuration file (see `cobc`'s `-conf` option)."
-                   Fmt.(list ~sep:(any ",@ ") (quote ~mark:"`" string))
-                   Cobol_config.DIALECT.all_canonical_names)
-             ~default:"default"
-             ~order:1;
-
-           Manifest.PROPERTY.enum "superbol.cobol.sourceFormat"
-             ~title:"Source Reference-format"
-             ~markdownDescription:
-               (with_superbol_toml_note "Default source reference-format.")
-             ~cases:Cobol_config.Options.all_format_names
-             ~default:(`String "auto")
-             ~order:2;
-
-           Manifest.property "superbol.cobol.sourceFormatByExtension"
-             ~title:"Source Format by File Extension"
-             ~type_:(`String "object")
-             ~additionalProperties:(`O [
-                 "type", `String "string";
-                 "enum", `A (List.map (fun s -> `String s)
-                               Cobol_config.Options.all_format_names);
-               ])
-             ~default:(`O [])
-             ~markdownDescription:
-               (with_superbol_toml_note
-                  "Per-extension source reference-format overrides. \
-                   Each entry maps a file extension (without dot, e.g. \
-                   `cbl`, `cob`) to a source format, taking precedence \
-                   over the global `#superbol.cobol.sourceFormat#` setting.")
-             ~order:3;
-
-           Manifest.PROPERTY.array "superbol.cobol.copybooks"
-             ~title:"Copybook Paths"
-             ~items:(`O [
-                 "type", `String "object";
-                 "required", `A [`String "dir"];
-                 "properties", `O [
-                   "dir", `O [
-                     "type", `String "string";
-                     "description", `String "Path to copybooks";
-                   ];
-                   "file-relative", `O [
-                     "type", `String "boolean";
-                   ];
-                 ];
-               ])
-             ~default:(`A [                 (* Should match `default_libpath` in
-                                               `superbol_project/project_config.ml` *)
-                 `O [
-                   "dir", `String ".";
-                 ];
-               ])
-             ~markdownDescription:
-               (with_superbol_toml_note "List of paths to copybooks.")
-             ~order:4;
-
-           Manifest.PROPERTY.strings "superbol.cobol.copyexts"
-             ~markdownDescription:
-               (with_superbol_toml_note
-                  "File extensions for copybook resolution")
-             ~default:Cobol_common.Copybook.copybook_extensions
-             ~order:5;
-
-           (* Paths *)
-
-           Manifest.PROPERTY.string "superbol.cobcPath"
-             ~title:"GnuCOBOL Compiler Executable"
-             ~default:"cobc"
-             ~scope:"machine-overridable"
-             ~description:"Path to the GnuCOBOL compiler executable."
-             ~order:11;
-
-           Manifest.PROPERTY.string "superbol.lspPath"
-             ~title:"SuperBOL Executable"
-             ~default:""
-             ~scope:"machine"
-             ~markdownDescription:
-               (with_extra_keyword_commment
-                  "Name of the `superbol-free` executable if available in PATH; \
-                   may be an absolute path otherwise. Leave empty to use the \
-                   bundled `superbol-free`, if available.")
-             ~order:12;
-
-           (* Flags *)
-
-           Manifest.PROPERTY.bool "superbol.forceSyntaxDiagnostics"
-             ~default:false
-             ~markdownDescription:
-               "Force reporting of syntax diagnostics for dialects other than \
-                ``COBOL85``."
-             ~order:21;
-
-           Manifest.PROPERTY.bool "superbol.cacheInGlobalStorage"
-             ~default:false
-             ~markdownDescription:
-               (with_extra_keyword_commment
-                  "Use storage provided by Visual Studio Code for caching. When \
-                   this setting is set to *false*, the cache related to the \
-                   contents of a given workspace folder *f* is stored in a file \
-                   named *f*`/_superbol/lsp-cache`.\n\nNote: cache files are not \
-                   removed automatically, whatever their location.")
-             ~order:22;
-
-           (* Debugger-specific: *)
-
-           Manifest.PROPERTY.bool
-             "superbol.debugger.displayVariableAttributes"
-             ~title:"Display Variable Attributes"
-             ~default:false
-             ~scope:"resource"
-             ~markdownDescription:
-               (with_extra_keyword_commment
-                  "Display storage property and field attributes (e.g. size of \
-                   alphanumerics, digits and scale of numerics).")
-             ~order:31;
-
-           Manifest.PROPERTY.null_string "superbol.debugger.libcobPath"
-             ~title:"GnuCOBOL Runtime Library"
-             ~scope:"machine-overridable"
-             ~description:"Path to the GnuCOBOL runtime library file."
-             ~order:32;
-
-           Manifest.PROPERTY.string "superbol.debugger.gdbPath"
-             ~title:"GNU Debugger Executable"
-             ~default:"gdb"
-             ~scope:"machine-overridable"
-             ~markdownDescription:
-               (with_extra_keyword_commment
-                  "Path to the GNU debugger executable.")
-             ~order:33;
-
-           Manifest.PROPERTY.string "superbol.debugger.cobcrunPath"
-             ~title:"GnuCOBOL module loader"
-             ~default:"cobcrun"
-             ~scope:"machine-overridable"
-             ~markdownDescription:
-               (with_extra_keyword_commment
-                  "Path to `cobcrun`, the GnuCOBOL module loader.")
-             ~order:34;
-         ])
-    ~taskDefinitions: [
-      Manifest.taskDefinition
-        "superbol"
-        ~properties: [
-          Manifest.PROPERTY.bool "forDebug"
-            ~description:"Build for debugging";
-
-          Manifest.PROPERTY.bool "forCoverage"
-            ~description:"Enable instrumentation for coverage";
-
-          Manifest.PROPERTY.bool "executable"
-            ~description:"Build an executable program instead of a module"
-            ~default:true;
-
-          Manifest.PROPERTY.null_string "cobcPath"
-            ~title:"GnuCOBOL Compiler Executable"
-            ~markdownDescription:
-              "Path to the GnuCOBOL compiler executable; when `null` or \"\", \
-               defaults to the value of \"superbol.cobcPath\" from the workspace \
-               configuration, if defined, to \"cobc\" otherwise.";
-
-          Manifest.PROPERTY.null_string "listingsTarget"
-            ~title:"Output file or directory for preprocessed program listings"
-            ~markdownDescription:
-              "Path to a directory where preprocessed program listings are \
-               generated; no listing is saved when `null`.";
-
-          Manifest.PROPERTY.array "extraArgs"
-            ~description:"Additional arguments passed to `cobc`";
-        ]
-    ]
-    ~configurationDefaults: [
-      "[cobol]",
-      Defaults [
-        "files.autoGuessEncoding", `Bool false;
-        "editor.insertSpaces", `Bool true;
-        "editor.formatOnType", `Bool false;
-        "editor.autoIndent", `String "full";
-        "editor.detectIndentation", `Bool false;
-        (* TODO: see if we can tune that directly from the client, checking the
-           configured format beforehand. *)
-        (* "editor.rulers", `A [ *)
-        (*   `Float 6.; *)
-        (*   `Float 7.; *)
-        (*   `Float 72.; *)
-        (* ]; *)
-        "editor.semanticHighlighting.enabled", `Bool true;
-        "editor.wordSeparators", `String "`~!#$%^&*()=+[{]}\\|;:'\",.<>/?";
-      ];
-      "[sql]",
-      Defaults [
-        "editor.wordSeparators", `String "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?";
       ]
+  ]
+
+let breakpoints =
+  [
+    Manifest.breakpoint "cobol";
+  ]
+
+let configuration =
+  let with_superbol_toml_note md =
+    md ^ "\n\n*(May be overriden in project-specific `superbol.toml` files)*."
+  and with_extra_keyword_commment md =
+    (* Be sure to include "COBOL" in descriptions, as users are more likely to
+       type "cobol" than "superbol" when searching for extension settings. *)
+    md ^ "\n<!-- COBOL -->"
+  in
+  Manifest.configuration ~title:"SuperBOL" [
+    (* Note: entries that belong to the `superbol.cobol` section is transmitted
+       to the LSP server, and needs to exactly mirror the `[cobol]` section in
+       `superbol.toml`.  There, convention for keys is to use dash-separated
+       words in lowercase in order to keep consistency with GnuCOBOL's
+       configurations.  *)
+
+    Manifest.PROPERTY.string "superbol.cobol.dialect"
+      ~markdownDescription:
+        (with_superbol_toml_note
+         @@ Pretty.to_string "Default COBOL dialect; `default` is equivalent to `gnucobol`. \
+                              The available dialects are %a. \
+                              The `-strict` version of a dialect permits using reserved words from \
+                              all other dialects as custom COBOL words, as the non-strict version also \
+                              reserve these words. \
+                              You may also specify an absolute path to a custom GnuCOBOL dialect \
+                              configuration file (see `cobc`'s `-conf` option)."
+           Fmt.(list ~sep:(any ",@ ") (quote ~mark:"`" string))
+           Cobol_config.DIALECT.all_canonical_names)
+      ~default:"default"
+      ~order:1;
+
+    Manifest.PROPERTY.enum "superbol.cobol.sourceFormat"
+      ~title:"Source Reference-format"
+      ~markdownDescription:
+        (with_superbol_toml_note "Default source reference-format.")
+      ~cases:Cobol_config.Options.all_format_names
+      ~default:(`String "auto")
+      ~order:2;
+
+    Manifest.property "superbol.cobol.sourceFormatByExtension"
+      ~title:"Source Format by File Extension"
+      ~type_:(`String "object")
+      ~additionalProperties:(`O [
+          "type", `String "string";
+          "enum", `A (List.map (fun s -> `String s)
+                        Cobol_config.Options.all_format_names);
+        ])
+      ~default:(`O [])
+      ~markdownDescription:
+        (with_superbol_toml_note
+           "Per-extension source reference-format overrides. \
+            Each entry maps a file extension (without dot, e.g. \
+            `cbl`, `cob`) to a source format, taking precedence \
+            over the global `#superbol.cobol.sourceFormat#` setting.")
+      ~order:3;
+
+    Manifest.PROPERTY.array "superbol.cobol.copybooks"
+      ~title:"Copybook Paths"
+      ~items:(`O [
+          "type", `String "object";
+          "required", `A [`String "dir"];
+          "properties", `O [
+            "dir", `O [
+              "type", `String "string";
+              "description", `String "Path to copybooks";
+            ];
+            "file-relative", `O [
+              "type", `String "boolean";
+            ];
+          ];
+        ])
+      ~default:(`A [                 (* Should match `default_libpath` in
+                                        `superbol_project/project_config.ml` *)
+          `O [
+            "dir", `String ".";
+          ];
+        ])
+      ~markdownDescription:
+        (with_superbol_toml_note "List of paths to copybooks.")
+      ~order:4;
+
+    Manifest.PROPERTY.strings "superbol.cobol.copyexts"
+      ~markdownDescription:
+        (with_superbol_toml_note
+           "File extensions for copybook resolution")
+      ~default:Cobol_common.Copybook.copybook_extensions
+      ~order:5;
+
+    (* Paths *)
+
+    Manifest.PROPERTY.string "superbol.cobcPath"
+      ~title:"GnuCOBOL Compiler Executable"
+      ~default:"cobc"
+      ~scope:"machine-overridable"
+      ~description:"Path to the GnuCOBOL compiler executable."
+      ~order:11;
+
+    Manifest.PROPERTY.string "superbol.lspPath"
+      ~title:"SuperBOL Executable"
+      ~default:""
+      ~scope:"machine"
+      ~markdownDescription:
+        (with_extra_keyword_commment
+           "Name of the `superbol-free` executable if available in PATH; \
+            may be an absolute path otherwise. Leave empty to use the \
+            bundled `superbol-free`, if available.")
+      ~order:12;
+
+    (* Flags *)
+
+    Manifest.PROPERTY.bool "superbol.forceSyntaxDiagnostics"
+      ~default:false
+      ~markdownDescription:
+        "Force reporting of syntax diagnostics for dialects other than \
+         ``COBOL85``."
+      ~order:21;
+
+    Manifest.PROPERTY.bool "superbol.cacheInGlobalStorage"
+      ~default:false
+      ~markdownDescription:
+        (with_extra_keyword_commment
+           "Use storage provided by Visual Studio Code for caching. When \
+            this setting is set to *false*, the cache related to the \
+            contents of a given workspace folder *f* is stored in a file \
+            named *f*`/_superbol/lsp-cache`.\n\nNote: cache files are not \
+            removed automatically, whatever their location.")
+      ~order:22;
+
+    (* Debugger-specific: *)
+
+    Manifest.PROPERTY.bool
+      "superbol.debugger.displayVariableAttributes"
+      ~title:"Display Variable Attributes"
+      ~default:false
+      ~scope:"resource"
+      ~markdownDescription:
+        (with_extra_keyword_commment
+           "Display storage property and field attributes (e.g. size of \
+            alphanumerics, digits and scale of numerics).")
+      ~order:31;
+
+    Manifest.PROPERTY.null_string "superbol.debugger.libcobPath"
+      ~title:"GnuCOBOL Runtime Library"
+      ~scope:"machine-overridable"
+      ~description:"Path to the GnuCOBOL runtime library file."
+      ~order:32;
+
+    Manifest.PROPERTY.string "superbol.debugger.gdbPath"
+      ~title:"GNU Debugger Executable"
+      ~default:"gdb"
+      ~scope:"machine-overridable"
+      ~markdownDescription:
+        (with_extra_keyword_commment
+           "Path to the GNU debugger executable.")
+      ~order:33;
+
+    Manifest.PROPERTY.string "superbol.debugger.cobcrunPath"
+      ~title:"GnuCOBOL module loader"
+      ~default:"cobcrun"
+      ~scope:"machine-overridable"
+      ~markdownDescription:
+        (with_extra_keyword_commment
+           "Path to `cobcrun`, the GnuCOBOL module loader.")
+      ~order:34;
+  ]
+
+let taskDefinitions =
+  [
+    Manifest.taskDefinition
+      "superbol"
+      ~properties: [
+        Manifest.PROPERTY.bool "forDebug"
+          ~description:"Build for debugging";
+
+        Manifest.PROPERTY.bool "forCoverage"
+          ~description:"Enable instrumentation for coverage";
+
+        Manifest.PROPERTY.bool "executable"
+          ~description:"Build an executable program instead of a module"
+          ~default:true;
+
+        Manifest.PROPERTY.null_string "cobcPath"
+          ~title:"GnuCOBOL Compiler Executable"
+          ~markdownDescription:
+            "Path to the GnuCOBOL compiler executable; when `null` or \"\", \
+             defaults to the value of \"superbol.cobcPath\" from the workspace \
+             configuration, if defined, to \"cobc\" otherwise.";
+
+        Manifest.PROPERTY.null_string "listingsTarget"
+          ~title:"Output file or directory for preprocessed program listings"
+          ~markdownDescription:
+            "Path to a directory where preprocessed program listings are \
+             generated; no listing is saved when `null`.";
+
+        Manifest.PROPERTY.array "extraArgs"
+          ~description:"Additional arguments passed to `cobc`";
+      ]
+  ]
+
+let configurationDefaults =
+  [
+    "[cobol]",
+    Defaults [
+      "files.autoGuessEncoding", `Bool false;
+      "editor.insertSpaces", `Bool true;
+      "editor.formatOnType", `Bool false;
+      "editor.autoIndent", `String "full";
+      "editor.detectIndentation", `Bool false;
+      (* TODO: see if we can tune that directly from the client, checking the
+         configured format beforehand. *)
+      (* "editor.rulers", `A [ *)
+      (*   `Float 6.; *)
+      (*   `Float 7.; *)
+      (*   `Float 72.; *)
+      (* ]; *)
+      "editor.semanticHighlighting.enabled", `Bool true;
+      "editor.wordSeparators", `String "`~!#$%^&*()=+[{]}\\|;:'\",.<>/?";
+    ];
+    "[sql]",
+    Defaults [
+      "editor.wordSeparators", `String "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?";
     ]
+  ]
+
+let problemPatterns =
+  [
+    Manifest.problemPattern
+      (Some "^(.*): ?(\\d+): (error|warning): ([^[]*)(\\[(.*)\\])?$")
+      ~name:"gnucobol"
+      ~file:1
+      ~location:2
+      ~severity:3
+      ~message:4
+      ~code:6;
+    Manifest.problemPattern
+      (Some "^(.*):(\\d+):\\s?(warning|Warnung|[wW]aarschuwing|[aA]lerta|avertissement|упозорење)\\s?:([^[]*)(\\[(.*)\\])?$")
+      ~name:"gnucobol-warning"
+      ~file:1
+      ~location:2
+      ~message:4
+      ~code:6;
+    Manifest.problemPattern
+      (Some "^(.*): ?(\\d+):\\s?(error|Fehler|[fF]out|[eE]rrores|[eE]rrores|erreur|грешка)\\s?:\\s?([^[]*)(\\[(.*)\\])?$")
+      ~name:"gnucobol-error"
+      ~file:1
+      ~location:2
+      ~message:4
+      ~code:6;
+    Manifest.problemPattern
+      (Some "^(.*): ?(\\d+): (note|Anmerkung|[nN]ota): ([^[]*)(\\[(.*)\\])?$")
+      ~name:"gnucobol-note"
+      ~file:1
+      ~location:2
+      ~message:4
+      ~code:6;
+  ]
+
+let problemMatchers =
+  [
+    Manifest.problemMatcher ()
+      ~name:"gnucobol"
+      ~owner:"cobol"
+      ~fileLocation:["autodetect"]
+      ~pattern:[Manifest.ProblemName "$gnucobol"]
+      ~source:"GnuCOBOL";
+    Manifest.problemMatcher ()
+      ~name:"gnucobol-warning"
+      ~owner:"cobol"
+      ~fileLocation:["autodetect"]
+      ~pattern:[Manifest.ProblemName "$gnucobol-warning"]
+      ~severity:"warning"
+      ~source:"GnuCOBOL";
+    Manifest.problemMatcher ()
+      ~name:"gnucobol-error"
+      ~owner:"cobol"
+      ~fileLocation:["autodetect"]
+      ~pattern:[Manifest.ProblemName "$gnucobol-error"]
+      ~severity:"error"
+      ~source:"GnuCOBOL";
+    Manifest.problemMatcher ()
+      ~name:"gnucobol-note"
+      ~owner:"cobol"
+      ~fileLocation:["autodetect"]
+      ~pattern:[Manifest.ProblemName "$gnucobol-note"]
+      ~severity:"info"
+      ~source:"GnuCOBOL";
+  ]
+
+
+let commands =
+  [
+    Manifest.command ()
+      ~command:"superbol.server.restart"
+      ~title:"Restart Language Server"
+      ~category:"SuperBOL";
+    Manifest.command ()
+      ~command:"superbol.write.project.config"
+      ~title:"Write Project Configuration"
+      ~category:"SuperBOL"
+    (* ~enablement:"!inDebugMode" *);
+    Manifest.command ()
+      ~command:"superbol.coverage.show"
+      ~title:"Show Coverage"
+      ~category:"SuperBOL";
+    Manifest.command ()
+      ~command:"superbol.coverage.hide"
+      ~title:"Hide Coverage"
+      ~category:"SuperBOL";
+    Manifest.command ()
+      ~command:"superbol.coverage.reload"
+      ~title:"Update Coverage"
+      ~category:"SuperBOL";
+    Manifest.command ()
+      ~command:"superbol.cfg.open"
+      ~title:"Show Control-flow"
+      ~category:"SuperBOL";
+    Manifest.command ()
+      ~command:"superbol.cfg.open.arc"
+      ~title:"Show Control-flow as an Arc-diagram"
+      ~category:"SuperBOL";
+  ]
+
+let menus =
+  [
+    "editor/context",
+    [menu ~command:"superbol.cfg.open" ~group:"superbol"
+       ~when_:"editorTextFocus && editorLangId == 'cobol'" ();
+     menu ~command:"superbol.cfg.open.arc" ~group:"superbol"
+       ~when_:"editorTextFocus && editorLangId == 'cobol'" ()]
+  ]
+
+let contributes =
+  Manifest.contributes ()
+    ~languages
+    ~grammars
+    ~debuggers
+    ~breakpoints
+    ~configuration
+    ~taskDefinitions
+    ~configurationDefaults
     ~semanticTokenScopes: [
       `O [
         "language", `String "cobol";
@@ -540,110 +663,16 @@ let contributes =
         ];
       ]
     ]
-    ~problemPatterns: [
-      Manifest.problemPattern
-        (Some "^(.*): ?(\\d+): (error|warning): ([^[]*)(\\[(.*)\\])?$")
-        ~name:"gnucobol"
-        ~file:1
-        ~location:2
-        ~severity:3
-        ~message:4
-        ~code:6;
-      Manifest.problemPattern
-        (Some "^(.*):(\\d+):\\s?(warning|Warnung|[wW]aarschuwing|[aA]lerta|avertissement|упозорење)\\s?:([^[]*)(\\[(.*)\\])?$")
-        ~name:"gnucobol-warning"
-        ~file:1
-        ~location:2
-        ~message:4
-        ~code:6;
-      Manifest.problemPattern
-        (Some "^(.*): ?(\\d+):\\s?(error|Fehler|[fF]out|[eE]rrores|[eE]rrores|erreur|грешка)\\s?:\\s?([^[]*)(\\[(.*)\\])?$")
-        ~name:"gnucobol-error"
-        ~file:1
-        ~location:2
-        ~message:4
-        ~code:6;
-      Manifest.problemPattern
-        (Some "^(.*): ?(\\d+): (note|Anmerkung|[nN]ota): ([^[]*)(\\[(.*)\\])?$")
-        ~name:"gnucobol-note"
-        ~file:1
-        ~location:2
-        ~message:4
-        ~code:6;
-    ]
-    ~problemMatchers:[
-      Manifest.problemMatcher ()
-        ~name:"gnucobol"
-        ~owner:"cobol"
-        ~fileLocation:["autodetect"]
-        ~pattern:[Manifest.ProblemName "$gnucobol"]
-        ~source:"GnuCOBOL";
-      Manifest.problemMatcher ()
-        ~name:"gnucobol-warning"
-        ~owner:"cobol"
-        ~fileLocation:["autodetect"]
-        ~pattern:[Manifest.ProblemName "$gnucobol-warning"]
-        ~severity:"warning"
-        ~source:"GnuCOBOL";
-      Manifest.problemMatcher ()
-        ~name:"gnucobol-error"
-        ~owner:"cobol"
-        ~fileLocation:["autodetect"]
-        ~pattern:[Manifest.ProblemName "$gnucobol-error"]
-        ~severity:"error"
-        ~source:"GnuCOBOL";
-      Manifest.problemMatcher ()
-        ~name:"gnucobol-note"
-        ~owner:"cobol"
-        ~fileLocation:["autodetect"]
-        ~pattern:[Manifest.ProblemName "$gnucobol-note"]
-        ~severity:"info"
-        ~source:"GnuCOBOL";
-    ]
-    ~commands: [
-      Manifest.command ()
-        ~command:"superbol.server.restart"
-        ~title:"Restart Language Server"
-        ~category:"SuperBOL";
-      Manifest.command ()
-        ~command:"superbol.write.project.config"
-        ~title:"Write Project Configuration"
-        ~category:"SuperBOL"
-      (* ~enablement:"!inDebugMode" *);
-      Manifest.command ()
-        ~command:"superbol.coverage.show"
-        ~title:"Show Coverage"
-        ~category:"SuperBOL";
-      Manifest.command ()
-        ~command:"superbol.coverage.hide"
-        ~title:"Hide Coverage"
-        ~category:"SuperBOL";
-      Manifest.command ()
-        ~command:"superbol.coverage.reload"
-        ~title:"Update Coverage"
-        ~category:"SuperBOL";
-      Manifest.command ()
-        ~command:"superbol.cfg.open"
-        ~title:"Show Control-flow"
-        ~category:"SuperBOL";
-      Manifest.command ()
-        ~command:"superbol.cfg.open.arc"
-        ~title:"Show Control-flow as an Arc-diagram"
-        ~category:"SuperBOL";
-    ]
+    ~problemPatterns
+    ~problemMatchers
+    ~commands
     ~tomlValidation: [
       Manifest.tomlValidation
         ~fileMatch:"superbol.toml"
         (* TODO: change this address to a more permanent one; also, substitute `master` for a version tag *)
         ~url:"https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema-0.2.3.json";
     ]
-    ~menus: [
-      "editor/context",
-      [menu ~command:"superbol.cfg.open" ~group:"superbol"
-         ~when_:"editorTextFocus && editorLangId == 'cobol'" ();
-       menu ~command:"superbol.cfg.open.arc" ~group:"superbol"
-         ~when_:"editorTextFocus && editorLangId == 'cobol'" ()]
-    ]
+    ~menus
 
 let manifest =
   Manifest.vscode
