@@ -256,14 +256,6 @@ let make make_lexing ?filename ~source_format ~platform input =
 let from_string = make Lexing.from_string
 let from_channel = make Lexing.from_channel
 
-let fill buff ~lookup_len (input: Src_input.t) =
-  match input.source with
-  | String str ->
-      Buffer.add_substring buff str 0 (min lookup_len (String.length str))
-  | Channel ic ->
-      (try Buffer.add_channel buff ic lookup_len with End_of_file -> ());
-      Stdlib.seek_in ic 0                        (* FIXME: may break on pipes *)
-
 let decide_on_source_format ~platform ?source_format input =
   match source_format with
   | Some format ->
@@ -271,13 +263,12 @@ let decide_on_source_format ~platform ?source_format input =
          pos_cnum. *)
       format
   | None ->
-      let autodetected_format =
-        platform.autodetect_format input.filename
-          ?source_contents:(match input.Src_input.source with
-              | String source_contents -> Some source_contents
-              | Channel _ -> None)
-      in
-      Src_format.from_config autodetected_format
+      (* TODO: skip any utf-8 BOM while shifting initial pos_cnum. *)
+      Src_format.from_config @@ platform.autodetect_format
+        ~filename:input.filename
+        ~source_contents:(match input.Src_input.source with
+            | String source_contents -> source_contents
+            | Channel ic -> platform.peek_channel_prefix ~len:20 ic)
 
 let from ?source_format ~platform (input: Src_input.t) =
   let source_format = decide_on_source_format ~platform ?source_format input in

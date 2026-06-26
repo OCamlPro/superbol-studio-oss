@@ -74,6 +74,7 @@ dune = "3.17.0"
 dot-gitignore-trailer = """
 # Edit drom.toml to change the following lines
 /superbol-free-*
+/tramabol-*
 /_*
 /node_modules
 /yarn-error.log
@@ -86,6 +87,7 @@ ATTIC
 !.vscode/tasks.json
 !.vscode/launch.json
 *.vsix
+/*.js
 *.opam.locked
 /emacs/lsp-superbol-customs.el
 _superbol
@@ -297,3 +299,9 @@ dir = "src/lsp/sql_parser"
 
 [[package]]
 dir = "src/lsp/cobol_cfg"
+
+[[package]]
+dir = "src/tramabol/tramabol"
+
+[[package]]
+dir = "src/tramabol/tramabol_lib"
