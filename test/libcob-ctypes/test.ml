@@ -14,7 +14,7 @@
 module COB = EzCob.V1
 
 let () =
-  if (COB.Types.version <> 5) then
+  if (COB.version <> 5) then
     failwith "Expected libcob version 5";
 
   COB.Module.global_init 0 Ctypes.(from_voidp (ptr char) null);

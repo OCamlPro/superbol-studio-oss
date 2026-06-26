@@ -12,6 +12,7 @@
 (**************************************************************************)
 
 module V1 = struct
+  let version = Types.version
   module Types = Types
   module Printer = Printer
   module Module = Module
