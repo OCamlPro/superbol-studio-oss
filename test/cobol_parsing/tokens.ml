@@ -55,6 +55,25 @@ let%expect_test "tokens-with-attached-ampersand" =
     DISPLAY, WORD[A], &, X"00", ., DISPLAY, X"100", &, X"00", ., EOF
 |}];;
 
+let%expect_test "tokens-operators-after-parenthesis" =
+  (* Just check we extract tokens properly *)
+  Parser_testing.show_parsed_tokens {|
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       PROCEDURE DIVISION.
+           IF A >= 1 THEN DISPLAY "A" END-IF
+           IF A (>= 1 OR 2) THEN DISPLAY "A" END-IF
+           IF A ( >= 1 OR 2) THEN DISPLAY "A" END-IF
+           STOP RUN.
+  |};
+  [%expect {|
+    IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[prog], ., PROCEDURE,
+    DIVISION, ., IF, WORD[A], >=, DIGITS[1], THEN, DISPLAY, "A", END-IF, IF,
+    WORD[A], LPAR BEFORE RELOP, >=, DIGITS[1], OR, DIGITS[2], ), THEN, DISPLAY,
+    "A", END-IF, IF, WORD[A], LPAR BEFORE RELOP, >=, DIGITS[1], OR, DIGITS[2], ),
+    THEN, DISPLAY, "A", END-IF, STOP, RUN, ., EOF
+|}];;
+
 (* --- *)
 
 let%expect_test "token-locations" =

@@ -73,3 +73,13 @@ $
     prog.cob:7.0-7.4:
     >> Error: Invalid >> compiler directive
 |}];;
+
+let%expect_test "replace" =
+  Preproc_testing.preprocess {|
+       REPLACE ==A== BY ==B==.
+       A
+       B
+  |};
+  [%expect {|
+    B B
+|}];;
