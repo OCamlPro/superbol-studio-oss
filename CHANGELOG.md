@@ -8,7 +8,8 @@
 - Warnings on unsupported usage, where the reported data item size may be be wrong [#570](https://github.com/OCamlPro/superbol-studio-oss/pull/570)
 
 ### Fixed
-- Extension breaks under some circumstances [#596](https://github.com/OCamlPro/superbol-studio-oss/issues/596)
+- Handling of some operators in abbreviated combined relation conditions [#611](https://github.com/OCamlPro/superbol-studio-oss/issues/611)
+- Misbehaviors of CFG visualization due to issues in underlying JS bindings [#596](https://github.com/OCamlPro/superbol-studio-oss/issues/596)
 - Details shown on hover of data items with definition issues [#575](https://github.com/OCamlPro/superbol-studio-oss/pull/575)
 - Handling of alphanumeric literals with UTF-8 characters in fixed-format COBOL code [#564](https://github.com/OCamlPro/superbol-studio-oss/pull/564)
 - Handling of queries about `LINKAGE` items given in `USING` phrases [#561](https://github.com/OCamlPro/superbol-studio-oss/pull/561)
