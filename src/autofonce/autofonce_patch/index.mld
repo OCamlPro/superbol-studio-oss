@@ -1,0 +1,11 @@
+{1 Library autofonce_patch}
+
+autofonce is a modern runner for GNU Autoconf Testsuites:
+autofonce has a limited understanding of m4 macros that appear in testsuites
+written for the GNU Autoconf testsuites, and can run such tests in a modern
+way.
+
+
+
+The entry point of this library is the module: {!Autofonce_patch}.
+

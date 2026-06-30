@@ -52,7 +52,7 @@ depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "3.17.0"}
   "pretty-osx" {= version}
-  "ez_file-osx" {>= "0.3.0" & < "1.0.0"}
+  "ez_file-osx" {>= "0.5"}
   "cobol_preproc-osx" {= version}
   "cobol_common-osx" {= version}
   "odoc" {with-doc}

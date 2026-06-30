@@ -1,0 +1,7 @@
+{1 Library ez_win32}
+
+SuperBOL Studio OSS is a new platform for COBOL
+
+
+The entry point of this library is the module: {!Ez_win32}.
+

@@ -106,7 +106,7 @@ jobs:
           key: v5-4.14.2-msys2-${{ matrix.sys }}-${{ hashFiles('**/*.opam') }}
 
       - run: |
-          opam install .\opam\*.opam vendors\autofonce\opam\*.opam .\vendors\ANSITerminal\ANSITerminal.opam .\test\opam\*.opam --deps-only --with-test
+          opam install .\opam\*.opam .\vendors\ANSITerminal\ANSITerminal.opam .\test\opam\*.opam --deps-only --with-test
 
       - run: make
 

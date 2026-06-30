@@ -749,4 +749,197 @@
   )
  )
 
+(package
+ (name autofonce)
+ (synopsis "A modern runner for GNU Autoconf Testsuites")
+ (description "autofonce is a modern runner for GNU Autoconf Testsuites:\nautofonce has a limited understanding of m4 macros that appear in testsuites\nwritten for the GNU Autoconf testsuites, and can run such tests in a modern\nway.\n")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (autofonce_lib (= :version))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name autofonce_core)
+ (synopsis "A modern runner for GNU Autoconf Testsuites (core library)")
+ (description "autofonce is a modern runner for GNU Autoconf Testsuites:\nautofonce has a limited understanding of m4 macros that appear in testsuites\nwritten for the GNU Autoconf testsuites, and can run such tests in a modern\nway.\n")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (ocplib_stuff ( >= 0.1 ))
+   (ez_file ( >= 0.3 ))
+   (autofonce_share (= :version))
+   (autofonce_misc (= :version))
+   (autofonce_m4 (= :version))
+   (ANSITerminal ( >= 0.8 ))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name autofonce_lib)
+ (synopsis "A modern runner for GNU Autoconf Testsuites (main library)")
+ (description "autofonce is a modern runner for GNU Autoconf Testsuites:\nautofonce has a limited understanding of m4 macros that appear in testsuites\nwritten for the GNU Autoconf testsuites, and can run such tests in a modern\nway.\n")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (ocplib_stuff ( >= 0.1 ))
+   (ez_file ( >= 0.5 ))
+   (ez_cmdliner ( >= 0.4.3 ))
+   (ez_call ( >= 0.1 ))
+   (autofonce_share (= :version))
+   (autofonce_patch (= :version))
+   (autofonce_m4 (= :version))
+   (autofonce_core (= :version))
+   (autofonce_config (= :version))
+   (ANSITerminal ( >= 0.8 ))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name autofonce_m4)
+ (synopsis "A modern runner for GNU Autoconf Testsuites (m4 handler)")
+ (description "autofonce is a modern runner for GNU Autoconf Testsuites:\nautofonce has a limited understanding of m4 macros that appear in testsuites\nwritten for the GNU Autoconf testsuites, and can run such tests in a modern\nway.\n")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (ocplib_stuff ( >= 0.1 ))
+   (ez_file ( >= 0.3 ))
+   (autofonce_misc (= :version))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name autofonce_share)
+ (synopsis "A modern runner for GNU Autoconf Testsuites (shared files)")
+ (description "autofonce is a modern runner for GNU Autoconf Testsuites:\nautofonce has a limited understanding of m4 macros that appear in testsuites\nwritten for the GNU Autoconf testsuites, and can run such tests in a modern\nway.\n")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (crunch ( >= 3.2.0 ))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name autofonce_patch)
+ (synopsis "A modern runner for GNU Autoconf Testsuites (diff utilities)")
+ (description "autofonce is a modern runner for GNU Autoconf Testsuites:\nautofonce has a limited understanding of m4 macros that appear in testsuites\nwritten for the GNU Autoconf testsuites, and can run such tests in a modern\nway.\n")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (ocplib_stuff ( >= 0.1 ))
+   (ez_file ( >= 0.5 ))
+   (autofonce_misc (= :version))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name autofonce_config)
+ (synopsis "A modern runner for GNU Autoconf Testsuites (configurations)")
+ (description "autofonce is a modern runner for GNU Autoconf Testsuites:\nautofonce has a limited understanding of m4 macros that appear in testsuites\nwritten for the GNU Autoconf testsuites, and can run such tests in a modern\nway.\n")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (toml ( >= 7.0 ))
+   (ocplib_stuff ( >= 0.1 ))
+   (ez_file ( >= 0.5 ))
+   (autofonce_misc (= :version))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name autofonce_misc)
+ (synopsis "A modern runner for GNU Autoconf Testsuites (utilities)")
+ (description "autofonce is a modern runner for GNU Autoconf Testsuites:\nautofonce has a limited understanding of m4 macros that appear in testsuites\nwritten for the GNU Autoconf testsuites, and can run such tests in a modern\nway.\n")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (ocplib_stuff ( >= 0.1 ))
+   (ez_file ( >= 0.4 ))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name ez_win32)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (ez_file ( >= 0.3 ))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name ez_call)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (ez_win32 ( >= 0.1 ))
+   (ez_file ( >= 0.3 ))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
 

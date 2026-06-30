@@ -6,9 +6,6 @@
 	path = import/superbol-vscode-debug
 	url = https://github.com/OCamlPro/superbol-vscode-debug.git
 	branch = superbol-vscode-debug
-[submodule "vendors/autofonce"]
-	path = vendors/autofonce
-	url = https://github.com/OCamlPro/autofonce.git
 [submodule "import/gnucobol4"]
 	path = import/gnucobol4
 	url = https://github.com/OcamlPro/gnucobol.git
