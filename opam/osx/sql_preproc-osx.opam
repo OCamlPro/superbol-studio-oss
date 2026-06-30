@@ -57,6 +57,7 @@ depends: [
   "cobol_unit-osx" {= version}
   "cobol_typeck-osx" {= version}
   "cobol_indent-osx" {= version}
+  "cobol_common-osx" {= version}
   "odoc" {with-doc}
   "dune" {>= "3.17.0" & < "3.19.0"}
 ]

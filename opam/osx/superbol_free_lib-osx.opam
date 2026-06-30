@@ -57,7 +57,7 @@ depends: [
   "sql_preproc-osx" {= version}
   "lwt-osx" {>= "5"}
   "ez_toml-osx" {= version}
-  "ez_file-osx" {>= "0.3"}
+  "ez_file-osx" {>= "0.4"}
   "ez_cmdliner-osx" {>= "0.3.0" & < "1.0.0"}
   "ez_api-osx" {>= "2.0"}
   "cobol_typeck-osx" {= version}

@@ -297,3 +297,41 @@ dir = "src/lsp/sql_parser"
 
 [[package]]
 dir = "src/lsp/cobol_cfg"
+
+[[package]]
+dir = "src/autofonce/autofonce"
+# edit 'src/autofonce/autofonce/package.toml' for package-specific options
+
+[[package]]
+dir = "src/autofonce/autofonce_core"
+# edit 'src/autofonce/autofonce_core/package.toml' for package-specific options
+
+[[package]]
+dir = "src/autofonce/autofonce_lib"
+# edit 'src/autofonce/autofonce_lib/package.toml' for package-specific options
+
+[[package]]
+dir = "src/autofonce/autofonce_m4"
+# edit 'src/autofonce/autofonce_m4/package.toml' for package-specific options
+
+[[package]]
+dir = "src/autofonce/autofonce_share"
+# edit 'src/autofonce/autofonce_share/package.toml' for package-specific options
+
+[[package]]
+dir = "src/autofonce/autofonce_patch"
+# edit 'src/autofonce/autofonce_patch/package.toml' for package-specific options
+
+[[package]]
+dir = "src/autofonce/autofonce_config"
+# edit 'src/autofonce/autofonce_config/package.toml' for package-specific options
+
+[[package]]
+dir = "src/autofonce/autofonce_misc"
+# edit 'src/autofonce/autofonce_misc/package.toml' for package-specific options
+
+[[package]]
+dir = "src/autofonce/ez_win32"
+
+[[package]]
+dir = "src/autofonce/ez_call"
