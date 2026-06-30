@@ -1,0 +1,7 @@
+{1 Library libcob-ctypes}
+
+SuperBOL Studio OSS is a new platform for COBOL
+
+
+The entry point of this library is the module: {!Libcob_ctypes}.
+
