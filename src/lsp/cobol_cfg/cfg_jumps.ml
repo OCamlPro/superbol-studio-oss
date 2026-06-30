@@ -42,7 +42,7 @@ module Jumps = Set.Make(struct
   end)
 
 let full_qn ~cu qn =
-  (Resolver_map.find_binding qn cu.unit_procedure.procedure_blocks.named).full_qn
+  (Resolver_map.find_binding qn cu.unit_procedure.procedure_blocks).full_qn
 
 let full_qn' ~cu qn = full_qn ~cu ~&qn
 

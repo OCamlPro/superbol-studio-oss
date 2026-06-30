@@ -159,26 +159,26 @@ let qualnames_proposal ~filename pos group : typed_qualname list =
     |> List.flatten
 
 let procedures_proposal ~filename pos group =
+  let open Cobol_unit.Types in
   match Lsp_lookup.last_cobol_unit_before_pos ~filename pos group with
   | None -> []
   | Some cu ->
-    let to_string_with_type typ paragraph =
-      match ~&paragraph with
-      | Cobol_unit.Types.{ paragraph_name = Some { payload = qn; _ }; _ } ->
-        List.map (fun s -> typ, s) @@ to_string qn
-      | _ -> []
-    in
-    cu.unit_procedure.procedure_blocks.list
-    |> List.rev_map begin function
-      | Cobol_unit.Types.Paragraph p ->
-        to_string_with_type "Paragraph" p
-      | Section section ->
-        List.mapi begin fun i paragraph ->
-          let typ = (if i == 0 then "Section" else "Paragraph") in
-          to_string_with_type typ paragraph end
-          ~&section.section_paragraphs.list
-        |> List.flatten
-    end
+    cu.unit_procedure.procedure_sections
+    |> List.rev_map (fun section ->
+        let paragraph_names = 
+          List.map (fun paragraph ->
+              match ~&paragraph with
+              | { paragraph_name = Some { payload = qn; _ }; 
+                  paragraph = { payload = { paragraph_is_section = false; _ }; _ } } ->
+                  List.map (fun s -> "Paragraph", s) @@ to_string qn
+              | _ -> [])
+            ~&section.section_paragraphs.list |>
+            List.flatten
+        in
+        match ~&section.section_name with
+          | Some sn -> ("Section", ~&sn) :: paragraph_names
+          | None -> paragraph_names
+    )
     |> List.flatten
 
 let all_intrinsic_function_name =

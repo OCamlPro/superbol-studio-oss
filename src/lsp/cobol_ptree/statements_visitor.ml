@@ -320,7 +320,6 @@ let fold_merge_or_sort_target (v : _ #folder) =
     ~continue:begin function
       | OutputProcedure name_procedure_range ->
           fold_procedure_range v name_procedure_range
-            ~fold:fold_procedure_name'
       | Giving names ->
           fold_list ~fold:fold_name' v names
     end
@@ -428,7 +427,7 @@ let fold_sort_source (v: _ #folder) =
   handle v#fold_sort_source
     ~continue:begin fun s x -> match s with
       | SortInputProcedure pr -> x
-          >> fold_procedure_range ~fold:fold_procedure_name' v pr
+          >> fold_procedure_range v pr
       | SortUsing names -> x
           >> fold_name'_list v names
     end
@@ -1060,7 +1059,7 @@ and fold_perform_inline' (v: _ #folder) : perform_inline_stmt with_loc -> 'a -> 
 and fold_perform_target' (v: _ #folder) : perform_target_stmt with_loc -> 'a -> 'a =
   handle' v#fold_perform_target' v
     ~fold:begin fun v { perform_target = proc_range; perform_mode } x -> x
-      >> fold_procedure_range ~fold:fold_procedure_name' v proc_range
+      >> fold_procedure_range v proc_range
       >> fold_option ~fold:fold_perform_mode v perform_mode
     end
 
