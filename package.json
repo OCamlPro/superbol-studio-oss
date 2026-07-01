@@ -633,17 +633,17 @@
   "dependencies": {
     "@vscode/debugadapter": "^1.61.0",
     "@vscode/debugprotocol": "^1.61.0",
-    "vscode-languageclient": "8.0.2",
-    "n-readlines": "^1.0.0"
+    "n-readlines": "^1.0.0",
+    "vscode-languageclient": "8.0.2"
   },
   "devDependencies": {
+    "@types/node": "^20.3.2",
     "@types/vscode": "^1.64.0",
     "@vscode/test-electron": "^1.6.1",
     "@vscode/vsce": "^2.15.0",
     "esbuild": "^0.15.16",
     "ovsx": "^0.1.0",
-    "typescript": "^5.1.6",
-    "@types/node": "^20.3.2"
+    "typescript": "^5.1.6"
   },
   "publisher": "OCamlPro",
   "categories": [

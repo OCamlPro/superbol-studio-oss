@@ -125,7 +125,7 @@ jobs:
         run: cat _build/_autofonce/results.log
 
       # Use fields.github-workflow-after-test to add something here
-      - run: yarn install && npm install esbuild
+      - run: npm install && npm install esbuild
         if: matrix.build_vsix
 
       - run: make vsix-debug

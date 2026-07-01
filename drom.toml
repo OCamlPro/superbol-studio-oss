@@ -76,8 +76,6 @@ dot-gitignore-trailer = """
 /superbol-free-*
 /_*
 /node_modules
-/yarn-error.log
-/yarn.lock
 /package-json
 /package.json.prev
 /gnucobol-config
@@ -130,7 +128,7 @@ github-workflow-after-build = """
 """
 
 github-workflow-after-test = """
-      - run: yarn install && npm install esbuild
+      - run: npm install && npm install esbuild
         if: matrix.build_vsix
 
       - run: make vsix-debug
