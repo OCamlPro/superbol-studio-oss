@@ -21,8 +21,6 @@ _build
 /superbol-free-*
 /_*
 /node_modules
-/yarn-error.log
-/yarn.lock
 /package-json
 /package.json.prev
 /gnucobol-config

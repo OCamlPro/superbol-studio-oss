@@ -66,12 +66,14 @@ let package =
     ~dependencies: [
       "@vscode/debugadapter", "^1.61.0";
       "@vscode/debugprotocol", "^1.61.0";
-      "vscode-languageclient", "8.0.2";
 
       (* for the debug extension: *)
       "n-readlines", "^1.0.0";
+
+      "vscode-languageclient", "8.0.2";
     ]
     ~devDependencies: [
+      "@types/node", "^20.3.2";
       "@types/vscode", "^" ^ vscode_engine;
       "@vscode/test-electron", "^1.6.1";
       "@vscode/vsce", "^2.15.0";
@@ -80,7 +82,6 @@ let package =
 
       (* for the debug extension: *)
       "typescript", "^5.1.6";
-      "@types/node", "^20.3.2";
     ]
 
 let cob_extensions_pattern = [ "[cC]{ob,OB,bl,BL,py,PY,bx,BX,bsql}"; "[pP]{co,CO}" ]
