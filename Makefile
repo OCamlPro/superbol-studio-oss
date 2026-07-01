@@ -9,7 +9,8 @@ BUILD_PLAT = $(shell node --print process.platform 2>/dev/null || echo linux)
 TARGET_PLAT ?= $(BUILD_PLAT)
 
 DUNE = opam exec -- dune
-DUNE_ARGS ?=
+DUNE_ARGS ?= --root="$(DUNE_ROOT)"
+DUNE_ROOT = $(if $(filter win32,${BUILD_PLAT}),$$(cygpath -w $$(pwd)),$$(pwd))
 ifneq ($(BUILD_PLAT),$(TARGET_PLAT))
 DUNE_CROSS_ARGS = $(strip $(if $(filter  win32,${TARGET_PLAT}),-x windows)	\
 			  $(if $(filter darwin,${TARGET_PLAT}),-x osx))
