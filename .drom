@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-610e1b61d39f9645953591714a880fce:.
+f7dbe71e10507d1583bb6b5f3204fa6f:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -295,7 +295,7 @@ bb3a9d286f0dc64021db4194427263ee:scripts/copy-bin.sh
 
 # begin context for scripts/static-build.sh
 # file scripts/static-build.sh
-02c01ee43dfe5e0ef25aeffa71e6908b:scripts/static-build.sh
+81e4a8b550cf75d285912794ad34771e:scripts/static-build.sh
 # end context for scripts/static-build.sh
 
 # begin context for sphinx/about.rst
