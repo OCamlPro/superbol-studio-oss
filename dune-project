@@ -258,7 +258,7 @@
    (superbol_preprocs (= :version))
    (superbol_platform (= :version))
    (sql_preproc (= :version))
-   (lwt ( >= 5 ))
+   (lwt (and ( >= 5 )( < 5.9 )))
    (ez_toml (= :version))
    (ez_file ( >= 0.4 ))
    (ez_cmdliner (and (>= 0.3.0) (< 1.0.0)))
