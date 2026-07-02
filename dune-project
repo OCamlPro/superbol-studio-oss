@@ -956,7 +956,7 @@
    (pretty (= :version))
    (ez_file (and (>= 0.3.0) (< 1.0.0)))
    (camlp-streams ( >= 5 ))
-   (goblint-cil (and ( >= 2.0.0 )( < 2.1.0 )))
+   (goblint-cil ( >= 2.0.0 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )

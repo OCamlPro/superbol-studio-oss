@@ -59,7 +59,7 @@ pretty = { version = "version", build = true }
 
 # package tools dependencies
 [tools]
-goblint-cil = ">=2.0.0 <2.1.0"
+goblint-cil = ">=2.0.0"
 
 # package fields (depends on package skeleton)
 #Examples:

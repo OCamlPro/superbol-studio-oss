@@ -16,7 +16,7 @@ JS_TARGETS = $(addprefix $(JS_OUTDIR)/,superbol-vscode-platform-bundle.js	\
 # (could be a submodule)
 LSP_MODE_SRCDIR ?= ../lsp-mode
 
-MORE_DEV_OPAM_FILES := vendors/ANSITerminal/ANSITerminal.opam
+MORE_DEV_OPAM_FILES := vendors/ANSITerminal/ANSITerminal.opam vendors/goblint-cil/goblint-cil.opam
 AUTOFONCE_EXE = dune exec -- src/autofonce/autofonce/main.exe
 
 # ---
