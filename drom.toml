@@ -154,6 +154,10 @@ github-workflow-after-test = """
         if: ${{ matrix.build_vsix && matrix.os == 'ubuntu-latest' }}
 """
 
+docker-alpine-image = "ocamlpro/ocaml:4.14.2"
+docker-alpine-packages = "gmp-static"
+static-binaries = "superbol-free"
+
 [[package]]
 dir = "src/superbol-studio-oss"
 # edit 'src/superbol-studio-oss/package.toml' for package-specific options
