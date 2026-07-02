@@ -27,29 +27,6 @@
 #include <gmp.h>
 #include "libcob/common.h"
 
-/* each argument is a [cob_field*], prefixed by the number of args */
-#define COB_VA_FIELDN                const int, ...
-/* each argument is a [cob_decimal**], prefixed by the number of args */
-#define COB_VA_DECIMALSN             const cob_u32_t, ...
-/* each argument is a [cob_decimal*], prefixed by the number of args */
-#define COB_VA_DECIMALN              const cob_u32_t, ...
-/* each pair of arguments is [u32, uli] */
-#define COB_VA_U32_ULI               ...
-/* each argument is a [cob_file*] */
-#define COB_VA_FILES                 ...
-/* each argument is a [cob_file*], and later a [EXTFH_FUNC] */
-#define COB_VA_FILE_EXTFH            ...
-/* each argument is a [cob_field*] */
-#define COB_VA_FIELDS                ...
-/* arguments are specified by a format string */
-#define COB_VA_FORMAT                const char *, ...
-/* only one optional argument, a [void*] if present */
-#define COB_VA_OPTIONAL_VOIDS       ...
-/* not used actually */
-#define COB_VA_DISCARDED            ...
-/* these ones are too complex to handle */
-#define COB_VA_FORMATTED_ARGS       ...
-#define NOT_IMPLEMENTED
 #include "stubs.h"
 
 #define CAML_NAME_SPACE
@@ -60,376 +37,503 @@
 #include <caml/memory.h>
 #include <caml/mlvalues.h>
 
-#define FIELD_MODULE_ML_MODULE           0
-#define FIELD_MODULE_NEED_INIT           1
-#define FIELD_MODULE_SIZE_OF             2
+#define CAMLparam6(p1,p2,p3,p4,p5,p6) \
+  CAMLparam0 (); \
+  CAMLxparam3 (p1, p1, p3) ; \
+  CAMLxparam3 (p4, p5, p6)
 
-#define FIELD_CONTEXT_ML_CONTEXT         0
-#define FIELD_CONTEXT_NEED_MODULE_INIT   1
-#define FIELD_CONTEXT_SIZE_OF            2
+#define CAMLparam7(p1,p2,p3,p4,p5,p6,p7) \
+  CAMLparam0 (); \
+  CAMLxparam4 (p1, p1, p3, p4) ; \
+  CAMLxparam3 (p5, p6, p7)
 
+#define CAMLparam8(p1,p2,p3,p4,p5,p6,p7,p8) \
+  CAMLparam0 (); \
+  CAMLxparam4 (p1, p1, p3, p4) ; \
+  CAMLxparam4 (p5, p6, p7, p8)
 
-struct ml_module {
-	cob_module* module;
-	char* module_name;
-	const char *cob_module_path;
+#define CAMLparam9(p1,p2,p3,p4,p5,p6,p7,p8,p9) \
+  CAMLparam0 (); \
+  CAMLxparam5 (p1, p1, p3, p4, p5) ; \
+  CAMLxparam4 (p6, p7, p8, p9)
+
+#define CAMLparam10(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10) \
+  CAMLparam0 (); \
+  CAMLxparam5 (p1, p1, p3, p4, p5) ; \
+  CAMLxparam5 (p6, p7, p8, p9, p10)
+
+#define Comp_val(x)		((void *)Field((x), 0))
+#define Val_comp(x,v)		((x) = caml_alloc_small(1, Abstract_tag), \
+				 Field((x), 0) = (value)(v))
+
+#define Ptr_val(x)		((void *)Field((x), 3))
+#define Val_ptr(x,id,c,is,v)	((x) = caml_alloc_small(4, Abstract_tag), \
+				 Field((x), 0) = (value)(id), \
+				 Field((x), 1) = (value)(c), \
+				 Field((x), 2) = (value)(is), \
+				 Field((x), 3) = (value)(v))
+
+#define Array_val(x)		 ((void *)Field((x), 3))
+#define Val_array(x,id,c,is,v,s) ((x) = caml_alloc_small(5, Abstract_tag), \
+				  Field((x), 0) = (value)(id), \
+				  Field((x), 1) = (value)(c), \
+				  Field((x), 2) = (value)(is), \
+				  Field((x), 3) = (value)(v), \
+				  Field((x), 4) = (value)(s))
+
+static inline void *copy(const void *src, size_t size)
+{
+	void *dst = malloc(size);
+	if (dst != NULL) {
+		memcpy(dst, src, size);
+	}
+	return dst;
+}
+
+#define copy(x) copy(&(x), sizeof(x))
+
+#define min(a,b) ((a) <= (b) ? (a) : (b))
+
+enum kind_id {
+	VOID,
+	CHAR,
+	SINT8,
+	UINT8,
+	SINT16,
+	UINT16,
+	SINT32,
+	UINT32,
+	SINT64,
+	UINT64,
+	CFLOAT,
+	CDOUBLE,
+	CENUM,
+	CCOMP,
+	/* Blocks */
+	CPTR,
+	CARRAY
 };
 
-/* This would be the equivalent of the memory allocated at every
-   call to an entry point */
-struct ml_context {
-	struct ml_module *ml_module ;
-	cob_global *cob_glob_ptr ;
-	cob_field **cob_procedure_params;
-	cob_decimal *cob_decimal_base ;
-};
+typedef struct kind_t {
+	struct kind_t *contents;
+	int size;
+	enum kind_id id;
+} kind_t;
 
-#define ML_MODULE(f_v)         ( (struct ml_module *)Field( f_v, 0) )
-#define ML_CONTEXT(f_v)        ( (struct ml_context *)Field( f_v, 0) )
-#define ML_COB_FIELD_ATTR(f_v) ( (cob_field_attr*)Field( f_v, 0) )
-#define ML_COB_FIELD(f_v)      ( (cob_field*)Field( f_v, 0) )
-#define ML_COB_FILE(f_v)       ( (cob_file*)Field( f_v, 0) )
-#define ML_COB_VOIDS(f_v)       ( (void*)Field( f_v, 0) )
-#define ML_BUFFER(f_v)         ( (char*)Field( f_v, 0) )
-#define ML_COB_DECIMAL(v)      ( cs->cob_decimal_base + Int_val(v) )
-
-CAMLprim value ml_cob_init (value args_v)
+static kind_t * mk_kind(enum kind_id id, struct kind_t *contents, int size)
 {
-	int argc = caml_array_length (args_v);
-	int i;
-	char** argv = (char**)malloc( (argc+1) * sizeof(char*) );
-	for (i=0; i<argc; i++){
-		value s_v = Field (args_v, i);
-		int len = caml_string_length (s_v);
-		char *s = (char*) malloc ( len+1 );
-		strncpy(s, String_val(s_v), len+1);
-		argv[i]=s;
-	}
-	argv[argc] = NULL;
-	cob_init (argc, argv);
-	return Val_unit;
+	kind_t *kind = malloc(sizeof(kind_t));
+	kind->id = id;
+	kind->contents = contents;
+	kind->size = size;
+	return kind;
 }
 
-/*
-CAMLprim value ml_cob_stop_run (value status_v)
+static kind_t translate_kind(value kind_v)
 {
-	cob_stop_run (Int_val(status_v));
-	return Val_unit;
-}
-*/
-
-CAMLprim value ml_cob_module_create (value module_name_v)
-{
-	CAMLparam0();
-	CAMLlocal1(module_v);
-	struct ml_module* ms =
-		(struct ml_module*) calloc( 1, sizeof(struct ml_module) );
-
-	int len = caml_string_length (module_name_v);
-	ms->module_name = (char*) malloc ( len+1 );
-	strncpy (ms->module_name, String_val (module_name_v), len+1);
-
-	module_v = caml_alloc ( FIELD_MODULE_SIZE_OF, Abstract_tag );
-	Field (module_v, FIELD_MODULE_ML_MODULE) = (value)ms;
-	Field (module_v, FIELD_MODULE_NEED_INIT) = Val_true;
-	CAMLreturn(module_v);
-}
-
-static void cob_program_ (int entry)
-{
-	exit(0);
-}
-
-static void cob_program ()
-{
-	cob_program_ (0);
-}
-
-CAMLprim value ml_cob_module_enter (value module_v)
-{
-	CAMLparam1 (module_v);
-	CAMLlocal1 (context_v);
-	int retcode = -1;
-
-	struct ml_module* ms = ML_MODULE( module_v );
-	struct ml_context* cs =
-		(struct ml_context*) calloc( 1, sizeof(struct ml_context) );
-
-	if (cob_module_global_enter (&ms->module,
-				     &cs->cob_glob_ptr, 0, /*entry*/0, 0)){
-		/* TODO check what we should free.. */
-		caml_failwith ("cob_module_global_enter");
+	kind_t kind;
+	if (Is_long(kind_v)) {
+		kind.id = VOID + Long_val(kind_v);
+		kind.contents = NULL;
+		kind.size = 0;
 	} else {
-		context_v = caml_alloc (FIELD_CONTEXT_SIZE_OF,
-					Abstract_tag );
-		value need_init = Field (module_v, FIELD_MODULE_NEED_INIT);
-		Field (context_v, FIELD_CONTEXT_ML_CONTEXT) = (value) cs;
-		Field (context_v, FIELD_CONTEXT_NEED_MODULE_INIT) = need_init;
-		cs->ml_module = ms;
-		cob_decimal_alloc (1, &cs->cob_decimal_base);
-		cob_global *cob_glob_ptr = cs->cob_glob_ptr;
-		cob_module *module = ms->module;
-
-		if ( need_init == Val_true ){
-			cob_field **cob_procedure_params = NULL; /* TODO */
-
-			module->cob_procedure_params = cob_procedure_params;
-
-
-			ms->cob_module_path = cob_glob_ptr->cob_main_argv0;
-
-			module->module_name = ms->module_name;
-			module->module_formatted_date = "";
-			module->module_source = "";
-			module->gc_version = "";
-			module->module_entry.funcptr = (void *(*)())cob_program;
-			module->module_cancel.funcptr = (void *(*)())cob_program_;
-			module->module_ref_count = NULL;
-			module->module_path = &ms->cob_module_path;
-			module->module_active = 0;
-			module->module_date = 20260419;
-			module->module_time = 172921;
-			module->module_type = 0;
-			module->module_param_cnt = 0;
-			module->ebcdic_sign = 0;
-			module->decimal_point = '.';
-			module->currency_symbol = '$';
-			module->numeric_separator = ',';
-			module->flag_filename_mapping = 1;
-			module->flag_binary_truncate = 1;
-			module->flag_pretty_display = 1;
-			module->flag_host_sign = 0;
-			module->flag_no_phys_canc = 1;
-			module->flag_main = 1;
-			module->flag_fold_call = 0;
-			module->flag_exit_program = 0;
-			module->flag_debug_trace = 0;
-			module->flag_dump_ready = 0;
-			module->xml_mode = 1;
-			module->module_stmt = 0;
-			module->module_sources = NULL;
-
-			module->collating_sequence = NULL;
-			module->crt_status = NULL;
-			module->cursor_pos = NULL;
-			module->xml_code = NULL;
-			module->xml_event = NULL;
-			module->xml_information = NULL;
-			module->xml_namespace = NULL;
-			module->xml_namespace_prefix = NULL;
-			module->xml_nnamespace = NULL;
-			module->xml_nnamespace_prefix = NULL;
-			module->xml_ntext = NULL;
-			module->xml_text = NULL;
-			module->json_code = NULL;
-			module->json_status = NULL;
-
-			cob_set_cancel (module);
+		kind.id = CPTR + Tag_val(kind_v);
+		kind.contents = malloc(sizeof(kind_t));
+		*(kind.contents) = translate_kind(Field(kind_v, 0));
+       		if (kind.id == CARRAY) {
+			kind.size = Long_val(Field(kind_v, 1));
+		} else {
+			kind.size = 0;
 		}
-
-		module->module_active++;
 	}
-	CAMLreturn( context_v );
+	return kind;
 }
 
-CAMLprim value ml_cob_module_leave (value context_v)
+static kind_t * copy_kind(kind_t *skind)
 {
-	struct ml_context *cs = ML_CONTEXT( context_v );
-	struct ml_module *ms = cs->ml_module;
-	cob_module *module = ms->module;
-
-	if (module->module_active) {
-		module->module_active--;
+	kind_t *dkind = NULL;
+	if (skind != NULL) {
+		dkind = malloc(sizeof(kind_t));
+		dkind->id = skind->id;
+		dkind->size = skind->size;
+		dkind->contents = copy_kind(skind->contents);
 	}
-	cob_module_leave (module);
-
-	free( cs );
-	Field( context_v,0) = (value)NULL;
-	return Val_unit;
+	return dkind;
 }
 
-CAMLprim value ml_cob_field_attr_create (
-	value type_v,
-	value digits_v,
-	value scale_v,
-	value flags_v,
-	value pic_v
-	)
+static long kind_size(enum kind_id id)
 {
-	CAMLparam1(pic_v);
-	CAMLlocal1(res_v);
-	cob_field_attr *a = (cob_field_attr*)malloc (sizeof(cob_field_attr));
-	a->type = Int_val( type_v );
-	a->digits = Int_val( digits_v );
-	a->scale = Int_val( scale_v );
-	a->flags = Int_val ( flags_v );
-
-	if (pic_v != Val_int(0) ){
-		const char *pic = String_val(Field(pic_v,0));
-		int len, pos;
-		const char *c;
-		char prev_char = pic[0];
-		len = 0;
-		for (c = pic; *c; c++){
-			if (*c != prev_char){
-				len++;
-				prev_char = *c;
-			}
-		}
-		cob_pic_symbol* picture =
-			(cob_pic_symbol*)malloc ( (len+1) * sizeof(cob_pic_symbol) );
-		len = 0;
-		pos = 0;
-		prev_char = pic[0];
-		for (c = pic; *c; c++){
-			if (*c != prev_char){
-				picture[pos].symbol = prev_char;
-				picture[pos].times_repeated = len;
-				pos++;
-				len=0;
-				prev_char = *c;
-			} else {
-				len++;
-			}
-		}
-		picture[pos].symbol = 0;
-		a->pic = picture;
-	} else {
-		a->pic = NULL;
+	switch (id) {
+	case VOID: return 1; /* Actually 0 */
+	case CHAR: return 1;
+	case SINT8: return 1;
+	case UINT8: return 1;
+	case SINT16: return 2;
+	case UINT16: return 2;
+	case SINT32: return 4;
+	case UINT32: return 4;
+	case SINT64: return 8;
+	case UINT64: return 8;
+	case CFLOAT: return 4;
+	case CDOUBLE: return 8;
+	case CENUM: return 4;
+	case CCOMP: return 8;
+	case CPTR: return 8;
+	case CARRAY: return 8;
 	}
-	res_v = caml_alloc (1, Abstract_tag);
-	Field (res_v, 0) = (value)a;
-	CAMLreturn (res_v);
+	return 8;
 }
 
-CAMLprim value ml_cob_buffer_create (
-	value size_v
-	)
+static value ml_alloc_ptr(const kind_t *kind, void *data)
 {
 	CAMLparam0();
 	CAMLlocal1(res_v);
-	int size = Int_val(size_v);
-	char *b = (char*)malloc (size);
-	res_v = caml_alloc (2, Abstract_tag);
-	Field (res_v, 0) = (value)b;
-	Field (res_v, 1) = Val_int (size);
-	CAMLreturn (res_v);
+	Val_ptr(res_v, kind->id, kind->contents, kind->size, data);
+	CAMLreturn(res_v);
 }
 
-CAMLprim value ml_cob_field_create (
-	value size_v,
-	value buffer_v,
-	value buf_pos_v,
-	value attr_v
-	)
+static value ml_alloc_array(const kind_t *kind, void *data, long size)
 {
-	CAMLparam2(buffer_v, attr_v);
+	CAMLparam0();
 	CAMLlocal1(res_v);
-	int buf_len = Int_val( Field( buffer_v, 1));
-	int buf_pos = Int_val( buf_pos_v );
-	int size = Int_val( size_v );
-	if (buf_pos+size > buf_len){
-		caml_failwith ("ml_cob_field");
+	Val_array(res_v, kind->id, kind->contents, kind->size, data, size);
+	CAMLreturn(res_v);
+}
+
+CAMLprim value ml_ptr_null(value kind_v)
+{
+	CAMLparam1(kind_v);
+	CAMLlocal1(res_v);
+	kind_t kind = translate_kind(kind_v);
+	res_v = ml_alloc_ptr(&kind, NULL);
+	CAMLreturn(res_v);
+}
+
+CAMLprim value ml_ptr_create(value default_v, value kind_v)
+{
+	CAMLparam2(default_v, kind_v);
+	CAMLlocal2(value_v, res_v);
+	kind_t kind = translate_kind(kind_v);
+	void *data = (void *)calloc(1, kind_size(kind.id));
+	if (Is_some(default_v)) {
+		value_v = Some_val(default_v);
+		switch (kind.id) {
+		case CHAR: *((char *)data) = (char)Long_val(value_v); break;
+		case SINT8: *((signed char *)data) = (signed char)Long_val(value_v); break;
+		case UINT8: *((unsigned char *)data) = (unsigned char)Long_val(value_v); break;
+		case SINT16: *((signed short *)data) = (signed short)Long_val(value_v); break;
+		case UINT16: *((unsigned short *)data) = (unsigned short)Long_val(value_v); break;
+		case SINT32: *((signed int *)data) = (signed int)Long_val(value_v); break;
+		case UINT32: *((unsigned int *)data) = (unsigned int)Long_val(value_v); break;
+		case SINT64: *((signed long *)data) = (signed long)Int64_val(value_v); break;
+		case UINT64: *((unsigned long *)data); (unsigned long)Int64_val(value_v); break;
+		case CFLOAT: *((float *)data) = (float)Double_val(value_v); break;
+		case CDOUBLE: *((double *)data) = (double)Double_val(value_v); break;
+		case CENUM: *((signed int *)data) = (signed int)Long_val(value_v); break;
+		case CCOMP: *((value *)data) = Field(value_v, 0); break;
+		case CPTR: *((value *)data) = Field(value_v, 3); break;
+		case CARRAY: *((value *)data) = Field(value_v, 3); break;
+		}
 	}
-	cob_field *f = (cob_field*)malloc (sizeof(cob_field));
-	f->size = size;
-	f->data = ML_BUFFER( buffer_v ) + buf_pos;
-	f->attr = ML_COB_FIELD_ATTR( attr_v );
-	res_v = caml_alloc (1, Abstract_tag);
-	Field (res_v, 0) = (value)f;
-	CAMLreturn (res_v);
+	res_v = ml_alloc_ptr(&kind, data);
+	CAMLreturn(res_v);
 }
 
-CAMLprim value ml_cob_field_init (value f_v, value str_v)
+CAMLprim value ml_ptr_free(value ptr_v)
 {
-	CAMLparam2( f_v, str_v );
-	cob_field *f = ML_COB_FIELD( f_v );
-	if (caml_string_length(str_v) < f->size)
-		caml_failwith ("ml_cob_field_init");
-	memcpy (f->data, String_val (str_v), f->size);
-	CAMLreturn( Val_unit );
-}
-
-/*
-
-CAMLprim value ml_cob_decimal_set_field
-   (value context_v, value reg_v, value f_v)
-{
-	struct ml_context *cs = ML_CONTEXT( context_v );
-	cob_field *f = ML_COB_FIELD( f_v );
-	cob_decimal_set_field (cs->cob_decimal_base + Int_val(reg_v), f);
-}
-
-CAMLprim value ml_cob_decimal_get_field
-  (value context_v, value reg_v, value f_v, value flags_v)
-{
-	struct ml_context *cs = ML_CONTEXT( context_v );
-	return Val_int(
-		cob_decimal_get_field (cs->cob_decimal_base + Int_val(reg_v),
-				       ML_COB_FIELD( f_v),
-				       Int_val( flags_v )) );
-}
-
-CAMLprim value ml_cob_decimal_add
-   (value context_v, value reg1_v, value reg2_v)
-{
-	struct ml_context *cs = ML_CONTEXT( context_v );
-	cob_decimal_add (cs->cob_decimal_base + Int_val(reg1_v),
-			 cs->cob_decimal_base + Int_val(reg2_v));
-}
-*/
-
-CAMLprim value ml_cob_memcpy
-   (value src_v, value dst_v, value size_v)
-{
-	cob_field* src = ML_COB_FIELD(src_v);
-	cob_field* dst = ML_COB_FIELD(dst_v);
-	int size = Int_val( size_v );
-	memcpy ( dst->data, src->data, size );
+	void *data = (void *)Field(ptr_v, 3);
+	free(data);
+	Field(ptr_v, 3) = (value)NULL;
 	return Val_unit;
 }
 
-CAMLprim value ml_cob_display (value to_device_v, value newline_v, value fields_v) {
-	CAMLparam1 (fields_v);
-	int to_device = Int_val (to_device_v);
-	int newline = Bool_val (newline_v);
-	int nfields = Wosize_val (fields_v);
-	int i;
-	for (i = 0; i < nfields; i++) {
-		cob_display (to_device, i == nfields - 1 && newline, 1,
-			     ML_COB_FIELD (Field (fields_v,i)));
+CAMLprim value ml_ptr_get(value ptr_v)
+{
+	CAMLparam1(ptr_v);
+	CAMLlocal1(res_v);
+	enum kind_id id = (enum kind_id)Field(ptr_v, 0);
+	void *data = (void *)Field(ptr_v, 3);
+	switch (id) {
+	case CHAR: res_v = Val_long(*((char *)data)); break;
+	case SINT8: res_v = Val_long(*((signed char *)data)); break;
+	case UINT8: res_v = Val_long(*((unsigned char *)data)); break;
+	case SINT16: res_v = Val_long(*((signed short *)data)); break;
+	case UINT16: res_v = Val_long(*((unsigned short *)data)); break;
+	case SINT32: res_v = Val_long(*((signed int *)data)); break;
+	case UINT32: res_v = Val_long(*((unsigned int *)data)); break;
+	case SINT64: res_v = caml_copy_int64(*((signed long *)data)); break;
+	case UINT64: res_v = caml_copy_int64(*((unsigned long *)data)); break;
+	case CFLOAT: res_v = caml_copy_double(*((float *)data)); break;
+	case CDOUBLE: res_v = caml_copy_double(*((double *)data)); break;
+	case CENUM: res_v = Val_long(*((signed int *)data)); break;
+	case CCOMP:
+		res_v = caml_alloc_small(1, Abstract_tag);
+		Field(res_v, 0) = *((value *)data);
+		break;
+	case CPTR: {
+		kind_t *ikind = (kind_t *)Field(ptr_v, 1);
+		res_v = ml_alloc_ptr(ikind, *((void **)data));
+		break;
+	}
+	case CARRAY: {
+		kind_t *ikind = (kind_t *)Field(ptr_v, 1);
+		long size = (long)Field(ptr_v, 2);
+		res_v = ml_alloc_array(ikind, *((void **)data), size);
+		break; // TODO: maybe just (value)data
+	}
+	}
+	CAMLreturn(res_v);
+}
+
+CAMLprim value ml_ptr_set(value ptr_v, value value_v)
+{
+	enum kind_id id = (enum kind_id)Field(ptr_v, 0);
+	void *data = (void *)Field(ptr_v, 3);
+	switch (id) {
+	case CHAR: *((char *)data) = (char)Long_val(value_v); break;
+	case SINT8: *((signed char *)data) = (signed char)Long_val(value_v); break;
+	case UINT8: *((unsigned char *)data) = (unsigned char)Long_val(value_v); break;
+	case SINT16: *((signed short *)data) = (signed short)Long_val(value_v); break;
+	case UINT16: *((unsigned short *)data) = (unsigned short)Long_val(value_v); break;
+	case SINT32: *((signed int *)data) = (signed int)Long_val(value_v); break;
+	case UINT32: *((unsigned int *)data) = (unsigned int)Long_val(value_v); break;
+	case SINT64: *((signed long *)data) = (signed long)Int64_val(value_v); break;
+	case UINT64: *((unsigned long *)data); (unsigned long)Int64_val(value_v); break;
+	case CFLOAT: *((float *)data) = (float)Double_val(value_v); break;
+	case CDOUBLE: *((double *)data) = (double)Double_val(value_v); break;
+	case CENUM: *((signed int *)data) = (signed int)Long_val(value_v); break;
+	case CCOMP: *((value *)data) = Field(value_v, 0); break;
+	case CPTR: *((value *)data) = Field(value_v, 3); break;
+	case CARRAY: *((value *)data) = Field(value_v, 3); break;
 	}
 	return Val_unit;
 }
 
-CAMLprim value ml_cob_module_free (value module_v)
+CAMLprim value ml_ptr_cast(value kind_v, value ptr_v)
 {
-	struct ml_module* ms = ML_MODULE( module_v );
-	free( ms->module_name );
-	free( ms );
-	Field( module_v,0) = (value)NULL;
+	CAMLparam2(kind_v, ptr_v);
+	CAMLlocal1(res_v);
+	kind_t kind = translate_kind(kind_v);
+	void *data = (char *)Field(ptr_v, 3);
+	res_v = ml_alloc_ptr(&kind, data);
+	CAMLreturn(res_v);
+}
+
+CAMLprim value ml_ptr_add(value ptr_v, value int_v)
+{
+	CAMLparam1(ptr_v);
+	CAMLlocal1(res_v);
+	enum kind_id id = (enum kind_id)Field(ptr_v, 0);
+	void *data = (void *)Field(ptr_v, 3);
+	data += Long_val(int_v) * kind_size(id);
+	Val_ptr(res_v, Field(ptr_v, 0),
+		copy_kind((kind_t *)Field(ptr_v, 1)),
+		Field(ptr_v, 2), data);
+	CAMLreturn(res_v);
+}
+
+CAMLprim value ml_ptr_sub(value ptr_v, value int_v)
+{
+	CAMLparam1(ptr_v);
+	CAMLlocal1(res_v);
+	enum kind_id id = (enum kind_id)Field(ptr_v, 0);
+	void *data = (void *)Field(ptr_v, 3);
+	data -= Long_val(int_v) * kind_size(id);
+	Val_ptr(res_v, Field(ptr_v, 0),
+		copy_kind((kind_t *)Field(ptr_v, 1)),
+		Field(ptr_v, 2), data);
+	CAMLreturn(res_v);
+}
+
+CAMLprim value ml_ptr_diff(value ptr1_v, value ptr2_v)
+{
+	enum kind_id id = (enum kind_id)Field(ptr1_v, 0);
+	void *data1 = (void *)Field(ptr1_v, 3);
+	void *data2 = (void *)Field(ptr2_v, 3);
+	return (data1 - data2) / kind_size(id);
+}
+
+CAMLprim value ml_array_create(value default_v, value kind_v, value size_v)
+{
+	CAMLparam2(default_v, kind_v);
+	CAMLlocal2(value_v, res_v);
+	kind_t kind = translate_kind(kind_v);
+	long size = Long_val(size_v);
+	void *data = (void *)malloc(size * kind_size(kind.id));
+	if (Is_some(default_v)) {
+		value_v = Some_val(default_v);
+		for (int i = 0; i < size; ++i) {
+			switch (kind.id) {
+			case CHAR: ((char *)data)[i] = (char)Long_val(value_v); break;
+			case SINT8: ((signed char *)data)[i] = (signed char)Long_val(value_v); break;
+			case UINT8: ((unsigned char *)data)[i] = (unsigned char)Long_val(value_v); break;
+			case SINT16: ((signed short *)data)[i] = (signed short)Long_val(value_v); break;
+			case UINT16: ((unsigned short *)data)[i] = (unsigned short)Long_val(value_v); break;
+			case SINT32: ((signed int *)data)[i] = (signed int)Long_val(value_v); break;
+			case UINT32: ((unsigned int *)data)[i] = (unsigned int)Long_val(value_v); break;
+			case SINT64: ((signed long *)data)[i] = (signed long)Int64_val(value_v); break;
+			case UINT64: ((unsigned long *)data)[i]; (unsigned long)Int64_val(value_v); break;
+			case CFLOAT: ((float *)data)[i] = (float)Double_val(value_v); break;
+			case CDOUBLE: ((double *)data)[i] = (double)Double_val(value_v); break;
+			case CENUM: ((signed int *)data)[i] = (signed int)Long_val(value_v); break;
+			case CCOMP: ((value *)data)[i] = Field(value_v, 0); break;
+			case CPTR: ((value *)data)[i] = Field(value_v, 3); break;
+			case CARRAY: ((value *)data)[i] = Field(value_v, 3); break;
+			}
+		}
+	}
+	res_v = ml_alloc_array(&kind, data, size);
+	CAMLreturn(res_v);
+}
+
+CAMLprim value ml_array_free(value array_v)
+{
+	void *data = (void *)Field(array_v, 3);
+	free(data);
+	Field(array_v, 3) = (value)NULL;
 	return Val_unit;
 }
 
-CAMLprim value ml_cob_buffer_free (value buffer_v)
+CAMLprim value ml_array_get(value array_v, value index_v)
 {
-	free( ML_BUFFER(buffer_v) );
-	Field( buffer_v,0) = (value)NULL;
+	CAMLparam1(array_v);
+	CAMLlocal1(res_v);
+	enum kind_id id = (enum kind_id)Field(array_v, 0);
+	void *data = (void *)Field(array_v, 3);
+	long index = Long_val(index_v);
+	switch (id) {
+	case CHAR: res_v = Val_long(((char *)data)[index]); break;
+	case SINT8: res_v = Val_long(((signed char *)data)[index]); break;
+	case UINT8: res_v = Val_long(((unsigned char *)data)[index]); break;
+	case SINT16: res_v = Val_long(((signed short *)data)[index]); break;
+	case UINT16: res_v = Val_long(((unsigned short *)data)[index]); break;
+	case SINT32: res_v = Val_long(((signed int *)data)[index]); break;
+	case UINT32: res_v = Val_long(((unsigned int *)data)[index]); break;
+	case SINT64: res_v = caml_copy_int64(((signed long *)data)[index]); break;
+	case UINT64: res_v = caml_copy_int64(((unsigned long *)data)[index]); break;
+	case CFLOAT: res_v = caml_copy_double(((float *)data)[index]); break;
+	case CDOUBLE: res_v = caml_copy_double(((double *)data)[index]); break;
+	case CENUM: res_v = Val_long(((signed int *)data)[index]); break;
+	case CCOMP:
+		res_v = caml_alloc_small(1, Abstract_tag);
+		Field(res_v, 0) = (((value *)data)[index]);
+		break;
+	case CPTR: {
+		kind_t *ikind = (kind_t *)Field(array_v, 1);
+		res_v = ml_alloc_ptr(ikind, ((void **)data)[index]);
+		break;
+	}
+	case CARRAY: {
+		kind_t *ikind = (kind_t *)Field(array_v, 1);
+		long size = (long)Field(array_v, 2);
+		res_v = ml_alloc_array(ikind, ((void **)data)[index], size);
+		break; // TODO: maybe just (value)data
+	}
+	}
+	CAMLreturn(res_v);
+}
+
+CAMLprim value ml_array_set(value array_v, value index_v, value value_v)
+{
+	enum kind_id id = (enum kind_id)Field(array_v, 0);
+	void *data = (void *)Field(array_v, 3);
+	long size = (long)Field(array_v, 4);
+	long index = Long_val(index_v);
+	switch (id) {
+	case CHAR: ((char *)data)[index] = (char)Long_val(value_v); break;
+	case SINT8: ((signed char *)data)[index] = (signed char)Long_val(value_v); break;
+	case UINT8: ((unsigned char *)data)[index] = (unsigned char)Long_val(value_v); break;
+	case SINT16: ((signed short *)data)[index] = (signed short)Long_val(value_v); break;
+	case UINT16: ((unsigned short *)data)[index] = (unsigned short)Long_val(value_v); break;
+	case SINT32: ((signed int *)data)[index] = (signed int)Long_val(value_v); break;
+	case UINT32: ((unsigned int *)data)[index] = (unsigned int)Long_val(value_v); break;
+	case SINT64: ((signed long *)data)[index] = (signed long)Int64_val(value_v); break;
+	case UINT64: ((unsigned long *)data)[index]; (unsigned long)Int64_val(value_v); break;
+	case CFLOAT: ((float *)data)[index] = (float)Double_val(value_v); break;
+	case CDOUBLE: ((double *)data)[index] = (double)Double_val(value_v); break;
+	case CENUM: ((signed int *)data)[index] = (signed int)Long_val(value_v); break;
+	case CCOMP: ((value *)data)[index] = Field(value_v, 0); break;
+	case CPTR: ((value *)data)[index] = Field(value_v, 3); break;
+	case CARRAY: ((value *)data)[index] = Field(value_v, 3); break;
+	}
 	return Val_unit;
 }
 
-CAMLprim value ml_cob_field_attr_free (value field_v)
+CAMLprim value ml_array_to_ptr(value array_v)
 {
-	free( ML_COB_FIELD_ATTR(field_v) );
-	Field( field_v,0) = (value)NULL;
+	CAMLparam1(array_v);
+	CAMLlocal1(res_v);
+	Val_ptr(res_v, Field(array_v, 0),
+		copy_kind((kind_t *)Field(array_v, 1)),
+		Field(array_v, 2), Field(array_v, 3));
+	CAMLreturn(res_v);
+}
+
+CAMLprim value ml_array_of_ptr(value size_v, value ptr_v)
+{
+	CAMLparam2(ptr_v, size_v);
+	CAMLlocal1(res_v);
+	Val_array(res_v, Field(ptr_v, 0),
+                  copy_kind((kind_t *)Field(ptr_v, 1)),
+                  Field(ptr_v, 2), Field(ptr_v, 3), Long_val(size_v));
+	CAMLreturn(res_v);
+}
+
+CAMLprim value ml_array_blit(value sarray_v, value spos_v, value darray_v, value dpos_v, value len_v)
+{
+	enum kind_id id = (enum kind_id)Field(sarray_v, 0);
+	void *sdata = (void *)Field(sarray_v, 3);
+	long spos = Long_val(spos_v);
+	void *ddata = (void *)Field(darray_v, 3);
+	long dpos = Long_val(dpos_v);
+	long len = Long_val(len_v);
+	long elem_size = kind_size(id);
+	memcpy(ddata + dpos * elem_size, sdata + spos * elem_size, len * elem_size);
 	return Val_unit;
 }
 
-CAMLprim value ml_cob_field_free (value field_v)
+CAMLprim value ml_array_of_string(value string_v)
 {
-	free( ML_COB_FIELD(field_v) );
-	Field( field_v,0) = (value)NULL;
-	return Val_unit;
+	CAMLparam1(string_v);
+	CAMLlocal1(res_v);
+	const char *string = (const char *)String_val(string_v);
+	long size = caml_string_length(string_v);
+	char *data = (char *)malloc(size);
+        memcpy(data, string, size);
+	Val_array(res_v, CHAR, NULL, 0, data, size);
+	CAMLreturn(res_v);
+}
+
+CAMLprim value ml_array_to_string(value array_v)
+{
+	CAMLparam1(array_v);
+	CAMLlocal1(res_v);
+	long size = (long)Field(array_v, 4);
+	const char *data = (const char *)Field(array_v, 3);
+        res_v = caml_alloc_initialized_string(size, data);
+	CAMLreturn(res_v);
+}
+
+CAMLprim value ml_array_get_string(value array_v, value pos_v, value len_v)
+{
+	CAMLparam1(array_v);
+	CAMLlocal1(res_v);
+	const char *data = (const char *)Field(array_v, 3);
+	long pos = Long_val(pos_v);
+	long len = Long_val(len_v);
+        res_v = caml_alloc_initialized_string(len, data + pos);
+	CAMLreturn(res_v);
+}
+
+CAMLprim value ml_array_set_string(value array_v, value pos_v, value string_v)
+{
+	CAMLparam2(array_v, string_v);
+	char *data = (char *)Field(array_v, 3);
+	long pos = Long_val(pos_v);
+	const char *string = (const char *)String_val(string_v);
+	long len = caml_string_length(string_v);
+        memcpy(data + pos, string, len);
+	CAMLreturn(Val_unit);
 }
 
 CAMLprim value ml_cob_resolve_cobol_and_call (value function_v)
@@ -442,305 +546,5 @@ CAMLprim value ml_cob_resolve_cobol_and_call (value function_v)
         CAMLreturn( Val_int( unifunc.funcint()) );
 }
 
-#include <caml/callback.h>
-
-void ml_cob_introspect_fields(void)
-{
-	int i;
-	cob_global *cobglobptr = cob_get_global_ptr ();
-	cob_module* module = cobglobptr->cob_current_module;
-	static const value * closure_f = NULL;
-	if (closure_f == NULL)
-		closure_f = caml_named_value("ml_introspect_field");
-	for (i=0; i<cobglobptr->cob_call_params; i++) {
-		value v = caml_alloc (1, Abstract_tag);
-		Field (v,0) = (value) module->cob_procedure_params[i];
-		value res = caml_callback(*closure_f, v);
-	}
-}
-
-CAMLprim value ml_cob_field_get_size (value field_v)
-{
-	cob_field* f = ML_COB_FIELD(field_v);
-	return Val_int( f -> size);
-}
-
-CAMLprim value ml_cob_field_set_buffer (value field_v, value buffer_v, value pos_v)
-{
-	cob_field* f = ML_COB_FIELD( field_v );
-	char *buf = ML_BUFFER( buffer_v );
-	int pos = Int_val( pos_v ) ;
-	f->data = buf + pos;
-	return Val_unit;
-}
-
-CAMLprim value ml_cob_subfield_set_pos (value subfield_v, value field_v, value pos_v)
-{
-	cob_field* subf = ML_COB_FIELD(subfield_v);
-	cob_field* f = ML_COB_FIELD(field_v);
-	int pos = Int_val( pos_v ) ;
-	subf->data = (char*)(f->data) + pos;
-	return Val_unit;
-}
-
-CAMLprim value ml_cob_field_get_buffer (value field_v)
-{
-	CAMLparam1( field_v );
-	CAMLlocal1( res_v );
-	cob_field* f = ML_COB_FIELD(field_v);
-	res_v = caml_alloc(2, Abstract_tag);
-	Field( res_v, 0) = (value)f->data;
-	Field( res_v, 1) = Val_int(f->size);
-	CAMLreturn( res_v );
-}
-
-CAMLprim value ml_cob_field_get_attr (value field_v)
-{
-	CAMLparam1( field_v );
-	CAMLlocal1( res_v );
-	cob_field* f = ML_COB_FIELD(field_v);
-	res_v = caml_alloc(1, Abstract_tag);
-	Field( res_v, 0) = (value)f->attr;
-	CAMLreturn( res_v );
-}
-
-CAMLprim value ml_cob_buffer_get_addr (value buffer_v)
-{
-	return Val_long(Field(buffer_v,0));
-}
-
-CAMLprim value ml_cob_buffer_get_string (value buffer_v)
-{
-	CAMLparam1( buffer_v );
-	CAMLlocal1( res_v );
-	int size = Int_val(Field(buffer_v,1));
-	res_v = caml_alloc_string(size);
-	memcpy( (void*)res_v, (void*)Field(buffer_v,0), size);
-	CAMLreturn( res_v );
-}
-
-CAMLprim value ml_cob_buffer_get_substring (value buffer_v,
-					    value pos_v, value len_v)
-{
-	CAMLparam1( buffer_v );
-	CAMLlocal1( res_v );
-	int pos = Int_val( pos_v );
-	int len = Int_val( len_v );
-	int size = Int_val(Field(buffer_v,1));
-	if (pos+len > size)
-		caml_failwith("ml_cob_buffer_get_substring");
-	res_v = caml_alloc_string(len);
-	memcpy( (void*)res_v,
-		(void*)(Field(buffer_v,0)+pos), len);
-	CAMLreturn( res_v );
-}
-
-CAMLprim value ml_cob_field_attr_get_ty (value field_attr_v)
-{
-	cob_field_attr* f = ML_COB_FIELD_ATTR(field_attr_v);
-	return Val_int( f -> type);
-}
-
-CAMLprim value ml_cob_field_attr_get_digits (value field_attr_v)
-{
-	cob_field_attr* f = ML_COB_FIELD_ATTR(field_attr_v);
-	return Val_int( f -> digits);
-}
-
-CAMLprim value ml_cob_field_attr_get_scale (value field_attr_v)
-{
-	cob_field_attr* f = ML_COB_FIELD_ATTR(field_attr_v);
-	return Val_int( f -> scale);
-}
-
-CAMLprim value ml_cob_field_attr_get_flags (value field_attr_v)
-{
-	cob_field_attr* f = ML_COB_FIELD_ATTR(field_attr_v);
-	return Val_int( f -> flags);
-}
-
-CAMLprim value ml_cob_field_attr_get_pic (value field_attr_v)
-{
-	CAMLparam1( field_attr_v );
-	CAMLlocal2( res_v, pic_v );
-	cob_field_attr* f = ML_COB_FIELD_ATTR(field_attr_v);
-	if ( f->pic != NULL ){
-		int len = 0;
-		int i;
-		for(i = 0; f->pic[i].symbol; i++)
-			len += f->pic[i].times_repeated;
-		pic_v = caml_alloc_string(len);
-		char *cursor = (char*)pic_v;
-		for(i = 0; f->pic[i].symbol; i++){
-			char c = f->pic[i].symbol;
-			for(int j=f->pic[i].times_repeated; j>0; j++){
-				*cursor++ = c;
-			}
-		}
-		res_v = caml_alloc (1,0);
-		Field (res_v, 0) = pic_v ;
-	} else {
-		res_v = Val_none ;
-	}
-	CAMLreturn( res_v );
-}
-
-/*
-CAMLprim value ml_cob_field_get_buffer (value field_v)
-{
-	CAMLparam1( field_v );
-	CAMLlocal1( res_v );
-	cob_field* f = ML_COB_FIELD(field_v);
-	res_v = caml_alloc(2, Abstract_tag);
-	Field( res_v, 0) = (value)f->data;
-	Field( res_v, 1) = Val_int(f->size);
-	CAMLreturn( res_v );
-}
-*/
-
-value ml_cob_call_COB_VA_FIELDN (cob_field* (*f)(COB_VA_FIELDN), value fields_v)
-{
-	CAMLparam1( fields_v );
-	CAMLlocal1( res_v );
-	cob_field* res;
-	int nfields = Wosize_val( fields_v );
-
-	switch (nfields){
-	case 0:
-		res = f(nfields); break;
-	case 1:
-		res = f(nfields
-			,ML_COB_FIELD(Field(fields_v,0))
-		); break;
-	case 2: res = f (nfields
-			    ,ML_COB_FIELD(Field(fields_v,0))
-			    ,ML_COB_FIELD(Field(fields_v,1))
-		); break;
-	case 3: res = f (nfields
-			    ,ML_COB_FIELD(Field(fields_v,0))
-			    ,ML_COB_FIELD(Field(fields_v,1))
-			    ,ML_COB_FIELD(Field(fields_v,2))
-		); break;
-	case 4: res = f (nfields
-			    ,ML_COB_FIELD(Field(fields_v,0))
-			    ,ML_COB_FIELD(Field(fields_v,1))
-			    ,ML_COB_FIELD(Field(fields_v,2))
-			    ,ML_COB_FIELD(Field(fields_v,3))
-		); break;
-	case 5: res = f (nfields
-			    ,ML_COB_FIELD(Field(fields_v,0))
-			    ,ML_COB_FIELD(Field(fields_v,1))
-			    ,ML_COB_FIELD(Field(fields_v,2))
-			    ,ML_COB_FIELD(Field(fields_v,3))
-			    ,ML_COB_FIELD(Field(fields_v,4))
-		); break;
-	case 6: res = f (nfields
-			    ,ML_COB_FIELD(Field(fields_v,0))
-			    ,ML_COB_FIELD(Field(fields_v,1))
-			    ,ML_COB_FIELD(Field(fields_v,2))
-			    ,ML_COB_FIELD(Field(fields_v,3))
-			    ,ML_COB_FIELD(Field(fields_v,4))
-			    ,ML_COB_FIELD(Field(fields_v,5))
-		); break;
-	case 7: res = f (nfields
-			    ,ML_COB_FIELD(Field(fields_v,0))
-			    ,ML_COB_FIELD(Field(fields_v,1))
-			    ,ML_COB_FIELD(Field(fields_v,2))
-			    ,ML_COB_FIELD(Field(fields_v,3))
-			    ,ML_COB_FIELD(Field(fields_v,4))
-			    ,ML_COB_FIELD(Field(fields_v,5))
-			    ,ML_COB_FIELD(Field(fields_v,6))
-		); break;
-	case 8: res = f (nfields
-			    ,ML_COB_FIELD(Field(fields_v,0))
-			    ,ML_COB_FIELD(Field(fields_v,1))
-			    ,ML_COB_FIELD(Field(fields_v,2))
-			    ,ML_COB_FIELD(Field(fields_v,3))
-			    ,ML_COB_FIELD(Field(fields_v,4))
-			    ,ML_COB_FIELD(Field(fields_v,5))
-			    ,ML_COB_FIELD(Field(fields_v,6))
-			    ,ML_COB_FIELD(Field(fields_v,7))
-		); break;
-	default: caml_failwith ("COB_VA_FIELDN with nargs > 8");
-	}
-
-	res_v = caml_alloc (1, Abstract_tag);
-	Field (res_v, 0) = (value) res ;
-	CAMLreturn (res_v);
-}
-
-value ml_cob_call_int2_COB_VA_FIELDN (cob_field* (*f)(const int, const int, COB_VA_FIELDN), value arg0_v, value arg1_v, value fields_v)
-{
-	CAMLparam1( fields_v );
-	CAMLlocal1( res_v );
-	const int arg0 = Long_val( arg0_v );
-	const int arg1 = Long_val( arg1_v );
-	cob_field* res;
-	int nfields = Wosize_val( fields_v );
-
-	switch (nfields){
-	case 0:
-		res = f (arg0, arg1, nfields); break;
-	case 1:
-		res = f (arg0, arg1, nfields
-			,ML_COB_FIELD(Field(fields_v,0))
-		); break;
-	case 2: res = f (arg0, arg1, nfields
-			    ,ML_COB_FIELD(Field(fields_v,0))
-			    ,ML_COB_FIELD(Field(fields_v,1))
-		); break;
-	case 3: res = f (arg0, arg1, nfields
-			    ,ML_COB_FIELD(Field(fields_v,0))
-			    ,ML_COB_FIELD(Field(fields_v,1))
-			    ,ML_COB_FIELD(Field(fields_v,2))
-		); break;
-	case 4: res = f (arg0, arg1, nfields
-			    ,ML_COB_FIELD(Field(fields_v,0))
-			    ,ML_COB_FIELD(Field(fields_v,1))
-			    ,ML_COB_FIELD(Field(fields_v,2))
-			    ,ML_COB_FIELD(Field(fields_v,3))
-		); break;
-	case 5: res = f (arg0, arg1, nfields
-			    ,ML_COB_FIELD(Field(fields_v,0))
-			    ,ML_COB_FIELD(Field(fields_v,1))
-			    ,ML_COB_FIELD(Field(fields_v,2))
-			    ,ML_COB_FIELD(Field(fields_v,3))
-			    ,ML_COB_FIELD(Field(fields_v,4))
-		); break;
-	case 6: res = f (arg0, arg1, nfields
-			    ,ML_COB_FIELD(Field(fields_v,0))
-			    ,ML_COB_FIELD(Field(fields_v,1))
-			    ,ML_COB_FIELD(Field(fields_v,2))
-			    ,ML_COB_FIELD(Field(fields_v,3))
-			    ,ML_COB_FIELD(Field(fields_v,4))
-			    ,ML_COB_FIELD(Field(fields_v,5))
-		); break;
-	case 7: res = f (arg0, arg1, nfields
-			    ,ML_COB_FIELD(Field(fields_v,0))
-			    ,ML_COB_FIELD(Field(fields_v,1))
-			    ,ML_COB_FIELD(Field(fields_v,2))
-			    ,ML_COB_FIELD(Field(fields_v,3))
-			    ,ML_COB_FIELD(Field(fields_v,4))
-			    ,ML_COB_FIELD(Field(fields_v,5))
-			    ,ML_COB_FIELD(Field(fields_v,6))
-		); break;
-	case 8: res = f (arg0, arg1, nfields
-			    ,ML_COB_FIELD(Field(fields_v,0))
-			    ,ML_COB_FIELD(Field(fields_v,1))
-			    ,ML_COB_FIELD(Field(fields_v,2))
-			    ,ML_COB_FIELD(Field(fields_v,3))
-			    ,ML_COB_FIELD(Field(fields_v,4))
-			    ,ML_COB_FIELD(Field(fields_v,5))
-			    ,ML_COB_FIELD(Field(fields_v,6))
-			    ,ML_COB_FIELD(Field(fields_v,7))
-		); break;
-	default: caml_failwith ("COB_VA_FIELDN with nargs > 8");
-	}
-
-	res_v = caml_alloc (1, Abstract_tag);
-	Field (res_v, 0) = (value) res ;
-	CAMLreturn (res_v);
-}
-
 /* The following line number should be offset +2 to its line number */
-#line 745 "_build/default/src/ezlibcob/libcob_stubs.c"
+#line 552 "_build/default/src/ezlibcob/libcob_stubs.c"

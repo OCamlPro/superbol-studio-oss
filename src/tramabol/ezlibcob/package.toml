@@ -59,7 +59,7 @@ pretty = { version = "version", build = true }
 
 # package tools dependencies
 [tools]
-# ...
+goblint-cil = ">=2.0.0 <2.1.0"
 
 # package fields (depends on package skeleton)
 #Examples:
@@ -89,12 +89,12 @@ dune-trailer = """
 
 (executable
  (name genstubs)
- (libraries pretty ez_file camlp-streams)
- (modules genstubs))
+ (libraries pretty ez_file camlp-streams goblint-cil)
+ (modules error parser types synthetize generate genstubs))
 
 (rule
  (targets v1.ml libcob_stubs.c)
- (deps stubs.h libcob_stubs_header.c v1_header.ml v1_trailer.ml)
+ (deps stubs.h libcob_stubs_header.c libcob_stubs_trailer.c v1_header.ml v1_trailer.ml)
  (action (run %{exe:genstubs.exe} stubs.h v1.ml libcob_stubs.c)))
 
 
@@ -111,12 +111,12 @@ dune-trailer = """
 (rule
  (target cflags)
  (enabled_if (<> %{os_type} Win32))
- (action (with-stdout-to %{target} (echo "(-fPIC)"))))
+ (action (with-stdout-to %{target} (echo "(-g -O0 -fPIC)"))))
 
 (rule
  (target cflags)
  (enabled_if (= %{os_type} Win32))
- (action (with-stdout-to %{target} (echo "()"))))
+ (action (with-stdout-to %{target} (echo "(-g -O0)"))))
 
 
 (rule
