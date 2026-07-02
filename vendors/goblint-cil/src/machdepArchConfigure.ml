@@ -9,7 +9,12 @@ let () =
     ]
   in
   C.main ~name:"model" ~args (fun c ->
-      let exe = "machdep" ^ !m ^ "-ml.exe" in
+      let exe = 
+        if Sys.win32 then
+          "machdep" ^ !m ^ "-ml.exe"
+        else
+          "./machdep" ^ !m ^ "-ml.exe"
+      in
       let {C.Process.exit_code; stdout; stderr} = C.Process.run c !real_gcc ["-D_GNUCC"; "-include"; "machdep" ^ !m ^ "-config.h"; "-m" ^ !m; "machdep-ml.c"; "-o"; exe] in
       if exit_code = 0 then (
         let {C.Process.stdout; stderr; exit_code} = C.Process.run c exe [] in

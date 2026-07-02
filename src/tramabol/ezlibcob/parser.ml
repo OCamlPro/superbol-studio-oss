@@ -15,8 +15,9 @@ let () =
   GoblintCil.initCIL ()
 
 let preprocess_c_file include_files c_file c_file_pp =
-  let c_null_in = open_in "/dev/null" in
-  let c_null_out = open_out "/dev/null" in
+  let null = if Sys.win32 then "NUL" else "/dev/null" in
+  let c_null_in = open_in null in
+  let c_null_out = open_out null in
   let null_in = Unix.descr_of_in_channel c_null_in in
   let null_out = Unix.descr_of_out_channel c_null_out in
   let args =

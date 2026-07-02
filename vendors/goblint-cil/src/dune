@@ -63,8 +63,17 @@
  (action (with-stdout-to %{target} (run ./modelConfigure.exe --real-gcc %{read-lines:../bin/real-gcc} -m 64))))
 
 (rule
+ (deps machdep32 machdep64)
+ (target machdep.ml)
+ (enabled_if (<> %{os_type} Win32))
+ (action (run %{bin:cppo} -V OCAML:%{ocaml_version}
+              %{dep:machdep.cppo.ml} -x machdep:./%{dep:machdep-ml.exe}
+              -o %{target})))
+
+(rule
  (deps machdep32 machdep64 machdep-ml.exe)
  (target machdep.ml)
+ (enabled_if (= %{os_type} Win32))
  (action (run %{bin:cppo} -V OCAML:%{ocaml_version}
               %{dep:machdep.cppo.ml} -x machdep:machdep-ml.exe
               -o %{target})))
