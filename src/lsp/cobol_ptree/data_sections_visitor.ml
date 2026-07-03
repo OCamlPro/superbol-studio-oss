@@ -330,7 +330,7 @@ let fold_report_group_clause (v: _ #folder) =
           >> Data_descr_visitor.fold_alignment v alignment
           >> fold_list ~fold:Data_descr_visitor.fold_column_position v position
       | ReportSource { source; rounding } -> x
-          >> fold_list ~fold:fold_expr v source
+          >> fold_list ~fold:fold_expr' v source
           >> fold_rounding v rounding
       | ReportSum { sum_of; reset_on; rounding } -> x
           >> fold_list v sum_of

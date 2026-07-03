@@ -142,7 +142,7 @@ let fold_condition_name_value (v: _ #folder) =
 let fold_constant_value (v: _ #folder) =
   handle v#fold_constant_value
     ~continue:begin function
-      | ConstExpr e -> fold_expr v e
+      | ConstExpr e -> fold_expr' v e
       | ConstByteLength n | ConstLength n | ConstFrom n -> fold_name' v n
     end
 
@@ -181,8 +181,8 @@ let fold_data_varying (v: _ #folder) =
   handle v#fold_data_varying
     ~continue:begin fun { data_varying; data_varying_from; data_varying_by } x -> x
       >> fold_name' v data_varying
-      >> fold_option ~fold:fold_expr v data_varying_from
-      >> fold_option ~fold:fold_expr v data_varying_by
+      >> fold_option ~fold:fold_expr' v data_varying_from
+      >> fold_option ~fold:fold_expr' v data_varying_by
     end
 
 let fold_endianness_mode (v: _ #folder) =
@@ -394,7 +394,7 @@ let fold_source_destination_clause (v: _ #folder) =
 let fold_sum_phrase (v: _ #folder) =
   handle v#fold_sum_phrase
     ~continue:begin fun { sum_operands; sum_upon_items } x -> x
-      >> fold_list ~fold:fold_expr v sum_operands
+      >> fold_list ~fold:fold_expr' v sum_operands
       >> fold_name'_list v sum_upon_items
     end
 
@@ -457,8 +457,8 @@ let fold_validation_clause (v: _ #folder) =
       | Class c -> fold_class_clause v c
       | Default i -> fold_option ~fold:fold_ident_or_literal v i
       | Destination i -> fold_list ~fold:fold_ident v i
-      | InvalidWhen c -> fold_list ~fold:fold_cond v c
-      | PresentWhen c -> fold_cond v c
+      | InvalidWhen c -> fold_list ~fold:fold_cond' v c
+      | PresentWhen c -> fold_cond' v c
       | Varying l -> fold_list ~fold:fold_data_varying v l
       | ValidateStatus { is_; when_; on; for_ } -> ignore (when_, on); fun x -> x
         >> fold_ident_or_literal v is_
