@@ -151,7 +151,7 @@ let run () =
   cob_decimal_alloc [| pd_0; pd_1 |];
 
   CobModule.set_module_active module_
-    (U32.inc (CobModule.get_module_active module_));
+    (U32.succ (CobModule.get_module_active module_));
 
   let a_1 = CobFieldAttr.create
               ~type_:(CobFieldType.(to_u16 (enc COB_TYPE_NUMERIC_DISPLAY)))
@@ -219,7 +219,7 @@ let run () =
   cob_display S32.zero S32.one [| c_3; f_21 |];
 
   CobModule.set_module_active module_
-    (U32.dec (CobModule.get_module_active module_));
+    (U32.pred (CobModule.get_module_active module_));
 
   cob_module_leave module_
 

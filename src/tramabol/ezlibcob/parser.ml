@@ -21,7 +21,7 @@ let preprocess_c_file include_files c_file c_file_pp =
   let null_in = Unix.descr_of_in_channel c_null_in in
   let null_out = Unix.descr_of_out_channel c_null_out in
   let args =
-    [ "gcc"; "-E";
+    [ "cpp";
       "-D"; "GENSTUBS";
       "-D"; "NOT_IMPLEMENTED=__attribute__((NOT_IMPLEMENTED))";
       "-D"; "NO_CONSTR=__attribute__((NO_CONSTR))";
@@ -36,46 +36,59 @@ let preprocess_c_file include_files c_file c_file_pp =
         include_file :: "-I" :: args
       ) [] include_files)
   in
-  let pid =
-    Unix.create_process_env "gcc" (Array.of_list args)
-      (Unix.environment ()) null_in null_out null_out
+  let status_opt =
+    try
+      let pid =
+        Unix.create_process_env "cpp" (Array.of_list args)
+          (Unix.environment ()) null_in null_out null_out
+      in
+      let _pid, status = Unix.waitpid [ (* WNOHANG *) ] pid in
+      Some (status)
+    with _ ->
+      None
   in
-  let _pid, status = Unix.waitpid [ (* WNOHANG *) ] pid in
   close_out c_null_out;
   close_in c_null_in;
-  match status with
-  | WEXITED (code) ->
+  match status_opt with
+  | Some (WEXITED (code)) ->
       code = 0
-  | WSIGNALED (signal) ->
-      Printf.eprintf "gcc killed by signal %d\n" signal; false
-  | WSTOPPED (signal) ->
-      Printf.eprintf "gcc stopped by signal %d\n" signal; false
+  | Some (WSIGNALED (signal)) ->
+      Printf.eprintf "cpp killed by signal %d\n" signal; false
+  | Some (WSTOPPED (signal)) ->
+      Printf.eprintf "cpp stopped by signal %d\n" signal; false
+  | None ->
+      Printf.eprintf "could not start cpp\n"; false
 
 let process_c_file c_file_pp =
-  let ci_file = GoblintCil.Frontc.parse c_file_pp () in
-  let is_root = function
-    | GoblintCil.GVarDecl (vi, _loc) ->
-        not (String.starts_with ~prefix:"__" vi.vname)
-    | GType (_ti, _loc) -> (* Typedef ttype tname *)
-        true
-    | GCompTag (_ci, _loc) -> (* Full struct declaration *)
-        true
-    | GCompTagDecl (_ci, _loc) -> (* Forward struct declaration *)
-        true
-    | GEnumTag (_ei, _loc) -> (* Full enum declaration *)
-        true
-    | GEnumTagDecl (_ei, _loc) -> (* Forward enum declaration *)
-        true
-    | _ ->
-        false
-  in
-  GoblintCil.RmUnused.removeUnused ~isRoot:is_root ci_file;
-  ci_file
+  try
+    let ci_file = GoblintCil.Frontc.parse c_file_pp () in
+    let is_root = function
+      | GoblintCil.GVarDecl (vi, _loc) ->
+          not (String.starts_with ~prefix:"__" vi.vname)
+      | GType (_ti, _loc) -> (* Typedef ttype tname *)
+          true
+      | GCompTag (_ci, _loc) -> (* Full struct declaration *)
+          true
+      | GCompTagDecl (_ci, _loc) -> (* Forward struct declaration *)
+          true
+      | GEnumTag (_ei, _loc) -> (* Full enum declaration *)
+          true
+      | GEnumTagDecl (_ei, _loc) -> (* Forward enum declaration *)
+          true
+      | _ ->
+          false
+    in
+    GoblintCil.RmUnused.removeUnused ~isRoot:is_root ci_file;
+    Some (ci_file)
+  with _ ->
+    None
 
 let parse_c_file c_file =
   let c_file_pp = Filename.temp_file (c_file ^ ".") ".pp" in
   let res = preprocess_c_file [ (* include paths *) ] c_file c_file_pp in
-  if res then
-    Some (process_c_file c_file_pp)
-  else
-    None
+  let res' =
+    if res then process_c_file c_file_pp
+    else None
+  in
+  Sys.remove c_file_pp;
+  res'
