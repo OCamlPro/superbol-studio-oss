@@ -5,7 +5,7 @@
   (public_name ezlibcob)
   (wrapped true)
   ; use field 'dune-libraries' to add libraries without opam deps
-  (libraries pretty ez_file camlp-streams )
+  (libraries  )
   ; use field 'dune-flags' to set this value
   (flags (:standard (:include flags)))
   ; use field 'dune-stanzas' to add more stanzas here
@@ -32,15 +32,10 @@
 
 ; use field 'dune-trailer' to add more stuff here
 
-(executable
- (name genstubs)
- (libraries pretty ez_file camlp-streams goblint-cil)
- (modules error parser types synthetize generate genstubs))
-
 (rule
  (targets v1.ml libcob_stubs.c)
  (deps stubs.h libcob_stubs_header.c libcob_stubs_trailer.c v1_header.ml v1_trailer.ml)
- (action (run %{exe:genstubs.exe} stubs.h v1.ml libcob_stubs.c)))
+ (action (run h2mlstubs stubs.h v1.ml libcob_stubs.c)))
 
 
 (rule
@@ -52,6 +47,7 @@
  (target flags)
  (enabled_if (= %{os_type} Win32))
  (action (with-stdout-to %{target} (echo "()"))))
+
 
 (rule
  (target cflags)

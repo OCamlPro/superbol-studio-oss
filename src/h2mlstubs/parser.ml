@@ -21,7 +21,7 @@ let preprocess_c_file include_files c_file c_file_pp =
   let null_in = Unix.descr_of_in_channel c_null_in in
   let null_out = Unix.descr_of_out_channel c_null_out in
   let args =
-    [ "cpp";
+    [ "gcc"; "-E";
       "-D"; "GENSTUBS";
       "-D"; "NOT_IMPLEMENTED=__attribute__((NOT_IMPLEMENTED))";
       "-D"; "NO_CONSTR=__attribute__((NO_CONSTR))";
@@ -39,7 +39,7 @@ let preprocess_c_file include_files c_file c_file_pp =
   let status_opt =
     try
       let pid =
-        Unix.create_process_env "cpp" (Array.of_list args)
+        Unix.create_process_env "gcc" (Array.of_list args)
           (Unix.environment ()) null_in null_out null_out
       in
       let _pid, status = Unix.waitpid [ (* WNOHANG *) ] pid in
