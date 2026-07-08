@@ -233,9 +233,14 @@ let currency_sign_char =                                    (* as per ISO/IEC *)
 let text_char = nonblank # ['\'' '"' '&']
 let neq = text_char # ['=']
 let text_word =
-  (* Note: accepts words that include floating comment markers `*>'; these are
-     processed in `Src_lexing.text_word`. *)
-  (neq* '='? neq+)+ | '=' | ">=" | "<=" | '&'
+  (* A text-word shoud not termninate with an equal sign to explicitly deal with
+     pseudotext markers `==`.  Yet, we allow some punctuation characters before
+     a single equal sign to deal with `(>=` and co, that may appear in
+     abbreviated relational conditions.
+
+     Note: accepts words that include floating comment markers `*>'; these are
+     processed in `Src_lexing.text_word`.  *)
+  (neq* '='? neq+)+ | ((neq # letter # digit # sign)* ['>' '<']? '=' neq*) | '&'
 
 let cdir_char =
   (letter | digit | ':')                            (* colon for pseudo-words *)

@@ -55,7 +55,7 @@ depends: [
   "superbol_preprocs-windows" {= version}
   "superbol_platform-windows" {= version}
   "sql_preproc-windows" {= version}
-  "lwt-windows" {>= "5"}
+  "lwt-windows" {>= "5" & < "5.9"}
   "ez_toml-windows" {= version}
   "ez_file-windows" {>= "0.4"}
   "ez_cmdliner-windows" {>= "0.3.0" & < "1.0.0"}

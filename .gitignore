@@ -8,7 +8,9 @@
 /vscode-debugadapter
 /vscode-debugprotocol
 /superbol-free
+/ezlibcob
 /tramabol
+/autofonce
 *~
 _build
 .merlin
@@ -22,8 +24,6 @@ _build
 /tramabol-*
 /_*
 /node_modules
-/yarn-error.log
-/yarn.lock
 /package-json
 /package.json.prev
 /gnucobol-config

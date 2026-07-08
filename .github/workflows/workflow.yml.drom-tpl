@@ -58,7 +58,7 @@ jobs:
         id: cache-opam
         with:
           path: _opam
-          key: v4-${{ runner.os }}-!{name}-${{ matrix.ocaml-compiler }}-${{ hashFiles('opam/*.opam', 'vendors/autofonce/opam/*.opam', 'vendors/ANSITerminal/*.opam') }}-skip_tests=${{ matrix.skip_test }}-repo=!(opam-repo)
+          key: v4-${{ runner.os }}-!{name}-${{ matrix.ocaml-compiler }}-${{ hashFiles('opam/*.opam', 'vendors/ANSITerminal/*.opam', 'vendors/goblint-cil/*.opam') }}-skip_tests=${{ matrix.skip_test }}-repo=!(opam-repo)
 
       # use fields.opam-repo = "git+https://" to add an 'extra' opam repository
 ![if:field:opam-repo]
@@ -75,9 +75,9 @@ jobs:
       - run: |
           if ${{ matrix.skip_test }}
           then
-            opam install -y opam/*.opam vendors/autofonce/opam/*.opam --deps-only
+            opam install -y opam/*.opam --deps-only
           else
-            opam install -y opam/*.opam vendors/autofonce/opam/*.opam --deps-only --with-test
+            opam install -y opam/*.opam --deps-only --with-test
           fi
         if: steps.cache-opam.outputs.cache-hit != 'true'
         name: Run opam install -y **/opam/*.opam --deps-only [ --with-test ]

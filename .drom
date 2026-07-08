@@ -5,25 +5,22 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-3dc0a59d45c5749d99a47075771b3c64:.
+1bfab60f4d7152eda431cd54effee855:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-421e4ddd01d6066fad944feb377ce83c:.github/workflows/workflow.yml
-d703a6755baa4f37322e78ce9e5260ec:.github/workflows/workflow.yml
-e3b97dd48b0cf76a4dbad08c06422b73:.github/workflows/workflow.yml
+789e965da2fe56a5fc76ebeb67415797:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
 # file .gitignore
-231a7ada609ca5b2979fde37a1374fb3:.gitignore
+e1fc1f64740796e3c174ba9b6bd1a782:.gitignore
 # end context for .gitignore
 
 # begin context for Makefile
 # file Makefile
-fbe8f720a7cc84e925880ad46b12a296:Makefile
-bf402c70eaab0a6c216d77887b2f708d:Makefile
+53951afb2341dca366ccf6894e3c5d72:Makefile
 # end context for Makefile
 
 # begin context for docs/README.txt
@@ -53,11 +50,48 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-95a5c4276a8b69d50fc92f608404e796:dune-project
-a25cfc34dd44d4d013702ab8ac434cee:dune-project
-24b8e94c4444bb740598c7a7184c42c1:dune-project
-5453b3822bf264aafb0452ecc3258654:dune-project
+3006bba37a84a8747305344367b420ef:dune-project
 # end context for dune-project
+
+# begin context for opam/autofonce.opam
+# file opam/autofonce.opam
+842f7d71bb04eae7e961f3395e5a37ac:opam/autofonce.opam
+# end context for opam/autofonce.opam
+
+# begin context for opam/autofonce_config.opam
+# file opam/autofonce_config.opam
+23acce8efd992891a5d2d80eb25692d5:opam/autofonce_config.opam
+# end context for opam/autofonce_config.opam
+
+# begin context for opam/autofonce_core.opam
+# file opam/autofonce_core.opam
+848d23f96c8ab93a04c108cdf9229d4d:opam/autofonce_core.opam
+# end context for opam/autofonce_core.opam
+
+# begin context for opam/autofonce_lib.opam
+# file opam/autofonce_lib.opam
+61aabeaa17f99473f87cb67fea7231e3:opam/autofonce_lib.opam
+# end context for opam/autofonce_lib.opam
+
+# begin context for opam/autofonce_m4.opam
+# file opam/autofonce_m4.opam
+68e1dfea66666fc6a1ea0f2c828670e1:opam/autofonce_m4.opam
+# end context for opam/autofonce_m4.opam
+
+# begin context for opam/autofonce_misc.opam
+# file opam/autofonce_misc.opam
+300040d4cda7bf8936cf94c39d048654:opam/autofonce_misc.opam
+# end context for opam/autofonce_misc.opam
+
+# begin context for opam/autofonce_patch.opam
+# file opam/autofonce_patch.opam
+fe711400d462da3fe5cb7144c8b1936d:opam/autofonce_patch.opam
+# end context for opam/autofonce_patch.opam
+
+# begin context for opam/autofonce_share.opam
+# file opam/autofonce_share.opam
+088ace592a1aec2e1355e6d73ba77489:opam/autofonce_share.opam
+# end context for opam/autofonce_share.opam
 
 # begin context for opam/cobol_cfg.opam
 # file opam/cobol_cfg.opam
@@ -124,10 +158,25 @@ bff32163e2b49b90242750acd6022ee5:opam/cobol_parser.opam
 77f07ce4f7598ccb8b1c4503a870e4ca:opam/ebcdic_lib.opam
 # end context for opam/ebcdic_lib.opam
 
+# begin context for opam/ez_call.opam
+# file opam/ez_call.opam
+2731a2f9de120fd12cf522d1098f6d19:opam/ez_call.opam
+# end context for opam/ez_call.opam
+
 # begin context for opam/ez_toml.opam
 # file opam/ez_toml.opam
 54bf97c02eeb76be96b88e2ff18a0c65:opam/ez_toml.opam
 # end context for opam/ez_toml.opam
+
+# begin context for opam/ez_win32.opam
+# file opam/ez_win32.opam
+378c57c3f07c999fa7af369477541c2e:opam/ez_win32.opam
+# end context for opam/ez_win32.opam
+
+# begin context for opam/ezlibcob.opam
+# file opam/ezlibcob.opam
+dc1f75f51d173db59dfe153393b5b1f4:opam/ezlibcob.opam
+# end context for opam/ezlibcob.opam
 
 # begin context for opam/ezr_toml.opam
 # file opam/ezr_toml.opam
@@ -191,7 +240,7 @@ a56c08535ff344da81fab8d806e214f7:opam/node-js-stubs.opam
 
 # begin context for opam/superbol_free_lib.opam
 # file opam/superbol_free_lib.opam
-035795a825caf209da5aa600543b58bf:opam/superbol_free_lib.opam
+df3d65c35f2930f9eefda35713cf0b81:opam/superbol_free_lib.opam
 # end context for opam/superbol_free_lib.opam
 
 # begin context for opam/superbol_platform.opam
@@ -261,7 +310,7 @@ bb3a9d286f0dc64021db4194427263ee:scripts/copy-bin.sh
 
 # begin context for scripts/static-build.sh
 # file scripts/static-build.sh
-02c01ee43dfe5e0ef25aeffa71e6908b:scripts/static-build.sh
+81e4a8b550cf75d285912794ad34771e:scripts/static-build.sh
 # end context for scripts/static-build.sh
 
 # begin context for sphinx/about.rst
@@ -278,6 +327,161 @@ fa07cf77f110a174b5443570324d1b6d:sphinx/conf.py
 # file sphinx/license.rst
 d626b5f615a4691b6788eaf63ad2dd14:sphinx/license.rst
 # end context for sphinx/license.rst
+
+# begin context for src/autofonce/autofonce/dune
+# file src/autofonce/autofonce/dune
+b7bfe2578bc462159b9429fe7969a8e1:src/autofonce/autofonce/dune
+# end context for src/autofonce/autofonce/dune
+
+# begin context for src/autofonce/autofonce/index.mld
+# file src/autofonce/autofonce/index.mld
+6e71f561f52909db6e1c8565f73c2031:src/autofonce/autofonce/index.mld
+# end context for src/autofonce/autofonce/index.mld
+
+# begin context for src/autofonce/autofonce/linking_flags.sh
+# file src/autofonce/autofonce/linking_flags.sh
+9fdfca3cc53df639758ff04fe09d3243:src/autofonce/autofonce/linking_flags.sh
+# end context for src/autofonce/autofonce/linking_flags.sh
+
+# begin context for src/autofonce/autofonce/version.mlt
+# file src/autofonce/autofonce/version.mlt
+14bbeb7751d103dc3a35b512a15a52ce:src/autofonce/autofonce/version.mlt
+# end context for src/autofonce/autofonce/version.mlt
+
+# begin context for src/autofonce/autofonce_config/dune
+# file src/autofonce/autofonce_config/dune
+f95b772c34f6a20ca833bfccc77579a5:src/autofonce/autofonce_config/dune
+# end context for src/autofonce/autofonce_config/dune
+
+# begin context for src/autofonce/autofonce_config/index.mld
+# file src/autofonce/autofonce_config/index.mld
+38ba83daa206e27083401022d7cd4694:src/autofonce/autofonce_config/index.mld
+# end context for src/autofonce/autofonce_config/index.mld
+
+# begin context for src/autofonce/autofonce_config/version.mlt
+# file src/autofonce/autofonce_config/version.mlt
+14bbeb7751d103dc3a35b512a15a52ce:src/autofonce/autofonce_config/version.mlt
+# end context for src/autofonce/autofonce_config/version.mlt
+
+# begin context for src/autofonce/autofonce_core/dune
+# file src/autofonce/autofonce_core/dune
+fef0a60de6af404f8f2b4544b3c9e2b1:src/autofonce/autofonce_core/dune
+# end context for src/autofonce/autofonce_core/dune
+
+# begin context for src/autofonce/autofonce_core/index.mld
+# file src/autofonce/autofonce_core/index.mld
+485662608d7dff3d0a0f30061fcabde2:src/autofonce/autofonce_core/index.mld
+# end context for src/autofonce/autofonce_core/index.mld
+
+# begin context for src/autofonce/autofonce_core/version.mlt
+# file src/autofonce/autofonce_core/version.mlt
+14bbeb7751d103dc3a35b512a15a52ce:src/autofonce/autofonce_core/version.mlt
+# end context for src/autofonce/autofonce_core/version.mlt
+
+# begin context for src/autofonce/autofonce_lib/dune
+# file src/autofonce/autofonce_lib/dune
+4b508925f49463fccfdf3902c1a0b7a0:src/autofonce/autofonce_lib/dune
+# end context for src/autofonce/autofonce_lib/dune
+
+# begin context for src/autofonce/autofonce_lib/index.mld
+# file src/autofonce/autofonce_lib/index.mld
+f9438b301884482620f92d77cf47f3ad:src/autofonce/autofonce_lib/index.mld
+# end context for src/autofonce/autofonce_lib/index.mld
+
+# begin context for src/autofonce/autofonce_lib/version.mlt
+# file src/autofonce/autofonce_lib/version.mlt
+14bbeb7751d103dc3a35b512a15a52ce:src/autofonce/autofonce_lib/version.mlt
+# end context for src/autofonce/autofonce_lib/version.mlt
+
+# begin context for src/autofonce/autofonce_m4/dune
+# file src/autofonce/autofonce_m4/dune
+58aabf47afe1f32312735a698c0c8bb0:src/autofonce/autofonce_m4/dune
+# end context for src/autofonce/autofonce_m4/dune
+
+# begin context for src/autofonce/autofonce_m4/index.mld
+# file src/autofonce/autofonce_m4/index.mld
+e9951a903e7871c514906279b5ad9fb8:src/autofonce/autofonce_m4/index.mld
+# end context for src/autofonce/autofonce_m4/index.mld
+
+# begin context for src/autofonce/autofonce_m4/version.mlt
+# file src/autofonce/autofonce_m4/version.mlt
+14bbeb7751d103dc3a35b512a15a52ce:src/autofonce/autofonce_m4/version.mlt
+# end context for src/autofonce/autofonce_m4/version.mlt
+
+# begin context for src/autofonce/autofonce_misc/dune
+# file src/autofonce/autofonce_misc/dune
+fe7ce04bc869b44dfa07a44426083575:src/autofonce/autofonce_misc/dune
+# end context for src/autofonce/autofonce_misc/dune
+
+# begin context for src/autofonce/autofonce_misc/index.mld
+# file src/autofonce/autofonce_misc/index.mld
+4a8ff3c4d7aa92b48b85ef7f1cb236f6:src/autofonce/autofonce_misc/index.mld
+# end context for src/autofonce/autofonce_misc/index.mld
+
+# begin context for src/autofonce/autofonce_misc/version.mlt
+# file src/autofonce/autofonce_misc/version.mlt
+14bbeb7751d103dc3a35b512a15a52ce:src/autofonce/autofonce_misc/version.mlt
+# end context for src/autofonce/autofonce_misc/version.mlt
+
+# begin context for src/autofonce/autofonce_patch/dune
+# file src/autofonce/autofonce_patch/dune
+8f2b4a1a9b2f8ddf67a589d1ba3c8ffc:src/autofonce/autofonce_patch/dune
+# end context for src/autofonce/autofonce_patch/dune
+
+# begin context for src/autofonce/autofonce_patch/index.mld
+# file src/autofonce/autofonce_patch/index.mld
+51a84f8e33f214aa915462db5752fa8d:src/autofonce/autofonce_patch/index.mld
+# end context for src/autofonce/autofonce_patch/index.mld
+
+# begin context for src/autofonce/autofonce_patch/version.mlt
+# file src/autofonce/autofonce_patch/version.mlt
+14bbeb7751d103dc3a35b512a15a52ce:src/autofonce/autofonce_patch/version.mlt
+# end context for src/autofonce/autofonce_patch/version.mlt
+
+# begin context for src/autofonce/autofonce_share/dune
+# file src/autofonce/autofonce_share/dune
+292754abcb758955f3945f685d321f08:src/autofonce/autofonce_share/dune
+# end context for src/autofonce/autofonce_share/dune
+
+# begin context for src/autofonce/autofonce_share/index.mld
+# file src/autofonce/autofonce_share/index.mld
+2adae1b0aa85cc7d439651ee752ef666:src/autofonce/autofonce_share/index.mld
+# end context for src/autofonce/autofonce_share/index.mld
+
+# begin context for src/autofonce/autofonce_share/version.mlt
+# file src/autofonce/autofonce_share/version.mlt
+14bbeb7751d103dc3a35b512a15a52ce:src/autofonce/autofonce_share/version.mlt
+# end context for src/autofonce/autofonce_share/version.mlt
+
+# begin context for src/autofonce/ez_call/dune
+# file src/autofonce/ez_call/dune
+a71df1cb0ebc5794edd35ef71693f95c:src/autofonce/ez_call/dune
+# end context for src/autofonce/ez_call/dune
+
+# begin context for src/autofonce/ez_call/index.mld
+# file src/autofonce/ez_call/index.mld
+99c27dda73b669abbc2ef14e184b04c7:src/autofonce/ez_call/index.mld
+# end context for src/autofonce/ez_call/index.mld
+
+# begin context for src/autofonce/ez_call/version.mlt
+# file src/autofonce/ez_call/version.mlt
+a5027007a5ed5a4b90598fcde0e6fc1b:src/autofonce/ez_call/version.mlt
+# end context for src/autofonce/ez_call/version.mlt
+
+# begin context for src/autofonce/ez_win32/dune
+# file src/autofonce/ez_win32/dune
+77be9ab7b581846c659520374dde865a:src/autofonce/ez_win32/dune
+# end context for src/autofonce/ez_win32/dune
+
+# begin context for src/autofonce/ez_win32/index.mld
+# file src/autofonce/ez_win32/index.mld
+b6a8ea9d6eef15ced32d2934e602ed64:src/autofonce/ez_win32/index.mld
+# end context for src/autofonce/ez_win32/index.mld
+
+# begin context for src/autofonce/ez_win32/version.mlt
+# file src/autofonce/ez_win32/version.mlt
+a5027007a5ed5a4b90598fcde0e6fc1b:src/autofonce/ez_win32/version.mlt
+# end context for src/autofonce/ez_win32/version.mlt
 
 # begin context for src/lsp/cobol_cfg/dune
 # file src/lsp/cobol_cfg/dune
@@ -524,6 +728,21 @@ a5027007a5ed5a4b90598fcde0e6fc1b:src/lsp/superbol_preprocs/version.mlt
 a5027007a5ed5a4b90598fcde0e6fc1b:src/lsp/superbol_project/version.mlt
 # end context for src/lsp/superbol_project/version.mlt
 
+# begin context for src/tramabol/ezlibcob/dune
+# file src/tramabol/ezlibcob/dune
+90ad4d5ebf85a2c2cb56dc3315bba667:src/tramabol/ezlibcob/dune
+# end context for src/tramabol/ezlibcob/dune
+
+# begin context for src/tramabol/ezlibcob/index.mld
+# file src/tramabol/ezlibcob/index.mld
+8dab7cddafae7f541a31059549a93225:src/tramabol/ezlibcob/index.mld
+# end context for src/tramabol/ezlibcob/index.mld
+
+# begin context for src/tramabol/ezlibcob/version.mlt
+# file src/tramabol/ezlibcob/version.mlt
+a5027007a5ed5a4b90598fcde0e6fc1b:src/tramabol/ezlibcob/version.mlt
+# end context for src/tramabol/ezlibcob/version.mlt
+
 # begin context for src/tramabol/tramabol/dune
 # file src/tramabol/tramabol/dune
 df582578c94b0faef0a9ae9c3589a9ef:src/tramabol/tramabol/dune
@@ -653,3 +872,8 @@ a5027007a5ed5a4b90598fcde0e6fc1b:src/vscode/vscode-debugprotocol/version.mlt
 # file src/vscode/vscode-json/version.mlt
 a5027007a5ed5a4b90598fcde0e6fc1b:src/vscode/vscode-json/version.mlt
 # end context for src/vscode/vscode-json/version.mlt
+
+# begin context for test/ezlibcob/dune
+# file test/ezlibcob/dune
+006be19bc8758ad251a7f3f0ce25f20a:test/ezlibcob/dune
+# end context for test/ezlibcob/dune

@@ -66,9 +66,10 @@ else
   GENERATE_PACKAGE_DOT_JSON ?= yes
 endif
 
-YARN = npx --yes yarn 
+NPX = npx $(NPX_ARGS)
+NPX_ARGS ?=
 
-VSCE_ARGS = --yarn $(if $(subst universal,,$(TARGET_PLAT)),-t $(TARGET_SPEC))
+VSCE_ARGS = $(if $(subst universal,,$(TARGET_PLAT)),-t $(TARGET_SPEC))
 VSCE_PACKAGE_ARGS ?=
 VSCE_PUBLISH_ARGS ?=
 OVSX_PUBLISH_ARGS ?=
@@ -107,18 +108,18 @@ else				#platform-specific
 	./$(SUPERBOL_LSP_BUILT) json vscode --gen - | diff -u package.json -
 endif
 
-.PHONY: build-debug yarn-debug
+.PHONY: build-debug bundle-debug
 
 build-debug:
 	${DUNE} build ${DUNE_ARGS} ${DUNE_BUILD_ARGS} $(STUDIO_JS)
 	@mkdir -p $(JS_OUTDIR)
 	$(CP) ${DUNE_BUILD_DIR}/default/$(STUDIO_JS) $(JS_OUTDIR)/
-	$(MAKE) yarn-debug
+	$(MAKE) bundle-debug
 
 # Use 'make build-debug' before to copy the JS file in $(JS_OUTDIR)
-yarn-debug: package.json
-yarn-debug: $(JS_TARGETS)
-	$(YARN) esbuild $(filter %.js, $+) \
+bundle-debug: package.json
+bundle-debug: $(JS_TARGETS)
+	$(NPX) esbuild $(filter %.js, $+) \
                 --bundle \
                 --external:vscode \
                 --outdir=_dist \
@@ -127,19 +128,19 @@ yarn-debug: $(JS_TARGETS)
                 --sourcemap
 # the last command generated _dist/$(STUDIO).bs.js
 
-.PHONY: build-release yarn-release
+.PHONY: build-release bundle-release
 
 build-release:
 	${DUNE} build ${DUNE_ARGS} ${DUNE_BUILD_ARGS} --profile=release \
 		      $(STUDIO_JS)
 	@mkdir -p $(JS_OUTDIR)
 	$(CP) ${DUNE_BUILD_DIR}/default/$(STUDIO_JS) $(JS_OUTDIR)/
-	$(MAKE) yarn-release
+	$(MAKE) bundle-release
 
 # Use 'make build-release' before to copy the JS file in $(JS_OUTDIR)
-yarn-release: package.json
-yarn-release: $(JS_TARGETS)
-	$(YARN) esbuild $(filter %.js, $+) \
+bundle-release: package.json
+bundle-release: $(JS_TARGETS)
+	$(NPX) esbuild $(filter %.js, $+) \
                 --bundle \
                 --external:vscode \
                 --outdir=_dist \
@@ -178,7 +179,7 @@ vsix-package: package.json gnucobol-config $(EXE_TARGETS) $(SUPERBOL_LSP_BUILT)
 		$(addprefix _dist/$(SUPERBOL_LSP)-,$(AVAILABLE_NATIVE_PLATFORMS)))	\
 	      _dist/$(SUPERBOL_LSP).js
 	$(CP) $(SUPERBOL_LSP_BUILT) _dist/$(SUPERBOL_LSP_EXE)
-	$(YARN) vsce package $(VSCE_ARGS) $(VSCE_PACKAGE_ARGS)	\
+	$(NPX) vsce package $(VSCE_ARGS) $(VSCE_PACKAGE_ARGS)	\
 		--no-git-tag-version				\
 		--no-update-package-json			\
 		--out $(TARGET_VSIX) $(VERSION)
@@ -209,12 +210,12 @@ vsix-clean: clean
 .PHONY: ovsx-deploy vsce-deploy deploy-all
 
 vsce-deploy:
-	$(YARN) vsce publish $(VSCE_ARGS) $(VSCE_PUBLISH_ARGS)	\
+	$(NPX) vsce publish $(VSCE_ARGS) $(VSCE_PUBLISH_ARGS)	\
 	        --packagePath $(TARGET_VSIX)
 
 ovsx-deploy:
 #	Note: should fail in case of duplicate version
-	$(YARN) ovsx publish $(VSCE_ARGS) $(OVSX_PUBLISH_ARGS)	\
+	$(NPX) ovsx publish $(VSCE_ARGS) $(OVSX_PUBLISH_ARGS)	\
 	        --packagePath $(TARGET_VSIX)
 
 deploy-all: # Make sure to run target `all-vsix-release-packages` beforehand
@@ -236,5 +237,5 @@ clean: clean-execs
 
 .PHONY: node-setup
 node-setup:
-	$(YARN) install
+	npm install
 build-deps: node-setup

@@ -55,7 +55,7 @@ depends: [
   "superbol_preprocs-osx" {= version}
   "superbol_platform-osx" {= version}
   "sql_preproc-osx" {= version}
-  "lwt-osx" {>= "5"}
+  "lwt-osx" {>= "5" & < "5.9"}
   "ez_toml-osx" {= version}
   "ez_file-osx" {>= "0.4"}
   "ez_cmdliner-osx" {>= "0.3.0" & < "1.0.0"}
