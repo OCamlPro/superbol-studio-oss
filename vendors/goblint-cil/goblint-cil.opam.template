@@ -1,0 +1,10 @@
+x-maintenance-intent: ["(latest)"]
+depexts: [
+  ["perl-ExtUtils-MakeMaker"] {os-distribution = "centos" | os-family = "fedora" | os-distribution = "ol"}
+  ["perl-FindBin"] {os-distribution = "centos" | os-family = "fedora"}
+  ["build-base"] {os-distribution = "alpine"}
+]
+available: arch = "x86_64" | arch = "arm64"
+x-ci-accept-failures: [
+  "freebsd-14.2" # installed cilly binary is not found for some reason (https://github.com/ocaml/opam-repository/pull/24812#issuecomment-1819231335)
+]

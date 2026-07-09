@@ -5,22 +5,22 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-f9eeaf2865a434ecbbe7f344de55a474:.
+70da75f4aa5ef82cf4bded2b77c357fc:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-24539d4131096fc0677c0608774d56b8:.github/workflows/workflow.yml
+789e965da2fe56a5fc76ebeb67415797:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
 # file .gitignore
-b5d9b1baa0b523771ae28eb8bf757d6a:.gitignore
+e5502605e28129eb222c300ab6174e48:.gitignore
 # end context for .gitignore
 
 # begin context for Makefile
 # file Makefile
-9106fbef802caf26249c241fb2e70902:Makefile
+3d648b4c47e42f1a9ee63a2beadeceef:Makefile
 # end context for Makefile
 
 # begin context for docs/README.txt
@@ -50,7 +50,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-056e7f9477564f0b453baf7ce1fc1f0c:dune-project
+841d2560f1adc2eb5cfc406d04f92076:dune-project
 # end context for dune-project
 
 # begin context for opam/autofonce.opam
@@ -173,10 +173,20 @@ bff32163e2b49b90242750acd6022ee5:opam/cobol_parser.opam
 378c57c3f07c999fa7af369477541c2e:opam/ez_win32.opam
 # end context for opam/ez_win32.opam
 
+# begin context for opam/ezlibcob.opam
+# file opam/ezlibcob.opam
+147efe42174820cfba0df58aca412f44:opam/ezlibcob.opam
+# end context for opam/ezlibcob.opam
+
 # begin context for opam/ezr_toml.opam
 # file opam/ezr_toml.opam
 2ae0006d49590bbdbb364466c0938fef:opam/ezr_toml.opam
 # end context for opam/ezr_toml.opam
+
+# begin context for opam/h2mlstubs.opam
+# file opam/h2mlstubs.opam
+b3c37a2994319dcd4811b1de8d59dfe8:opam/h2mlstubs.opam
+# end context for opam/h2mlstubs.opam
 
 # begin context for opam/interop-js-stubs.opam
 # file opam/interop-js-stubs.opam
@@ -468,6 +478,21 @@ b6a8ea9d6eef15ced32d2934e602ed64:src/autofonce/ez_win32/index.mld
 a5027007a5ed5a4b90598fcde0e6fc1b:src/autofonce/ez_win32/version.mlt
 # end context for src/autofonce/ez_win32/version.mlt
 
+# begin context for src/h2mlstubs/dune
+# file src/h2mlstubs/dune
+586f780bd9900b2809f7a060d0dc1216:src/h2mlstubs/dune
+# end context for src/h2mlstubs/dune
+
+# begin context for src/h2mlstubs/linking_flags.sh
+# file src/h2mlstubs/linking_flags.sh
+9fdfca3cc53df639758ff04fe09d3243:src/h2mlstubs/linking_flags.sh
+# end context for src/h2mlstubs/linking_flags.sh
+
+# begin context for src/h2mlstubs/version.mlt
+# file src/h2mlstubs/version.mlt
+a5027007a5ed5a4b90598fcde0e6fc1b:src/h2mlstubs/version.mlt
+# end context for src/h2mlstubs/version.mlt
+
 # begin context for src/lsp/cobol_cfg/dune
 # file src/lsp/cobol_cfg/dune
 cfee3e13c13fa1890123d30809d7a1a3:src/lsp/cobol_cfg/dune
@@ -713,9 +738,24 @@ a5027007a5ed5a4b90598fcde0e6fc1b:src/lsp/superbol_preprocs/version.mlt
 a5027007a5ed5a4b90598fcde0e6fc1b:src/lsp/superbol_project/version.mlt
 # end context for src/lsp/superbol_project/version.mlt
 
+# begin context for src/tramabol/ezlibcob/dune
+# file src/tramabol/ezlibcob/dune
+3418b1122a84632ec29cff4a7903df3b:src/tramabol/ezlibcob/dune
+# end context for src/tramabol/ezlibcob/dune
+
+# begin context for src/tramabol/ezlibcob/index.mld
+# file src/tramabol/ezlibcob/index.mld
+8dab7cddafae7f541a31059549a93225:src/tramabol/ezlibcob/index.mld
+# end context for src/tramabol/ezlibcob/index.mld
+
+# begin context for src/tramabol/ezlibcob/version.mlt
+# file src/tramabol/ezlibcob/version.mlt
+a5027007a5ed5a4b90598fcde0e6fc1b:src/tramabol/ezlibcob/version.mlt
+# end context for src/tramabol/ezlibcob/version.mlt
+
 # begin context for src/vendor/ez_toml/dune
 # file src/vendor/ez_toml/dune
-5b0adf2706d3d163581192a5fe88cf03:src/vendor/ez_toml/dune
+0778f52cc1225df698a5fcd42310b6ff:src/vendor/ez_toml/dune
 # end context for src/vendor/ez_toml/dune
 
 # begin context for src/vendor/ez_toml/index.mld
@@ -822,3 +862,8 @@ a5027007a5ed5a4b90598fcde0e6fc1b:src/vscode/vscode-debugprotocol/version.mlt
 # file src/vscode/vscode-json/version.mlt
 a5027007a5ed5a4b90598fcde0e6fc1b:src/vscode/vscode-json/version.mlt
 # end context for src/vscode/vscode-json/version.mlt
+
+# begin context for test/ezlibcob/dune
+# file test/ezlibcob/dune
+006be19bc8758ad251a7f3f0ce25f20a:test/ezlibcob/dune
+# end context for test/ezlibcob/dune

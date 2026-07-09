@@ -1,0 +1,95 @@
+(include_subdirs unqualified)
+
+(library
+  (public_name goblint-cil)
+  (name goblintCil)
+  (libraries zarith unix str stdlib-shims)
+  (modules (:standard \ main mainFeature ciloptions machdepConfigure machdepArchConfigure modelConfigure))
+)
+
+(executable
+ (name machdepConfigure)
+ (modules machdepConfigure)
+ (libraries dune-configurator))
+
+(rule
+ (target machdep-config.h)
+ (action (run ./machdepConfigure.exe)))
+
+(rule
+ (target machdep32-config.h)
+ (action (run ./machdepConfigure.exe -m 32)))
+
+(rule
+ (target machdep64-config.h)
+ (action (run ./machdepConfigure.exe -m 64)))
+
+(rule
+ (deps machdep-config.h machdep-ml.c)
+ (target machdep-ml.exe)
+ (action (run %{read-lines:../bin/real-gcc} -D_GNUCC -include machdep-config.h machdep-ml.c -o %{target})))
+
+(executable
+ (name machdepArchConfigure)
+ (modules machdepArchConfigure)
+ (libraries dune-configurator))
+
+(rule
+ (deps machdep32-config.h machdep-ml.c)
+ (target machdep32)
+ (action (with-stdout-to %{target} (run ./machdepArchConfigure.exe --real-gcc %{read-lines:../bin/real-gcc} -m 32))))
+
+(rule
+ (deps machdep64-config.h machdep-ml.c)
+ (target machdep64)
+ (action (with-stdout-to %{target} (run ./machdepArchConfigure.exe --real-gcc %{read-lines:../bin/real-gcc} -m 64))))
+
+; for Cilly.pm
+(executable
+ (name modelConfigure)
+ (modules modelConfigure)
+ (libraries dune-configurator))
+
+; for Cilly.pm
+(rule
+ (deps machdep32-config.h machdep-ml.c)
+ (target gcc32model)
+ (action (with-stdout-to %{target} (run ./modelConfigure.exe --real-gcc %{read-lines:../bin/real-gcc} -m 32))))
+
+; for Cilly.pm
+(rule
+ (deps machdep64-config.h machdep-ml.c)
+ (target gcc64model)
+ (action (with-stdout-to %{target} (run ./modelConfigure.exe --real-gcc %{read-lines:../bin/real-gcc} -m 64))))
+
+(rule
+ (deps machdep32 machdep64)
+ (target machdep.ml)
+ (enabled_if (<> %{os_type} Win32))
+ (action (run %{bin:cppo} -V OCAML:%{ocaml_version}
+              %{dep:machdep.cppo.ml} -x machdep:./%{dep:machdep-ml.exe}
+              -o %{target})))
+
+(rule
+ (deps machdep32 machdep64 machdep-ml.exe)
+ (target machdep.ml)
+ (enabled_if (= %{os_type} Win32))
+ (action (run %{bin:cppo} -V OCAML:%{ocaml_version}
+              %{dep:machdep.cppo.ml} -x machdep:machdep-ml.exe
+              -o %{target})))
+
+(ocamllex formatlex)
+(ocamlyacc formatparse)
+
+(executable
+ (name main)
+ (modules main mainFeature ciloptions)
+ (modes native)
+ (libraries goblint-cil dynlink findlib)
+ (flags :standard -linkall))
+
+(env
+  (dev
+    (flags (:standard -warn-error -A -w -unused-var-strict)) ; https://dune.readthedocs.io/en/stable/faq.html#how-to-make-warnings-non-fatal
+  )
+)

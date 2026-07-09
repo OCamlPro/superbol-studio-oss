@@ -9,6 +9,8 @@
 /vscode-debugprotocol
 /superbol-free
 /autofonce
+/h2mlstubs
+/ezlibcob
 *~
 _build
 .merlin

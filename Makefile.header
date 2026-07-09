@@ -5,6 +5,7 @@ MAIN_SRCDIR ?= src
 STUDIO = superbol_vscode_platform
 STUDIO_SRCDIR = $(MAIN_SRCDIR)/vscode/superbol-vscode-platform
 GNUCOBOL_SRCDIR = import/gnucobol
+GNUCOBOL4_SRCDIR = import/gnucobol4
 SUPERBOL_LSP_PKG = lsp/superbol-free
 
 JS_OUTDIR = _out
@@ -15,7 +16,7 @@ JS_TARGETS = $(addprefix $(JS_OUTDIR)/,superbol-vscode-platform-bundle.js	\
 # (could be a submodule)
 LSP_MODE_SRCDIR ?= ../lsp-mode
 
-MORE_DEV_OPAM_FILES := vendors/ANSITerminal/ANSITerminal.opam
+MORE_DEV_OPAM_FILES := vendors/ANSITerminal/ANSITerminal.opam vendors/goblint-cil/goblint-cil.opam
 AUTOFONCE_EXE = dune exec -- src/autofonce/autofonce/main.exe
 
 # ---
@@ -51,6 +52,7 @@ opam-cross:
 	rm -f opam/osx/*-js-*.opam
 	rm -f opam/osx/vscode-debug*.opam
 	rm -f opam/osx/*-vscode-*.opam
+	rm -f opam/osx/ezlibcob-*.opam
 	sed -i '/"superbol-vscode-platform-osx"/ d'		\
 		opam/osx/superbol-studio-oss-osx.opam
 	sed -i '/"ANSITerminal-osx"/ d' opam/osx/*.opam
@@ -58,6 +60,7 @@ opam-cross:
 	rm -f opam/windows/*-js-*.opam
 	rm -f opam/windows/vscode-debug*.opam
 	rm -f opam/windows/*-vscode-*.opam
+	rm -f opam/windows/ezlibcob-*.opam
 	sed -i '/"superbol-vscode-platform-windows"/ d'		\
 		opam/windows/superbol-studio-oss-windows.opam
 	sed -i '/"ANSITerminal-windows"/ d' opam/windows/*.opam

@@ -45,9 +45,11 @@ jobs:
           release: false
           update: true
           msystem: ${{ matrix.sys }}
+          path-type: inherit
           install: autoconf automake make libtool flex bison
                    gettext gettext-devel help2man texinfo texinfo-tex
                    mingw-w64-${{ matrix.env }}-cc
+                   mingw-w64-${{ matrix.env }}-gcc
                    mingw-w64-${{ matrix.env }}-gmp
                    mingw-w64-${{ matrix.env }}-ncurses
                    mingw-w64-${{ matrix.env }}-libxml2
@@ -76,7 +78,8 @@ jobs:
           mkdir import/gnucobol4/_build && cd import/gnucobol4/_build
           # Note: we add the path to git-bash so that we can use the diff
           # command it provides, to workaround a diff bug under the MSYS2 CI
-          PATH="$PATH:/c/Program Files/Git/usr/bin" ../configure $CFGOPT CFLAGS=-std=c17
+          sed -i 's/-Qunused-arguments//g' ../configure
+          PATH="$PATH:/c/Program Files/Git/usr/bin" ../configure $CFGOPT CFLAGS=-std=c17 --prefix="C:/GnuCOBOL4"
 
       - name: Build GnuCOBOL
         shell: msys2 {0}
@@ -85,6 +88,16 @@ jobs:
       - name: Install GnuCOBOL
         shell: msys2 {0}
         run: make -C import/gnucobol4/_build --jobs=$(($(nproc)+1)) install
+
+      - name: Copy GnuCOBOL dependencies
+        shell: msys2 {0}
+        run: |
+          cd /${{ matrix.sys }}/bin
+          cp libintl-*.dll libiconv-*.dll libgcc_s_seh-*.dll libgmp-*.dll libjson-c-*.dll libncursesw*.dll libpanelw*.dll libwinpthread-*.dll libxml2-*.dll liblzma-*.dll zlib*.dll /c/GnuCOBOL4/bin/ || true
+
+      - name: Add GnuCOBOL to PATH
+        shell: pwsh
+        run: echo C:\GnuCOBOL4\bin >> $env:GITHUB_PATH
 
       - name: Manual install of opam depexts
         shell: msys2 {0}
@@ -106,7 +119,7 @@ jobs:
           key: v5-4.14.2-msys2-${{ matrix.sys }}-${{ hashFiles('**/*.opam') }}
 
       - run: |
-          opam install .\opam\*.opam .\vendors\ANSITerminal\ANSITerminal.opam .\test\opam\*.opam --deps-only --with-test
+          opam install .\opam\*.opam .\vendors\ANSITerminal\ANSITerminal.opam .\vendors\goblint-cil\goblint-cil.opam .\test\opam\*.opam --deps-only --with-test
 
       - run: make
 
