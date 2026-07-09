@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>FuncVar (goblint-cil.Syntacticsearch.FuncVar)</title><meta charset="utf-8"/><link rel="stylesheet" href="../../../odoc.support/odoc.css"/><meta name="generator" content="odoc 3.1.0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><script src="../../../odoc.support/highlight.pack.js"></script><script>hljs.initHighlightingOnLoad();</script></head><body class="odoc"><nav class="odoc-nav"><a href="../index.html">Up</a> – <a href="../../../index.html">Index</a> &#x00BB; <a href="../../index.html">goblint-cil</a> &#x00BB; <a href="../index.html">Syntacticsearch</a> &#x00BB; FuncVar</nav><header class="odoc-preamble"><h1>Module <code><span>Syntacticsearch.FuncVar</span></code></h1></header><div class="odoc-content"><div class="odoc-spec"><div class="spec value anchored" id="val-is_equal_varname_varid"><a href="#val-is_equal_varname_varid" class="anchor"></a><code><span><span class="keyword">val</span> is_equal_varname_varid : 
+  <span><a href="../../GoblintCil/index.html#type-varinfo">GoblintCil.varinfo</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span>int <span class="arrow">&#45;&gt;</span></span>
+  bool</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-delete_elem"><a href="#val-delete_elem" class="anchor"></a><code><span><span class="keyword">val</span> delete_elem : 
+  <span><span><span class="xref-unresolved">Stdlib</span>.String.t list</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Stdlib</span>.String.t list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-delete_duplicates"><a href="#val-delete_duplicates" class="anchor"></a><code><span><span class="keyword">val</span> delete_duplicates : <span><span><span class="type-var">'a</span> list</span> <span class="arrow">&#45;&gt;</span></span> <span><span><span>(<span class="type-var">'a</span>, int)</span> <span class="xref-unresolved">Stdlib</span>.Hashtbl.t</span> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-map_gfun"><a href="#val-map_gfun" class="anchor"></a><code><span><span class="keyword">val</span> map_gfun : 
+  <span><span>(<span><a href="../../GoblintCil/index.html#type-fundec">GoblintCil.fundec</a> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> option</span>)</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../GoblintCil/index.html#type-global">GoblintCil.global</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> option</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-map_gvar"><a href="#val-map_gvar" class="anchor"></a><code><span><span class="keyword">val</span> map_gvar : 
+  <span><span>(<span><a href="../../GoblintCil/index.html#type-varinfo">GoblintCil.varinfo</a> <span class="arrow">&#45;&gt;</span></span>
+    <span><a href="../../GoblintCil/index.html#type-initinfo">GoblintCil.initinfo</a> <span class="arrow">&#45;&gt;</span></span>
+    <span><a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> <span class="arrow">&#45;&gt;</span></span>
+    <span><span class="type-var">'a</span> option</span>)</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../GoblintCil/index.html#type-global">GoblintCil.global</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> option</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-is_temporary"><a href="#val-is_temporary" class="anchor"></a><code><span><span class="keyword">val</span> is_temporary : <span>int <span class="arrow">&#45;&gt;</span></span> bool</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-get_func_loc"><a href="#val-get_func_loc" class="anchor"></a><code><span><span class="keyword">val</span> get_func_loc : <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span> <span>string <span class="arrow">&#45;&gt;</span></span> <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-generate_globalvar_list"><a href="#val-generate_globalvar_list" class="anchor"></a><code><span><span class="keyword">val</span> generate_globalvar_list : <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span> <span>string list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-get_all_alphaconverted_in_fun"><a href="#val-get_all_alphaconverted_in_fun" class="anchor"></a><code><span><span class="keyword">val</span> get_all_alphaconverted_in_fun : 
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span>string <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Stdlib</span>.String.t list</span></span></code></div></div><div class="odoc-spec"><div class="spec class anchored" id="class-var_search_in_expr"><a href="#class-var_search_in_expr" class="anchor"></a><code><span><span class="keyword">class</span> </span><span><a href="class-var_search_in_expr/index.html">var_search_in_expr</a></span><span> : <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span> <span>int <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span><span><span><span>(string * <span class="type-var">'a</span> * string * int)</span> list</span> <span class="xref-unresolved">Stdlib</span>.ref</span> <span class="arrow">&#45;&gt;</span></span> <span>
+  bool <span class="arrow">&#45;&gt;</span></span> <a href="../../GoblintCil/class-nopCilVisitor/index.html">GoblintCil.nopCilVisitor</a></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-search_expression"><a href="#val-search_expression" class="anchor"></a><code><span><span class="keyword">val</span> search_expression : 
+  <span><a href="../../GoblintCil/index.html#type-exp">GoblintCil.exp</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span>int <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <span class="type-var">'a</span> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-search_lhost"><a href="#val-search_lhost" class="anchor"></a><code><span><span class="keyword">val</span> search_lhost : 
+  <span><a href="../../GoblintCil/index.html#type-lhost">GoblintCil.lhost</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span>int <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <span class="type-var">'a</span> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-search_offset"><a href="#val-search_offset" class="anchor"></a><code><span><span class="keyword">val</span> search_offset : 
+  <span><a href="../../GoblintCil/index.html#type-offset">GoblintCil.offset</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span>int <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <span class="type-var">'a</span> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-search_expression_list"><a href="#val-search_expression_list" class="anchor"></a><code><span><span class="keyword">val</span> search_expression_list : 
+  <span><span><a href="../../GoblintCil/index.html#type-exp">GoblintCil.exp</a> list</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span>int <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <span class="type-var">'a</span> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-search_instr_list_for_var"><a href="#val-search_instr_list_for_var" class="anchor"></a><code><span><span class="keyword">val</span> search_instr_list_for_var : 
+  <span><span><a href="../../GoblintCil/index.html#type-instr">GoblintCil.instr</a> list</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span>int <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-search_stmt_list_for_var"><a href="#val-search_stmt_list_for_var" class="anchor"></a><code><span><span class="keyword">val</span> search_stmt_list_for_var : 
+  <span><span><a href="../../GoblintCil/index.html#type-stmt">GoblintCil.stmt</a> list</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span>int <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_uses_in_fun_var"><a href="#val-find_uses_in_fun_var" class="anchor"></a><code><span><span class="keyword">val</span> find_uses_in_fun_var : 
+  <span><a href="../../GoblintCil/index.html#type-fundec">GoblintCil.fundec</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span>int <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_uses_in_fun_find_fun"><a href="#val-find_uses_in_fun_find_fun" class="anchor"></a><code><span><span class="keyword">val</span> find_uses_in_fun_find_fun : 
+  <span><span><a href="../../GoblintCil/index.html#type-global">GoblintCil.global</a> list</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span>int <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_uses_in_fun"><a href="#val-find_uses_in_fun" class="anchor"></a><code><span><span class="keyword">val</span> find_uses_in_fun : 
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span>int <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_all_glob_vars"><a href="#val-find_all_glob_vars" class="anchor"></a><code><span><span class="keyword">val</span> find_all_glob_vars : <span><span><a href="../../GoblintCil/index.html#type-global">GoblintCil.global</a> list</span> <span class="arrow">&#45;&gt;</span></span> <span>int list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_uses_in_fun_all_glob"><a href="#val-find_uses_in_fun_all_glob" class="anchor"></a><code><span><span class="keyword">val</span> find_uses_in_fun_all_glob : 
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_fundec"><a href="#val-find_fundec" class="anchor"></a><code><span><span class="keyword">val</span> find_fundec : 
+  <span><span><a href="../../GoblintCil/index.html#type-global">GoblintCil.global</a> list</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../GoblintCil/index.html#type-fundec">GoblintCil.fundec</a> option</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_uses_in_fun_all"><a href="#val-find_uses_in_fun_all" class="anchor"></a><code><span><span class="keyword">val</span> find_uses_in_fun_all : 
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_var_in_globals"><a href="#val-find_var_in_globals" class="anchor"></a><code><span><span class="keyword">val</span> find_var_in_globals : 
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span>int <span class="arrow">&#45;&gt;</span></span>
+  <span><span><a href="../../GoblintCil/index.html#type-global">GoblintCil.global</a> list</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_uses"><a href="#val-find_uses" class="anchor"></a><code><span><span class="keyword">val</span> find_uses : 
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span>int <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_uses_all_glob"><a href="#val-find_uses_all_glob" class="anchor"></a><code><span><span class="keyword">val</span> find_uses_all_glob : 
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_uses_all"><a href="#val-find_uses_all" class="anchor"></a><code><span><span class="keyword">val</span> find_uses_all : 
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-cond_search_uses_stmt_list"><a href="#val-cond_search_uses_stmt_list" class="anchor"></a><code><span><span class="keyword">val</span> cond_search_uses_stmt_list : 
+  <span><span><a href="../../GoblintCil/index.html#type-stmt">GoblintCil.stmt</a> list</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span>int <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_uses_in_cond_in_fun"><a href="#val-find_uses_in_cond_in_fun" class="anchor"></a><code><span><span class="keyword">val</span> find_uses_in_cond_in_fun : 
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span>int <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_uses_in_cond"><a href="#val-find_uses_in_cond" class="anchor"></a><code><span><span class="keyword">val</span> find_uses_in_cond : 
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span>int <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_uses_in_cond_all_glob"><a href="#val-find_uses_in_cond_all_glob" class="anchor"></a><code><span><span class="keyword">val</span> find_uses_in_cond_all_glob : 
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_uses_in_cond_in_fun_all_glob"><a href="#val-find_uses_in_cond_in_fun_all_glob" class="anchor"></a><code><span><span class="keyword">val</span> find_uses_in_cond_in_fun_all_glob : 
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_uses_in_cond_in_fun_all"><a href="#val-find_uses_in_cond_in_fun_all" class="anchor"></a><code><span><span class="keyword">val</span> find_uses_in_cond_in_fun_all : 
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_uses_in_cond_all"><a href="#val-find_uses_in_cond_all" class="anchor"></a><code><span><span class="keyword">val</span> find_uses_in_cond_all : 
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-remove_result"><a href="#val-remove_result" class="anchor"></a><code><span><span class="keyword">val</span> remove_result : <span><span><span class="type-var">'a</span> list</span> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_uses_in_noncond"><a href="#val-find_uses_in_noncond" class="anchor"></a><code><span><span class="keyword">val</span> find_uses_in_noncond : 
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span>int <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_uses_in_noncond_all_glob"><a href="#val-find_uses_in_noncond_all_glob" class="anchor"></a><code><span><span class="keyword">val</span> find_uses_in_noncond_all_glob : 
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_uses_in_noncond_all"><a href="#val-find_uses_in_noncond_all" class="anchor"></a><code><span><span class="keyword">val</span> find_uses_in_noncond_all : 
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span>bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_decl_in_fun"><a href="#val-find_decl_in_fun" class="anchor"></a><code><span><span class="keyword">val</span> find_decl_in_fun : 
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span>int <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_decl_in_fun_all"><a href="#val-find_decl_in_fun_all" class="anchor"></a><code><span><span class="keyword">val</span> find_decl_in_fun_all : 
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_decl_all_glob"><a href="#val-find_decl_all_glob" class="anchor"></a><code><span><span class="keyword">val</span> find_decl_all_glob : 
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_decl"><a href="#val-find_decl" class="anchor"></a><code><span><span class="keyword">val</span> find_decl : 
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span>int <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(<span class="xref-unresolved">Stdlib</span>.String.t * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_decl_all"><a href="#val-find_decl_all" class="anchor"></a><code><span><span class="keyword">val</span> find_decl_all : 
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec class anchored" id="class-var_find_def_in_fun"><a href="#class-var_find_def_in_fun" class="anchor"></a><code><span><span class="keyword">class</span> </span><span><a href="class-var_find_def_in_fun/index.html">var_find_def_in_fun</a></span><span> : <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span> <span>int <span class="arrow">&#45;&gt;</span></span> <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span> <span><span><span><span>(string
+                                                 * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a>
+                                                 * string
+                                                 * int)</span>
+                                                  list</span>
+                                                  <span class="xref-unresolved">Stdlib</span>.ref</span> <span class="arrow">&#45;&gt;</span></span> <a href="../../GoblintCil/class-nopCilVisitor/index.html">GoblintCil.nopCilVisitor</a></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_defs_in_fun"><a href="#val-find_defs_in_fun" class="anchor"></a><code><span><span class="keyword">val</span> find_defs_in_fun : 
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span>int <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_defs_in_fun_all_glob"><a href="#val-find_defs_in_fun_all_glob" class="anchor"></a><code><span><span class="keyword">val</span> find_defs_in_fun_all_glob : 
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_defs_in_fun_all"><a href="#val-find_defs_in_fun_all" class="anchor"></a><code><span><span class="keyword">val</span> find_defs_in_fun_all : 
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_defs"><a href="#val-find_defs" class="anchor"></a><code><span><span class="keyword">val</span> find_defs : 
+  <span><span class="xref-unresolved">Stdlib</span>.String.t <span class="arrow">&#45;&gt;</span></span>
+  <span>int <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_defs_all_glob"><a href="#val-find_defs_all_glob" class="anchor"></a><code><span><span class="keyword">val</span> find_defs_all_glob : 
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-find_defs_all"><a href="#val-find_defs_all" class="anchor"></a><code><span><span class="keyword">val</span> find_defs_all : 
+  <span><a href="../../GoblintCil/index.html#type-file">GoblintCil.file</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(string * <a href="../../GoblintCil/index.html#type-location">GoblintCil.location</a> * string * int)</span> list</span></span></code></div></div></div></body></html>
