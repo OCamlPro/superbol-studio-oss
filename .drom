@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-1bfab60f4d7152eda431cd54effee855:.
+482c0b4b5c898499efc0db696fce9e03:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -15,12 +15,12 @@ version:0.9.0
 
 # begin context for .gitignore
 # file .gitignore
-e1fc1f64740796e3c174ba9b6bd1a782:.gitignore
+62012fff03f05eee34fd52e39c83897d:.gitignore
 # end context for .gitignore
 
 # begin context for Makefile
 # file Makefile
-53951afb2341dca366ccf6894e3c5d72:Makefile
+f4c14250506a8337e004be3b87a52c01:Makefile
 # end context for Makefile
 
 # begin context for docs/README.txt
@@ -50,7 +50,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-3006bba37a84a8747305344367b420ef:dune-project
+5870df941b28483c70ca60a055a2689e:dune-project
 # end context for dune-project
 
 # begin context for opam/autofonce.opam
@@ -175,13 +175,18 @@ bff32163e2b49b90242750acd6022ee5:opam/cobol_parser.opam
 
 # begin context for opam/ezlibcob.opam
 # file opam/ezlibcob.opam
-dc1f75f51d173db59dfe153393b5b1f4:opam/ezlibcob.opam
+147efe42174820cfba0df58aca412f44:opam/ezlibcob.opam
 # end context for opam/ezlibcob.opam
 
 # begin context for opam/ezr_toml.opam
 # file opam/ezr_toml.opam
 2ae0006d49590bbdbb364466c0938fef:opam/ezr_toml.opam
 # end context for opam/ezr_toml.opam
+
+# begin context for opam/h2mlstubs.opam
+# file opam/h2mlstubs.opam
+b3c37a2994319dcd4811b1de8d59dfe8:opam/h2mlstubs.opam
+# end context for opam/h2mlstubs.opam
 
 # begin context for opam/interop-js-stubs.opam
 # file opam/interop-js-stubs.opam
@@ -483,6 +488,21 @@ b6a8ea9d6eef15ced32d2934e602ed64:src/autofonce/ez_win32/index.mld
 a5027007a5ed5a4b90598fcde0e6fc1b:src/autofonce/ez_win32/version.mlt
 # end context for src/autofonce/ez_win32/version.mlt
 
+# begin context for src/h2mlstubs/dune
+# file src/h2mlstubs/dune
+586f780bd9900b2809f7a060d0dc1216:src/h2mlstubs/dune
+# end context for src/h2mlstubs/dune
+
+# begin context for src/h2mlstubs/linking_flags.sh
+# file src/h2mlstubs/linking_flags.sh
+9fdfca3cc53df639758ff04fe09d3243:src/h2mlstubs/linking_flags.sh
+# end context for src/h2mlstubs/linking_flags.sh
+
+# begin context for src/h2mlstubs/version.mlt
+# file src/h2mlstubs/version.mlt
+a5027007a5ed5a4b90598fcde0e6fc1b:src/h2mlstubs/version.mlt
+# end context for src/h2mlstubs/version.mlt
+
 # begin context for src/lsp/cobol_cfg/dune
 # file src/lsp/cobol_cfg/dune
 cfee3e13c13fa1890123d30809d7a1a3:src/lsp/cobol_cfg/dune
@@ -730,7 +750,7 @@ a5027007a5ed5a4b90598fcde0e6fc1b:src/lsp/superbol_project/version.mlt
 
 # begin context for src/tramabol/ezlibcob/dune
 # file src/tramabol/ezlibcob/dune
-90ad4d5ebf85a2c2cb56dc3315bba667:src/tramabol/ezlibcob/dune
+3418b1122a84632ec29cff4a7903df3b:src/tramabol/ezlibcob/dune
 # end context for src/tramabol/ezlibcob/dune
 
 # begin context for src/tramabol/ezlibcob/index.mld

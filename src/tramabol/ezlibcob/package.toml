@@ -53,13 +53,11 @@ skip = ["main.ml"]
 #   ez_file = ">=0.1 <1.3"
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
-camlp-streams = { version = "5", build = true }
-ez_file = { version = "0.3.0", build = true }
-pretty = { version = "version", build = true }
+# ...
 
 # package tools dependencies
 [tools]
-goblint-cil = ">=2.0.0"
+h2mlstubs = "version"
 
 # package fields (depends on package skeleton)
 #Examples:
@@ -87,15 +85,10 @@ dune-stanzas = """
 """
 dune-trailer = """
 
-(executable
- (name genstubs)
- (libraries pretty ez_file camlp-streams goblint-cil)
- (modules error parser types synthetize generate genstubs))
-
 (rule
  (targets v1.ml libcob_stubs.c)
  (deps stubs.h libcob_stubs_header.c libcob_stubs_trailer.c v1_header.ml v1_trailer.ml)
- (action (run %{exe:genstubs.exe} stubs.h v1.ml libcob_stubs.c)))
+ (action (run h2mlstubs stubs.h v1.ml libcob_stubs.c)))
 
 
 (rule
@@ -107,6 +100,7 @@ dune-trailer = """
  (target flags)
  (enabled_if (= %{os_type} Win32))
  (action (with-stdout-to %{target} (echo "()"))))
+
 
 (rule
  (target cflags)

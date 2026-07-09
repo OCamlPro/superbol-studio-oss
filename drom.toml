@@ -360,3 +360,6 @@ dir = "src/autofonce/autofonce_config"
 [[package]]
 dir = "src/autofonce/autofonce_misc"
 # edit 'src/autofonce/autofonce_misc/package.toml' for package-specific options
+
+[[package]]
+dir = "src/h2mlstubs"

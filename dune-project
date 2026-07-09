@@ -760,10 +760,7 @@
 
  (depends
    (ocaml (>= 4.14.0))
-   (pretty (= :version))
-   (ez_file (and (>= 0.3.0) (< 1.0.0)))
-   (camlp-streams ( >= 5 ))
-   (goblint-cil ( >= 2.0.0 ))
+   (h2mlstubs (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
@@ -995,6 +992,26 @@
    (ocaml (>= 4.14.0))
    (ocplib_stuff ( >= 0.1 ))
    (ez_file ( >= 0.4 ))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name h2mlstubs)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (pretty (= :version))
+   (goblint-cil ( >= 2.0.0 ))
+   (ez_file (and (>= 0.3.0) (< 1.0.0)))
+   (camlp-streams ( >= 5 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
