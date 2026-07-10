@@ -55,6 +55,10 @@ depends: [
   "superbol_free_lib-windows" {= version}
   "pretty-windows" {= version}
   "ez_cmdliner-windows" {>= "0.3.0" & < "1.0.0"}
+  "cobol_typeck-windows" {= version}
+  "cobol_preproc-windows" {= version}
+  "cobol_parser-windows" {= version}
+  "cobol_interp-windows" {= version}
   "cobol_common-windows" {= version}
   "odoc" {with-doc}
   "dune" {>= "3.17.0" & < "3.19.0"}

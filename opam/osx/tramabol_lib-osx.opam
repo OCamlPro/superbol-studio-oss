@@ -55,6 +55,10 @@ depends: [
   "superbol_free_lib-osx" {= version}
   "pretty-osx" {= version}
   "ez_cmdliner-osx" {>= "0.3.0" & < "1.0.0"}
+  "cobol_typeck-osx" {= version}
+  "cobol_preproc-osx" {= version}
+  "cobol_parser-osx" {= version}
+  "cobol_interp-osx" {= version}
   "cobol_common-osx" {= version}
   "odoc" {with-doc}
   "dune" {>= "3.17.0" & < "3.19.0"}

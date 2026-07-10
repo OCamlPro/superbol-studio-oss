@@ -268,6 +268,8 @@ and ident = ident_ term
 (** (Qualified) name (should be `qualref` for "qualified reference" instead). *)
 and qualname = qualname_ term
 
+and qualname_with_subscripts = qualident_ term
+
 (** Any sort of literal (Boolean, alphanumeric, national, numeric,
     figurative) *)
 and literal = lit_ term
@@ -336,7 +338,7 @@ and binary_relation =
 (** An abbreviated combined relation describes a condition of the form
     {v NOT? subject <abbrev-relation-operand> v}.
     The leftmost non AbbrevComb element is always an AbbrevRelOp.
-    Be careful: the COBOL standard imposes that the optional NOT only 
+    Be careful: the COBOL standard imposes that the optional NOT only
     applies to the leftmost object in the abbreviated relational condition. *)
 and abbrev_combined_relation =
   bool * expr with_loc * abbrev_relation_operand with_loc
@@ -349,7 +351,7 @@ and abbrev_relation_operand =
   | AbbrevParen of bool * abbrev_relation_operand with_loc (** {v NOT? (a) v} *)
   | AbbrevOther of cond (** {v <non-relational condition> v} *)
   | AbbrevComb (** {v a' <AND/OR> a'' v} *)
-      of (abbrev_relation_operand with_loc as 'x) * logop * 'x  
+      of (abbrev_relation_operand with_loc as 'x) * logop * 'x
 
 
 and logop =
@@ -438,7 +440,7 @@ and qualident =
 
 and subscript =
   | SubSAll
-  | SubSExpr of expr with_loc 
+  | SubSExpr of expr with_loc
   | SubSIdx of name with_loc * sign * integer
 
 and _ sign_cond =
@@ -601,7 +603,7 @@ module COMPARE = struct
     compare_struct (Bool.compare b1 b2) @@
     lazy (compare_struct (compare_expr' e1 e2) @@
           lazy (compare_with_loc compare_abbrev_relation_operand a1 a2))
-    
+
   and compare_abbrev_relation_operand a b = match a, b with
     | AbbrevRelOp (r1, a1), AbbrevRelOp (r2, a2) ->
         compare_struct (compare_relop r1 r2) @@
@@ -618,7 +620,7 @@ module COMPARE = struct
     | AbbrevSubject _, _ -> -1
     | _, AbbrevSubject _ -> 1
     | AbbrevParen (b1, a1), AbbrevParen (b2, a2) ->
-        compare_struct (Bool.compare b1 b2) @@ 
+        compare_struct (Bool.compare b1 b2) @@
         lazy (compare_with_loc compare_abbrev_relation_operand a1 a2)
     | AbbrevParen _, _ -> -1
     | _, AbbrevParen _ -> 1
@@ -794,6 +796,8 @@ module COMPARE = struct
     lazy (Option.compare (compare_with_loc compare_name) c d)
 
   and compare_ident: ident compare_fun = fun a b -> compare_term a b
+  and compare_qualname_with_subscripts: qualname_with_subscripts compare_fun =
+    fun a b -> compare_term a b
   and compare_trimming_tip x y =
     match x, y with
     | Leading, Leading | Trailing, Trailing -> 0
@@ -1039,7 +1043,7 @@ module FMT = struct
     fmt "%a@ %a@ %a" ppf
       pp_expr' a pp_relop o pp_expr' b
 
-  and pp_cond ?(pos = true) ppf c = 
+  and pp_cond ?(pos = true) ppf c =
     match c with
     | Expr e ->
         fmt "%a%a" ppf not_ pos pp_expr' e
@@ -1062,7 +1066,7 @@ module FMT = struct
   and pp_cond' ppf = pp_with_loc (pp_cond ~pos:true) ppf
 
   and pp_abbrev_combined_relation ppf (neg, e, a) =
-    fmt "%a%a@ %a" ppf not_ (not neg) pp_expr' e 
+    fmt "%a%a@ %a" ppf not_ (not neg) pp_expr' e
       pp_abbrev_relation_operand ~&a
 
   and pp_abbrev_relation_operand ppf = function
@@ -1122,6 +1126,10 @@ module FMT = struct
   and pp_literal: literal Pretty.printer = fun ppf -> pp_term ppf
   and pp_literal' = fun ppf -> pp_with_loc pp_literal ppf
   and pp_ident: ident Pretty.printer = fun ppf -> pp_term ppf
+  and pp_qualname_with_subscripts: qualname_with_subscripts Pretty.printer =
+    fun ppf -> pp_term ppf
+  and pp_qualname_with_subscripts' =
+    fun ppf -> pp_with_loc pp_qualname_with_subscripts ppf
 
   (** Pretty-printing for named unions of term types (some are yet to be
       renamed) *)

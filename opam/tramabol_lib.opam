@@ -53,6 +53,10 @@ depends: [
   "superbol_free_lib" {= version}
   "pretty" {= version}
   "ez_cmdliner" {>= "0.3.0" & < "1.0.0"}
+  "cobol_typeck" {= version}
+  "cobol_preproc" {= version}
+  "cobol_parser" {= version}
+  "cobol_interp" {= version}
   "cobol_common" {= version}
   "odoc" {with-doc}
   "dune" {>= "3.17.0" & < "3.19.0"}

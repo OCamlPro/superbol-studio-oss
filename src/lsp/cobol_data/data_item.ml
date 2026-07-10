@@ -51,6 +51,9 @@ let qualname = function
   | Field { field_qualname; _ } -> field_qualname
   | Table _ -> None
 
+let record_size: record -> Data_memory.size = fun r ->
+  size ~&(r.record_item)
+
 (** Note: may be a no-op *)
 let pp_item_qualname ?(leading = Fmt.nop) ppf item =
   Fmt.(option (leading ++ Cobol_ptree.pp_qualname')) ppf (qualname item)

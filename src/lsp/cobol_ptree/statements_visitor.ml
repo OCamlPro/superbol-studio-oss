@@ -668,9 +668,9 @@ let fold_stop_arg (v: _ #folder) =
   handle v#fold_stop_arg
     ~continue:begin fun a x -> match a with
       | StopWithQualIdent i -> x
-        >> fold_qualident v i
+        >> fold' ~fold:fold_qualname_with_subscripts v i
       | StopWithLiteral l -> x
-        >> fold_literal v l
+        >> fold_literal' v l
     end
 
 let fold_stop' (v: _ #folder) =
@@ -948,7 +948,7 @@ and fold_display' (v: _ #folder) : display_stmt with_loc -> 'a -> 'a =
 
 and fold_display_items_clauses (v: _ #folder) : display_items_clauses -> 'a -> 'a =
   fun { display_items; display_clauses } x -> x
-    >> fold_list ~fold:fold_ident_or_literal v display_items
+    >> fold_list ~fold:fold_ident_or_literal' v display_items
     >> fold_list ~fold:fold_display_clause' v display_clauses
 
 and fold_display_clause' (v: _ #folder) : display_clause with_loc -> 'a -> 'a =

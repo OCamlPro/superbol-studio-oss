@@ -215,6 +215,10 @@ and fold_ident_or_nonnum (v: _ #folder) : ident_or_nonnum -> 'a -> 'a = function
   | StrConcat _
   | Fig _ as f -> fold_literal v f
 
+
+and fold_qualname_with_subscripts (v: _ #folder) : qualname_with_subscripts -> 'a -> 'a = function
+  | QualIdent _ as i -> fold_ident v i
+
 and fold_qualident (v: _ #folder) =
   handle v#fold_qualident
     ~continue:begin fun { ident_name; ident_subscripts } x -> x
@@ -371,6 +375,9 @@ and fold_ident_or_literal (v: _ #folder) : ident_or_literal -> 'a -> 'a = functi
   | StrConcat _
   | Concat _ as l -> fold_literal v l
 
+and fold_ident_or_literal' (v: _ #folder) =
+  fold' ~fold:fold_ident_or_literal v
+
 and fold_scalar (v: _ #folder) : scalar -> 'a -> 'a = function
   | Address _
   | Counter _
@@ -440,7 +447,7 @@ let rec fold_cond: _ #folder -> cond -> _ = fun v ->
 
 and fold_cond' (v: _ #folder) =
   handle' v#fold_cond' ~fold:fold_cond v
-    
+
 and fold_binary_relation (v: _ #folder) (e, r, f) x = x
   >> fold_expr' v e
   >> fold_relop v r
@@ -468,7 +475,7 @@ and fold_abbrev_relation_operand (v: _ #folder) =
           >> fold_logop v o
           >> fold_abbrev_relation_operand' v a2
     end
-    
+
 and fold_abbrev_relation_operand' (v: _ #folder) =
   handle' v#fold_abbrev_relation_operand' ~fold:fold_abbrev_relation_operand v
 

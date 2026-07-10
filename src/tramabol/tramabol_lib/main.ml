@@ -46,6 +46,13 @@ let main ?style_renderer ?utf_8 () =
   EZCMD.main ~version:Version.version @@
   EZCMD.sub "tramabol" ~doc:"interpreter for COBOL programs" ~args @@
   begin fun () ->
-    let type_checked_prog = parse_n_typeck (common ()) !file in
-    ignore type_checked_prog;
+    match Cobol_interp.Main.group (parse_n_typeck (common ()) !file).group with
+    | Ok status ->
+        Pretty.error "Terminated with status: %d@." status;
+        Cobol_common.exit ~status ()
+    | Error errors ->
+        Cobol_common.Basics.NEL.iter ~f:begin fun e ->
+          Pretty.error "Error: @[%a@]@." Cobol_ir.Printer.pp_error e;
+        end errors;
+        Cobol_common.exit ~status:1 ()
   end

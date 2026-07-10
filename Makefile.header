@@ -141,4 +141,13 @@ ifneq ($(TARGET_PLAT),universal)
 	$(CP) $(TRAMABOL_BUILT) $(TRAMABOL_EXE)
 
   $(TRAMABOL_BUILT): build
+
+  .PHONY: test-tramabol
+  test-tramabol:
+	opam exec -- dune runtest test/tramabol
+
+  .PHONY: test-tramabol-promote
+  test-promote: test-tramabol-promote
+  test-tramabol-promote:
+	opam exec -- dune runtest test/tramabol --auto-promote
 endif

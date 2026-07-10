@@ -363,3 +363,9 @@ dir = "src/tramabol/tramabol_lib"
 
 [[package]]
 dir = "src/tramabol/ezlibcob"
+
+[[package]]
+dir = "src/tramabol/cobol_interp"
+
+[[package]]
+dir = "src/tramabol/cobol_ir"

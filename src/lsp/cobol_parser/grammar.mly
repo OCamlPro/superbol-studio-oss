@@ -3341,15 +3341,15 @@ let display_statement [@context display_stmt] :=
 let end_display := oterm_(END_DISPLAY)
 
 let display_items_clauses_list :=
- | ill = ident_or_literal+;
+ | ill = loc(ident_or_literal)+;
    { [ { display_items = ill; display_clauses = []; } ] }
  | dicl = nell(display_items_clauses);
    { dicl }
- | dicl = nell(display_items_clauses); ill = ident_or_literal+;
+ | dicl = nell(display_items_clauses); ill = loc(ident_or_literal)+;
    { dicl @ [ { display_items = ill; display_clauses = []; } ] }
 
 let display_items_clauses :=
- | ill = ident_or_literal+; dcl = loc(display_clause)+;
+ | ill = loc(ident_or_literal)+; dcl = loc(display_clause)+;
    { { display_items = ill; display_clauses = dcl; } }
 
 let display_clause :=
@@ -4237,9 +4237,9 @@ let stop_body [@context stop_stmt] := (* with context: should not accept empty *
   | THREAD; ~ = o(qualident); <StopThread>
 
 let stop_with_arg :=
-  | ~ = qualident; <StopWithQualIdent>                   (* ~COB85, -COB2002 *)
-  | ~ = literal; <StopWithLiteral> (* obsolete in COB85 (but MF allows ZERO,
-                                      SPACE & QUOTE) *)
+  | q = loc(qualident); {StopWithQualIdent ((QualIdent ~&q) &@<-q)} (* ~COB85, -COB2002 *)
+  | ~ = loc(literal); <StopWithLiteral> (* obsolete in COB85 (but MF allows ZERO,
+                                           SPACE & QUOTE) *)
 
 let with_status :=
   | WITH; status_kind = status_kind;
