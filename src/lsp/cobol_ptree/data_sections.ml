@@ -119,7 +119,7 @@ type report_group_clause =
   | ReportBlankWhenZero
   | ReportSource of
       {
-        source: expression list;                               (* non-empty *)
+        source: expr with_loc list;                               (* non-empty *)
         rounding: rounding;
       }
   | ReportSum of
@@ -129,7 +129,7 @@ type report_group_clause =
         rounding: rounding;
       }
   | ReportValue of literal
-  | ReportPresentWhen of condition                              (* +COB2002 *)
+  | ReportPresentWhen of cond with_loc                              (* +COB2002 *)
   | ReportGroupIndicate
   | ReportOccurs of                                             (* +COB2002 *)
       {
@@ -162,7 +162,7 @@ let pp_report_group_clause ppf = function
   | ReportBlankWhenZero -> Fmt.pf ppf "BLANK WHEN ZERO"
   | ReportSource { source; rounding } ->
       Fmt.pf ppf "SOURCE %a %a"
-        Fmt.(list ~sep:sp pp_expression) source
+        Fmt.(list ~sep:sp pp_expr') source
         pp_rounding rounding
   | ReportSum { sum_of; reset_on; rounding } ->
       Fmt.(list ~sep:nop (hbox pp_sum_phrase ++ sp)) ppf sum_of;
@@ -170,7 +170,7 @@ let pp_report_group_clause ppf = function
         ppf reset_on;
       pp_rounding ppf rounding
   | ReportValue v -> Fmt.pf ppf "VALUE %a" pp_literal v
-  | ReportPresentWhen c -> Fmt.pf ppf "PRESENT WHEN %a" pp_condition c
+  | ReportPresentWhen c -> Fmt.pf ppf "PRESENT WHEN %a" pp_cond' c
   | ReportGroupIndicate -> Fmt.pf ppf "GROUP"
   | ReportOccurs { from; to_; depending; step } ->
       Fmt.pf ppf "OCCURS %a%a%a%a"

@@ -33,13 +33,13 @@ type allocate_stmt =
 [@@deriving ord]
 
 and allocate_kind =
-  | AllocateCharacters of expression (*arith exp that evaluates to int (may be rounded)*)
+  | AllocateCharacters of expr with_loc (*arith exp that evaluates to int (may be rounded)*)
   | AllocateDataItem of name with_loc
 [@@deriving ord]
 
 let pp_allocate_kind ppf = function
   | AllocateCharacters e ->
-    Fmt.pf ppf "%a@ CHARACTERS" pp_expression e
+    Fmt.pf ppf "%a@ CHARACTERS" pp_expr' e
   | AllocateDataItem n ->
     pp_name ppf n.payload
 
@@ -662,7 +662,7 @@ type set_stmt =
       {
         targets: ident list;
         set_method: set_ambiguous_method;
-        value: expression;
+        value: expr with_loc;
       }
   | SetSwitch of
       set_switch_spec list
@@ -732,7 +732,7 @@ let pp_set_stmt ppf ss =
     Fmt.pf ppf "%a@ %a@ %a"
       Fmt.(list ~sep:sp pp_ident) targets
       pp_set_ambiguous_method set_method
-      pp_expression value
+      pp_expr' value
   | SetSwitch sssl ->
     Fmt.(list ~sep:sp pp_set_switch_spec) ppf sssl
   | SetCondition scsl ->

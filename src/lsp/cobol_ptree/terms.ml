@@ -316,34 +316,22 @@ and unop =
 
 and expr =
   | Atom of scalar
-  | Unop of unop * expression
-  | Binop of expression * binop * expression (* split arith/bool ? *)
-
-and expression = expr with_loc
+  | Unop of unop * expr with_loc
+  | Binop of expr with_loc * binop * expr with_loc (* split arith/bool ? *)
 
 (** Any form of condition {v c v} *)
 and cond =
-  | Expr:
-      expression -> cond         (** expression used as a condition *)
-  | Relation:
-      binary_relation -> cond            (** simple binary relation *)
-  | Abbrev:
-      abbrev_combined_relation -> cond     (** abbreviated relation *)
-  | ClassCond:
-      expression * class_ -> cond               (** class condition *)
-  | SignCond:
-      expression * signz -> cond (** {v e POSITIVE/NEGATIVE/ZERO v} *)
-  | Omitted:
-      expression -> cond                        (** {v c OMITTED v} *)
-  | Not:
-      condition -> cond                             (** {v NOT c v} *)
-  | Logop:
-      condition * logop * condition -> cond (** {v c <AND/OR> c' v} *)
-
-and condition = cond with_loc
+  | Expr of expr with_loc (** expression used as a condition *)
+  | Relation of binary_relation (** simple binary relation *)
+  | Abbrev of abbrev_combined_relation (** abbreviated relation *)
+  | ClassCond of expr with_loc * class_ (** class condition *)
+  | SignCond of expr with_loc * signz (** {v e POSITIVE/NEGATIVE/ZERO v} *)
+  | Omitted of expr with_loc (** {v c OMITTED v} *)
+  | Not of cond with_loc (** {v NOT c v} *)
+  | Logop of cond with_loc * logop * cond with_loc (** {v c <AND/OR> c' v} *)
 
 and binary_relation =
-  expression * relop * expression             (** {v e <relop> e' v} *)
+  expr with_loc * relop * expr with_loc (** {v e <relop> e' v} *)
 
 (** An abbreviated combined relation describes a condition of the form
     {v NOT? subject <abbrev-relation-operand> v}.
@@ -351,19 +339,18 @@ and binary_relation =
     Be careful: the COBOL standard imposes that the optional NOT only 
     applies to the leftmost object in the abbreviated relational condition. *)
 and abbrev_combined_relation =
-  bool * expression * abbrev_relation_operand'
+  bool * expr with_loc * abbrev_relation_operand with_loc
 
 (** Suffix of relational combined conditions ({v a v}) *)
 and abbrev_relation_operand =
-  | AbbrevRelOp of relop * abbrev_relation_operand'        (** {v <relop> a v} *)
-  | AbbrevObject of bool * expression                         (** {v NOT? e v} *)
-  | AbbrevSubject of abbrev_combined_relation               (** {v NOT? e a v} *)
-  | AbbrevParen of bool * abbrev_relation_operand'          (** {v NOT? (a) v} *)
-  | AbbrevOther of cond                   (** {v <non-relational condition> v} *)
-  | AbbrevComb of
-      (abbrev_relation_operand' as 'x) * logop * 'x  (** {v a' <AND/OR> a'' v} *)
+  | AbbrevRelOp of relop * abbrev_relation_operand with_loc (** {v <relop> a v} *)
+  | AbbrevObject of bool * expr with_loc (** {v NOT? e v} *)
+  | AbbrevSubject of abbrev_combined_relation (** {v NOT? e a v} *)
+  | AbbrevParen of bool * abbrev_relation_operand with_loc (** {v NOT? (a) v} *)
+  | AbbrevOther of cond (** {v <non-relational condition> v} *)
+  | AbbrevComb (** {v a' <AND/OR> a'' v} *)
+      of (abbrev_relation_operand with_loc as 'x) * logop * 'x  
 
-and abbrev_relation_operand' = abbrev_relation_operand with_loc
 
 and logop =
   | LAnd
@@ -439,8 +426,8 @@ and trimming_tip =
   | Leading
   | Trailing
 
-and effective_arg =                  (* TODO: could be an [expression option] *)
-  | ArgExpr of expression (* Regroup identifiers, literals and arithmetic expressions *)
+and effective_arg =                  (* TODO: could be an [expr with_loc option] *)
+  | ArgExpr of expr with_loc (* Regroup identifiers, literals and arithmetic expressions *)
   | ArgOmitted
 
 and qualident =
@@ -451,7 +438,7 @@ and qualident =
 
 and subscript =
   | SubSAll
-  | SubSExpr of expression
+  | SubSExpr of expr with_loc 
   | SubSIdx of name with_loc * sign * integer
 
 and _ sign_cond =
@@ -463,8 +450,8 @@ and signz = loose_ sign_cond
 
 and refmod =
   {
-    refmod_left: expression;
-    refmod_length: expression option;
+    refmod_left: expr with_loc ;
+    refmod_length: expr with_loc option;
   }
 
 and inline_invocation =
@@ -588,11 +575,11 @@ module COMPARE = struct
         compare_term a b
     | Unop(a, c), Unop(b, d) ->
         compare_struct (Stdlib.compare a b) @@
-        lazy (compare_expression c d)
+        lazy (compare_expr' c d)
     | Binop(a, c ,e), Binop(b, d, f) ->
         compare_struct (Stdlib.compare c d) @@
-        lazy (compare_struct (compare_expression a b) @@
-              lazy (compare_expression e f))
+        lazy (compare_struct (compare_expr' a b) @@
+              lazy (compare_expr' e f))
     (* take the arbitrari order Binop > Unop > Atom *)
     | Atom _, _ ->
         -1
@@ -604,16 +591,15 @@ module COMPARE = struct
         1
 
   and compare_expr' x y = compare_with_loc compare_expr x y
-  and compare_expression x y = compare_expr' x y
 
   and compare_binary_relation (x1, r1, y1) (x2, r2, y2) =
-    compare_struct (compare_expression x1 x2) @@
+    compare_struct (compare_expr' x1 x2) @@
     lazy (compare_struct (compare r1 r2) @@
-          lazy (compare_expression y1 y2))
+          lazy (compare_expr' y1 y2))
 
   and compare_abbrev_combined_relation (b1, e1, a1) (b2, e2, a2) =
     compare_struct (Bool.compare b1 b2) @@
-    lazy (compare_struct (compare_expression e1 e2) @@
+    lazy (compare_struct (compare_expr' e1 e2) @@
           lazy (compare_with_loc compare_abbrev_relation_operand a1 a2))
     
   and compare_abbrev_relation_operand a b = match a, b with
@@ -624,7 +610,7 @@ module COMPARE = struct
     | _, AbbrevRelOp _ -> 1
     | AbbrevObject (b1, e1), AbbrevObject (b2, e2) ->
         compare_struct (Bool.compare b1 b2) @@
-        lazy (compare_expression e1 e2)
+        lazy (compare_expr' e1 e2)
     | AbbrevObject _, _ -> -1
     | _, AbbrevObject _ -> 1
     | AbbrevSubject r1, AbbrevSubject r2 ->
@@ -647,7 +633,7 @@ module COMPARE = struct
   and compare_cond : cond -> cond -> int =
     fun a b -> match a, b with
       | Expr x, Expr y ->
-          compare_expression x y
+          compare_expr' x y
       | Expr _, _ -> -1
       | _, Expr _ -> 1
       | Relation x, Relation y -> compare_binary_relation x y
@@ -657,28 +643,28 @@ module COMPARE = struct
       | Abbrev _, _ -> -1
       | _, Abbrev _ -> 1
       | ClassCond (x1, c1), ClassCond (x2, c2) ->
-          compare_struct (compare_expression x1 x2) @@
+          compare_struct (compare_expr' x1 x2) @@
           lazy (compare_class_ c1 c2)
       | ClassCond _, _ -> -1
       | _, ClassCond _ -> 1
       | SignCond (x1, s1), SignCond(x2, s2) ->
-          compare_struct (compare_expression x1 x2) @@
+          compare_struct (compare_expr' x1 x2) @@
           lazy (compare_signz s1 s2)
       | SignCond _, _ -> -1
       | _, SignCond _ -> 1
       | Omitted x, Omitted y ->
-          compare_expression x y
+          compare_expr' x y
       | Omitted _, _ -> -1
       | _, Omitted _ -> 1
       | Not x, Not y ->
-          compare_condition x y
+          compare_cond' x y
       | Not _, _ -> -1
       | _, Not _ -> 1
       | Logop (x1, o1, y1), Logop (x2, o2, y2) ->
           compare_struct (compare_logop o1 o2) @@
-          lazy (compare_struct (compare_condition x1 x2) @@
-                lazy (compare_condition y1 y2))
-  and compare_condition a b = compare_with_loc compare_cond a b
+          lazy (compare_struct (compare_cond' x1 x2) @@
+                lazy (compare_cond' y1 y2))
+  and compare_cond' a b = compare_with_loc compare_cond a b
   and compare_relop =
     Stdlib.compare
   and compare_logop =
@@ -695,7 +681,7 @@ module COMPARE = struct
     lazy (List.compare compare_subscript c d)
   and compare_subscript x y = match x,y with
     | SubSExpr a ,SubSExpr b ->
-        compare_expression a b
+        compare_expr' a b
     | SubSIdx(n1, s1, i1),
       SubSIdx(n2, s2, i2) ->
         compare_struct (compare_with_loc compare_name n1 n2) @@
@@ -706,8 +692,8 @@ module COMPARE = struct
   and compare_refmod
       { refmod_left = a; refmod_length = c }
       { refmod_left = b; refmod_length = d } =
-    compare_struct (compare_expression a b) @@
-    lazy (Option.compare compare_expression c d)
+    compare_struct (compare_expr' a b) @@
+    lazy (Option.compare compare_expr' c d)
   and compare_sign : strict_ sign_cond compare_fun = compare
   and compare_signz : loose_ sign_cond compare_fun = compare
   and compare_object_ref x y = match x, y with
@@ -787,7 +773,7 @@ module COMPARE = struct
     lazy (Bool.compare c d)
   and compare_effective_arg x y = match x, y with
     | ArgExpr a, ArgExpr b ->
-        compare_expression a b
+        compare_expr' a b
     | ArgExpr _, ArgOmitted ->
         1
     | ArgOmitted, ArgOmitted ->
@@ -897,13 +883,13 @@ module FMT = struct
 
   and pp_subscript ppf : subscript -> unit = function
     | SubSAll -> string ppf "ALL"
-    | SubSExpr e -> pp_expression ppf e
+    | SubSExpr e -> pp_expr' ppf e
     | SubSIdx (n, s, i) -> fmt "%a@ %a@ %a" ppf pp_name' n pp_sign s pp_integer i
 
   and pp_refmod ppf { refmod_left; refmod_length } =
     fmt "@[<1>(%a:%a)@]" ppf
-      pp_expression refmod_left
-      (option pp_expression) refmod_length
+      pp_expr' refmod_left
+      (option pp_expr') refmod_length
 
   and pp_qualident ppf { ident_name = n; ident_subscripts } =
     pp_qualname' ppf n;
@@ -976,9 +962,9 @@ module FMT = struct
        parenthesize the unary part to get `1 (- X)`. But then if we have
         `Y (- X)`  that is no longer correct. And even consider `(1 + X) (- 2)`
        So we just put parentheses everywhere and call it a day for now (which is
-       a pity, given that we do work in pp_expression to avoid unnecessary
+       a pity, given that we do work in pp_expr' to avoid unnecessary
        parentheses). *)
-    | ArgExpr e -> Fmt.parens pp_expression ppf e
+    | ArgExpr e -> Fmt.parens pp_expr' ppf e
 
   and pp_object_view ppf { object_view_ident; object_view_spec } =
     fmt "%a@ AS@ " ppf pp_ident object_view_ident;
@@ -1008,7 +994,7 @@ module FMT = struct
   and pp_scalar: scalar Pretty.printer = fun ppf -> pp_term ppf
 
   and pp_expr ppf e = Unparse.Expression.pp ppf (pretty_expression e)
-  and pp_expression ppf = pp_with_loc pp_expr ppf
+  and pp_expr' ppf = pp_with_loc pp_expr ppf
 
   and pretty_expression = function
     | Atom a -> Unparse.Expression.atom pp_term a
@@ -1051,39 +1037,39 @@ module FMT = struct
 
   and pp_binary_relation ppf (a, o, b) =
     fmt "%a@ %a@ %a" ppf
-      pp_expression a pp_relop o pp_expression b
+      pp_expr' a pp_relop o pp_expr' b
 
   and pp_cond ?(pos = true) ppf c = 
     match c with
     | Expr e ->
-        fmt "%a%a" ppf not_ pos pp_expression e
+        fmt "%a%a" ppf not_ pos pp_expr' e
     | Relation rel ->
         fmt "%a@[<1>(%a)@]" ppf not_ pos pp_binary_relation rel
     | Abbrev r ->
         fmt "%a%a" ppf not_ pos pp_abbrev_combined_relation r
     | ClassCond (e, c) ->
-        fmt "%a@ %a%a" ppf pp_expression e not_ pos pp_class_ c
+        fmt "%a@ %a%a" ppf pp_expr' e not_ pos pp_class_ c
     | SignCond (e, s) ->
-        fmt "%a@ %a%a" ppf pp_expression e not_ pos pp_sign s
+        fmt "%a@ %a%a" ppf pp_expr' e not_ pos pp_sign s
     | Omitted e ->
-        fmt "%a@ %aOMITTED" ppf pp_expression e not_ pos
+        fmt "%a@ %aOMITTED" ppf pp_expr' e not_ pos
     | Not c ->
         pp_with_loc (pp_cond ~pos:(not pos)) ppf c
     | Logop (a, o, b) ->
         fmt "@[<1>%a(%a@ %a@ %a)@]" ppf
-          not_ pos pp_condition a pp_logop o pp_condition b
+          not_ pos pp_cond' a pp_logop o pp_cond' b
 
-  and pp_condition ppf = pp_with_loc (pp_cond ~pos:true) ppf
+  and pp_cond' ppf = pp_with_loc (pp_cond ~pos:true) ppf
 
   and pp_abbrev_combined_relation ppf (neg, e, a) =
-    fmt "@[<1>(%a%a@ %a)@]" ppf not_ (not neg) pp_expression e 
+    fmt "@[<1>(%a%a@ %a)@]" ppf not_ (not neg) pp_expr' e 
       pp_abbrev_relation_operand ~&a
 
   and pp_abbrev_relation_operand ppf = function
     | AbbrevRelOp (o, a) ->
         fmt "%a@ %a" ppf pp_relop o pp_abbrev_relation_operand ~&a
     | AbbrevObject (neg, e) ->
-        fmt "%a%a" ppf not_ (not neg) pp_expression e
+        fmt "%a%a" ppf not_ (not neg) pp_expr' e
     | AbbrevSubject r ->
         pp_abbrev_combined_relation ppf r
     | AbbrevParen (neg, a) ->

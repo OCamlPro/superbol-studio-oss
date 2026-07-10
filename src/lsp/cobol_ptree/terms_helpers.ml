@@ -12,17 +12,18 @@
 (**************************************************************************)
 
 open Terms
-open Cobol_common.Srcloc.INFIX
+open Cobol_common
+open Srcloc.INFIX
 
-let neg_condition ~neg (c: condition): cond =
+let neg_condition ~neg (c: cond with_loc): cond =
   if not neg then ~&c else Not c
 
 (** [abbrev_condition_expansion_state] is used internally by [expand_abbrev_cond]
     to remember the previous subject and relational operator that are omitted
     in the abbreviation. *)
 type abbrev_condition_expansion_state =
-  | AfterSubject of bool * expression
-  | AfterRelOp of bool * expression * relop
+  | AfterSubject of bool * expr with_loc
+  | AfterRelOp of bool * expr with_loc * relop
   | AfterNonAbbrev
 
 (** [AbbrevMissingSubjectAfterNonAbbrev] is raised by [expand_abbrev_cond] on

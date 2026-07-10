@@ -207,7 +207,7 @@ let dual_handler_none =
 (* Entry points *)
 
 %start <Cobol_ptree.compilation_group> compilation_group
-%start <condition> standalone_condition
+%start <cond with_loc> standalone_condition
 
 %%
 

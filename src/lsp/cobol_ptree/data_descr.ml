@@ -278,8 +278,8 @@ let pp_data_occurs_clause ppf = function
 type data_varying =
   {
     data_varying: name with_loc;
-    data_varying_from: expression option;
-    data_varying_by: expression option;
+    data_varying_from: expr with_loc option;
+    data_varying_by: expr with_loc option;
   }
 [@@deriving ord]
 
@@ -288,8 +288,8 @@ let pp_data_varying ppf
 =
   Fmt.pf ppf "%a%a%a"
     pp_name' v
-    Fmt.(option (any "@ FROM " ++ pp_expression)) f
-    Fmt.(option (any "@ BY " ++ pp_expression)) b
+    Fmt.(option (any "@ FROM " ++ pp_expr')) f
+    Fmt.(option (any "@ BY " ++ pp_expr')) b
 
 let pp_varying_clause ppf vcs =
   Fmt.pf ppf "VARYING %a"
@@ -493,8 +493,8 @@ type validation_clause =
   | Class of class_clause
   | Default of ident_or_literal option
   | Destination of ident list (* non-empty *)
-  | InvalidWhen of condition list (* non-empty *)
-  | PresentWhen of condition
+  | InvalidWhen of cond with_loc list (* non-empty *)
+  | PresentWhen of cond with_loc
   | Varying of data_varying list
   | ValidateStatus of
       {
@@ -546,10 +546,10 @@ let pp_destination_clause =
   Fmt.(any "DESTINATION " ++ list ~sep:sp pp_ident)
 
 let pp_invalid_when_clause =
-  Fmt.(list ~sep:sp (any "INVALID WHEN " ++ pp_condition))
+  Fmt.(list ~sep:sp (any "INVALID WHEN " ++ pp_cond'))
 
 let pp_present_when_clause =
-  Fmt.(any "PRESENT WHEN " ++ pp_condition)
+  Fmt.(any "PRESENT WHEN " ++ pp_cond')
 
 let pp_validation_clause ppf = function
   | Class cc -> pp_class_clause ppf cc
@@ -676,14 +676,14 @@ let pp_line_position ppf = function
 
 type sum_phrase =
   {
-    sum_operands: expression list; (* non-empty *)
+    sum_operands: expr with_loc list; (* non-empty *)
     sum_upon_items: name with_loc list;
   }
 [@@deriving ord]
 
 let pp_sum_phrase ppf { sum_operands = ops; sum_upon_items = sui } =
   Fmt.pf ppf "SUM@;<1 2>";
-  Fmt.(box (list ~sep:sp pp_expression)) ppf ops;
+  Fmt.(box (list ~sep:sp pp_expr')) ppf ops;
   if sui != [] then
     Fmt.pf ppf "@ %a"
       Fmt.(box (any "UPON" ++ list ~sep:nop (sp ++ pp_name'))) sui
@@ -811,14 +811,14 @@ let pp_report_clause ppf = function
 
 
 type constant_value =
-  | ConstExpr of expression                                 (* or plain ident *)
+  | ConstExpr of expr with_loc                                 (* or plain ident *)
   | ConstByteLength of name with_loc
   | ConstLength of name with_loc
   | ConstFrom of name with_loc                        (* compilation variable *)
 [@@deriving ord]
 
 let pp_constant_value ppf = function
-  | ConstExpr e -> Fmt.pf ppf "AS@ %a" pp_expression e
+  | ConstExpr e -> Fmt.pf ppf "AS@ %a" pp_expr' e
   | ConstByteLength n -> Fmt.pf ppf "AS BYTE LENGTH %a" pp_name' n
   | ConstLength n -> Fmt.pf ppf "AS LENGTH %a" pp_name' n
   | ConstFrom n -> Fmt.pf ppf "FROM %a" pp_name' n

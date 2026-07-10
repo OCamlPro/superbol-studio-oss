@@ -19,7 +19,7 @@ open Cobol_parser.Tokens
 open Cobol_parser.INTERNAL.Grammar
 open Cobol_parser.INTERNAL.Dummy
 
-let condition: condition testable = testable pp_condition (=)
+let condition: condition testable = testable pp_cond' (=)
 let parse_condition = parse_list_as standalone_condition
 let expand_condition = Cobol_ptree.Terms_helpers.expand_every_abbrev_cond
 let check_condition toks cond =
