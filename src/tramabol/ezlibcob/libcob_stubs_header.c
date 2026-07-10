@@ -1,4 +1,4 @@
-#line 2 "src/ezlibcob/libcob_stubs_header.c"
+#line 2 "src/tramabol/ezlibcob/libcob_stubs_header.c"
 /**************************************************************************/
 /*                                                                        */
 /*                        SuperBOL OSS Studio                             */
@@ -46,4 +46,4 @@ CAMLprim value ml_cob_resolve_cobol_and_call (value function_v)
 }
 
 /* The following line number should be offset +2 to its line number */
-#line 51 "_build/default/src/ezlibcob/libcob_stubs.c"
+#line 51 "_build/default/src/tramabol/ezlibcob/libcob_stubs.c"
