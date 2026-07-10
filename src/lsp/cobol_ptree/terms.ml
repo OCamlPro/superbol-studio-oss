@@ -1062,7 +1062,7 @@ module FMT = struct
   and pp_cond' ppf = pp_with_loc (pp_cond ~pos:true) ppf
 
   and pp_abbrev_combined_relation ppf (neg, e, a) =
-    fmt "@[<1>(%a%a@ %a)@]" ppf not_ (not neg) pp_expr' e 
+    fmt "%a%a@ %a" ppf not_ (not neg) pp_expr' e 
       pp_abbrev_relation_operand ~&a
 
   and pp_abbrev_relation_operand ppf = function
@@ -1075,9 +1075,9 @@ module FMT = struct
     | AbbrevParen (neg, a) ->
         fmt "%a@[<1>(%a)@]" ppf not_ (not neg) pp_abbrev_relation_operand ~&a
     | AbbrevOther c ->
-        fmt "@[<1>(%a)@]" ppf (pp_cond ~pos:true) c
+        pp_cond ppf c
     | AbbrevComb (a1, o, a2) ->
-        fmt "@[<1>(%a@ %a@ %a)@]" ppf
+        fmt "%a@ %a@ %a" ppf
           pp_abbrev_relation_operand ~&a1
           pp_logop o
           pp_abbrev_relation_operand ~&a2
