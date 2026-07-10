@@ -375,10 +375,13 @@ let gen_comp (comp : comp) =
     if comp.comp_struct then
       begin
         let args =
-          List.map (fun (name, ty) ->
-              Printf.sprintf "?%s:%s"
-                (clean_ml_name name) (mod_ml_type comp ty)
-            ) comp.comp_fields @ ["unit"]
+          if comp.comp_fields <> [] then
+            List.map (fun (name, ty) ->
+                Printf.sprintf "%s:%s"
+                  (clean_ml_name name) (mod_ml_type comp ty)
+              ) comp.comp_fields
+          else
+            ["unit"]
         in
         Printf.bprintf ml_buf "  external create : %s -> t = "
           (String.concat " -> " args);
@@ -460,10 +463,8 @@ let gen_comp (comp : comp) =
         Printf.bprintf c_buf "  %s *res = (%s *)calloc(1, sizeof(%s));\n"
           comp.comp_c_type comp.comp_c_type comp.comp_c_type;
         List.iter (fun (name, ty) ->
-            Printf.bprintf c_buf "  if (Is_some(%s_v)) {\n" name;
             Printf.bprintf c_buf "    res->%s = %s;\n" name
-              (conv_to_c ty (Printf.sprintf "Some_val(%s_v)" name));
-            Printf.bprintf c_buf "  }\n"
+              (conv_to_c ty (Printf.sprintf "%s_v" name));
           ) comp.comp_fields;
         Printf.bprintf c_buf "  Val_comp(res_v, res);\n";
         Printf.bprintf c_buf "  CAMLreturn(res_v);\n";

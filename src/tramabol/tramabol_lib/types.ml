@@ -1,4 +1,3 @@
-#2 "src/tramabol/ezlibcob/v1_trailer.ml"
 (**************************************************************************)
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)
@@ -11,3 +10,10 @@
 (* of this source tree.                                                   *)
 (*                                                                        *)
 (**************************************************************************)
+
+open Ezlibcob.V1
+
+type module_ = CobModule.t cptr
+type globals = CobGlobal.t cptr
+type field = CobField.t
+type fields_array = field carray

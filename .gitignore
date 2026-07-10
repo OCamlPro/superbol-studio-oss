@@ -8,9 +8,10 @@
 /vscode-debugadapter
 /vscode-debugprotocol
 /superbol-free
+/ezlibcob
+/tramabol
 /autofonce
 /h2mlstubs
-/ezlibcob
 *~
 _build
 .merlin
@@ -21,6 +22,7 @@ _build
 .drom.config
 # Edit drom.toml to change the following lines
 /superbol-free-*
+/tramabol-*
 /_*
 /node_modules
 /package-json
@@ -31,6 +33,7 @@ ATTIC
 !.vscode/tasks.json
 !.vscode/launch.json
 *.vsix
+/*.js
 *.opam.locked
 /emacs/lsp-superbol-customs.el
 _superbol

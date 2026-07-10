@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-70da75f4aa5ef82cf4bded2b77c357fc:.
+b0bb2ac91f411fea15fc06ef727b762b:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -15,12 +15,12 @@ version:0.9.0
 
 # begin context for .gitignore
 # file .gitignore
-e5502605e28129eb222c300ab6174e48:.gitignore
+62012fff03f05eee34fd52e39c83897d:.gitignore
 # end context for .gitignore
 
 # begin context for Makefile
 # file Makefile
-3d648b4c47e42f1a9ee63a2beadeceef:Makefile
+f4c14250506a8337e004be3b87a52c01:Makefile
 # end context for Makefile
 
 # begin context for docs/README.txt
@@ -50,7 +50,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-841d2560f1adc2eb5cfc406d04f92076:dune-project
+9698195333738577c8295dd625e5ce50:dune-project
 # end context for dune-project
 
 # begin context for opam/autofonce.opam
@@ -262,6 +262,16 @@ df3d65c35f2930f9eefda35713cf0b81:opam/superbol_free_lib.opam
 # file opam/superbol_project.opam
 a775ab5225ee66687e84a737fbf30121:opam/superbol_project.opam
 # end context for opam/superbol_project.opam
+
+# begin context for opam/tramabol.opam
+# file opam/tramabol.opam
+282d5f5de6d79da53bb80c574db84a50:opam/tramabol.opam
+# end context for opam/tramabol.opam
+
+# begin context for opam/tramabol_lib.opam
+# file opam/tramabol_lib.opam
+92f4d2ade1c66f3442911d78d49ea37f:opam/tramabol_lib.opam
+# end context for opam/tramabol_lib.opam
 
 # begin context for opam/vscode-debugadapter.opam
 # file opam/vscode-debugadapter.opam
@@ -753,9 +763,29 @@ a5027007a5ed5a4b90598fcde0e6fc1b:src/lsp/superbol_project/version.mlt
 a5027007a5ed5a4b90598fcde0e6fc1b:src/tramabol/ezlibcob/version.mlt
 # end context for src/tramabol/ezlibcob/version.mlt
 
+# begin context for src/tramabol/tramabol/dune
+# file src/tramabol/tramabol/dune
+521745abda4e0e60cfe54e41945dc7a7:src/tramabol/tramabol/dune
+# end context for src/tramabol/tramabol/dune
+
+# begin context for src/tramabol/tramabol/linking_flags.sh
+# file src/tramabol/tramabol/linking_flags.sh
+236a0354fe949a020f31913b39b31663:src/tramabol/tramabol/linking_flags.sh
+# end context for src/tramabol/tramabol/linking_flags.sh
+
+# begin context for src/tramabol/tramabol_lib/dune
+# file src/tramabol/tramabol_lib/dune
+c99069ce5009e89f9979d097a5d5effe:src/tramabol/tramabol_lib/dune
+# end context for src/tramabol/tramabol_lib/dune
+
+# begin context for src/tramabol/tramabol_lib/version.mlt
+# file src/tramabol/tramabol_lib/version.mlt
+a5027007a5ed5a4b90598fcde0e6fc1b:src/tramabol/tramabol_lib/version.mlt
+# end context for src/tramabol/tramabol_lib/version.mlt
+
 # begin context for src/vendor/ez_toml/dune
 # file src/vendor/ez_toml/dune
-0778f52cc1225df698a5fcd42310b6ff:src/vendor/ez_toml/dune
+5b0adf2706d3d163581192a5fe88cf03:src/vendor/ez_toml/dune
 # end context for src/vendor/ez_toml/dune
 
 # begin context for src/vendor/ez_toml/index.mld

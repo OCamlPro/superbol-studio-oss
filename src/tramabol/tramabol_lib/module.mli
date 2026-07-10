@@ -1,4 +1,3 @@
-#2 "src/tramabol/ezlibcob/v1_trailer.ml"
 (**************************************************************************)
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)
@@ -11,3 +10,7 @@
 (* of this source tree.                                                   *)
 (*                                                                        *)
 (**************************************************************************)
+
+val create: name:string -> source_file:string -> Types.module_
+val enter: Types.module_ -> procedure_params:Types.fields_array -> Types.globals
+val leave: Types.module_ -> unit

@@ -750,6 +750,97 @@
  )
 
 (package
+ (name ezlibcob)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (h2mlstubs (= :version))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name tramabol)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "Interpreter for COBOL programs (command-line program)")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (tramabol_lib (= :version))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name tramabol_lib)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "Interpreter for COBOL programs (main library)")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (superbol_platform (= :version))
+   (superbol_free_lib (= :version))
+   (pretty (= :version))
+   (ezlibcob (= :version))
+   (ez_cmdliner (and (>= 0.3.0) (< 1.0.0)))
+   (cobol_common (= :version))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name ez_win32)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (ez_file ( >= 0.3 ))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name ez_call)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (ez_win32 ( >= 0.1 ))
+   (ez_file ( >= 0.3 ))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
  (name autofonce)
  (synopsis "A modern runner for GNU Autoconf Testsuites")
  (description "autofonce is a modern runner for GNU Autoconf Testsuites:\nautofonce has a limited understanding of m4 macros that appear in testsuites\nwritten for the GNU Autoconf testsuites, and can run such tests in a modern\nway.\n")
@@ -908,41 +999,6 @@
  )
 
 (package
- (name ez_win32)
- (synopsis "SuperBOL Studio OSS Project")
- (description "SuperBOL Studio OSS is a new platform for COBOL")
- 
-  (sites
-    
-  )
-
- (depends
-   (ocaml (>= 4.14.0))
-   (ez_file ( >= 0.3 ))
-   odoc
-   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
-  )
- )
-
-(package
- (name ez_call)
- (synopsis "SuperBOL Studio OSS Project")
- (description "SuperBOL Studio OSS is a new platform for COBOL")
- 
-  (sites
-    
-  )
-
- (depends
-   (ocaml (>= 4.14.0))
-   (ez_win32 ( >= 0.1 ))
-   (ez_file ( >= 0.3 ))
-   odoc
-   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
-  )
- )
-
-(package
  (name h2mlstubs)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
@@ -957,23 +1013,6 @@
    (goblint-cil ( >= 2.0.0 ))
    (ez_file (and (>= 0.3.0) (< 1.0.0)))
    (camlp-streams ( >= 5 ))
-   odoc
-   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
-  )
- )
-
-(package
- (name ezlibcob)
- (synopsis "SuperBOL Studio OSS Project")
- (description "SuperBOL Studio OSS is a new platform for COBOL")
- 
-  (sites
-    
-  )
-
- (depends
-   (ocaml (>= 4.14.0))
-   (h2mlstubs (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
