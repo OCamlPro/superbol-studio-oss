@@ -84,10 +84,12 @@ let run () =
   let module_date = U32.of_int 20260617 in
   let module_time = U32.of_int 231330 in
 
-  let cob_procedure_params = CArray.create ~default:(CobField.null ()) CComp 1 in
+  let cob_procedure_params =
+    CArray.create ~default:(CobField.null ())
+      (CPtr (CComp CobField.kind)) 1 in
 
-  let pmodule = CPtr.create CComp in
-  let pglobal = CPtr.create CComp in
+  let pmodule = CPtr.create (CPtr (CComp CobModule.kind)) in
+  let pglobal = CPtr.create (CPtr (CComp CobGlobal.kind)) in
   let _res = cob_module_global_enter pmodule pglobal S32.zero S32.zero in
   let module_ = CPtr.get pmodule in
   let _global = CPtr.get pglobal in
@@ -146,8 +148,8 @@ let run () =
 
   let d_0 = CobDecimal.create () in
   let d_1 = CobDecimal.create () in
-  let pd_0 = CPtr.create ~default:d_0 (CComp) in
-  let pd_1 = CPtr.create ~default:d_1 (CComp) in
+  let pd_0 = CPtr.create ~default:d_0 (CPtr (CComp CobDecimal.kind)) in
+  let pd_1 = CPtr.create ~default:d_1 (CPtr (CComp CobDecimal.kind)) in
   cob_decimal_alloc [| pd_0; pd_1 |];
 
   CobModule.set_module_active module_
@@ -174,6 +176,22 @@ let run () =
       ~scale:S16.zero
       ~flags
       ~pic:(CobPicSymbol.null ())
+  in
+
+  let pic_array = CArray.create (CComp CobPicSymbol.kind) 3 in
+  let a1 = CArray.get_ptr pic_array 0 in
+  let a2 = CArray.get_ptr pic_array 1 in
+  CobPicSymbol.set_symbol a1 '9';
+  CobPicSymbol.set_times_repeated a1 S32.one;
+  CobPicSymbol.set_symbol a2 'X';
+  CobPicSymbol.set_times_repeated a1 (S32.of_int 3);
+  let _dummy_attrs =
+    CobFieldAttr.create
+      ~type_:(CobFieldType.(to_u16 (enc COB_TYPE_GROUP)))
+      ~digits:U16.zero
+      ~scale:S16.zero
+      ~flags:(U16.of_int 42)
+      ~pic:(CArray.to_ptr pic_array)
   in
 
   let a_1 = digits_attrs 3 in

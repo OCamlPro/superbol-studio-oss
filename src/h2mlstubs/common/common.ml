@@ -1,4 +1,4 @@
-#2 "src/h2mlstubs/common.ml"
+#2 "src/h2mlstubs/common/common.ml"
 (**************************************************************************)
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)
@@ -11,6 +11,8 @@
 (* of this source tree.                                                   *)
 (*                                                                        *)
 (**************************************************************************)
+
+type !'a comp_kind
 
 type !'a cint
 type !'a enum
@@ -170,7 +172,7 @@ type _ kind =
   | CFloat : CFloat.t kind
   | CDouble : CDouble.t kind
   | CEnum : 'a enum kind
-  | CComp : 'a comp kind
+  | CComp : 'a comp_kind -> 'a comp kind
   | CPtr : 'a kind -> 'a cptr kind
   | CArray : 'a kind * int -> 'a carray kind
 
@@ -192,6 +194,7 @@ module CArray = struct
   external create : ?default:'a -> 'a kind -> int -> 'a t = "ml_array_create"
   external free : 'a t -> unit = "ml_array_free"
   external get : 'a t -> int -> 'a = "ml_array_get"
+  external get_ptr : 'a t -> int -> 'a cptr = "ml_array_get_ptr"
   external set : 'a t -> int -> 'a -> unit = "ml_array_set"
   external to_ptr : 'a t -> 'a cptr = "ml_array_to_ptr"
   external of_ptr : int -> 'a cptr -> 'a t = "ml_array_of_ptr"
