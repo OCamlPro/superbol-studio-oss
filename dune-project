@@ -797,6 +797,7 @@
    (superbol_platform (= :version))
    (superbol_free_lib (= :version))
    (pretty (= :version))
+   (ezlibcob (= :version))
    (ez_cmdliner (and (>= 0.3.0) (< 1.0.0)))
    (cobol_common (= :version))
    odoc

@@ -10,6 +10,7 @@
   
    (modes exe js)
  (js_of_ocaml (flags --enable=effects --disable=genprim))
+ (enabled_if %{env:HAVE_LIBCOB5=true})               ; <- /!\ enabled by default
 
   )
 

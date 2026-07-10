@@ -57,6 +57,7 @@ ez_cmdliner = "0.3.0"
 pretty = "version"
 superbol_free_lib = "version"
 superbol_platform = "version"
+ezlibcob = "version"
 
 # package tools dependencies
 [tools]
@@ -75,3 +76,6 @@ superbol_platform = "version"
 #  static-clibs = "unix" 
 [fields]
 # ...
+dune-stanzas = """
+ (enabled_if %{env:HAVE_LIBCOB5=true})               ; <- /!\\ enabled by default
+"""

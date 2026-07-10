@@ -5,12 +5,13 @@
   (public_name tramabol_lib)
   (wrapped true)
   ; use field 'dune-libraries' to add libraries without opam deps
-  (libraries superbol_platform superbol_free_lib pretty ez_cmdliner cobol_common )
+  (libraries superbol_platform superbol_free_lib pretty ezlibcob ez_cmdliner cobol_common )
   ; use field 'dune-flags' to set this value
   (flags (:standard))
   ; use field 'dune-stanzas' to add more stanzas here
   
-  
+   (enabled_if %{env:HAVE_LIBCOB5=true})               ; <- /!\ enabled by default
+
   )
 
 
