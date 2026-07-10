@@ -1,4 +1,4 @@
-#2 "src/ezlibcob/v1_header.ml"
+#2 "src/tramabol/ezlibcob/v1_header.ml"
 (**************************************************************************)
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)
@@ -16,4 +16,4 @@ external resolve_cobol_and_call: string -> int =
   "ml_cob_resolve_cobol_and_call"
 
 (* The following line should be specified with an offset of +2 *)
-#21 "_build/default/src/ezlibcob/v1.ml"
+#21 "_build/default/src/tramabol/ezlibcob/v1.ml"

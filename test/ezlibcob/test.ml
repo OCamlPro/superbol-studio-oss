@@ -153,16 +153,33 @@ let run () =
   CobModule.set_module_active module_
     (U32.succ (CobModule.get_module_active module_));
 
-  let a_1 = CobFieldAttr.create
-              ~type_:(CobFieldType.(to_u16 (enc COB_TYPE_NUMERIC_DISPLAY)))
-              ~digits:(U16.of_int 3) () in
-  let a_2 = CobFieldAttr.create
-              ~type_:(CobFieldType.(to_u16 (enc COB_TYPE_ALPHANUMERIC)))
-              ~flags:(CobFieldFlag.(to_u16 (enc COB_FLAG_CONSTANT))) () in
-  let a_3 = CobFieldAttr.create
-              ~type_:(CobFieldType.(to_u16 (enc COB_TYPE_GROUP))) () in
-  let a_4 = CobFieldAttr.create
-              ~type_:(CobFieldType.(to_u16 (enc COB_TYPE_ALPHANUMERIC))) () in
+  let digits_attrs ?(flags = U16.zero) n =
+    CobFieldAttr.create
+      ~type_:(CobFieldType.(to_u16 (enc COB_TYPE_NUMERIC_DISPLAY)))
+      ~digits:(U16.of_int n)
+      ~scale:S16.zero
+      ~flags
+      ~pic:(CobPicSymbol.create ~symbol:'9' ~times_repeated:(S32.of_int n))
+  and alphanum_attrs ?(flags = U16.zero) n =
+    CobFieldAttr.create
+      ~type_:(CobFieldType.(to_u16 (enc COB_TYPE_ALPHANUMERIC)))
+      ~digits:U16.zero
+      ~scale:S16.zero
+      ~flags
+      ~pic:(CobPicSymbol.create ~symbol:'X' ~times_repeated:(S32.of_int n))
+  and group_attrs ?(flags = U16.zero) () =
+    CobFieldAttr.create
+      ~type_:(CobFieldType.(to_u16 (enc COB_TYPE_GROUP)))
+      ~digits:U16.zero
+      ~scale:S16.zero
+      ~flags
+      ~pic:(CobPicSymbol.null ())
+  in
+
+  let a_1 = digits_attrs 3 in
+  let a_2 = alphanum_attrs  7 ~flags:CobFieldFlag.(to_u16 (enc COB_FLAG_CONSTANT)) in
+  let a_3 = group_attrs () in
+  let a_4 = alphanum_attrs 6 in
 
   let b_c = CArray.create Char ~default:' ' 24 in
   CArray.set_string b_c 0 "var1 = ";
@@ -170,11 +187,11 @@ let run () =
   CArray.set_string b_c 16 "var3 = ";
   let b_c' = CPtr.cast UInt8 (CArray.to_ptr b_c) in
   let c_1 = CobField.create ~size:(U64.of_int 7) ~attr:a_2
-              ~data:b_c' () in
+              ~data:b_c' in
   let c_2 = CobField.create ~size:(U64.of_int 7) ~attr:a_2
-              ~data:(CPtr.add b_c' 8) () in
+              ~data:(CPtr.add b_c' 8) in
   let c_3 = CobField.create ~size:(U64.of_int 7) ~attr:a_2
-              ~data:(CPtr.add b_c' 16) () in
+              ~data:(CPtr.add b_c' 16) in
 
   let b_w = CArray.create Char ~default:' ' 24 in
   CArray.set_string b_w 0 "000000";
@@ -182,15 +199,15 @@ let run () =
   CArray.set_string b_w 16 "000";
   let b_w' = CPtr.cast UInt8 (CArray.to_ptr b_w) in
   let f_17 = CobField.create ~size:(U64.of_int 6) ~attr:a_3
-               ~data:b_w' () in
+               ~data:b_w' in
   let f_18 = CobField.create ~size:(U64.of_int 3) ~attr:a_1
-               ~data:b_w' () in
+               ~data:b_w' in
   let f_19 = CobField.create ~size:(U64.of_int 3) ~attr:a_1
-               ~data:(CPtr.add b_w' 3) () in
+               ~data:(CPtr.add b_w' 3) in
   let f_20 = CobField.create ~size:(U64.of_int 6) ~attr:a_4
-               ~data:(CPtr.add b_w' 8) () in
+               ~data:(CPtr.add b_w' 8) in
   let f_21 = CobField.create ~size:(U64.of_int 3) ~attr:a_1
-               ~data:(CPtr.add b_w' 16) () in
+               ~data:(CPtr.add b_w' 16) in
 
   CArray.set_string b_w 0 "888";
   cob_display S32.zero S32.one [| c_1; f_17 |];
@@ -199,7 +216,7 @@ let run () =
 
   let b = CArray.of_string "var3 = var1.left + var1.right" in
   let f = CobField.create ~size:(U64.of_int 29) ~attr:a_2
-            ~data:(CPtr.cast UInt8 (CArray.to_ptr b)) () in
+            ~data:(CPtr.cast UInt8 (CArray.to_ptr b)) in
   cob_display S32.zero S32.one [| f |];
 
   cob_decimal_set_field d_0 f_18;
@@ -209,7 +226,7 @@ let run () =
 
   let b = CArray.of_string "memcpy var1 to var2" in
   let f = CobField.create ~size:(U64.of_int 19) ~attr:a_2
-            ~data:(CPtr.cast UInt8 (CArray.to_ptr b)) () in
+            ~data:(CPtr.cast UInt8 (CArray.to_ptr b)) in
   cob_display S32.zero S32.one [| f |];
 
   CArray.blit b_w 0 b_w 8 6;
