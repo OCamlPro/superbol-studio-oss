@@ -448,5 +448,6 @@ server and the VSCode extension from sources.
 ## Resources
 
 * Website: https://ocamlpro.github.io/superbol-studio-oss
-* General Documentation: https://ocamlpro.github.io/superbol-studio-oss/sphinx
+* User Manuals: https://superbol.eu/solutions/superbol-studio/user-manual
+* Developper Documentation: https://ocamlpro.github.io/superbol-studio-oss/sphinx
 * Sources: https://github.com/ocamlpro/superbol-studio-oss
