@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-901f19a99d3206de530a859ff5506892:.
+c48b4190a35b1eeb0d947c4ba7594654:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -242,11 +242,6 @@ c4b11a7cd0d345002bf032c527dcb96b:opam/superbol-studio-oss.opam
 # file opam/superbol-vscode-oss.opam
 611d3a1c335b86d86a409611b02ad505:opam/superbol-vscode-oss.opam
 # end context for opam/superbol-vscode-oss.opam
-
-# begin context for opam/superbol-vscode-platform.opam
-# file opam/superbol-vscode-platform.opam
-22d36736a7a6daba5d37319a8bee094f:opam/superbol-vscode-platform.opam
-# end context for opam/superbol-vscode-platform.opam
 
 # begin context for opam/superbol_free_lib.opam
 # file opam/superbol_free_lib.opam
@@ -745,7 +740,7 @@ a5027007a5ed5a4b90598fcde0e6fc1b:src/lsp/superbol_project/version.mlt
 
 # begin context for src/tramabol/ezlibcob/dune
 # file src/tramabol/ezlibcob/dune
-3418b1122a84632ec29cff4a7903df3b:src/tramabol/ezlibcob/dune
+b465af9c4551ced5d0867c56cb2d9cd0:src/tramabol/ezlibcob/dune
 # end context for src/tramabol/ezlibcob/dune
 
 # begin context for src/tramabol/ezlibcob/index.mld

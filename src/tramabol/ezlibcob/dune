@@ -64,14 +64,14 @@
  (targets libcob_incdir)
  (enabled_if (<> %{os_type} Win32))
  (action (with-stdout-to %{targets}
-   (run %{env:GNUCOBOL4_CONFIG=cob-config} --includedir))))
+   (run %{env:GNUCOBOL4_COB_CONFIG=cob-config} --includedir))))
 
 (rule
  (targets libcob_incdir)
  (enabled_if (= %{os_type} Win32))
  (action (with-stdout-to %{targets}
    (pipe-stdout
-     (run sh %{env:GNUCOBOL4_CONFIG=cob-config} --includedir)
+     (run sh %{env:GNUCOBOL4_COB_CONFIG=cob-config} --includedir)
      (run sed "s/\\\\/\\\\\\\\/g")))))
 
 
@@ -80,7 +80,7 @@
  (enabled_if (<> %{os_type} Win32))
  (action (with-stdout-to %{targets}
   (progn (echo "(")
-         (run %{env:GNUCOBOL4_CONFIG=cob-config} --cflags)
+         (run %{env:GNUCOBOL4_COB_CONFIG=cob-config} --cflags)
          (echo ")")))))
 
 (rule
@@ -89,7 +89,7 @@
  (action (with-stdout-to %{targets}
   (progn (echo "(")
          (pipe-stdout
-           (run sh %{env:GNUCOBOL4_CONFIG=cob-config} --cflags)
+           (run sh %{env:GNUCOBOL4_COB_CONFIG=cob-config} --cflags)
            (run sed "s/\\\\/\\\\\\\\/g"))
          (echo ")")))))
 
@@ -99,7 +99,7 @@
  (enabled_if (<> %{os_type} Win32))
  (action (with-stdout-to %{targets}
   (progn (echo "(")
-         (run %{env:GNUCOBOL4_CONFIG=cob-config} --libs)
+         (run %{env:GNUCOBOL4_COB_CONFIG=cob-config} --libs)
          (echo ")")))))
 
 (rule
@@ -108,7 +108,7 @@
  (action (with-stdout-to %{targets}
   (progn (echo "(")
          (pipe-stdout
-           (run sh %{env:GNUCOBOL4_CONFIG=cob-config} --libs)
+           (run sh %{env:GNUCOBOL4_COB_CONFIG=cob-config} --libs)
            (run sed "s/\\\\/\\\\\\\\/g"))
          (echo ")")))))
 
