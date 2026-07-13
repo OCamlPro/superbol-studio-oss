@@ -1,4 +1,4 @@
-#2 "src/ezlibcob/libcob_stubs_trailer.c"
+#2 "src/tramabol/ezlibcob/libcob_stubs_trailer.c"
 /**************************************************************************/
 /*                                                                        */
 /*                        SuperBOL OSS Studio                             */

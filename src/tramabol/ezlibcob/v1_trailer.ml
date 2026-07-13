@@ -1,4 +1,4 @@
-#2 "src/ezlibcob/v1_trailer.ml"
+#2 "src/tramabol/ezlibcob/v1_trailer.ml"
 (**************************************************************************)
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)

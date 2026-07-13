@@ -46,7 +46,7 @@ let rec ml_type ty =
   | STFloat { kind = Float; _ } -> "CFloat.t"
   | STFloat { kind = Double; _ } -> "CDouble.t"
   | STEnum { enum; _ } -> enum.enum_ml_type
-  | STComp { comp; _ } -> comp.comp_ml_type
+  | STComp { comp; _ } -> Printf.sprintf "%s cptr" comp.comp_ml_type
   | STPtr { type_; _ } -> Printf.sprintf "%s cptr" (ml_type type_)
   | STArray { type_; _ } -> Printf.sprintf "%s carray" (ml_type type_)
 
@@ -96,10 +96,10 @@ let conv_to_c ty x =
       Printf.sprintf "(%s)Double_val(%s)" (c_type ty) x
   | STEnum (_) ->
       Printf.sprintf "(%s)Long_val(%s)" (c_type ty) x
-  | STComp { comp = _; unref = false; _ } ->
-      Printf.sprintf "(%s)Comp_val(%s)" (c_type ty) x
-  | STComp { comp = _; unref = true; _ } ->
-      Printf.sprintf "*(%s *)Comp_val(%s)" (c_type ty) x
+  | STComp { unref = false; _ } ->
+      Printf.sprintf "(%s)Ptr_val(%s)" (c_type ty) x
+  | STComp { unref = true; _ } ->
+      Printf.sprintf "*(%s *)Ptr_val(%s)" (c_type ty) x
   | STPtr (_) ->
       Printf.sprintf "(%s)Ptr_val(%s)" (c_type ty) x
   | STArray (_) ->
@@ -120,8 +120,9 @@ let conv_to_ml ty x v =
     | STInt { kind = Int64; sign = Unsigned; _ } -> "UINT64", "NULL", 0
     | STFloat { kind = Float; _ } -> "CFLOAT", "NULL", 0
     | STFloat { kind = Double; _ } -> "CDOUBLE", "NULL", 0
-    | STComp (_) -> "CCOMP", "NULL", 0
     | STEnum (_) -> "CENUM", "NULL", 0
+    | STComp { comp; _ } ->
+        "CPTR", Printf.sprintf "mk_kind(CCOMP, NULL, sizeof(%s))" comp.comp_c_type, 0
     | STPtr { type_; _ } ->
         let id, contents, isize = type_kind type_ in
         "CPTR", Printf.sprintf "mk_kind(%s, %s, %d)" id contents isize, 0
@@ -142,10 +143,9 @@ let conv_to_ml ty x v =
       Printf.sprintf "((%s) = caml_copy_double(%s))" x v
   | STEnum (_) ->
       Printf.sprintf "((%s) = Val_long(%s))" x v
-  | STComp { comp = _; unref = false; _ } ->
-      Printf.sprintf "Val_comp(%s, %s)" x v
-  | STComp { comp = _; unref = true; _ } ->
-      Printf.sprintf "Val_comp(%s, copy(%s))" x v
+  | STComp { comp; unref; _ } ->
+      let v' = if unref then Printf.sprintf "copy(%s)" v else v in
+      Printf.sprintf "Val_ptr(%s, CCOMP, NULL, sizeof(%s), %s)" x comp.comp_c_type v'
   | STPtr { type_; _ } ->
       let id, contents, isize = type_kind type_ in
       Printf.sprintf "Val_ptr(%s, %s, %s, %d, %s)" x id contents isize v
@@ -353,8 +353,8 @@ let gen_stub (stub : stub) =
 
 let mod_ml_type comp ty =
   match ty with
-  | STComp c when c.comp == comp -> "t"
-  | _ -> (ml_type ty)
+  | STComp c when c.comp == comp -> "t cptr"
+  | _ -> ml_type ty
 
 let gen_comp (comp : comp) =
   let ml_buf = Buffer.create 10000 in
@@ -366,8 +366,19 @@ let gen_comp (comp : comp) =
   Printf.bprintf ml_buf "  type k\n";
   Printf.bprintf ml_buf "  type t = k comp\n";
 
+  (* Struct kind *)
+  Printf.bprintf ml_buf
+    "  external kind : unit -> k comp_kind = \"ml_comp_%s_kind\"\n"
+    comp.comp_name;
+  Printf.bprintf ml_buf "  let kind = kind ()\n";
+
+  (* Casts *)
+  Printf.bprintf ml_buf "  external to_ptr : t -> t cptr = \"%%identity\"\n";
+  Printf.bprintf ml_buf "  external of_ptr : t cptr -> t = \"%%identity\"\n";
+
   (* Null-Constructor *)
-  Printf.bprintf ml_buf "  external null : unit -> t = \"ml_comp_%s_null\"\n"
+  Printf.bprintf ml_buf
+    "  external null : unit -> t cptr = \"ml_comp_%s_null\"\n"
     comp.comp_name;
 
   (* Constructor *)
@@ -375,12 +386,15 @@ let gen_comp (comp : comp) =
     if comp.comp_struct then
       begin
         let args =
-          List.map (fun (name, ty) ->
-              Printf.sprintf "?%s:%s"
-                (clean_ml_name name) (mod_ml_type comp ty)
-            ) comp.comp_fields @ ["unit"]
+          if comp.comp_fields <> [] then
+            List.map (fun (name, ty) ->
+                Printf.sprintf "%s:%s"
+                  (clean_ml_name name) (mod_ml_type comp ty)
+              ) comp.comp_fields
+          else
+            ["unit"]
         in
-        Printf.bprintf ml_buf "  external create : %s -> t = "
+        Printf.bprintf ml_buf "  external create : %s -> t cptr = "
           (String.concat " -> " args);
         if List.length comp.comp_fields >= 5 then
           Printf.bprintf ml_buf "\"ml_comp_%s_create_bytecode\" "
@@ -389,10 +403,10 @@ let gen_comp (comp : comp) =
       end
     else
       begin
-        Printf.bprintf ml_buf "  external create : unit -> t = ";
+        Printf.bprintf ml_buf "  external create : unit -> t cptr = ";
         Printf.bprintf ml_buf "\"ml_comp_%s_create\"\n" comp.comp_name;
         List.iter (fun (name, ty) ->
-            Printf.bprintf ml_buf "  external create_%s : %s -> t = "
+            Printf.bprintf ml_buf "  external create_%s : %s -> t cptr = "
               name (mod_ml_type comp ty);
             Printf.bprintf ml_buf "\"ml_comp_%s_create_%s\"\n"
               comp.comp_name name;
@@ -403,14 +417,14 @@ let gen_comp (comp : comp) =
   if not comp.comp_no_destr then
     begin
       Printf.bprintf ml_buf
-        "  external free : t -> unit = \"ml_comp_%s_free\"\n" comp.comp_name
+        "  external free : t cptr -> unit = \"ml_comp_%s_free\"\n" comp.comp_name
     end;
 
   List.iter (fun (name, ty) ->
 
       (* Getter *)
       Printf.bprintf ml_buf
-        "  external get_%s : t -> %s = \"ml_comp_%s_get_%s\"\n"
+        "  external get_%s : t cptr -> %s = \"ml_comp_%s_get_%s\"\n"
         name (mod_ml_type comp ty) comp.comp_name name;
 
       (* Setter *)
@@ -421,7 +435,7 @@ let gen_comp (comp : comp) =
           ()
       | _ ->
           Printf.bprintf ml_buf
-            "  external set_%s : t -> %s -> unit = \"ml_comp_%s_set_%s\"\n"
+            "  external set_%s : t cptr -> %s -> unit = \"ml_comp_%s_set_%s\"\n"
             name (mod_ml_type comp ty) comp.comp_name name
 
     ) comp.comp_fields;
@@ -430,11 +444,17 @@ let gen_comp (comp : comp) =
 
   (* Generate the C stub *)
 
+  (* Struct kind *)
+  Printf.bprintf c_buf "value ml_comp_%s_kind(value unit_v)\n{\n"
+    comp.comp_name;
+  Printf.bprintf c_buf "  return Val_long(sizeof(%s));\n" comp.comp_c_type;
+  Printf.bprintf c_buf "}\n\n";
+
   (* Null-Constructor *)
   Printf.bprintf c_buf "value ml_comp_%s_null(value unit_v)\n{\n"
     comp.comp_name;
   Printf.bprintf c_buf "  value res_v;\n";
-  Printf.bprintf c_buf "  Val_comp(res_v, NULL);\n";
+  Printf.bprintf c_buf "  Val_ptr(res_v, CCOMP, NULL, sizeof(%s), NULL);\n" comp.comp_c_type;
   Printf.bprintf c_buf "  return res_v;\n";
   Printf.bprintf c_buf "}\n\n";
 
@@ -460,12 +480,10 @@ let gen_comp (comp : comp) =
         Printf.bprintf c_buf "  %s *res = (%s *)calloc(1, sizeof(%s));\n"
           comp.comp_c_type comp.comp_c_type comp.comp_c_type;
         List.iter (fun (name, ty) ->
-            Printf.bprintf c_buf "  if (Is_some(%s_v)) {\n" name;
-            Printf.bprintf c_buf "    res->%s = %s;\n" name
-              (conv_to_c ty (Printf.sprintf "Some_val(%s_v)" name));
-            Printf.bprintf c_buf "  }\n"
+            Printf.bprintf c_buf "  res->%s = %s;\n" name
+              (conv_to_c ty (Printf.sprintf "%s_v" name));
           ) comp.comp_fields;
-        Printf.bprintf c_buf "  Val_comp(res_v, res);\n";
+        Printf.bprintf c_buf "  Val_ptr(res_v, CCOMP, NULL, sizeof(%s), res);\n" comp.comp_c_type;
         Printf.bprintf c_buf "  CAMLreturn(res_v);\n";
         Printf.bprintf c_buf "}\n\n"
       end
@@ -476,7 +494,7 @@ let gen_comp (comp : comp) =
         Printf.bprintf c_buf "  value res_v;\n";
         Printf.bprintf c_buf "  %s *res = (%s *)calloc(1, sizeof(%s));\n"
           comp.comp_c_type comp.comp_c_type comp.comp_c_type;
-        Printf.bprintf c_buf "  Val_comp(res_v, res);\n";
+        Printf.bprintf c_buf "  Val_ptr(res_v, CCOMP, NULL, sizeof(%s), res);\n" comp.comp_c_type;
         Printf.bprintf c_buf "  return res_v;\n";
         Printf.bprintf c_buf "}\n\n";
         List.iter (fun (name, ty) ->
@@ -487,7 +505,7 @@ let gen_comp (comp : comp) =
               comp.comp_c_type comp.comp_c_type comp.comp_c_type;
             Printf.bprintf c_buf "  res->%s = %s;\n"
               name (conv_to_c ty "val_v");
-            Printf.bprintf c_buf "  Val_comp(res_v, res);\n";
+            Printf.bprintf c_buf "  Val_ptr(res_v, CCOMP, NULL, sizeof(%s), res);\n" comp.comp_c_type;
             Printf.bprintf c_buf "  return res_v;\n";
             Printf.bprintf c_buf "}\n\n";
           ) comp.comp_fields
@@ -498,7 +516,7 @@ let gen_comp (comp : comp) =
     begin
       Printf.bprintf c_buf "value ml_comp_%s_free(value obj_v)\n{\n"
         comp.comp_name;
-      Printf.bprintf c_buf "  free(Comp_val(obj_v));\n";
+      Printf.bprintf c_buf "  free(Ptr_val(obj_v));\n";
       Printf.bprintf c_buf "  Field(obj_v, 0) = (value)NULL;\n";
       Printf.bprintf c_buf "  return Val_unit;\n";
       Printf.bprintf c_buf "}\n\n"
@@ -511,7 +529,7 @@ let gen_comp (comp : comp) =
       Printf.bprintf c_buf "value ml_comp_%s_get_%s(value obj_v)\n{\n"
         comp.comp_name name;
       Printf.bprintf c_buf "  value res_v;\n";
-      Printf.bprintf c_buf "  %s *obj = (%s *)Comp_val(obj_v);\n"
+      Printf.bprintf c_buf "  %s *obj = (%s *)Ptr_val(obj_v);\n"
         comp.comp_c_type comp.comp_c_type;
       Printf.bprintf c_buf "  %s res = obj->%s;\n" (c_type ty) name;
       Printf.bprintf c_buf "  %s;\n" (conv_to_ml ty "res_v" "res");
@@ -528,7 +546,7 @@ let gen_comp (comp : comp) =
           Printf.bprintf c_buf
             "value ml_comp_%s_set_%s(value obj_v, value val_v)\n{\n"
             comp.comp_name name;
-          Printf.bprintf c_buf "  %s *obj = (%s *)Comp_val(obj_v);\n"
+          Printf.bprintf c_buf "  %s *obj = (%s *)Ptr_val(obj_v);\n"
             comp.comp_c_type comp.comp_c_type;
           Printf.bprintf c_buf "  obj->%s = %s;\n" name (conv_to_c ty "val_v");
           Printf.bprintf c_buf "  return Val_unit;\n";
