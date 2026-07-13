@@ -2804,9 +2804,12 @@ let length_of_expression ==
 (* ---------- Conditions ---------- *)
 
 let condition :=
- | ~ = loc(nonrel_condition);                < >
- | ~ = loc(relation_condition); %prec lowest < >
- | l = condition; op = logop; r = condition; { with_loc (Logop (l, op, r)) $sloc }
+ | ~ = loc(cond); <>
+
+let cond [@symbol "<condition>"] [@recovery_with_pos dummy_cond] :=
+ | ~ = nonrel_condition;                     < >
+ | ~ = relation_condition;      %prec lowest < >
+ | l = condition; op = logop; r = condition; { Logop (l, op, r) }
 
 let logop ==
  | AND;           { LAnd }

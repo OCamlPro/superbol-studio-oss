@@ -38,7 +38,7 @@ run_reportwriter.at-2794-prog.cob:155.48:
 ----                                                   ^
  156                  03  COLUMN 30   PIC X(5) VALUE " ''  "
  157                                  ABSENT AFTER NEW PRR-EMPLOYEE-KEY
->> Hint: Missing <expression>
+>> Hint: Missing <condition>
 
 run_reportwriter.at-2794-prog.cob:155.49-155.53:
  152                  03  COLUMN 01   PIC X(27) SOURCE PRR-EMPLOYEE-KEY.
@@ -92,7 +92,7 @@ run_reportwriter.at-3704-prog.cob:70.37:
 ----                                        ^
   71                   10  COLUMN 51    PIC X(5) VALUE '  "  '
   72                                 ABSENT AFTER PAGE OR ADVISOR.
->> Hint: Missing WHEN
+>> Hint: Missing WHEN <condition>
 
 run_reportwriter.at-3704-prog.cob:70.38-70.43:
   67                   10  COLUMN 26    PIC 99    SOURCE COURSE-PTS.
