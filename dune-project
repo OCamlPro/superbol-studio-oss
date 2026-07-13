@@ -19,7 +19,7 @@
 
  (depends
    (ocaml (>= 4.14.0))
-   (superbol-vscode-platform (= :version))
+   (superbol-vscode-oss (= :version))
    (superbol-free (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
@@ -50,7 +50,7 @@
  )
 
 (package
- (name superbol-vscode-platform)
+ (name superbol-vscode-oss)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  

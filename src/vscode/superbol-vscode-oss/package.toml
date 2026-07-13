@@ -1,6 +1,6 @@
 
 # name of package
-name = "superbol-vscode-platform"
+name = "superbol-vscode-oss"
 skeleton = "js_program"
 
 # version if different from project version

@@ -5,22 +5,22 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-70da75f4aa5ef82cf4bded2b77c357fc:.
+901f19a99d3206de530a859ff5506892:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-789e965da2fe56a5fc76ebeb67415797:.github/workflows/workflow.yml
+81bc6c151d06d8ffbb2fee06ba3e5e26:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
 # file .gitignore
-e5502605e28129eb222c300ab6174e48:.gitignore
+6ac2f4b83d8de3c17ba69cd8fa75673c:.gitignore
 # end context for .gitignore
 
 # begin context for Makefile
 # file Makefile
-3d648b4c47e42f1a9ee63a2beadeceef:Makefile
+236478eacf803d105131521d8183edda:Makefile
 # end context for Makefile
 
 # begin context for docs/README.txt
@@ -50,7 +50,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-841d2560f1adc2eb5cfc406d04f92076:dune-project
+cee781ce94f98afd91d99076321b0cd9:dune-project
 # end context for dune-project
 
 # begin context for opam/autofonce.opam
@@ -230,13 +230,18 @@ a56c08535ff344da81fab8d806e214f7:opam/node-js-stubs.opam
 
 # begin context for opam/superbol-studio-oss.opam
 # file opam/superbol-studio-oss.opam
-2cad9ad4d16f3d1ed014afc0a630cd77:opam/superbol-studio-oss.opam
+c4b11a7cd0d345002bf032c527dcb96b:opam/superbol-studio-oss.opam
 # end context for opam/superbol-studio-oss.opam
 
 # begin context for opam/superbol-vscode-lib.opam
 # file opam/superbol-vscode-lib.opam
 936a01bc24434e4f646223868bc3a55e:opam/superbol-vscode-lib.opam
 # end context for opam/superbol-vscode-lib.opam
+
+# begin context for opam/superbol-vscode-oss.opam
+# file opam/superbol-vscode-oss.opam
+611d3a1c335b86d86a409611b02ad505:opam/superbol-vscode-oss.opam
+# end context for opam/superbol-vscode-oss.opam
 
 # begin context for opam/superbol-vscode-platform.opam
 # file opam/superbol-vscode-platform.opam
@@ -818,15 +823,20 @@ a5027007a5ed5a4b90598fcde0e6fc1b:src/vendor/vscode-ocaml-platform/src-bindings/v
 a5027007a5ed5a4b90598fcde0e6fc1b:src/vscode/superbol-vscode-lib/version.mlt
 # end context for src/vscode/superbol-vscode-lib/version.mlt
 
-# begin context for src/vscode/superbol-vscode-platform/dune
-# file src/vscode/superbol-vscode-platform/dune
-8e474db028efea60c5774c81daa92012:src/vscode/superbol-vscode-platform/dune
-# end context for src/vscode/superbol-vscode-platform/dune
+# begin context for src/vscode/superbol-vscode-oss/dune
+# file src/vscode/superbol-vscode-oss/dune
+fdf11e015b7be08613077faeef040a87:src/vscode/superbol-vscode-oss/dune
+# end context for src/vscode/superbol-vscode-oss/dune
 
-# begin context for src/vscode/superbol-vscode-platform/version.mlt
-# file src/vscode/superbol-vscode-platform/version.mlt
-a5027007a5ed5a4b90598fcde0e6fc1b:src/vscode/superbol-vscode-platform/version.mlt
-# end context for src/vscode/superbol-vscode-platform/version.mlt
+# begin context for src/vscode/superbol-vscode-oss/superbol_vscode_oss.ml
+# file src/vscode/superbol-vscode-oss/superbol_vscode_oss.ml
+93408d90461ccdfce4fb08ce84ec2e81:src/vscode/superbol-vscode-oss/superbol_vscode_oss.ml
+# end context for src/vscode/superbol-vscode-oss/superbol_vscode_oss.ml
+
+# begin context for src/vscode/superbol-vscode-oss/version.mlt
+# file src/vscode/superbol-vscode-oss/version.mlt
+a5027007a5ed5a4b90598fcde0e6fc1b:src/vscode/superbol-vscode-oss/version.mlt
+# end context for src/vscode/superbol-vscode-oss/version.mlt
 
 # begin context for src/vscode/vscode-debugadapter/dune
 # file src/vscode/vscode-debugadapter/dune

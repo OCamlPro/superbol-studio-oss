@@ -11,13 +11,13 @@
 //
 // -----------------------------------------------------------------------
 //
-// This file is copied as `_out/superbol-vscode-platform-bundle.js`
+// This file is copied as `_out/superbol-vscode-oss-bundle.js`
 // before bundling the VS Code extension.  Its sole purpose is to
 // bundle the "main" LSP client extension together with the debugger
 // extension that we import as a submodule in
 // `import/superbol-vscode-debug`.
 // 
-import * as main from "./superbol_vscode_platform.bc";
+import * as main from "./superbol_vscode_oss.bc";
 import * as debug from "../import/superbol-vscode-debug/src/extension";
 export function activate (context) {
   main.activate (context);
