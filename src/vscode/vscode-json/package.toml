@@ -59,6 +59,7 @@ ppx_deriving_encoding = "0.3.0"
 
 # package tools dependencies
 [tools]
+# ...
 
 # package fields (depends on package skeleton)
 #Examples:
@@ -69,7 +70,8 @@ ppx_deriving_encoding = "0.3.0"
 #  no-opam-test = "yes" 
 #  no-opam-doc = "yes" 
 #  gen-opam = "some" | "all" 
-#  dune-stanzas = "(flags (:standard (:include linking.sexp)))" 
+#  dune-flags = "(:standard (:include linking.sexp))" 
+#  dune-stanzas = "(foreign_stubs (language c) (names mapfile_stubs))" 
 #  static-clibs = "unix" 
 [fields]
 # ...

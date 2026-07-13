@@ -53,10 +53,10 @@ skip = ["main.ml"]
 #   ez_file = ">=0.1 <1.3"
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
-pretty = "version"
-camlp-streams = "5"
+camlp-streams = ">=5"
 ez_file = "0.3.0"
 goblint-cil = ">=2.0.0"
+pretty = "version"
 
 # package tools dependencies
 [tools]
@@ -83,9 +83,9 @@ dune-trailer = """
  (action
   (with-stdout-to common_ml.ml
    (progn
-    (echo \"let contents = {|\")
+    (echo "let contents = {|")
     (cat common/common.ml)
-    (echo \"|}\")))))
+    (echo "|}")))))
 
 (rule
  (targets common_c.ml)
@@ -93,7 +93,7 @@ dune-trailer = """
  (action
   (with-stdout-to common_c.ml
    (progn
-    (echo \"let contents = {|\")
+    (echo "let contents = {|")
     (cat common/common.c)
-    (echo \"|}\")))))
+    (echo "|}")))))
 """

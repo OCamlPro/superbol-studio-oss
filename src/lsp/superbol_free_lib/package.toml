@@ -46,7 +46,7 @@ gen-version = "version.ml"
 preprocess = "pps ppx_cobcflags ppx_deriving_encoding"
 
 # files to skip while updating at package level
-skip = ["index.mld", "main.ml" ]
+skip = ["index.mld", "main.ml"]
 
 # package library dependencies
 #   [dependencies]
@@ -58,27 +58,21 @@ cobol_indent = "version"
 cobol_lsp = "version"
 cobol_parser = "version"
 cobol_typeck = "version"
-superbol_preprocs = "version"
-superbol_platform = "version"
-ez_file = ">=0.4"
 ez_cmdliner = "0.3.0"
-vscode-json = "version"
-ez_api = { version = "2.0", libname = "ez_api.encoding" }
+ez_file = ">=0.4"
 ez_toml = "version"
-sql_preproc = "version"
-
-# We only depend on `lwt` via `ez_api` (and we don't even use any bit
-# of `lwt` at all).  But we still need to add the following constraint
-# on `lwt` so it installs properly on windows:
-# Note: lwt-osx.5.9.0 currently fails to build; the upper-bound may be
-# lifted once it does.
 lwt = ">=5 <5.9"
+sql_preproc = "version"
+superbol_platform = "version"
+superbol_preprocs = "version"
+vscode-json = "version"
+[dependencies.ez_api]
+libname = "ez_api.encoding"
+version = ">=2.0"
 
 # package tools dependencies
 [tools]
-# Ensure `cmdliner` accepts abberviated subcommands
 cmdliner = "<2"
-# ...
 
 # package fields (depends on package skeleton)
 #Examples:
@@ -89,7 +83,8 @@ cmdliner = "<2"
 #  no-opam-test = "yes" 
 #  no-opam-doc = "yes" 
 #  gen-opam = "some" | "all" 
-#  dune-stanzas = "(flags (:standard (:include linking.sexp)))" 
+#  dune-flags = "(:standard (:include linking.sexp))" 
+#  dune-stanzas = "(foreign_stubs (language c) (names mapfile_stubs))" 
 #  static-clibs = "unix" 
 [fields]
 # ...
