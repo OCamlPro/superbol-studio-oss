@@ -14,10 +14,12 @@
       </div>
       <div class="section">
         <ul>
-<li><a href="https://get-superbol.com">Official Project</a></li>
-!{li-github}
-![if:gen:docs]!{li-doc-gen}![fi]
+<li><a href="https://superbol.eu">Official Project</a></li>
+<li><a href="https://superbol.eu/solutions/superbol-studio/user-manual">User Manuals</a></li>
+<li><a href="!{doc-gen}">Developper Documentation</a></li>
+<!-- ![if:gen:docs]!{li-doc-gen}![fi] -->
 <!-- ![if:gen:sphinx]!{li-doc-api}![fi] -->
+!{li-github}
 !{li-bug-reports}
         </ul>
         <p>Authors:</p>
