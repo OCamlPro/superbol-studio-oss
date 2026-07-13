@@ -207,7 +207,7 @@ let dual_handler_none =
 (* Entry points *)
 
 %start <Cobol_ptree.compilation_group> compilation_group
-%start <condition> standalone_condition
+%start <cond with_loc> standalone_condition
 
 %%
 
@@ -226,7 +226,7 @@ let loc_result (X) ==
   | res = loc (X); { Cobol_common.Srcloc.lift_result res }
 
 let loc (X) ==
-  | x = X; { x &@ Grammar_utils.Overlay_manager.join_limits $sloc }
+  | x = X; { with_loc x $sloc }
 
 let ioloc (X) ==
   |             {None}
@@ -1481,8 +1481,8 @@ let constant_spec_prefix ==
   | CONSTANT; ~ = ibo(global_clause); < >
 
 let constant_spec :=
-  | go = constant_spec_prefix; AS?; e = loc(expression_no_leftmost_length);
-    { go, ConstExpr ~&e &@<- e } (* or plain ident *)
+  | go = constant_spec_prefix; AS?; e = expression_no_leftmost_length;
+    { go, ConstExpr e &@<- e } (* or plain ident *)
   | p = constant_value_length; OF?; n = name;
     { fst p, match snd p with
         | `ByteLength -> ConstByteLength n &@<- n
@@ -1974,8 +1974,8 @@ source_clause:
 
 (* Not rigorously exact (see P389), but too complicated to parse otherwise  *)
 source_operands:
- | e = expression            { [e] }
- | el = ntl(arithmetic_term) { el }
+ | e = expression                 { [e] }
+ | el = ntl(loc(arithmetic_term)) { el }
 
 sum_clause:
  | sl = nel(sum_phrase)
@@ -1989,8 +1989,8 @@ sum_phrase:
 
 (* Not sure which expressions are valid here (see P381) *)
 sum_operands:
- | e = expression            { [e] }
- | el = ntl(arithmetic_term) { el }
+ | e = expression                 { [e] }
+ | el = ntl(loc(arithmetic_term)) { el }
 
 let report_data_name_or_final :=
   | ~ = qualident; <ReportDataName>
@@ -2284,8 +2284,8 @@ let qualnames := ~ = rnel(qualname); < >
 let reference == qualname
 
 let refmod ==
- | "("; refmod_left = loc(expression_no_all);
-   ":"; refmod_length = ro(loc(expression_no_all)); ")";
+ | "("; refmod_left = expression_no_all;
+   ":"; refmod_length = ro(expression_no_all); ")";
    { { refmod_left; refmod_length } }
 
 let literal_int_ident :=
@@ -2677,34 +2677,36 @@ let ident_or_integer :=
 
 (* ---------- Expressions ---------- *)
 
-(* TODO: rename `expression` into `subscript_expression`, and
-   `expression_no_all` into `expression`. *)
-
 let expr_(leftmost_term,term) :=
-  | ~ = expr_(leftmost_term,term); ~ = expr_binop; ~ = term; <Binop>
-  | ~ = leftmost_term;                                       <     >
+  | ~ = loc(expr_(leftmost_term,term)); ~ = expr_binop; ~ = loc(term); <Binop>
+  | ~ = leftmost_term;                                                 <     >
 
 let expr_binop ==
   | "+"; {BPlus}
   | "-"; {BMinus}
 
-let expression [@recovery dummy_expr] [@symbol "<expression>"] [@cost 0] :=
+let expr [@recovery dummy_expr] [@symbol "<expression>"] [@cost 0] :=
       expr_(term(atomic),
             term(atomic))
 
-let expression_no_all ==
+let expr_no_all ==
       expr_(term(atomic_no_all),
             term(atomic_no_all))
 
-let expression_par_unop ==
+let expr_par_unop ==
       expr_(term_(factor_(atomic_no_all),
                   factor(atomic,atomic)),
             term(atomic))
 
-let expression_no_leftmost_length :=
+let expr_no_leftmost_length :=
       expr_(term_(factor_(atomic_no_leftmost_length),
                   factor(atomic,atomic)),
             term(atomic))
+
+let expression == loc(expr)
+let expression_no_all == loc(expr_no_all)
+let expression_par_unop == loc(expr_par_unop)
+let expression_no_leftmost_length == loc(expr_no_leftmost_length)
 
 (* --- *)
 
@@ -2715,8 +2717,8 @@ let term_with_leftmost(leftmost_atomic,atomic) ==
             factor(atomic,atomic))
 
 let term_(f1,f2) :=
-  | ~ = term_(f1,f2); ~ = binop; ~ = f2; <Binop>
-  | ~ = f1;                              <     >
+  | ~ = loc(term_(f1,f2)); ~ = binop; ~ = loc(f2); <Binop>
+  | ~ = f1;                                        <     >
 
 let binop ==
   | "*";   { BMul }
@@ -2730,8 +2732,8 @@ let binop ==
 let factor(leftmost_atomic,atomic) == factor_(unary_(leftmost_atomic,atomic))
 
 let factor_(e) :=
-  | ~ = e; ~ = powop; ~ = factor_(e); <Binop>
-  | ~ = e;                            <     >
+  | ~ = loc(e); ~ = powop; ~ = loc(factor_(e)); <Binop>
+  | ~ = e;                                      <     >
 
 let powop ==
   | "**"; {BPow}
@@ -2739,8 +2741,8 @@ let powop ==
 (* --- *)
 
 let unary_(l,e) :=
-  | ~ = l;           <    >
-  | ~ = unop; ~ = e; <Unop>
+  | ~ = l;                <    >
+  | ~ = unop; ~ = loc(e); <Unop>
 
 let unop ==
   | "+";   { UPlus }
@@ -2754,13 +2756,13 @@ let atomic_(term,expr_in_paren) :=
   | "("; ~ = expr_in_paren; ")"; < >                      (* arith or boolean *)
 
 let atomic [@recovery dummy_expr] [@symbol "<atomic expression>"] :=
-  | atomic_(arithmetic_term, expression)
+  | atomic_(arithmetic_term, expr)
 
 let atomic_no_all [@recovery dummy_expr] [@symbol "<atomic expression>"] :=
-  | atomic_(arithmetic_term_no_all, expression_no_all)
+  | atomic_(arithmetic_term_no_all, expr_no_all)
 
 let atomic_no_leftmost_length [@recovery dummy_expr] [@symbol "<atomic expression>"] :=
-  | atomic_(arithmetic_term_no_length, expression)
+  | atomic_(arithmetic_term_no_length, expr)
 
 (* --- *)
 
@@ -2801,66 +2803,62 @@ let length_of_expression ==
 
 (* ---------- Conditions ---------- *)
 
+let condition :=
+ | ~ = loc(cond); <>
 
+let cond [@symbol "<condition>"] [@recovery_with_pos dummy_cond] :=
+ | ~ = nonrel_condition;                     < >
+ | ~ = relation_condition;      %prec lowest < >
+ | l = condition; op = logop; r = condition; { Logop (l, op, r) }
 
-condition:
- | complex_condition { $1 }
+let logop ==
+ | AND;           { LAnd }
+ | OR;            { LOr }
 
-complex_condition:
- | nonrel_condition { $1 }
- | relation_condition %prec lowest { $1 }
- | complex_condition logop complex_condition { Logop ($1, $2, $3) }
+let any_lpar ==
+ | LPAR;              {}
+ | LPAR_BEFORE_RELOP; {}
 
-%inline logop:
- | AND           { LAnd }
- | OR            { LOr }
-
-%inline any_lpar:
- | LPAR              {}
- | LPAR_BEFORE_RELOP {}
-
-%inline relation_condition:
- | neg = ibo(NOT) e = expression pred = abbrev_relop_operand { relation_condition (neg, e, pred) }
+let relation_condition ==
+ | neg = ibo(NOT); e = expression; pred = loc(abbrev_relop_operand); 
+    { relation_condition (neg, e, pred) }
 
 nonrel_condition:
- | n = ibo(NOT)     e = expression %prec lowest { neg_simple_cond ~neg:n @@ Expr e }
- | n = ibo(NOT)     c = extended_condition      { neg_condition ~neg:n c }
- | n = ibo(NOT) "(" c  = complex_condition ")"  { neg_condition ~neg:n c }
+ | n = ibo(NOT)     e = expression %prec lowest { neg_condition ~neg:n (Expr e &@<- e) }
+ | n = ibo(NOT)     c = loc(extended_condition) { neg_condition ~neg:n c }
+ | n = ibo(NOT) "(" c  = condition ")"          { neg_condition ~neg:n c }
 
 abbrev_relop_atom:
- | r = relop             e = abbrev_object_atom          { AbbrevRelOp (r, e) }
- |     LPAR_BEFORE_RELOP c = abbrev_relop_operand RPAR   { c }
- | NOT LPAR_BEFORE_RELOP c = abbrev_relop_operand RPAR   { AbbrevNot c }
+ | r = relop e = loc(abbrev_object_atom)                             { AbbrevRelOp (r, e) }
+ | n = ibo(NOT) LPAR_BEFORE_RELOP c = loc(abbrev_relop_operand) RPAR { AbbrevParen (n, c) }
 
 abbrev_relop_operand:
  | abbrev_relop_atom { $1 }
- | abbrev_relop_operand logop abbrev_relation_operand    { AbbrevComb ($1, $2, $3) }
+ | loc(abbrev_relop_operand) logop loc(abbrev_relation_operand)    { AbbrevComb ($1, $2, $3) }
 
 abbrev_object_atom:
  | n = ibo(NOT)     e = expression          %prec lowest { AbbrevObject (n, e) }
- |      "(" c = abbrev_object_operand ")"                { c }
- | NOT  "(" c = abbrev_object_operand ")"                { AbbrevNot c }
+ | n = ibo(NOT) "(" c = loc(abbrev_object_operand) ")"   { AbbrevParen (n, c) }
 
 abbrev_object_operand:
  | abbrev_object_atom { $1 }
- | abbrev_object_operand logop abbrev_relation_operand   { AbbrevComb ($1, $2, $3) }
+ | loc(abbrev_object_operand) logop loc(abbrev_relation_operand)   { AbbrevComb ($1, $2, $3) }
 
 abbrev_relation_operand:
- | r = relop    e = abbrev_object_atom                   { AbbrevRelOp (r, e) }
- | n = ibo(NOT) e = expression              %prec lowest { AbbrevObject (n, e) }
- | n = ibo(NOT) e = expression a = abbrev_relop_atom     { AbbrevSubject (n, e, a) }
- | n = ibo(NOT) c = extended_condition                   { AbbrevOther (neg_condition ~neg:n c) }
- |     any_lpar c = abbrev_relation_operand RPAR         { c }
- | NOT any_lpar c = abbrev_relation_operand RPAR         { AbbrevNot c }
- | abbrev_relation_operand logop abbrev_relation_operand { AbbrevComb ($1, $2, $3) }
+ | r = relop    e = loc(abbrev_object_atom)                        { AbbrevRelOp (r, e) }
+ | n = ibo(NOT) e = expression                        %prec lowest { AbbrevObject (n, e) }
+ | n = ibo(NOT) e = expression a = loc(abbrev_relop_atom)          { AbbrevSubject (n, e, a) }
+ | n = ibo(NOT) c = loc(extended_condition)                        { AbbrevOther (neg_condition ~neg:n c) }
+ | n = ibo(NOT) any_lpar c = loc(abbrev_relation_operand) RPAR     { AbbrevParen (n, c) }
+ | loc(abbrev_relation_operand) logop loc(abbrev_relation_operand) { AbbrevComb ($1, $2, $3) }
 
 extended_condition:
  | e = expression io(IS) n = bo(NOT) c = class_condition
-    { neg_simple_cond ~neg:n @@ ClassCond (e, c) } (* exp = ident *)
+    { neg_condition ~neg:n (with_loc (ClassCond (e, c)) $sloc) } 
  | e = expression io(IS) n = bo(NOT) s = sign_condition
-    { neg_simple_cond ~neg:n @@ SignCond (e, s) } (* exp = arith exp *)
+    { neg_condition ~neg:n (with_loc (SignCond (e, s)) $sloc) } 
  | e = expression io(IS) n = bo(NOT) OMITTED
-    { neg_simple_cond ~neg:n @@ Omitted e } (* exp = ident *)
+    { neg_condition ~neg:n (with_loc (Omitted e) $sloc) } 
 
 relop [@recovery Eq] [@symbol "<relational arithmetic operator>"]:
  | io(IS) n = ibo(NOT) GREATER THAN?
@@ -2982,7 +2980,7 @@ COB2002:
 let using_by :=
  | b = call_using_by?; e = loc(arithmetic_term);
    { { call_using_by = b;                       (* COB85: ident, COB2002: exp *)
-       call_using_expr = Cobol_common.Srcloc.map_payload Option.some e } }
+       call_using_expr = Some e &@<- e } }
  | b = call_using_by?; omitted = loc(OMITTED);
    { { call_using_by = b;
        call_using_expr = None &@<- omitted } }                    (* +COB2002 *)

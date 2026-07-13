@@ -921,7 +921,7 @@ and fold_compute' (v: _ #folder) : compute_stmt with_loc -> 'a -> 'a =
     ~fold:begin fun v { compute_targets; compute_expr;
                         compute_on_size_error } x -> x
       >> fold_rounded_idents v compute_targets
-      >> fold_expr v compute_expr
+      >> fold_expr' v compute_expr
       >> fold_dual_handler v compute_on_size_error
     end
 

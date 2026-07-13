@@ -368,7 +368,7 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
         acc
         |> [Numeric; NumericEdited; Boolean]
         @>>@ fold_rounded_idents v c.compute_targets
-        |> Any @>@ fold_expr v c.compute_expr
+        |> Any @>@ fold_expr' v c.compute_expr
         |> fold_dual_handler v c.compute_on_size_error
         |> skip
 

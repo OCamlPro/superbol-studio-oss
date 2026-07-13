@@ -87,7 +87,7 @@ let pp_position ppf = function
 type call_using_clause =
   {
     call_using_by: call_using_by option;
-    call_using_expr: expression option with_loc;        (** OMITTED if [None] *)
+    call_using_expr: expr with_loc option with_loc;        (** OMITTED if [None] *)
   }
 [@@deriving ord]
 
@@ -104,21 +104,21 @@ let pp_call_using_by ppf = function
 
 let pp_call_using_clause ppf { call_using_by = cub; call_using_expr = cue } =
   Fmt.(option (pp_call_using_by ++ sp)) ppf cub;
-  Fmt.(pp_with_loc @@ option ~none:(any "OMITTED") pp_expression) ppf cue
+  Fmt.(pp_with_loc @@ option ~none:(any "OMITTED") pp_expr') ppf cue
 
 
 (* DELETE, OPEN, REWRITE, WRITE, READ (through on_lock_or_retry) *)
 type retry_clause =
-  | RetryNTimes of expression (* arith *)
-  | RetryForNSeconds of expression (* arith *)
+  | RetryNTimes of expr with_loc (* arith *)
+  | RetryForNSeconds of expr with_loc (* arith *)
   | RetryForever
 [@@deriving ord]
 
 let pp_retry_clause ppf rc =
   Fmt.pf ppf "RETRY";
   match rc with
-  | RetryNTimes e -> Fmt.pf ppf "@ @[%a@]@ TIMES" pp_expression e
-  | RetryForNSeconds e ->Fmt.pf ppf " FOR@ @[%a@]@ SECONDS" pp_expression e
+  | RetryNTimes e -> Fmt.pf ppf "@ @[%a@]@ TIMES" pp_expr' e
+  | RetryForNSeconds e ->Fmt.pf ppf " FOR@ @[%a@]@ SECONDS" pp_expr' e
   | RetryForever -> Fmt.pf ppf " FOREVER"
 
 
@@ -289,27 +289,27 @@ let pp_divide_operands ppf = function
 
 (* EVALUATE *)
 type selection_subject =
-  | Subject of condition
+  | Subject of cond with_loc
   | SubjectConst of bool
 [@@deriving ord]
 
 let pp_selection_subject ppf = function
-  | Subject c -> pp_condition ppf c
+  | Subject c -> pp_cond' ppf c
   | SubjectConst b -> Fmt.pf ppf (if b then "TRUE" else "FALSE")
 
 type selection_object =
-  | SelCond of condition (* ident / literal / expression *)
+  | SelCond of cond with_loc (* ident / literal / expression *)
   | SelRange of
       {
         negated: bool;
-        start: expression;
-        stop: expression;
+        start: expr with_loc;
+        stop: expr with_loc;
         alphabet: name with_loc option;
       }
   | SelRelation of
       {
         relation: relop;
-        expr: expression;
+        expr: expr with_loc;
       }
   | SelClassCond of
       {
@@ -330,15 +330,15 @@ type selection_object =
 [@@deriving ord]
 
 let pp_selection_object ppf = function
-  | SelCond c -> pp_condition ppf c
+  | SelCond c -> pp_cond' ppf c
   | SelRange { negated; start; stop; alphabet } ->
     if negated then Fmt.pf ppf "NOT@ ";
     Fmt.pf ppf "%a@ THROUGH@ %a%a"
-      pp_expression start
-      pp_expression stop
+      pp_expr' start
+      pp_expr' stop
       Fmt.(option (sp ++ const string "IN" ++ sp ++ pp_with_loc pp_name)) alphabet
   | SelRelation { relation; expr } ->
-    Fmt.pf ppf "%a@ %a" pp_relop relation pp_expression expr
+    Fmt.pf ppf "%a@ %a" pp_relop relation pp_expr' expr
   | SelClassCond { negated; class_specifier = cs } ->
     if negated then Fmt.pf ppf "NOT@ ";
     pp_class_ ppf cs
@@ -478,14 +478,14 @@ type search_condition =
   | IsEqual of
       {
         data_item: qualident;
-        condition: expression;
+        condition: expr with_loc;
       }
   | Cond of qualident
 [@@deriving ord]
 
 let pp_search_condition ppf = function
   | IsEqual { data_item = di; condition = c } ->
-    Fmt.pf ppf "%a@ EQUAL@ %a" pp_qualident di pp_expression c
+    Fmt.pf ppf "%a@ EQUAL@ %a" pp_qualident di pp_expr' c
   | Cond qi -> pp_qualident ppf qi
 
 
@@ -635,7 +635,7 @@ type start_position =
       {
         operator: relop;
         name: qualname;
-        length: expression option;
+        length: expr with_loc option;
       }
   (* any relop except IS NOT EQUAL TO or IS NOT = *)
 [@@deriving ord]
@@ -647,7 +647,7 @@ let pp_start_position ppf = function
     Fmt.pf ppf "KEY@ %a@ %a%a"
       pp_relop op
       pp_qualname n
-      Fmt.(option (sp ++ const words "WITH LENGTH" ++ pp_expression)) l
+      Fmt.(option (sp ++ const words "WITH LENGTH" ++ pp_expr')) l
 
 
 (* STRING *)

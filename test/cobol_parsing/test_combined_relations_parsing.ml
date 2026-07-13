@@ -13,15 +13,17 @@
 
 open Alcotest
 
+open Cobol_common
 open Cobol_ptree
+open Srcloc.INFIX
 open Testing_helpers.Make (Cobol_parser.INTERNAL.Dummy.Tags)
 open Cobol_parser.Tokens
 open Cobol_parser.INTERNAL.Grammar
 open Cobol_parser.INTERNAL.Dummy
 
-let condition: condition testable = testable pp_condition (=)
+let condition: cond with_loc testable = testable pp_cond' (fun a b -> compare_cond' a b = 0)
 let parse_condition = parse_list_as standalone_condition
-let expand_condition = Cobol_ptree.Terms_helpers.expand_every_abbrev_cond
+let expand_condition = Srcloc.map_payload Terms_helpers.expand_every_abbrev_cond
 let check_condition toks cond =
   check condition "correct conditions parsing" cond
     (expand_condition @@ parse_condition toks)
@@ -43,23 +45,20 @@ let test_conditions =
   and a_ = alphanum "a" and b_ = alphanum "b"
   and ac = Cond.ident "A" and bc = Cond.ident "B"
   and cc = Cond.ident "C"
-  and ae = Term.ident "A" and be = Term.ident "B"
-  and ce = Term.ident "C" and de = Term.ident "D"
-  and al = Term.strlit "a" and bl = Term.strlit "b" in
-  let ae = Atom ae and be = Atom be and ce = Atom ce and de = Atom de
-  and al = Atom al and bl = Atom bl (* and cl = Atom cl *)
-  and one = Atom (Integer "1")
-  and two = Atom (Integer "2") in
-  let ( !. ) a = Not a
-  and ( &&. ) a b = Logop (a, LAnd, b)
-  and ( ||. ) a b = Logop (a, LOr, b)
-  and ( ==. ) a b : condition = Relation (a, Eq, b)
-  and ( <>. ) a b : condition = Relation (a, Ne, b)
-  and ( >. ) a b : condition = Relation (a, Gt, b)
-  and ( >=. ) a b : condition = Relation (a, Ge, b)
-  and ( <. ) a b : condition = Relation (a, Lt, b)
-  and ( <=. ) a b : condition = Relation (a, Le, b)
-  and ( +. ) a b = Binop (a, BPlus, b) in
+  and ae = Expr.ident "A" and be = Expr.ident "B"
+  and ce = Expr.ident "C" and de = Expr.ident "D"
+  and al = Expr.strlit "a" and bl = Expr.strlit "b"
+  and one = Expr.integer "1" and two = Expr.integer "2" in
+  let ( !. ) a = Not a &@ Srcloc.dummy
+  and ( &&. ) a b = Logop (a, LAnd, b) &@ Srcloc.dummy
+  and ( ||. ) a b = Logop (a, LOr, b) &@ Srcloc.dummy
+  and ( ==. ) a b : cond with_loc = Relation (a, Eq, b) &@ Srcloc.dummy
+  and ( <>. ) a b : cond with_loc = Relation (a, Ne, b) &@ Srcloc.dummy
+  and ( >. ) a b : cond with_loc = Relation (a, Gt, b) &@ Srcloc.dummy
+  and ( >=. ) a b : cond with_loc = Relation (a, Ge, b) &@ Srcloc.dummy
+  and ( <. ) a b : cond with_loc = Relation (a, Lt, b) &@ Srcloc.dummy
+  and ( <=. ) a b : cond with_loc = Relation (a, Le, b) &@ Srcloc.dummy
+  and ( +. ) a b = Binop (a, BPlus, b) &@ Srcloc.dummy in
   [
     chk "NOT A"         [NOT; a]             !.ac;
     chk "(NOT A)"       [LPAR; NOT; a; RPAR] !.ac;
@@ -81,9 +80,9 @@ let test_conditions =
     (* GnuCOBOL and MF do not agree on this example.
        We would need a source for an explanation of MF's behaviour. *)
     (*chk "A = \"a\" OR (NOT B)"
-      [a; EQ; a_; OR; LPAR; NOT; b; RPAR]    ((ae ==. al) ||. !.(Expr be));*)
+      [a; EQ; a_; OR; LPAR; NOT; b; RPAR]    ((ae ==. al) ||. !.(Cond.expr be));*)
     chk "(A = \"a\") AND NOT B"
-      [LPAR; a; EQ; a_; RPAR; AND; NOT; b]   ((ae ==. al) &&. !.(Expr be));
+      [LPAR; a; EQ; a_; RPAR; AND; NOT; b]   ((ae ==. al) &&. !.(Cond.expr be));
     chk "(A >= B) AND (A <= C)"
       [LPAR; a; GE; b; RPAR; AND;
        LPAR; a; LE; c; RPAR]                 ((ae >=. be) &&. (ae <=. ce));
