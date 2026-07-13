@@ -150,7 +150,7 @@ github-workflow-after-test = """
         uses: actions/upload-artifact@v4
         with:
           name: VSIX-${{ matrix.os }}
-          path: superbol-vscode-platform-*.vsix
+          path: superbol-vscode-oss-*.vsix
           compression-level: 0 # no compression (already a zip archive)
         if: matrix.build_vsix
 
@@ -161,7 +161,7 @@ github-workflow-after-test = """
         uses: actions/upload-artifact@v4
         with:
           name: VSIX-universal
-          path: superbol-vscode-platform-*-universal-*.vsix
+          path: superbol-vscode-oss-*-universal-*.vsix
           compression-level: 0 # no compression (already a zip archive)
         if: ${{ matrix.build_vsix && matrix.os == 'ubuntu-latest' }}
 """
@@ -180,8 +180,8 @@ dir = "src/vscode/superbol-vscode-lib"
 # edit 'src/vscode/superbol-vscode-lib/package.toml' for package-specific options
 
 [[package]]
-dir = "src/vscode/superbol-vscode-platform"
-# edit 'src/vscode/superbol-vscode-platform/package.toml' for package-specific options
+dir = "src/vscode/superbol-vscode-oss"
+# edit 'src/vscode/superbol-vscode-oss/package.toml' for package-specific options
 
 [[package]]
 dir = "src/vendor/vscode-ocaml-platform/src-bindings/interop"

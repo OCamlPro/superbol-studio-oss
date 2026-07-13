@@ -50,7 +50,7 @@ install: [
 depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "3.17.0"}
-  "superbol-vscode-platform" {= version}
+  "superbol-vscode-oss" {= version}
   "superbol-free" {= version}
   "odoc" {with-doc}
   "dune" {>= "3.17.0" & < "3.19.0"}

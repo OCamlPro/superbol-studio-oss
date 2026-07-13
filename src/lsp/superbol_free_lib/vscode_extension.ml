@@ -49,7 +49,7 @@ let package =
       author_email = Some "contact@ocamlpro.com"
     }
     ~keywords: [ "cobol" ; "gnucobol" ]
-    ~main: "./_dist/superbol-vscode-platform-bundle"
+    ~main: "./_dist/superbol-vscode-oss-bundle"
     ~scripts: [
       "compile",
       "make compile";

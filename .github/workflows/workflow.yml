@@ -147,7 +147,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: VSIX-${{ matrix.os }}
-          path: superbol-vscode-platform-*.vsix
+          path: superbol-vscode-oss-*.vsix
           compression-level: 0 # no compression (already a zip archive)
         if: matrix.build_vsix
 
@@ -158,7 +158,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: VSIX-universal
-          path: superbol-vscode-platform-*-universal-*.vsix
+          path: superbol-vscode-oss-*-universal-*.vsix
           compression-level: 0 # no compression (already a zip archive)
         if: ${{ matrix.build_vsix && matrix.os == 'ubuntu-latest' }}
 

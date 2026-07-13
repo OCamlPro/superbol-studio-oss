@@ -1,15 +1,15 @@
 # -*- Makefile -*-
-TARGET_NAME = superbol-vscode-platform
+TARGET_NAME = superbol-vscode-oss
 
 MAIN_SRCDIR ?= src
-STUDIO = superbol_vscode_platform
-STUDIO_SRCDIR = $(MAIN_SRCDIR)/vscode/superbol-vscode-platform
+STUDIO = superbol_vscode_oss
+STUDIO_SRCDIR = $(MAIN_SRCDIR)/vscode/superbol-vscode-oss
 GNUCOBOL_SRCDIR = import/gnucobol
 GNUCOBOL4_SRCDIR = import/gnucobol4
 SUPERBOL_LSP_PKG = lsp/superbol-free
 
 JS_OUTDIR = _out
-JS_TARGETS = $(addprefix $(JS_OUTDIR)/,superbol-vscode-platform-bundle.js	\
+JS_TARGETS = $(addprefix $(JS_OUTDIR)/,superbol-vscode-oss-bundle.js	\
 				       superbol-vscode-gdb.js)
 
 # Emacs lsp-mode source directory (https://github.com/emacs-lsp/lsp-mode):
@@ -27,13 +27,13 @@ include Makefile.vsix-rules
 
 # js assembly
 
-$(JS_OUTDIR)/superbol-vscode-platform-bundle.js:			\
-		src/vscode/superbol-vscode-platform/bundle.js
+$(JS_OUTDIR)/superbol-vscode-oss-bundle.js:			\
+		src/vscode/superbol-vscode-oss/bundle.js
 	@mkdir -p $(dir $@);
 	cp -f $< $@
 
 $(JS_OUTDIR)/superbol-vscode-gdb.js:					\
-		src/vscode/superbol-vscode-platform/gdb.js
+		src/vscode/superbol-vscode-oss/gdb.js
 	@mkdir -p $(dir $@);
 	cp -f $< $@
 
@@ -43,7 +43,7 @@ $(JS_OUTDIR)/superbol-vscode-gdb.js:					\
 
 # Generates opam files for cross-compilation.  We don't generate
 # specific files for js-only packages.  As a result we also forcibly
-# remove a dependency to `superbol-vscode-platform` (which is js-only)
+# remove a dependency to `superbol-vscode-oss` (which is js-only)
 # from the platform-specific version of `superbol-studio-oss`. This is
 # ok as those files are only there to grab external dependencies
 # before cross-compiling.
@@ -53,7 +53,7 @@ opam-cross:
 	rm -f opam/osx/vscode-debug*.opam
 	rm -f opam/osx/*-vscode-*.opam
 	rm -f opam/osx/ezlibcob-*.opam
-	sed -i '/"superbol-vscode-platform-osx"/ d'		\
+	sed -i '/"superbol-vscode-oss-osx"/ d'		\
 		opam/osx/superbol-studio-oss-osx.opam
 	sed -i '/"ANSITerminal-osx"/ d' opam/osx/*.opam
 	opam exec -- drom dep --cross windows
@@ -61,7 +61,7 @@ opam-cross:
 	rm -f opam/windows/vscode-debug*.opam
 	rm -f opam/windows/*-vscode-*.opam
 	rm -f opam/windows/ezlibcob-*.opam
-	sed -i '/"superbol-vscode-platform-windows"/ d'		\
+	sed -i '/"superbol-vscode-oss-windows"/ d'		\
 		opam/windows/superbol-studio-oss-windows.opam
 	sed -i '/"ANSITerminal-windows"/ d' opam/windows/*.opam
 
