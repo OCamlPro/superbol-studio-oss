@@ -101,7 +101,7 @@ and evaluate_branch =
 (* PERFORM *)
 and perform_target_stmt =
   {
-    perform_target: procedure_name with_loc procedure_range;
+    perform_target: procedure_range;
     perform_mode: perform_mode option;
   }
 
@@ -638,7 +638,7 @@ and pp_evaluate_branch ppf { eval_selection; eval_actions } =
 
 and pp_perform_target_stmt ppf { perform_target; perform_mode } =
   Fmt.pf ppf "@[<hv>PERFORM@;<1 2>%a%a@]"
-    (pp_procedure_range pp_procedure_name') perform_target
+    pp_procedure_range perform_target
     Fmt.(option (sp ++ pp_perform_mode)) perform_mode
 
 and pp_perform_inline_stmt ppf { perform_inline_mode; perform_statements } =
