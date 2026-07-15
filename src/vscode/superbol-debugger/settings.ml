@@ -12,7 +12,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let debugSettings =
+let debugSettings () =
   let settings =
     Vscode.Workspace.getConfiguration ~section:"superbol.debugger" () in
   if Vscode.WorkspaceConfiguration.has settings ~section:"gdbPath" then
@@ -22,24 +22,24 @@ let debugSettings =
 
 let displayVariableAttributes () =
   let res =
-    Vscode.WorkspaceConfiguration.get debugSettings
+    Vscode.WorkspaceConfiguration.get (debugSettings ())
       ~section:"displayVariableAttributes" in
   Option.fold ~none:false ~some:[%js.to: bool] res
 
 let gdbPath () =
   let res =
-    Vscode.WorkspaceConfiguration.get debugSettings
+    Vscode.WorkspaceConfiguration.get (debugSettings ())
       ~section:"gdbPath" in
   Option.fold ~none:"" ~some:[%js.to: string] res
 
 let libcobPath () =
   let res =
-    Vscode.WorkspaceConfiguration.get debugSettings
+    Vscode.WorkspaceConfiguration.get (debugSettings ())
       ~section:"libcobPath" in
   Option.fold ~none:"" ~some:[%js.to: string] res
 
 let cobcrunPath () =
   let res =
-    Vscode.WorkspaceConfiguration.get debugSettings
+    Vscode.WorkspaceConfiguration.get (debugSettings ())
       ~section:"cobcrunPath" in
   Option.fold ~none:"" ~some:[%js.to: string] res
