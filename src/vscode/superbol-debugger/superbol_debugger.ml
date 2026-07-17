@@ -84,6 +84,7 @@ module GdbDebugConfiguration = struct
     val gdbtty : t -> Types.GdbTty.t or_undefined [@@js.get]
     val useCobcrun : t -> bool or_undefined [@@js.get]
     val cobcrunPath : t -> string or_undefined [@@js.get]
+    val gdbTargetWrapperPath : t -> string or_undefined [@@js.get]
     val sourceDirs : t -> string maybe_list [@@js.get]
 
     val set_name: t -> string -> unit [@@js.set]
@@ -101,6 +102,7 @@ module GdbDebugConfiguration = struct
     val set_gdbtty : t -> Types.GdbTty.t or_undefined -> unit [@@js.set]
     val set_useCobcrun : t -> bool or_undefined -> unit [@@js.set]
     val set_cobcrunPath : t -> string or_undefined -> unit [@@js.set]
+    val set_gdbTargetWrapperPath : t -> string or_undefined -> unit [@@js.set]
     val set_sourceDirs : t -> string maybe_list -> unit [@@js.set]
 
     val create :
@@ -109,7 +111,7 @@ module GdbDebugConfiguration = struct
       -> ?target:string -> ?arguments:string -> ?cwd:string
       -> ?group:string list -> ?env:string Interop.Dict.t -> ?verbose:bool
       -> ?gdbtty:Types.GdbTty.t -> ?useCobcrun:bool -> ?cobcrunPath:string
-      -> ?sourceDirs:string list -> unit -> t [@@js.builder]]
+      -> ?gdbTargetWrapperPath:string -> ?sourceDirs:string list -> unit -> t [@@js.builder]]
 end
 
 module GdbConfigurationProvider = struct
@@ -193,7 +195,7 @@ module GdbConfigurationProvider = struct
      (except for preLaunchTask, pid, remoteDebugger and cwd), as this
      makes GdbLaunchArguments and GdbAttachArguments easier to
      define and use *)
-  let resolveDebugConfiguration
+  let resolveDebugConfiguration extension
       ~folder:_workspaceFolder ~debugConfiguration:config ?token:_ () :
     DebugConfiguration.t ProviderResult.t =
     findSuperBOLBuildTasks () |>
@@ -226,6 +228,11 @@ module GdbConfigurationProvider = struct
             set_useCobcrun config (Some (false));
           if cobcrunPath config = None then
             set_cobcrunPath config (Some (Settings.cobcrunPath ()));
+          if gdbTargetWrapperPath config = None then (
+            let uri = Vscode.ExtensionContext.extensionUri extension in
+            let path = Format.sprintf "%s/_dist/gdb-target-wrapper" (Vscode.Uri.path uri) in
+            set_gdbTargetWrapperPath config (Some path);
+          );
           let libcobpath = Settings.libcobPath () in
           if libcobpath <> "" then
             begin
@@ -244,16 +251,16 @@ module GdbConfigurationProvider = struct
         Promise.return (Some (config))) |>
     wrapPromise
 
-  let resolveDebugConfigurationWithSubstitutedVariables
+  let resolveDebugConfigurationWithSubstitutedVariables extension
       ~folder ~debugConfiguration ?token () :
     DebugConfiguration.t ProviderResult.t =
-    resolveDebugConfiguration ~folder ~debugConfiguration ?token ()
+    resolveDebugConfiguration extension ~folder ~debugConfiguration ?token ()
 
-  let create () =
+  let create extension =
     DebugConfigurationProvider.create
       ~provideDebugConfigurations
-      ~resolveDebugConfiguration
-      ~resolveDebugConfigurationWithSubstitutedVariables
+      ~resolveDebugConfiguration:(resolveDebugConfiguration extension)
+      ~resolveDebugConfigurationWithSubstitutedVariables:(resolveDebugConfigurationWithSubstitutedVariables extension)
 
 end
 
@@ -356,7 +363,7 @@ module GnuCOBOLEvalExpressionProvider = struct
 end
 
 let activate (extension: ExtensionContext.t) =
-  let provider = GdbConfigurationProvider.create () in
+  let provider = GdbConfigurationProvider.create extension in
   ExtensionContext.subscribe extension
     ~disposable:(Debug.registerDebugConfigurationProvider
                    ~debugType:"superbol-gdb" ~provider ());

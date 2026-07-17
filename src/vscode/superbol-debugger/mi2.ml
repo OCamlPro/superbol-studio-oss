@@ -20,6 +20,7 @@ type t = {
   mutable noDebug : bool;
   mutable gdbTty : Types.GdbTty.t;
   mutable cobcrunPath: string;
+  mutable gdbTargetWrapperPath : string;
   mutable useCobcrun: bool;
   mutable sourceDirs: string list;
   mutable breakpoints : int Breakpoint.Map.t; (* or set *)
@@ -154,6 +155,7 @@ let rec create () =
     noDebug = false;
     gdbTty = Bool (false);
     cobcrunPath = "";
+    gdbTargetWrapperPath = "";
     useCobcrun = false;
     sourceDirs = [];
     breakpoints = Breakpoint.Map.empty;
@@ -176,7 +178,7 @@ let rec create () =
   }
 
 and init mi2 gdbPath procEnv noDebug
-    gdbTty cobcrunPath useCobcrun sourceDirs =
+    gdbTty cobcrunPath gdbTargetWrapperPath useCobcrun sourceDirs =
   let procEnv =
     Interop.Dict.union (fun _n _v1 v2 ->
         Some v2
@@ -187,6 +189,7 @@ and init mi2 gdbPath procEnv noDebug
   mi2.noDebug <- noDebug;
   mi2.gdbTty <- gdbTty;
   mi2.cobcrunPath <- cobcrunPath;
+  mi2.gdbTargetWrapperPath <- gdbTargetWrapperPath;
   mi2.useCobcrun <- useCobcrun;
   mi2.sourceDirs <- sourceDirs
 
@@ -297,9 +300,8 @@ and initCommands mi2 target ?targetArgs cwd =
   in
   let commands =
     match mi2.ttyName, mi2.newConsole with
-    | Some (tty), _ ->
-        sendCommand mi2 "gdb-set env TERM=xterm" () ::
-        sendCommand mi2 ("gdb-set inferior-tty /dev/" ^ tty) () :: commands
+    | Some _, _ ->
+        sendCommand mi2 ("gdb-set exec-wrapper " ^ mi2.gdbTargetWrapperPath) () :: commands
     | None, true ->
         sendCommand mi2 "gdb-set new-console on" () :: commands
     | None, false ->
@@ -336,7 +338,8 @@ and stdout mi2 ~chunk =
       let line = Bytes.sub_string b off len in
       let lexbuf = Lexing.from_string ~with_positions:false line in
       try onMiNode mi2 (Mi2Parser.node Mi2Lexer.token lexbuf)
-      with _ -> () (* NOTE: (gdb) marker arrives here *)
+      with _ -> (
+        () (* NOTE: (gdb) marker arrives here *))
     )
 
 and stderr mi2 ~chunk =

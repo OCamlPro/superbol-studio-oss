@@ -32,6 +32,7 @@ module GdbLaunchArguments = struct
     val gdbtty : t -> Types.GdbTty.t [@@js.get]
     val useCobcrun : t -> bool [@@js.get]
     val cobcrunPath : t -> string [@@js.get]
+    val gdbTargetWrapperPath : t -> string [@@js.get]
     val sourceDirs : t -> string maybe_list [@@js.get]]
 end
 
@@ -52,6 +53,7 @@ module GdbAttachArguments = struct
     val verbose : t -> bool [@@js.get]
     val useCobcrun : t -> bool [@@js.get]
     val cobcrunPath : t -> string [@@js.get]
+    val gdbTargetWrapperPath : t -> string [@@js.get]
     val sourceDirs : t -> string maybe_list [@@js.get]]
 end
 
@@ -130,6 +132,7 @@ module GdbDebugSession = struct
       (GdbLaunchArguments.noDebug args |> Option.value ~default:false)
       (GdbLaunchArguments.gdbtty args)
       (GdbLaunchArguments.cobcrunPath args)
+      (GdbLaunchArguments.gdbTargetWrapperPath args)
       (GdbLaunchArguments.useCobcrun args)
       (GdbLaunchArguments.sourceDirs args);
     setupEventHandlers gdb;
@@ -184,6 +187,7 @@ module GdbDebugSession = struct
           false
           (GdbTty.Bool false)
           (GdbAttachArguments.cobcrunPath args)
+          (GdbAttachArguments.gdbTargetWrapperPath args)
           (GdbAttachArguments.useCobcrun args)
           (GdbAttachArguments.sourceDirs args);
         setupEventHandlers gdb;

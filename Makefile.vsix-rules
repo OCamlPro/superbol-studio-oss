@@ -92,7 +92,7 @@ ifeq ($(TARGET_PLAT),$(BUILD_PLAT))
     rebuild-package.json package.json: $(SUPERBOL_LSP_BUILT)
 	cp -f package.json package.json.prev
 	./$(SUPERBOL_LSP_BUILT) json vscode --gen package.json
-	diff -u package.json.prev package.json && rm -f package.json.prev 
+	diff -u package.json.prev package.json && rm -f package.json.prev
    endif
 endif
 
@@ -154,7 +154,7 @@ bundle-release: $(JS_TARGETS)
 
 # packaging
 
-.PHONY: vsix-dist-setup vsix-package vsix-debug vsix-release	\
+.PHONY: vsix-dist-setup vsix-package vsix-debug vsix-gdb-target-wrapper vsix-release	\
 	all-vsix-debug-packages					\
 	all-vsix-debug						\
 	all-vsix-release-packages				\
@@ -172,13 +172,19 @@ gnucobol-config: $(GNUCOBOL_SRCDIR)/config
 vsix-dist-setup:
 	@mkdir -p _dist
 
-vsix-package: package.json gnucobol-config $(EXE_TARGETS) $(SUPERBOL_LSP_BUILT)
+SUPERBOL_DEBUGGER=src/vscode/superbol-debugger
+
+vsix-gdb-target-wrapper:
+	cd $(SUPERBOL_DEBUGGER) && $(CC) $(CCFLAGS) -g ./gdb-target-wrapper.c -o gdb-target-wrapper
+
+vsix-package: package.json gnucobol-config $(EXE_TARGETS) $(SUPERBOL_LSP_BUILT) vsix-gdb-target-wrapper
 #	needs 'make build-debug' or 'make build-release' before
 #       remove native versions to avoid accidental includion in wrong VSIXs
 	rm -f $(addsuffix -*,							\
 		$(addprefix _dist/$(SUPERBOL_LSP)-,$(AVAILABLE_NATIVE_PLATFORMS)))	\
 	      _dist/$(SUPERBOL_LSP).js
 	$(CP) $(SUPERBOL_LSP_BUILT) _dist/$(SUPERBOL_LSP_EXE)
+	$(CP) $(SUPERBOL_DEBUGGER)/gdb-target-wrapper _dist/
 	$(NPX) vsce package $(VSCE_ARGS) $(VSCE_PACKAGE_ARGS)	\
 		--no-git-tag-version				\
 		--no-update-package-json			\
