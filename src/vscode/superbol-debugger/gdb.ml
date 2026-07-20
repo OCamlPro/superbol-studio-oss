@@ -237,8 +237,9 @@ module GdbDebugSession = struct
   and handleMsg gdb type_ msg =
     let category =
       match type_ with
-      | "target" | "stdout" -> OutputEvent.M.Stdout
-      | "log"    | "stderr" -> OutputEvent.M.Stderr
+      | "~" -> OutputEvent.M.Console
+      | "target" | "stdout" | "@" -> OutputEvent.M.Stdout
+      | "log"    | "stderr" | "&" -> OutputEvent.M.Stderr
       | _                   -> OutputEvent.M.Other type_
     in
     sendEvent gdb.session
