@@ -354,14 +354,18 @@ and stderr mi2 ~chunk =
       log mi2 "stderr" (Bytes.sub_string b off len)
     );
 
-and stdin mi2 data ?cb () =
-  match mi2.process with
-  | Some (process) ->
-      Log.debug ["stdin: "; data];
-      Node.Stream.Writable.write (* TODO: should we add \n ? *)
-        (Node.ChildProcess.get_stdin process) data ?callback:cb ()
-  | None ->
-     ()
+and stdin mi2 ?cb fmt =
+  Format.kasprintf (fun s ->
+    match mi2.process with
+    | Some (process) ->
+        Log.debug ["stdin: "; s];
+        (* We must insert a newline to execute the command. *)
+        let data = Format.sprintf "%s\n" s in
+        Node.Stream.Writable.write
+          (Node.ChildProcess.get_stdin process) data ?callback:cb ()
+    | None ->
+       ()
+  ) fmt
 
 and onMiNode mi2 (node : MiNode.t) =
   match node with
@@ -1087,27 +1091,32 @@ and getCurrentFunctionName mi2 =
 and sendUserInput mi2 command ?(threadId=0) ?(frameLevel=0) ()
   : Promise.error option Promise.t =
   ignore threadId; ignore frameLevel;
-  Promise.make @@ fun ~resolve ~reject:_ ->
-  stdin mi2 command ~cb:resolve ()
+  Promise.make @@ fun ~resolve ~reject ->
+  match mi2.process with
+  | Some _ ->
+      mi2.tok <- mi2.tok + 1;
+      mi2.handlers <- IntMap.add mi2.tok ignore mi2.handlers;
+      stdin mi2 ~cb:resolve "%d%s" mi2.tok command
+  | None ->
+      reject (mkError "Child process not started" ())
 
 (* NOTE: this is never rejected unless on_failure=Reject ;
    however this may be pending forever if the reply cannot be read/parsed *)
-and sendCommand mi2 cmd ?(on_failure=Reject) () : MiNode.result Promise.t =
+and sendCommand mi2 command ?(on_failure=Reject) () : MiNode.result Promise.t =
   Promise.make @@ fun ~resolve ~reject ->
   match mi2.process with
-  | Some (process) ->
+  | Some _ ->
       mi2.tok <- mi2.tok + 1;
       mi2.handlers <- IntMap.add mi2.tok (fun (rnode : MiNode.result) ->
           (* NOTE: node is always valid (if it can't be
              parsed, the handler can not even be called *)
           if rnode.class_ = Error && on_failure = Reject then (* default *)
             let msg = MiNode.(rfield rnode "msg" |> Value.string) in
-            reject (mkError msg ~src:cmd ())
+            reject (mkError msg ~src:command ())
           else
             resolve rnode
         ) mi2.handlers;
-      Node.Stream.Writable.write (Node.ChildProcess.get_stdin process)
-        (Printf.sprintf "%d-%s\n" mi2.tok cmd) ()
+      stdin mi2 "%d-%s" mi2.tok command
   | None ->
       reject (mkError "Child process not started" ())
 
