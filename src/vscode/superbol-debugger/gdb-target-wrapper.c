@@ -4,10 +4,10 @@
 #include <assert.h>
 #include <limits.h>
 
-#define BUF_CAP 2046
+#define BUF_CAP PIPE_BUF / 2 - 4
 #define ESCAPED_CAP (4 + 2 * BUF_CAP)
 
-static_assert(ESCAPED_CAP <= PIPE_BUF);
+static_assert(0 < ESCAPED_CAP && ESCAPED_CAP <= PIPE_BUF);
 
 size_t to_c_string(size_t len, char buf[restrict static len], char *restrict escaped) {
   int i = 0;
