@@ -1,7 +1,5 @@
 # -*- Makefile -*-
 
-AVAILABLE_NATIVE_PLATFORMS = linux darwin win32
-
 CP ?= cp -fl # ln -srf
 
 DUNE_BUILD_DIR ?= _build
@@ -111,6 +109,7 @@ endif
 .PHONY: build-debug bundle-debug
 
 build-debug:
+	rm -rf _dist
 	${DUNE} build ${DUNE_ARGS} ${DUNE_BUILD_ARGS} $(STUDIO_JS)
 	@mkdir -p $(JS_OUTDIR)
 	$(CP) ${DUNE_BUILD_DIR}/default/$(STUDIO_JS) $(JS_OUTDIR)/
@@ -131,6 +130,7 @@ bundle-debug: $(JS_TARGETS)
 .PHONY: build-release bundle-release
 
 build-release:
+	rm -rf _dist
 	${DUNE} build ${DUNE_ARGS} ${DUNE_BUILD_ARGS} --profile=release \
 		      $(STUDIO_JS)
 	@mkdir -p $(JS_OUTDIR)
@@ -174,10 +174,6 @@ vsix-dist-setup:
 
 vsix-package: package.json gnucobol-config $(EXE_TARGETS) $(SUPERBOL_LSP_BUILT)
 #	needs 'make build-debug' or 'make build-release' before
-#       remove native versions to avoid accidental includion in wrong VSIXs
-	rm -f $(addsuffix -*,							\
-		$(addprefix _dist/$(SUPERBOL_LSP)-,$(AVAILABLE_NATIVE_PLATFORMS)))	\
-	      _dist/$(SUPERBOL_LSP).js
 	$(CP) $(SUPERBOL_LSP_BUILT) _dist/$(SUPERBOL_LSP_EXE)
 	$(NPX) vsce package $(VSCE_ARGS) $(VSCE_PACKAGE_ARGS)	\
 		--no-git-tag-version				\
