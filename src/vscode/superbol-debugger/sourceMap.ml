@@ -239,7 +239,7 @@ and parse sm cFile =
       let sm, gacc, _lacc = Util.foldFileLines (fun (sm, gacc, lacc) line ->
           let sm, gacc, lacc =
 
-
+            (* debug "processing: %s" line; *)
             (* Handle includes (.c) *)
             if Util.matches reFileInclude line then
               let cFile = Util.group line 1 in
@@ -294,12 +294,6 @@ and parse sm cFile =
             else if Util.matches reProcedure line &&
                     not (Util.hasGroup 2) then
               let cobLine = Util.groupInt line 1 in
-              (* Discard last line if it is for the same file&line.
-                 Unlikely, but happens if several statements on same line. *)
-              let lines = Util.filterHd (fun (l : line) ->
-                  l.cobFile <> lacc.cobFile || l.cobLine <> cobLine
-                ) gacc.lines
-              in
               let performLine = Util.matches reSubroutine line in
               let cobolLine = lookupLineInCobolFile lacc.cobFile cobLine in
               let line = { cobFile = lacc.cobFile; cobLine;
@@ -309,7 +303,7 @@ and parse sm cFile =
                            rootCFile;
                            cobolLine;
                          } in
-              let lines = line :: lines in
+              let lines = line :: gacc.lines in
               sm, { gacc with lines; performLine }, lacc
 
 
