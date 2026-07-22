@@ -46,7 +46,7 @@ generators = ["ocamllex"]
 preprocess = "pps ppx_deriving.show ppx_deriving.ord"
 
 # files to skip while updating at package level
-skip = [ "index.mld", "main.ml"]
+skip = ["index.mld", "main.ml"]
 
 # package library dependencies
 #   [dependencies]
@@ -57,8 +57,6 @@ cobol_common = "version"
 cobol_config = "version"
 cobol_ptree = "version"
 zarith = ">=1"
-# zarith_stubs_js is necessary for proper compilation of the LSP server into JS,
-# and it has no effect on native code:
 zarith_stubs_js = ">=0.17"
 
 # package tools dependencies
@@ -74,7 +72,8 @@ ppx_deriving = ">=5.2.1"
 #  no-opam-test = "yes" 
 #  no-opam-doc = "yes" 
 #  gen-opam = "some" | "all" 
-#  dune-stanzas = "(flags (:standard (:include linking.sexp)))" 
+#  dune-flags = "(:standard (:include linking.sexp))" 
+#  dune-stanzas = "(foreign_stubs (language c) (names mapfile_stubs))" 
 #  static-clibs = "unix" 
 [fields]
 # ...

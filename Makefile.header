@@ -9,8 +9,7 @@ GNUCOBOL4_SRCDIR = import/gnucobol4
 SUPERBOL_LSP_PKG = lsp/superbol-free
 
 JS_OUTDIR = _out
-JS_TARGETS = $(addprefix $(JS_OUTDIR)/,superbol-vscode-oss-bundle.js	\
-				       superbol-vscode-gdb.js)
+JS_TARGETS = $(addprefix $(JS_OUTDIR)/,superbol-vscode-oss-bundle.js)
 
 # Emacs lsp-mode source directory (https://github.com/emacs-lsp/lsp-mode):
 # (could be a submodule)
@@ -29,11 +28,6 @@ include Makefile.vsix-rules
 
 $(JS_OUTDIR)/superbol-vscode-oss-bundle.js:			\
 		src/vscode/superbol-vscode-oss/bundle.js
-	@mkdir -p $(dir $@);
-	cp -f $< $@
-
-$(JS_OUTDIR)/superbol-vscode-gdb.js:					\
-		src/vscode/superbol-vscode-oss/gdb.js
 	@mkdir -p $(dir $@);
 	cp -f $< $@
 

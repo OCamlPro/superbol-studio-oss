@@ -5,8 +5,10 @@ share-version = "0.9.2"
 
 [project]
 authors = ["Nicolas Berthier <nicolas.berthier@ocamlpro.com>", "David Declerck <david.declerck@ocamlpro.com>", "Boris Eng <boris.eng@ocamlpro.com>", "Fabrice Le Fessant <fabrice.le_fessant@ocamlpro.com>", "Emilien Lemaire <emilien.lemaire@ocamlpro.com>", "Guillaume Bertholon <guillaume.bertholon@ocamlpro.com>"]
+bug-reports = "https://github.com/ocamlpro/superbol-studio-oss/issues"
 ci-systems = ["ubuntu-latest", "macos-latest"]
 copyright = "OCamlPro SAS"
+dev-repo = "https://github.com/ocamlpro/superbol-studio-oss"
 edition = "4.14.2"
 github-organization = "ocamlpro"
 license = "MIT"
@@ -15,8 +17,6 @@ name = "superbol-studio-oss"
 skeleton = "program"
 synopsis = "SuperBOL Studio OSS Project"
 version = "0.3.1"
-dev-repo = "https://github.com/ocamlpro/superbol-studio-oss"
-bug-reports = "https://github.com/ocamlpro/superbol-studio-oss/issues"
 
 # keys that you could also define:
 # odoc-target = "...odoc-target..."
@@ -27,15 +27,13 @@ bug-reports = "https://github.com/ocamlpro/superbol-studio-oss/issues"
 # homepage = "...homepage..."
 
 [project]
-description = """SuperBOL Studio OSS is a new platform for COBOL"""
+description = "SuperBOL Studio OSS is a new platform for COBOL"
 
 [project]
 skip = ["@test", "@ocamlformat", "@ocp-indent", "README.md", "LICENSE.md", "CHANGES.md", "sphinx/index.rst", "sphinx/install.rst", "dune"]
 
 # project-wide library dependencies (not for package-specific deps)
 [dependencies]
-# NB: now we'd need a way to avoid putting that dependency in `libraries` in `dune` files.
-# superbol_testutils = { version = "version", for-test = true }
 
 # project-wide tools dependencies (not for package-specific deps)
 [tools]
@@ -58,10 +56,10 @@ share-dirs = ["share"]
 #    [profile]
 #    dev = { ocaml-flags = "-w +a-4-40-41-42-44" }
 #    release = { ocaml-flags = "-w -a" }
-[profile]
-dev       = { ocaml-flags = "-w -32-67-69" } #unused value(-declaration), unused field
-universal = { ocaml-flags = "-w -32-67-69" }
-# ...
+[profile.dev]
+ocaml-flags = "-w -32-67-69"
+[profile.universal]
+ocaml-flags = "-w -32-67-69"
 
 # project-wide fields (depends on project skeleton)
 # examples:
@@ -70,7 +68,8 @@ universal = { ocaml-flags = "-w -32-67-69" }
 #  readme-trailer = "..."
 #  dot-gitignore-trailer = "..."
 [fields]
-dune = "3.17.0"
+docker-alpine-image = "ocamlpro/ocaml:4.14.2"
+docker-alpine-packages = "gmp-static"
 dot-gitignore-trailer = """
 # Edit drom.toml to change the following lines
 /superbol-free-*
@@ -87,6 +86,48 @@ ATTIC
 *.opam.locked
 /emacs/lsp-superbol-customs.el
 _superbol
+"""
+dune = "3.17.0"
+github-workflow-after-build = """
+      - run: make check-package.json
+
+      - run: make dev-deps # install test dependencies
+        if: ${{ ! matrix.skip_test }}
+"""
+github-workflow-after-test = """
+      - run: npm install && npm install esbuild
+        if: matrix.build_vsix
+
+      - run: make vsix-debug
+        if: matrix.build_vsix
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VSIX-${{ matrix.os }}
+          path: superbol-vscode-oss-*.vsix
+          compression-level: 0 # no compression (already a zip archive)
+        if: matrix.build_vsix
+
+      - run: make vsix-debug TARGET_PLAT=universal
+        if: ${{ matrix.build_vsix && matrix.os == 'ubuntu-latest' }}
+
+      - name: Upload universal VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VSIX-universal
+          path: superbol-vscode-oss-*-universal-*.vsix
+          compression-level: 0 # no compression (already a zip archive)
+        if: ${{ matrix.build_vsix && matrix.os == 'ubuntu-latest' }}
+"""
+github-workflow-before-build = """
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '>=16'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+        if: matrix.build_vsix
+
 """
 github-workflow-before-opam = """
       - run: git submodule init
@@ -120,60 +161,11 @@ github-workflow-before-opam = """
           echo 'HAVE_LIBCOB5=false' >> $GITHUB_ENV
         if: ${{ matrix.os != 'ubuntu-latest' && matrix.os != 'macos-latest' }}
 """
-
-github-workflow-before-build = """
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '>=16'
-          cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
-        if: matrix.build_vsix
-
-"""
-
-# NB: a `before-tests` field would make more sense here.
-github-workflow-after-build = """
-      - run: make check-package.json
-
-      - run: make dev-deps # install test dependencies
-        if: ${{ ! matrix.skip_test }}
-"""
-
-github-workflow-after-test = """
-      - run: npm install && npm install esbuild
-        if: matrix.build_vsix
-
-      - run: make vsix-debug
-        if: matrix.build_vsix
-
-      - name: Upload VSIX artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: VSIX-${{ matrix.os }}
-          path: superbol-vscode-oss-*.vsix
-          compression-level: 0 # no compression (already a zip archive)
-        if: matrix.build_vsix
-
-      - run: make vsix-debug TARGET_PLAT=universal
-        if: ${{ matrix.build_vsix && matrix.os == 'ubuntu-latest' }}
-
-      - name: Upload universal VSIX artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: VSIX-universal
-          path: superbol-vscode-oss-*-universal-*.vsix
-          compression-level: 0 # no compression (already a zip archive)
-        if: ${{ matrix.build_vsix && matrix.os == 'ubuntu-latest' }}
-"""
-
-docker-alpine-image = "ocamlpro/ocaml:4.14.2"
-docker-alpine-packages = "gmp-static"
 static-binaries = "superbol-free"
 
 [[package]]
 dir = "src/superbol-studio-oss"
 # edit 'src/superbol-studio-oss/package.toml' for package-specific options
-
 
 [[package]]
 dir = "src/vscode/superbol-vscode-lib"
@@ -185,19 +177,19 @@ dir = "src/vscode/superbol-vscode-oss"
 
 [[package]]
 dir = "src/vendor/vscode-ocaml-platform/src-bindings/interop"
-# edit 'src/vscode/interop-js-stubs/package.toml' for package-specific options
+# edit 'src/vendor/vscode-ocaml-platform/src-bindings/interop/package.toml' for package-specific options
 
 [[package]]
 dir = "src/vendor/vscode-ocaml-platform/src-bindings/node"
-# edit 'src/vscode/node-js-stubs/package.toml' for package-specific options
+# edit 'src/vendor/vscode-ocaml-platform/src-bindings/node/package.toml' for package-specific options
 
 [[package]]
 dir = "src/vendor/vscode-ocaml-platform/src-bindings/vscode"
-# edit 'src/vscode/vscode-js-stubs/package.toml' for package-specific options
+# edit 'src/vendor/vscode-ocaml-platform/src-bindings/vscode/package.toml' for package-specific options
 
 [[package]]
 dir = "src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient"
-# edit 'src/vscode/vscode-languageclient-js-stubs/package.toml' for package-specific options
+# edit 'src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/package.toml' for package-specific options
 
 [[package]]
 dir = "src/vscode/vscode-json"
@@ -211,15 +203,13 @@ dir = "src/vscode/vscode-debugadapter"
 dir = "src/vscode/vscode-debugprotocol"
 # edit 'src/vscode/vscode-debugprotocol/package.toml' for package-specific options
 
-
-
 [[package]]
 dir = "src/lsp/superbol-free"
-# edit 'src/lsp/superbol/package.toml' for package-specific options
+# edit 'src/lsp/superbol-free/package.toml' for package-specific options
 
 [[package]]
 dir = "src/lsp/superbol_free_lib"
-# edit 'src/lsp/superbol_lib/package.toml' for package-specific options
+# edit 'src/lsp/superbol_free_lib/package.toml' for package-specific options
 
 [[package]]
 dir = "src/lsp/superbol_preprocs"
@@ -255,35 +245,35 @@ dir = "src/lsp/cobol_lsp"
 
 [[package]]
 dir = "src/lsp/ppx_cobcflags"
-# edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
+# edit 'src/lsp/ppx_cobcflags/package.toml' for package-specific options
 
 [[package]]
 dir = "src/lsp/pretty"
-# edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
+# edit 'src/lsp/pretty/package.toml' for package-specific options
 
 [[package]]
 dir = "src/lsp/cobol_config"
-# edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
+# edit 'src/lsp/cobol_config/package.toml' for package-specific options
 
 [[package]]
 dir = "src/lsp/cobol_indent"
-# edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
+# edit 'src/lsp/cobol_indent/package.toml' for package-specific options
 
 [[package]]
 dir = "src/lsp/cobol_indent_old"
-# edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
+# edit 'src/lsp/cobol_indent_old/package.toml' for package-specific options
 
 [[package]]
 dir = "src/lsp/cobol_preproc"
-# edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
+# edit 'src/lsp/cobol_preproc/package.toml' for package-specific options
 
 [[package]]
 dir = "src/lsp/cobol_data"
-# edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
+# edit 'src/lsp/cobol_data/package.toml' for package-specific options
 
 [[package]]
 dir = "src/lsp/cobol_typeck"
-# edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
+# edit 'src/lsp/cobol_typeck/package.toml' for package-specific options
 
 [[package]]
 dir = "src/lsp/cobol_unit"
@@ -291,7 +281,7 @@ dir = "src/lsp/cobol_unit"
 
 [[package]]
 dir = "src/vendor/ez_toml"
-# edit 'src/testing/superbol_testutils/package.toml' for package-specific options
+# edit 'src/vendor/ez_toml/package.toml' for package-specific options
 
 [[package]]
 dir = "src/lsp/ezr_toml"
@@ -299,7 +289,7 @@ dir = "src/lsp/ezr_toml"
 
 [[package]]
 dir = "src/lsp/sql_preproc"
-# edit 'src/lsp/ezr_toml/package.toml' for package-specific options
+# edit 'src/lsp/sql_preproc/package.toml' for package-specific options
 
 [[package]]
 dir = "src/lsp/sql_ast"
@@ -311,6 +301,7 @@ dir = "src/lsp/sql_parser"
 
 [[package]]
 dir = "src/lsp/cobol_cfg"
+# edit 'src/lsp/cobol_cfg/package.toml' for package-specific options
 
 [[package]]
 dir = "src/autofonce/autofonce"
@@ -346,12 +337,17 @@ dir = "src/autofonce/autofonce_misc"
 
 [[package]]
 dir = "src/autofonce/ez_win32"
+# edit 'src/autofonce/ez_win32/package.toml' for package-specific options
 
 [[package]]
 dir = "src/autofonce/ez_call"
+# edit 'src/autofonce/ez_call/package.toml' for package-specific options
 
 [[package]]
 dir = "src/h2mlstubs"
+# edit 'src/h2mlstubs/package.toml' for package-specific options
 
 [[package]]
 dir = "src/tramabol/ezlibcob"
+# edit 'src/tramabol/ezlibcob/package.toml' for package-specific options
+
