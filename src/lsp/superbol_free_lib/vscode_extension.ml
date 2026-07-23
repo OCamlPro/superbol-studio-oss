@@ -78,7 +78,7 @@ let package =
       "@vscode/test-electron", "^1.6.1";
       "@vscode/vsce", "^2.15.0";
       "esbuild", "^0.15.16";
-      "ovsx", "^0.1.0";
+      "ovsx", "^1.0.2";
 
       (* for the debug extension: *)
       "typescript", "^5.1.6";

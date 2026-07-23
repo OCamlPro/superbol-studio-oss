@@ -609,7 +609,7 @@
   "displayName": "SuperBOL Studio OSS",
   "description": "Provides a COBOL mode in Visual Studio Code, based on the SuperBOL LSP server for COBOL, a source level debugger, and commands for GnuCOBOL 3.2+",
   "license": "MIT",
-  "version": "0.3.1",
+  "version": "1.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/OCamlPro/superbol-studio-oss"
@@ -642,7 +642,7 @@
     "@vscode/test-electron": "^1.6.1",
     "@vscode/vsce": "^2.15.0",
     "esbuild": "^0.15.16",
-    "ovsx": "^0.1.0",
+    "ovsx": "^1.0.2",
     "typescript": "^5.1.6"
   },
   "publisher": "OCamlPro",
