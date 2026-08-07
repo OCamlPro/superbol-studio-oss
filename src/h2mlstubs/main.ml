@@ -11,6 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+Synthetize.ml_type := Generate.ml_type
+
 let () =
   let idl_file = Sys.argv.(1) in
   let ml_file = Sys.argv.(2) in

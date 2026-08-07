@@ -24,6 +24,7 @@ let is_heap_allocated st =
   | STFloat (_) -> true
   | STEnum (_) -> false
   | STComp (_) -> true
+  | STFun (_) -> true
   | STPtr (_) -> true
   | STArray (_) -> true
 
@@ -47,20 +48,23 @@ let rec ml_type ty =
   | STFloat { kind = Double; _ } -> "CDouble.t"
   | STEnum { enum; _ } -> enum.enum_ml_type
   | STComp { comp; _ } -> Printf.sprintf "%s cptr" comp.comp_ml_type
+  | STFun { fun_; _ } -> Printf.sprintf "(%s) callback" fun_.fun_ml_type
   | STPtr { type_; _ } -> Printf.sprintf "%s cptr" (ml_type type_)
   | STArray { type_; _ } -> Printf.sprintf "%s carray" (ml_type type_)
 
 let rec c_type ty =
-  let p const sign type_ ptr =
+  let p const type_ ptr =
     let const = if const then " const" else "" in
+    let ptr = if ptr then " *" else "" in
+    Printf.sprintf "%s%s%s" type_ ptr const
+  in
+  let p_int const sign type_ ptr =
     let sign =
       match sign with
-        | None -> ""
-        | Some (Signed) -> "signed "
-        | Some (Unsigned) -> "unsigned "
+        | Signed -> "signed "
+        | Unsigned -> "unsigned "
     in
-    let ptr = if ptr then " *" else "" in
-    Printf.sprintf "%s%s%s%s" sign type_ ptr const
+    Printf.sprintf "%s%s" sign (p const type_ ptr)
   in
   let ikind = function
     | Int8 -> "char"
@@ -73,14 +77,16 @@ let rec c_type ty =
     | Double -> "double"
   in
   match ty with
-  | STVoid { const } -> p const None "void" false
-  | STChar { const } -> p const None "char" false
-  | STInt { const; kind; sign } -> p const (Some (sign)) (ikind kind) false
-  | STFloat { const; kind } -> p const None (fkind kind) false
-  | STEnum { const; enum } -> p const None enum.enum_c_type false
-  | STComp { const; unref; comp } -> p const None comp.comp_c_type false ^ (if not unref then " *" else "")
-  | STPtr { const; type_ } -> p const None (c_type type_) true
-  | STArray { const; size = _; type_ } -> p const None (c_type type_) true
+  | STVoid { const } -> p const "void" false
+  | STChar { const } -> p const "char" false
+  | STInt { const; kind; sign } -> p_int const sign (ikind kind) false
+  | STFloat { const; kind } -> p const (fkind kind) false
+  | STEnum { const; enum } -> p const enum.enum_c_type false
+  | STComp { const; unref; comp } -> p const comp.comp_c_type false ^ (if not unref then " *" else "")
+  | STFun { const; unref; fun_ } -> p const fun_.fun_c_type false ^ (if not unref then " *" else "")
+  | STPtr { const; type_ } -> p const (c_type type_) true
+  | STArray { const; size = _; type_ } -> p const (c_type type_) true
+
 
 let conv_to_c ty x =
   match ty with
@@ -104,6 +110,8 @@ let conv_to_c ty x =
       Printf.sprintf "(%s)Ptr_val(%s)" (c_type ty) x
   | STArray (_) ->
       Printf.sprintf "(%s)Array_val(%s)" (c_type ty) x
+  | STFun (_) ->
+      Printf.sprintf "(%s)Callback_val(%s)" (c_type ty) x
 
 let conv_to_ml ty x v =
   let rec type_kind ty =
@@ -123,6 +131,7 @@ let conv_to_ml ty x v =
     | STEnum (_) -> "CENUM", "NULL", 0
     | STComp { comp; _ } ->
         "CPTR", Printf.sprintf "mk_kind(CCOMP, NULL, sizeof(%s))" comp.comp_c_type, 0
+    | STFun (_) -> "CFUN", "NULL", 0
     | STPtr { type_; _ } ->
         let id, contents, isize = type_kind type_ in
         "CPTR", Printf.sprintf "mk_kind(%s, %s, %d)" id contents isize, 0
@@ -146,6 +155,8 @@ let conv_to_ml ty x v =
   | STComp { comp; unref; _ } ->
       let v' = if unref then Printf.sprintf "copy(%s)" v else v in
       Printf.sprintf "Val_ptr(%s, CCOMP, NULL, sizeof(%s), %s)" x comp.comp_c_type v'
+  | STFun (_) ->
+      Printf.sprintf "Val_callback(%s, %s)" x v
   | STPtr { type_; _ } ->
       let id, contents, isize = type_kind type_ in
       Printf.sprintf "Val_ptr(%s, %s, %s, %d, %s)" x id contents isize v
@@ -220,8 +231,12 @@ let gen_stub (stub : stub) =
 
   let stub_fun_name =
     let c = stub.fun_name.[0] in
-    if c <> Char.uppercase_ascii c then stub.fun_name
-    else Printf.sprintf "f_%s" stub.fun_name
+    if c = Char.uppercase_ascii c
+       || stub.fun_name = "function"
+       || stub.fun_name = "module"
+       || stub.fun_name = "val"
+    then Printf.sprintf "f_%s" stub.fun_name
+    else stub.fun_name
   in
 
   let ml_fun_name = Printf.sprintf "ml_%s" stub.fun_name in
@@ -255,7 +270,6 @@ let gen_stub (stub : stub) =
   (* The CAMLparam line *)
   if alloc then
     begin
-      (* TODO: when more than 5, should split *)
       let caml_params =
         List.filter_map (fun (arg : arg) ->
             if is_heap_allocated arg.arg_type then
@@ -610,6 +624,153 @@ let gen_enum (enum : enum) =
 
 
 
+let gen_fun pool_size (fun_ : fun_) =
+  let ml_buf = Buffer.create 10000 in
+  let c_buf = Buffer.create 10000 in
+
+  (* Generate the ML create/free functions *)
+  Printf.bprintf ml_buf
+    "  external create_%s : (%s) -> (%s) t = \"ml_cb_%s_create\"\n"
+    fun_.fun_sig fun_.fun_ml_type fun_.fun_ml_type fun_.fun_sig;
+  Printf.bprintf ml_buf
+    "  external free_%s : (%s) t -> unit = \"ml_cb_%s_free\"\n"
+    fun_.fun_sig fun_.fun_ml_type fun_.fun_sig;
+
+  (* Generate the closure array *)
+  Printf.bprintf c_buf
+    "static value cb_%s_closures[] = {\n" fun_.fun_sig;
+  Printf.bprintf c_buf "  ";
+  for _i = 0 to pool_size - 2 do
+    Printf.bprintf c_buf "Val_unit, ";
+  done;
+  Printf.bprintf c_buf "Val_unit\n";
+  Printf.bprintf c_buf "};\n\n";
+
+  (* Generate the dispatch function *)
+
+  (* The prototype *)
+  Printf.bprintf c_buf "/*static*/ %s cb_%s_dispatch(int slot"
+    (c_type fun_.fun_ret) fun_.fun_sig;
+  if fun_.fun_args <> [] then
+    Printf.bprintf c_buf ", %s"
+      (String.concat ", "
+         (List.map (fun (an, ty) ->
+              Printf.sprintf "%s %s" (c_type ty) an) fun_.fun_args));
+  Printf.bprintf c_buf ") {\n";
+
+  (* The CAMLparam line *)
+  Printf.bprintf c_buf "  CAMLparam0();\n";
+
+  (* The CAMLlocal line *)
+  let use_array = List.length fun_.fun_args > 3 in
+  let caml_alloc, caml_non_alloc =
+    if use_array then [], []
+    else
+      List.fold_left (fun (a, na) (an, ty) ->
+          let name = Printf.sprintf "%s_v" an in
+          if is_heap_allocated ty then name :: a, na else a, name :: na
+        ) ([], []) (List.rev fun_.fun_args)
+  in
+  let caml_alloc, caml_non_alloc =
+    if is_heap_allocated fun_.fun_ret then
+      "res_v" :: caml_alloc, caml_non_alloc
+    else
+      caml_alloc, "res_v" :: caml_non_alloc
+  in
+  if use_array then
+    Printf.bprintf c_buf "  CAMLlocalN(args_v, %d);\n" pool_size;
+  if caml_alloc <> [] then
+    Printf.bprintf c_buf "  CAMLlocal%d(%s);\n"
+      (List.length caml_alloc) (String.concat ", " caml_alloc);
+  if caml_non_alloc <> [] then
+    Printf.bprintf c_buf "  value %s;\n"
+      (String.concat ", " caml_non_alloc);
+
+  (* Extract ML values from C values *)
+  if use_array then
+    List.iteri (fun i (an, ty) ->
+        Printf.bprintf c_buf "  %s;\n"
+          (conv_to_ml ty (Printf.sprintf "args_v[%d]" i) an)
+      ) fun_.fun_args
+  else
+    List.iter (fun (an, ty) ->
+        Printf.bprintf c_buf "  %s;\n"
+          (conv_to_ml ty (Printf.sprintf "%s_v" an) an)
+      ) fun_.fun_args;
+
+  (* Now, call the function with the C values *)
+  let nb_args = List.length fun_.fun_args in
+  if nb_args <= 3 then
+    Printf.bprintf c_buf
+      "  res_v = caml_callback%s_exn(cb_%s_closures[slot], %s);\n"
+      (if nb_args <= 1 then "" else string_of_int nb_args)
+      fun_.fun_sig
+      (if nb_args <= 0 then "Val_unit"
+       else String.concat ", "
+              (List.map (fun (an, _ty) ->
+                   Printf.sprintf "%s_v" an) fun_.fun_args))
+  else
+    Printf.bprintf c_buf
+      "  res_v = caml_callbackN_exn(cb_%s_closures[slot], %d, args_v);\n"
+      fun_.fun_sig nb_args;
+
+  (* Handle the return value *)
+  begin
+    match fun_.fun_ret with
+    | STVoid (_) ->
+        Printf.bprintf c_buf "  CAMLreturn0;\n"
+    | _ ->
+        Printf.bprintf c_buf "  %s res;\n" (c_type fun_.fun_ret);
+        Printf.bprintf c_buf "  if (!Is_exception_result(res_v)) {\n";
+        Printf.bprintf c_buf "    res = %s;\n" (conv_to_c fun_.fun_ret "res_v");
+        Printf.bprintf c_buf "  }\n";
+        Printf.bprintf c_buf "  CAMLreturnT(%s, res);\n" (c_type fun_.fun_ret);
+  end;
+  Printf.bprintf c_buf "}\n\n";
+
+  (* Generate the trampolines *)
+  for i = 0 to pool_size - 1 do
+    Printf.bprintf c_buf
+      "static %s cb_%s_%d(%s) { return cb_%s_dispatch(%d"
+      (c_type fun_.fun_ret) fun_.fun_sig i
+      (String.concat ", "
+         (List.map (fun (an, ty) ->
+              Printf.sprintf "%s %s" (c_type ty) an) fun_.fun_args))
+      fun_.fun_sig i;
+    if fun_.fun_args <> [] then
+      Printf.bprintf c_buf ", %s"
+        (String.concat ", " (List.map fst fun_.fun_args));
+    Printf.bprintf c_buf "); }\n"
+  done;
+  Printf.bprintf c_buf "\n";
+
+  (* Generate the trampoline array *)
+  Printf.bprintf c_buf
+    "static %s * const cb_%s_table[] = {\n"
+    fun_.fun_c_type fun_.fun_sig;
+
+  Printf.bprintf c_buf "  ";
+  for i = 0 to pool_size - 2 do
+    Printf.bprintf c_buf "cb_%s_%d, " fun_.fun_sig i;
+  done;
+  Printf.bprintf c_buf "cb_%s_%d\n" fun_.fun_sig (pool_size - 1);
+  Printf.bprintf c_buf "};\n\n";
+
+  (* Generate the C create stubs *)
+  Printf.bprintf c_buf "value ml_cb_%s_create(value closure_v)\n{\n" fun_.fun_sig;
+  Printf.bprintf c_buf "  static int first_slot = 0;\n";
+  Printf.bprintf c_buf "  return callback_create(closure_v, (f_generic **)cb_%s_table, cb_%s_closures, &first_slot, %d);\n" fun_.fun_sig fun_.fun_sig pool_size ;
+  Printf.bprintf c_buf "};\n\n";
+
+  (* Generate the C free stubs *)
+  Printf.bprintf c_buf "value ml_cb_%s_free(value callback_v)\n{\n" fun_.fun_sig;
+  Printf.bprintf c_buf "  return callback_free(callback_v, (f_generic **)cb_%s_table, cb_%s_closures, %d);\n" fun_.fun_sig fun_.fun_sig pool_size;
+  Printf.bprintf c_buf "};\n\n";
+
+  (Buffer.contents ml_buf, Buffer.contents c_buf)
+
+
+
 let add_data buf data =
   Buffer.add_string buf data
 
@@ -635,16 +796,37 @@ let generate (contents : contents) ml_file c_file =
   add_file ml_file ml_buf "_header" ".ml";
   add_file c_file c_buf "_header" ".c";
 
+  (* Generate convenience typedefs for function pointer types *)
+  List.iter (fun fun_ ->
+      Printf.bprintf c_buf "typedef %s (%s)(%s);\n\n"
+        (c_type fun_.fun_ret) fun_.fun_c_type
+        (String.concat ", "
+           (List.map (fun (_an, ty) -> c_type ty) fun_.fun_args));
+    ) contents.funs;
+
+  (* Generate enumeartions *)
   List.iter (fun enum ->
       let ml_str = gen_enum enum in
       Buffer.add_string ml_buf ml_str
     ) contents.enums;
 
+  (* Generate structures and unions *)
   List.iter (fun comp ->
       let ml_str, c_str = gen_comp comp in
       Buffer.add_string ml_buf ml_str;
       Buffer.add_string c_buf c_str
     ) contents.comps;
+
+  (* Generate function pointer trampolines *)
+  Printf.bprintf ml_buf "module Callback = struct\n";
+  Printf.bprintf ml_buf "  type 'a t = 'a callback\n";
+  Printf.bprintf ml_buf "  external cast : 'a t -> 'b t = \"%%identity\"";
+  List.iter (fun fun_ ->
+      let ml_str, c_str = gen_fun contents.trampoline_pool_size fun_ in
+      Buffer.add_string ml_buf ml_str;
+      Buffer.add_string c_buf c_str
+    ) contents.funs;
+  Printf.bprintf ml_buf "end\n\n";
 
   let nfuncs = ref 0 in
   let nfailed = ref 0 in

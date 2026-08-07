@@ -18,12 +18,13 @@
 #include <string.h>
 
 #define CAML_NAME_SPACE
-#include <caml/alloc.h>
-#include <caml/bigarray.h>
-#include <caml/custom.h>
-#include <caml/fail.h>
 #include <caml/memory.h>
 #include <caml/mlvalues.h>
+#include <caml/alloc.h>
+#include <caml/custom.h>
+#include <caml/bigarray.h>
+#include <caml/callback.h>
+#include <caml/fail.h>
 
 #define CAMLparam6(p1,p2,p3,p4,p5,p6) \
   CAMLparam0 (); \
@@ -50,6 +51,26 @@
   CAMLxparam5 (p1, p1, p3, p4, p5) ; \
   CAMLxparam5 (p6, p7, p8, p9, p10)
 
+#define CAMLlocal6(p1,p2,p3,p4,p5,p6) \
+  CAMLlocal3 (p1, p1, p3) ; \
+  CAMLlocal3 (p4, p5, p6)
+
+#define CAMLlocal7(p1,p2,p3,p4,p5,p6,p7) \
+  CAMLlocal4 (p1, p1, p3, p4) ; \
+  CAMLlocal3 (p5, p6, p7)
+
+#define CAMLlocal8(p1,p2,p3,p4,p5,p6,p7,p8) \
+  CAMLlocal4 (p1, p1, p3, p4) ; \
+  CAMLlocal4 (p5, p6, p7, p8)
+
+#define CAMLlocal9(p1,p2,p3,p4,p5,p6,p7,p8,p9) \
+  CAMLlocal5 (p1, p1, p3, p4, p5) ; \
+  CAMLlocal4 (p6, p7, p8, p9)
+
+#define CAMLlocal10(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10) \
+  CAMLlocal5 (p1, p1, p3, p4, p5) ; \
+  CAMLlocal5 (p6, p7, p8, p9, p10)
+
 #define Comp_val(x)		((void *)Field((x), 0))
 #define Val_comp(x,v)		((x) = caml_alloc_small(1, Abstract_tag), \
 				 Field((x), 0) = (value)(v))
@@ -68,6 +89,58 @@
 				  Field((x), 2) = (value)(is), \
 				  Field((x), 3) = (value)(v), \
 				  Field((x), 4) = (value)(s))
+
+#define Callback_val(x)		((f_generic *)(void *)Field((x), 0))
+#define Val_callback(x,v)	((x) = caml_alloc_small(1, Abstract_tag), \
+				 Field((x), 0) = (value)(void *)(v));
+
+
+
+typedef void (f_generic)(void);
+
+static inline int callback_lookup(f_generic *cb, f_generic * const *cb_table, size_t size)
+{
+	for (int i = 0; i < size; ++i) {
+		if (cb == cb_table[i]) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+static value callback_create(value closure_v, f_generic * const *cb_table, value *cb_closures, int *first_slot, size_t size)
+{
+	CAMLparam1(closure_v);
+	CAMLlocal1(res_v);
+	int i, slot = *first_slot;
+	for (i = 0; i < size; ++i) {
+	  slot = (slot + 1) % size;
+	  if (cb_closures[slot] == Val_unit) break;
+	}
+	if (i >= size) {
+		caml_failwith("callback pool exhausted");
+	}
+	caml_register_generational_global_root(&cb_closures[slot]);
+	caml_modify_generational_global_root(&cb_closures[slot], closure_v);
+	Val_callback(res_v, cb_table[slot]);
+	*first_slot = (slot + 1) % size;
+	CAMLreturn(res_v);
+}
+
+static value callback_free(value callback_v, f_generic * const *cb_table, value *cb_closures, size_t size)
+{
+	CAMLparam1(callback_v);
+	f_generic *callback = Callback_val(callback_v);
+	int slot = callback_lookup(callback, cb_table, size);
+	Field(callback_v, 0) = (value)NULL;
+	if (slot >= 0) {
+		caml_remove_generational_global_root(&cb_closures[slot]);
+		cb_closures[slot] = Val_unit;
+	}
+	CAMLreturn(Val_unit);
+}
+
+
 
 static inline void *copy(const void *src, size_t size)
 {

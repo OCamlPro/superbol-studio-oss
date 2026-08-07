@@ -32,6 +32,7 @@ type type_ =
   | STFloat of { const : bool; kind : float_kind }
   | STEnum of { const : bool; enum : enum }
   | STComp of { const : bool; comp : comp; unref : bool }
+  | STFun of { const : bool; fun_ : fun_; unref : bool }
   | STPtr of { const : bool; type_ : type_ }
   | STArray of { const : bool; type_ : type_; size : int } (* only when in a struct *)
 
@@ -61,6 +62,17 @@ and comp = {
 
     comp_struct : bool;
   }
+
+and fun_ = {
+    fun_ml_type : string;
+    fun_c_type : string;
+
+    (* fields needed for building *)
+
+    fun_sig : string;
+    fun_ret : type_;
+    fun_args : (string * type_) list;
+}
 
 type arg_kind =
   | Normal
@@ -96,7 +108,9 @@ type stub = {
   }
 
 type contents = {
+    trampoline_pool_size : int;
     stubs : stub list;
     enums : enum list;
     comps : comp list;
+    funs : fun_ list;
   }
