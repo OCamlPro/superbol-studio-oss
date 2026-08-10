@@ -759,18 +759,24 @@ let pp_source_destination_clause ppf = function
   | Using i -> Fmt.pf ppf "USING %a" pp_ident i
   | Value l -> Fmt.pf ppf "VALUE %a" pp_literal l
 
-type valueof_clause =
+type valueof_clause =                                           (* (obsolete) *)
   {
-    valueof_valued: name with_loc;
+    valueof_subject: file_label;
     valueof_value: qualname_or_literal;
   }
+
+and file_label =
+  | FileLabelID
+  | FileLabelName of name with_loc
 [@@deriving ord]
 
-let pp_valueof_clause ppf { valueof_valued; valueof_value } =
-  Fmt.(
-    pair ~sep:sp pp_name' pp_qualname_or_literal ppf
-      (valueof_valued, valueof_value)
-  )
+let pp_file_label ppf = function
+  | FileLabelID -> Fmt.string ppf "ID"
+  | FileLabelName n -> pp_name' ppf n
+
+let pp_valueof_clause ppf { valueof_subject; valueof_value } =
+  Fmt.(pair ~sep:sp) pp_file_label pp_qualname_or_literal ppf
+    (valueof_subject, valueof_value)
 
 type report_clause =
   | Global

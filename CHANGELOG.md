@@ -2,6 +2,9 @@
 
 ## [_] Next release
 
+### Fixed
+- Grammar rules for `VALUE OF` clause [#629](https://github.com/OCamlPro/superbol-studio-oss/pull/629) (fix for [Issue #625](https://github.com/OCamlPro/superbol-studio-oss/issues/625))
+
 
 ## [1.0.0] First stable release (2026-07-23)
 
@@ -23,7 +26,8 @@
 - Documentation and renaming to reduce confusion in the typed COBOL AST API [#576](https://github.com/OCamlPro/superbol-studio-oss/pull/576)
 
 ### Removed
-- Remove deprecated Cobol_data.OLD and Cobol_typeck.OLD [#592](https://github.com/OCamlPro/superbol-studio-oss/pull/592)
+- Remove deprecated `Cobol_data.OLD` and `Cobol_typeck.OLD` [#592](https://github.com/OCamlPro/superbol-studio-oss/pull/592)
+
 
 ## [0.3.0] Third release (2026-02-27)
 

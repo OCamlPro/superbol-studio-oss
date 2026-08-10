@@ -1403,10 +1403,13 @@ label_clause:
  | LABEL mr(RECORD IS? | RECORDS ARE? {}) STANDARD { LabelStandard }
  | LABEL mr(RECORD IS? | RECORDS ARE? {}) OMITTED  { LabelOmitted }
 
-valueof_clause:
- | VALUE OF iil = nel(i = name IS? il = qualname_or_literal
-                        { { valueof_valued = i; valueof_value = il; } })
-  { iil }
+let valueof_clause :=
+ | VALUE; OF; ~ = nel(valueof_binding); < >
+
+let valueof_binding :=
+  | s = mr(~ = name; <FileLabelName> | ID; { FileLabelID }); IS?;
+    v = qualname_or_literal;
+    { { valueof_subject = s; valueof_value = v } }
 
 data_clause:
  | DATA_RECORD IS? il = names   { il }
@@ -2820,7 +2823,7 @@ let any_lpar ==
  | LPAR_BEFORE_RELOP; {}
 
 let relation_condition ==
- | neg = ibo(NOT); e = expression; pred = loc(abbrev_relop_operand); 
+ | neg = ibo(NOT); e = expression; pred = loc(abbrev_relop_operand);
     { relation_condition (neg, e, pred) }
 
 nonrel_condition:
@@ -2854,11 +2857,11 @@ abbrev_relation_operand:
 
 extended_condition:
  | e = expression io(IS) n = bo(NOT) c = class_condition
-    { neg_condition ~neg:n (with_loc (ClassCond (e, c)) $sloc) } 
+    { neg_condition ~neg:n (with_loc (ClassCond (e, c)) $sloc) }
  | e = expression io(IS) n = bo(NOT) s = sign_condition
-    { neg_condition ~neg:n (with_loc (SignCond (e, s)) $sloc) } 
+    { neg_condition ~neg:n (with_loc (SignCond (e, s)) $sloc) }
  | e = expression io(IS) n = bo(NOT) OMITTED
-    { neg_condition ~neg:n (with_loc (Omitted e) $sloc) } 
+    { neg_condition ~neg:n (with_loc (Omitted e) $sloc) }
 
 relop [@recovery Eq] [@symbol "<relational arithmetic operator>"]:
  | io(IS) n = ibo(NOT) GREATER THAN?
