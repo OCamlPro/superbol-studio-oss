@@ -7,6 +7,11 @@ on:
   # manual run in actions tab - for all branches
   workflow_dispatch:
 
+# Cancel runs upon PR updates:
+concurrency:
+  group: win-tramabol-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
 jobs:
   build:
     runs-on: windows-latest
