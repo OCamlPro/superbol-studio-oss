@@ -81,6 +81,7 @@ class ['a] folder = object
   method fold_table_data_value          : (table_data_value            , 'a) fold = default
   method fold_usage_clause              : (usage_clause                , 'a) fold = default
   method fold_validation_clause         : (validation_clause           , 'a) fold = default
+  method fold_file_label                : (file_label                  , 'a) fold = default
   method fold_valueof_clause            : (valueof_clause              , 'a) fold = default
 
 end
@@ -465,10 +466,17 @@ let fold_validation_clause (v: _ #folder) =
         >> fold_list ~fold:fold_ident v for_
     end
 
+let fold_file_label (v: _ #folder) =
+  handle v#fold_file_label
+    ~continue:begin function
+      | FileLabelID -> Fun.id
+      | FileLabelName n -> fold_name' v n
+    end
+
 let fold_valueof_clause (v: _ #folder) =
   handle v#fold_valueof_clause
-    ~continue:begin fun { valueof_valued; valueof_value } x -> x
-      >> fold_name' v valueof_valued
+    ~continue:begin fun { valueof_subject; valueof_value } x -> x
+      >> fold_file_label v valueof_subject
       >> fold_qualname_or_literal v valueof_value
     end
 
