@@ -262,7 +262,7 @@ and display_stmt =
 
 and display_items_clauses =
   {
-    display_items: ident_or_literal list; (* non-empty *)
+    display_items: ident_or_literal with_loc list; (* non-empty *)
     display_clauses: display_clause with_loc list;
   }
 
@@ -817,7 +817,7 @@ and pp_display_items_clauses ppf
   { display_items; display_clauses }
 =
   Fmt.pf ppf "%a%a"
-    Fmt.(list ~sep:sp pp_ident_or_literal) display_items
+    Fmt.(list ~sep:sp (pp_with_loc pp_ident_or_literal)) display_items
     Fmt.(list ~sep:sp (pp_with_loc pp_display_clause)) display_clauses
 
 and pp_display_clause ppf = function

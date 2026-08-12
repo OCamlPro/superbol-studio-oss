@@ -74,6 +74,7 @@ dune = "3.17.0"
 dot-gitignore-trailer = """
 # Edit drom.toml to change the following lines
 /superbol-free-*
+/tramabol-*
 /_*
 /node_modules
 /package-json
@@ -84,6 +85,7 @@ ATTIC
 !.vscode/tasks.json
 !.vscode/launch.json
 *.vsix
+/*.js
 *.opam.locked
 /emacs/lsp-superbol-customs.el
 _superbol
@@ -354,4 +356,16 @@ dir = "src/autofonce/ez_call"
 dir = "src/h2mlstubs"
 
 [[package]]
+dir = "src/tramabol/tramabol"
+
+[[package]]
+dir = "src/tramabol/tramabol_lib"
+
+[[package]]
 dir = "src/tramabol/ezlibcob"
+
+[[package]]
+dir = "src/tramabol/cobol_interp"
+
+[[package]]
+dir = "src/tramabol/cobol_ir"

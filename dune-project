@@ -963,6 +963,48 @@
  )
 
 (package
+ (name tramabol)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "Interpreter for COBOL programs (command-line program)")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (tramabol_lib (= :version))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name tramabol_lib)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "Interpreter for COBOL programs (main library)")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (superbol_platform (= :version))
+   (superbol_free_lib (= :version))
+   (pretty (= :version))
+   (ez_cmdliner (and (>= 0.3.0) (< 1.0.0)))
+   (cobol_typeck (= :version))
+   (cobol_preproc (= :version))
+   (cobol_parser (= :version))
+   (cobol_interp (= :version))
+   (cobol_common (= :version))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
  (name ezlibcob)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
@@ -974,6 +1016,46 @@
  (depends
    (ocaml (>= 4.14.0))
    (h2mlstubs (= :version))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name cobol_interp)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "Interpreter for COBOL programs (core interpretation logic)")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (pretty (= :version))
+   (ezlibcob (= :version))
+   (cobol_unit (= :version))
+   (cobol_ir (= :version))
+   (cobol_data (= :version))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name cobol_ir)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "Intermediate representation for COBOL programs")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.0))
+   (pretty (= :version))
+   (cobol_unit (= :version))
+   (cobol_data (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )

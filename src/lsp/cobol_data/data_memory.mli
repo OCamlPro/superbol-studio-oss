@@ -58,7 +58,8 @@ val amd64_memory_config: memory_config
 val int: int -> factor
 val valof: Cobol_ptree.qualname -> factor
 
-val point_size: size                                             (* null-size *)
+val point_size: size                              (** null-size *)
+val zero_size: size                               (** alias for {!point_size} *)
 val const_size: int -> size
 val valof_size: Cobol_ptree.qualname -> size
 val elementary_size: elementary_size -> size
@@ -74,6 +75,9 @@ val size_of_pointer: size
 
 (** Raises {!NOT_SCALAR} in case of failure. *)
 val as_bits: ?memory_config:memory_config -> size -> int
+
+(** Raises {!NOT_SCALAR} in case of failure. *)
+val as_bytes: ?memory_config:memory_config -> size -> int
 
 val add: size -> size -> size
 val diff: size -> size -> size

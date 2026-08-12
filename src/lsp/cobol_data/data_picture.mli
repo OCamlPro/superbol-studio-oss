@@ -194,6 +194,7 @@ val pp_detailed_category: category Pretty.printer
 val pp_category: category Pretty.printer
 val pp_category_name: category Pretty.printer
 val pp_picture_symbols: symbols list Pretty.printer
+val char_of_symbol: symbol -> char
 
 (** [is_edited pic] indicates whether the given picture string represents an
     edited item *)
