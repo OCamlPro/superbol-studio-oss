@@ -1464,6 +1464,10 @@ end
 
 module Extension = struct
   include Interface.Make ()
+
+  include
+    [%js:
+    val packageJSON : t -> Jsonoo.t [@@js.get]]
 end
 
 module Extensions = struct
@@ -1666,7 +1670,9 @@ module ExtensionContext = struct
 
     val logUri : t -> Uri.t [@@js.get]
 
-    val extensionMode : t -> ExtensionMode.t [@@js.get]]
+    val extensionMode : t -> ExtensionMode.t [@@js.get]
+
+    val extension : t -> Extension.t [@@js.get]]
 
   let subscribe this ~disposable =
     let subscriptions = Ojs.get_prop_ascii ([%js.of: t] this) "subscriptions" in
