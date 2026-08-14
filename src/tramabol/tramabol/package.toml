@@ -93,4 +93,6 @@ dune-trailer = """
 ; (enabled_if (= %{profile} \"universal\")))
 """
 static-macos-clibs = "zarith ${MACPORTS:-/usr/local/osxcross/macports/pkgs/opt/local}/lib/libgmp.a camlstr bigstringaf_stubs cstruct_stubs"
+static-macos-ldflags = "-L%{env:GNUCOBOL4_LIBDIR=/opt/gnucobol-4.x/lib} -lcob"
 static-alpine-clibs = "zarith gmp bigstringaf_stubs cstruct_stubs"
+static-mingw64-ldflags = "-L%{env:GNUCOBOL4_LIBDIR=/opt/gnucobol-4.x/lib} -lcob"
