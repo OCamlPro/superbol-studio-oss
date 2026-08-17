@@ -108,9 +108,9 @@ let approx_type_of_usage : usage -> approx_typing_info = function
 
 let approx_type_of_compvar
   : compilation_variable_definition -> approx_typing_info = function
-  | { compvar_value = Alphanum _; _ } -> Alphanum
-  | { compvar_value = Boolean _; _ } -> Boolean
-  | { compvar_value = Numeric _; _ } -> Numeric
+  | { compvar_value = { src_payload = Alphanum _; _}; _ } -> Alphanum
+  | { compvar_value = { src_payload = Boolean _; _}; _ } -> Boolean
+  | { compvar_value = { src_payload = Numeric _; _}; _ } -> Numeric
 
 let approx_type_of_datadef : data_definition -> (approx_typing_info * bool) =
   function

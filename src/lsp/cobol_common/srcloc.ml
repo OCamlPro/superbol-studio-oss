@@ -725,6 +725,15 @@ let map_payload: ('a -> 'b) -> 'a with_loc -> 'b with_loc = fun f a ->
 let map_loc: (srcloc -> srcloc) -> 'a with_loc -> 'a with_loc = fun f a ->
   flagit (payload a) (f (loc a))
 
+let with_src ~src src_payload =
+  { src; src_payload }
+
+let with_loc_as_src ~loc x =
+  with_src ~src:(Source_location loc) x
+
+let lift_loc_as_src x =
+  with_src ~src:(Source_location x.loc) x.payload
+
 module INFIX : sig
   (* Meaning of letters:
      * '~' means projection

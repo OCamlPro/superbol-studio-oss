@@ -169,8 +169,8 @@ let get ?(verbose_on = `Stdout) () =
           fst @@                             (* drop definition used for logs *)
           Cobol_preproc.Env.define_process_parameter
             (Cobol_preproc.Env.var var)
-            (Alphanum { src_payload = Cobol_data.Value.alphanum_of_string def;
-                        src = Process_parameter }) env
+            { src_payload = Alphanum (Cobol_data.Value.alphanum_of_string def);
+              src = Process_parameter } env
         with Not_found ->
           Pretty.failwith "Invalid argument `%s' given to flag `-D`" definition
       end !definitions Cobol_preproc.Env.empty

@@ -121,9 +121,8 @@ let preproc_var_definition_of ~var ?(try_compil_vars = true) env
 
 let register_preproc_var ~src var value env =
   let def =
-    { src;
-      src_payload = { compvar_name = VAR.to_uppercase_string var;
-                      compvar_value = value } }
+    Cobol_common.Srcloc.with_src ~src
+      { compvar_name = VAR.to_uppercase_string var; compvar_value = value }
   in
   { env with
     preproc_vars = MAP.add var def env.preproc_vars },
@@ -148,9 +147,9 @@ let undefine_preproc_var var (env: t) : t =
 let define_compilation_var ~loc var value (env: t)
   : t * compilation_var_definition =
   let def =
-    { src = Source_location loc;
-      src_payload = { compvar_name = VAR.to_uppercase_string ~&var;
-                      compvar_value = value } }
+    Cobol_common.Srcloc.with_loc_as_src ~loc
+      { compvar_name = VAR.to_uppercase_string ~&var;
+        compvar_value = value }
   in
   { env with compil_vars = MAP.add ~&var def env.compil_vars },
   def
@@ -160,14 +159,20 @@ let find_compilation_var v env =
 
 (* --- *)
 
-let alphanum_literal_value (a: alphanum_literal with_loc) : value =
-  Alphanum { src_payload = ~&a;
-             src = Source_location ~@a }
+let alphanum_literal_value' (a: alphanum_literal with_loc) : value =
+  Alphanum ~&a
 
-let boolean_literal_value (b: boolean_literal with_loc) : value =
-  Boolean { src_payload = ~&b.bool_value;
-            src = Source_location ~@b }
+let boolean_literal_value' (b: boolean_literal with_loc) : value =
+  Boolean ~&b.bool_value
 
-let numeric_literal_value (f: fixed_literal with_loc) : value =
-  Numeric { src_payload = ~&f.fixed_value;
-            src = Source_location ~@f }
+let numeric_literal_value' (f: fixed_literal with_loc) : value =
+  Numeric ~&f.fixed_value
+
+let alphanum_literal_value (a: alphanum_literal with_loc) : value with_src =
+  Cobol_common.Srcloc.with_loc_as_src ~loc:~@a (alphanum_literal_value' a)
+
+let boolean_literal_value (b: boolean_literal with_loc) : value with_src =
+  Cobol_common.Srcloc.with_loc_as_src ~loc:~@b (boolean_literal_value' b)
+
+let numeric_literal_value (f: fixed_literal with_loc) : value with_src =
+  Cobol_common.Srcloc.with_loc_as_src ~loc:~@f (numeric_literal_value' f)

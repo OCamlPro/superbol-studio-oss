@@ -42,12 +42,20 @@ val range_of_srcloc_in
   -> Cobol_common.Srcloc.srcloc
   -> Lsp.Types.Range.t
 
+(** [is_in_srcloc ~filename pos loc] returns [true] iff the {i projection} of
+    [loc] on [filename] includes position [pos].
+
+    The projection of a source location [loc] on a given filename roughtly
+    corresponds to the removal from [loc] of every character position that do
+    not come from [filename]. *)
 val is_in_srcloc
   : filename:string
   -> Lsp.Types.Position.t
   -> Cobol_common.Srcloc.srcloc
   -> bool
 
+(** [is_in_src ~filename pos src] returns [true] iff [src] describes a file
+    source location [loc] and [is_in_srcloc ~filename pos loc] holds. *)
 val is_in_src
   : filename:string
   -> Lsp.Types.Position.t

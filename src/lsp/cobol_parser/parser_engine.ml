@@ -211,13 +211,13 @@ let try_compilation_variable_substitution ps var : (TOK.token * _) option =
   | None ->
       None
   | Some ({ src_payload = { compvar_value; _ }; _ } as def) ->
-      match compvar_value with
-      | Alphanum { src_payload = a; _ } ->
+      match compvar_value.src_payload with
+      | Alphanum a ->
           Some (TOK.ALPHANUM a, def)
-      | Boolean { src_payload = b; _ } ->
+      | Boolean b ->
           let boollit = (Cobol_data.Literal.of_boolean_value b).bool_ptree in
           Some (TOK.BOOLIT boollit, def)
-      | Numeric { src_payload = n; _ } ->
+      | Numeric n ->
           match Cobol_data.Literal.(categorize_fixed @@ of_fixed_value n) with
           | `Z { int_ptree = z; _ } ->
               if String.starts_with ~prefix:"-" z

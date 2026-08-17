@@ -143,6 +143,10 @@ val locfrom: 'a -> 'b with_loc -> 'a with_loc
 val map_payload: ('a -> 'b) -> 'a with_loc -> 'b with_loc
 val map_loc: (srcloc -> srcloc) -> 'a with_loc -> 'a with_loc
 
+val with_src: src:src -> 'a -> 'a with_src
+val with_loc_as_src: loc:srcloc -> 'a -> 'a with_src
+val lift_loc_as_src: 'a with_loc -> 'a with_src
+
 val lift_option: 'a option with_loc -> 'a with_loc option
 val lift_result: ('a, 'e) result with_loc -> ('a with_loc, 'e with_loc) result
 val concat_locs: _ with_loc list -> srcloc option

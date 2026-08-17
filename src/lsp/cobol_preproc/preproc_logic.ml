@@ -14,6 +14,7 @@
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 open Cobol_common.Platform.TYPES
+open Cobol_data.Types
 
 open Preproc_diagnostics
 
@@ -91,12 +92,10 @@ let definition_value ~platform ~var ~(value: Compdir_tree.definition_value with_
   | Parameter_definition ->                                    (* [sys.getenv] *)
       match platform.getenv_opt @@ ENV.VAR.to_uppercase_string ~&var with
       | Some value ->
-          let alphanum = Cobol_data.Value.alphanum_of_string value in
-          Ok (Alphanum { src_payload = alphanum;
-                         src = Process_environment })
+          Ok (Cobol_common.Srcloc.with_src ~src:Process_environment @@
+              Alphanum (Cobol_data.Value.alphanum_of_string value))
       | None ->
           Error `UNDEFINED
-
 
 
 let ppvar_def def var =
@@ -127,15 +126,15 @@ let eval_term (term: Compdir_tree.term) env : (ENV.value, _) result * _ list =
   | Variable var ->
       (match ENV.preproc_var_definition_of ~var env with
        | Ok def ->
-           Ok def.src_payload.compvar_value, [compvar_eval var ~def]
+           Ok def.src_payload.compvar_value.src_payload, [compvar_eval var ~def]
        | Error `UNDEFINED as e ->
            e, [compvar_eval var])
   | Literal Alphanum a ->
-      Ok (ENV.alphanum_literal_value a), []
+      Ok (ENV.alphanum_literal_value' a), []
   | Literal Boolean b ->
-      Ok (ENV.boolean_literal_value b), []
+      Ok (ENV.boolean_literal_value' b), []
   | Literal Numeric f ->
-      Ok (ENV.numeric_literal_value f), []
+      Ok (ENV.numeric_literal_value' f), []
 
 
 exception TYPE_MISMATCH of ENV.value * ENV.value
@@ -149,9 +148,9 @@ type matching_operands =
 
 let operands (a: ENV.value) (b: ENV.value) : matching_operands =
   match a, b with
-  | Alphanum a, Alphanum b -> Alpha (a.src_payload, b.src_payload)
-  | Boolean a, Boolean b -> Bool (a.src_payload, b.src_payload)
-  | Numeric a, Numeric b -> Num (a.src_payload, b.src_payload)
+  | Alphanum a, Alphanum b -> Alpha (a, b)
+  | Boolean a, Boolean b -> Bool (a, b)
+  | Numeric a, Numeric b -> Num (a, b)
   | a, b -> raise @@ TYPE_MISMATCH (a, b)
 
 
@@ -199,16 +198,20 @@ let eval_set_conditon ~loc var polarity env =
 
 let eval_value_condition ~loc var polarity env =
   let diags = Preproc_diagnostics.none in
+  let[@local] compvar_value def =
+    match def.src_payload.compvar_value.src_payload with
+    | Boolean b ->
+        OUT.result
+          (Z.(equal zero) b.bool_bits != polarity,
+           [compvar_eval var ~def])
+    | Alphanum _ | Numeric _ as value ->
+        let stuff = Variable_type_in_compdir_condition { value } in
+        OUT.result ~diags:(warn_unexpected diags ~loc stuff)
+          (false, [compvar_eval var ~def])
+  in
   match ENV.preproc_var_definition_of ~var env with
-  | Ok ({ src_payload = { compvar_value = Boolean b; _ }; _ } as def) ->
-      OUT.result
-        (Z.(equal zero) b.src_payload.bool_bits != polarity,
-         [compvar_eval var ~def])
-  | Ok ({ src_payload = { compvar_value = (Alphanum _ | Numeric _ as value); _ };
-          _ } as def) ->
-      let stuff = Variable_type_in_compdir_condition { value } in
-      OUT.result ~diags:(warn_unexpected diags ~loc stuff)
-        (false, [compvar_eval var ~def])
+  | Ok def ->
+      compvar_value def
   | Error `UNDEFINED ->
       let stuff = Variable_in_compdir_condition { var } in
       OUT.result ~diags:(warn_undefined diags ~loc:~@var stuff)
