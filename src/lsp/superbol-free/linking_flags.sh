@@ -65,6 +65,7 @@ case "$1" in
         ;;
     macosx)
         COMMON_LIBS="zarith ${MACPORTS:-/usr/local/osxcross/macports/pkgs/opt/local}/lib/libgmp.a camlstr bigstringaf_stubs cstruct_stubs unix"
+        FLAGS=""
         # `m` and `pthread` are built-in in libSystem
         echo2 '(-noautolink'
         for l in $COMMON_LIBS; do
@@ -72,9 +73,16 @@ case "$1" in
             else echo2 " -cclib -l$l"
             fi
         done
+        for l in $FLAGS; do echo2 " -cclib $l"; done
+        echo2 ')'
+        ;;
+    mingw64)
+        FLAGS=""
+        echo2 '(';
+        for l in $FLAGS; do echo2 " -cclib $l"; done
         echo2 ')'
         ;;
     *)
-        echo "Static linking is not supported for your platform. See $0 to contribute." >&2
+        echo "Static linking is not supported for your platform ($1). See $0 to contribute." >&2
         exit 3
 esac
