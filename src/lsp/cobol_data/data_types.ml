@@ -281,7 +281,7 @@ type data_definition =
       }
   | Compilation_data of
       {
-        def: compilation_variable_definition with_preproc_loc;
+        def: compilation_variable_definition with_src;
       }
 
 and compilation_variable_definition =
@@ -291,8 +291,8 @@ and compilation_variable_definition =
   }
 
 and compilation_value =
-  | Alphanum of alphanum_value with_preproc_loc
-  | Boolean of boolean_value with_preproc_loc
-  | Numeric of fixed_value with_preproc_loc
+  | Alphanum of alphanum_value with_src
+  | Boolean of boolean_value with_src
+  | Numeric of fixed_value with_src
 
 (* screen: "_ OCCURS n TIMES" only. Max 2 dimensions. *)

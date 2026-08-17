@@ -90,7 +90,7 @@ let is_in_srcloc ~filename pos srcloc =
   srcloc != Srcloc.dummy &&
   is_in_lexloc pos (Srcloc.lexloc_in ~filename srcloc)
 
-let is_in_preproc_loc ~filename pos = function
+let is_in_src ~filename pos = function
   | Source_location loc ->
       is_in_srcloc ~filename pos loc
   | Process_parameter

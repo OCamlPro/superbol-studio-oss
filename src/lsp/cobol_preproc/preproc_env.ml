@@ -64,13 +64,13 @@ module TYPES = struct
     }
   and var = VAR.t
   and preproc_definition =
-    Cobol_data.Types.compilation_variable_definition with_preproc_loc
+    Cobol_data.Types.compilation_variable_definition with_src
   and compilation_var_definition =
     preproc_definition                                  (* for now (not sure) *)
   and value =
     Cobol_data.Types.compilation_value
 
-  exception REDEFINITION of { prev_def_loc: preproc_loc }
+  exception REDEFINITION of { prev_def_src: src }
 end
 include TYPES
 
@@ -78,12 +78,10 @@ type t = env
 
 (* pretty-printing *)
 
-let pp_definition ppf { pp_payload; _ } =
-  Cobol_data.Printer.pp_compilation_variable_definition ppf pp_payload
-
 let pp: t Pretty.printer = fun ppf map ->
   Pretty.list ~fopen:"@[<2>@<1>⦃ " ~fsep:",@ " ~fclose:" @<1>⦄@]"
-    Fmt.(box ~indent:2 @@ pair ~sep:(any " =>@ ") VAR.pp pp_definition)
+    Fmt.(box ~indent:2 @@ pair ~sep:(any " =>@ ") VAR.pp
+           (pp_with_src Cobol_data.Printer.pp_compilation_variable_definition))
     ppf (MAP.bindings map.preproc_vars)
 
 (* constructors *)
@@ -121,23 +119,23 @@ let preproc_var_definition_of ~var ?(try_compil_vars = true) env
       else
         Error `UNDEFINED
 
-let register_preproc_var ~pp_loc var value env =
+let register_preproc_var ~src var value env =
   let def =
     { compvar_name = VAR.to_uppercase_string var;
       compvar_value = value }
   in
   { env with
-    preproc_vars = MAP.add var { pp_loc; pp_payload = def } env.preproc_vars }
+    preproc_vars = MAP.add var { src; src_payload = def } env.preproc_vars }
 
 let define_preproc_var ~loc var value ?(override = false) (env: t) : t =
   match MAP.find_opt ~&var env.preproc_vars with
-  | Some { pp_loc; _ } when not override ->
-      raise @@ REDEFINITION { prev_def_loc = pp_loc }
+  | Some { src; _ } when not override ->
+      raise @@ REDEFINITION { prev_def_src = src }
   | Some _ | None ->
-      register_preproc_var ~&var value env ~pp_loc:(Source_location loc)
+      register_preproc_var ~&var value env ~src:(Source_location loc)
 
 let define_process_parameter var value (env: t) : t =      (* always override *)
-  register_preproc_var var value env ~pp_loc:Process_parameter
+  register_preproc_var var value env ~src:Process_parameter
 
 let undefine_preproc_var var (env: t) : t =
   { env with preproc_vars = MAP.remove ~&var env.preproc_vars }
@@ -147,9 +145,9 @@ let undefine_preproc_var var (env: t) : t =
 let define_compilation_var ~loc var value (env: t)
   : t * compilation_var_definition =
   let def =
-    { pp_loc = Source_location loc;
-      pp_payload = { compvar_name = VAR.to_uppercase_string ~&var;
-                     compvar_value = value } }
+    { src = Source_location loc;
+      src_payload = { compvar_name = VAR.to_uppercase_string ~&var;
+                      compvar_value = value } }
   in
   { env with compil_vars = MAP.add ~&var def env.compil_vars },
   def
@@ -160,13 +158,13 @@ let find_compilation_var v env =
 (* --- *)
 
 let alphanum_literal_value (a: alphanum_literal with_loc) : value =
-  Alphanum { pp_payload = ~&a;
-             pp_loc = Source_location ~@a }
+  Alphanum { src_payload = ~&a;
+             src = Source_location ~@a }
 
 let boolean_literal_value (b: boolean_literal with_loc) : value =
-  Boolean { pp_payload = ~&b.bool_value;
-            pp_loc = Source_location ~@b }
+  Boolean { src_payload = ~&b.bool_value;
+            src = Source_location ~@b }
 
 let numeric_literal_value (f: fixed_literal with_loc) : value =
-  Numeric { pp_payload = ~&f.fixed_value;
-            pp_loc = Source_location ~@f }
+  Numeric { src_payload = ~&f.fixed_value;
+            src = Source_location ~@f }

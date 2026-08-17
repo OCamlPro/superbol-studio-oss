@@ -183,7 +183,7 @@ type warning =
       {
         loc: srcloc;
         var: Preproc_env.var with_loc;
-        prev_def_loc: preproc_loc;
+        prev_def_src: src;
       }
   (* | Compdir_warning of *)
   (*     { *)
@@ -264,14 +264,11 @@ let pp_warning ppf = function
       Pretty.print ppf "Undefined@ %a" pp_undefined_warning_stuff stuff
   | Unexpected_warning { stuff; _ } ->
       Pretty.print ppf "Unexpected@ %a" pp_unexpected_warning_stuff stuff
-  | Redefinition_of_env_variable { var; prev_def_loc; _ } ->
+  | Redefinition_of_env_variable { var; prev_def_src; _ } ->
       Pretty.print ppf "Redefinition@ of@ %a;@ previous@ definition@ was@ from@ \
-                        %t"
+                        %a"
         Preproc_env.VAR.pp ~&var
-        (fun ppf -> match prev_def_loc with
-           | Source_location l -> Cobol_common.Srcloc.pp_file_loc ppf l
-           | Process_parameter -> Pretty.print ppf "process@ parameters"
-           | Process_environment -> Pretty.print ppf "process@ environment")
+        Cobol_common.Srcloc.pp_src prev_def_src
 
 type diagnostics =
   {

@@ -210,14 +210,14 @@ let try_compilation_variable_substitution ps var : (TOK.token * _) option =
   match Cobol_preproc.lookup_compilation_variable ps.preproc.pp var with
   | None ->
       None
-  | Some ({ pp_payload = { compvar_value; _ }; _ } as def) ->
+  | Some ({ src_payload = { compvar_value; _ }; _ } as def) ->
       match compvar_value with
-      | Alphanum { pp_payload = a; _ } ->
+      | Alphanum { src_payload = a; _ } ->
           Some (TOK.ALPHANUM a, def)
-      | Boolean { pp_payload = b; _ } ->
+      | Boolean { src_payload = b; _ } ->
           let boollit = (Cobol_data.Literal.of_boolean_value b).bool_ptree in
           Some (TOK.BOOLIT boollit, def)
-      | Numeric { pp_payload = n; _ } ->
+      | Numeric { src_payload = n; _ } ->
           match Cobol_data.Literal.(categorize_fixed @@ of_fixed_value n) with
           | `Z { int_ptree = z; _ } ->
               if String.starts_with ~prefix:"-" z

@@ -59,12 +59,12 @@ let record_size: record -> Data_memory.size = fun r ->
 let pp_item_qualname ?(leading = Fmt.nop) ppf item =
   Fmt.(option (leading ++ Cobol_ptree.pp_qualname')) ppf (qualname item)
 
-let def_loc: data_definition -> preproc_loc = function
+let def_source: data_definition -> src = function
   | Data_field { def; _} -> Source_location ~@def
   | Data_renaming { def; _} -> Source_location ~@def
   | Data_condition { def; _} -> Source_location ~@def
   | Table_index { table; _ } -> Source_location ~@table
-  | Compilation_data { def; _ } -> def.pp_loc
+  | Compilation_data { def; _ } -> def.src
 
 let def_qualname = function
   | Data_field { def = { payload = { field_qualname = Some qn'; _ }; _ }; _ } ->

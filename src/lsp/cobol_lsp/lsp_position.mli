@@ -48,10 +48,10 @@ val is_in_srcloc
   -> Cobol_common.Srcloc.srcloc
   -> bool
 
-val is_in_preproc_loc
+val is_in_src
   : filename:string
   -> Lsp.Types.Position.t
-  -> Cobol_common.Srcloc.preproc_loc
+  -> Cobol_common.Srcloc.src
   -> bool
 
 (* --- *)

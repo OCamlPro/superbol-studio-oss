@@ -288,7 +288,7 @@ let find_proc_definition
 let compvar_definition_locs
     (loc_translator: Lsp_position.translator)
     (def: Cobol_preproc.Env.compilation_var_definition) =
-  match def.pp_loc with
+  match def.src with
   | Source_location loc ->
       [loc_translator.location_of_srcloc loc]
   | Process_parameter
@@ -582,7 +582,7 @@ let handle_semtoks_full,
 (** {3 Hover} *)
 
 let doc_of_datadef ~rev_comments ~filename data_def =
-  match Cobol_data.Item.def_loc data_def with
+  match Cobol_data.Item.def_source data_def with
   | Process_parameter ->
       "Given as process parameter"
   | Process_environment ->
@@ -622,7 +622,7 @@ let lookup_data_definition cu_name element_at_pos group =
         Lsp_lookup.baseloc_of_qualname qn
     | Data_item _ | Proc_name _ ->
         raise Not_found
-    | Compilation_variable { def = { pp_loc = Source_location loc; _ } as def;
+    | Compilation_variable { def = { src = Source_location loc; _ } as def;
                              _ } ->
         Compilation_data { def },
         loc
@@ -648,7 +648,7 @@ let describe_data_definition_for_element_at_pos
       try
         let data_def, hover_loc
           = lookup_data_definition cu_name ele_at_pos group in
-        let data_def_loc = Cobol_data.Item.def_loc data_def in
+        let data_def_src = Cobol_data.Item.def_source data_def in
         let rev_comments = artifacts.rev_comments in
         let doc_comments = doc_of_datadef ~rev_comments ~filename data_def in
         let pp_documentation ppf =
@@ -657,7 +657,7 @@ let describe_data_definition_for_element_at_pos
         in
         let text =
           if always_show_hover_definition_text_in_data_div ||
-             not (Lsp_position.is_in_preproc_loc ~filename position data_def_loc)
+             not (Lsp_position.is_in_src ~filename position data_def_src)
           then Some (Pretty.to_string "%a%t"
                        Lsp_data_info_printer.pp_data_definition data_def
                        pp_documentation)

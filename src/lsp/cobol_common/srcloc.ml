@@ -64,25 +64,25 @@ module TYPES = struct
   type 'a with_loc = { payload: 'a; loc: srcloc [@compare fun _ _ -> 0] }
   [@@deriving ord]
 
-  type preproc_loc =
+  type src =
     | Source_location of (srcloc [@compare fun _ _ -> 0])
     | Process_parameter
     | Process_environment
   [@@deriving ord]
 
-  type 'a with_preproc_loc =
+  type 'a with_src =
     {
-      pp_payload: 'a;
-      pp_loc: preproc_loc [@compare fun _ _ -> 0];
+      src_payload: 'a;
+      src: src [@compare fun _ _ -> 0];
     }
   [@@deriving ord]
 
   let pp pe ppf e = pe ppf e.payload            (* ignore source localization *)
   let pp_with_loc = pp
   let show_with_loc pe l = Pretty.to_string "%a" (pp pe) l
-  let pp' pe ppf e = pe ppf e.pp_payload                              (* same *)
-  let pp_with_preproc_loc = pp'
-  let show_with_preproc_loc pe l = Pretty.to_string "%a" (pp' pe) l
+  let pp_src pe ppf e = pe ppf e.src_payload                          (* same *)
+  let pp_with_src = pp_src
+  let show_with_src pe l = Pretty.to_string "%a" (pp_src pe) l
 end
 include TYPES
 
@@ -495,6 +495,14 @@ let pp_srcloc ~platform = pp_srcloc_with_optional_caret ~platform
 
 let pp_file_loc ppf loc =
   pp_file_loc ppf (to_raw_loc @@ as_lexloc loc)
+
+let pp_src ppf = function
+  | Source_location l ->
+      pp_file_loc ppf l
+  | Process_parameter ->
+      Pretty.print ppf "process@ parameters"
+  | Process_environment ->
+      Pretty.print ppf "process@ environment"
 
 (** {2 Constructors} *)
 

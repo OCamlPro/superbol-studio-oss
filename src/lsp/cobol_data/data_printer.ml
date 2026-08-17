@@ -298,9 +298,9 @@ let pp_record: record Pretty.printer =
   ]
 
 let pp_compilation_value ppf = function
-  | Alphanum s -> pp_alphanum_value ppf s.pp_payload
-  | Boolean b -> pp_boolean_value ppf b.pp_payload
-  | Numeric f -> pp_fixed_value ppf f.pp_payload
+  | Alphanum s -> pp_alphanum_value ppf s.src_payload
+  | Boolean b -> pp_boolean_value ppf b.src_payload
+  | Numeric f -> pp_fixed_value ppf f.src_payload
 
 let pp_compilation_variable_definition ppf { compvar_name; compvar_value } =
   Pretty.record [
@@ -339,6 +339,6 @@ let pp_data_definition ppf = function
   | Compilation_data { def } ->
       Pretty.record [
         Fmt.(styled `Yellow @@ any "compilation data (constant)");
-        Pretty.vfield "def" (fun () -> def.pp_payload)
+        Pretty.vfield "def" (fun () -> def.src_payload)
           pp_compilation_variable_definition;
       ] ppf ()

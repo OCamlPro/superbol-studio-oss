@@ -137,7 +137,7 @@ let approx_type_of_datadef : data_definition -> (approx_typing_info * bool) =
   | Table_index _ ->
       Index, false
   | Compilation_data { def; _ } ->
-      approx_type_of_compvar def.pp_payload, false
+      approx_type_of_compvar def.src_payload, false
 
 let is_valid ~expected data =
   let (data_cat, is_group) = approx_type_of_datadef data in
