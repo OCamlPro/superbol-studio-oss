@@ -59,14 +59,14 @@ module MAP = Map.Make (VAR)
 module TYPES = struct
   type env =
     {
-      preproc_vars: preproc_definition MAP.t;
+      preproc_vars: preproc_var_definition MAP.t;
       compil_vars: compilation_var_definition MAP.t;
     }
   and var = VAR.t
-  and preproc_definition =
+  and preproc_var_definition =
     Cobol_data.Types.compilation_variable_definition with_src
   and compilation_var_definition =
-    preproc_definition                                  (* for now (not sure) *)
+    preproc_var_definition                              (* for now (not sure) *)
   and value =
     Cobol_data.Types.compilation_value
 
@@ -107,7 +107,7 @@ let mem_var' v env = mem_preproc_var ~&v env || mem_compil_var ~&v env
 (* higher-level operations *)
 
 let preproc_var_definition_of ~var ?(try_compil_vars = true) env
-  : (preproc_definition, [`UNDEFINED]) result =
+  : (preproc_var_definition, [`UNDEFINED]) result =
   match MAP.find_opt ~&var env.preproc_vars with
   | Some value ->
       Ok value
@@ -121,20 +121,23 @@ let preproc_var_definition_of ~var ?(try_compil_vars = true) env
 
 let register_preproc_var ~src var value env =
   let def =
-    { compvar_name = VAR.to_uppercase_string var;
-      compvar_value = value }
+    { src;
+      src_payload = { compvar_name = VAR.to_uppercase_string var;
+                      compvar_value = value } }
   in
   { env with
-    preproc_vars = MAP.add var { src; src_payload = def } env.preproc_vars }
+    preproc_vars = MAP.add var def env.preproc_vars },
+  def
 
-let define_preproc_var ~loc var value ?(override = false) (env: t) : t =
+let define_preproc_var ~loc var value ?(override = false) (env: t)
+  : t * preproc_var_definition =
   match MAP.find_opt ~&var env.preproc_vars with
   | Some { src; _ } when not override ->
       raise @@ REDEFINITION { prev_def_src = src }
   | Some _ | None ->
       register_preproc_var ~&var value env ~src:(Source_location loc)
 
-let define_process_parameter var value (env: t) : t =      (* always override *)
+let define_process_parameter var value (env: t) =          (* always override *)
   register_preproc_var var value env ~src:Process_parameter
 
 let undefine_preproc_var var (env: t) : t =

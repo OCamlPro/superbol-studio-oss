@@ -281,6 +281,13 @@ and apply_preproc_directive ({ env; context; _ } as lp)
     if env != lp.env || diags != Preproc_diagnostics.none
     then { lp with env; diags = Preproc_diagnostics.union diags lp.diags }
     else lp
+  and new_env_n_log lp { result = (env, log); diags } =
+    if env != lp.env || diags != Preproc_diagnostics.none || log <> []
+    then { lp with
+           env;
+           diags = Preproc_diagnostics.union diags lp.diags;
+           pplog = Preproc_trace.append_entries log lp.pplog }
+    else lp
   and new_context lp { result = context; diags } =
     if context != lp.context || diags != Preproc_diagnostics.none
     then { lp with context; diags = Preproc_diagnostics.union diags lp.diags }
@@ -298,7 +305,7 @@ and apply_preproc_directive ({ env; context; _ } as lp)
     when not (Preproc_logic.emitting lp.context) ->
       lp                                                            (* ignore *)
   | Define def ->
-      new_env lp @@ Preproc_logic.on_define ~loc def ~env
+      new_env_n_log lp @@ Preproc_logic.on_define ~loc def ~env
         ~platform:lp.persist.platform
   | Define_off var ->
       new_env lp @@ Preproc_logic.on_define_off ~loc var ~env

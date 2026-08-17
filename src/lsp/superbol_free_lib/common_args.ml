@@ -166,6 +166,7 @@ let get ?(verbose_on = `Stdout) () =
           and def = String.(sub definition (eqsign + 1)
                               (length definition - eqsign - 1)) in
           (* TODO: Check numerics: i.e, no quotes & proper format. *)
+          fst @@                             (* drop definition used for logs *)
           Cobol_preproc.Env.define_process_parameter
             (Cobol_preproc.Env.var var)
             (Alphanum { src_payload = Cobol_data.Value.alphanum_of_string def;

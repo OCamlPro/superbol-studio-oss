@@ -43,10 +43,11 @@ module TYPES = struct
           qn: Cobol_ptree.qualname;
           in_section: Cobol_unit.Types.procedure_section option;
         }
-    | Compilation_variable of
+    | Compilation_variable_ref of
         {
           def: Cobol_preproc.Env.compilation_var_definition;
           use: [`Substitution | `Evaluation | `Definition];
+          loc: srcloc;
         }
 
   type name_definition =
@@ -239,19 +240,21 @@ let element_at_position ~uri pos
 
   end group init |> function
   | { elt = { element_at_position = None; _ } as elt; _ } ->
-      let compvar ~loc def use =
+      let compvar_ref ~loc def use =
         if Lsp_position.is_in_srcloc ~filename pos loc
-        then Some (Compilation_variable { def; use })
+        then Some (Compilation_variable_ref { def; use; loc })
         else None
       in
       let element_at_position =
         List.find_map begin function
-          | Cobol_preproc.Trace.Variable_definition { loc; def; _ } ->
-              compvar ~loc def `Definition
+          | Cobol_preproc.Trace.Variable_definition
+              { def = Preproc_variable def | Compilation_variable def;
+                loc; _ } ->
+              compvar_ref ~loc def `Definition
           | Cobol_preproc.Trace.Variable_substitution { loc; def; _ } ->
-              compvar ~loc def `Substitution
+              compvar_ref ~loc def `Substitution
           | Cobol_preproc.Trace.Variable_evaluation { loc; def = Some def; _ } ->
-              compvar ~loc def `Evaluation
+              compvar_ref ~loc def `Evaluation
           | _ ->
               None
         end (Cobol_preproc.Trace.events artifacts.Cobol_parser.Outputs.pplog)

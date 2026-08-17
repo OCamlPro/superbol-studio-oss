@@ -80,32 +80,39 @@ let on_define_off ~loc var ~(env: ENV.t) =
   else OUT.result env ~diags:(undefined ~loc var)
 
 
+let definition_value ~platform ~var ~(value: Compdir_tree.definition_value with_loc) =
+  match ~&value with
+  | Literal_definition Alphanum l ->
+      Ok (ENV.alphanum_literal_value l)
+  | Literal_definition Boolean l ->
+      Ok (ENV.boolean_literal_value l)
+  | Literal_definition Numeric l ->
+      Ok (ENV.numeric_literal_value l)
+  | Parameter_definition ->                                    (* [sys.getenv] *)
+      match platform.getenv_opt @@ ENV.VAR.to_uppercase_string ~&var with
+      | Some value ->
+          let alphanum = Cobol_data.Value.alphanum_of_string value in
+          Ok (Alphanum { src_payload = alphanum;
+                         src = Process_environment })
+      | None ->
+          Error `UNDEFINED
+
+
+
+let ppvar_def def var =
+  Preproc_trace.Variable_definition { loc = ~@var; var = ~&var;
+                                      def = Preproc_variable def }
+
 let on_define ~platform ~loc Compdir_tree.{ var; value; override } ~env =
-  let open struct exception KEEP_UNDEFINED end in
-  try
-    let value =
-      match ~&value with
-      | Literal_definition Alphanum l ->
-          ENV.alphanum_literal_value l
-      | Literal_definition Boolean l ->
-          ENV.boolean_literal_value l
-      | Literal_definition Numeric l ->
-          ENV.numeric_literal_value l
-      | Parameter_definition ->                                (* [sys.getenv] *)
-          let v = ENV.VAR.to_uppercase_string ~&var in
-          match platform.getenv_opt v with
-          | Some value ->
-              let alphanum = Cobol_data.Value.alphanum_of_string value in
-              Alphanum { src_payload = alphanum;
-                         src = Process_environment }
-          | None -> raise KEEP_UNDEFINED
-    in
-    OUT.result (ENV.define_preproc_var ~loc var value ~override env)
-  with
-  | KEEP_UNDEFINED ->
-      OUT.result env
-  | ENV.REDEFINITION { prev_def_src } ->
-      OUT.result env ~diags:(redefinition ~loc var ~prev_def_src)
+  match definition_value ~platform ~var ~value with
+  | Error `UNDEFINED ->                                      (* keep undefined *)
+      OUT.result (env, [])
+  | Ok v ->
+      try
+        let env, def = ENV.define_preproc_var ~loc var v ~override env in
+        OUT.result (env, [ppvar_def def var])
+      with ENV.REDEFINITION { prev_def_src } ->
+        OUT.result (env, []) ~diags:(redefinition ~loc var ~prev_def_src)
 
 
 (* Conditionals *)
@@ -119,8 +126,10 @@ let eval_term (term: Compdir_tree.term) env : (ENV.value, _) result * _ list =
   match term with
   | Variable var ->
       (match ENV.preproc_var_definition_of ~var env with
-       | Ok def -> Ok def.src_payload.compvar_value, [compvar_eval var ~def]
-       | Error `UNDEFINED as e -> e, [compvar_eval var])
+       | Ok def ->
+           Ok def.src_payload.compvar_value, [compvar_eval var ~def]
+       | Error `UNDEFINED as e ->
+           e, [compvar_eval var])
   | Literal Alphanum a ->
       Ok (ENV.alphanum_literal_value a), []
   | Literal Boolean b ->

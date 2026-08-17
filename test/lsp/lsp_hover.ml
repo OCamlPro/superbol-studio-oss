@@ -1556,14 +1556,14 @@ let%expect_test "hover-datadef-78" =
     ---
     References: 2
     (line 9, character 46):
-    __rootdir__/prog.cob:6.7-6.28:
-       3          PROGRAM-ID. prog.
-       4          DATA DIVISION.
-       5          WORKING-STORAGE SECTION.
-       6 >        78 CONST VALUE "ABCD".
-    ----          ^^^^^^^^^^^^^^^^^^^^^
+    __rootdir__/prog.cob:10.43-10.48:
        7         *Note: currently handled as hovering over `01 VAR ... CONST.`
        8          77 VAR VALUE CONST.
+       9          PROCEDURE DIVISION.
+      10 >            DISPLAY "VAR: " VAR ", CONST: " CONST
+    ----                                              ^^^^^
+      11              STOP RUN.
+      12
     Compilation variable with value "ABCD"
     ---
     References: 3

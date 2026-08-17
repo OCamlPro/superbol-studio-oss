@@ -285,16 +285,6 @@ let find_proc_definition
       Lsp_notify.ambiguous "procedure-name" qn ~matching_qualnames;
       []
 
-let compvar_definition_locs
-    (loc_translator: Lsp_position.translator)
-    (def: Cobol_preproc.Env.compilation_var_definition) =
-  match def.src with
-  | Source_location loc ->
-      [loc_translator.location_of_srcloc loc]
-  | Process_parameter
-  | Process_environment ->
-      []
-
 let find_definitions ?allow_notifications loc_translator
     cu_name element_at_pos group =
   try
@@ -307,8 +297,11 @@ let find_definitions ?allow_notifications loc_translator
     | Proc_name { qn; in_section } ->
         find_proc_definition loc_translator ?allow_notifications ?in_section
           qn cu
-    | Compilation_variable { def; _ } ->
-        compvar_definition_locs loc_translator def
+    | Compilation_variable_ref { def = { src = Source_location loc; _ }; _ } ->
+        [loc_translator.location_of_srcloc loc]
+    | Compilation_variable_ref { def = { src = Process_parameter |
+                                               Process_environment; _ }; _ } ->
+        []            (* CHECKME: location of ref maybe not be the definition *)
   with Not_found -> []
 
 let lookup_definition_in_doc
@@ -357,6 +350,7 @@ let compvar_reference_locs (loc_translator: Lsp_position.translator)
     ~(doc: Lsp_document.t)
     (compvar_def: Cobol_preproc.Env.compilation_var_definition) =
   List.filter_map begin function
+    (* | Cobol_preproc.Trace.Variable_definition _ / filter out definition locs *)
     | Cobol_preproc.Trace.Variable_substitution { loc; def; _ }
     | Cobol_preproc.Trace.Variable_evaluation { loc; def = Some def; _ } ->
         if def == compvar_def                             (* CHECKME: phys. eq *)
@@ -424,7 +418,7 @@ let lookup_references_in_doc
               let cu, cu_refs = CUMap.find_by_name cu_name references in
               Option.fold ~none:[] ~some:(proc_refs cu_refs) @@
               find_proc_qn qn ?in_section ~&cu ~kind:"procedure-name"
-          | Compilation_variable { def; _ } ->
+          | Compilation_variable_ref { def; _ } ->
               compvar_reference_locs ~doc loc_translator def
         with Not_found -> []
       in
@@ -622,12 +616,9 @@ let lookup_data_definition cu_name element_at_pos group =
         Lsp_lookup.baseloc_of_qualname qn
     | Data_item _ | Proc_name _ ->
         raise Not_found
-    | Compilation_variable { def = { src = Source_location loc; _ } as def;
-                             _ } ->
+    | Compilation_variable_ref { def; loc; _ } ->
         Compilation_data { def },
         loc
-    | Compilation_variable _ ->
-        raise Not_found                      (* TODO: return a definition loc *)
   with Cobol_unit.Resolver_map.Ambiguous _ ->
     raise Not_found
 
