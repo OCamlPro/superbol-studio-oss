@@ -322,15 +322,20 @@ and expr =
   | Binop of expr with_loc * binop * expr with_loc (* split arith/bool ? *)
 
 (** Any form of condition {v c v} *)
-and cond =
+and 'r cond =
   | Expr of expr with_loc (** expression used as a condition *)
-  | Relation of binary_relation (** simple binary relation *)
-  | Abbrev of abbrev_combined_relation (** abbreviated relation *)
+  | Relation of 'r (** potentially abbreviated relation (depending on 'r) *)
   | ClassCond of expr with_loc * class_ (** class condition *)
   | SignCond of expr with_loc * signz (** {v e POSITIVE/NEGATIVE/ZERO v} *)
   | Omitted of expr with_loc (** {v c OMITTED v} *)
-  | Not of cond with_loc (** {v NOT c v} *)
-  | Logop of cond with_loc * logop * cond with_loc (** {v c <AND/OR> c' v} *)
+  | Not of 'r cond with_loc (** {v NOT c v} *)
+  | Logop of 'r cond with_loc * logop * 'r cond with_loc (** {v c <AND/OR> c' v} *)
+  
+and condition = abbrev_combined_relation cond
+
+and expanded_cond = binary_relation cond
+
+and no_rel = | (** empty type used to forbid the Relation constructor in cond *)
 
 and binary_relation =
   expr with_loc * relop * expr with_loc (** {v e <relop> e' v} *)
@@ -349,9 +354,9 @@ and abbrev_relation_operand =
   | AbbrevObject of bool * expr with_loc (** {v NOT? e v} *)
   | AbbrevSubject of abbrev_combined_relation (** {v NOT? e a v} *)
   | AbbrevParen of bool * abbrev_relation_operand with_loc (** {v NOT? (a) v} *)
-  | AbbrevOther of cond (** {v <non-relational condition> v} *)
-  | AbbrevComb (** {v a' <AND/OR> a'' v} *)
-      of (abbrev_relation_operand with_loc as 'x) * logop * 'x
+  | AbbrevLogop (** {v a' <AND/OR> a'' v} *)
+      of (abbrev_relation_operand with_loc as 'x) * logop * 'x  
+  | AbbrevOther of no_rel cond (** {v <non-relational condition> v} *)
 
 
 and logop =
@@ -624,26 +629,23 @@ module COMPARE = struct
         lazy (compare_with_loc compare_abbrev_relation_operand a1 a2)
     | AbbrevParen _, _ -> -1
     | _, AbbrevParen _ -> 1
-    | AbbrevOther c1, AbbrevOther c2 -> compare_cond c1 c2
+    | AbbrevOther c1, AbbrevOther c2 -> compare_cond (fun (never: no_rel) _ -> match never with _ -> .) c1 c2
     | AbbrevOther _, _ -> -1
     | _, AbbrevOther _ -> 1
-    | AbbrevComb (x1, o1, y1), AbbrevComb (x2, o2, y2) ->
+    | AbbrevLogop (x1, o1, y1), AbbrevLogop (x2, o2, y2) ->
         compare_struct (compare_with_loc compare_abbrev_relation_operand x1 x2) @@
         lazy (compare_struct (compare_logop o1 o2) @@
               lazy (compare_with_loc compare_abbrev_relation_operand y1 y2))
 
-  and compare_cond : cond -> cond -> int =
-    fun a b -> match a, b with
+  and compare_cond: 'r. ('r -> 'r -> int) -> 'r cond -> 'r cond -> int =
+    fun compare_rel a b -> match a, b with
       | Expr x, Expr y ->
           compare_expr' x y
       | Expr _, _ -> -1
       | _, Expr _ -> 1
-      | Relation x, Relation y -> compare_binary_relation x y
+      | Relation x, Relation y -> compare_rel x y
       | Relation _, _ -> -1
       | _, Relation _ -> 1
-      | Abbrev x, Abbrev y -> compare_abbrev_combined_relation x y
-      | Abbrev _, _ -> -1
-      | _, Abbrev _ -> 1
       | ClassCond (x1, c1), ClassCond (x2, c2) ->
           compare_struct (compare_expr' x1 x2) @@
           lazy (compare_class_ c1 c2)
@@ -659,14 +661,14 @@ module COMPARE = struct
       | Omitted _, _ -> -1
       | _, Omitted _ -> 1
       | Not x, Not y ->
-          compare_cond' x y
+          compare_cond' compare_rel x y
       | Not _, _ -> -1
       | _, Not _ -> 1
       | Logop (x1, o1, y1), Logop (x2, o2, y2) ->
           compare_struct (compare_logop o1 o2) @@
-          lazy (compare_struct (compare_cond' x1 x2) @@
-                lazy (compare_cond' y1 y2))
-  and compare_cond' a b = compare_with_loc compare_cond a b
+          lazy (compare_struct (compare_cond' compare_rel x1 x2) @@
+                lazy (compare_cond' compare_rel y1 y2))
+  and compare_cond' compare_rel a b = compare_with_loc (compare_cond compare_rel) a b
   and compare_relop =
     Stdlib.compare
   and compare_logop =
@@ -821,6 +823,9 @@ module COMPARE = struct
   let compare_strlit: strlit compare_fun = compare_term
   let compare_strlit_or_intlit: strlit_or_intlit compare_fun = compare_term
   let compare_scalar: scalar compare_fun = compare_term
+  
+  let compare_condition a b = compare_cond compare_abbrev_combined_relation a b
+  let compare_condition' a b = compare_cond' compare_abbrev_combined_relation a b
 end
 include COMPARE
 
@@ -1038,66 +1043,33 @@ module FMT = struct
     | BOr  -> "B-OR"
     | BXor -> "B-XOR"
   and pp_binop ppf o = string ppf (show_binop o)
+  
+  and pp_sign: type k. k sign_cond Pretty.printer = fun ppf -> function
+    | SgnPositive -> string ppf "POSITIVE"
+    | SgnNegative -> string ppf "NEGATIVE"
+    | SgnZero -> string ppf "ZERO"
+  and pp_signz ppf = pp_sign ppf
+  
+  and pp_literal: literal Pretty.printer = fun ppf -> pp_term ppf
+  and pp_literal' = fun ppf -> pp_with_loc pp_literal ppf
+  and pp_ident: ident Pretty.printer = fun ppf -> pp_term ppf
 
-  and pp_binary_relation ppf (a, o, b) =
-    fmt "%a@ %a@ %a" ppf
-      pp_expr' a pp_relop o pp_expr' b
+  let not_ ppf = function false -> fmt "NOT@ " ppf | true -> ()
 
-  and pp_cond ?(pos = true) ppf c =
-    match c with
-    | Expr e ->
-        fmt "%a%a" ppf not_ pos pp_expr' e
-    | Relation rel ->
-        fmt "%a@[<1>(%a)@]" ppf not_ pos pp_binary_relation rel
-    | Abbrev r ->
-        fmt "%a%a" ppf not_ pos pp_abbrev_combined_relation r
-    | ClassCond (e, c) ->
-        fmt "%a@ %a%a" ppf pp_expr' e not_ pos pp_class_ c
-    | SignCond (e, s) ->
-        fmt "%a@ %a%a" ppf pp_expr' e not_ pos pp_sign s
-    | Omitted e ->
-        fmt "%a@ %aOMITTED" ppf pp_expr' e not_ pos
-    | Not c ->
-        pp_with_loc (pp_cond ~pos:(not pos)) ppf c
-    | Logop (a, o, b) ->
-        fmt "@[<1>%a(%a@ %a@ %a)@]" ppf
-          not_ pos pp_cond' a pp_logop o pp_cond' b
-
-  and pp_cond' ppf = pp_with_loc (pp_cond ~pos:true) ppf
-
-  and pp_abbrev_combined_relation ppf (neg, e, a) =
-    fmt "%a%a@ %a" ppf not_ (not neg) pp_expr' e
-      pp_abbrev_relation_operand ~&a
-
-  and pp_abbrev_relation_operand ppf = function
-    | AbbrevRelOp (o, a) ->
-        fmt "%a@ %a" ppf pp_relop o pp_abbrev_relation_operand ~&a
-    | AbbrevObject (neg, e) ->
-        fmt "%a%a" ppf not_ (not neg) pp_expr' e
-    | AbbrevSubject r ->
-        pp_abbrev_combined_relation ppf r
-    | AbbrevParen (neg, a) ->
-        fmt "%a@[<1>(%a)@]" ppf not_ (not neg) pp_abbrev_relation_operand ~&a
-    | AbbrevOther c ->
-        pp_cond ppf c
-    | AbbrevComb (a1, o, a2) ->
-        fmt "%a@ %a@ %a" ppf
-          pp_abbrev_relation_operand ~&a1
-          pp_logop o
-          pp_abbrev_relation_operand ~&a2
-
-  and not_ ppf = function false -> fmt "NOT@ " ppf | true -> ()
-
-  and show_relop = function
+  let show_relop = function
     | Gt -> ">"
     | Lt -> "<"
     | Eq -> "="
     | Ne -> "<>"
     | Ge -> ">="
     | Le -> "<="
-  and pp_relop ppf o = string ppf (show_relop o)
+  let pp_relop ppf o = string ppf (show_relop o)
+  
+  let pp_binary_relation ppf (a, o, b) =
+    fmt "%a@ %a@ %a" ppf
+      pp_expr' a pp_relop o pp_expr' b
 
-  and show_class_ = function
+  let show_class_ = function
     | AlphabetOrClass n -> str "%a" pp_name' n
     | Alphabetic -> "ALPHABETIC"
     | AlphabeticLower -> "ALPHABETIC-LOWER"
@@ -1111,26 +1083,62 @@ module FMT = struct
     | InArithmeticRange -> "IN-ARITHMETIC-RANGE"
     | NearestToZero -> "NEAREST-TO-ZERO"
     | ClassNumeric -> "NUMERIC"
-  and pp_class_ ppf c = string ppf (show_class_ c)
+  let pp_class_ ppf c = string ppf (show_class_ c)
 
-  and pp_sign: type k. k sign_cond Pretty.printer = fun ppf -> function
-    | SgnPositive -> string ppf "POSITIVE"
-    | SgnNegative -> string ppf "NEGATIVE"
-    | SgnZero -> string ppf "ZERO"
-  and pp_signz ppf = pp_sign ppf
-
-  and pp_logop ppf = function
+  let pp_logop ppf = function
     | LAnd -> string ppf "AND"
     | LOr -> string ppf "OR"
 
-  and pp_literal: literal Pretty.printer = fun ppf -> pp_term ppf
-  and pp_literal' = fun ppf -> pp_with_loc pp_literal ppf
-  and pp_ident: ident Pretty.printer = fun ppf -> pp_term ppf
-  and pp_qualname_with_subscripts: qualname_with_subscripts Pretty.printer =
-    fun ppf -> pp_term ppf
-  and pp_qualname_with_subscripts' =
-    fun ppf -> pp_with_loc pp_qualname_with_subscripts ppf
+  let rec pp_cond:
+    'r. 'r Pretty.printer -> ?pos:bool -> 'r cond Pretty.printer = 
+    fun pp_rel ?(pos = true) ppf c -> 
+    match c with
+    | Expr e ->
+        fmt "%a%a" ppf not_ pos pp_expr' e
+    | Relation r ->
+        if pos then
+          pp_rel ppf r
+        else
+          fmt "NOT @[<1>(%a)@]" ppf pp_rel r
+    | ClassCond (e, c) ->
+        fmt "%a@ %a%a" ppf pp_expr' e not_ pos pp_class_ c
+    | SignCond (e, s) ->
+        fmt "%a@ %a%a" ppf pp_expr' e not_ pos pp_sign s
+    | Omitted e ->
+        fmt "%a@ %aOMITTED" ppf pp_expr' e not_ pos
+    | Not c ->
+        pp_with_loc (pp_cond pp_rel ~pos:(not pos)) ppf c
+    | Logop (a, o, b) ->
+        fmt "@[<1>%a(%a@ %a@ %a)@]" ppf
+          not_ pos (pp_cond' pp_rel) a pp_logop o (pp_cond' pp_rel) b
 
+  and pp_cond':
+    'r. 'r Pretty.printer -> 'r cond with_loc Pretty.printer =
+    fun pp_rel ppf c -> pp_with_loc (pp_cond pp_rel ~pos:true) ppf c
+
+  let pp_no_rel _ (never: no_rel) = match never with _ -> .
+
+  let rec pp_abbrev_combined_relation ppf (neg, e, a) =
+    fmt "%a%a@ %a" ppf not_ (not neg) pp_expr' e 
+      pp_abbrev_relation_operand ~&a
+
+  and pp_abbrev_relation_operand ppf = function
+    | AbbrevRelOp (o, a) ->
+        fmt "%a@ %a" ppf pp_relop o pp_abbrev_relation_operand ~&a
+    | AbbrevObject (neg, e) ->
+        fmt "%a%a" ppf not_ (not neg) pp_expr' e
+    | AbbrevSubject r ->
+        pp_abbrev_combined_relation ppf r
+    | AbbrevParen (neg, a) ->
+        fmt "%a@[<1>(%a)@]" ppf not_ (not neg) pp_abbrev_relation_operand ~&a
+    | AbbrevOther c ->
+        pp_cond pp_no_rel ppf c
+    | AbbrevLogop (a1, o, a2) ->
+        fmt "%a@ %a@ %a" ppf
+          pp_abbrev_relation_operand ~&a1
+          pp_logop o
+          pp_abbrev_relation_operand ~&a2
+          
   (** Pretty-printing for named unions of term types (some are yet to be
       renamed) *)
 
@@ -1148,7 +1156,13 @@ module FMT = struct
   let pp_qualname_or_literal: qualname_or_literal Pretty.printer = pp_term
   let pp_qualname_or_intlit: qualname_or_intlit Pretty.printer = pp_term
   let pp_qualname_or_alphanum: qualname_or_alphanum Pretty.printer = pp_term
+  let pp_qualname_with_subscripts: qualname_with_subscripts Pretty.printer =
+    pp_term
+  let pp_qualname_with_subscripts' =
+    pp_with_loc pp_qualname_with_subscripts
 
+  let pp_condition = pp_cond pp_abbrev_combined_relation
+  let pp_condition' = pp_cond' pp_abbrev_combined_relation
 end
 include FMT
 

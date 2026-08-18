@@ -207,7 +207,7 @@ let dual_handler_none =
 (* Entry points *)
 
 %start <Cobol_ptree.compilation_group> compilation_group
-%start <cond with_loc> standalone_condition
+%start <condition with_loc> standalone_condition
 
 %%
 
@@ -2823,12 +2823,12 @@ let any_lpar ==
  | LPAR_BEFORE_RELOP; {}
 
 let relation_condition ==
- | neg = ibo(NOT); e = expression; pred = loc(abbrev_relop_operand);
-    { relation_condition (neg, e, pred) }
+ | neg = ibo(NOT); e = expression; pred = loc(abbrev_relop_operand); 
+    { Relation (neg, e, pred) }
 
 nonrel_condition:
  | n = ibo(NOT)     e = expression %prec lowest { neg_condition ~neg:n (Expr e &@<- e) }
- | n = ibo(NOT)     c = loc(extended_condition) { neg_condition ~neg:n c }
+ | n = ibo(NOT)     c = loc(extended_condition) { neg_condition ~neg:n (cast_no_rel_cond ~&c &@<- c) }
  | n = ibo(NOT) "(" c  = condition ")"          { neg_condition ~neg:n c }
 
 abbrev_relop_atom:
@@ -2837,7 +2837,7 @@ abbrev_relop_atom:
 
 abbrev_relop_operand:
  | abbrev_relop_atom { $1 }
- | loc(abbrev_relop_operand) logop loc(abbrev_relation_operand)    { AbbrevComb ($1, $2, $3) }
+ | loc(abbrev_relop_operand) logop loc(abbrev_relation_operand)    { AbbrevLogop ($1, $2, $3) }
 
 abbrev_object_atom:
  | n = ibo(NOT)     e = expression          %prec lowest { AbbrevObject (n, e) }
@@ -2845,7 +2845,7 @@ abbrev_object_atom:
 
 abbrev_object_operand:
  | abbrev_object_atom { $1 }
- | loc(abbrev_object_operand) logop loc(abbrev_relation_operand)   { AbbrevComb ($1, $2, $3) }
+ | loc(abbrev_object_operand) logop loc(abbrev_relation_operand)   { AbbrevLogop ($1, $2, $3) }
 
 abbrev_relation_operand:
  | r = relop    e = loc(abbrev_object_atom)                        { AbbrevRelOp (r, e) }
@@ -2853,7 +2853,7 @@ abbrev_relation_operand:
  | n = ibo(NOT) e = expression a = loc(abbrev_relop_atom)          { AbbrevSubject (n, e, a) }
  | n = ibo(NOT) c = loc(extended_condition)                        { AbbrevOther (neg_condition ~neg:n c) }
  | n = ibo(NOT) any_lpar c = loc(abbrev_relation_operand) RPAR     { AbbrevParen (n, c) }
- | loc(abbrev_relation_operand) logop loc(abbrev_relation_operand) { AbbrevComb ($1, $2, $3) }
+ | loc(abbrev_relation_operand) logop loc(abbrev_relation_operand) { AbbrevLogop ($1, $2, $3) }
 
 extended_condition:
  | e = expression io(IS) n = bo(NOT) c = class_condition
@@ -3484,12 +3484,12 @@ let selection_objects :=
  | so = selection_object; ALSO; sol = selection_objects; { so :: sol }
 
 let selection_object :=
- | c = condition;           {SelCond c}                 (* also arith/bool exp*)
- | ~ = range_expression;    < >
- | ~ = partial_expression;  < >                                   (* +COB2002 *)
- | TRUE;                    {SelConst true}
- | FALSE;                   {SelConst false}
- | ANY;                     {SelAny: selection_object}
+ | c = loc(abbrev_relation_operand); {SelCond c}                 (* also arith/bool exp*)
+ | ~ = range_expression;             < >
+ | ~ = partial_expression;           < >                                   (* +COB2002 *)
+ | TRUE;                             {SelConst true}
+ | FALSE;                            {SelConst false}
+ | ANY;                              {SelAny}
 
 let range_expression :=
  | b = ibo(NOT); i1 = expression; THROUGH;
@@ -3497,8 +3497,6 @@ let range_expression :=
    { SelRange { negated = b; start = i1; stop = i2; alphabet = i } }
 
 let partial_expression :=
- | o = relop; e = expression;
-   { SelRelation { relation = o; expr = e } } (* relation (general, bool, pointer) *)
  | IS; n = bo(NOT); c = class_condition;
    { SelClassCond { negated = n; class_specifier = c } } (* class *) (* exp = ident *)
  | n = bo(NOT); c = class_condition_no_ident;

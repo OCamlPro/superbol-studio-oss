@@ -289,27 +289,28 @@ let pp_divide_operands ppf = function
 
 (* EVALUATE *)
 type selection_subject =
-  | Subject of cond with_loc
+  | Subject of condition with_loc
   | SubjectConst of bool
 [@@deriving ord]
 
 let pp_selection_subject ppf = function
-  | Subject c -> pp_cond' ppf c
+  | Subject c -> pp_condition' ppf c
   | SubjectConst b -> Fmt.pf ppf (if b then "TRUE" else "FALSE")
 
 type selection_object =
-  | SelCond of cond with_loc (* ident / literal / expression *)
+  | SelCond of abbrev_relation_operand with_loc (** Condition with a potentially omitted subject 
+      interpreted as an abbreviated condition prepended by the corresponding subject in EVALUATE.
+      May start with AbbrevSubject to denote an independant condition.
+      Typically used for clauses such as:
+      - WHEN > 5 (matching subject should be an integer)
+      - WHEN A > 3 (matching subject should be either TRUE or FALSE)
+      - WHEN <= 3 OR A > 3 (matching subject should be an integer) *)
   | SelRange of
       {
         negated: bool;
         start: expr with_loc;
         stop: expr with_loc;
         alphabet: name with_loc option;
-      }
-  | SelRelation of
-      {
-        relation: relop;
-        expr: expr with_loc;
       }
   | SelClassCond of
       {
@@ -330,15 +331,13 @@ type selection_object =
 [@@deriving ord]
 
 let pp_selection_object ppf = function
-  | SelCond c -> pp_cond' ppf c
+  | SelCond c -> pp_with_loc pp_abbrev_relation_operand ppf c
   | SelRange { negated; start; stop; alphabet } ->
     if negated then Fmt.pf ppf "NOT@ ";
     Fmt.pf ppf "%a@ THROUGH@ %a%a"
       pp_expr' start
       pp_expr' stop
       Fmt.(option (sp ++ const string "IN" ++ sp ++ pp_with_loc pp_name)) alphabet
-  | SelRelation { relation; expr } ->
-    Fmt.pf ppf "%a@ %a" pp_relop relation pp_expr' expr
   | SelClassCond { negated; class_specifier = cs } ->
     if negated then Fmt.pf ppf "NOT@ ";
     pp_class_ ppf cs
