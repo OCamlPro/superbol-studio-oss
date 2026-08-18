@@ -13,7 +13,8 @@
 
 (** Some utilities to construct or rewrite terms (mostly conditions for now) *)
 
-val neg_condition: neg:bool -> Terms.cond Cobol_common.with_loc -> Terms.cond
+val neg_condition: neg:bool -> 'r Terms.cond Cobol_common.with_loc -> 'r Terms.cond
+val cast_no_rel_cond: Terms.no_rel Terms.cond -> 'r Terms.cond
 
-val expand_every_abbrev_cond: Terms.cond -> Terms.cond
-val expand_abbrev_cond: Terms.abbrev_combined_relation -> Terms.cond
+val expand_every_abbrev_cond: Terms.condition -> Terms.expanded_cond
+val expand_abbrev_cond: Terms.abbrev_combined_relation -> Terms.expanded_cond

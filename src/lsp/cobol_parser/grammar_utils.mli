@@ -15,8 +15,6 @@ open Cobol_ptree
 
 module Overlay_manager: Cobol_preproc.Src_overlay.MANAGER
 
-val relation_condition: Cobol_ptree.abbrev_combined_relation -> Cobol_ptree.cond
-
 type data_division_sentence =
   | S_DATA_DIVISION_HEADER of srcloc
   | S_FILE_SECTION_HEADER of srcloc

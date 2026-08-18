@@ -42,7 +42,7 @@ module Make (Tags: TAGS) = struct
 
   module Cond = struct
     open Expr
-    let expr e : cond with_loc = Expr e &@ Srcloc.dummy
+    let expr e : 'r cond with_loc = Expr e &@ Srcloc.dummy
     let ident x = expr (ident x)
   end
 

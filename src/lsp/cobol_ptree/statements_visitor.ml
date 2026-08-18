@@ -713,15 +713,12 @@ let fold_selection_object (v: _ #folder) =
     ~continue:begin fun selection_object x ->
       match selection_object with
       | SelCond c -> x
-          >> fold_condition v c
+          >> fold_abbrev_relation_operand' v c
       | SelRange { negated; start; stop; alphabet} -> x
           >> fold_bool v negated
           >> fold_expression v start
           >> fold_expression v stop
           >> fold_option ~fold:fold_name' v alphabet
-      | SelRelation { relation; expr } -> x
-          >> fold_relop v relation
-          >> fold_expression v expr
       | SelClassCond { negated; class_specifier } -> x
           >> fold_bool v negated
           >> fold_class v class_specifier

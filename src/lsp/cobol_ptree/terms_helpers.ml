@@ -15,8 +15,14 @@ open Terms
 open Cobol_common
 open Srcloc.INFIX
 
-let neg_condition ~neg (c: cond with_loc): cond =
+let neg_condition ~neg (c: 'r cond with_loc): 'r cond =
   if not neg then ~&c else Not c
+
+let cast_no_rel_cond (c: no_rel cond): 'r cond = 
+    (* OCaml typechecker is not clever enough to deduce that no_rel cond and 
+       'r. 'r cond are equivalent. We use Obj.magic to allow the cast without 
+       rebuilding recursiveley the full condition. *)
+    Obj.magic c 
 
 (** [abbrev_condition_expansion_state] is used internally by [expand_abbrev_cond]
     to remember the previous subject and relational operator that are omitted
@@ -41,10 +47,10 @@ exception AbbrevMissingRelOpAfterSubject
     combined relation condition from [cond] by an equivalent non-abbreviated
     condition (with abbreviated relations replaced with binary relations). *)
 let rec expand_every_abbrev_cond
-  : cond -> cond = function
-  | Expr _ | Relation _ | ClassCond _ | SignCond _ | Omitted _ as c ->
+  : condition -> expanded_cond = function
+  | Expr _ | ClassCond _ | SignCond _ | Omitted _ as c ->
       c
-  | Abbrev a ->
+  | Relation a ->
       expand_abbrev_cond a
   | Not c ->
       Not (expand_every_abbrev_condition c)
@@ -62,7 +68,7 @@ and expand_every_abbrev_condition cond = expand_every_abbrev_cond ~&cond &@<- co
     {i NOT [relation_condition] [logop] abbrev-combined-conditions} if [neg]
     holds), where [logop] and {i abbrev-combined-conditions} are given via
     [logop], and [flatop]. *)
-and expand_abbrev_cond (abbrev : abbrev_combined_relation) : cond =
+and expand_abbrev_cond (abbrev : abbrev_combined_relation) : expanded_cond =
 
   let rec disambiguate abbrevop sr =
     (* Recursively constructs a valid condition based on the abbreviated
@@ -92,8 +98,8 @@ and expand_abbrev_cond (abbrev : abbrev_combined_relation) : cond =
         let c, sr = disambiguate a sr in
         neg_condition ~neg c &@<- abbrevop, sr
     | AbbrevOther c, _ ->
-        expand_every_abbrev_condition (c &@<- abbrevop), AfterNonAbbrev
-    | AbbrevComb (a1, logop, a2), sr ->
+        cast_no_rel_cond c &@<- abbrevop, AfterNonAbbrev
+    | AbbrevLogop (a1, logop, a2), sr ->
         let c1, sr = disambiguate a1 sr in
         let c2, sr = disambiguate a2 sr in
         Logop (c1, logop, c2) &@<- abbrevop, sr

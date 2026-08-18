@@ -493,8 +493,8 @@ type validation_clause =
   | Class of class_clause
   | Default of ident_or_literal option
   | Destination of ident list (* non-empty *)
-  | InvalidWhen of cond with_loc list (* non-empty *)
-  | PresentWhen of cond with_loc
+  | InvalidWhen of condition with_loc list (* non-empty *)
+  | PresentWhen of condition with_loc
   | Varying of data_varying list
   | ValidateStatus of
       {
@@ -546,10 +546,10 @@ let pp_destination_clause =
   Fmt.(any "DESTINATION " ++ list ~sep:sp pp_ident)
 
 let pp_invalid_when_clause =
-  Fmt.(list ~sep:sp (any "INVALID WHEN " ++ pp_cond'))
+  Fmt.(list ~sep:sp (any "INVALID WHEN " ++ pp_condition'))
 
 let pp_present_when_clause =
-  Fmt.(any "PRESENT WHEN " ++ pp_cond')
+  Fmt.(any "PRESENT WHEN " ++ pp_condition')
 
 let pp_validation_clause ppf = function
   | Class cc -> pp_class_clause ppf cc
