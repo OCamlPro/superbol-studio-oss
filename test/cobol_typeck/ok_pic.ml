@@ -194,3 +194,177 @@ let%expect_test "signed-numeric-sizes" =
         }
       }
     } |}];;
+
+let%expect_test "pic-with-space-in-parens" =
+  dotest @@ prog "pic-with-space-in-parens"
+  ~working_storage:{|
+            77 PAREN-PIC-0   PIC    X( 30 ).
+            77 PAREN-PIC-1   PIC    9( 10 ).
+            77 PAREN-PIC-2   PIC    X(2 ).
+            77 PAREN-PIC-3   PIC    9( 2 )V9( 2 ).
+            77 PAREN-PIC-4   PIC IS X( 30 ).
+            77 PAREN-PIC-5   PIC IS 9( 10 ).
+            77 PAREN-PIC-6   PIC IS X(2 ).
+            77 PAREN-PIC-7   PIC IS 9( 2 )V9( 2 ).
+  |};
+[%expect {|
+  prog.cob:4.7-4.39:
+     1          PROGRAM-ID. pic-with-space-in-parens.
+     2          DATA DIVISION.
+     3          WORKING-STORAGE SECTION.
+     4 >        77 PAREN-PIC-0   PIC    X( 30 ).
+  ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     5               77 PAREN-PIC-1   PIC    9( 10 ).
+     6               77 PAREN-PIC-2   PIC    X(2 ).
+  Item definition: {
+    qualname: PAREN-PIC-0
+    offset: 0
+    size: 240
+    layout: {
+      elementary
+      usage: {
+        display
+        category: ALPHANUMERIC(30)
+      }
+    }
+  }
+  prog.cob:5.12-5.44:
+     2          DATA DIVISION.
+     3          WORKING-STORAGE SECTION.
+     4          77 PAREN-PIC-0   PIC    X( 30 ).
+     5 >             77 PAREN-PIC-1   PIC    9( 10 ).
+  ----               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     6               77 PAREN-PIC-2   PIC    X(2 ).
+     7               77 PAREN-PIC-3   PIC    9( 2 )V9( 2 ).
+  Item definition: {
+    qualname: PAREN-PIC-1
+    offset: 0
+    size: 80
+    layout: {
+      elementary
+      usage: {
+        display
+        category: NUMERIC(digits = 10, scale = 0, sign = unsigned)
+      }
+    }
+  }
+  prog.cob:6.12-6.42:
+     3          WORKING-STORAGE SECTION.
+     4          77 PAREN-PIC-0   PIC    X( 30 ).
+     5               77 PAREN-PIC-1   PIC    9( 10 ).
+     6 >             77 PAREN-PIC-2   PIC    X(2 ).
+  ----               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     7               77 PAREN-PIC-3   PIC    9( 2 )V9( 2 ).
+     8               77 PAREN-PIC-4   PIC IS X( 30 ).
+  Item definition: {
+    qualname: PAREN-PIC-2
+    offset: 0
+    size: 16
+    layout: {
+      elementary
+      usage: {
+        display
+        category: ALPHANUMERIC(2)
+      }
+    }
+  }
+  prog.cob:7.12-7.50:
+     4          77 PAREN-PIC-0   PIC    X( 30 ).
+     5               77 PAREN-PIC-1   PIC    9( 10 ).
+     6               77 PAREN-PIC-2   PIC    X(2 ).
+     7 >             77 PAREN-PIC-3   PIC    9( 2 )V9( 2 ).
+  ----               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     8               77 PAREN-PIC-4   PIC IS X( 30 ).
+     9               77 PAREN-PIC-5   PIC IS 9( 10 ).
+  Item definition: {
+    qualname: PAREN-PIC-3
+    offset: 0
+    size: 32
+    layout: {
+      elementary
+      usage: {
+        display
+        category: NUMERIC(digits = 4, scale = 2, sign = unsigned)
+      }
+    }
+  }
+  prog.cob:8.12-8.44:
+     5               77 PAREN-PIC-1   PIC    9( 10 ).
+     6               77 PAREN-PIC-2   PIC    X(2 ).
+     7               77 PAREN-PIC-3   PIC    9( 2 )V9( 2 ).
+     8 >             77 PAREN-PIC-4   PIC IS X( 30 ).
+  ----               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     9               77 PAREN-PIC-5   PIC IS 9( 10 ).
+    10               77 PAREN-PIC-6   PIC IS X(2 ).
+  Item definition: {
+    qualname: PAREN-PIC-4
+    offset: 0
+    size: 240
+    layout: {
+      elementary
+      usage: {
+        display
+        category: ALPHANUMERIC(30)
+      }
+    }
+  }
+  prog.cob:9.12-9.44:
+     6               77 PAREN-PIC-2   PIC    X(2 ).
+     7               77 PAREN-PIC-3   PIC    9( 2 )V9( 2 ).
+     8               77 PAREN-PIC-4   PIC IS X( 30 ).
+     9 >             77 PAREN-PIC-5   PIC IS 9( 10 ).
+  ----               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    10               77 PAREN-PIC-6   PIC IS X(2 ).
+    11               77 PAREN-PIC-7   PIC IS 9( 2 )V9( 2 ).
+  Item definition: {
+    qualname: PAREN-PIC-5
+    offset: 0
+    size: 80
+    layout: {
+      elementary
+      usage: {
+        display
+        category: NUMERIC(digits = 10, scale = 0, sign = unsigned)
+      }
+    }
+  }
+  prog.cob:10.12-10.42:
+     7               77 PAREN-PIC-3   PIC    9( 2 )V9( 2 ).
+     8               77 PAREN-PIC-4   PIC IS X( 30 ).
+     9               77 PAREN-PIC-5   PIC IS 9( 10 ).
+    10 >             77 PAREN-PIC-6   PIC IS X(2 ).
+  ----               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    11               77 PAREN-PIC-7   PIC IS 9( 2 )V9( 2 ).
+    12          PROCEDURE DIVISION.
+  Item definition: {
+    qualname: PAREN-PIC-6
+    offset: 0
+    size: 16
+    layout: {
+      elementary
+      usage: {
+        display
+        category: ALPHANUMERIC(2)
+      }
+    }
+  }
+  prog.cob:11.12-11.50:
+     8               77 PAREN-PIC-4   PIC IS X( 30 ).
+     9               77 PAREN-PIC-5   PIC IS 9( 10 ).
+    10               77 PAREN-PIC-6   PIC IS X(2 ).
+    11 >             77 PAREN-PIC-7   PIC IS 9( 2 )V9( 2 ).
+  ----               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    12          PROCEDURE DIVISION.
+    13
+  Item definition: {
+    qualname: PAREN-PIC-7
+    offset: 0
+    size: 32
+    layout: {
+      elementary
+      usage: {
+        display
+        category: NUMERIC(digits = 4, scale = 2, sign = unsigned)
+      }
+    }
+  } |}]
