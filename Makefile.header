@@ -5,9 +5,16 @@ MAIN_SRCDIR ?= src
 STUDIO = superbol_vscode_oss
 STUDIO_SRCDIR = $(MAIN_SRCDIR)/vscode/superbol-vscode-oss
 GNUCOBOL_SRCDIR = import/gnucobol
-GNUCOBOL4_SRCDIR = import/gnucobol4
 SUPERBOL_LSP_PKG = lsp/superbol-free
 TRAMABOL_PKG = tramabol/tramabol
+
+GNUCOBOL4_COB_CONFIG ?= cob-config
+GNUCOBOL4_COB_CONFIG_HOST ?= $(GNUCOBOL4_COB_CONFIG)
+GNUCOBOL4_LIBDIR ?= $(shell $(GNUCOBOL4_COB_CONFIG_HOST) --libdir)
+
+export GNUCOBOL4_COB_CONFIG
+export GNUCOBOL4_COB_CONFIG_HOST
+export GNUCOBOL4_LIBDIR
 
 JS_OUTDIR = _out
 JS_TARGETS = $(addprefix $(JS_OUTDIR)/,superbol-vscode-oss-bundle.js	\

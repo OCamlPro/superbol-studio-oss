@@ -85,14 +85,44 @@ dune-trailer = """
 (alias
  (name build)
  (deps (glob_files *.exe))
- (enabled_if (<> %{profile} \"universal\")))
+ (enabled_if (<> %{profile} "universal")))
 
 ;(alias
 ; (name build)
 ; (deps (glob_files *.bc.js))
 ; (enabled_if (= %{profile} \"universal\")))
+
+
+; Note: ${GNUCOBOL4_LIBDIR}/libcob-bundle is required when
+; cross-compiling for OSX.
+(rule
+ (targets libcob_libs)
+ (enabled_if (= %{context_name} "default.osx"))
+  (action (with-stdout-to %{targets}
+    (progn
+      (echo -L%{env:GNUCOBOL4_LIBDIR=/opt/gnucobol-4.x/lib}/libcob-bundle " ")
+      (run %{read:../ezlibcob/cob_config} --libs)))))
+
+(rule
+ (targets libcob_libs)
+ (enabled_if (= %{context_name} "default.windows"))
+ (action (with-stdout-to %{targets}
+   (echo ""))))
+
+(rule
+ (targets libcob_libs)
+ (enabled_if (and (= %{context_name} "default") (<> %{os_type} Win32)))
+ (action (with-stdout-to %{targets}
+   (run %{read:../ezlibcob/cob_config} --libs))))
+
+(rule
+ (targets libcob_libs)
+ (enabled_if (and (= %{context_name} "default") (= %{os_type} Win32)))
+ (action (with-stdout-to %{targets}
+   (pipe-stdout
+      (run sh %{read:../ezlibcob/cob_config} --libs)
+      (run sed "s/\\\\\\\\/\\\\\\\\\\\\\\\\/g")))))
 """
-static-macos-clibs = "zarith ${MACPORTS:-/usr/local/osxcross/macports/pkgs/opt/local}/lib/libgmp.a camlstr bigstringaf_stubs cstruct_stubs"
-static-macos-ldflags = "-L%{env:GNUCOBOL4_LIBDIR=/opt/gnucobol-4.x/lib} -lcob"
+static-clibs = "%{read:libcob_libs}"
+static-macos-clibs = "zarith ${MACPORTS:-/usr/local/osxcross/macports/pkgs/opt/local}/lib/libgmp.a camlstr bigstringaf_stubs cstruct_stubs ezlibcob_stubs"
 static-alpine-clibs = "zarith gmp bigstringaf_stubs cstruct_stubs"
-static-mingw64-ldflags = "-L%{env:GNUCOBOL4_LIBDIR=/opt/gnucobol-4.x/lib} -lcob"

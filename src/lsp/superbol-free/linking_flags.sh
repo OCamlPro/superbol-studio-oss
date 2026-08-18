@@ -53,7 +53,10 @@ case "$1" in
                 echo2 ' -cclib -Wl,-Bstatic'
                 echo2 ' -cclib -static-libgcc'
                 for l in $COMMON_LIBS; do
-                    echo2 " -cclib -l$l"
+                    if [ "${l#-}" != "${l}" ]
+                    then echo2 " -cclib $l"
+                    else echo2 " -cclib -l$l"
+                    fi
                 done
                 echo2 ' -cclib -static)'
                 ;;
@@ -64,22 +67,27 @@ case "$1" in
         esac
         ;;
     macosx)
+        shift
         COMMON_LIBS="zarith ${MACPORTS:-/usr/local/osxcross/macports/pkgs/opt/local}/lib/libgmp.a camlstr bigstringaf_stubs cstruct_stubs unix"
-        FLAGS=""
         # `m` and `pthread` are built-in in libSystem
         echo2 '(-noautolink'
-        for l in $COMMON_LIBS; do
-            if [ "${l%.a}" != "${l}" ]; then echo2 " -cclib $l"
+        for l in $COMMON_LIBS $@; do
+            if [ "${l%.a}" != "${l}" ] || [ "${l#-}" != "${l}" ]
+            then echo2 " -cclib $l"
             else echo2 " -cclib -l$l"
             fi
         done
-        for l in $FLAGS; do echo2 " -cclib $l"; done
         echo2 ')'
         ;;
     mingw64)
-        FLAGS=""
-        echo2 '(';
-        for l in $FLAGS; do echo2 " -cclib $l"; done
+        shift
+        echo2 '('
+        for l in $@; do
+            if [ "${l%.a}" != "${l}" ] || [ "${l#-}" != "${l}" ]
+            then echo2 " -cclib $l"
+            else echo2 " -cclib -l$l"
+            fi
+        done
         echo2 ')'
         ;;
     *)

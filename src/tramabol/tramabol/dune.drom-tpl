@@ -12,7 +12,7 @@
   )
 
 ; Use `static-clibs` to specify static C libs (without lib prefix)
-; and `static-macos-clibs`, `static-macos-ldflags`, `static-mingw64-ldflags` and `static-alpine-clibs` for system specific deps
+; and `static-macos-clibs` and `static-alpine-clibs` for system specific deps
 (rule
   (targets linking.sexp)
   (deps (file linking_flags.sh) (env_var LINKING_MODE) !(linking-deps))
