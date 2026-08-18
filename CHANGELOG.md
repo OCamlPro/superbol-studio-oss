@@ -2,6 +2,9 @@
 
 ## [_] Next release
 
+### Added
+- Parsing of abbreviated conditions in EVALUATE WHEN clauses [#638](https://github.com/OCamlPro/superbol-studio-oss/pull/638)
+
 ### Fixed
 - Grammar rules for `VALUE OF` clause [#629](https://github.com/OCamlPro/superbol-studio-oss/pull/629) (fix for [Issue #625](https://github.com/OCamlPro/superbol-studio-oss/issues/625))
 
