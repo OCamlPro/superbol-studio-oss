@@ -61,17 +61,30 @@
 
 
 (rule
+ (targets cob_config)
+ (enabled_if (= %{context_name} "default"))
+ (action (with-stdout-to %{targets}
+   (echo %{env:GNUCOBOL4_COB_CONFIG=cob-config}))))
+
+(rule
+ (targets cob_config)
+ (enabled_if (<> %{context_name} "default"))
+ (action (with-stdout-to %{targets}
+   (echo %{env:GNUCOBOL4_COB_CONFIG_HOST=cob-config}))))
+
+
+(rule
  (targets libcob_incdir)
  (enabled_if (<> %{os_type} Win32))
  (action (with-stdout-to %{targets}
-   (run %{env:GNUCOBOL4_COB_CONFIG=cob-config} --includedir))))
+   (run %{read:cob_config} --includedir))))
 
 (rule
  (targets libcob_incdir)
  (enabled_if (= %{os_type} Win32))
  (action (with-stdout-to %{targets}
    (pipe-stdout
-     (run sh %{env:GNUCOBOL4_COB_CONFIG=cob-config} --includedir)
+     (run sh %{read:cob_config} --includedir)
      (run sed "s/\\\\/\\\\\\\\/g")))))
 
 
@@ -80,7 +93,7 @@
  (enabled_if (<> %{os_type} Win32))
  (action (with-stdout-to %{targets}
   (progn (echo "(")
-         (run %{env:GNUCOBOL4_COB_CONFIG=cob-config} --cflags)
+         (run %{read:cob_config} --cflags)
          (echo ")")))))
 
 (rule
@@ -89,26 +102,43 @@
  (action (with-stdout-to %{targets}
   (progn (echo "(")
          (pipe-stdout
-           (run sh %{env:GNUCOBOL4_COB_CONFIG=cob-config} --cflags)
+           (run sh %{read:cob_config} --cflags)
            (run sed "s/\\\\/\\\\\\\\/g"))
          (echo ")")))))
 
 
+; Note: we require ${GNUCOBOL4_LIBDIR}/libcob-bundle to be available when cross-compiling for OSX:
 (rule
  (targets libcob_libs)
- (enabled_if (<> %{os_type} Win32))
+ (enabled_if (= %{context_name} "default.osx"))
  (action (with-stdout-to %{targets}
   (progn (echo "(")
-         (run %{env:GNUCOBOL4_COB_CONFIG=cob-config} --libs)
+         (echo -L%{env:GNUCOBOL4_LIBDIR=/opt/gnucobol-4.x/lib}/libcob-bundle -lcob)
          (echo ")")))))
 
 (rule
  (targets libcob_libs)
- (enabled_if (= %{os_type} Win32))
+ (enabled_if (= %{context_name} "default.windows"))
+ (action (with-stdout-to %{targets}
+  (progn (echo "(")
+         (echo -L%{env:GNUCOBOL4_LIBDIR=/opt/gnucobol-4.x/lib} -lcob)
+         (echo ")")))))
+
+(rule
+ (targets libcob_libs)
+ (enabled_if (and (= %{context_name} "default") (<> %{os_type} Win32)))
+ (action (with-stdout-to %{targets}
+  (progn (echo "(")
+         (run %{read:cob_config} --libs)
+         (echo ")")))))
+
+(rule
+ (targets libcob_libs)
+ (enabled_if (and (= %{context_name} "default") (= %{os_type} Win32)))
  (action (with-stdout-to %{targets}
   (progn (echo "(")
          (pipe-stdout
-           (run sh %{env:GNUCOBOL4_COB_CONFIG=cob-config} --libs)
+           (run sh %{read:cob_config} --libs)
            (run sed "s/\\\\/\\\\\\\\/g"))
          (echo ")")))))
 

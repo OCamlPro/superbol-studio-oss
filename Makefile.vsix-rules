@@ -31,9 +31,6 @@ DOT_EXE = $(if $(filter win32,$(TARGET_PLAT)),.exe)
 TARGET_PROFILE ?= release
 TARGET_VSIX = $(TARGET_NAME)-$(VERSION)-$(TARGET_SPEC)-$(TARGET_PROFILE).vsix
 
-# For `all-*` targets
-TARGET_PLATFORMS ?= linux # win32 darwin
-
 # ---
 
 STUDIO_JS = $(STUDIO_SRCDIR)/$(STUDIO).bc.js
@@ -154,13 +151,7 @@ bundle-release: $(JS_TARGETS)
 
 # packaging
 
-.PHONY: vsix-dist-setup vsix-package vsix-debug vsix-release	\
-	all-vsix-debug-packages					\
-	all-vsix-debug						\
-	all-vsix-release-packages				\
-	all-vsix-release					\
-	all-vsix-packages					\
-	all-vsix
+.PHONY: vsix-dist-setup vsix-package vsix-debug vsix-release
 
 gnucobol-config: $(GNUCOBOL_SRCDIR)/config
 	@mkdir -p $@
@@ -186,24 +177,12 @@ vsix-release: build-release
 vsix-debug: build-debug
 	$(MAKE) vsix-package TARGET_PROFILE=debug
 
-all-vsix-release all-vsix-release-packages:
-	for plat in $(TARGET_PLATFORMS); do			\
-		$(MAKE) vsix-release TARGET_PLAT=$${plat};	\
-	done
-
-all-vsix-debug all-vsix-debug-packages:
-	for plat in $(TARGET_PLATFORMS); do			\
-		$(MAKE) vsix-debug TARGET_PLAT=$${plat};	\
-	done
-
-all-vsix all-vsix-packages: all-vsix-debug-packages all-vsix-release-packages
-
 vsix-clean: clean
 	rm -rf $(JS_OUTDIR) gnucobol-config _dist *.vsix
 
 # publishing (requires vsce/ovsx login)
 
-.PHONY: ovsx-deploy vsce-deploy deploy-all
+.PHONY: ovsx-deploy vsce-deploy
 
 vsce-deploy:
 	$(NPX) vsce publish $(VSCE_ARGS) $(VSCE_PUBLISH_ARGS)	\
@@ -213,12 +192,6 @@ ovsx-deploy:
 #	Note: should fail in case of duplicate version
 	$(NPX) ovsx publish $(VSCE_ARGS) $(OVSX_PUBLISH_ARGS)	\
 	        --packagePath $(TARGET_VSIX)
-
-deploy-all: # Make sure to run target `all-vsix-release-packages` beforehand
-#	$(MAKE) all-vsix-release-packages;
-	for plat in $(TARGET_PLATFORMS); do				\
-		$(MAKE) ovsx-deploy vsce-deploy TARGET_PROFILE=release;	\
-	done
 
 # vsix-specific cleanup
 
