@@ -19,7 +19,7 @@ let loc_of_edit ~filename e =
   }
 
 let error ?loc fmt =
-  Printf.kprintf
+  Printf.ksprintf
     (fun s ->
       Printf.eprintf "Error";
       begin
@@ -33,7 +33,7 @@ let error ?loc fmt =
     fmt
 
 let warning ?loc fmt =
-  Printf.kprintf
+  Printf.ksprintf
     (fun s ->
       Printf.eprintf "Warning";
       begin
