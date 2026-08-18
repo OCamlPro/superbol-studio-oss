@@ -18,11 +18,21 @@ open Srcloc.INFIX
 let neg_condition ~neg (c: 'r cond with_loc): 'r cond =
   if not neg then ~&c else Not c
 
-let cast_no_rel_cond (c: no_rel cond): 'r cond = 
-    (* OCaml typechecker is not clever enough to deduce that no_rel cond and 
-       'r. 'r cond are equivalent. We use Obj.magic to allow the cast without 
-       rebuilding recursiveley the full condition. *)
-    Obj.magic c 
+(* OCaml typechecker only allows converting between no_rel cond and 'r cond by
+   rebuilding recursively the full condition. Keep this version to show type
+   equivalence. *)
+let rec cast_no_rel_cond: 'r. no_rel cond -> 'r cond = 
+  function 
+  | Expr e -> Expr e
+  | Relation _ -> .
+  | ClassCond (e, c) -> ClassCond (e, c)
+  | SignCond (e, s) -> SignCond (e, s)
+  | Omitted e -> Omitted e
+  | Not c -> Not (cast_no_rel_cond ~&c &@<- c)
+  | Logop (c1, op, c2) -> Logop (cast_no_rel_cond ~&c1 &@<- c1, op, cast_no_rel_cond ~&c2 &@<- c2)
+(* We can instead use an external %identity to bypass the typechecker limitation
+   and cast without rebuilding the full condition *)
+external cast_no_rel_cond: no_rel cond -> 'r cond = "%identity"
 
 (** [abbrev_condition_expansion_state] is used internally by [expand_abbrev_cond]
     to remember the previous subject and relational operator that are omitted
