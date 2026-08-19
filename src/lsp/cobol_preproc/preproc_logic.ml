@@ -156,8 +156,8 @@ let operands (a: ENV.value) (b: ENV.value) : matching_operands =
 
 let eval_condition ~(operator: Compdir_tree.condition_operator) a b =
   match operands a b, operator with
-  | Alpha (a, b), Eq -> a = b
-  | Alpha (a, b), Ne -> a <> b
+  | Alpha (a, b), Eq -> String.compare a.str b.str = 0
+  | Alpha (a, b), Ne -> String.compare a.str b.str <> 0
   | Alpha (a, b), Le
   | Alpha (b, a), Ge -> String.compare a.str b.str <= 0
   | Alpha (a, b), Lt
