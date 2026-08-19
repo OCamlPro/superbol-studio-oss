@@ -35,19 +35,21 @@ type boolean =
 
 let pp_integer = Pretty.string
 
-let fixed_of_strings i d =
+let fixed_of_strings ~integral ~fractional =
   {
-    fixed_integral = i;
-    fixed_fractional = d;
+    fixed_integral = integral;
+    fixed_fractional = fractional;
   }
+
+let fixed_zero = fixed_of_strings ~integral:"0" ~fractional:"1"
 
 let pp_fixed ppf { fixed_integral; fixed_fractional } =
   Pretty.print ppf "%s.%s" fixed_integral fixed_fractional
 
-let floating_of_strings i d e =
+let floating_of_strings ~integral ~fractional ~exponent =
   {
-    float_significand = fixed_of_strings i d;
-    float_exponent = e;
+    float_significand = fixed_of_strings ~integral ~fractional;
+    float_exponent = exponent;
   }
 
 let pp_floating ppf { float_significand = s; float_exponent = e } =
@@ -60,3 +62,5 @@ let boolean_of_string ?(base: [`Bool | `Hex] = `Bool) s =
     bool_base = base;
     bool_value = s;
   }
+
+let boolean_zero = boolean_of_string "0"

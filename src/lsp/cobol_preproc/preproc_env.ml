@@ -11,8 +11,23 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Environment for preprocessing and compilation.  Holds definitions of
+    preprocessor constants (preprocessor DEFINES, computation process
+    variables), along with compilation variables (78-level constants).
+
+    Accepted values for these preprocessor variables are:
+    - Alphanumerics;
+    - Booleans;
+    - Fixed-point numerics (no plain Integer, nor floating-points).
+
+    For now, the set of values for compilation variables is equivalent to that
+    of preprocessor variables. *)
+
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
+open Cobol_data.Types
+
+module VAL = Cobol_data.Value
 
 (** Utility module that maps any string to a physically unique upper-cased
     internal representation. *)
@@ -40,28 +55,39 @@ end
 module MAP = Map.Make (VAR)
 
 module TYPES = struct
-  type env = definition MAP.t
-  and var = VAR.t
-  and definition =
+  type env =
     {
-      def_loc: definition_loc;
-      def_value: value;
+      preproc_vars: preproc_var_definition MAP.t;
+      compil_vars: compilation_var_definition MAP.t;
     }
-  and definition_loc = preproc_loc
-  and 'a with_preproc_loc =
-    { pp_payload: 'a; pp_loc: preproc_loc }
-  and preproc_loc =
-    | Source_location of srcloc
-    | Process_parameter
-    | Process_environment
-    (* | Computed *)
-  and value =
-    | Alphanum of Cobol_data.Value.alphanum with_preproc_loc
-    | Boolean of Cobol_data.Value.boolean with_preproc_loc
-    | Numeric of Cobol_data.Value.fixed with_preproc_loc
 
-  exception UNDEFINED of var with_loc
-  exception REDEFINITION of { prev_def_loc: definition_loc }
+  and var = VAR.t
+
+  and preproc_var_definition =
+    compilation_variable_definition with_src
+
+  and compilation_var_definition =
+    compilation_variable_definition with_src       (* same for now (not sure) *)
+
+  and compilation_variable_definition =
+    {
+      compvar: var;
+      compvar_value: value with_src;
+    }
+
+  and value =
+    | Alphanum of Cobol_data.Types.alphanum_value
+    | Boolean of Cobol_data.Types.boolean_value
+    | Numeric of Cobol_data.Types.fixed_value
+
+  type var_definition =
+    | Preproc_var of preproc_var_definition
+    | Compilation_var of compilation_var_definition
+
+  type lookup_error =
+    | Undefined
+
+  exception REDEFINITION of { prev_def_src: src }
 end
 include TYPES
 
@@ -70,46 +96,110 @@ type t = env
 (* pretty-printing *)
 
 let pp_value ppf = function
-  | Alphanum s -> Pretty.print ppf "%s" s.pp_payload
-  | Boolean b -> Pretty.print ppf "%a" Cobol_data.Value.pp_boolean b.pp_payload
-  | Numeric f -> Pretty.print ppf "%a" Cobol_data.Value.pp_fixed f.pp_payload
+  | Alphanum s -> Cobol_data.Printer.pp_alphanum_value ppf s
+  | Boolean b -> Cobol_data.Printer.pp_boolean_value ppf b
+  | Numeric f -> Cobol_data.Printer.pp_fixed_value ppf f
 
-let pp_definition ppf { def_value; _ } =
-  pp_value ppf def_value
+let pp_compilation_variable_definition ppf { compvar; compvar_value } =
+  Pretty.record [
+    Fmt.field "name" (fun () -> compvar) VAR.pp;
+    Fmt.field "value" (fun () -> compvar_value) (pp_with_src pp_value);
+  ] ppf ()
 
 let pp: t Pretty.printer = fun ppf map ->
   Pretty.list ~fopen:"@[<2>@<1>⦃ " ~fsep:",@ " ~fclose:" @<1>⦄@]"
-    Fmt.(box ~indent:2 @@ pair ~sep:(any " =>@ ") VAR.pp pp_definition)
-    ppf (MAP.bindings map)
+    Fmt.(box ~indent:2 @@ pair ~sep:(any " =>@ ") VAR.pp
+           (pp_with_src pp_compilation_variable_definition))
+    ppf (MAP.bindings map.preproc_vars)
 
 (* constructors *)
 
-let empty = MAP.empty
+let empty =
+  {
+    preproc_vars = MAP.empty;
+    compil_vars = MAP.empty;
+  }
 
-let var = VAR.of_string
-let var' = Cobol_common.Srcloc.map_payload var
+let var: string -> var = VAR.of_string
+let var': string with_loc -> var with_loc = Cobol_common.Srcloc.map_payload var
 
-let mem v = MAP.mem v
-let mem' v = MAP.mem ~&v
+let mem_preproc_var v env = MAP.mem v env.preproc_vars
+let mem_preproc_var' v env = MAP.mem ~&v env.preproc_vars
+
+let mem_compil_var v env = MAP.mem v env.compil_vars
+let mem_compil_var' v env = MAP.mem ~&v env.compil_vars
+
+let mem_var v env = mem_preproc_var v env || mem_compil_var v env
+let mem_var' v env = mem_preproc_var ~&v env || mem_compil_var ~&v env
 
 (* higher-level operations *)
 
-let definition_of ~var env : definition =
-  match MAP.find_opt ~&var env with
-  | None -> raise @@ UNDEFINED var
-  | Some value -> value
+let var_definition_of ~var ?(try_compil_vars = true) env
+  : (var_definition, lookup_error) result =
+  match MAP.find_opt ~&var env.preproc_vars with
+  | Some value ->
+      Ok (Preproc_var value)
+  | None ->
+      if try_compil_vars then
+        match MAP.find_opt ~&var env.compil_vars with
+        | Some value -> Ok (Compilation_var value)
+        | None -> Error Undefined
+      else
+        Error Undefined
 
-let define ~loc var value ?(override = false) (env: t) : t =
-  match MAP.find_opt ~&var env with
-  | Some { def_loc; _ } when not override ->
-      raise @@ REDEFINITION { prev_def_loc = def_loc }
+let register_preproc_var ~src var value env =
+  let def =
+    Cobol_common.Srcloc.with_src ~src
+      { compvar = var; compvar_value = value }
+  in
+  { env with
+    preproc_vars = MAP.add var def env.preproc_vars },
+  def
+
+let define_preproc_var ~loc var value ?(override = false) (env: t)
+  : t * preproc_var_definition =
+  match MAP.find_opt ~&var env.preproc_vars with
+  | Some { src; _ } when not override ->
+      raise @@ REDEFINITION { prev_def_src = src }
   | Some _ | None ->
-      MAP.add ~&var { def_loc = Source_location loc;
-                      def_value = value } env
+      register_preproc_var ~&var value env ~src:(Source_location loc)
 
-let define_process_parameter var value (env: t) : t =      (* always override *)
-  MAP.add var { def_loc = Process_parameter;
-                def_value = value } env
+let define_process_parameter var value (env: t) =          (* always override *)
+  register_preproc_var var value env ~src:Process_parameter
 
-let undefine var (env: t) : t =
-  MAP.remove ~&var env
+let undefine_preproc_var var (env: t) : t =
+  { env with preproc_vars = MAP.remove ~&var env.preproc_vars }
+
+(* --- *)
+
+let define_compilation_var ~loc var value (env: t)
+  : t * compilation_var_definition =
+  let def =
+    Cobol_common.Srcloc.with_loc_as_src ~loc
+      { compvar = ~&var; compvar_value = value }
+  in
+  { env with compil_vars = MAP.add ~&var def env.compil_vars },
+  def
+
+let find_compilation_var v env =
+  MAP.find_opt v env.compil_vars
+
+(* --- *)
+
+let alphanum_literal_value' (a: alphanum_literal with_loc) : value =
+  Alphanum ~&a
+
+let boolean_literal_value' (b: boolean_literal with_loc) : value =
+  Boolean ~&b.bool_value
+
+let numeric_literal_value' (f: fixed_literal with_loc) : value =
+  Numeric ~&f.fixed_value
+
+let alphanum_literal_value (a: alphanum_literal with_loc) : value with_src =
+  Cobol_common.Srcloc.with_loc_as_src ~loc:~@a (alphanum_literal_value' a)
+
+let boolean_literal_value (b: boolean_literal with_loc) : value with_src =
+  Cobol_common.Srcloc.with_loc_as_src ~loc:~@b (boolean_literal_value' b)
+
+let numeric_literal_value (f: fixed_literal with_loc) : value with_src =
+  Cobol_common.Srcloc.with_loc_as_src ~loc:~@f (numeric_literal_value' f)

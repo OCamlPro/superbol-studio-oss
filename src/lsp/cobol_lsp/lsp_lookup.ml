@@ -36,12 +36,18 @@ module TYPES = struct
     | Data_item of
         {
           full_qn: Cobol_ptree.qualname option;
-          def_loc: srcloc;
+          item_loc: srcloc;
         }
     | Proc_name of
         {
           qn: Cobol_ptree.qualname;
           in_section: Cobol_unit.Types.procedure_section option;
+        }
+    | Preproc_or_compilation_variable_ref of
+        {
+          def: Cobol_preproc.Env.var_definition;
+          use: [`Substitution | `Evaluation | `Definition];
+          loc: srcloc;
         }
 
   type name_definition =
@@ -117,10 +123,35 @@ let rec qualname_at_pos ~filename (qn: Cobol_ptree.qualname) pos =
 
 (* --- *)
 
-(** [element_at_position pos group] seeks the compilation unit name and qualified
-    name at the given position [pos], in typed compilation group [group]. *)
-let element_at_position ~uri pos group : element_at_position =
-  let filename = Lsp.Uri.to_path uri in
+(** [preproc_element_at_position ~filename pos artifacts] seeks a relevant
+    syntactic element at position [pos], using only parsing artifacts
+    [artifacts]. *)
+let preproc_element_at_position ~filename pos
+    (artifacts: Cobol_parser.Outputs.artifacts) =
+  let var_ref ~loc def use =
+    if Lsp_position.is_in_srcloc ~filename pos loc
+    then Some (Preproc_or_compilation_variable_ref { def; use; loc })
+    else None
+  in
+  List.find_map begin fun (event: Cobol_preproc.Trace.log_entry) ->
+    match event with
+    | Variable_definition { def = def; loc; _ } ->
+        var_ref ~loc def `Definition
+    | Variable_substitution { loc; def; _ } ->
+        var_ref ~loc (Compilation_var def) `Substitution
+    | Variable_evaluation { loc; def = Some def; _ } ->
+        var_ref ~loc def `Evaluation
+    | _ ->
+        None
+  end (Cobol_preproc.Trace.events artifacts.Cobol_parser.Outputs.pplog)
+
+(** [element_at_position ~filename pos group artifacts] seeks the compilation
+    unit name and relevant syntactic element at the given position [pos] in
+    [filename], in typed compilation group [group] with associated parsing
+    artifacts [artifacts]. *)
+let element_at_position ~filename pos (group: Cobol_unit.Types.group) artifacts
+  : element_at_position =
+  (* let filename = Lsp.Uri.to_path uri in *)
   let open struct
 
     type acc =
@@ -139,8 +170,6 @@ let element_at_position ~uri pos group : element_at_position =
         context = Data_decls;                       (* does not really matter *)
       }
 
-    let result acc = acc.elt
-
   end in
 
   let enter_context context ({ context = prev_context; _ } as acc) =
@@ -154,10 +183,10 @@ let element_at_position ~uri pos group : element_at_position =
   and on_data_name qn ({ elt; _ } as acc) =
     { acc with
       elt = { elt with element_at_position = Some (Data_name qn) } }
-  and on_data_item ?full_qn def_loc ({ elt; _ } as acc) =
+  and on_data_item ?full_qn item_loc ({ elt; _ } as acc) =
+    let element = Data_item { full_qn; item_loc } in
     { acc with
-      elt = { elt with element_at_position = Some (Data_item { full_qn;
-                                                               def_loc }) } }
+      elt = { elt with element_at_position = Some element } }
   and on_proc_name qn ({ elt; context } as acc) =
     let element_at_position = match context with
       | Data_decls -> Some (Proc_name { qn; in_section = None })   (* unlikely *)
@@ -231,7 +260,12 @@ let element_at_position ~uri pos group : element_at_position =
       | _ ->                        (* unknow/unimplemented kind of EXEC block *)
           acc
 
-  end group init |> result
+  end group init |> function
+  | { elt = { element_at_position = None; _ } as elt; _ } ->
+      let element = preproc_element_at_position ~filename pos artifacts in
+      { elt with element_at_position = element }
+  | acc ->
+      acc.elt
 
 (* --- *)
 
@@ -250,6 +284,8 @@ let last_cobol_unit_before_pos ~filename pos group =
       then Visitor.skip_children @@ Some ~&cu
       else Visitor.skip_children acc
   end group None
+
+(* --- *)
 
 let copy_at_pos ~filename pos ptree =
   Cobol_ptree.Visitor.fold_compilation_group object

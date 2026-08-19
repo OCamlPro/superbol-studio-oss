@@ -46,17 +46,19 @@ let cdtoks_of_word directive_kind
           ~f:begin fun t -> match ~&t with
             | CDEnd ->
                 Fun.id
-            | CDInt s ->
-                fixedlit (Cobol_ptree.fixed_of_strings s "1" &@<- t)
-            | CDFxd (n, _, f) ->
-                fixedlit (Cobol_ptree.fixed_of_strings n f &@<- t)
+            | CDInt integral ->
+                fixedlit (Cobol_ptree.fixed_of_strings
+                            ~integral ~fractional:"0" &@<- t)
+            | CDFxd (integral, _, fractional) ->
+                fixedlit (Cobol_ptree.fixed_of_strings
+                            ~integral ~fractional &@<- t)
             | CDTok tok ->
                 fun (toks, acc) -> List.cons (tok, ~@@t) toks, acc
           end
       in
       List.rev toks, acc
-  | Alphanum { knd = Basic; str; qte = _ } ->
-      [ALPHANUM str, ~@@word],
+  | Alphanum { knd = Basic; str; qte = quotation } ->
+      [ALPHANUM (Cobol_ptree.alphanum_of_string str ~quotation), ~@@word],
       acc
   | Alphanum { knd = Bool; str; qte = _ } ->
       boollit ~prefix_length:1 ~base:`Bool str

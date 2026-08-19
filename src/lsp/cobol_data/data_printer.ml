@@ -16,6 +16,18 @@ open Data_types
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 
+let pp_alphanum_value = Data_types.pp_alphanum_value
+let pp_boolean_value  = Data_value.pp_boolean
+let pp_integer_value  = Data_value.pp_integer
+let pp_fixed_value    = Data_value.pp_fixed_as_decimal
+let pp_floating_value = Data_value.pp_floating
+
+let pp_alphanum_literal = Data_types.pp_alphanum_literal
+let pp_boolean_literal  = Data_types.pp_boolean_literal
+let pp_integer_literal  = Data_types.pp_integer_literal
+let pp_fixed_literal    = Data_types.pp_fixed_literal
+let pp_floating_literal = Data_types.pp_floating_literal
+
 let pp_offset = Data_memory.pp_offset
 let pp_size = Data_memory.pp_size
 
