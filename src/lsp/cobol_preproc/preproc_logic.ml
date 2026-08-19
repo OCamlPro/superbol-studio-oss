@@ -158,12 +158,12 @@ let operands (a: ENV.value) (b: ENV.value) : matching_operands =
 
 let eval_condition ~(operator: Compdir_tree.condition_operator) a b =
   match operands a b, operator with
-  | Alpha (a, b), Eq -> String.compare a.str b.str = 0
-  | Alpha (a, b), Ne -> String.compare a.str b.str <> 0
+  | Alpha (a, b), Eq -> Cobol_data.Value.compare_alphanums a b = 0
+  | Alpha (a, b), Ne -> Cobol_data.Value.compare_alphanums a b <> 0
   | Alpha (a, b), Le
-  | Alpha (b, a), Ge -> String.compare a.str b.str <= 0
+  | Alpha (b, a), Ge -> Cobol_data.Value.compare_alphanums a b <= 0
   | Alpha (a, b), Lt
-  | Alpha (b, a), Gt -> String.compare a.str b.str < 0
+  | Alpha (b, a), Gt -> Cobol_data.Value.compare_alphanums a b < 0
   | Bool (a, b), Eq -> Z.equal a.bool_bits b.bool_bits
   | Bool (a, b), Ne -> not (Z.equal a.bool_bits b.bool_bits)
   | Bool (a, b), Le

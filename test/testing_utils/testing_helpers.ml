@@ -28,8 +28,7 @@ module Make (Tags: TAGS) = struct
       { ident_name = name x &@ Tags.loc; ident_subscripts = [] }
     let ident x : scalar = QualIdent (qualident x)
     let strlit str : scalar =
-      Alphanum { str; quotation = Double_quote; hexadecimal = false; runtime_repr = Native_bytes }
-
+      Alphanum (Cobol_ptree.alphanum_of_string str)
   end
 
   module Expr = struct

@@ -48,6 +48,7 @@ let dummy_literal =
 let dummy_alphanum =
   {
     str = alphanum__;
+    given_str = alphanum__;
     quotation = Double_quote;
     hexadecimal = false;
     runtime_repr = Native_bytes;

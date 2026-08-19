@@ -424,8 +424,8 @@ let acc_tokens_of_text_word (rev_prefix_tokens, state) { payload = c; loc } =
     then { state with lexer_state }
     else state
   in
-  let alphanum ~hexadecimal ?(repr = Cobol_ptree.Native_bytes) str quotation =
-    Cobol_ptree.{ str; hexadecimal; quotation; runtime_repr = repr }
+  let alphanum ~hexadecimal ?(zero_terminated = false) str quotation =
+    Cobol_ptree.alphanum_of_string ~quotation ~hexadecimal ~zero_terminated str
   and boollit ~base str =
     Cobol_ptree.boolean_of_string ~base str
   in
@@ -452,7 +452,7 @@ let acc_tokens_of_text_word (rev_prefix_tokens, state) { payload = c; loc } =
         tok @@ ALPHANUM (alphanum ~hexadecimal:true str qte)
     | Alphanum { knd = NullTerm; str; qte } ->
         tok @@ ALPHANUM (alphanum ~hexadecimal:false str qte
-                           ~repr:Null_terminated_bytes)
+                           ~zero_terminated:true)
     | Alphanum { knd = National | NationalX; str; _ } ->
         tok @@ NATLIT str                              (* TODO: differentiate *)
     | AlphanumPrefix { knd = Hex; str; qte }
