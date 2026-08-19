@@ -72,3 +72,55 @@ let%expect_test "boolean-value" =
         value: 1010
       }
     } |}];;
+
+let%expect_test "hexadecimal-value" =
+  dotest @@ prog "prog"
+    ~working_storage:{|
+       78 F VALUE  X"68656C6C6F20776F726C64".
+       78 G VALUE X"a68656C6C6F20776F726C64".
+       77 X VALUE F.
+       77 Y VALUE G.
+    |};
+  [%expect {|
+    prog.cob:6.7-6.20:
+       3          WORKING-STORAGE SECTION.
+       4          78 F VALUE  X"68656C6C6F20776F726C64".
+       5          78 G VALUE X"a68656C6C6F20776F726C64".
+       6 >        77 X VALUE F.
+    ----          ^^^^^^^^^^^^^
+       7          77 Y VALUE G.
+       8          PROCEDURE DIVISION.
+    Item definition: {
+      qualname: X
+      offset: 0
+      size: 88
+      layout: {
+        elementary
+        usage: {
+          display
+          category: ALPHANUMERIC(11)
+        }
+        value: X"68656C6C6F20776F726C64"/"hello world"
+      }
+    }
+    prog.cob:7.7-7.20:
+       4          78 F VALUE  X"68656C6C6F20776F726C64".
+       5          78 G VALUE X"a68656C6C6F20776F726C64".
+       6          77 X VALUE F.
+       7 >        77 Y VALUE G.
+    ----          ^^^^^^^^^^^^^
+       8          PROCEDURE DIVISION.
+       9
+    Item definition: {
+      qualname: Y
+      offset: 0
+      size: 96
+      layout: {
+        elementary
+        usage: {
+          display
+          category: ALPHANUMERIC(12)
+        }
+        value: X"a68656C6C6F20776F726C64"/"\nhello world"
+      }
+    } |}];;

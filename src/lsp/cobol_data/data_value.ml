@@ -52,6 +52,13 @@ let non_bool_bit ~base = function
 
 (* --- *)
 
+let compare_alphanums (a: alphanum_value) (b: alphanum_value) =
+  (* CHECKME: ignore runtime representaition attribute (Native_bytes or
+     Null_terminated_bytes) *)
+  String.compare a.str b.str
+
+(* --- *)
+
 let integer_zero = Z.zero
 let pp_integer = Z.pp_print
 let integer_of_string s =

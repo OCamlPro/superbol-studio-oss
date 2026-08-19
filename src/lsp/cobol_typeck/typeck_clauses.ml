@@ -156,10 +156,8 @@ let display_usage_from_literal: Cobol_ptree.literal -> usage =
     else None, String.length i
   in
   function
-  | Alphanum { str; hexadecimal = false; _ } ->
+  | Alphanum { str; _ } ->
       Display (PIC.alphanumeric ~size:(String.length str))
-  | Alphanum { str; hexadecimal = true; _ } ->
-      Display (PIC.alphanumeric ~size:(String.length str / 2))
   | Boolean { bool_base = `Bool; bool_value } ->
       Display (PIC.boolean (String.length bool_value))
   | Boolean { bool_base = `Hex; bool_value } ->
