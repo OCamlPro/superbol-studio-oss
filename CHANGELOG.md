@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Handling of data item documentation that spans over several lines [#???](https://github.com/OCamlPro/superbol-studio-oss/pull/???)
 - Parsing of abbreviated conditions in EVALUATE WHEN clauses [#638](https://github.com/OCamlPro/superbol-studio-oss/pull/638)
 - Support for 78-level data items [#634](https://github.com/OCamlPro/superbol-studio-oss/pull/634)
 

@@ -1652,6 +1652,8 @@ let%expect_test "hover-preproc-directives" =
       20
     Compilation variable with value 42.24
     ---
+     Some documentation for bis
+     ...
      on several lines.
     ---
     References: 1
@@ -1780,40 +1782,46 @@ let%expect_test "hover-comment" =
          02 VAL-1 PIC X. *> val1 only inline comment
       * val2 only line comment
          02 VAL-2 PIC X.
+      * val3 several line
+      * comments
+         02 VAL-3 PIC X.
+      * val4 several line
+      * comments and...
+         02 VAL-4 PIC X. *> an inline comment.
        PROCEDURE DIVISION.
-         DISPLAY S_|_TRUCT V_|_AL-1 V_|_AL-2.
+         DISPLAY S_|_TRUCT V_|_AL-1 V_|_AL-2 V_|_AL-3 V_|_AL-4.
          STOP RUN.
     |cobol};
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-    (line 12, character 18):
-    __rootdir__/prog.cob:13.17-13.23:
-      10         * val2 only line comment
-      11            02 VAL-2 PIC X.
-      12          PROCEDURE DIVISION.
-      13 >          DISPLAY STRUCT VAL-1 VAL-2.
+    (line 18, character 18):
+    __rootdir__/prog.cob:19.17-19.23:
+      16         * comments and...
+      17            02 VAL-4 PIC X. *> an inline comment.
+      18          PROCEDURE DIVISION.
+      19 >          DISPLAY STRUCT VAL-1 VAL-2 VAL-3 VAL-4.
     ----                    ^^^^^^
-      14            STOP RUN.
-      15
+      20            STOP RUN.
+      21
     ```cobol
     STRUCT
     ```
-    Group of 2 subfields
-    Size: 2 bytes
+    Group of 4 subfields
+    Size: 4 bytes
     ---
      inline comment
     ---
     References: 2
-    (line 12, character 25):
-    __rootdir__/prog.cob:13.24-13.29:
-      10         * val2 only line comment
-      11            02 VAL-2 PIC X.
-      12          PROCEDURE DIVISION.
-      13 >          DISPLAY STRUCT VAL-1 VAL-2.
+    (line 18, character 25):
+    __rootdir__/prog.cob:19.24-19.29:
+      16         * comments and...
+      17            02 VAL-4 PIC X. *> an inline comment.
+      18          PROCEDURE DIVISION.
+      19 >          DISPLAY STRUCT VAL-1 VAL-2 VAL-3 VAL-4.
     ----                           ^^^^^
-      14            STOP RUN.
-      15
+      20            STOP RUN.
+      21
     ```cobol
     VAL-1 IN STRUCT
     ```
@@ -1825,15 +1833,15 @@ let%expect_test "hover-comment" =
      val1 only inline comment
     ---
     References: 2
-    (line 12, character 31):
-    __rootdir__/prog.cob:13.30-13.35:
-      10         * val2 only line comment
-      11            02 VAL-2 PIC X.
-      12          PROCEDURE DIVISION.
-      13 >          DISPLAY STRUCT VAL-1 VAL-2.
+    (line 18, character 31):
+    __rootdir__/prog.cob:19.30-19.35:
+      16         * comments and...
+      17            02 VAL-4 PIC X. *> an inline comment.
+      18          PROCEDURE DIVISION.
+      19 >          DISPLAY STRUCT VAL-1 VAL-2 VAL-3 VAL-4.
     ----                                 ^^^^^
-      14            STOP RUN.
-      15
+      20            STOP RUN.
+      21
     ```cobol
     VAL-2 IN STRUCT
     ```
@@ -1843,6 +1851,47 @@ let%expect_test "hover-comment" =
     ALPHANUMERIC(1)
     ---
      val2 only line comment
+    ---
+    References: 2
+    (line 18, character 37):
+    __rootdir__/prog.cob:19.36-19.41:
+      16         * comments and...
+      17            02 VAL-4 PIC X. *> an inline comment.
+      18          PROCEDURE DIVISION.
+      19 >          DISPLAY STRUCT VAL-1 VAL-2 VAL-3 VAL-4.
+    ----                                       ^^^^^
+      20            STOP RUN.
+      21
+    ```cobol
+    VAL-3 IN STRUCT
+    ```
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
+    ALPHANUMERIC(1)
+    ---
+     val3 several line
+     comments
+    ---
+    References: 2
+    (line 18, character 43):
+    __rootdir__/prog.cob:19.42-19.47:
+      16         * comments and...
+      17            02 VAL-4 PIC X. *> an inline comment.
+      18          PROCEDURE DIVISION.
+      19 >          DISPLAY STRUCT VAL-1 VAL-2 VAL-3 VAL-4.
+    ----                                             ^^^^^
+      20            STOP RUN.
+      21
+    ```cobol
+    VAL-4 IN STRUCT
+    ```
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
+    ALPHANUMERIC(1)
+    ---
+     an inline comment.
     ---
     References: 2 |}];;
 
