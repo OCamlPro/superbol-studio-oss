@@ -22,9 +22,9 @@ module Positions = Set.Make (struct
   end)
 
 type context =
-  | ProcedureDiv
-  | DataDiv
-  | None
+  | Procedure_division
+  | Data_division
+  | Global_context
 
 let enter_context context (prev_context, acc) =
   Cobol_common.Visitor.do_children_and_then (context, acc)
@@ -42,17 +42,17 @@ let positions ~uri group artifacts =
   Cobol_unit.Visitor.fold_unit_group object (v)
     inherit [_] Cobol_unit.Visitor.folder
     method! fold_procedure _ =
-      enter_context ProcedureDiv
+      enter_context Procedure_division
     method! fold_data_definitions _ =
-      enter_context DataDiv
+      enter_context Data_division
     method! fold_paragraph' _ =
       Cobol_common.Visitor.skip
     method! fold_procedure_name' =
-      take_when_in ProcedureDiv
+      take_when_in Procedure_division
     method! fold_qualname' =
-      take_when_in DataDiv
+      take_when_in Data_division
     method! fold_record_renaming { renaming_name; _ } =
-      take_when_in DataDiv renaming_name
+      take_when_in Data_division renaming_name
     method! fold_field_definition { field_qualname; field_redefines;
                                     field_leading_ranges;
                                     field_offset; field_size; field_layout;
@@ -79,7 +79,7 @@ let positions ~uri group artifacts =
         |> Cobol_data.Visitor.fold_table_range v table_range
         |> Cobol_data.Visitor.fold_item_redefinitions v table_redefinitions
       end
-  end group (None, Positions.empty) |>
+  end group (Global_context, Positions.empty) |>
   snd |>
   Cobol_preproc.Trace.fold artifacts.Cobol_parser.Outputs.pplog
     ~f:begin fun event positions ->

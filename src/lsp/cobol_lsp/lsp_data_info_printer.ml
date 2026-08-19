@@ -287,7 +287,7 @@ let pp_compilation_data ppf def =
        | Source_location _ ->
            ()
        | Process_parameter ->
-           Fmt.pf ppf "@ (given@ as@ process@ paramter)"
+           Fmt.pf ppf "@ (given@ as@ process@ parameter)"
        | Process_environment ->
            Fmt.pf ppf "@ (defined@ in@ process@ environment)")
 

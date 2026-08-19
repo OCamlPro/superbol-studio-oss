@@ -11,18 +11,17 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Environment for preprocessing and compilation.  Holds defintions of
-    preprocessor constants (preprocessor DEFINES, compulation process
+(** Environment for preprocessing and compilation.  Holds definitions of
+    preprocessor constants (preprocessor DEFINES, computation process
     variables), along with compilation variables (78-level constants).
-
 
     Accepted values for these preprocessor variables are:
     - Alphanumerics;
     - Booleans;
     - Fixed-point numerics (no plain Integer, nor floating-points).
 
-    For now, the set of values for compilation variables if equivalent to that
-    of preprocssor variables. *)
+    For now, the set of values for compilation variables is equivalent to that
+    of preprocessor variables. *)
 
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
@@ -32,7 +31,7 @@ module VAL = Cobol_data.Value
 
 (** Utility module that maps any string to a physically unique upper-cased
     internal representation. *)
-(* TODO: Maybe move that ot cobol_data as well *)
+(* TODO: Maybe move that to cobol_data as well *)
 module VAR: sig
   type t
   val pp: t Pretty.printer

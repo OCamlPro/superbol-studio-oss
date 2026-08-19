@@ -42,7 +42,8 @@
 ; (enabled_if (= %{profile} "universal")))
 
 
-; Note: ${GNUCOBOL4_LIBDIR}/libcob-bundle is required when cross-compiling.
+; Note: ${GNUCOBOL4_LIBDIR}/libcob-bundle is required when
+; cross-compiling for OSX.
 (rule
  (targets libcob_libs)
  (enabled_if (= %{context_name} "default.osx"))

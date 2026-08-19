@@ -107,7 +107,8 @@
          (echo ")")))))
 
 
-; Note: we require ${GNUCOBOL4_LIBDIR}/libcob-bundle to be available when cross-compiling for OSX:
+; Note: ${GNUCOBOL4_LIBDIR}/libcob-bundle is required when
+; cross-compiling for OSX.
 (rule
  (targets libcob_libs)
  (enabled_if (= %{context_name} "default.osx"))

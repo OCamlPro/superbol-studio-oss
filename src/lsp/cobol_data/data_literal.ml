@@ -69,7 +69,7 @@ let fixed ({ payload = literal; loc }: Cobol_ptree.fixed with_loc)
 let fixed_zero: fixed_literal =
   {
     fixed_ptree = Cobol_ptree.fixed_zero;
-    fixed_value = VAL.fixed_of_strings ~integral:"0" ~fractional:"1";
+    fixed_value = VAL.fixed_of_strings ~integral:"0" ~fractional:"0";
   }
 
 let of_fixed_value: fixed_value -> fixed_literal = fun v ->
