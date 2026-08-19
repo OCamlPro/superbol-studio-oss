@@ -598,27 +598,26 @@ type data_definition =
 
 let doc_of_datadef ~rev_comments ~filename data_def =
   let definition_comment def_loc =
-    let definition_lexloc = Cobol_common.Srcloc.as_lexloc def_loc in
-    let definition_filename = (fst definition_lexloc).pos_fname in
-    if not (String.equal filename definition_filename)    (* def is in copybook *)
+    let def_lexloc = Cobol_common.Srcloc.as_lexloc def_loc in
+    let def_filename = (fst def_lexloc).pos_fname in
+    if not (String.equal filename def_filename)      (* def is in copybook *)
     then ""
     else
-      let definition_range =
-        Lsp_position.range_of_srcloc_in ~filename def_loc
-      in
-      let definition_line = definition_range.start.line in
-      List.find_map begin fun Cobol_preproc.Text.{ comment_loc; comment_kind;
-                                                   comment_contents = c } ->
+      let def_range = Lsp_position.range_of_srcloc_in ~filename def_loc in
+      List.fold_left begin fun (rev_comments, consider_line)
+        Cobol_preproc.Text.{ comment_loc; comment_kind; comment_contents = c } ->
         let comment_range = Lsp_position.range_of_lexloc comment_loc in
-        let comment_line = comment_range.start.line in
-        if definition_line = comment_line
-        then Some (String.sub c 2 (String.length c - 2))
-        else if definition_line = comment_line + 1 && comment_kind == `Line
-        then Some (String.sub c 1 (String.length c - 1))
-        else None
-      end rev_comments |> function
-      | Some c -> c
-      | None -> ""
+        match comment_kind with
+        | `Floating ->
+            if comment_range.start.line == consider_line
+            then String.sub c 2 (String.length c - 2) :: rev_comments, -1
+            else rev_comments, consider_line
+        | `Line ->
+            if comment_range.start.line + 1 == consider_line
+            then String.sub c 1 (String.length c - 1) :: rev_comments,
+                 consider_line - 1
+            else rev_comments, consider_line
+      end ([], def_range.start.line) rev_comments |> fst |> String.concat "\n"
   in
   match data_def with
   | Preproc Compilation_var { src = Process_parameter; _ }
