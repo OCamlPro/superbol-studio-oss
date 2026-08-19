@@ -179,23 +179,34 @@ let eval_condition ~(operator: Compdir_tree.condition_operator) a b =
 
 
 let eval_defined_condition var polarity env =
-  match ENV.var_definition_of ~try_compil_vars:false ~var env with
+  match ENV.var_definition_of (* ~try_compil_vars:false *) ~var env with
   | Ok def ->
       OUT.result (polarity, [var_eval var ~def])                      (* use! *)
   | Error Undefined ->
       OUT.result (not polarity, [var_eval var])                         (* use! *)
 
-let eval_set_conditon ~loc var polarity env =
+let eval_set_condition ~loc var polarity env =
   let diags = Preproc_diagnostics.none in
   let item = Set_condition_directive { assumed_set = false } in
   let def =
-    match ENV.var_definition_of ~try_compil_vars:false ~var env with
+    match ENV.var_definition_of (* ~try_compil_vars:false *) ~var env with
     | Ok def ->
         Some def
     | Error Undefined ->
         None
   in
-  OUT.result (not polarity, [var_eval var ?def])
+  let set =
+    match def with
+    | None ->
+        false
+    | Some Preproc_var def | Some Compilation_var def ->
+        match def.src_payload.compvar_value.src_payload with
+        | Boolean b ->
+            not (Z.equal b.bool_bits Z.zero)
+        | Alphanum _ | Numeric _ ->                                 (* CHECKME *)
+            false
+  in
+  OUT.result (set = polarity, [var_eval var ?def])
     ~diags:(warn diags @@ Ignored { loc; item })
 
 let eval_value_condition ~loc var polarity env =
@@ -242,7 +253,7 @@ let eval_boolexpr env
   | Defined_condition { var; polarity } ->
       eval_defined_condition var polarity env
   | Set_condition { var; polarity } ->
-      eval_set_conditon ~loc:~@e var polarity env
+      eval_set_condition ~loc:~@e var polarity env
   | Value_condition { var; polarity } ->
       eval_value_condition ~loc:~@e var polarity env
   | Constant_condition { left_operand = l; right_operand = r;

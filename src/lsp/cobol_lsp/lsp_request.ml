@@ -360,15 +360,15 @@ let ppenv_var_reference_locs (loc_translator: Lsp_position.translator)
   List.filter_map begin fun (event: Cobol_preproc.Trace.log_entry) ->
     match ppvar_def, event with
     | Compilation_var compvar_def,
-      (* | Cobol_preproc.Trace.Variable_definition _ / filter out definition locs *)
+      (* | Variable_definition _ / filter out definition locs *)
       (Variable_substitution { loc; def; _ } |
        Variable_evaluation { loc; def = Some Compilation_var def; _ }) ->
-        if def == compvar_def                             (* CHECKME: phys. eq *)
+        if def == compvar_def (* Note: assumes sharing btw map and log entries *)
         then Some (loc_translator.location_of_srcloc loc)
         else None
     | Preproc_var ppvar_def,
       Variable_evaluation { loc; def = Some Preproc_var def; _ } ->
-        if def == ppvar_def                               (* CHECKME: phys. eq *)
+        if def == ppvar_def   (* Note: assumes sharing btw map and log entries *)
         then Some (loc_translator.location_of_srcloc loc)
         else None
     | _ ->

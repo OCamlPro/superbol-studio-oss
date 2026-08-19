@@ -110,7 +110,7 @@ let pp: t Pretty.printer = fun ppf map ->
   Pretty.list ~fopen:"@[<2>@<1>⦃ " ~fsep:",@ " ~fclose:" @<1>⦄@]"
     Fmt.(box ~indent:2 @@ pair ~sep:(any " =>@ ") VAR.pp
            (pp_with_src pp_compilation_variable_definition))
-    ppf (MAP.bindings map.preproc_vars)
+    ppf (MAP.bindings map.preproc_vars @ MAP.bindings map.compil_vars)
 
 (* constructors *)
 

@@ -41,7 +41,8 @@ let fixed_of_strings ~integral ~fractional =
     fixed_fractional = fractional;
   }
 
-let fixed_zero = fixed_of_strings ~integral:"0" ~fractional:"1"
+let fixed_zero =
+  fixed_of_strings ~integral:"0" ~fractional:"0"
 
 let pp_fixed ppf { fixed_integral; fixed_fractional } =
   Pretty.print ppf "%s.%s" fixed_integral fixed_fractional
