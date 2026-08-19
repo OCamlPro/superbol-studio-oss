@@ -18,17 +18,9 @@
 ; and `static-macos-clibs` and `static-alpine-clibs` for system specific deps
 (rule
   (targets linking.sexp)
-  (enabled_if (<> %{ocaml-config:system} mingw64))
-  (deps (file linking_flags.sh))
+  (deps (file linking_flags.sh) (env_var LINKING_MODE) )
   (action  (with-stdout-to %{targets}
-    (run bash linking_flags.sh linking.sexp %{env:LINKING_MODE=dynamic} %{ocaml-config:system} ))))
-
-(rule
-  (targets linking.sexp)
-  (enabled_if (= %{ocaml-config:system} mingw64))
-  (deps (file linking_flags.sh))
-  (action  (with-stdout-to %{targets}
-    (run bash -c "echo '()' > linking.sexp"))))
+    (run bash linking_flags.sh linking.sexp %{env:LINKING_MODE=dynamic} %{ocaml-config:system} %{read:libcob_libs}))))
 
 
 (documentation
@@ -48,4 +40,34 @@
 ; (name build)
 ; (deps (glob_files *.bc.js))
 ; (enabled_if (= %{profile} "universal")))
+
+
+; Note: ${GNUCOBOL4_LIBDIR}/libcob-bundle is required when cross-compiling.
+(rule
+ (targets libcob_libs)
+ (enabled_if (= %{context_name} "default.osx"))
+  (action (with-stdout-to %{targets}
+    (progn
+      (echo -L%{env:GNUCOBOL4_LIBDIR=/opt/gnucobol-4.x/lib}/libcob-bundle " ")
+      (run %{read:../ezlibcob/cob_config} --libs)))))
+
+(rule
+ (targets libcob_libs)
+ (enabled_if (= %{context_name} "default.windows"))
+ (action (with-stdout-to %{targets}
+   (echo ""))))
+
+(rule
+ (targets libcob_libs)
+ (enabled_if (and (= %{context_name} "default") (<> %{os_type} Win32)))
+ (action (with-stdout-to %{targets}
+   (run %{read:../ezlibcob/cob_config} --libs))))
+
+(rule
+ (targets libcob_libs)
+ (enabled_if (and (= %{context_name} "default") (= %{os_type} Win32)))
+ (action (with-stdout-to %{targets}
+   (pipe-stdout
+      (run sh %{read:../ezlibcob/cob_config} --libs)
+      (run sed "s/\\\\/\\\\\\\\/g")))))
 

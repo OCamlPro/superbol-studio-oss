@@ -841,7 +841,6 @@ AT_CLEANUP
 
 AT_SETUP([MF WHEN COND AND COND])
 
-# promoted on 2024-04-05T13:38
 AT_DATA([prog.cob], [
        program-id. GetFlyerLevel.
        procedure division.
@@ -852,20 +851,10 @@ AT_DATA([prog.cob], [
        end program.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
 [Checking `prog.cob'
 ],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
-prog.cob:5.28-5.31:
-   2          program-id. GetFlyerLevel.
-   3          procedure division.
-   4              evaluate lnk-award-points
-   5 >                 when >= 300 and < 700
-----                               ^^^
-   6                      move "Silver" to lnk-award-level
-   7              end-evaluate.
->> Error: Invalid syntax
-
 ])
 
 AT_CLEANUP

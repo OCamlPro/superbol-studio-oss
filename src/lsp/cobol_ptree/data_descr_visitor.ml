@@ -458,8 +458,8 @@ let fold_validation_clause (v: _ #folder) =
       | Class c -> fold_class_clause v c
       | Default i -> fold_option ~fold:fold_ident_or_literal v i
       | Destination i -> fold_list ~fold:fold_ident v i
-      | InvalidWhen c -> fold_list ~fold:fold_cond' v c
-      | PresentWhen c -> fold_cond' v c
+      | InvalidWhen c -> fold_list ~fold:fold_condition' v c
+      | PresentWhen c -> fold_condition' v c
       | Varying l -> fold_list ~fold:fold_data_varying v l
       | ValidateStatus { is_; when_; on; for_ } -> ignore (when_, on); fun x -> x
         >> fold_ident_or_literal v is_

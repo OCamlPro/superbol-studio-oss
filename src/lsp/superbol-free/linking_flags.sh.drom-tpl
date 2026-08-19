@@ -53,7 +53,10 @@ case "$1" in
                 echo2 ' -cclib -Wl,-Bstatic'
                 echo2 ' -cclib -static-libgcc'
                 for l in $COMMON_LIBS; do
-                    echo2 " -cclib -l$l"
+                    if [ "${l#-}" != "${l}" ]
+                    then echo2 " -cclib $l"
+                    else echo2 " -cclib -l$l"
+                    fi
                 done
                 echo2 ' -cclib -static)'
                 ;;
@@ -64,17 +67,30 @@ case "$1" in
         esac
         ;;
     macosx)
+        shift
         COMMON_LIBS="!(static-macos-clibs) unix"
         # `m` and `pthread` are built-in in libSystem
         echo2 '(-noautolink'
-        for l in $COMMON_LIBS; do
-            if [ "${l%.a}" != "${l}" ]; then echo2 " -cclib $l"
+        for l in $COMMON_LIBS $@; do
+            if [ "${l%.a}" != "${l}" ] || [ "${l#-}" != "${l}" ]
+            then echo2 " -cclib $l"
+            else echo2 " -cclib -l$l"
+            fi
+        done
+        echo2 ')'
+        ;;
+    mingw64)
+        shift
+        echo2 '('
+        for l in $@; do
+            if [ "${l%.a}" != "${l}" ] || [ "${l#-}" != "${l}" ]
+            then echo2 " -cclib $l"
             else echo2 " -cclib -l$l"
             fi
         done
         echo2 ')'
         ;;
     *)
-        echo "Static linking is not supported for your platform. See $0 to contribute." >&2
+        echo "Static linking is not supported for your platform ($1). See $0 to contribute." >&2
         exit 3
 esac

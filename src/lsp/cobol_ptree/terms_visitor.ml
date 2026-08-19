@@ -63,8 +63,8 @@ class ['a] folder = object
   method fold_expr: (expr, 'a) fold = default
   method fold_expr': (expr with_loc, 'a) fold = default
   method fold_class: (class_, 'a) fold = default
-  method fold_cond: (cond, 'a) fold = default
-  method fold_cond': (cond with_loc, 'a) fold = default
+  method fold_condition: (condition, 'a) fold = default
+  method fold_condition': (condition with_loc, 'a) fold = default
   method fold_abbrev_relation_operand: (abbrev_relation_operand, 'a) fold = default
   method fold_abbrev_relation_operand': (abbrev_relation_operand with_loc, 'a) fold = default
   method fold_logop: (logop, 'a) fold = default
@@ -422,14 +422,12 @@ let fold_class (v: _ #folder) =
       | ClassNumeric -> Fun.id
     end
 
-let rec fold_cond: _ #folder -> cond -> _ = fun v ->
-  handle v#fold_cond
-    ~continue:begin fun (c: cond) x -> match c with
+let rec fold_condition: _ #folder -> condition -> _ = fun v ->
+  handle v#fold_condition
+    ~continue:begin fun (c: condition) x -> match c with
       | Expr e | Omitted e -> x
           >> fold_expr' v e
-      | Relation rel -> x
-          >> fold_binary_relation v rel
-      | Abbrev (_n, e, a) -> x
+      | Relation (_n, e, a) -> x
           >> fold_expr' v e
           >> fold_abbrev_relation_operand' v a
       | ClassCond (e, c) -> x
@@ -439,15 +437,15 @@ let rec fold_cond: _ #folder -> cond -> _ = fun v ->
           >> fold_expr' v e
           >> fold_signz v s
       | Not c -> x
-          >> fold_cond' v c
+          >> fold_condition' v c
       | Logop (c, l, d) -> x
-          >> fold_cond' v c
+          >> fold_condition' v c
           >> fold_logop v l
-          >> fold_cond' v d
+          >> fold_condition' v d
     end
 
-and fold_cond' (v: _ #folder) =
-  handle' v#fold_cond' ~fold:fold_cond v
+and fold_condition' (v: _ #folder) =
+  handle' v#fold_condition' ~fold:fold_condition v
 
 and fold_binary_relation (v: _ #folder) (e, r, f) x = x
   >> fold_expr' v e
@@ -470,8 +468,8 @@ and fold_abbrev_relation_operand (v: _ #folder) =
           >> fold_bool v neg
           >> fold_abbrev_relation_operand' v a
       | AbbrevOther c -> x
-          >> fold_cond v c
-      | AbbrevComb (a1, o, a2) -> x
+          >> fold_condition v (Terms_helpers.cast_no_rel_cond c)
+      | AbbrevLogop (a1, o, a2) -> x
           >> fold_abbrev_relation_operand' v a1
           >> fold_logop v o
           >> fold_abbrev_relation_operand' v a2
@@ -481,7 +479,7 @@ and fold_abbrev_relation_operand' (v: _ #folder) =
   handle' v#fold_abbrev_relation_operand' ~fold:fold_abbrev_relation_operand v
 
 let fold_expression = fold_expr'                                     (* alias *)
-let fold_condition = fold_cond'                                      (* alias *)
+let fold_condition = fold_condition'                                      (* alias *)
 
 let fold_ident_or_alphanum (v: _ #folder) : ident_or_alphanum -> 'a -> 'a = function
   | Alphanum a -> fold_alphanum v a
