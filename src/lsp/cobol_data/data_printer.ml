@@ -17,10 +17,10 @@ open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 
 let pp_alphanum_value = Data_types.pp_alphanum_value
-let pp_boolean_value  = Data_types.pp_boolean_value
-let pp_integer_value  = Data_types.pp_integer_value
-let pp_fixed_value    = Data_types.pp_fixed_value
-let pp_floating_value = Data_types.pp_floating_value
+let pp_boolean_value  = Data_value.pp_boolean
+let pp_integer_value  = Data_value.pp_integer
+let pp_fixed_value    = Data_value.pp_fixed_as_decimal
+let pp_floating_value = Data_value.pp_floating
 
 let pp_alphanum_literal = Data_types.pp_alphanum_literal
 let pp_boolean_literal  = Data_types.pp_boolean_literal
@@ -297,17 +297,6 @@ let pp_record: record Pretty.printer =
        Pretty.vfield "renamings" (fun x -> x.record_renamings) pp_record_renamings);
   ]
 
-let pp_compilation_value ppf = function
-  | Alphanum s -> pp_alphanum_value ppf s
-  | Boolean b -> pp_boolean_value ppf b
-  | Numeric f -> pp_fixed_value ppf f
-
-let pp_compilation_variable_definition ppf { compvar_name; compvar_value } =
-  Pretty.record [
-    Fmt.field "name" (fun () -> compvar_name) Fmt.string;
-    Fmt.field "value" (fun () -> compvar_value) (pp_with_src pp_compilation_value);
-  ] ppf ()
-
 let pp_data_definition ppf = function
   | Data_field { def; record = { record_name; _ } } ->
       Pretty.record [
@@ -335,10 +324,4 @@ let pp_data_definition ppf = function
         T Fmt.(styled `Yellow @@ any "table index");
         T (Fmt.field "record" (fun () -> record_name) Fmt.string);
         T (Pretty.vfield "table" (fun () -> table) pp_table_definition');
-      ] ppf ()
-  | Compilation_data { def } ->
-      Pretty.record [
-        Fmt.(styled `Yellow @@ any "compilation data (constant)");
-        Pretty.vfield "def" (fun () -> def.src_payload)
-          pp_compilation_variable_definition;
       ] ppf ()

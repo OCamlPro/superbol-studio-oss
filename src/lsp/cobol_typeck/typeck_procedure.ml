@@ -47,14 +47,12 @@ let resolve_procedure_args ~data_definitions ~refs pa =
   let resolve_arg_name_ref ~arg_name ~arg_passing_style acc =
     let register_linkage_record ~arg_data_definition acc =
       match Cobol_data.Item.def_storage arg_data_definition.resolved with
-      | Some Linkage ->
+      | Linkage ->
           { acc with
             rev_args = ({ arg_data_definition;
                           arg_passing_style } &@<- arg_name) :: acc.rev_args }
-      | Some actual_storage ->
+      | actual_storage ->
           error acc @@ Invalid_proc_arg_storage { arg_name; actual_storage }
-      | None ->
-          error acc @@ Proc_arg_is_a_constant { arg_name }
     in
     match
       (* CHECKME: may need to only lookup among records (maybe also only in

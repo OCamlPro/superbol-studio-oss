@@ -46,7 +46,7 @@ module TYPES: sig
         {
           loc: srcloc;
           var: Preproc_env.var;
-          def: variable_definition;
+          def: Preproc_env.var_definition;
         }
     | Variable_substitution of                 (* Note: parser-specific event *)
         {
@@ -58,7 +58,7 @@ module TYPES: sig
         {
           loc: srcloc;
           var: Preproc_env.var;
-          def: Preproc_env.compilation_var_definition option; (* [None] if undef *)
+          def: Preproc_env.var_definition option;          (* [None] if undef *)
         }
 
   and copy_event_status =
@@ -66,16 +66,11 @@ module TYPES: sig
     | CyclicCopy of string
     | MissingCopy of Cobol_common.Copybook.TYPES.lookup_error
 
-  and variable_definition =
-    | Compilation_variable of Preproc_env.compilation_var_definition
-    | Preproc_variable of Preproc_env.preproc_var_definition
-
   type log
 end
 
 include module type of TYPES
-  with type variable_definition = TYPES.variable_definition
-   and type copy_event_status = TYPES.copy_event_status
+  with type copy_event_status = TYPES.copy_event_status
    and type log_entry = TYPES.log_entry
    and type log = TYPES.log
 
@@ -113,25 +108,20 @@ val exec_block
 val ignored
   : Text.text                                                    (* non-empty *)
   -> log -> log
-val ppvar_def
+val var_def
   : loc: srcloc
   -> var: Preproc_env.var
-  -> def: Preproc_env.preproc_var_definition
-  -> log -> log
-val compvar_def
-  : loc: srcloc
-  -> var: Preproc_env.var
-  -> def: Preproc_env.compilation_var_definition
+  -> def: Preproc_env.var_definition
   -> log -> log
 val compvar_subst
   : loc: srcloc
   -> var: Preproc_env.var
   -> def: Preproc_env.compilation_var_definition
   -> log -> log
-val compvar_eval
+val var_eval
   : loc: srcloc
   -> var: Preproc_env.var
-  -> ?def: Preproc_env.compilation_var_definition
+  -> ?def: Preproc_env.var_definition
   -> log -> log
 
 (* --- *)

@@ -279,20 +279,5 @@ type data_definition =
         table: table_definition with_loc;          (* table whose index it is *)
         qualname: Cobol_ptree.qualname with_loc;   (* fully qualified name *)
       }
-  | Compilation_data of
-      {
-        def: compilation_variable_definition with_src;
-      }
-
-and compilation_variable_definition =
-  {
-    compvar_name: string;                                 (* always uppercase *)
-    compvar_value: compilation_value with_src;
-  }
-
-and compilation_value =
-  | Alphanum of alphanum_value
-  | Boolean of boolean_value
-  | Numeric of fixed_value
 
 (* screen: "_ OCCURS n TIMES" only. Max 2 dimensions. *)

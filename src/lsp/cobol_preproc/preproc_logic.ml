@@ -93,14 +93,14 @@ let definition_value ~platform ~var ~(value: Compdir_tree.definition_value with_
       match platform.getenv_opt @@ ENV.VAR.to_uppercase_string ~&var with
       | Some value ->
           Ok (Cobol_common.Srcloc.with_src ~src:Process_environment @@
-              Alphanum (Cobol_data.Value.alphanum_of_string value))
+              ENV.Alphanum (Cobol_data.Value.alphanum_of_string value))
       | None ->
           Error `UNDEFINED
 
 
 let ppvar_def def var =
   Preproc_trace.Variable_definition { loc = ~@var; var = ~&var;
-                                      def = Preproc_variable def }
+                                      def = Preproc_var def }
 
 let on_define ~platform ~loc Compdir_tree.{ var; value; override } ~env =
   match definition_value ~platform ~var ~value with
@@ -117,18 +117,20 @@ let on_define ~platform ~loc Compdir_tree.{ var; value; override } ~env =
 (* Conditionals *)
 
 
-let compvar_eval ?def var =
+let var_eval ?def var =
   Preproc_trace.Variable_evaluation { loc = ~@var; var = ~&var; def }
 
 
 let eval_term (term: Compdir_tree.term) env : (ENV.value, _) result * _ list =
   match term with
   | Variable var ->
-      (match ENV.preproc_var_definition_of ~var env with
-       | Ok def ->
-           Ok def.src_payload.compvar_value.src_payload, [compvar_eval var ~def]
-       | Error `UNDEFINED as e ->
-           e, [compvar_eval var])
+      (match ENV.var_definition_of ~var env with
+       | Ok (Preproc_var d as def) ->
+           Ok d.src_payload.compvar_value.src_payload, [var_eval var ~def]
+       | Ok (Compilation_var d as def) ->
+           Ok d.src_payload.compvar_value.src_payload, [var_eval var ~def]
+       | Error Undefined as e ->
+           e, [var_eval var])
   | Literal Alphanum a ->
       Ok (ENV.alphanum_literal_value' a), []
   | Literal Boolean b ->
@@ -177,54 +179,53 @@ let eval_condition ~(operator: Compdir_tree.condition_operator) a b =
 
 
 let eval_defined_condition var polarity env =
-  match ENV.preproc_var_definition_of ~try_compil_vars:false ~var env with
+  match ENV.var_definition_of ~try_compil_vars:false ~var env with
   | Ok def ->
-      OUT.result (polarity, [compvar_eval var ~def])                  (* use! *)
-  | Error `UNDEFINED ->
-      OUT.result (not polarity, [compvar_eval var])                     (* use! *)
+      OUT.result (polarity, [var_eval var ~def])                      (* use! *)
+  | Error Undefined ->
+      OUT.result (not polarity, [var_eval var])                         (* use! *)
 
 let eval_set_conditon ~loc var polarity env =
   let diags = Preproc_diagnostics.none in
   let item = Set_condition_directive { assumed_set = false } in
   let def =
-    match ENV.preproc_var_definition_of ~try_compil_vars:false ~var env with
+    match ENV.var_definition_of ~try_compil_vars:false ~var env with
     | Ok def ->
         Some def
-    | Error `UNDEFINED ->
+    | Error Undefined ->
         None
   in
-  OUT.result (not polarity, [compvar_eval var ?def])
+  OUT.result (not polarity, [var_eval var ?def])
     ~diags:(warn diags @@ Ignored { loc; item })
 
 let eval_value_condition ~loc var polarity env =
   let diags = Preproc_diagnostics.none in
-  let[@local] compvar_value def =
-    match def.src_payload.compvar_value.src_payload with
+  let[@local] var_value (Preproc_env.(Preproc_var d |
+                                      Compilation_var d) as def) =
+    match d.src_payload.compvar_value.src_payload with
     | Boolean b ->
-        OUT.result
-          (Z.(equal zero) b.bool_bits != polarity,
-           [compvar_eval var ~def])
+        OUT.result (Z.(equal zero) b.bool_bits != polarity, [var_eval var ~def])
     | Alphanum _ | Numeric _ as value ->
         let stuff = Variable_type_in_compdir_condition { value } in
         OUT.result ~diags:(warn_unexpected diags ~loc stuff)
-          (false, [compvar_eval var ~def])
+          (false, [var_eval var ~def])
   in
-  match ENV.preproc_var_definition_of ~var env with
+  match ENV.var_definition_of ~var env with
   | Ok def ->
-      compvar_value def
-  | Error `UNDEFINED ->
+      var_value def
+  | Error Undefined ->
       let stuff = Variable_in_compdir_condition { var } in
       OUT.result ~diags:(warn_undefined diags ~loc:~@var stuff)
-        (false, [compvar_eval var])
+        (false, [var_eval var])
 
 let eval_constant_conditions ~loc l r polarity operator env =
   let l, log1 = eval_term l env
   and r, log2 = eval_term r env in
   let log = LIST.append log1 log2 in
   match l, r with
-  | Error `UNDEFINED, Ok _
-  | Ok _, Error `UNDEFINED
-  | Error `UNDEFINED, Error `UNDEFINED ->
+  | Error Undefined, Ok _
+  | Ok _, Error Undefined
+  | Error Undefined, Error Undefined ->
       OUT.result (false, log)                             (* ignore undefined *)
   | Ok l, Ok r ->
       try

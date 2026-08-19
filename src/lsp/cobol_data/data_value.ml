@@ -51,6 +51,7 @@ let non_bool_bit ~base = function
   | _ -> true
 
 (* --- *)
+
 let integer_zero = Z.zero
 let pp_integer = Z.pp_print
 let integer_of_string s =
@@ -75,6 +76,9 @@ let fixed_to_string = Q.to_string
 let to_ptree_fixed ?(max_fractional_size = 18) q : Cobol_ptree.fixed =
   Num_utils.fixed_decimal_of_rational ~max_fractional_size q
 
+let pp_fixed_as_decimal ppf q =
+  Cobol_ptree.pp_fixed ppf (to_ptree_fixed q)
+
 (* --- *)
 
 let floating_zero =
@@ -84,7 +88,7 @@ let floating_zero =
   }
 
 let pp_floating ppf { float_significand; float_exponent } =
-  Pretty.print ppf "%aE%d" pp_fixed float_significand float_exponent
+  Pretty.print ppf "%aE%d" pp_fixed_as_decimal float_significand float_exponent
 
 let floating_of_strings ~integral ~fractional ~exponent =
   try
@@ -120,10 +124,15 @@ let boolean_of_string ?(base: [`Bool | `Hex] = `Bool) literal : boolean_value =
       with Invalid_argument _ ->
         invalid_chars [s, 0, non_bool_bit ~base]
 
+let pp_boolean ppf { bool_width; bool_bits } =
+  if bool_width = 0
+  then Pretty.string ppf "b\"\""          (* "empty" Boolean literal *)
+  else Z.pp_print ppf bool_bits           (* print as a plain decimal Integer *)
+
 let boolean_to_string { bool_width; bool_bits } : string =
   if bool_width = 0
-  then ""
-  else Z.to_string bool_bits                                       (* CHECKME *)
+  then "b''"
+  else Z.to_string bool_bits
 
 let to_ptree_boolean b : Cobol_ptree.boolean =
   Cobol_ptree.{ bool_base = `Bool; bool_value = boolean_to_string b }

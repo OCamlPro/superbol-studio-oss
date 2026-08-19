@@ -84,7 +84,7 @@ let bind_78_constant lp ~loc const_name (lit: Cobol_ptree.literal with_loc) =
         ~some:Preproc_diagnostics.literal_diagnostics
         ~none:Preproc_diagnostics.none
     and pplog =
-      Preproc_trace.compvar_def ~loc ~var:~&var ~def lp.pplog
+      Preproc_trace.var_def ~loc ~var:~&var ~def:(Compilation_var def) lp.pplog
     in
     add_diags { lp with env; pplog } diags
   in

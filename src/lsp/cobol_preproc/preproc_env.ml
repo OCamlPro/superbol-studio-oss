@@ -31,7 +31,6 @@ module VAL = Cobol_data.Value
 
 (** Utility module that maps any string to a physically unique upper-cased
     internal representation. *)
-(* TODO: Maybe move that to cobol_data as well *)
 module VAR: sig
   type t
   val pp: t Pretty.printer
@@ -61,13 +60,32 @@ module TYPES = struct
       preproc_vars: preproc_var_definition MAP.t;
       compil_vars: compilation_var_definition MAP.t;
     }
+
   and var = VAR.t
+
   and preproc_var_definition =
-    Cobol_data.Types.compilation_variable_definition with_src
+    compilation_variable_definition with_src
+
   and compilation_var_definition =
-    preproc_var_definition                              (* for now (not sure) *)
+    compilation_variable_definition with_src       (* same for now (not sure) *)
+
+  and compilation_variable_definition =
+    {
+      compvar: var;
+      compvar_value: value with_src;
+    }
+
   and value =
-    Cobol_data.Types.compilation_value
+    | Alphanum of Cobol_data.Types.alphanum_value
+    | Boolean of Cobol_data.Types.boolean_value
+    | Numeric of Cobol_data.Types.fixed_value
+
+  type var_definition =
+    | Preproc_var of preproc_var_definition
+    | Compilation_var of compilation_var_definition
+
+  type lookup_error =
+    | Undefined
 
   exception REDEFINITION of { prev_def_src: src }
 end
@@ -77,10 +95,21 @@ type t = env
 
 (* pretty-printing *)
 
+let pp_value ppf = function
+  | Alphanum s -> Cobol_data.Printer.pp_alphanum_value ppf s
+  | Boolean b -> Cobol_data.Printer.pp_boolean_value ppf b
+  | Numeric f -> Cobol_data.Printer.pp_fixed_value ppf f
+
+let pp_compilation_variable_definition ppf { compvar; compvar_value } =
+  Pretty.record [
+    Fmt.field "name" (fun () -> compvar) VAR.pp;
+    Fmt.field "value" (fun () -> compvar_value) (pp_with_src pp_value);
+  ] ppf ()
+
 let pp: t Pretty.printer = fun ppf map ->
   Pretty.list ~fopen:"@[<2>@<1>⦃ " ~fsep:",@ " ~fclose:" @<1>⦄@]"
     Fmt.(box ~indent:2 @@ pair ~sep:(any " =>@ ") VAR.pp
-           (pp_with_src Cobol_data.Printer.pp_compilation_variable_definition))
+           (pp_with_src pp_compilation_variable_definition))
     ppf (MAP.bindings map.preproc_vars)
 
 (* constructors *)
@@ -105,23 +134,23 @@ let mem_var' v env = mem_preproc_var ~&v env || mem_compil_var ~&v env
 
 (* higher-level operations *)
 
-let preproc_var_definition_of ~var ?(try_compil_vars = true) env
-  : (preproc_var_definition, [`UNDEFINED]) result =
+let var_definition_of ~var ?(try_compil_vars = true) env
+  : (var_definition, lookup_error) result =
   match MAP.find_opt ~&var env.preproc_vars with
   | Some value ->
-      Ok value
+      Ok (Preproc_var value)
   | None ->
       if try_compil_vars then
         match MAP.find_opt ~&var env.compil_vars with
-        | Some value -> Ok value
-        | None -> Error `UNDEFINED
+        | Some value -> Ok (Compilation_var value)
+        | None -> Error Undefined
       else
-        Error `UNDEFINED
+        Error Undefined
 
 let register_preproc_var ~src var value env =
   let def =
     Cobol_common.Srcloc.with_src ~src
-      { compvar_name = VAR.to_uppercase_string var; compvar_value = value }
+      { compvar = var; compvar_value = value }
   in
   { env with
     preproc_vars = MAP.add var def env.preproc_vars },
@@ -147,8 +176,7 @@ let define_compilation_var ~loc var value (env: t)
   : t * compilation_var_definition =
   let def =
     Cobol_common.Srcloc.with_loc_as_src ~loc
-      { compvar_name = VAR.to_uppercase_string ~&var;
-        compvar_value = value }
+      { compvar = ~&var; compvar_value = value }
   in
   { env with compil_vars = MAP.add ~&var def env.compil_vars },
   def

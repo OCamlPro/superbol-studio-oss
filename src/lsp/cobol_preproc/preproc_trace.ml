@@ -50,7 +50,7 @@ module TYPES = struct
         {
           loc: srcloc;
           var: Preproc_env.var;
-          def: variable_definition;
+          def: Preproc_env.var_definition;
         }
     | Variable_substitution of                 (* Note: parser-specific event *)
         {
@@ -62,17 +62,13 @@ module TYPES = struct
         {
           loc: srcloc;
           var: Preproc_env.var;
-          def: Preproc_env.compilation_var_definition option; (* [None] if undef *)
+          def: Preproc_env.var_definition option;          (* [None] if undef *)
         }
 
   and copy_event_status =
     | CopyDone of string
     | CyclicCopy of string
     | MissingCopy of Cobol_common.Copybook.TYPES.lookup_error
-
-  and variable_definition =
-    | Compilation_variable of Preproc_env.compilation_var_definition
-    | Preproc_variable of Preproc_env.preproc_var_definition
 
   type log = log_entry list
 end
@@ -100,13 +96,11 @@ let exec_block ~preamble_loc ?postamble_loc text : log -> log =
 let ignored text : log -> log =
   let ignored_loc = Option.get @@ Cobol_common.Srcloc.concat_locs text in
   List.cons @@ Ignored { text; ignored_loc }
-let ppvar_def ~loc ~var ~def : log -> log =
-  List.cons @@ Variable_definition { loc; var; def = Preproc_variable def }
-let compvar_def ~loc ~var ~def : log -> log =
-  List.cons @@ Variable_definition { loc; var; def = Compilation_variable def }
+let var_def ~loc ~var ~def : log -> log =
+  List.cons @@ Variable_definition { loc; var; def }
 let compvar_subst ~loc ~var ~def : log -> log =
   List.cons @@ Variable_substitution { loc; var; def }
-let compvar_eval ~loc ~var ?def : log -> log =
+let var_eval ~loc ~var ?def : log -> log =
   List.cons @@ Variable_evaluation { loc; var; def }
 
 (* --- *)

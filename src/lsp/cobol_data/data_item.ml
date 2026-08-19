@@ -59,12 +59,11 @@ let record_size: record -> Data_memory.size = fun r ->
 let pp_item_qualname ?(leading = Fmt.nop) ppf item =
   Fmt.(option (leading ++ Cobol_ptree.pp_qualname')) ppf (qualname item)
 
-let def_source: data_definition -> src = function
-  | Data_field { def; _} -> Source_location ~@def
-  | Data_renaming { def; _} -> Source_location ~@def
-  | Data_condition { def; _} -> Source_location ~@def
-  | Table_index { table; _ } -> Source_location ~@table
-  | Compilation_data { def; _ } -> def.src
+let def_loc: data_definition -> srcloc = function
+  | Data_field { def; _ } -> ~@def
+  | Data_renaming { def; _ } -> ~@def
+  | Data_condition { def; _ } -> ~@def
+  | Table_index { table; _ } -> ~@table
 
 let def_qualname = function
   | Data_field { def = { payload = { field_qualname = Some qn'; _ }; _ }; _ } ->
@@ -77,40 +76,30 @@ let def_qualname = function
       Some ~&(~&def.condition_name_qualname)
   | Table_index { qualname; _ } ->
       Some ~&qualname
-  | Compilation_data _ ->
-      None
 
-let def_record: data_definition -> record option = function
+let def_record: data_definition -> record = function
   | Data_field { record; _}
   | Data_renaming { record; _}
   | Data_condition { record; _}
-  | Table_index { record; _ } ->
-      Some record
-  | Compilation_data _ ->
-      None
+  | Table_index { record; _ } -> record
 
-let def_storage: data_definition -> data_storage option = fun def ->
-  match def_record def with
-  | Some record -> Some record.record_storage
-  | None -> None
+let def_storage: data_definition -> data_storage = fun def ->
+  (def_record def).record_storage
 
 let def_size: data_definition -> Data_memory.size = function
   | Data_field { def; _} -> ~&def.field_size
   | Data_renaming { def; _} -> ~&def.renaming_size
   | Data_condition { field; _} -> ~&field.field_size
   | Table_index { table; _ } -> ~&table.table_size
-  | Compilation_data _ -> Data_memory.point_size                       (* TODO *)
 
 let def_offset: data_definition -> Data_memory.offset = function
   | Data_field { def; _} -> ~&def.field_offset
   | Data_renaming { def; _} -> ~&def.renaming_offset
   | Data_condition { field; _} -> ~&field.field_offset
   | Table_index { table; _ } -> ~&table.table_offset
-  | Compilation_data _ -> Data_memory.point_size
 
 let def_has_issues: data_definition -> bool = function
   | Data_field { def; _ } -> ~&def.field_has_definition_issues
   | Data_renaming _ -> false
   | Data_condition { field; _ } -> ~&field.field_has_definition_issues
   | Table_index { table; _ } -> ~&table.table_has_definition_issues
-  | Compilation_data _ -> false
