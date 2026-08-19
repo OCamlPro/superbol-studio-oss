@@ -124,15 +124,11 @@ let boolean_of_string ?(base: [`Bool | `Hex] = `Bool) literal : boolean_value =
       with Invalid_argument _ ->
         invalid_chars [s, 0, non_bool_bit ~base]
 
-let pp_boolean ppf { bool_width; bool_bits } =
-  if bool_width = 0
-  then Pretty.string ppf "b\"\""          (* "empty" Boolean literal *)
-  else Z.pp_print ppf bool_bits           (* print as a plain decimal Integer *)
-
 let boolean_to_string { bool_width; bool_bits } : string =
-  if bool_width = 0
-  then "b''"
-  else Z.to_string bool_bits
+  Z.format (Printf.sprintf "%%0%db" bool_width) bool_bits
+
+let pp_boolean ppf b =
+  Pretty.print ppf "b\"%s\"" (boolean_to_string b)
 
 let to_ptree_boolean b : Cobol_ptree.boolean =
   Cobol_ptree.{ bool_base = `Bool; bool_value = boolean_to_string b }

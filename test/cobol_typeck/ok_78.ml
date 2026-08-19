@@ -18,24 +18,14 @@ let dotest = Typeck_testing.show_data
 let%expect_test "one-77" =
   dotest @@ prog "prog"
     ~working_storage:{|
-       78 CONST PIC A VALUE "A".
+       78 CONST VALUE "A".
        77 A     PIC A VALUE CONST.
     |};
   [%expect {|
-    prog.cob:4.16-4.21:
-       1          PROGRAM-ID. prog.
-       2          DATA DIVISION.
-       3          WORKING-STORAGE SECTION.
-       4 >        78 CONST PIC A VALUE "A".
-    ----                   ^^^^^
-       5          77 A     PIC A VALUE CONST.
-       6          PROCEDURE DIVISION.
-    >> Error: Unexpected clause for 78-level data item
-
     prog.cob:5.7-5.34:
        2          DATA DIVISION.
        3          WORKING-STORAGE SECTION.
-       4          78 CONST PIC A VALUE "A".
+       4          78 CONST VALUE "A".
        5 >        77 A     PIC A VALUE CONST.
     ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
        6          PROCEDURE DIVISION.
@@ -51,5 +41,34 @@ let%expect_test "one-77" =
           category: ALPHABETIC(1)
         }
         value: "A"
+      }
+    } |}];;
+
+let%expect_test "boolean-value" =
+  dotest @@ prog "prog"
+    ~working_storage:{|
+       78 F VALUE B"1010".
+       77 X VALUE F.
+    |};
+  [%expect {|
+    prog.cob:5.7-5.20:
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4          78 F VALUE B"1010".
+       5 >        77 X VALUE F.
+    ----          ^^^^^^^^^^^^^
+       6          PROCEDURE DIVISION.
+       7
+    Item definition: {
+      qualname: X
+      offset: 0
+      size: 32
+      layout: {
+        elementary
+        usage: {
+          display
+          category: BOOLEAN(4)
+        }
+        value: 1010
       }
     } |}];;

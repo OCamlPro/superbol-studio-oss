@@ -1546,7 +1546,7 @@ let%expect_test "hover-preproc-directives" =
     ----               ^
        9          77 WS VALUE "OK".
       10          >>ELSE
-    Compilation variable with value 2
+    Compilation variable with value b"10"
     ---
     References: 2
     (line 12, character 16):
@@ -1603,7 +1603,7 @@ let%expect_test "hover-preproc-directives" =
     ----                   ^
        8          >>IF B
        9          77 WS VALUE "OK".
-    Compilation variable with value 2
+    Compilation variable with value b"10"
     ---
     References: 2
     (line 7, character 13):
@@ -1615,7 +1615,7 @@ let%expect_test "hover-preproc-directives" =
     ----               ^
        9          77 WS VALUE "OK".
       10          >>ELSE
-    Compilation variable with value 2
+    Compilation variable with value b"10"
     ---
     References: 2
     (line 12, character 16):
