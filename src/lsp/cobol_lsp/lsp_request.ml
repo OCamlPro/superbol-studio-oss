@@ -318,8 +318,9 @@ let lookup_definition_in_doc
     Cobol_typeck.Outputs.{ group; _ }
   =
   let rootdir = Lsp_project.(string_of_rootdir @@ rootdir doc.project)
-  and uri = textDocument.uri in
-  match Lsp_lookup.element_at_position ~uri position group doc.artifacts with
+  and filename = Lsp.Uri.to_path textDocument.uri
+  and artifacts = doc.artifacts in
+  match Lsp_lookup.element_at_position ~filename position group artifacts with
   | { element_at_position = None; _ } ->
       None
   | { element_at_position = Some element;
@@ -380,9 +381,9 @@ let lookup_references_in_doc
     Cobol_typeck.Outputs.{ group; artifacts = { references }; _ }
   =
   let rootdir = Lsp_project.(string_of_rootdir @@ rootdir doc.project)
-  and uri = textDocument.uri
+  and filename = Lsp.Uri.to_path textDocument.uri
   and artifacts = doc.artifacts in
-  match Lsp_lookup.element_at_position ~uri position group artifacts with
+  match Lsp_lookup.element_at_position ~filename position group artifacts with
   | { element_at_position = None; _ } ->
       Lsp_debug.message "Lsp_request.lookup_references_in_doc: \
                          element_at_position = None";
@@ -669,13 +670,12 @@ let pp_data_definition_info ppf = function
 
 let describe_data_definition_for_element_at_pos
     ?(show_hover_text_on_definitions = false)
-    ~uri
-    ~(checked_doc: Cobol_typeck.Outputs.t)
-    ~(artifacts: Cobol_parser.Outputs.artifacts) position
+    ~(doc: Lsp_document.t) ~(checked_doc: Cobol_typeck.Outputs.t) position
   =
   let Cobol_typeck.Outputs.{ group; _ } = checked_doc in
-  let filename = Lsp.Uri.to_path uri in
-  match Lsp_lookup.element_at_position ~uri position group artifacts with
+  let filename = Lsp.Uri.to_path @@ Lsp_document.uri doc
+  and artifacts = doc.artifacts in
+  match Lsp_lookup.element_at_position ~filename position group artifacts with
   | { element_at_position = None; _ } ->
       None
   | { element_at_position = Some ele_at_pos;
@@ -769,8 +769,7 @@ let handle_hover ?show_hover_text_on_definitions
         data_references ~textDocument position ~doc checked_doc
       in
       match
-        describe_data_definition_for_element_at_pos ~uri:textDocument.uri
-          position ~checked_doc ~artifacts:doc.artifacts
+        describe_data_definition_for_element_at_pos position ~doc ~checked_doc
           ?show_hover_text_on_definitions,
         preproc_info_on_hover ~filename position doc.artifacts.pplog
       with

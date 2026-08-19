@@ -123,13 +123,35 @@ let rec qualname_at_pos ~filename (qn: Cobol_ptree.qualname) pos =
 
 (* --- *)
 
-(** [element_at_position pos group] seeks the compilation unit name and qualified
-    name at the given position [pos], in typed compilation group [group]. *)
-let element_at_position ~uri pos
-    (group: Cobol_unit.Types.group)
-    (artifacts: Cobol_parser.Outputs.artifacts)
+(** [preproc_element_at_position ~filename pos artifacts] seeks a relevant
+    syntactic element at position [pos], using only parsing artifacts
+    [artifacts]. *)
+let preproc_element_at_position ~filename pos
+    (artifacts: Cobol_parser.Outputs.artifacts) =
+  let var_ref ~loc def use =
+    if Lsp_position.is_in_srcloc ~filename pos loc
+    then Some (Preproc_or_compilation_variable_ref { def; use; loc })
+    else None
+  in
+  List.find_map begin fun (event: Cobol_preproc.Trace.log_entry) ->
+    match event with
+    | Variable_definition { def = def; loc; _ } ->
+        var_ref ~loc def `Definition
+    | Variable_substitution { loc; def; _ } ->
+        var_ref ~loc (Compilation_var def) `Substitution
+    | Variable_evaluation { loc; def = Some def; _ } ->
+        var_ref ~loc def `Evaluation
+    | _ ->
+        None
+  end (Cobol_preproc.Trace.events artifacts.Cobol_parser.Outputs.pplog)
+
+(** [element_at_position ~filename pos group artifacts] seeks the compilation
+    unit name and relevant syntactic element at the given position [pos] in
+    [filename], in typed compilation group [group] with associated parsing
+    artifacts [artifacts]. *)
+let element_at_position ~filename pos (group: Cobol_unit.Types.group) artifacts
   : element_at_position =
-  let filename = Lsp.Uri.to_path uri in
+  (* let filename = Lsp.Uri.to_path uri in *)
   let open struct
 
     type acc =
@@ -240,25 +262,8 @@ let element_at_position ~uri pos
 
   end group init |> function
   | { elt = { element_at_position = None; _ } as elt; _ } ->
-      let var_ref ~loc def use =
-        if Lsp_position.is_in_srcloc ~filename pos loc
-        then Some (Preproc_or_compilation_variable_ref { def; use; loc })
-        else None
-      in
-      let element_at_position =
-        List.find_map begin fun (event: Cobol_preproc.Trace.log_entry) ->
-          match event with
-          | Variable_definition { def = def; loc; _ } ->
-              var_ref ~loc def `Definition
-          | Variable_substitution { loc; def; _ } ->
-              var_ref ~loc (Compilation_var def) `Substitution
-          | Variable_evaluation { loc; def = Some def; _ } ->
-              var_ref ~loc def `Evaluation
-          | _ ->
-              None
-        end (Cobol_preproc.Trace.events artifacts.Cobol_parser.Outputs.pplog)
-      in
-      { elt with element_at_position }
+      let element = preproc_element_at_position ~filename pos artifacts in
+      { elt with element_at_position = element }
   | acc ->
       acc.elt
 
