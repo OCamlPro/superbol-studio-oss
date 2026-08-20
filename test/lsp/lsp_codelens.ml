@@ -238,13 +238,38 @@ let%expect_test "codelens-78-level-in-copybook" =
   [%expect {|
     {"params":{"message":"file://__rootdir__/lib.cpy appears to be a copybook","type":4},"method":"window/logMessage","jsonrpc":"2.0"}
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/lib.cpy"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"} |}];;
+
+let%expect_test "codelens-78-level-in-copybook-with-replacement" =
+  let end_with_postproc = codelens
+      ~copybooks: [
+        "lib.cpy", {cobol|
+       78 A VALUE "A".
+       |cobol}
+      ]
+      {cobol|
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       COPY lib REPLACING ==A== BY ==B==.
+       77 C PIC 9 VALUE B.
+       PROCEDURE DIVISION.
+          DISPLAY C
+          STOP RUN.
+      |cobol}
+  in
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"message":"file://__rootdir__/lib.cpy appears to be a copybook","type":4},"method":"window/logMessage","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/lib.cpy"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-    __rootdir__/prog.cob:6.7:
-       3          PROGRAM-ID. prog.
+    __rootdir__/prog.cob:7.10:
        4          DATA DIVISION.
        5          WORKING-STORAGE SECTION.
-       6 >        COPY lib.
-    ----          ^
-       7          PROCEDURE DIVISION.
-       8             DISPLAY A
-    1 reference |}];;
+       6          COPY lib REPLACING ==A== BY ==B==.
+       7 >        77 C PIC 9 VALUE B.
+    ----             ^
+       8          PROCEDURE DIVISION.
+       9             DISPLAY C
+    2 references |}];;
