@@ -11,24 +11,24 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type alphanum_quote =
-  | Simple_quote (* '...' *)
-  | Double_quote (* "..." *)
-[@@deriving ord]
-
-type alphanum_repr =
-  | Native_bytes
-  | Null_terminated_bytes
-[@@deriving ord]
-
 type alphanum =
   {
-    str: string;
+    str: string; (** "Canonic" representation; differs from [given_str] iff
+                     [hexadecimal] holds *)
     given_str: string;
     quotation: alphanum_quote;
     hexadecimal: bool;
     runtime_repr: alphanum_repr;
   }
+
+and alphanum_quote =
+  | Simple_quote (* '...' *)
+  | Double_quote (* "..." *)
+
+and alphanum_repr =
+  | Native_bytes
+  | Null_terminated_bytes
+
 [@@deriving ord]
 
 (** Assumes a leading zero in case of odd length. *)
