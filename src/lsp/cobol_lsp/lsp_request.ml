@@ -11,6 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open EzCompat                                                    (* StringMap *)
+
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 open Lsp_imports
@@ -578,6 +580,7 @@ let handle_semtoks_full,
                                         rev_comments; rev_ignored; _ };
                           _ } Cobol_typeck.Outputs.{ ptree; _ } ->
         let data =
+          let rev_comments = StringMap.find "" rev_comments in
           Lsp_semtoks.data ~filename:(Lsp.Uri.to_path doc.uri) ~range
             ~pplog ~rev_comments ~rev_ignored
             ~tokens:(Lazy.force tokens) ~ptree
@@ -596,16 +599,13 @@ type data_definition =
   | Regular of Cobol_data.Types.data_definition
   | Preproc of Cobol_preproc.Env.var_definition              (* or compil-var *)
 
-let doc_of_datadef ~rev_comments ~filename data_def =
+let doc_of_datadef data_def (artifacts: Cobol_parser.Outputs.artifacts) =
   let definition_comment def_loc =
     let definition_lexloc = Cobol_common.Srcloc.as_lexloc def_loc in
     let definition_filename = (fst definition_lexloc).pos_fname in
-    if not (String.equal filename definition_filename)    (* def is in copybook *)
-    then ""
-    else
-      let definition_range =
-        Lsp_position.range_of_srcloc_in ~filename def_loc
-      in
+    try
+      let rev_comments = StringMap.find definition_filename artifacts.rev_comments in
+      let definition_range = Lsp_position.range_of_lexloc definition_lexloc in
       let definition_line = definition_range.start.line in
       List.find_map begin fun Cobol_preproc.Text.{ comment_loc; comment_kind;
                                                    comment_contents = c } ->
@@ -619,6 +619,8 @@ let doc_of_datadef ~rev_comments ~filename data_def =
       end rev_comments |> function
       | Some c -> c
       | None -> ""
+    with Invalid_argument _ | Not_found ->
+      ""
   in
   match data_def with
   | Preproc Compilation_var { src = Process_parameter; _ }
@@ -688,9 +690,8 @@ let describe_data_definition_for_element_at_pos
           | Preproc Preproc_var def -> def.src
           | Preproc Compilation_var def -> def.src
         in
-        let rev_comments = artifacts.rev_comments in
-        let doc_comments = doc_of_datadef ~rev_comments ~filename data_def in
         let pp_documentation ppf =
+          let doc_comments = doc_of_datadef data_def artifacts in
           if doc_comments <> ""
           then Pretty.print ppf "\n---\n%s" doc_comments
         in
