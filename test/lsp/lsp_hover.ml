@@ -1950,3 +1950,38 @@ let%expect_test "hover-procedure-using" =
     ALPHANUMERIC(1)
     ---
     References: 3 |}]
+
+
+let%expect_test "78-level-in-copybook" =
+  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let server,    _ = add_cobol_doc server ~projdir "lib.cpy" {cobol|
+       >> DEFINE X AS "CONST"
+       78 A VALUE "ABC".
+  |cobol} in
+  print_hovered server ~projdir @@ extract_position_markers {cobol|
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       COPY lib. *> inline comment
+       PROCEDURE DIVISION.
+          DISPLAY _|_A
+          STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect{|
+    {"params":{"message":"file://__rootdir__/lib.cpy appears to be a copybook","type":4},"method":"window/logMessage","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/lib.cpy"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    (line 7, character 18):
+    __rootdir__/prog.cob:8.18-8.19:
+       5          WORKING-STORAGE SECTION.
+       6          COPY lib. *> inline comment
+       7          PROCEDURE DIVISION.
+       8 >           DISPLAY A
+    ----                     ^
+       9             STOP RUN.
+      10
+    Compilation variable with value "ABC"
+    ---
+    References: 2 |}]

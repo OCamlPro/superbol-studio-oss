@@ -105,7 +105,7 @@ let lexloc_of_qualname_in ~filename (qn: Cobol_ptree.qualname) =
   | Qual (n, qn) -> Cobol_common.Srcloc.start_pos_in ~filename ~@n, end_pos qn
 
 (** [qualname_at_pos ~filename qualname pos] returns the qualname built from all
-    the qualifiers of [qualname] that are after or at position [pos] ion
+    the qualifiers of [qualname] that are after or at position [pos] in
     [filename].  This function is temporary and is expected to be replaced once
     a better way of finding the qualname is implemented. *)
 let rec qualname_at_pos ~filename (qn: Cobol_ptree.qualname) pos =
@@ -129,9 +129,12 @@ let rec qualname_at_pos ~filename (qn: Cobol_ptree.qualname) pos =
 let preproc_element_at_position ~filename pos
     (artifacts: Cobol_parser.Outputs.artifacts) =
   let var_ref ~loc def use =
-    if Lsp_position.is_in_srcloc ~filename pos loc
-    then Some (Preproc_or_compilation_variable_ref { def; use; loc })
-    else None
+    try               (* Some locations in the pre-processor log may not involve
+                         [filename], so we need to catch those cases. *)
+      if Lsp_position.is_in_srcloc ~filename pos loc
+      then Some (Preproc_or_compilation_variable_ref { def; use; loc })
+      else None
+    with Invalid_argument _ -> None
   in
   List.find_map begin fun (event: Cobol_preproc.Trace.log_entry) ->
     match event with

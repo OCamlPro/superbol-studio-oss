@@ -83,11 +83,14 @@ let positions ~uri group artifacts =
   snd |>
   Cobol_preproc.Trace.fold artifacts.Cobol_parser.Outputs.pplog
     ~f:begin fun event positions ->
-      match event with
-      | Cobol_preproc.Trace.Variable_definition { loc; _ } ->
-          let range = Lsp_position.range_of_srcloc_in ~filename loc in
-          Positions.add range.start positions
-      | _ ->
-          positions
+      try match event with    (* Some locations in the pre-processor log may not
+                                 involve [filename], so we need to catch those
+                                 cases. *)
+        | Cobol_preproc.Trace.Variable_definition { loc; _ } ->
+            let range = Lsp_position.range_of_srcloc_in ~filename loc in
+            Positions.add range.start positions
+        | _ ->
+            positions
+      with Invalid_argument _ -> positions
     end |>
   Positions.elements

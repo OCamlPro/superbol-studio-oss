@@ -14,8 +14,13 @@
 open Lsp.Types
 open Lsp_testing
 
-let codelens doc : string -> unit =
+let codelens ?(copybooks = []) doc : string -> unit =
   let { end_with_postproc; projdir }, server = make_lsp_project () in
+  let server =
+    List.fold_left begin fun server (copybook_name, copybook) ->
+      fst @@ add_cobol_doc server ~projdir copybook_name copybook
+    end server copybooks
+  in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let location_as_srcloc = new srcloc_resuscitator_cache in
   let params = CodeLensParams.create () ~textDocument:prog in
@@ -208,3 +213,38 @@ let%expect_test "codelens-procedure" =
       10               PERFORM AA.
       11               PERFORM BB IN AA.
     2 references |}];;
+
+let%expect_test "codelens-78-level-in-copybook" =
+  let end_with_postproc = codelens
+      ~copybooks: [
+        "lib.cpy", {cobol|
+       >> DEFINE X AS "CONST"
+       78 A VALUE "ABC".
+       77 B PIC 9 VALUE 9.
+       |cobol}
+      ]
+      {cobol|
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       COPY lib.
+       PROCEDURE DIVISION.
+          DISPLAY A
+          STOP RUN.
+      |cobol}
+  in
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"message":"file://__rootdir__/lib.cpy appears to be a copybook","type":4},"method":"window/logMessage","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/lib.cpy"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    __rootdir__/prog.cob:6.7:
+       3          PROGRAM-ID. prog.
+       4          DATA DIVISION.
+       5          WORKING-STORAGE SECTION.
+       6 >        COPY lib.
+    ----          ^
+       7          PROCEDURE DIVISION.
+       8             DISPLAY A
+    1 reference |}];;
