@@ -116,6 +116,7 @@ val is_pointwise: srcloc -> bool
 val start_pos: srcloc -> Lexing.position    (* only suitable for Area A checks *)
 val start_pos_in: filename: string -> srcloc -> Lexing.position
 val end_pos_in: filename: string -> srcloc -> Lexing.position
+val shallow_start_pos: srcloc -> Lexing.position option
 
 val concat: srcloc -> srcloc -> srcloc
 val concat_srclocs: srcloc list -> srcloc option

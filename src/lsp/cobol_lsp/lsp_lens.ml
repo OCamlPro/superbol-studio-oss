@@ -41,6 +41,7 @@ let positions ~uri group artifacts =
   in
   Cobol_unit.Visitor.fold_unit_group object (v)
     inherit [_] Cobol_unit.Visitor.folder
+    inherit! [_] Lsp_position.shallow_sieve ~filename
     method! fold_procedure _ =
       enter_context Procedure_division
     method! fold_data_definitions _ =
@@ -87,8 +88,9 @@ let positions ~uri group artifacts =
                                  involve [filename], so we need to catch those
                                  cases. *)
         | Cobol_preproc.Trace.Variable_definition { loc; _ } ->
-            let range = Lsp_position.range_of_srcloc_in ~filename loc in
-            Positions.add range.start positions
+            (match Lsp_position.shallow_start_position_in ~filename loc with
+             | None -> positions
+             | Some pos -> Positions.add pos positions)
         | _ ->
             positions
       with Invalid_argument _ -> positions

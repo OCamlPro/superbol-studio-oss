@@ -1985,3 +1985,45 @@ let%expect_test "78-level-in-copybook" =
     Compilation variable with value "ABC"
     ---
     References: 2 |}]
+
+let%expect_test "78-level-in-copybook-with-replacement" =
+  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let server,    _ = add_cobol_doc server ~projdir "lib.cpy" {cobol|
+       78 A VALUE "A".
+  |cobol} in
+  print_hovered server ~projdir @@ extract_position_markers {cobol|
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       COPY lib REPLACING ==A== BY ==B==. *> inline comment
+       77 C PIC 9 VALUE B.
+       PROCEDURE DIVISION.
+          DISPLAY _|_C
+          STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect{|
+    {"params":{"message":"file://__rootdir__/lib.cpy appears to be a copybook","type":4},"method":"window/logMessage","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/lib.cpy"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    (line 8, character 18):
+    __rootdir__/prog.cob:9.18-9.19:
+       6          COPY lib REPLACING ==A== BY ==B==. *> inline comment
+       7          77 C PIC 9 VALUE B.
+       8          PROCEDURE DIVISION.
+       9 >           DISPLAY C
+    ----                     ^
+      10             STOP RUN.
+      11
+    ```cobol
+    C
+    ```
+    ```cobol
+    PIC 9 USAGE DISPLAY
+    ```
+    NUMERIC(digits = 1, scale = 0, sign = unsigned)
+    *e.g,* [`0`] (0), [`1`] (1)
+    VALUE "A"
+    ---
+    References: 2 |}]
