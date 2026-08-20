@@ -90,6 +90,13 @@ let is_in_srcloc ~filename pos srcloc =
   srcloc != Srcloc.dummy &&
   is_in_lexloc pos (Srcloc.lexloc_in ~filename srcloc)
 
+let is_in_src ~filename pos = function
+  | Source_location loc ->
+      is_in_srcloc ~filename pos loc
+  | Process_parameter
+  | Process_environment ->
+      false
+
 (* --- *)
 
 (** {1 Translation of generalized source locations} *)
@@ -123,7 +130,7 @@ let location_of_srcloc ?(focus_on_main_doc = false) ~rootdir ~uri loc =
   in
   Location.create ~uri ~range
 
-let loc_translator ?focus_on_main_doc ~rootdir TextDocumentIdentifier.{ uri } =
+let loc_translator ?focus_on_main_doc ~rootdir uri =
   let location_of_srcloc
     = location_of_srcloc ~rootdir ?focus_on_main_doc ~uri in
   {

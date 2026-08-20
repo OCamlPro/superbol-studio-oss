@@ -30,8 +30,8 @@ let prefix_of_literal_kind: literal_kind -> string = function
   | NationalX -> "NX"
 
 let char_of_quotation: quotation -> char = function
-  | Apostrophe -> '\''
-  | Quote -> '"'
+  | Simple_quote -> '\''
+  | Double_quote -> '"'
 
 module FMT = struct
 

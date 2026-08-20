@@ -4,8 +4,10 @@
 
 ### Added
 - Parsing of abbreviated conditions in EVALUATE WHEN clauses [#638](https://github.com/OCamlPro/superbol-studio-oss/pull/638)
+- Support for 78-level data items [#634](https://github.com/OCamlPro/superbol-studio-oss/pull/634)
 
 ### Fixed
+- Amount of references reported in codelens, that wrongly included declarations [#???](https://github.com/OCamlPro/superbol-studio-oss/pull/???)
 - Grammar rules for `VALUE OF` clause [#629](https://github.com/OCamlPro/superbol-studio-oss/pull/629) (fix for [Issue #625](https://github.com/OCamlPro/superbol-studio-oss/issues/625))
 
 
