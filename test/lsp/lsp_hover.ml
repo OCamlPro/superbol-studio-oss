@@ -1887,6 +1887,8 @@ let%expect_test "hover-comment-copy" =
     ```
     ALPHANUMERIC(1)
     ---
+     copy inline comment
+    ---
     References: 2 |}]
 
 let%expect_test "hover-data-division-ref-count-only" =
