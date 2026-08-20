@@ -734,8 +734,7 @@ let find_hovered_pplog_event ~filename position pplog =
     | Variable_evaluation { loc; _ } ->
         try           (* Some locations in the pre-processor log may not involve
                          [filename], so we need to catch those cases. *)
-          Lsp_position.is_in_lexloc position
-            (Cobol_common.Srcloc.lexloc_in ~filename loc)
+          Lsp_position.is_in_srcloc ~filename position loc
         with Invalid_argument _ -> false
   end (Cobol_preproc.Trace.events pplog)
 
