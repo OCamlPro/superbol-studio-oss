@@ -132,7 +132,9 @@ let boolean_of_string ?(base: [`Bool | `Hex] = `Bool) literal : boolean_value =
         invalid_chars [s, 0, non_bool_bit ~base]
 
 let boolean_to_string { bool_width; bool_bits } : string =
-  Z.format (Printf.sprintf "%%0%db" bool_width) bool_bits
+  if bool_width = 0
+  then ""
+  else Z.format (Printf.sprintf "%%0%db" bool_width) bool_bits
 
 let pp_boolean ppf b =
   Pretty.print ppf "b\"%s\"" (boolean_to_string b)

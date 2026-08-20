@@ -822,12 +822,6 @@ module FMT = struct
 
   open Fmt
 
-  let pp_boolean: boolean Pretty.printer = fun ppf -> function
-    (* | { bool_width = 0; _ } -> *)
-    (*     string ppf "zero-length-boolean" *)
-    | { bool_value; _ } ->
-        string ppf bool_value
-
   let rec pp_term: type k. k term Pretty.printer = fun ppf -> function
     | Alphanum s -> pp_alphanum ppf s
     | Boolean b -> pp_boolean ppf b

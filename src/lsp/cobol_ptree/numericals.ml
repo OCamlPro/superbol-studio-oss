@@ -65,3 +65,6 @@ let boolean_of_string ?(base: [`Bool | `Hex] = `Bool) s =
   }
 
 let boolean_zero = boolean_of_string "0"
+
+let pp_boolean: boolean Pretty.printer = fun ppf b ->
+  Pretty.print ppf "b\"%s\"" b.bool_value

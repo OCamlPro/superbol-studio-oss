@@ -49,6 +49,8 @@ let%expect_test "boolean-value" =
     ~working_storage:{|
        78 F VALUE B"1010".
        77 X VALUE F.
+       78 G VALUE B"".
+       77 Y VALUE G.
     |};
   [%expect {|
     prog.cob:5.7-5.20:
@@ -57,8 +59,8 @@ let%expect_test "boolean-value" =
        4          78 F VALUE B"1010".
        5 >        77 X VALUE F.
     ----          ^^^^^^^^^^^^^
-       6          PROCEDURE DIVISION.
-       7
+       6          78 G VALUE B"".
+       7          77 Y VALUE G.
     Item definition: {
       qualname: X
       offset: 0
@@ -69,7 +71,28 @@ let%expect_test "boolean-value" =
           display
           category: BOOLEAN(4)
         }
-        value: 1010
+        value: b"1010"
+      }
+    }
+    prog.cob:7.7-7.20:
+       4          78 F VALUE B"1010".
+       5          77 X VALUE F.
+       6          78 G VALUE B"".
+       7 >        77 Y VALUE G.
+    ----          ^^^^^^^^^^^^^
+       8          PROCEDURE DIVISION.
+       9
+    Item definition: {
+      qualname: Y
+      offset: 0
+      size: 0
+      layout: {
+        elementary
+        usage: {
+          display
+          category: BOOLEAN(0)
+        }
+        value: b""
       }
     } |}];;
 
