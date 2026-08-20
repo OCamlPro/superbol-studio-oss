@@ -538,3 +538,167 @@ let%expect_test "references-requests-procedure-using" =
     ----                     ^^^
        9             STOP RUN.
       10 |}]
+
+let%expect_test "references-requests-78-n-preproc" =
+  let { end_with_postproc; projdir }, server = make_lsp_project () in
+  print_references ~projdir server @@ extract_position_markers {cobol|
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       78 _|1-b-def|_B VALUE 1.
+       >>IF _|3-b-preproc|_B = 1
+       78 R VALUE "OK".
+       *> wrong expr, still registered as a ref.
+       >>ELIF B_|3-b-wrong-use|_
+       78 R VALUE "KO".
+       >>END-IF
+       PROCEDURE DIVISION.
+           DISPLAY _|2-b-expr|_B _|4-r-conditioned|_R.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[{"message":"Unexpected type of variable in compiler directive condition","range":{"end":{"character":15,"line":8},"start":{"character":14,"line":8}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    1-b-def (line 4, character 10):
+    __rootdir__/prog.cob:5.7-5.19:
+       2          PROGRAM-ID. prog.
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5 >        78 B VALUE 1.
+    ----          ^^^^^^^^^^^^
+       6          >>IF B = 1
+       7          78 R VALUE "OK".
+    __rootdir__/prog.cob:6.12-6.13:
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5          78 B VALUE 1.
+       6 >        >>IF B = 1
+    ----               ^
+       7          78 R VALUE "OK".
+       8          *> wrong expr, still registered as a ref.
+    __rootdir__/prog.cob:9.14-9.15:
+       6          >>IF B = 1
+       7          78 R VALUE "OK".
+       8          *> wrong expr, still registered as a ref.
+       9 >        >>ELIF B
+    ----                 ^
+      10          78 R VALUE "KO".
+      11          >>END-IF
+    __rootdir__/prog.cob:13.19-13.20:
+      10          78 R VALUE "KO".
+      11          >>END-IF
+      12          PROCEDURE DIVISION.
+      13 >            DISPLAY B R.
+    ----                      ^
+      14
+    2-b-expr (line 12, character 19):
+    __rootdir__/prog.cob:5.7-5.19:
+       2          PROGRAM-ID. prog.
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5 >        78 B VALUE 1.
+    ----          ^^^^^^^^^^^^
+       6          >>IF B = 1
+       7          78 R VALUE "OK".
+    __rootdir__/prog.cob:6.12-6.13:
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5          78 B VALUE 1.
+       6 >        >>IF B = 1
+    ----               ^
+       7          78 R VALUE "OK".
+       8          *> wrong expr, still registered as a ref.
+    __rootdir__/prog.cob:9.14-9.15:
+       6          >>IF B = 1
+       7          78 R VALUE "OK".
+       8          *> wrong expr, still registered as a ref.
+       9 >        >>ELIF B
+    ----                 ^
+      10          78 R VALUE "KO".
+      11          >>END-IF
+    __rootdir__/prog.cob:13.19-13.20:
+      10          78 R VALUE "KO".
+      11          >>END-IF
+      12          PROCEDURE DIVISION.
+      13 >            DISPLAY B R.
+    ----                      ^
+      14
+    3-b-preproc (line 5, character 12):
+    __rootdir__/prog.cob:5.7-5.19:
+       2          PROGRAM-ID. prog.
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5 >        78 B VALUE 1.
+    ----          ^^^^^^^^^^^^
+       6          >>IF B = 1
+       7          78 R VALUE "OK".
+    __rootdir__/prog.cob:6.12-6.13:
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5          78 B VALUE 1.
+       6 >        >>IF B = 1
+    ----               ^
+       7          78 R VALUE "OK".
+       8          *> wrong expr, still registered as a ref.
+    __rootdir__/prog.cob:9.14-9.15:
+       6          >>IF B = 1
+       7          78 R VALUE "OK".
+       8          *> wrong expr, still registered as a ref.
+       9 >        >>ELIF B
+    ----                 ^
+      10          78 R VALUE "KO".
+      11          >>END-IF
+    __rootdir__/prog.cob:13.19-13.20:
+      10          78 R VALUE "KO".
+      11          >>END-IF
+      12          PROCEDURE DIVISION.
+      13 >            DISPLAY B R.
+    ----                      ^
+      14
+    3-b-wrong-use (line 8, character 15):
+    __rootdir__/prog.cob:5.7-5.19:
+       2          PROGRAM-ID. prog.
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5 >        78 B VALUE 1.
+    ----          ^^^^^^^^^^^^
+       6          >>IF B = 1
+       7          78 R VALUE "OK".
+    __rootdir__/prog.cob:6.12-6.13:
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5          78 B VALUE 1.
+       6 >        >>IF B = 1
+    ----               ^
+       7          78 R VALUE "OK".
+       8          *> wrong expr, still registered as a ref.
+    __rootdir__/prog.cob:9.14-9.15:
+       6          >>IF B = 1
+       7          78 R VALUE "OK".
+       8          *> wrong expr, still registered as a ref.
+       9 >        >>ELIF B
+    ----                 ^
+      10          78 R VALUE "KO".
+      11          >>END-IF
+    __rootdir__/prog.cob:13.19-13.20:
+      10          78 R VALUE "KO".
+      11          >>END-IF
+      12          PROCEDURE DIVISION.
+      13 >            DISPLAY B R.
+    ----                      ^
+      14
+    4-r-conditioned (line 12, character 21):
+    __rootdir__/prog.cob:7.7-7.22:
+       4          WORKING-STORAGE SECTION.
+       5          78 B VALUE 1.
+       6          >>IF B = 1
+       7 >        78 R VALUE "OK".
+    ----          ^^^^^^^^^^^^^^^
+       8          *> wrong expr, still registered as a ref.
+       9          >>ELIF B
+    __rootdir__/prog.cob:13.21-13.22:
+      10          78 R VALUE "KO".
+      11          >>END-IF
+      12          PROCEDURE DIVISION.
+      13 >            DISPLAY B R.
+    ----                        ^
+      14 |}]

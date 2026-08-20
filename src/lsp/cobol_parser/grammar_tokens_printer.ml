@@ -28,13 +28,13 @@ let combined_tokens =
   Seq.map (fun (a, b) -> b, a) @@
   List.to_seq Text_keywords.combined_keywords
 
-let pp_alphanum_string_prefix ppf Cobol_ptree.{ hexadecimal; quotation; str;
-                                                runtime_repr } =
+let pp_alphanum_string_prefix ppf Cobol_ptree.{ hexadecimal; quotation; given_str;
+                                                runtime_repr; _ } =
   if runtime_repr = Null_terminated_bytes then Fmt.char ppf 'Z';
   if hexadecimal then Fmt.char ppf 'X';
   match quotation with
-  | Simple_quote -> Fmt.pf ppf "'%s" str
-  | Double_quote -> Fmt.pf ppf "\"%s" str
+  | Simple_quote -> Fmt.pf ppf "'%s" given_str
+  | Double_quote -> Fmt.pf ppf "\"%s" given_str
 
 let pp_token_string: token Pretty.printer = fun ppf ->
   let string s = Pretty.string ppf s

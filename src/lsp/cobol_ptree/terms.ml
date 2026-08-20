@@ -13,6 +13,8 @@
 
 open Common
 open Numericals
+open Alphanums
+
 open Cobol_common.Srcloc.INFIX
 
 type name = string
@@ -67,16 +69,6 @@ type complex_ = [ `Complex ]
 (* Attributes for distinguishing sign conditions *)
 type strict_ = [ `Strict ]
 type loose_ = [ `Loose ]
-
-type alphanum_quote =
-  | Simple_quote (* '...' *)
-  | Double_quote (* "..." *)
-[@@deriving ord]
-
-type alphanum_repr =
-  | Native_bytes
-  | Null_terminated_bytes
-[@@deriving ord]
 
 type intrinsic_name =
   | ABS
@@ -203,25 +195,6 @@ let show_intrinsic_name i =
 let pp_intrinsic_name ppf i =
   Pretty.string ppf (show_intrinsic_name i)
 
-type alphanum =
-  {
-    str: string;
-    quotation: alphanum_quote;
-    hexadecimal: bool;
-    runtime_repr: alphanum_repr;
-  }
-[@@deriving ord]
-
-let pp_alphanum ppf { hexadecimal; quotation; str; runtime_repr } =
-  if runtime_repr = Null_terminated_bytes then Fmt.char ppf 'Z';
-  if hexadecimal then Fmt.char ppf 'X';
-  match quotation with
-  | Simple_quote -> Fmt.pf ppf "'%s'" str
-  | Double_quote -> Fmt.pf ppf "\"%s\"" str
-
-type national = string                                             (* for now *)
-[@@deriving ord, show]
-
 (** Now comes the type of all/most terms *)
 type _ term =
   | Alphanum: alphanum -> [>alnum_] term
@@ -330,7 +303,7 @@ and 'r cond =
   | Omitted of expr with_loc (** {v c OMITTED v} *)
   | Not of 'r cond with_loc (** {v NOT c v} *)
   | Logop of 'r cond with_loc * logop * 'r cond with_loc (** {v c <AND/OR> c' v} *)
-  
+
 and condition = abbrev_combined_relation cond
 
 and expanded_cond = binary_relation cond
@@ -355,7 +328,7 @@ and abbrev_relation_operand =
   | AbbrevSubject of abbrev_combined_relation (** {v NOT? e a v} *)
   | AbbrevParen of bool * abbrev_relation_operand with_loc (** {v NOT? (a) v} *)
   | AbbrevLogop (** {v a' <AND/OR> a'' v} *)
-      of (abbrev_relation_operand with_loc as 'x) * logop * 'x  
+      of (abbrev_relation_operand with_loc as 'x) * logop * 'x
   | AbbrevOther of no_rel cond (** {v <non-relational condition> v} *)
 
 
@@ -823,7 +796,7 @@ module COMPARE = struct
   let compare_strlit: strlit compare_fun = compare_term
   let compare_strlit_or_intlit: strlit_or_intlit compare_fun = compare_term
   let compare_scalar: scalar compare_fun = compare_term
-  
+
   let compare_condition a b = compare_cond compare_abbrev_combined_relation a b
   let compare_condition' a b = compare_cond' compare_abbrev_combined_relation a b
 end
@@ -1043,13 +1016,13 @@ module FMT = struct
     | BOr  -> "B-OR"
     | BXor -> "B-XOR"
   and pp_binop ppf o = string ppf (show_binop o)
-  
+
   and pp_sign: type k. k sign_cond Pretty.printer = fun ppf -> function
     | SgnPositive -> string ppf "POSITIVE"
     | SgnNegative -> string ppf "NEGATIVE"
     | SgnZero -> string ppf "ZERO"
   and pp_signz ppf = pp_sign ppf
-  
+
   and pp_literal: literal Pretty.printer = fun ppf -> pp_term ppf
   and pp_literal' = fun ppf -> pp_with_loc pp_literal ppf
   and pp_ident: ident Pretty.printer = fun ppf -> pp_term ppf
@@ -1064,7 +1037,7 @@ module FMT = struct
     | Ge -> ">="
     | Le -> "<="
   let pp_relop ppf o = string ppf (show_relop o)
-  
+
   let pp_binary_relation ppf (a, o, b) =
     fmt "%a@ %a@ %a" ppf
       pp_expr' a pp_relop o pp_expr' b
@@ -1090,8 +1063,8 @@ module FMT = struct
     | LOr -> string ppf "OR"
 
   let rec pp_cond:
-    'r. 'r Pretty.printer -> ?pos:bool -> 'r cond Pretty.printer = 
-    fun pp_rel ?(pos = true) ppf c -> 
+    'r. 'r Pretty.printer -> ?pos:bool -> 'r cond Pretty.printer =
+    fun pp_rel ?(pos = true) ppf c ->
     match c with
     | Expr e ->
         fmt "%a%a" ppf not_ pos pp_expr' e
@@ -1119,7 +1092,7 @@ module FMT = struct
   let pp_no_rel _ (never: no_rel) = match never with _ -> .
 
   let rec pp_abbrev_combined_relation ppf (neg, e, a) =
-    fmt "%a%a@ %a" ppf not_ (not neg) pp_expr' e 
+    fmt "%a%a@ %a" ppf not_ (not neg) pp_expr' e
       pp_abbrev_relation_operand ~&a
 
   and pp_abbrev_relation_operand ppf = function
@@ -1138,7 +1111,7 @@ module FMT = struct
           pp_abbrev_relation_operand ~&a1
           pp_logop o
           pp_abbrev_relation_operand ~&a2
-          
+
   (** Pretty-printing for named unions of term types (some are yet to be
       renamed) *)
 

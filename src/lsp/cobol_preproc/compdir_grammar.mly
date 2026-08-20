@@ -12,14 +12,17 @@
 (**************************************************************************)
 
 %{
+  open Cobol_common.Srcloc.TYPES
   open Compdir_tree
+
+  open Cobol_common.Srcloc.INFIX
 %}
 
 %token EOL
 %token <string> TEXT_WORD
-%token <Cobol_data.Literal.alphanum> ALPHANUM
-%token <Cobol_data.Literal.boolean> BOOLLIT
-%token <Cobol_data.Literal.fixed> FIXEDLIT
+%token <Cobol_data.Types.alphanum_literal> ALPHANUM
+%token <Cobol_data.Types.boolean_literal> BOOLLIT
+%token <Cobol_data.Types.fixed_literal> FIXEDLIT
 
 (* Note: use the lexer to distinguish punctuation *)
 %token EQ              "="          [@keyword (* symbol *)  "="]
@@ -103,6 +106,8 @@
 
 %start <unit> _unused_symbols             (* <- used to supress some warnings *)
 
+%type <string with_loc> text_word
+
 (* -------------------------------------------------------------------------- *)
 
 %%
@@ -139,7 +144,7 @@ let source_format :=
 (* --- >>SET ... | $ SET ... ------------------------------------------------ *)
 
 let set_directive :=
-  | ~ = nonempty_list(loc(set_directive_item)); PERIOD?; EOL; <>
+  | ~ = nonempty_list(loc(set_directive_item)); PERIOD?; EOL; < >
 
 let set_directive_item :=
   | ~ = set_operand; <Set_preproc>
@@ -150,8 +155,8 @@ let const_value :=
   | LPAR; ~ = loc(FIXEDLIT); RPAR; <Numeric>
 
 let string_value :=
-  | ~ = loc(ALPHANUM); <>
-  | LPAR; ~ = loc(TEXT_WORD); RPAR; <>
+  | a = loc(ALPHANUM); { a.payload.str &@<- a }
+  | LPAR; ~ = text_word; RPAR; < >
 
 let set_operand :=
   | ADDRSV;                                             {Add_srv}

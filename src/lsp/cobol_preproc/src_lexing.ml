@@ -474,7 +474,7 @@ let quoted_alphanum ?(fitting = Nominal) ~knd
      after text manipulation stage. *)
   let cld = closed_alphanum str
   and tbc = to_be_continued_alphanum str
-  and qte = if str.[0] = '\'' then Apostrophe else Quote in
+  and qte = if str.[0] = '\'' then Simple_quote else Double_quote in
   match state.continued with
   | CNone when fitting = Nominal && cld && not tbc ->
       emit (Alphanum { knd; qte; str = strip_quotes str } &@<- str') state
@@ -497,8 +497,8 @@ let quoted_alphanum ?(fitting = Nominal) ~knd
       let str = ~&s0 ^ strip_left_quote str
       and strloc = Cobol_common.Srcloc.concat ~@s0 ~@str' in
       let cld = match qte with
-        | Quote -> closed_alphanum ("\"" ^ str)
-        | Apostrophe -> closed_alphanum ("'" ^ str)
+        | Double_quote -> closed_alphanum ("\"" ^ str)
+        | Simple_quote -> closed_alphanum ("'" ^ str)
       in
       let str = if cld then strip_right_quote str else str in
       if fitting = Nominal && cld && not tbc then
