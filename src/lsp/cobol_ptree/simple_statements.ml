@@ -16,6 +16,7 @@
 open Common
 open Terms
 open Operands
+open Alphanums
 
 
 (*

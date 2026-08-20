@@ -25,21 +25,22 @@ let pointwise_range_at_start =
   let start_pos = Position.create ~line:0 ~character:0 in
   Range.create ~start:start_pos ~end_:start_pos
 
+let position_of_lexing_pos (pos: Lexing.position) =
+  Position.create           (* NOTE: Line numbers start at 0 in LSP protocol. *)
+    ~line:(pos.pos_lnum - 1)
+    ~character:(pos.pos_cnum - pos.pos_bol)
+
 (** {1 Postions {i w.r.t} lexical locations} *)
 
 (** [start_of_lexloc] creates a representation of the start of the given lexical
     location that is suitable for the LSP library. *)
 let start_of_lexloc ((start_pos, _end_pos): lexloc) =
-  Position.create           (* NOTE: Line numbers start at 0 in LSP protocol. *)
-    ~line:(start_pos.pos_lnum - 1)
-    ~character:(start_pos.pos_cnum - start_pos.pos_bol)
+  position_of_lexing_pos start_pos
 
 (** [end_of_lexloc] creates a representation of the end of the given lexical
     location that is suitable for the LSP library. *)
 let end_of_lexloc ((_start_pos, end_pos): lexloc) =
-  Position.create           (* NOTE: Line numbers start at 0 in LSP protocol. *)
-    ~line:(end_pos.pos_lnum - 1)
-    ~character:(end_pos.pos_cnum - end_pos.pos_bol)
+  position_of_lexing_pos end_pos
 
 (** [range_of_lexloc] creates a representation of the given lexical location
     that is suitable for the LSP library. *)
@@ -84,11 +85,28 @@ let intersects_lexloc (Range.{ start; end_ } as range) lexloc =
 let range_of_srcloc_in ~filename srcloc =
   range_of_lexloc (Srcloc.lexloc_in ~filename srcloc)
 
+(** [shallow_start_position_in ~filename srcloc] returns the position that
+    corresponds to the result of {!Srcloc.shallow_start_pos srcloc} if it lies
+    within [filename], and [None] otherwise. *)
+let shallow_start_position_in ~filename loc : Position.t option =
+  match Srcloc.shallow_start_pos loc with
+  | Some pos when pos.pos_fname = filename ->
+      Some (position_of_lexing_pos pos)
+  | Some _ | None ->
+      None
+
 (** [is_in_srcloc ~filename pos srcloc] is a shorthand for [is_in_lexloc pos
     (Srcloc.lexloc_in ~filename srcloc)] *)
 let is_in_srcloc ~filename pos srcloc =
   srcloc != Srcloc.dummy &&
   is_in_lexloc pos (Srcloc.lexloc_in ~filename srcloc)
+
+let is_in_src ~filename pos = function
+  | Source_location loc ->
+      is_in_srcloc ~filename pos loc
+  | Process_parameter
+  | Process_environment ->
+      false
 
 (* --- *)
 
@@ -139,4 +157,14 @@ class ['x] sieve ~filename ~pos = object
     if is_in_srcloc ~filename pos loc
     then Visitor.do_children
     else Visitor.skip_children
+end
+
+class ['x] shallow_sieve ~filename = object
+  method fold': 'n. ('n with_loc, 'x) Cobol_common.Visitor.fold =
+    fun { loc; _ } ->
+    match Srcloc.shallow_start_pos loc with
+    | Some pos when pos.pos_fname = filename ->
+        Visitor.do_children
+    | Some _ | None ->
+        Visitor.skip_children
 end

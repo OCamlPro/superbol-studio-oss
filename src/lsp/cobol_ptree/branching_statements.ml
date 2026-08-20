@@ -15,6 +15,7 @@
 
 open Common
 open Numericals
+open Alphanums
 open Terms
 open Operands
 open Simple_statements
