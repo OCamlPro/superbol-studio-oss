@@ -132,10 +132,35 @@ and binary_range_properties =
   }
 
 type data_storage =
-  | File of Cobol_ptree.name with_loc
+  | Generic_file of
+      {
+        file_name: Cobol_ptree.name with_loc;
+        file_record_size_info: file_record_size_info option;
+      }
+  | Sort_merge_file of
+      {
+        file_name: Cobol_ptree.name with_loc;
+      }
   | Local_storage
   | Working_storage
-  | Linkage                                                          (* file? *)
+  | Linkage
+
+and file_record_size_info =
+  | Fixed_record_size of
+      {
+        size: int with_loc;
+      }
+  | Varying_record_size of
+      {
+        min: int with_loc option;
+        max: int with_loc option;
+        depending: Cobol_ptree.qualname with_loc option;
+      }
+  | Bound_record_size of    (* either fixed or variable (implementor-defined) *)
+      {
+        min: int with_loc;
+        max: int with_loc;
+      }
 
 type length_variability =
   | Fixed_length

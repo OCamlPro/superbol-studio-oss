@@ -11,6 +11,7 @@
     ok_conditions ko_conditions
                   ko_proc_names
                   ko_syntax
+    ok_fd
     ok_78         ko_78)
  (preprocess
   (pps ppx_expect))
