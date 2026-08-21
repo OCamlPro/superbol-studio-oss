@@ -27,11 +27,49 @@ let pp_qualname'_list = Fmt.(hbox (list ~sep:comma Cobol_ptree.pp_qualname'))
 let pp_literal'_opt = Fmt.option Cobol_ptree.pp_literal'
 let pp_literal'_list = Fmt.list Cobol_ptree.pp_literal'
 
+let pp_file_record_size_info ppf = function
+  | Fixed_record_size { size } ->
+      Pretty.record_with_conditional_fields [
+        T Fmt.(styled `Yellow @@ any "fixed");
+        T (Fmt.field "size" (fun () -> size) pp_int');
+      ] ppf ()
+  | Varying_record_size { min; max; depending } ->
+      Pretty.record_with_conditional_fields [
+        T Fmt.(styled `Yellow @@ any "varying");
+        C'(min <> None,
+           Fmt.field "min" (fun () -> min) pp_int'_opt);
+        C'(max <> None,
+           Fmt.field "max" (fun () -> max) pp_int'_opt);
+        C'(depending <> None,
+           Fmt.field "depending" (fun () -> depending) pp_qualname'_opt);
+      ] ppf ()
+  | Bound_record_size { min; max } ->
+      Pretty.record_with_conditional_fields [
+        T Fmt.(styled `Yellow @@ any "fixed-or-variable");
+        T (Fmt.field "min" (fun () -> min) pp_int');
+        T (Fmt.field "max" (fun () -> max) pp_int');
+      ] ppf ()
+
 let pp_data_storage ppf = function
-  | File n -> Fmt.pf ppf "FILE@ %a" Cobol_ptree.pp_name' n
-  | Local_storage -> Fmt.string ppf "LOCAL-STORAGE"
-  | Working_storage -> Fmt.string ppf "WORKING-STORAGE"
-  | Linkage -> Fmt.string ppf "LINKAGE"
+  | Generic_file { file_name; file_record_size_info } ->
+      Pretty.record_with_conditional_fields [
+        T Fmt.(styled `Yellow @@ any "file");
+        T Fmt.(field "name" (fun () -> file_name) Cobol_ptree.pp_name');
+        C'(file_record_size_info <> None,
+           Pretty.vfield "record-size" (fun () -> file_record_size_info)
+             (Fmt.option pp_file_record_size_info));
+      ] ppf ()
+  | Sort_merge_file { file_name } ->
+      Pretty.record_with_conditional_fields [
+        T Fmt.(styled `Yellow @@ any "sort-merge-file");
+        T Fmt.(field "name" (fun () -> file_name) Cobol_ptree.pp_name');
+      ] ppf ()
+  | Local_storage ->
+      Fmt.string ppf "LOCAL-STORAGE"
+  | Working_storage ->
+      Fmt.string ppf "WORKING-STORAGE"
+  | Linkage ->
+      Fmt.string ppf "LINKAGE"
 
 (* usage *)
 

@@ -26,11 +26,19 @@ type data_clauses =
     value: Cobol_ptree.data_value_clause with_loc option;
     redefines: Cobol_ptree.name with_loc option;
     sign: Cobol_ptree.sign_clause with_loc option;
-    clause_diags: diagnostics;
+    data_clause_diags: diagnostics;
   }
 
 
-let init_clauses =
+type fd_clauses =
+  {
+    fd_record: Cobol_ptree.record_clause with_loc option;
+    fd_clause_diags: diagnostics;
+  }
+
+(* --- *)
+
+let no_data_clauses =
   {
     occurs = None;
     usage = None;
@@ -38,18 +46,24 @@ let init_clauses =
     value = None;
     redefines = None;
     sign = None;
-    clause_diags = [];
+    data_clause_diags = [];
+  }
+
+let no_fd_clauses =
+  {
+    fd_record = None;
+    fd_clause_diags = [];
   }
 
 
 let clause_error acc error =
-  { acc with clause_diags = Data_error error :: acc.clause_diags }
+  { acc with data_clause_diags = Data_error error :: acc.data_clause_diags }
 
 let clause_warn acc warn =
-  { acc with clause_diags = Data_warning warn :: acc.clause_diags }
+  { acc with data_clause_diags = Data_warning warn :: acc.data_clause_diags }
 
 let clause_diagnostic acc diag =
-  { acc with clause_diags = diag :: acc.clause_diags }
+  { acc with data_clause_diags = diag :: acc.data_clause_diags }
 
 let register_used_feature acc ~loc:usage_loc ~feature =
   clause_diagnostic acc @@ Dialect_feature_used { feature; usage_loc }
@@ -89,7 +103,7 @@ let on_redefines_clause acc =
   on_unique_clause ~clause_name:"REDEFINES" acc.redefines acc
     ~f:begin fun acc clause ->
       let acc =
-        if acc != init_clauses then  (* note: hackish use of physical equality *)
+        if acc != no_data_clauses then (* note: hackish use of physical equality *)
           register_used_feature acc
             ~feature:Cobol_config.Options.free_redefines_position
             ~loc:~@clause
@@ -114,7 +128,37 @@ let of_data_item (data_clauses: Cobol_ptree.data_clause with_loc list) =
     | DataValue     d -> on_value_clause acc (d &@ loc)
     | DataSign      s -> on_sign_clause acc (s &@ loc)
     | _ -> acc
-  end init_clauses data_clauses
+  end no_data_clauses data_clauses
+
+
+(* --- *)
+
+
+let fd_clause_warn acc warn =
+  { acc with fd_clause_diags = Data_warning warn :: acc.fd_clause_diags }
+
+
+let on_unique_file_clause ~clause_name ~f prev_val acc clause =
+  match prev_val with
+  | Some { loc; _ } ->
+      fd_clause_warn acc (Duplicate_clause { clause_name;
+                                             first_loc = loc;
+                                             second_loc = ~@clause })
+  | None ->
+      f acc clause
+
+
+let on_fd_record_clause acc =
+  on_unique_file_clause ~clause_name:"RECORD" acc.fd_record acc
+    ~f:(fun acc clause -> { acc with fd_record = Some clause })
+
+
+let of_fd (file_clauses: Cobol_ptree.file_fd_clause with_loc list) =
+  List.fold_left begin fun acc { payload = clause; loc } ->
+    match (clause: Cobol_ptree.file_fd_clause) with
+    | FileRecord    o -> on_fd_record_clause acc (o &@ loc)
+    | _ -> acc
+  end no_fd_clauses file_clauses
 
 
 (* --- *)
