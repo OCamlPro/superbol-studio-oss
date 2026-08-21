@@ -279,14 +279,14 @@ let fold_record_clause (v: _ #folder) =
   handle v#fold_record_clause
     ~continue:begin fun c x -> match c with
       | FixedLength i -> x
-          >> fold_integer v i
+          >> fold_integer' v i
       | VariableLength { min_length; max_length; depending } -> x
-          >> fold_integer_opt v min_length
-          >> fold_integer_opt v max_length
+          >> fold_integer'_opt v min_length
+          >> fold_integer'_opt v max_length
           >> fold_qualname'_opt v depending
       | FixedOrVariableLength { min_length; max_length } -> x
-          >> fold_integer v min_length
-          >> fold_integer v max_length
+          >> fold_integer' v min_length
+          >> fold_integer' v max_length
     end
 
 let fold_recording_mode (v: _ #folder) =

@@ -10,6 +10,7 @@
     ok_redefines  ko_redefines
     ok_conditions ko_conditions
                   ko_proc_names
+    ok_fd
                   ko_syntax)
  (preprocess
   (pps ppx_expect))
