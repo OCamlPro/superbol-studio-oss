@@ -179,35 +179,36 @@ let eval_condition ~(operator: Compdir_tree.condition_operator) a b =
 
 
 let eval_defined_condition var polarity env =
+  (* CHECKME: check whether DEFINED applies on 78-level items (compil. vars) *)
   match ENV.var_definition_of (* ~try_compil_vars:false *) ~var env with
   | Ok def ->
-      OUT.result (polarity, [var_eval var ~def])                      (* use! *)
+      OUT.result (polarity, [var_eval var ~def])                   (* var_use *)
   | Error Undefined ->
-      OUT.result (not polarity, [var_eval var])                         (* use! *)
+      OUT.result (not polarity, [var_eval var])                      (* var_use *)
 
 let eval_set_condition ~loc var polarity env =
   let diags = Preproc_diagnostics.none in
-  let item = Set_condition_directive { assumed_set = false } in
   let def =
+    (* CHECKME: check whether SET applies on 78-level items (compil. vars) *)
     match ENV.var_definition_of (* ~try_compil_vars:false *) ~var env with
     | Ok def ->
         Some def
     | Error Undefined ->
         None
   in
-  let set =
+  let set, diags =
     match def with
     | None ->
-        false
+        false, diags
     | Some Preproc_var def | Some Compilation_var def ->
         match def.src_payload.compvar_value.src_payload with
         | Boolean b ->
-            not (Z.equal b.bool_bits Z.zero)
-        | Alphanum _ | Numeric _ ->                                 (* CHECKME *)
-            false
+            not (Z.equal b.bool_bits Z.zero), diags
+        | Alphanum _ | Numeric _ ->            (* CHECKME: not on non-booleans *)
+            let item = Set_condition_directive { assumed_set = false } in
+            false, warn diags @@ Ignored { loc; item }
   in
-  OUT.result (set = polarity, [var_eval var ?def])
-    ~diags:(warn diags @@ Ignored { loc; item })
+  OUT.result (set = polarity, [var_eval var ?def]) ~diags
 
 let eval_value_condition ~loc var polarity env =
   let diags = Preproc_diagnostics.none in
