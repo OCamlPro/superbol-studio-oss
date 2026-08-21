@@ -15,6 +15,7 @@
     strings. *)
 
 include Common
+include Alphanums
 include Numericals
 include Terms
 include Misc_sections

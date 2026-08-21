@@ -51,8 +51,9 @@ let%expect_test "tokens-with-attached-ampersand" =
   |};
   [%expect {|
     IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[prog], ., PROCEDURE,
-    DIVISION, ., DISPLAY, X"00", &, WORD[A], ., DISPLAY, WORD[A], &, WORD[B], .,
-    DISPLAY, WORD[A], &, X"00", ., DISPLAY, X"100", &, X"00", ., EOF
+    DIVISION, ., DISPLAY, X"00"/"\000", &, WORD[A], ., DISPLAY, WORD[A], &,
+    WORD[B], ., DISPLAY, WORD[A], &, X"00"/"\000", ., DISPLAY, X"100"/"\001\000",
+    &, X"00"/"\000", ., EOF
 |}];;
 
 let%expect_test "tokens-operators-after-parenthesis" =

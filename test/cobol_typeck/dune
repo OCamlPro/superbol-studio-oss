@@ -10,7 +10,8 @@
     ok_redefines  ko_redefines
     ok_conditions ko_conditions
                   ko_proc_names
-                  ko_syntax)
+                  ko_syntax
+    ok_78         ko_78)
  (preprocess
   (pps ppx_expect))
  (inline_tests

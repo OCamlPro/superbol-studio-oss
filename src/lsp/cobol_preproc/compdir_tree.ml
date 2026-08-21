@@ -31,10 +31,10 @@ type directive =
 
 and source_directive =
   | Source_format_is_free of srcloc [@printer fun _ _ -> ()]
-  | Source_format_is of Cobol_data.Literal.alphanum with_loc
+  | Source_format_is of string with_loc
 
 and set_directive_item =
-  | Set_source_format of Cobol_data.Literal.alphanum with_loc
+  | Set_source_format of string with_loc
   | Set_preproc of set_operand
 
 and preproc_directive =
@@ -61,9 +61,21 @@ and definition_value =
   | Parameter_definition
 
 and literal =
-  | Alphanum of Cobol_data.Literal.alphanum with_loc
-  | Boolean of Cobol_data.Literal.boolean with_loc
-  | Numeric of Cobol_data.Literal.fixed with_loc
+  | Alphanum of alphanum_literal with_loc
+  | Boolean of boolean_literal with_loc
+  | Numeric of fixed_literal with_loc
+
+and alphanum_literal =
+  Cobol_data.Types.alphanum_literal
+  [@printer Cobol_data.Printer.pp_alphanum_literal]
+
+and boolean_literal =
+  Cobol_data.Types.boolean_literal
+  [@printer Cobol_data.Printer.pp_boolean_literal]
+
+and fixed_literal =
+  Cobol_data.Types.fixed_literal
+  [@printer Cobol_data.Printer.pp_fixed_literal]
 
 and term =
   | Variable of var with_loc
@@ -108,7 +120,7 @@ and set_operand =
   | Constant of var with_loc * literal
   | DPC_in_data of bool
   | Fold_copy_name of bool
-  | Int_level of Cobol_data.Literal.fixed with_loc
+  | Int_level of fixed_literal with_loc
   | Make_syn
   | Nest_call
   | N_symbol of string with_loc
