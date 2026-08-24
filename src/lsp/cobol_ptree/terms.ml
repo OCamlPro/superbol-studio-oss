@@ -1135,6 +1135,9 @@ include FMT
 
 module UPCAST = struct
   (** Exlicit term upcasting utilities, that should all reduce to identity. *)
+  (* For each upcasting operation, we first properly show the equivalence with
+     an implementation, and then re-declare the symbol as "%identity" for
+     performance purposes. *)
 
   let ident_with_alphanum: ident -> ident_or_alphanum = function
     | QualIdent _ as v -> v
@@ -1146,6 +1149,7 @@ module UPCAST = struct
     | Counter _ as v -> v
     | RefMod _ as v -> v
     | ScalarRefMod _ as v -> v
+  external ident_with_alphanum: ident -> ident_or_alphanum = "%identity"
 
   let ident_with_nonnum: ident -> ident_or_nonnum = function
     | QualIdent _ as v -> v
@@ -1157,6 +1161,7 @@ module UPCAST = struct
     | Counter _ as v -> v
     | RefMod _ as v -> v
     | ScalarRefMod _ as v -> v
+  external ident_with_nonnum: ident -> ident_or_nonnum = "%identity"
 
   let ident_with_numeric: ident -> ident_or_numlit = function
     | QualIdent _ as v -> v
@@ -1168,6 +1173,7 @@ module UPCAST = struct
     | Counter _ as v -> v
     | RefMod _ as v -> v
     | ScalarRefMod _ as v -> v
+  external ident_with_numeric: ident -> ident_or_numlit = "%identity"
 
   let ident_with_string: ident -> ident_or_strlit = function
     | QualIdent _ as v -> v
@@ -1179,6 +1185,7 @@ module UPCAST = struct
     | Counter _ as v -> v
     | RefMod _ as v -> v
     | ScalarRefMod _ as v -> v
+  external ident_with_string: ident -> ident_or_strlit = "%identity"
 
   let ident_with_literal: ident -> ident_or_literal = function
     | QualIdent _ as v -> v
@@ -1190,6 +1197,7 @@ module UPCAST = struct
     | Counter _ as v -> v
     | RefMod _ as v -> v
     | ScalarRefMod _ as v -> v
+  external ident_with_literal: ident -> ident_or_literal = "%identity"
 
   let ident_with_integer: ident -> ident_or_intlit = function
     | QualIdent _ as v -> v
@@ -1201,24 +1209,43 @@ module UPCAST = struct
     | Counter _ as v -> v
     | RefMod _ as v -> v
     | ScalarRefMod _ as v -> v
+  external ident_with_integer: ident -> ident_or_intlit = "%identity"
 
   let string_with_name: strlit -> name_or_string = function
     | Alphanum _ as v -> v
     | National _ as v -> v
     | Fig _ as v -> v
     | StrConcat _ as v -> v
+  external string_with_name: strlit -> name_or_string = "%identity"
 
   let string_with_ident: strlit -> ident_or_strlit = function
     | Alphanum _ as v -> v
     | National _ as v -> v
     | Fig _ as v -> v
     | StrConcat _ as v -> v
+  external string_with_ident: strlit -> ident_or_strlit = "%identity"
+
+  let strlit_as_nonnumlit: strlit -> nonnumlit = function
+    | Alphanum _ as v -> v
+    | National _ as v -> v
+    | Fig _ as v -> v
+    | StrConcat _ as v -> v
+  external strlit_as_nonnumlit: strlit -> nonnumlit = "%identity"
+
+  let strlit_as_nonnumlit: strlit -> literal = function
+    | Alphanum _ as v -> v
+    | National _ as v -> v
+    | Fig _ as v -> v
+    | StrConcat _ as v -> v
+  external strlit_as_literal: strlit -> literal = "%identity"
+  external strlit'_as_literal': strlit with_loc -> literal with_loc = "%identity"
 
   let numeric_with_ident: numlit -> ident_or_numlit = function
     | Integer _ as v -> v
     | Fixed _ as v -> v
     | Floating _ as v -> v
     | NumFig _ as v -> v
+  external numeric_with_ident: numlit -> ident_or_numlit = "%identity"
 
   let nonnum_with_ident: nonnumlit -> ident_or_nonnum = function
     | Alphanum _ as v -> v
@@ -1227,6 +1254,17 @@ module UPCAST = struct
     | Fig _ as v -> v
     | StrConcat _ as v -> v
     | Concat _ as v -> v
+  external nonnum_with_ident: nonnumlit -> ident_or_nonnum = "%identity"
+
+  let nonnum_as_literal: nonnumlit -> literal = function
+    | Alphanum _ as v -> v
+    | National _ as v -> v
+    | Boolean _ as v -> v
+    | Fig _ as v -> v
+    | StrConcat _ as v -> v
+    | Concat _ as v -> v
+  external nonnum_as_literal: nonnumlit -> literal = "%identity"
+  external nonnum'_as_literal': nonnumlit with_loc -> literal with_loc = "%identity"
 
   let literal_with_ident: literal -> ident_or_literal = function
     | Alphanum _ as v -> v
@@ -1239,6 +1277,7 @@ module UPCAST = struct
     | Fig _ as v -> v
     | StrConcat _ as v -> v
     | Concat _ as v -> v
+  external literal_with_ident: literal -> ident_or_literal = "%identity"
 
   let literal_with_name: literal -> name_or_literal = function
     | Alphanum _ as v -> v
@@ -1251,8 +1290,9 @@ module UPCAST = struct
     | Fig _ as v -> v
     | StrConcat _ as v -> v
     | Concat _ as v -> v
+  external literal_with_name: literal -> name_or_literal = "%identity"
 
-  let literal_with_qualdatname: literal -> qualname_or_literal = function
+  let literal_with_qualname: literal -> qualname_or_literal = function
     | Alphanum _ as v -> v
     | National _ as v -> v
     | Boolean _ as v -> v
@@ -1263,21 +1303,26 @@ module UPCAST = struct
     | Fig _ as v -> v
     | StrConcat _ as v -> v
     | Concat _ as v -> v
+  external literal_with_qualname: literal -> qualname_or_literal = "%identity"
 
   let qualname_with_alphanum: qualname -> qualname_or_alphanum = function
     | Name _ as v -> v
     | Qual _ as v -> v
+  external qualname_with_alphanum: qualname -> qualname_or_alphanum = "%identity"
 
   let qualname_with_literal: qualname -> qualname_or_literal = function
     | Name _ as v -> v
     | Qual _ as v -> v
+  external qualname_with_literal: qualname -> qualname_or_literal = "%identity"
 
   let qualname_with_integer: qualname -> qualname_or_intlit = function
     | Name _ as v -> v
     | Qual _ as v -> v
+  external qualname_with_integer: qualname -> qualname_or_intlit = "%identity"
 
   let name_with_literal: name_ term -> name_or_literal = function
     | Name _ as v -> v
+  external name_or_literal: name_ term -> name_or_literal = "%identity"
 
   let base_ident_with_refmod: base_ident_ term -> ident = function
     | QualIdent _ as v -> v
@@ -1288,6 +1333,7 @@ module UPCAST = struct
     | Address _ as v -> v
     | Counter _ as v -> v
     | ScalarRefMod _ as v -> v
+  external base_ident_with_refmod: base_ident_ term -> ident = "%identity"
 
   let scalar_ident_as_scalar: scalar_ident_ term -> scalar = function
     | QualIdent _ as v -> v
@@ -1297,12 +1343,14 @@ module UPCAST = struct
     | Address _ as v -> v
     | Counter _ as v -> v
     | ScalarRefMod _ as v -> v
+  external scalar_ident_as_scalar: scalar_ident_ term -> scalar = "%identity"
 
   let numeric_as_scalar: numlit -> scalar = function
     | Integer _ as v -> v
     | Fixed _ as v -> v
     | Floating _ as v -> v
     | NumFig _ as v -> v
+  external numeric_as_scalar: numlit -> scalar = "%identity"
 
   let nonnumlit_as_scalar: nonnumlit -> scalar = function
     | Alphanum _ as v -> v
@@ -1311,6 +1359,7 @@ module UPCAST = struct
     | Fig _ as v -> v
     | StrConcat _ as v -> v
     | Concat _ as v -> v
+  external nonnumlit_as_scalar: nonnumlit -> scalar = "%identity"
 
   let literal_as_scalar: literal -> scalar = function
     | Alphanum _ as v -> v
@@ -1323,6 +1372,7 @@ module UPCAST = struct
     | Fig _ as v -> v
     | StrConcat _ as v -> v
     | Concat _ as v -> v
+  external literal_as_scalar: literal -> scalar = "%identity"
 end
 
 (* --- *)

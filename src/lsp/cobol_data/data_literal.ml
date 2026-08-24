@@ -178,51 +178,11 @@ let rec value
   | National _ ->
       unsupported ~loc:~@lit National_literal
 
-and strlit_value: Cobol_ptree.strlit with_loc -> _ = fun lit ->
-  match ~&lit with
-  | Alphanum x ->
-      alphanum_literal_value (x &@<- lit)
-  | Fig Zero ->
-      Ok (Zero_value &@<- lit)
-  | Fig Space ->
-      Ok (Space_value &@<- lit)
-  | Fig Quote ->
-      Ok (Quote_value &@<- lit)
-  | Fig LowValue ->
-      Ok (Low_value &@<- lit)
-  | Fig HighValue ->
-      Ok (High_value &@<- lit)
-  | StrConcat (a, b) ->
-      concat ~loc:~@lit (strlit_value a) (strlit_value b)
-  | Fig (All _ as x) ->
-      unsupported ~loc:~@lit (Figurative_constant x)
-  | National _ ->
-      unsupported ~loc:~@lit National_literal
+and strlit_value lit =
+  value (Cobol_ptree.UPCAST.strlit'_as_literal' lit)
 
-and nonnumlit_value: Cobol_ptree.nonnumlit with_loc -> _ = fun lit ->
-  match ~&lit with
-  | Alphanum x ->
-      alphanum_literal_value (x &@<- lit)
-  | Boolean x ->
-      boolean_literal_value (x &@<- lit)
-  | Fig Zero ->
-      Ok (Zero_value &@<- lit)
-  | Fig Space ->
-      Ok (Space_value &@<- lit)
-  | Fig Quote ->
-      Ok (Quote_value &@<- lit)
-  | Fig LowValue ->
-      Ok (Low_value &@<- lit)
-  | Fig HighValue ->
-      Ok (High_value &@<- lit)
-  | StrConcat (a, b) ->
-      concat ~loc:~@lit (strlit_value a) (strlit_value b)
-  | Concat (a, b) ->
-      concat ~loc:~@lit (nonnumlit_value a) (nonnumlit_value b)
-  | Fig (All _ as x) ->
-      unsupported ~loc:~@lit (Figurative_constant x)
-  | National _ ->
-      unsupported ~loc:~@lit National_literal
+and nonnumlit_value lit =
+  value (Cobol_ptree.UPCAST.nonnum'_as_literal' lit)
 
 and concat ~loc a b =
   match a, b with

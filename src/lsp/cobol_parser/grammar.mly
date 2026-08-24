@@ -2613,7 +2613,7 @@ nonnumeric_literal_no_all:
 (* Used in many *)
 let qualname_or_literal :=
  | n = qualname; { UPCAST.qualname_with_literal n }
- | l = literal;  { UPCAST.literal_with_qualdatname l }
+ | l = literal;  { UPCAST.literal_with_qualname l }
 
 let x == scalar                                       (* alias, as in GnuCOBOL *)
 let scalar :=
