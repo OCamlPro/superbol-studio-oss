@@ -60,6 +60,7 @@ menhirLib = ">2019"
 
 # package tools dependencies
 [tools]
+menhir = ">=20231231 <20240715"
 
 # package fields (depends on package skeleton)
 #Examples:
