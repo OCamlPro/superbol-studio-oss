@@ -180,12 +180,12 @@ let boolean_of_string ?(base: [`Bool | `Hex] = `Bool) literal =
 let boolean (b: Cobol_ptree.boolean) : (boolean_value, error) result =
   boolean_of_string ~base:b.bool_base b.bool_string
 
-let boolean_to_string { bool_width; bool_bits } : string =
+let string_of_boolean { bool_width; bool_bits } : string =
   if bool_width = 0
   then ""
   else Z.format (Printf.sprintf "%%0%db" bool_width) bool_bits
 
 let ptree_of_boolean b : Cobol_ptree.boolean =
-  Cobol_ptree.{ bool_base = `Bool; bool_string = boolean_to_string b }
+  { bool_base = `Bool; bool_string = string_of_boolean b }
 
 (* --- *)
