@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-d57e6f04b6abae161e681f93858f13c1:.
+f3d50bff8eeb746eed6b1e25f5273f0b:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -305,7 +305,7 @@ e20a36e2a2371141499b1a1e7f888be0:opam/vscode-js-stubs.opam
 
 # begin context for opam/vscode-json.opam
 # file opam/vscode-json.opam
-2b95ef5238fdd00942fd64ed8fb0bf64:opam/vscode-json.opam
+44f4d0e5084fbfc357354786b2b1eb29:opam/vscode-json.opam
 # end context for opam/vscode-json.opam
 
 # begin context for opam/vscode-languageclient-js-stubs.opam
