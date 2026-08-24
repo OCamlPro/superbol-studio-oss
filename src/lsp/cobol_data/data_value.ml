@@ -11,15 +11,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Representation of basic COBOL values.
-
-    `*_of_strings?` functions may raise {!INVALID_CHARS}. *)
+(** Representation of basic COBOL values. *)
 
 open Data_types
 
 module NEL = Cobol_common.Basics.NEL
 
-exception INVALID_CHARS of (int * char) NEL.t
+(* --- *)
+
+type error = Invalid_chars of (int * char) NEL.t                     [@@unboxed]
 
 (* Accumulates a non-empty list of characters, associated with their index in a
    string [S], and raises {!INVALID_CHARS}.
@@ -39,7 +39,7 @@ let invalid_chars specs =
       end (0, chars) s
     end [] specs
   in
-  raise @@ INVALID_CHARS chars
+  Error (Invalid_chars chars)
 
 let non_digit = function
   | '0' .. '9' -> false
@@ -70,13 +70,16 @@ let of_hex hex =
     Char.chr ((hi lsl 4) lor lo)
   end
 
-let alphanum_of_string ?(hexadecimal = false) s : alphanum_value =
-  if not hexadecimal then s else
-    try of_hex s
+let plain_alphanum: string -> alphanum_value =
+  Fun.id
+
+let alphanum_of_string ?(hexadecimal = false) s : (alphanum_value, error) result =
+  if not hexadecimal then Ok s else
+    try Ok (of_hex s)
     with Invalid_argument _ ->
       invalid_chars [s, 0, non_bool_bit ~base:`Hex]
 
-let alphanum (a: Cobol_ptree.alphanum) : alphanum_value =
+let alphanum (a: Cobol_ptree.alphanum) : (alphanum_value, error) result =
   alphanum_of_string ~hexadecimal:a.hexadecimal a.str
 
 let concat_alphanums a b =
@@ -92,10 +95,10 @@ let ptree_of_alphanum (a: alphanum_value) : Cobol_ptree.alphanum =
 
 let integer_zero = Z.zero
 let integer_of_string s =
-  try Z.of_string_base 10 s
+  try Ok (Z.of_string_base 10 s)
   with Invalid_argument _ ->
     invalid_chars [s, 0, non_digit]
-let integer (i: Cobol_ptree.integer) : integer_value =
+let integer (i: Cobol_ptree.integer) : (integer_value, error) result =
   integer_of_string i
 let string_of_integer =
   Z.to_string
@@ -105,11 +108,11 @@ let string_of_integer =
 let fixed_zero = Q.zero
 let fixed_of_string = Q.of_string
 let fixed_of_strings ~integral ~fractional =
-  try Printf.ksprintf Q.of_string "%s.%s" integral fractional
+  try Ok (Printf.ksprintf Q.of_string "%s.%s" integral fractional)
   with Invalid_argument _ ->
     invalid_chars [integral,   0,                          non_digit;
                    fractional, String.length integral + 1, non_digit]
-let fixed (f: Cobol_ptree.fixed) : fixed_value =
+let fixed (f: Cobol_ptree.fixed) : (fixed_value, error) result =
   fixed_of_strings ~integral:f.fixed_integral ~fractional:f.fixed_fractional
 let string_of_fixed = Q.to_string
 
@@ -134,15 +137,15 @@ let floating_zero: floating_value =
 
 let floating_of_strings ~integral ~fractional ~exponent =
   try
-    { float_significand = Q.of_string (integral ^ "." ^ fractional);
-      float_exponent = int_of_string exponent }
+    Ok ({ float_significand = Q.of_string (integral ^ "." ^ fractional);
+          float_exponent = int_of_string exponent })
   with Invalid_argument _ ->
     let ilen = String.length integral and flen = String.length fractional in
     invalid_chars [integral,   0,               non_digit;
                    fractional, ilen + 1,        non_digit;
                    exponent,   ilen + flen + 2, non_digit]
 
-let floating (f: Cobol_ptree.floating) : floating_value =
+let floating (f: Cobol_ptree.floating) : (floating_value, error) result =
   floating_of_strings
     ~integral:f.float_significand.fixed_integral
     ~fractional:f.float_significand.fixed_fractional
@@ -162,19 +165,19 @@ let boolean_zero: boolean_value =
     bool_bits = integer_zero;
   }
 
-let boolean_of_string ?(base: [`Bool | `Hex] = `Bool) literal : boolean_value =
+let boolean_of_string ?(base: [`Bool | `Hex] = `Bool) literal =
   match literal with
   | "" ->
-      { bool_width = 0; bool_bits = Z.zero }
+      Ok { bool_width = 0; bool_bits = Z.zero }
   | s ->
-      let bool_width = String.length s * if base = `Bool then 1 else 4 in
       try
-        let bool_bits = Z.of_string_base (if base = `Bool then 2 else 16) s in
-        { bool_width; bool_bits }
+        let bool_width = String.length s * if base = `Bool then 1 else 4 in
+        Ok ({ bool_width;
+              bool_bits = Z.of_string_base (if base = `Bool then 2 else 16) s })
       with Invalid_argument _ ->
         invalid_chars [s, 0, non_bool_bit ~base]
 
-let boolean (b: Cobol_ptree.boolean) : boolean_value =
+let boolean (b: Cobol_ptree.boolean) : (boolean_value, error) result =
   boolean_of_string ~base:b.bool_base b.bool_string
 
 let boolean_to_string { bool_width; bool_bits } : string =

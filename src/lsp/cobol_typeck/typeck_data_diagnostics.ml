@@ -143,6 +143,8 @@ type error =
         name: string;
         loc: srcloc;
       }
+  | Data_literal_error of
+      Cobol_data.Types.error
 
 and picture_feature =
   | Digits of { given: int; min: int; max: int }
@@ -211,6 +213,8 @@ let error_loc = function
   | Unexpected_redefinition_name { redef_redefines = { loc; _ }; _ }
   | Unexpected_table_value_clause { value_loc = loc; _ } ->
       Some loc
+  | Data_literal_error e ->
+      Some (Cobol_data.Error.loc e)
 
 let warning_loc = function
   | Duplicate_clause { second_loc = loc; _ }
@@ -316,6 +320,8 @@ let pp_error ppf = function
                        " pp_entry entry pp_misplacement_explanation expl
   | Pending_feature { name; _ } ->
       Pretty.print ppf "%s@ is@ not@ supported@ yet" name
+  | Data_literal_error e ->
+      Cobol_data.Printer.pp_error ppf e
 
 let pp_warning ppf = function
   | Redefinition_of_table_item { table_item_name; _ } ->

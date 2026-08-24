@@ -14,6 +14,7 @@
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 module LIST = Cobol_common.Basics.LIST
+module NEL = Cobol_common.Basics.NEL
 
 type error =
   | Copybook_lookup_error of { copyloc: srcloc option;
@@ -22,7 +23,7 @@ type error =
   | Feature_error of Cobol_config.DIAG.error
   | Forbidden of { loc: srcloc; stuff: forbidden_stuff }
   | Invalid of { loc: srcloc; stuff: invalid_stuff }
-  | Literal_error of Cobol_data.Diagnostics.error
+  | Literal_error of Cobol_data.Types.error
   | Malformed of { loc: srcloc; stuff: malformed_stuff }
   | Missing of { loc: srcloc; stuff: missing_stuff }
   | Src_error of Src_diagnostics.error
@@ -68,7 +69,7 @@ let error_loc = function
   | Src_error e ->
       Some (Src_diagnostics.error_loc e)
   | Literal_error e ->
-      Some (Cobol_data.Diagnostics.error_loc e)
+      Some (Cobol_data.Error.loc e)
   | Cyclic_copy { copyloc = loc; _ }
   | Forbidden { loc; _ }
   | Invalid { loc; _ }
@@ -149,7 +150,7 @@ let pp_error ppf = function
   | Invalid { stuff; _ } ->
       Pretty.print ppf "Invalid@ %a" pp_invalid_stuff stuff
   | Literal_error e ->
-      Cobol_data.Diagnostics.pp_error ppf e
+      Cobol_data.Printer.pp_error ppf e
   | Malformed { stuff = Compiler_directive; _ } ->
       Pretty.print ppf "Malformed@ compiler@ directive"
   | Malformed { stuff = Preproc_statement stmt; _ } ->
@@ -289,13 +290,14 @@ let add_src_diagnostics Src_diagnostics.{ errors; warnings } diags =
   List.fold_right (fun e -> add_error (Src_error e)) errors |>
   List.fold_right (fun w -> add_warning (Src_warning w)) warnings
 
-let add_literal_diagnostics Cobol_data.Diagnostics.{ errors; _ } diags =
-  List.fold_left begin fun diags error ->
-    add_error (Literal_error error) diags
-  end diags errors
+let literal_error diags error =
+  add_error (Literal_error error) diags
 
-let literal_diagnostics diags =
-  add_literal_diagnostics diags none
+let literal_errors diags = function
+  | None ->
+      diags
+  | Some errors ->
+      NEL.fold_left diags errors ~f:literal_error
 
 let translate ({ warnings; errors }: t) =
   let module DIAGS = Cobol_common.Diagnostics in

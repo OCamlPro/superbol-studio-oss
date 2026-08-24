@@ -93,7 +93,7 @@ let definition_value ~platform ~var ~(value: Compdir_tree.definition_value with_
       match platform.getenv_opt @@ ENV.VAR.to_uppercase_string ~&var with
       | Some value ->
           Ok (Cobol_common.Srcloc.with_src ~src:Process_environment @@
-              ENV.Alphanum (Cobol_data.Value.alphanum_of_string value))
+              ENV.Alphanum (Cobol_data.Value.plain_alphanum value))
       | None ->
           Error `UNDEFINED
 

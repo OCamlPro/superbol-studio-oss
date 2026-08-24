@@ -20,7 +20,7 @@ module LIST = Cobol_common.Basics.LIST
 
 module OUT = Preproc_outputs
 module ENV = Preproc_env
-module LIT = Cobol_data.Literal
+module NEL = Cobol_common.Basics.NEL
 
 (* --- *)
 
@@ -76,34 +76,32 @@ let rev_comments { reader; _ } = Src_reader.rev_comments reader
 let rev_ignored { reader; _ } = Src_reader.rev_ignored reader
 
 let bind_78_constant lp ~loc const_name (lit: Cobol_ptree.literal with_loc) =
-  let[@local] define ?diags value =
+  let[@local] define value errors =
     let var = ENV.var' const_name in
     let env, def = ENV.define_compilation_var var ~loc value lp.env in
     let diags =
-      Option.fold diags
-        ~some:Preproc_diagnostics.literal_diagnostics
-        ~none:Preproc_diagnostics.none
+      Preproc_diagnostics.literal_errors Preproc_diagnostics.none errors
     and pplog =
       Preproc_trace.var_def ~loc ~var:~&var ~def:(Compilation_var def) lp.pplog
     in
     add_diags { lp with env; pplog } diags
   in
   match ~&lit with
-  | Alphanum alphanum ->
-      let value = LIT.alphanum (alphanum &@<- lit) in
-      define (ENV.alphanum_literal_value value.result) ~diags:value.diags
-  | Boolean bool ->
-      let value = LIT.boolean (bool &@<- lit) in
-      define (ENV.boolean_literal_value value.result) ~diags:value.diags
+  | Alphanum x ->
+      let v, e = Cobol_data.Literal.alphanum_with_dummy_fallback (x &@<- lit) in
+      define (ENV.alphanum_literal_value v) e
+  | Boolean x ->
+      let v, e = Cobol_data.Literal.boolean_with_dummy_fallback (x &@<- lit) in
+      define (ENV.boolean_literal_value v) e
   | Integer integral ->
-      let fixed = Cobol_ptree.fixed_of_strings ~integral ~fractional:"0" in
-      let value = LIT.fixed (fixed &@<- lit) in
-      define (ENV.numeric_literal_value value.result) ~diags:value.diags
-  | Fixed fixed ->
-      let value = LIT.fixed (fixed &@<- lit) in
-      define (ENV.numeric_literal_value value.result) ~diags:value.diags
+      let x = Cobol_ptree.fixed_of_strings ~integral ~fractional:"0" in
+      let v, e = Cobol_data.Literal.fixed_with_dummy_fallback (x &@<- lit) in
+      define (ENV.numeric_literal_value v) e
+  | Fixed x ->
+      let v, e = Cobol_data.Literal.fixed_with_dummy_fallback (x &@<- lit) in
+      define (ENV.numeric_literal_value v) e
   | NumFig Zero | Fig Zero ->
-      define (ENV.numeric_value (Cobol_data.Value.fixed_zero &@<- lit))
+      define (ENV.numeric_value (Cobol_data.Value.fixed_zero &@<- lit)) None
   | _ ->
       add_error lp @@ Unexpected { loc = ~@lit;
                                    stuff = Constant_literal_kind lit }

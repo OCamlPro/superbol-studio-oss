@@ -274,8 +274,8 @@ let auto_usage diags ~item_loc ~usage_clause picture =
       diags, Error None
 
 
-let display_usage ~item_loc ?value_literal_ptree ?picture diags =
-  match picture, value_literal_ptree with
+let display_usage ~item_loc ?value_literal ?picture diags =
+  match picture, value_literal with
   | None, None ->
       diags, Error None
   | None, Some value ->
@@ -321,23 +321,25 @@ let packed_decimal_usage diags ~item_loc ~picture usage =
       diags, Ok (Packed_decimal { picture; with_sign_nibble = false })
 
 
-let literal_value: Cobol_ptree.literal with_loc -> Cobol_data.Types.literal_value with_loc option =
-  fun lit ->
+let literal_value diags lit =
   match Cobol_data.Literal.value lit with
-  | Ok lit ->
-      Some lit
-  | Error () ->
-      None
+  | Ok value ->
+      diags, Some value, Some lit
+  | Error data_errors ->
+      NEL.fold_left diags data_errors
+        ~f:(fun diags e -> data_error diags @@ Data_literal_error e),
+      None, Some lit
+
 
 let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
   let diags = [] in
-  let diags, value, value_literal_ptree = match item_clauses.value with
+  let diags, value, value_literal = match item_clauses.value with
     | Some { payload = ValueTable _; loc = value_loc } ->
         data_error diags @@ Unexpected_table_value_clause { item_name;
                                                             value_loc },
         None, None
     | Some { payload = ValueData lit; _ } ->
-        diags, literal_value lit, Some lit
+        literal_value diags lit
     | None ->
         diags, None, None
   in
@@ -397,7 +399,7 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
         auto_usage diags ~item_loc ~usage_clause picture
 
     | Display ->
-        display_usage diags ~item_loc ?picture ?value_literal_ptree
+        display_usage diags ~item_loc ?picture ?value_literal
 
     | FloatBinary32 e ->
         diags, Ok (Float_binary { width = `W32;

@@ -345,3 +345,39 @@ let pp_data_definition ppf = function
         T (Fmt.field "record" (fun () -> record_name) Fmt.string);
         T (Pretty.vfield "table" (fun () -> table) pp_table_definition');
       ] ppf ()
+
+(* --- *)
+
+let pp_literal_class ppf = function
+  | Boolean ->
+      Pretty.string ppf "Boolean"
+  | Fixed ->
+      Pretty.print ppf "fixed-point@ numeric"
+  | Floating ->
+      Pretty.print ppf "floating-point@ numeric"
+  | Hexadecimal ->
+      Pretty.string ppf "hexadecimal"
+  | Integer ->
+      Pretty.print ppf "Integer"
+
+let pp_invalid_stuff ppf = function
+  | Character_in_literal { literal_class; char } ->
+      Pretty.print ppf "character@ `%c'@ in@ %a@ literal"
+        char pp_literal_class literal_class
+
+let pp_unsupported_stuff ppf = function
+  | Figurative_constant x ->
+      Pretty.print ppf "figurative@ constant@ %a" Cobol_ptree.pp_figurative x
+  | National_literal ->
+      Pretty.print ppf "national@ literal"
+  | Concatenation_of_literals ->
+      Pretty.print ppf "concatenation@ of@ literals"
+
+let pp_error ppf = function
+  | Invalid { stuff; _ } ->
+      Pretty.print ppf "Invalid@ %a" pp_invalid_stuff stuff
+  | Unsupported { stuff; _ } ->
+      Pretty.print ppf "Unsupported@ %a" pp_unsupported_stuff stuff
+  | Overlong_literal { max_length; literal_string; _ } ->
+      Pretty.print ppf "Literal@ of@ length@ %u@ exceeds@ maximum@ allowed@ \
+                        length@ %u" (String.length literal_string) max_length

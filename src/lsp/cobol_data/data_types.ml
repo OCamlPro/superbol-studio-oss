@@ -300,3 +300,29 @@ type data_definition =
       }
 
 (* screen: "_ OCCURS n TIMES" only. Max 2 dimensions. *)
+
+(** {2 Diagnostics} *)
+
+type error =
+  | Invalid of { loc: srcloc; stuff: invalid_stuff }
+  | Unsupported of { loc: srcloc; stuff: unsupported_stuff }
+  | Overlong_literal of { loc: srcloc;
+                          literal_string: string;
+                          max_length: int }       (* TODO: +kind *)
+
+and invalid_stuff =
+  | Character_in_literal of { literal_class: literal_class; char: char }
+
+and literal_class =
+  | Boolean
+  | Fixed
+  | Floating
+  | Hexadecimal
+  | Integer
+
+and unsupported_stuff =
+  | Figurative_constant: 'x. 'x Cobol_ptree.figurative -> unsupported_stuff
+  | National_literal
+  | Concatenation_of_literals              (* FIXME: may just be a user error *)
+
+type errors = error NEL.t
