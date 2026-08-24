@@ -33,3 +33,16 @@ let%expect_test "add-simple-cobol-doc" =
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
 |}];;
+
+let%expect_test "program-id-concatenation" =
+  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  ignore @@ add_cobol_doc server ~projdir "prog.cob" {cobol|
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog AS "pr" & "og".
+       PROCEDURE DIVISION.
+          STOP RUN.
+  |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+|}];;
