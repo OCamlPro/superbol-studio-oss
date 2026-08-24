@@ -230,7 +230,7 @@ and _ figurative =
   | Quote: [>strlit_] figurative                (* ALPHA/NAT *)
   | LowValue: [>strlit_] figurative             (* ALPHA/NAT *)
   | HighValue: [>strlit_] figurative            (* ALPHA/NAT *)
-  | All: nonnumlit -> [<nonnum_] figurative      (* ALPHA/NAT/BOOL + fig const *)
+  | All: nonnumlit with_loc -> [<nonnum_] figurative (* ALPHA/NAT/BOOL + fig const *)
 (* (\* | Symbolic of ident (\* use in alphanum, national *\) *\) *)
 
 (** and then particular instantiations. *)
@@ -855,7 +855,7 @@ module FMT = struct
     | Quote -> string ppf "QUOTE"
     | LowValue -> fmt "LOW-VALUES" ppf
     | HighValue -> fmt "HIGH-VALUES" ppf
-    | All l -> fmt "ALL@ %a" ppf pp_term l
+    | All l -> fmt "ALL@ %a" ppf (pp_with_loc pp_term) l
 
   and pp_subscript ppf : subscript -> unit = function
     | SubSAll -> string ppf "ALL"

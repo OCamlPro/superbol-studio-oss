@@ -173,6 +173,14 @@ let rec value
       concat ~loc:~@lit (strlit_value a) (strlit_value b)
   | Concat (a, b) ->
       concat ~loc:~@lit (nonnumlit_value a) (nonnumlit_value b)
+  | Fig All { payload = Alphanum a; loc } ->
+      (match alphanum_value (a &@ loc) with
+       | Ok a -> Ok (All_alphanum_value ~&a &@<- lit)
+       | Error e -> Error e)
+  | Fig All ({ payload = Fig _; _ } as f) ->
+      (* IBM doc: in [ALL a], the word ALL has no meaning and is used only for
+         readability in case [a] is a figurative constant. *)
+      value (Cobol_ptree.UPCAST.nonnum'_as_literal' f)
   | Fig (All _ as x) ->
       unsupported ~loc:~@lit (Figurative_constant x)
   | National _ ->

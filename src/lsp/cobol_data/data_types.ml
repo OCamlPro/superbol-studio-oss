@@ -85,6 +85,7 @@ and literal_value =
   | Quote_value
   | Low_value
   | High_value
+  | All_alphanum_value of alphanum_value
 
 [@@deriving ord]
 

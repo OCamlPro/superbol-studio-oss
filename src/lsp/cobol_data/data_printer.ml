@@ -38,6 +38,7 @@ let pp_value ppf = function
   | Quote_value -> Fmt.string ppf "QUOTE"
   | Low_value -> Fmt.string ppf "LOW-VALUE"
   | High_value -> Fmt.string ppf "HIGH-VALUE"
+  | All_alphanum_value a -> Fmt.pf ppf "ALL@ %a" pp_alphanum_value a
 let pp_value'_opt = Fmt.option (pp_with_loc pp_value)
 
 (** Pretty-prints the given alphanum as a literal; appends a slash and an

@@ -2485,7 +2485,7 @@ let ident_or_literal
 
 let figurative_constant [@recovery Zero] [@symbol "<figurative constant>"] :=
   |      ~ = figurative_constant_no_all; < >
-  | ALL; l = nonnumeric_literal_no_all;  { All l }
+  | ALL; l = loc(nonnumeric_literal_no_all); { All l }
 (*ALL symbolic-character (alphanum, national) (defined in SPECIAL-NAMES)*)
 
 let figurative_constant_no_all ==

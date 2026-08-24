@@ -165,7 +165,7 @@ and fold_any_figurative (v: _ #folder) =
   handle v#fold_any_figurative
     ~continue:begin function
       | Zero | Space | Quote | LowValue | HighValue -> Fun.id
-      | All n -> fold_nonnumlit v n
+      | All n -> fold_nonnumlit' v n
     end
 
 and fold_strlit (v: _ #folder) : strlit -> 'a -> 'a = function
