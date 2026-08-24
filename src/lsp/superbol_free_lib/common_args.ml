@@ -166,10 +166,11 @@ let get ?(verbose_on = `Stdout) () =
           and def = String.(sub definition (eqsign + 1)
                               (length definition - eqsign - 1)) in
           (* TODO: Check numerics: i.e, no quotes & proper format. *)
+          fst @@                             (* drop definition used for logs *)
           Cobol_preproc.Env.define_process_parameter
             (Cobol_preproc.Env.var var)
-            (Alphanum { pp_payload = def;
-                        pp_loc = Process_parameter }) env
+            { src_payload = Alphanum (Cobol_data.Value.plain_alphanum def);
+              src = Process_parameter } env
         with Not_found ->
           Pretty.failwith "Invalid argument `%s' given to flag `-D`" definition
       end !definitions Cobol_preproc.Env.empty

@@ -13,6 +13,8 @@
 
 open Common
 open Numericals
+open Alphanums
+
 open Cobol_common.Srcloc.INFIX
 
 type name = string
@@ -67,16 +69,6 @@ type complex_ = [ `Complex ]
 (* Attributes for distinguishing sign conditions *)
 type strict_ = [ `Strict ]
 type loose_ = [ `Loose ]
-
-type alphanum_quote =
-  | Simple_quote (* '...' *)
-  | Double_quote (* "..." *)
-[@@deriving ord]
-
-type alphanum_repr =
-  | Native_bytes
-  | Null_terminated_bytes
-[@@deriving ord]
 
 type intrinsic_name =
   | ABS
@@ -203,25 +195,6 @@ let show_intrinsic_name i =
 let pp_intrinsic_name ppf i =
   Pretty.string ppf (show_intrinsic_name i)
 
-type alphanum =
-  {
-    str: string;
-    quotation: alphanum_quote;
-    hexadecimal: bool;
-    runtime_repr: alphanum_repr;
-  }
-[@@deriving ord]
-
-let pp_alphanum ppf { hexadecimal; quotation; str; runtime_repr } =
-  if runtime_repr = Null_terminated_bytes then Fmt.char ppf 'Z';
-  if hexadecimal then Fmt.char ppf 'X';
-  match quotation with
-  | Simple_quote -> Fmt.pf ppf "'%s'" str
-  | Double_quote -> Fmt.pf ppf "\"%s\"" str
-
-type national = string                                             (* for now *)
-[@@deriving ord, show]
-
 (** Now comes the type of all/most terms *)
 type _ term =
   | Alphanum: alphanum -> [>alnum_] term
@@ -248,8 +221,8 @@ type _ term =
   | RefMod: base_ident_ term * refmod -> [>refmod_ident_] term (* Reference modification *)
   | ScalarRefMod: scalar_ident_ term * refmod -> [>refmod_scalar_ident_] term
 
-  | StrConcat: strlit_ term * strlit_ term -> [>strlit_] term
-  | Concat: nonnum_ term * nonnum_ term -> [>nonnum_] term
+  | StrConcat: strlit with_loc * strlit with_loc -> [>strlit_] term
+  | Concat: nonnumlit with_loc * nonnumlit with_loc -> [>nonnum_] term
 
 and _ figurative =
   | Zero: [<int_|nonnum_] figurative            (* ALPHA/NAT/BOOL/NUM *)
@@ -257,7 +230,7 @@ and _ figurative =
   | Quote: [>strlit_] figurative                (* ALPHA/NAT *)
   | LowValue: [>strlit_] figurative             (* ALPHA/NAT *)
   | HighValue: [>strlit_] figurative            (* ALPHA/NAT *)
-  | All: nonnumlit -> [<nonnum_] figurative      (* ALPHA/NAT/BOOL + fig const *)
+  | All: nonnumlit with_loc -> [<nonnum_] figurative (* ALPHA/NAT/BOOL + fig const *)
 (* (\* | Symbolic of ident (\* use in alphanum, national *\) *\) *)
 
 (** and then particular instantiations. *)
@@ -330,7 +303,7 @@ and 'r cond =
   | Omitted of expr with_loc (** {v c OMITTED v} *)
   | Not of 'r cond with_loc (** {v NOT c v} *)
   | Logop of 'r cond with_loc * logop * 'r cond with_loc (** {v c <AND/OR> c' v} *)
-  
+
 and condition = abbrev_combined_relation cond
 
 and expanded_cond = binary_relation cond
@@ -355,7 +328,7 @@ and abbrev_relation_operand =
   | AbbrevSubject of abbrev_combined_relation (** {v NOT? e a v} *)
   | AbbrevParen of bool * abbrev_relation_operand with_loc (** {v NOT? (a) v} *)
   | AbbrevLogop (** {v a' <AND/OR> a'' v} *)
-      of (abbrev_relation_operand with_loc as 'x) * logop * 'x  
+      of (abbrev_relation_operand with_loc as 'x) * logop * 'x
   | AbbrevOther of no_rel cond (** {v <non-relational condition> v} *)
 
 
@@ -571,9 +544,9 @@ module COMPARE = struct
       | ScalarRefMod (b1, r1), ScalarRefMod (b2, r2) ->
           compare_struct (compare_term b1 b2) @@ lazy (compare_refmod r1 r2)
       | StrConcat (a, c), StrConcat (b, d) ->
-          compare_struct (compare_term a b) @@ lazy (compare_term c d)
+          compare_struct (compare_term ~&a ~&b) @@ lazy (compare_term ~&c ~&d)
       | Concat(a,c), Concat(b,d) ->
-          compare_struct (compare_term a b) @@ lazy (compare_term c d)
+          compare_struct (compare_term ~&a ~&b) @@ lazy (compare_term ~&c ~&d)
       | a , b ->
           Stdlib.compare a b
 
@@ -823,7 +796,7 @@ module COMPARE = struct
   let compare_strlit: strlit compare_fun = compare_term
   let compare_strlit_or_intlit: strlit_or_intlit compare_fun = compare_term
   let compare_scalar: scalar compare_fun = compare_term
-  
+
   let compare_condition a b = compare_cond compare_abbrev_combined_relation a b
   let compare_condition' a b = compare_cond' compare_abbrev_combined_relation a b
 end
@@ -849,12 +822,6 @@ module FMT = struct
 
   open Fmt
 
-  let pp_boolean: boolean Pretty.printer = fun ppf -> function
-    (* | { bool_width = 0; _ } -> *)
-    (*     string ppf "zero-length-boolean" *)
-    | { bool_value; _ } ->
-        string ppf bool_value
-
   let rec pp_term: type k. k term Pretty.printer = fun ppf -> function
     | Alphanum s -> pp_alphanum ppf s
     | Boolean b -> pp_boolean ppf b
@@ -879,8 +846,8 @@ module FMT = struct
     | RefMod (i, r) -> fmt "@[%a@ %a@]" ppf pp_term i pp_refmod r
     | ScalarRefMod (i, r) -> fmt "@[%a@ %a@]" ppf pp_term i pp_refmod r
 
-    | StrConcat (a, b) -> fmt "%a@ &@ %a" ppf pp_term a pp_term b
-    | Concat (a, b) -> fmt "%a@ &@ %a" ppf pp_term a pp_term b
+    | StrConcat (a, b) -> fmt "%a@ &@ %a" ppf pp_term ~&a pp_term ~&b
+    | Concat (a, b) -> fmt "%a@ &@ %a" ppf pp_term ~&a pp_term ~&b
 
   and pp_figurative: type k. k figurative Pretty.printer = fun ppf -> function
     | Zero -> string ppf "ZERO"
@@ -888,7 +855,7 @@ module FMT = struct
     | Quote -> string ppf "QUOTE"
     | LowValue -> fmt "LOW-VALUES" ppf
     | HighValue -> fmt "HIGH-VALUES" ppf
-    | All l -> fmt "ALL@ %a" ppf pp_term l
+    | All l -> fmt "ALL@ %a" ppf (pp_with_loc pp_term) l
 
   and pp_subscript ppf : subscript -> unit = function
     | SubSAll -> string ppf "ALL"
@@ -1043,13 +1010,13 @@ module FMT = struct
     | BOr  -> "B-OR"
     | BXor -> "B-XOR"
   and pp_binop ppf o = string ppf (show_binop o)
-  
+
   and pp_sign: type k. k sign_cond Pretty.printer = fun ppf -> function
     | SgnPositive -> string ppf "POSITIVE"
     | SgnNegative -> string ppf "NEGATIVE"
     | SgnZero -> string ppf "ZERO"
   and pp_signz ppf = pp_sign ppf
-  
+
   and pp_literal: literal Pretty.printer = fun ppf -> pp_term ppf
   and pp_literal' = fun ppf -> pp_with_loc pp_literal ppf
   and pp_ident: ident Pretty.printer = fun ppf -> pp_term ppf
@@ -1064,7 +1031,7 @@ module FMT = struct
     | Ge -> ">="
     | Le -> "<="
   let pp_relop ppf o = string ppf (show_relop o)
-  
+
   let pp_binary_relation ppf (a, o, b) =
     fmt "%a@ %a@ %a" ppf
       pp_expr' a pp_relop o pp_expr' b
@@ -1090,8 +1057,8 @@ module FMT = struct
     | LOr -> string ppf "OR"
 
   let rec pp_cond:
-    'r. 'r Pretty.printer -> ?pos:bool -> 'r cond Pretty.printer = 
-    fun pp_rel ?(pos = true) ppf c -> 
+    'r. 'r Pretty.printer -> ?pos:bool -> 'r cond Pretty.printer =
+    fun pp_rel ?(pos = true) ppf c ->
     match c with
     | Expr e ->
         fmt "%a%a" ppf not_ pos pp_expr' e
@@ -1119,7 +1086,7 @@ module FMT = struct
   let pp_no_rel _ (never: no_rel) = match never with _ -> .
 
   let rec pp_abbrev_combined_relation ppf (neg, e, a) =
-    fmt "%a%a@ %a" ppf not_ (not neg) pp_expr' e 
+    fmt "%a%a@ %a" ppf not_ (not neg) pp_expr' e
       pp_abbrev_relation_operand ~&a
 
   and pp_abbrev_relation_operand ppf = function
@@ -1138,7 +1105,7 @@ module FMT = struct
           pp_abbrev_relation_operand ~&a1
           pp_logop o
           pp_abbrev_relation_operand ~&a2
-          
+
   (** Pretty-printing for named unions of term types (some are yet to be
       renamed) *)
 
@@ -1168,6 +1135,9 @@ include FMT
 
 module UPCAST = struct
   (** Exlicit term upcasting utilities, that should all reduce to identity. *)
+  (* For each upcasting operation, we first properly show the equivalence with
+     an implementation, and then re-declare the symbol as "%identity" for
+     performance purposes. *)
 
   let ident_with_alphanum: ident -> ident_or_alphanum = function
     | QualIdent _ as v -> v
@@ -1179,6 +1149,7 @@ module UPCAST = struct
     | Counter _ as v -> v
     | RefMod _ as v -> v
     | ScalarRefMod _ as v -> v
+  external ident_with_alphanum: ident -> ident_or_alphanum = "%identity"
 
   let ident_with_nonnum: ident -> ident_or_nonnum = function
     | QualIdent _ as v -> v
@@ -1190,6 +1161,7 @@ module UPCAST = struct
     | Counter _ as v -> v
     | RefMod _ as v -> v
     | ScalarRefMod _ as v -> v
+  external ident_with_nonnum: ident -> ident_or_nonnum = "%identity"
 
   let ident_with_numeric: ident -> ident_or_numlit = function
     | QualIdent _ as v -> v
@@ -1201,6 +1173,7 @@ module UPCAST = struct
     | Counter _ as v -> v
     | RefMod _ as v -> v
     | ScalarRefMod _ as v -> v
+  external ident_with_numeric: ident -> ident_or_numlit = "%identity"
 
   let ident_with_string: ident -> ident_or_strlit = function
     | QualIdent _ as v -> v
@@ -1212,6 +1185,7 @@ module UPCAST = struct
     | Counter _ as v -> v
     | RefMod _ as v -> v
     | ScalarRefMod _ as v -> v
+  external ident_with_string: ident -> ident_or_strlit = "%identity"
 
   let ident_with_literal: ident -> ident_or_literal = function
     | QualIdent _ as v -> v
@@ -1223,6 +1197,7 @@ module UPCAST = struct
     | Counter _ as v -> v
     | RefMod _ as v -> v
     | ScalarRefMod _ as v -> v
+  external ident_with_literal: ident -> ident_or_literal = "%identity"
 
   let ident_with_integer: ident -> ident_or_intlit = function
     | QualIdent _ as v -> v
@@ -1234,24 +1209,43 @@ module UPCAST = struct
     | Counter _ as v -> v
     | RefMod _ as v -> v
     | ScalarRefMod _ as v -> v
+  external ident_with_integer: ident -> ident_or_intlit = "%identity"
 
   let string_with_name: strlit -> name_or_string = function
     | Alphanum _ as v -> v
     | National _ as v -> v
     | Fig _ as v -> v
     | StrConcat _ as v -> v
+  external string_with_name: strlit -> name_or_string = "%identity"
 
   let string_with_ident: strlit -> ident_or_strlit = function
     | Alphanum _ as v -> v
     | National _ as v -> v
     | Fig _ as v -> v
     | StrConcat _ as v -> v
+  external string_with_ident: strlit -> ident_or_strlit = "%identity"
+
+  let strlit_as_nonnumlit: strlit -> nonnumlit = function
+    | Alphanum _ as v -> v
+    | National _ as v -> v
+    | Fig _ as v -> v
+    | StrConcat _ as v -> v
+  external strlit_as_nonnumlit: strlit -> nonnumlit = "%identity"
+
+  let strlit_as_nonnumlit: strlit -> literal = function
+    | Alphanum _ as v -> v
+    | National _ as v -> v
+    | Fig _ as v -> v
+    | StrConcat _ as v -> v
+  external strlit_as_literal: strlit -> literal = "%identity"
+  external strlit'_as_literal': strlit with_loc -> literal with_loc = "%identity"
 
   let numeric_with_ident: numlit -> ident_or_numlit = function
     | Integer _ as v -> v
     | Fixed _ as v -> v
     | Floating _ as v -> v
     | NumFig _ as v -> v
+  external numeric_with_ident: numlit -> ident_or_numlit = "%identity"
 
   let nonnum_with_ident: nonnumlit -> ident_or_nonnum = function
     | Alphanum _ as v -> v
@@ -1260,6 +1254,17 @@ module UPCAST = struct
     | Fig _ as v -> v
     | StrConcat _ as v -> v
     | Concat _ as v -> v
+  external nonnum_with_ident: nonnumlit -> ident_or_nonnum = "%identity"
+
+  let nonnum_as_literal: nonnumlit -> literal = function
+    | Alphanum _ as v -> v
+    | National _ as v -> v
+    | Boolean _ as v -> v
+    | Fig _ as v -> v
+    | StrConcat _ as v -> v
+    | Concat _ as v -> v
+  external nonnum_as_literal: nonnumlit -> literal = "%identity"
+  external nonnum'_as_literal': nonnumlit with_loc -> literal with_loc = "%identity"
 
   let literal_with_ident: literal -> ident_or_literal = function
     | Alphanum _ as v -> v
@@ -1272,6 +1277,7 @@ module UPCAST = struct
     | Fig _ as v -> v
     | StrConcat _ as v -> v
     | Concat _ as v -> v
+  external literal_with_ident: literal -> ident_or_literal = "%identity"
 
   let literal_with_name: literal -> name_or_literal = function
     | Alphanum _ as v -> v
@@ -1284,8 +1290,9 @@ module UPCAST = struct
     | Fig _ as v -> v
     | StrConcat _ as v -> v
     | Concat _ as v -> v
+  external literal_with_name: literal -> name_or_literal = "%identity"
 
-  let literal_with_qualdatname: literal -> qualname_or_literal = function
+  let literal_with_qualname: literal -> qualname_or_literal = function
     | Alphanum _ as v -> v
     | National _ as v -> v
     | Boolean _ as v -> v
@@ -1296,21 +1303,26 @@ module UPCAST = struct
     | Fig _ as v -> v
     | StrConcat _ as v -> v
     | Concat _ as v -> v
+  external literal_with_qualname: literal -> qualname_or_literal = "%identity"
 
   let qualname_with_alphanum: qualname -> qualname_or_alphanum = function
     | Name _ as v -> v
     | Qual _ as v -> v
+  external qualname_with_alphanum: qualname -> qualname_or_alphanum = "%identity"
 
   let qualname_with_literal: qualname -> qualname_or_literal = function
     | Name _ as v -> v
     | Qual _ as v -> v
+  external qualname_with_literal: qualname -> qualname_or_literal = "%identity"
 
   let qualname_with_integer: qualname -> qualname_or_intlit = function
     | Name _ as v -> v
     | Qual _ as v -> v
+  external qualname_with_integer: qualname -> qualname_or_intlit = "%identity"
 
   let name_with_literal: name_ term -> name_or_literal = function
     | Name _ as v -> v
+  external name_or_literal: name_ term -> name_or_literal = "%identity"
 
   let base_ident_with_refmod: base_ident_ term -> ident = function
     | QualIdent _ as v -> v
@@ -1321,6 +1333,7 @@ module UPCAST = struct
     | Address _ as v -> v
     | Counter _ as v -> v
     | ScalarRefMod _ as v -> v
+  external base_ident_with_refmod: base_ident_ term -> ident = "%identity"
 
   let scalar_ident_as_scalar: scalar_ident_ term -> scalar = function
     | QualIdent _ as v -> v
@@ -1330,12 +1343,14 @@ module UPCAST = struct
     | Address _ as v -> v
     | Counter _ as v -> v
     | ScalarRefMod _ as v -> v
+  external scalar_ident_as_scalar: scalar_ident_ term -> scalar = "%identity"
 
   let numeric_as_scalar: numlit -> scalar = function
     | Integer _ as v -> v
     | Fixed _ as v -> v
     | Floating _ as v -> v
     | NumFig _ as v -> v
+  external numeric_as_scalar: numlit -> scalar = "%identity"
 
   let nonnumlit_as_scalar: nonnumlit -> scalar = function
     | Alphanum _ as v -> v
@@ -1344,6 +1359,7 @@ module UPCAST = struct
     | Fig _ as v -> v
     | StrConcat _ as v -> v
     | Concat _ as v -> v
+  external nonnumlit_as_scalar: nonnumlit -> scalar = "%identity"
 
   let literal_as_scalar: literal -> scalar = function
     | Alphanum _ as v -> v
@@ -1356,6 +1372,7 @@ module UPCAST = struct
     | Fig _ as v -> v
     | StrConcat _ as v -> v
     | Concat _ as v -> v
+  external literal_as_scalar: literal -> scalar = "%identity"
 end
 
 (* --- *)

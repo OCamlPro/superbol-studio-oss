@@ -23,6 +23,7 @@ open Cobol_common.Srcloc.INFIX
 class ['a] folder = object
   (* inherit ['a] Cobol_common.Visitor.Fold.folder *)
   inherit ['a] Cobol_ptree.Terms_visitor.folder
+  method fold_literal_value: (literal_value, 'a) fold = default
   method fold_record: (record, 'a) fold = default
   method fold_storage: (data_storage, 'a) fold = default
   method fold_picture: (picture, 'a) fold = default
@@ -55,6 +56,12 @@ class ['a] folder = object
 end
 
 (* --- *)
+
+let fold_literal_value (v: _ #folder) =
+  leaf v#fold_literal_value
+
+let fold_literal_value' (v: _ #folder) =
+  fold' ~fold:fold_literal_value v
 
 let fold_storage (v: _ #folder) = leaf v#fold_storage
 let fold_memory_offset (v: _ #folder) = leaf v#fold_memory_offset
@@ -188,7 +195,7 @@ and fold_field_layout (v: _ #folder) =
     ~continue:begin fun l x -> match l with
       | Elementary_field { usage; init_value } -> x
           >> fold_usage v usage
-          >> Cobol_ptree.Terms_visitor.fold_literal'_opt v init_value
+          >> fold_option ~fold:fold_literal_value' v init_value
       | Struct_field { subfields } -> x
           >> fold_item_definitions v subfields
     end

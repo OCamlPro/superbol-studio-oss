@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
-(*  Copyright (c) 2026 OCamlPro SAS                                       *)
+(*  Copyright (c) 2022-2026 OCamlPro SAS                                  *)
 (*                                                                        *)
 (* All rights reserved.                                                   *)
 (* This source code is licensed under the GNU Affero General Public       *)
@@ -11,20 +11,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Types
+open Data_types
 
-let manager =
-  Cobol_ir.Types.{
-    create_record_data = Record.create;
-    create_mutable_field = Field.in_record_memory;
-    create_field_from_literal_value = Field.from_literal_value;
+(* --- *)
 
-    create_module = Module.create;
-    enter_module = Module.enter;
-    leave_module = Module.leave;
-
-    init_field = Field.init;
-    field_as_int = Field.as_int;
-
-    display_fields = Termio.display_fields;
-  }
+let loc = function
+  | Invalid { loc; _ }
+  | Unsupported { loc; _ }
+  | Overlong_literal { loc; _ } ->
+      loc

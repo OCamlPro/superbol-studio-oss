@@ -39,6 +39,7 @@ and cob_module_memory =
 
 type Cobol_ir.Types.unsupported_stuff +=
   | Literal of Cobol_ptree.literal
+  | Literal_value of Cobol_data.Types.literal_value
   | Field_usage
 
 type Cobol_ir.Types.error +=

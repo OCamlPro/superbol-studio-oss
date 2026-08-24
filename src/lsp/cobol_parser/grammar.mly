@@ -71,6 +71,7 @@ let dual_handler_none =
 %[@post.tag procedure_division_header unit]
 %[@post.tag procedure_division Cobol_ptree.procedure_division]
 %[@post.tag method_definitions Cobol_ptree.method_definitions]
+%[@post.tag data_descr_entry Cobol_ptree.data_item]
 
 %[@post.tag pending string]
 
@@ -1269,9 +1270,9 @@ let report_descr_entry :=
        report_items = crl } }
 
 let constant_or_data_descr_entry :=
-  | e = constant;
+  | e = constant; ".";
     { Constant e }
-  | e = data_descr_entry;
+  | e = data_descr_entry; ".";
     { Data e }                                  (* including level 77 entries *)
   | l = loc(elementary_level); dn = name; RENAMES; ri = loc(qualname);
     to_ = o(THROUGH; ~ = loc(qualname); < >); ".";
@@ -1473,7 +1474,7 @@ let constant :=
   (* BYTE-LENGTH is sensitive throughout "constant entry" w.r.t ISO/IEC 2014.
      However, like in GnuCOBOL we restrict the scope to the only places where
      the keyword is relevant. *)
-  | l = loc(elementary_level); n = name; spec = constant_spec; ".";
+  | l = loc(elementary_level); n = name; spec = constant_spec;
     { let go, cv = spec in
       { constant_level = l;
         constant_name = n;
@@ -1497,10 +1498,10 @@ let constant_value_length [@context constant] :=
   | go = constant_spec_prefix; AS?; BYTE_LENGTH; {go, `ByteLength}
   | go = constant_spec_prefix; AS?; LENGTH;      {go, `Length}
 
-let data_descr_entry :=
+let data_descr_entry [@post.data_descr_entry] :=
   | l = loc(elementary_level);
     eno = ro(entry_name_clause);
-    dcl = rl(loc(data_descr_clause)); ".";
+    dcl = rl(loc(data_descr_clause));
     { { data_level = l;
         data_name = eno;
         data_clauses = dcl } }
@@ -2484,7 +2485,7 @@ let ident_or_literal
 
 let figurative_constant [@recovery Zero] [@symbol "<figurative constant>"] :=
   |      ~ = figurative_constant_no_all; < >
-  | ALL; l = nonnumeric_literal_no_all;  { All l }
+  | ALL; l = loc(nonnumeric_literal_no_all); { All l }
 (*ALL symbolic-character (alphanum, national) (defined in SPECIAL-NAMES)*)
 
 let figurative_constant_no_all ==
@@ -2503,11 +2504,13 @@ let integer [@recovery integer_zero] [@symbol "<integer literal>"] :=
 
 let fixedlit [@recovery fixed_zero] [@cost 10]
       [@symbol "<fixed-point literal>"] :=
-  | (i, _, d) = FIXEDLIT; { Cobol_ptree.fixed_of_strings i d }
+  | (integral, _, fractional) = FIXEDLIT;
+    { Cobol_ptree.fixed_of_strings ~integral ~fractional }
 
 let floatlit [@recovery floating_zero] [@cost 10]
       [@symbol "<floating-point literal>"] :=
-  | (i, _, d, e) = FLOATLIT; { Cobol_ptree.floating_of_strings i d e }
+  | (integral, _, fractional, exponent) = FLOATLIT;
+    { Cobol_ptree.floating_of_strings ~integral ~fractional ~exponent }
 
 let alphanum [@recovery dummy_alphanum] [@symbol "<alphanumeric literal>"] :=
   | ~ = ALPHANUM; < >
@@ -2520,8 +2523,8 @@ let literal [@recovery dummy_literal] [@symbol "<literal>"] :=
  | f = fixedlit;  {Fixed f}
  | f = floatlit;  {Floating f}
  | f = figurative_constant;            {Fig f}
- | l1 = nonnumeric_literal_no_all; "&";
-   l2 = nonnumeric_literal_no_all;     {Concat (l1, l2): literal}
+ | l1 = loc(nonnumeric_literal_no_all); "&";
+   l2 = loc(nonnumeric_literal_no_all);     {Concat (l1, l2): literal}
 
 (*
 literal_no_all:
@@ -2553,16 +2556,16 @@ let elementary_string_literal ==
  | n = NATLIT;   { National n : strlit }
 
 let string_literal [@symbol "<string literal>"] :=
- | l = elementary_string_literal;  { l }
- | f = figurative_constant;        { Fig f }
- | l1 = string_literal_no_all; "&";
-   l2 = string_literal_no_all;     { StrConcat (l1, l2) : strlit }
+ | l = elementary_string_literal;        { l }
+ | f = figurative_constant;              { Fig f }
+ | l1 = loc(string_literal_no_all); "&";
+   l2 = loc(string_literal_no_all);      { StrConcat (l1, l2) : strlit }
 
 let string_literal_no_all [@symbol "<string literal>"] :=
- | l = elementary_string_literal;  { l: strlit }
- | f = figurative_constant_no_all; { Fig f }
- | l1 = string_literal_no_all; "&";
-   l2 = string_literal_no_all;     { StrConcat (l1, l2) : strlit }
+ | l = elementary_string_literal;        { l: strlit }
+ | f = figurative_constant_no_all;       { Fig f }
+ | l1 = loc(string_literal_no_all); "&";
+   l2 = loc(string_literal_no_all);      { StrConcat (l1, l2) : strlit }
 
 
 
@@ -2575,8 +2578,8 @@ elementary_string_or_int_literal:
 string_or_int_literal:
  | l = elementary_string_or_int_literal { l }
  | f = figurative_constant              { Fig f }
- | l1 = string_literal_no_all "&"
-   l2 = string_literal_no_all       { StrConcat (l1, l2) : strlit_or_intlit }
+ | l1 = loc(string_literal_no_all) "&"
+   l2 = loc(string_literal_no_all)      { StrConcat (l1, l2) : strlit_or_intlit }
 
 (*
 string_or_int_literal_no_all:
@@ -2592,16 +2595,16 @@ elementary_nonnumeric_literal:
  | b = BOOLIT   { Boolean b }
 
 nonnumeric_literal:
- | l = elementary_nonnumeric_literal  { l }
- | f = figurative_constant            { Fig f }
- | l1 = nonnumeric_literal_no_all "&"
-   l2 = nonnumeric_literal_no_all     { Concat (l1, l2): nonnumlit }
+ | l = elementary_nonnumeric_literal       { l }
+ | f = figurative_constant                 { Fig f }
+ | l1 = loc(nonnumeric_literal_no_all) "&"
+   l2 = loc(nonnumeric_literal_no_all)     { Concat (l1, l2): nonnumlit }
 
 nonnumeric_literal_no_all:
- | l = elementary_nonnumeric_literal  { l }
- | f = figurative_constant_no_all     { Fig f }
- | l1 = nonnumeric_literal_no_all "&"
-   l2 = nonnumeric_literal_no_all     { Concat (l1, l2): nonnumlit }
+ | l = elementary_nonnumeric_literal       { l }
+ | f = figurative_constant_no_all          { Fig f }
+ | l1 = loc(nonnumeric_literal_no_all) "&"
+   l2 = loc(nonnumeric_literal_no_all)     { Concat (l1, l2): nonnumlit }
 
 
 
@@ -2610,7 +2613,7 @@ nonnumeric_literal_no_all:
 (* Used in many *)
 let qualname_or_literal :=
  | n = qualname; { UPCAST.qualname_with_literal n }
- | l = literal;  { UPCAST.literal_with_qualdatname l }
+ | l = literal;  { UPCAST.literal_with_qualname l }
 
 let x == scalar                                       (* alias, as in GnuCOBOL *)
 let scalar :=
@@ -2823,7 +2826,7 @@ let any_lpar ==
  | LPAR_BEFORE_RELOP; {}
 
 let relation_condition ==
- | neg = ibo(NOT); e = expression; pred = loc(abbrev_relop_operand); 
+ | neg = ibo(NOT); e = expression; pred = loc(abbrev_relop_operand);
     { Relation (neg, e, pred) }
 
 nonrel_condition:

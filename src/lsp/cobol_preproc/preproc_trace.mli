@@ -8,37 +8,57 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cobol_common.Srcloc.TYPES
+
 module TYPES: sig
   type log_entry =
     | FileCopy of
         {
-          copyloc: Cobol_common.srcloc;
+          copyloc: srcloc;
           status: copy_event_status;
         }
     | Replace of
         {
-          replloc: Cobol_common.srcloc;
+          replloc: srcloc;
         }
     | Replacement of
         {
-          matched_loc: Cobol_common.srcloc;
+          matched_loc: srcloc;
           replacement_text: Text.text;
         }
     | CompilerDirective of
         {
           compdir: Preproc_directives.compiler_directive;
-          loc: Cobol_common.srcloc;
+          loc: srcloc;
         }
     | Exec_block of
         {
-          preamble_loc: Cobol_common.srcloc;
+          preamble_loc: srcloc;
           text: Text.text;
-          postamble_loc: Cobol_common.srcloc option;
+          postamble_loc: srcloc option;
         }
     | Ignored of
         {
           text: Text.text;
-          ignored_loc: Cobol_common.srcloc;
+          ignored_loc: srcloc;
+        }
+    | Variable_definition of
+        {
+          loc: srcloc;
+          var: Preproc_env.var;
+          def: Preproc_env.var_definition;
+        }
+    | Variable_substitution of                 (* Note: parser-specific event *)
+        {
+          loc: srcloc;
+          var: Preproc_env.var;
+          def: Preproc_env.compilation_var_definition;
+        }
+    | Variable_evaluation of
+        {
+          loc: srcloc;
+          var: Preproc_env.var;
+          def: Preproc_env.var_definition option;          (* [None] if undef *)
         }
 
   and copy_event_status =
@@ -58,34 +78,55 @@ val empty: log
 val append
   : log_entry
   -> log -> log
+val append_entries
+  : log_entry list
+  -> log -> log
 val new_compdir
-  : loc: Cobol_common.srcloc
+  : loc: srcloc
   -> compdir:Preproc_directives.compiler_directive
   -> log -> log
 val copy_done
-  : loc: Cobol_common.srcloc
+  : loc: srcloc
   -> filename: string
   -> log -> log
 val cyclic_copy
-  : loc: Cobol_common.srcloc
+  : loc: srcloc
   -> filename: string
   -> log -> log
 val missing_copy
-  : loc: Cobol_common.srcloc
+  : loc: srcloc
   -> error: Cobol_common.Copybook.TYPES.lookup_error
   -> log -> log
 val new_replace
-  : loc: Cobol_common.srcloc
+  : loc: srcloc
   -> log -> log
 val exec_block
-  : preamble_loc: Cobol_common.srcloc
-  -> ?postamble_loc: Cobol_common.srcloc
+  : preamble_loc: srcloc
+  -> ?postamble_loc: srcloc
   -> Text.text
   -> log -> log
 val ignored
   : Text.text                                                    (* non-empty *)
   -> log -> log
+val var_def
+  : loc: srcloc
+  -> var: Preproc_env.var
+  -> def: Preproc_env.var_definition
+  -> log -> log
+val compvar_subst
+  : loc: srcloc
+  -> var: Preproc_env.var
+  -> def: Preproc_env.compilation_var_definition
+  -> log -> log
+val var_eval
+  : loc: srcloc
+  -> var: Preproc_env.var
+  -> ?def: Preproc_env.var_definition
+  -> log -> log
 
 (* --- *)
 
 val events: log -> log_entry list
+
+(** Fold in any order *)
+val fold: f:(log_entry -> 'a -> 'a) -> log -> 'a -> 'a

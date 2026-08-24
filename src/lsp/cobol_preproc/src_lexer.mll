@@ -507,10 +507,10 @@ and fixed_continue_line state
            NB: The ISO/IEC standard is less specific than IBM docs on this. *)
         let cont = match Src_lexing.continue_quoted_alphanum state with
           | Nominal -> fixed_continue_open
-          | Closed Quote -> fixed_continue_quoted
-          | Closed Apostrophe -> fixed_continue_apostrophed
-          | UnclosedEBCDICs Quote -> fixed_continue_quoted_ebcdics
-          | UnclosedEBCDICs Apostrophe -> fixed_continue_apostrophed_ebcdics
+          | Closed Double_quote -> fixed_continue_quoted
+          | Closed Simple_quote -> fixed_continue_apostrophed
+          | UnclosedEBCDICs Double_quote -> fixed_continue_quoted_ebcdics
+          | UnclosedEBCDICs Simple_quote -> fixed_continue_apostrophed_ebcdics
         in
         cont state lexbuf
       }

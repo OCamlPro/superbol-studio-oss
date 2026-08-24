@@ -129,17 +129,17 @@ let elementary_field_attrs = function
 
 (* TODO: work on 78-level constants will enable us to use types for literals
    defined in `Cobol_data` instead) *)
-let from_literal (lit: Cobol_ptree.literal Cobol_ptree.with_loc) =
+let from_literal_value (lit: Cobol_data.Types.literal_value Cobol_ptree.with_loc) =
   match ~&lit with
-  | Alphanum a ->
-      let size = String.length a.str in
-      let data = CPtr.cast UInt8 @@ CArray.to_ptr @@ CArray.of_string a.str in
+  | Alphanum_value str ->
+      let size = String.length str in
+      let data = CPtr.cast UInt8 @@ CArray.to_ptr @@ CArray.of_string str in
       let pic = Cobol_data.Picture.alphanumeric ~size in
       let attr = alphanum_attrs ~constant:true ~pic in
       let* size = lift_ezlibcob_error @@ U64.of_int size in
       Ok (CobField.create ~attr ~data ~size)
   | _ ->
-      error @@ Unsupported { stuff = Literal ~&lit; loc = ~@lit }
+      error @@ Unsupported { stuff = Literal_value ~&lit; loc = ~@lit }
 
 let memory_bytes size =
   Cobol_data.Memory.as_bytes size
@@ -170,7 +170,7 @@ let in_record_memory field_definition (record: cob_record_handle) =
         | None ->
             Ok None
         | Some lit ->
-            let* f = from_literal lit in
+            let* f = from_literal_value lit in
             Ok (Some f)
       in
       Ok {

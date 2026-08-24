@@ -20,20 +20,25 @@ module LIST = Cobol_common.Basics.LIST
 
 module OUT = Preproc_outputs
 module ENV = Preproc_env
+module NEL = Cobol_common.Basics.NEL
 
 (* --- *)
+
+(* TODO: fields marked with `x` below should probably be moved to a
+   `preprocessor_cold` type as they are also less likely to change as often as
+   `buff`, and `reader` *)
 
 type preprocessor =
   {
     buff: Text.t;
     reader: Src_reader.t;
-    ppstate: Preproc_state.t;
-    pplog: Preproc_trace.log;
-    diags: Preproc_diagnostics.t;
-    env: Preproc_env.t;
-    context: Preproc_logic.context;
-    rev_ignored: Text.t;     (* text accumulated when not emitting (reversed) *)
-    persist: preprocessor_persist;
+    ppstate: Preproc_state.t;                                            (* x *)
+    pplog: Preproc_trace.log;                                            (* x *)
+    diags: Preproc_diagnostics.t;                                        (* x *)
+    env: Preproc_env.t;                                                  (* x *)
+    context: Preproc_logic.context;                                      (* x *)
+    rev_ignored: Text.t;   (* text accumulated when not emitting (reversed) x *)
+    persist: preprocessor_persist;                                       (* x *)
   }
 
 (** the preprocessor state that does not change very often *)
@@ -69,6 +74,40 @@ let source_format { reader; _ } = Src_reader.source_format reader
 let rev_log { pplog; _ } = pplog
 let rev_comments { reader; _ } = Src_reader.rev_comments reader
 let rev_ignored { reader; _ } = Src_reader.rev_ignored reader
+
+let bind_78_constant lp ~loc const_name (lit: Cobol_ptree.literal with_loc) =
+  let[@local] define value errors =
+    let var = ENV.var' const_name in
+    let env, def = ENV.define_compilation_var var ~loc value lp.env in
+    let diags =
+      Preproc_diagnostics.literal_errors Preproc_diagnostics.none errors
+    and pplog =
+      Preproc_trace.var_def ~loc ~var:~&var ~def:(Compilation_var def) lp.pplog
+    in
+    add_diags { lp with env; pplog } diags
+  in
+  match ~&lit with
+  | Alphanum x ->
+      let v, e = Cobol_data.Literal.alphanum_with_dummy_fallback (x &@<- lit) in
+      define (ENV.alphanum_literal_value v) e
+  | Boolean x ->
+      let v, e = Cobol_data.Literal.boolean_with_dummy_fallback (x &@<- lit) in
+      define (ENV.boolean_literal_value v) e
+  | Integer integral ->
+      let x = Cobol_ptree.fixed_of_strings ~integral ~fractional:"0" in
+      let v, e = Cobol_data.Literal.fixed_with_dummy_fallback (x &@<- lit) in
+      define (ENV.numeric_literal_value v) e
+  | Fixed x ->
+      let v, e = Cobol_data.Literal.fixed_with_dummy_fallback (x &@<- lit) in
+      define (ENV.numeric_literal_value v) e
+  | NumFig Zero | Fig Zero ->
+      define (ENV.numeric_value (Cobol_data.Value.fixed_zero &@<- lit)) None
+  | _ ->
+      add_error lp @@ Unexpected { loc = ~@lit;
+                                   stuff = Constant_literal_kind lit }
+
+let lookup_compilation_variable lp variable =
+  ENV.find_compilation_var variable lp.env
 
 (** [position_at ~line ~char pp] computes a lexing position that corresponds to
     the given line and character indexes (all starting at 0) in the input
@@ -111,6 +150,9 @@ let with_replacing lp replacing =
 
 let show tag { persist = { show_if_verbose; platform; _ }; _ } =
   platform.verbosity > 0 && LIST.mem tag show_if_verbose
+
+let record_compilation_variable_substitution lp ~loc ~var ~def =
+  with_pplog lp @@ Preproc_trace.compvar_subst ~loc ~var ~def lp.pplog
 
 let source_format_config = function
   | Cobol_config.SF sf -> Some (Src_format.from_config sf)
@@ -238,9 +280,23 @@ and apply_preproc_directive ({ env; context; _ } as lp)
     if env != lp.env || diags != Preproc_diagnostics.none
     then { lp with env; diags = Preproc_diagnostics.union diags lp.diags }
     else lp
+  and new_env_n_log lp { result = (env, log); diags } =
+    if env != lp.env || diags != Preproc_diagnostics.none || log <> []
+    then { lp with
+           env;
+           diags = Preproc_diagnostics.union diags lp.diags;
+           pplog = Preproc_trace.append_entries log lp.pplog }
+    else lp
   and new_context lp { result = context; diags } =
     if context != lp.context || diags != Preproc_diagnostics.none
     then { lp with context; diags = Preproc_diagnostics.union diags lp.diags }
+    else lp
+  and new_context_n_log lp { result = (context, log); diags } =
+    if context != lp.context || diags != Preproc_diagnostics.none || log <> []
+    then { lp with
+           context;
+           diags = Preproc_diagnostics.union diags lp.diags;
+           pplog = Preproc_trace.append_entries log lp.pplog }
     else lp
   in
   match ppdir with
@@ -248,14 +304,14 @@ and apply_preproc_directive ({ env; context; _ } as lp)
     when not (Preproc_logic.emitting lp.context) ->
       lp                                                            (* ignore *)
   | Define def ->
-      new_env lp @@ Preproc_logic.on_define ~loc def ~env
+      new_env_n_log lp @@ Preproc_logic.on_define ~loc def ~env
         ~platform:lp.persist.platform
   | Define_off var ->
       new_env lp @@ Preproc_logic.on_define_off ~loc var ~env
   | If condition ->
-      new_context lp @@ Preproc_logic.on_if ~loc ~condition ~env context
+      new_context_n_log lp @@ Preproc_logic.on_if ~loc ~condition ~env context
   | Elif condition ->
-      new_context lp @@ Preproc_logic.on_elif ~loc ~condition ~env context
+      new_context_n_log lp @@ Preproc_logic.on_elif ~loc ~condition ~env context
   | Else ->
       new_context lp @@ Preproc_logic.on_else ~loc context
   | End
