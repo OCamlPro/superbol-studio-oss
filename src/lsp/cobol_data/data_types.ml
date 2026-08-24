@@ -23,41 +23,19 @@ type 'a nel = 'a NEL.t
 
 (** {2 Literals} *)
 
-type integer_literal =
+type alphanum_literal =
   {
-    int_ptree: Cobol_ptree.integer;
-    int_value: integer_value;
+    alphanum_ptree: Cobol_ptree.alphanum [@compare fun _ _ -> 0];
+    alphanum_value: alphanum_value;
+    (** differs from [alphanum_ptree.given_str] iff [alphanum_ptree.hexadecimal]
+        holds *)
   }
 
-and integer_value = Z.t [@printer Z.pp_print]
-
-and fixed_literal =
-  {
-    fixed_ptree: Cobol_ptree.fixed;
-    fixed_value: fixed_value;
-  }
-
-and fixed_value = Q.t [@printer Q.pp_print]
-
-and floating_literal =
-  {
-    float_ptree: Cobol_ptree.floating;
-    float_value: floating_value;
-  }
-
-and floating_value =
-  {
-    float_significand: fixed_value;
-    float_exponent: int;                    (* 0 <= . <= 9999 in ISO/IEC 2014 *)
-  }
-
-and alphanum_literal = Cobol_ptree.alphanum
-
-and alphanum_value = Cobol_ptree.alphanum
+and alphanum_value = string
 
 and boolean_literal =
   {
-    bool_ptree: Cobol_ptree.boolean;
+    bool_ptree: Cobol_ptree.boolean [@compare fun _ _ -> 0];
     bool_value: boolean_value;
   }
 
@@ -67,7 +45,48 @@ and boolean_value =
     bool_bits: Z.t; [@printer Z.pp_print]           (** irrelevant if 0-width *)
   }
 
-[@@deriving show]
+and integer_literal =
+  {
+    int_ptree: Cobol_ptree.integer [@compare fun _ _ -> 0];
+    int_value: integer_value;
+  }
+
+and integer_value = Z.t [@printer Z.pp_print]
+
+and fixed_literal =
+  {
+    fixed_ptree: Cobol_ptree.fixed [@compare fun _ _ -> 0];
+    fixed_value: fixed_value;
+  }
+
+and fixed_value = Q.t [@printer Q.pp_print]
+
+and floating_literal =
+  {
+    float_ptree: Cobol_ptree.floating [@compare fun _ _ -> 0];
+    float_value: floating_value;
+  }
+
+and floating_value =
+  {
+    float_significand: fixed_value;
+    float_exponent: int;                    (* 0 <= . <= 9999 in ISO/IEC 2014 *)
+  }
+
+(** Values that may come from literals only. *)
+and literal_value =
+  | Alphanum_value of alphanum_value
+  | Boolean_value of boolean_value
+  | Integer_value of integer_value
+  | Fixed_value of fixed_value
+  | Floating_value of floating_value
+  | Zero_value
+  | Space_value
+  | Quote_value
+  | Low_value
+  | High_value
+
+[@@deriving ord]
 
 (** {2 Storage} *)
 
@@ -159,7 +178,7 @@ and field_layout =
   | Elementary_field of
       {
         usage: usage;
-        init_value: Cobol_ptree.literal with_loc option;
+        init_value: literal_value with_loc option;
       }
   | Struct_field of
       {

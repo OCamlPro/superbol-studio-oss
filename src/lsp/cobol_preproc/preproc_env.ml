@@ -187,13 +187,16 @@ let find_compilation_var v env =
 (* --- *)
 
 let alphanum_literal_value' (a: alphanum_literal with_loc) : value =
-  Alphanum ~&a
+  Alphanum ~&a.alphanum_value
 
 let boolean_literal_value' (b: boolean_literal with_loc) : value =
   Boolean ~&b.bool_value
 
 let numeric_literal_value' (f: fixed_literal with_loc) : value =
   Numeric ~&f.fixed_value
+
+let numeric_value' (f: fixed_value with_loc) : value =
+  Numeric ~&f
 
 let alphanum_literal_value (a: alphanum_literal with_loc) : value with_src =
   Cobol_common.Srcloc.with_loc_as_src ~loc:~@a (alphanum_literal_value' a)
@@ -203,3 +206,6 @@ let boolean_literal_value (b: boolean_literal with_loc) : value with_src =
 
 let numeric_literal_value (f: fixed_literal with_loc) : value with_src =
   Cobol_common.Srcloc.with_loc_as_src ~loc:~@f (numeric_literal_value' f)
+
+let numeric_value (f: fixed_value with_loc) : value with_src =
+  Cobol_common.Srcloc.with_loc_as_src ~loc:~@f (numeric_value' f)

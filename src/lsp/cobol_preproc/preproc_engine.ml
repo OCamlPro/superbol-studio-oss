@@ -90,7 +90,8 @@ let bind_78_constant lp ~loc const_name (lit: Cobol_ptree.literal with_loc) =
   in
   match ~&lit with
   | Alphanum alphanum ->
-      define (ENV.alphanum_literal_value (alphanum &@<- lit))
+      let value = LIT.alphanum (alphanum &@<- lit) in
+      define (ENV.alphanum_literal_value value.result) ~diags:value.diags
   | Boolean bool ->
       let value = LIT.boolean (bool &@<- lit) in
       define (ENV.boolean_literal_value value.result) ~diags:value.diags
@@ -102,7 +103,7 @@ let bind_78_constant lp ~loc const_name (lit: Cobol_ptree.literal with_loc) =
       let value = LIT.fixed (fixed &@<- lit) in
       define (ENV.numeric_literal_value value.result) ~diags:value.diags
   | NumFig Zero | Fig Zero ->
-      define (ENV.numeric_literal_value (LIT.fixed_zero &@<- lit))
+      define (ENV.numeric_value (Cobol_data.Value.fixed_zero &@<- lit))
   | _ ->
       add_error lp @@ Unexpected { loc = ~@lit;
                                    stuff = Constant_literal_kind lit }

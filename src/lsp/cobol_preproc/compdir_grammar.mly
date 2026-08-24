@@ -155,7 +155,7 @@ let const_value :=
   | LPAR; ~ = loc(FIXEDLIT); RPAR; <Numeric>
 
 let string_value :=
-  | a = loc(ALPHANUM); { a.payload.str &@<- a }
+  | a = loc(ALPHANUM); { a.payload.alphanum_value &@<- a }
   | LPAR; ~ = text_word; RPAR; < >
 
 let set_operand :=

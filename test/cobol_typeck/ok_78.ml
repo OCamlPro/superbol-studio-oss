@@ -123,7 +123,7 @@ let%expect_test "hexadecimal-value" =
           display
           category: ALPHANUMERIC(11)
         }
-        value: X"68656C6C6F20776F726C64"/"hello world"
+        value: "hello world"
       }
     }
     prog.cob:7.7-7.20:
@@ -144,6 +144,6 @@ let%expect_test "hexadecimal-value" =
           display
           category: ALPHANUMERIC(12)
         }
-        value: X"a68656C6C6F20776F726C64"/"\nhello world"
+        value: "\nhello world"
       }
     } |}];;

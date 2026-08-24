@@ -48,7 +48,6 @@ let dummy_literal =
 let dummy_alphanum =
   {
     str = alphanum__;
-    given_str = alphanum__;
     quotation = Double_quote;
     hexadecimal = false;
     runtime_repr = Native_bytes;
@@ -90,7 +89,7 @@ let floating_zero =
 let boolean_zero =
   {
     bool_base = `Bool;
-    bool_value = integer_zero;
+    bool_string = integer_zero;
   }
 
 (* --- *)

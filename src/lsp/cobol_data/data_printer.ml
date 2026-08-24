@@ -16,17 +16,39 @@ open Data_types
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 
-let pp_alphanum_value = Data_types.pp_alphanum_value
-let pp_boolean_value  = Data_value.pp_boolean
-let pp_integer_value  = Data_value.pp_integer
-let pp_fixed_value    = Data_value.pp_fixed_as_decimal
-let pp_floating_value = Data_value.pp_floating
+let pp_alphanum_value ppf a =                      (* print as escaped string *)
+  Pretty.print ppf "%S" a
+let pp_boolean_value ppf b =
+  Cobol_ptree.pp_boolean ppf (Data_value.ptree_of_boolean b)
+let pp_integer_value =
+  Z.pp_print
+let pp_fixed_value ppf q =
+  Cobol_ptree.pp_fixed ppf (Data_value.ptree_of_fixed q)
+let pp_floating_value ppf f =
+  Cobol_ptree.pp_floating ppf (Data_value.ptree_of_floating f)
 
-let pp_alphanum_literal = Data_types.pp_alphanum_literal
-let pp_boolean_literal  = Data_types.pp_boolean_literal
-let pp_integer_literal  = Data_types.pp_integer_literal
-let pp_fixed_literal    = Data_types.pp_fixed_literal
-let pp_floating_literal = Data_types.pp_floating_literal
+let pp_value ppf = function
+  | Alphanum_value x -> pp_alphanum_value ppf x
+  | Boolean_value x -> pp_boolean_value ppf x
+  | Integer_value x -> pp_integer_value ppf x
+  | Fixed_value x -> pp_fixed_value ppf x
+  | Floating_value x -> pp_floating_value ppf x
+  | Zero_value -> Fmt.string ppf "ZERO"
+  | Space_value -> Fmt.string ppf "SPACE"
+  | Quote_value -> Fmt.string ppf "QUOTE"
+  | Low_value -> Fmt.string ppf "LOW-VALUE"
+  | High_value -> Fmt.string ppf "HIGH-VALUE"
+let pp_value'_opt = Fmt.option (pp_with_loc pp_value)
+
+(** Pretty-prints the given alphanum as a literal; appends a slash and an
+    escaped "real value" only if the alphanum value was given in hexadeciaml. *)
+let pp_alphanum_literal ppf (a: alphanum_literal) =
+  Cobol_ptree.pp_alphanum ppf a.alphanum_ptree;
+  if a.alphanum_ptree.hexadecimal then Fmt.pf ppf "/%S" a.alphanum_value
+let pp_boolean_literal  ppf b = pp_boolean_value  ppf b.bool_value
+let pp_integer_literal  ppf i = pp_integer_value  ppf i.int_value
+let pp_fixed_literal    ppf f = pp_fixed_value    ppf f.fixed_value
+let pp_floating_literal ppf f = pp_floating_value ppf f.float_value
 
 let pp_offset = Data_memory.pp_offset
 let pp_size = Data_memory.pp_size
@@ -36,8 +58,6 @@ let pp_int'_opt = Fmt.option pp_int'
 let pp_qualname'_opt = Fmt.option Cobol_ptree.pp_qualname'
 let pp_qualname'_list = Fmt.(hbox (list ~sep:comma Cobol_ptree.pp_qualname'))
 (* Pretty.list ~fopen:"@[<h>" ~fsep:",@;" ~fclose:"@]" Cobol_ptree.pp_qualname' *)
-let pp_literal'_opt = Fmt.option Cobol_ptree.pp_literal'
-let pp_literal'_list = Fmt.list Cobol_ptree.pp_literal'
 
 let pp_data_storage ppf = function
   | File n -> Fmt.pf ppf "FILE@ %a" Cobol_ptree.pp_name' n
@@ -209,7 +229,7 @@ and pp_field_layout: field_layout Pretty.printer = fun ppf -> function
         T Fmt.(styled `Yellow @@ any "elementary");
         T (Pretty.vfield "usage" (fun () -> usage) pp_usage);
         C'(init_value <> None,
-           Fmt.field "value" (fun () -> init_value) pp_literal'_opt);
+           Fmt.field "value" (fun () -> init_value) pp_value'_opt);
       ] ppf ()
   | Struct_field { subfields } ->
       Pretty.record_with_conditional_fields [

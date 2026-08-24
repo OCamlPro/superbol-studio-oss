@@ -221,8 +221,8 @@ type _ term =
   | RefMod: base_ident_ term * refmod -> [>refmod_ident_] term (* Reference modification *)
   | ScalarRefMod: scalar_ident_ term * refmod -> [>refmod_scalar_ident_] term
 
-  | StrConcat: strlit_ term * strlit_ term -> [>strlit_] term
-  | Concat: nonnum_ term * nonnum_ term -> [>nonnum_] term
+  | StrConcat: strlit with_loc * strlit with_loc -> [>strlit_] term
+  | Concat: nonnumlit with_loc * nonnumlit with_loc -> [>nonnum_] term
 
 and _ figurative =
   | Zero: [<int_|nonnum_] figurative            (* ALPHA/NAT/BOOL/NUM *)
@@ -544,9 +544,9 @@ module COMPARE = struct
       | ScalarRefMod (b1, r1), ScalarRefMod (b2, r2) ->
           compare_struct (compare_term b1 b2) @@ lazy (compare_refmod r1 r2)
       | StrConcat (a, c), StrConcat (b, d) ->
-          compare_struct (compare_term a b) @@ lazy (compare_term c d)
+          compare_struct (compare_term ~&a ~&b) @@ lazy (compare_term ~&c ~&d)
       | Concat(a,c), Concat(b,d) ->
-          compare_struct (compare_term a b) @@ lazy (compare_term c d)
+          compare_struct (compare_term ~&a ~&b) @@ lazy (compare_term ~&c ~&d)
       | a , b ->
           Stdlib.compare a b
 
@@ -846,8 +846,8 @@ module FMT = struct
     | RefMod (i, r) -> fmt "@[%a@ %a@]" ppf pp_term i pp_refmod r
     | ScalarRefMod (i, r) -> fmt "@[%a@ %a@]" ppf pp_term i pp_refmod r
 
-    | StrConcat (a, b) -> fmt "%a@ &@ %a" ppf pp_term a pp_term b
-    | Concat (a, b) -> fmt "%a@ &@ %a" ppf pp_term a pp_term b
+    | StrConcat (a, b) -> fmt "%a@ &@ %a" ppf pp_term ~&a pp_term ~&b
+    | Concat (a, b) -> fmt "%a@ &@ %a" ppf pp_term ~&a pp_term ~&b
 
   and pp_figurative: type k. k figurative Pretty.printer = fun ppf -> function
     | Zero -> string ppf "ZERO"

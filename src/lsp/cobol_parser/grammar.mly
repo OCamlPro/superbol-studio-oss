@@ -2523,8 +2523,8 @@ let literal [@recovery dummy_literal] [@symbol "<literal>"] :=
  | f = fixedlit;  {Fixed f}
  | f = floatlit;  {Floating f}
  | f = figurative_constant;            {Fig f}
- | l1 = nonnumeric_literal_no_all; "&";
-   l2 = nonnumeric_literal_no_all;     {Concat (l1, l2): literal}
+ | l1 = loc(nonnumeric_literal_no_all); "&";
+   l2 = loc(nonnumeric_literal_no_all);     {Concat (l1, l2): literal}
 
 (*
 literal_no_all:
@@ -2556,16 +2556,16 @@ let elementary_string_literal ==
  | n = NATLIT;   { National n : strlit }
 
 let string_literal [@symbol "<string literal>"] :=
- | l = elementary_string_literal;  { l }
- | f = figurative_constant;        { Fig f }
- | l1 = string_literal_no_all; "&";
-   l2 = string_literal_no_all;     { StrConcat (l1, l2) : strlit }
+ | l = elementary_string_literal;        { l }
+ | f = figurative_constant;              { Fig f }
+ | l1 = loc(string_literal_no_all); "&";
+   l2 = loc(string_literal_no_all);      { StrConcat (l1, l2) : strlit }
 
 let string_literal_no_all [@symbol "<string literal>"] :=
- | l = elementary_string_literal;  { l: strlit }
- | f = figurative_constant_no_all; { Fig f }
- | l1 = string_literal_no_all; "&";
-   l2 = string_literal_no_all;     { StrConcat (l1, l2) : strlit }
+ | l = elementary_string_literal;        { l: strlit }
+ | f = figurative_constant_no_all;       { Fig f }
+ | l1 = loc(string_literal_no_all); "&";
+   l2 = loc(string_literal_no_all);      { StrConcat (l1, l2) : strlit }
 
 
 
@@ -2578,8 +2578,8 @@ elementary_string_or_int_literal:
 string_or_int_literal:
  | l = elementary_string_or_int_literal { l }
  | f = figurative_constant              { Fig f }
- | l1 = string_literal_no_all "&"
-   l2 = string_literal_no_all       { StrConcat (l1, l2) : strlit_or_intlit }
+ | l1 = loc(string_literal_no_all) "&"
+   l2 = loc(string_literal_no_all)      { StrConcat (l1, l2) : strlit_or_intlit }
 
 (*
 string_or_int_literal_no_all:
@@ -2595,16 +2595,16 @@ elementary_nonnumeric_literal:
  | b = BOOLIT   { Boolean b }
 
 nonnumeric_literal:
- | l = elementary_nonnumeric_literal  { l }
- | f = figurative_constant            { Fig f }
- | l1 = nonnumeric_literal_no_all "&"
-   l2 = nonnumeric_literal_no_all     { Concat (l1, l2): nonnumlit }
+ | l = elementary_nonnumeric_literal       { l }
+ | f = figurative_constant                 { Fig f }
+ | l1 = loc(nonnumeric_literal_no_all) "&"
+   l2 = loc(nonnumeric_literal_no_all)     { Concat (l1, l2): nonnumlit }
 
 nonnumeric_literal_no_all:
- | l = elementary_nonnumeric_literal  { l }
- | f = figurative_constant_no_all     { Fig f }
- | l1 = nonnumeric_literal_no_all "&"
-   l2 = nonnumeric_literal_no_all     { Concat (l1, l2): nonnumlit }
+ | l = elementary_nonnumeric_literal       { l }
+ | f = figurative_constant_no_all          { Fig f }
+ | l1 = loc(nonnumeric_literal_no_all) "&"
+   l2 = loc(nonnumeric_literal_no_all)     { Concat (l1, l2): nonnumlit }
 
 
 
@@ -2826,7 +2826,7 @@ let any_lpar ==
  | LPAR_BEFORE_RELOP; {}
 
 let relation_condition ==
- | neg = ibo(NOT); e = expression; pred = loc(abbrev_relop_operand); 
+ | neg = ibo(NOT); e = expression; pred = loc(abbrev_relop_operand);
     { Relation (neg, e, pred) }
 
 nonrel_condition:

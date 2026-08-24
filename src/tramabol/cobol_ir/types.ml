@@ -161,8 +161,8 @@ type ('f, 'r, 'm) value_manager =
     create_mutable_field:
       Cobol_data.Types.field_definition with_loc -> 'r record_handle ->
       ('f mutable_field, errors) result;
-    create_field_from_literal:
-      Cobol_ptree.literal with_loc ->
+    create_field_from_literal_value:
+      Cobol_data.Types.literal_value with_loc ->
       ('f immutable_field, errors) result;
 
     create_module:

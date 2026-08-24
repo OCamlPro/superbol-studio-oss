@@ -17,7 +17,7 @@ let manager =
   Cobol_ir.Types.{
     create_record_data = Record.create;
     create_mutable_field = Field.in_record_memory;
-    create_field_from_literal = Field.from_literal;
+    create_field_from_literal_value = Field.from_literal_value;
 
     create_module = Module.create;
     enter_module = Module.enter;

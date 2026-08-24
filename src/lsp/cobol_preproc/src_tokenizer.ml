@@ -26,7 +26,7 @@ let cdtoks_of_word directive_kind
     let f = Cobol_data.Literal.fixed f in
     List.cons (FIXEDLIT ~&(f.result), ~@@(f.result)) toks,
     Preproc_diagnostics.add_literal_diagnostics f.diags acc
-  and boollit ~prefix_length ~base str =
+  and[@local] boollit ~prefix_length ~base str =
     let l = Cobol_ptree.boolean_of_string ~base str in
     (* CHECKME: remove prefix & quotes from literal location here? *)
     let lloc = Cobol_common.Srcloc.trunc_prefix (prefix_length + 1) ~@word in
@@ -34,6 +34,11 @@ let cdtoks_of_word directive_kind
     let b = Cobol_data.Literal.boolean (l &@ lloc) in
     [BOOLLIT ~&(b.result), ~@@word],
     Preproc_diagnostics.add_literal_diagnostics b.diags acc
+  and[@local] alphanum ~quotation str =
+    let a = Cobol_ptree.alphanum_of_string str ~quotation in
+    let a = Cobol_data.Literal.alphanum (a &@<- word) in
+    [ALPHANUM ~&(a.result), ~@@word],
+    Preproc_diagnostics.add_literal_diagnostics a.diags acc
   in
   let lexer = Src_lexer.cdtoken directive_kind in
   match ~&word with
@@ -58,8 +63,7 @@ let cdtoks_of_word directive_kind
       in
       List.rev toks, acc
   | Alphanum { knd = Basic; str; qte = quotation } ->
-      [ALPHANUM (Cobol_ptree.alphanum_of_string str ~quotation), ~@@word],
-      acc
+      alphanum ~quotation str
   | Alphanum { knd = Bool; str; qte = _ } ->
       boollit ~prefix_length:1 ~base:`Bool str
   | Alphanum { knd = BoolX; str; qte = _ } ->

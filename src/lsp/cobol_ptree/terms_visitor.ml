@@ -153,7 +153,10 @@ and fold_nonnumlit (v: _ #folder) : nonnumlit -> 'a -> 'a = function
   | National n -> fold_national v n
   | Fig f -> fold_any_figurative v f
   | StrConcat _ as s -> fold_strlit v s
-  | Concat (n, n') -> fun x -> x >> fold_nonnumlit v n >> fold_nonnumlit v n'
+  | Concat (n, n') -> fun x -> x >> fold_nonnumlit' v n >> fold_nonnumlit' v n'
+
+and fold_nonnumlit' (v: _ #folder) =
+  fold' ~fold:fold_nonnumlit v
 
 and fold_int_figurative (v: _ #folder) =
   leaf v#fold_int_figurative
@@ -169,7 +172,10 @@ and fold_strlit (v: _ #folder) : strlit -> 'a -> 'a = function
   | Alphanum a -> fold_alphanum v a
   | National n -> fold_national v n
   | Fig f -> fold_any_figurative v f
-  | StrConcat (s, s') -> fun x -> x >> fold_strlit v s >> fold_strlit v s'
+  | StrConcat (s, s') -> fun x -> x >> fold_strlit' v s >> fold_strlit' v s'
+
+and fold_strlit' (v: _ #folder) =
+  fold' ~fold:fold_strlit v
 
 and fold_scalar_ident (v: _ #folder) : scalar_ident_ term -> 'a -> 'a = function
   | Address ai -> fold_address v ai

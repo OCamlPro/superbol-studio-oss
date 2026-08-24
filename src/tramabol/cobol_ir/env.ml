@@ -12,6 +12,7 @@
 (**************************************************************************)
 
 open Cobol_ptree                                                 (* for terms *)
+open Cobol_data.Types
 open Cobol_unit.Types
 open Types
 
@@ -23,8 +24,8 @@ let error e = Error (NEL.one e)
 
 module TYPES = struct
   module CONST_REF = struct
-    type t = literal
-    let equal a b = Cobol_ptree.compare_literal a b = 0
+    type t = literal_value
+    let equal a b = Cobol_data.Types.compare_literal_value a b = 0
     let hash a = Hashtbl.hash a
   end
   module CONST_TABLE = Ephemeron.K1.Make (CONST_REF)
@@ -41,12 +42,12 @@ open TYPES
 let lookup_named_field (qn: qualname) env =
   FIELDS_MAP.find qn env.named_fields
 
-let literal_field (lit: literal with_loc) env : (_ immutable_field, _) result =
+let literal_field (lit: literal_value with_loc) env : (_ immutable_field, _) result =
   match CONST_TABLE.find_opt env.const_fields ~&lit with
   | Some f ->
       Ok f
   | None ->
-      let* f = env.vm.create_field_from_literal lit in
+      let* f = env.vm.create_field_from_literal_value lit in
       CONST_TABLE.add env.const_fields ~&lit f;
       Ok f
 
@@ -83,10 +84,14 @@ let resolve_term: type k. _ env -> k term with_loc -> _ = fun env t ->
   | Fixed _
   | Floating _
   | Integer _
-  | National _ as lit ->
-      make_literal env (lit &@<- t)
   | NumFig _
   | Fig _
+  | StrConcat _
+  | Concat _
+  | National _ as lit ->
+      (match Cobol_data.Literal.value (lit &@<- t) with
+       | Ok lit -> make_literal env lit
+       | Error _ -> error @@ Unsupported { stuff = Term ~&t; loc = ~@t })
   | Address _
   | Counter _
   | InlineCall _
@@ -95,7 +100,5 @@ let resolve_term: type k. _ env -> k term with_loc -> _ = fun env t ->
   | ObjectView _
   | ObjectRef _
   | RefMod _
-  | ScalarRefMod _
-  | StrConcat _
-  | Concat _ ->
+  | ScalarRefMod _ ->
       error @@ Unsupported { stuff = Term ~&t; loc = ~@t }

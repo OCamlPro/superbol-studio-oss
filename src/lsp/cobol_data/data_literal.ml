@@ -38,15 +38,22 @@ let with_invalid_chars ~loc ~literal_class diags chars v =
 
 (* --- *)
 
-let alphanum = Cobol_ptree.alphanum_of_string
+let alphanum ({ payload = literal; loc }: Cobol_ptree.alphanum with_loc)
+  : alphanum_literal with_loc OUT.with_diags =
+  try
+    OUT.result ({ alphanum_ptree = literal;
+                  alphanum_value = VAL.alphanum literal} &@ loc)
+  with VAL.INVALID_CHARS chars ->
+    with_invalid_chars ~loc OUT.none chars ~literal_class:Hexadecimal
+      { alphanum_ptree = literal; alphanum_value = literal.str }
 
 (* --- *)
 
 let integer ({ payload = literal; loc }: Cobol_ptree.integer with_loc)
   : integer_literal with_loc OUT.with_diags =
   try
-    let int_value = VAL.integer_of_string literal in
-    OUT.result ({ int_ptree = literal; int_value } &@ loc)
+    OUT.result ({ int_ptree = literal;
+                  int_value = VAL.integer literal } &@ loc)
   with VAL.INVALID_CHARS chars ->
     with_invalid_chars ~loc OUT.none chars ~literal_class:Integer
       { int_ptree = literal; int_value = VAL.integer_zero }
@@ -56,47 +63,19 @@ let integer ({ payload = literal; loc }: Cobol_ptree.integer with_loc)
 let fixed ({ payload = literal; loc }: Cobol_ptree.fixed with_loc)
   : fixed_literal with_loc OUT.with_diags =
   try
-    let fixed_value =
-      VAL.fixed_of_strings
-        ~integral:literal.fixed_integral
-        ~fractional:literal.fixed_fractional
-    in
-    OUT.result ({ fixed_ptree = literal; fixed_value } &@ loc)
+    OUT.result ({ fixed_ptree = literal;
+                  fixed_value = VAL.fixed literal } &@ loc)
   with VAL.INVALID_CHARS chars ->
     with_invalid_chars ~loc OUT.none chars ~literal_class:Fixed
       { fixed_ptree = literal; fixed_value = VAL.fixed_zero }
-
-let fixed_zero: fixed_literal =
-  {
-    fixed_ptree = Cobol_ptree.fixed_zero;
-    fixed_value = VAL.fixed_of_strings ~integral:"0" ~fractional:"0";
-  }
-
-let of_fixed_value: fixed_value -> fixed_literal = fun v ->
-  {
-    fixed_ptree = VAL.to_ptree_fixed v;
-    fixed_value = v;
-  }
-
-let categorize_fixed: fixed_literal -> [`Z of integer_literal |
-                                        `Q of fixed_literal ]  = fun v ->
-  if v.fixed_ptree.fixed_fractional = "0"
-  then `Z { int_value = v.fixed_value.num;
-            int_ptree = v.fixed_ptree.fixed_integral }
-  else `Q v
 
 (* --- *)
 
 let floating ({ payload = literal; loc }: Cobol_ptree.floating with_loc)
   : floating_literal with_loc OUT.with_diags =
   try
-    let float_value =
-      VAL.floating_of_strings
-        ~integral:literal.float_significand.fixed_integral
-        ~fractional:literal.float_significand.fixed_fractional
-        ~exponent:literal.float_exponent
-    in
-    OUT.result ({ float_ptree = literal; float_value } &@ loc)
+    OUT.result ({ float_ptree = literal;
+                  float_value = VAL.floating literal } &@ loc)
   with VAL.INVALID_CHARS chars ->
     with_invalid_chars ~loc OUT.none chars ~literal_class:Floating
       { float_ptree = literal; float_value = VAL.floating_zero }
@@ -108,7 +87,7 @@ let boolean
     (* TODO deal with prefix length? *)
     ?(max_length = 8_191)                         (* as per ISO/IEC 1989:2014 *)
     Cobol_ptree.{ payload = { bool_base = base;
-                              bool_value = literal_string } as bool_ptree;
+                              bool_string = literal_string } as bool_ptree;
                   loc } =
   let diags = OUT.none in
   let len = String.length literal_string in
@@ -118,16 +97,109 @@ let boolean
     else diags
   in
   try
-    let v = { bool_ptree;
-              bool_value = VAL.boolean_of_string ~base literal_string } in
-    OUT.result ~diags (v &@ loc)
+    OUT.result ({ bool_ptree;
+                  bool_value = VAL.boolean bool_ptree } &@ loc)
+      ~diags
   with VAL.INVALID_CHARS chars ->
     with_invalid_chars ~loc diags chars
       ~literal_class:(if base = `Bool then Boolean else Hexadecimal)
       { bool_ptree; bool_value = VAL.boolean_zero }
 
-let of_boolean_value b : boolean_literal =
-  {
-    bool_ptree = VAL.to_ptree_boolean b;
-    bool_value = b;
-  }
+(* --- *)
+
+let rec value: Cobol_ptree.literal with_loc -> (literal_value with_loc, _) result = fun lit ->
+  try
+    Result.map (fun x -> x &@<- lit) @@
+    match ~&lit with
+    | Alphanum a ->
+        Ok (Alphanum_value (VAL.alphanum a))
+    | Boolean b ->
+        Ok (Boolean_value (VAL.boolean b))
+    | Integer i ->
+        Ok (Integer_value (VAL.integer i))
+    | Fixed f ->
+        Ok (Fixed_value (VAL.fixed f))
+    | Floating f ->
+        Ok (Floating_value (VAL.floating f))
+    | NumFig Zero
+    | Fig Zero ->
+        Ok Zero_value
+    | Fig Space ->
+        Ok Space_value
+    | Fig Quote ->
+        Ok Quote_value
+    | Fig LowValue ->
+        Ok Low_value
+    | Fig HighValue ->
+        Ok High_value
+    | StrConcat (a, b) ->
+        concat (strlit_value a) (strlit_value b)
+    | Concat (a, b) ->
+        concat (nonnumlit_value a) (nonnumlit_value b)
+    | Fig All _
+    | National _ ->
+        Error ()
+  with VAL.INVALID_CHARS _ | Exit ->
+    Error ()
+
+and strlit_value: Cobol_ptree.strlit with_loc -> _ = fun lit ->
+  try
+    Result.map (fun x -> x &@<- lit) @@
+    match ~&lit with
+    | Alphanum a ->
+        Ok (Alphanum_value (VAL.alphanum a))
+    | Fig Zero ->
+        Ok Zero_value
+    | Fig Space ->
+        Ok Space_value
+    | Fig Quote ->
+        Ok Quote_value
+    | Fig LowValue ->
+        Ok Low_value
+    | Fig HighValue ->
+        Ok High_value
+    | StrConcat (a, b) ->
+        concat (strlit_value a) (strlit_value b)
+    | Fig All _
+    | National _ ->
+        Error ()
+  with VAL.INVALID_CHARS _ | Exit ->
+    Error ()
+
+and nonnumlit_value: Cobol_ptree.nonnumlit with_loc -> _ = fun lit ->
+  try
+    Result.map (fun x -> x &@<- lit) @@
+    match ~&lit with
+    | Alphanum a ->
+        Ok (Alphanum_value (VAL.alphanum a))
+    | Boolean b ->
+        Ok (Boolean_value (VAL.boolean b))
+    | Fig Zero ->
+        Ok Zero_value
+    | Fig Space ->
+        Ok Space_value
+    | Fig Quote ->
+        Ok Quote_value
+    | Fig LowValue ->
+        Ok Low_value
+    | Fig HighValue ->
+        Ok High_value
+    | StrConcat (a, b) ->
+        concat (strlit_value a) (strlit_value b)
+    | Concat (a, b) ->
+        concat (nonnumlit_value a) (nonnumlit_value b)
+    | Fig All _
+    | National _ ->
+        Error ()
+  with VAL.INVALID_CHARS _ | Exit ->
+    Error ()
+
+and concat a b =
+  match a, b with
+  | Error (), _ | _, Error () ->
+      Error ()
+  | Ok { payload = Alphanum_value a; _ },
+    Ok { payload = Alphanum_value b; _ } ->
+      Ok (Alphanum_value (VAL.concat_alphanums a b))
+  | Ok _, Ok _ ->                                        (* Not suported (yet) *)
+      Error ()

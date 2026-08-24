@@ -177,7 +177,8 @@ and pp_field_layout: field_layout Pretty.printer = fun ppf x ->
       Fmt.(
         const pp_usage usage
       ++ any "\n\n"
-      ++ const (option ~none:nop (any "VALUE " ++ Cobol_ptree.pp_literal')) init_value)
+      ++ const (option ~none:nop @@ any "VALUE " ++
+                pp_with_loc Cobol_data.Printer.pp_value) init_value)
       ppf x
   | Struct_field { subfields } ->
       Fmt.const pp_struct subfields ppf x

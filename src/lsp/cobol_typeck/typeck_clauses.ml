@@ -158,10 +158,10 @@ let display_usage_from_literal: Cobol_ptree.literal -> usage =
   function
   | Alphanum { str; _ } ->
       Display (PIC.alphanumeric ~size:(String.length str))
-  | Boolean { bool_base = `Bool; bool_value } ->
-      Display (PIC.boolean (String.length bool_value))
-  | Boolean { bool_base = `Hex; bool_value } ->
-      Display (PIC.boolean (String.length bool_value * 4))
+  | Boolean { bool_base = `Bool; bool_string } ->
+      Display (PIC.boolean (String.length bool_string))
+  | Boolean { bool_base = `Hex; bool_string } ->
+      Display (PIC.boolean (String.length bool_string * 4))
   | Integer i ->
       let sign, digits = detect_sign i in
       Display (PIC.fixed_numeric ~sign digits 0)
@@ -274,8 +274,8 @@ let auto_usage diags ~item_loc ~usage_clause picture =
       diags, Error None
 
 
-let display_usage ~item_loc ?value ?picture diags =
-  match picture, value with
+let display_usage ~item_loc ?value_literal_ptree ?picture diags =
+  match picture, value_literal_ptree with
   | None, None ->
       diags, Error None
   | None, Some value ->
@@ -321,17 +321,25 @@ let packed_decimal_usage diags ~item_loc ~picture usage =
       diags, Ok (Packed_decimal { picture; with_sign_nibble = false })
 
 
+let literal_value: Cobol_ptree.literal with_loc -> Cobol_data.Types.literal_value with_loc option =
+  fun lit ->
+  match Cobol_data.Literal.value lit with
+  | Ok lit ->
+      Some lit
+  | Error () ->
+      None
+
 let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
   let diags = [] in
-  let diags, value = match item_clauses.value with
+  let diags, value, value_literal_ptree = match item_clauses.value with
     | Some { payload = ValueTable _; loc = value_loc } ->
         data_error diags @@ Unexpected_table_value_clause { item_name;
                                                             value_loc },
-        None
-    | Some { payload = ValueData literal; _ } ->
-        diags, Some literal
+        None, None
+    | Some { payload = ValueData lit; _ } ->
+        diags, literal_value lit, Some lit
     | None ->
-        diags, None
+        diags, None, None
   in
   let picture_config =
     match item_clauses.sign with
@@ -389,7 +397,7 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
         auto_usage diags ~item_loc ~usage_clause picture
 
     | Display ->
-        display_usage diags ~item_loc ?picture ?value
+        display_usage diags ~item_loc ?picture ?value_literal_ptree
 
     | FloatBinary32 e ->
         diags, Ok (Float_binary { width = `W32;

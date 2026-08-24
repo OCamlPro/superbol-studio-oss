@@ -28,7 +28,7 @@ type floating =
 type boolean =
   {
     bool_base: [`Bool | `Hex];
-    bool_value: string;
+    bool_string: string;
   }                                                             [@@deriving ord]
 
 (* --- *)
@@ -40,9 +40,6 @@ let fixed_of_strings ~integral ~fractional =
     fixed_integral = integral;
     fixed_fractional = fractional;
   }
-
-let fixed_zero =
-  fixed_of_strings ~integral:"0" ~fractional:"0"
 
 let pp_fixed ppf { fixed_integral; fixed_fractional } =
   Pretty.print ppf "%s.%s" fixed_integral fixed_fractional
@@ -61,10 +58,10 @@ let pp_floating ppf { float_significand = s; float_exponent = e } =
 let boolean_of_string ?(base: [`Bool | `Hex] = `Bool) s =
   {
     bool_base = base;
-    bool_value = s;
+    bool_string = s;
   }
 
 let boolean_zero = boolean_of_string "0"
 
 let pp_boolean: boolean Pretty.printer = fun ppf b ->
-  Pretty.print ppf "b\"%s\"" b.bool_value
+  Pretty.print ppf "b\"%s\"" b.bool_string
