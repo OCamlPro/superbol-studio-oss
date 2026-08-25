@@ -11,6 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open EzCompat                                             (* import StringMap *)
+
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Platform.TYPES
 open Cobol_common.Srcloc.INFIX
@@ -48,10 +50,11 @@ and preprocessor_persist =
     overlay_manager: (module Src_overlay.MANAGER);
     replacing: Preproc_directives.replacing with_loc list list;
     copybooks: Cobol_common.Srcloc.copylocs;              (* opened copybooks *)
+    copybook_rev_comments: Text.comments StringMap.t;
+    copybook_lookup_config: Cobol_common.Copybook.TYPES.lookup_config;
     dialect: Cobol_config.dialect;
     source_format: Src_format.any option;  (* to keep auto-detecting on reset *)
     exec_preprocs: exec_preprocessor EXEC_MAP.t;
-    copybook_lookup_config: Cobol_common.Copybook.TYPES.lookup_config;
     platform: Cobol_common.Platform.TYPES.platform;     (* == reader.platform *)
     show_if_verbose: [`Txt | `Src] list;
   }
@@ -69,10 +72,15 @@ let add_warn lp w =
   { lp with diags = Preproc_diagnostics.add_warning w lp.diags }
 
 let position { reader; _ } = Src_reader.position reader
-let input_file { reader; _ } = Src_reader.input_file reader
+let input_filename { reader; _ } = Src_reader.input_filename reader
 let source_format { reader; _ } = Src_reader.source_format reader
 let rev_log { pplog; _ } = pplog
-let rev_comments { reader; _ } = Src_reader.rev_comments reader
+let rev_comments ({ reader; persist; _ } as lp) =
+  let rev_comments = Src_reader.rev_comments reader in
+  let map = StringMap.add "" rev_comments persist.copybook_rev_comments in
+  match input_filename lp with
+  | Some f -> StringMap.add f rev_comments map
+  | None -> map
 let rev_ignored { reader; _ } = Src_reader.rev_ignored reader
 
 let bind_78_constant lp ~loc const_name (lit: Cobol_ptree.literal with_loc) =
@@ -141,8 +149,6 @@ let with_buff lp buff =
   if lp.buff == buff then lp else { lp with buff }
 let with_pplog lp pplog =
   if lp.pplog == pplog then lp else { lp with pplog }
-let with_diags_n_pplog lp diags pplog =
-  if lp.diags == diags && lp.pplog == pplog then lp else { lp with diags; pplog }
 let with_buff_n_pplog lp buff pplog =
   if lp.buff == buff && lp.pplog == pplog then lp else { lp with buff; pplog }
 let with_replacing lp replacing =
@@ -181,10 +187,11 @@ let preprocessor input = function
             overlay_manager = (module Om);
             replacing = [];
             copybooks = Cobol_common.Srcloc.no_copy;
+            copybook_rev_comments = StringMap.empty;
+            copybook_lookup_config;
             dialect = Config.dialect;
             source_format;
             exec_preprocs;
-            copybook_lookup_config;
             platform;
             show_if_verbose = [`Src];
           };
@@ -494,35 +501,40 @@ and do_exec ?(partial = false) lp rev_prefix exec_block suffix =
 and read_lib ({ persist = { copybook_lookup_config; platform;
                             copybooks; _ }; _ } as lp)
     loc { txtname; libname } =
-  let text, diags, pplog =
+  let text, diags, pplog, copybook_rev_comments =
     match
       platform.find_lib
         ~&txtname ?libname:~&?libname
-        ?fromfile:(input_file lp) ~lookup_config:copybook_lookup_config
+        ?fromfile:(input_filename lp) ~lookup_config:copybook_lookup_config
     with
     | Ok filename when Cobol_common.Srcloc.mem_copy filename copybooks ->
         [],
         Preproc_diagnostics.add_error
           (Cyclic_copy { copyloc = loc; filename }) lp.diags,
-        Preproc_trace.cyclic_copy ~loc ~filename lp.pplog
+        Preproc_trace.cyclic_copy ~loc ~filename lp.pplog,
+        lp.persist.copybook_rev_comments
     | Ok filename ->
         if platform.verbosity>0 then
           platform.error "Reading library `%s'@." filename;
-        let text, lp =             (* note: [lp] holds all prev and new diags *)
+        let text, lp' =             (* note: [lp] holds all prev and new diags *)
           Src_input.from ~filename ~platform ~f:begin fun input ->
             full_text                                   (* likewise for pplog *)
               (preprocessor input (`Fork (lp, loc, filename)))
               ~postproc:(Cobol_common.Srcloc.copy_from ~filename ~copyloc:loc)
           end
         in
-        text, lp.diags, Preproc_trace.copy_done ~loc ~filename lp.pplog
+        text, lp'.diags, Preproc_trace.copy_done ~loc ~filename lp'.pplog,
+        StringMap.union (fun _ x _ -> Some x (* unreachable *))
+          lp.persist.copybook_rev_comments (rev_comments lp')
     | Error lnf ->
         [],
         Preproc_diagnostics.add_error
           (Copybook_lookup_error { copyloc = Some loc; lnf }) lp.diags,
-        Preproc_trace.missing_copy ~loc ~error:lnf lp.pplog
+        Preproc_trace.missing_copy ~loc ~error:lnf lp.pplog,
+        lp.persist.copybook_rev_comments
   in
-  text, with_diags_n_pplog lp diags pplog
+  text,
+  { lp with diags; pplog; persist = { lp.persist with copybook_rev_comments } }
 
 
 and full_text ?(item = "library") ?postproc lp : Text.text * preprocessor =

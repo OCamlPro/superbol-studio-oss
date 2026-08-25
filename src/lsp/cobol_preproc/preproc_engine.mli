@@ -11,6 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open EzCompat                                                    (* StringMap *)
 open Cobol_common.Srcloc.TYPES
 
 type preprocessor
@@ -29,10 +30,21 @@ val reset_preprocessor_for_string
 
 val diags: preprocessor -> Preproc_diagnostics.t
 val position: preprocessor -> Lexing.position
-val position_at: line:int -> char: int -> preprocessor -> Lexing.position
+val position_at: line:int -> char:int -> preprocessor -> Lexing.position
+val input_filename: preprocessor -> string option
 val source_format: preprocessor -> Src_format.any
 val rev_log: preprocessor -> Preproc_trace.log
-val rev_comments: preprocessor -> Text.comments
+
+(** [rev_comments pp] associates filenames read by [pp] (directly or indirectly
+    while processing copybooks) with comments read in each respective file, in
+    reverse order.
+
+    As a special rule the returned map always includes an association between
+    [""] and the file fed to [pp]. *)
+val rev_comments: preprocessor -> Text.comments StringMap.t
+
+(** [rev_ignored pp] lists the lexical locations ignored when reading the file
+    given to [pp]. *)
 val rev_ignored: preprocessor -> lexloc list
 
 val next_chunk: preprocessor -> Text.text * preprocessor

@@ -3,7 +3,8 @@
 ## [_] Next release
 
 ### Added
-- Parsing of abbreviated conditions in EVALUATE WHEN clauses [#638](https://github.com/OCamlPro/superbol-studio-oss/pull/638)
+- Display of documentation for data items defined in copybooks [#641](https://github.com/OCamlPro/superbol-studio-oss/pull/641)
+- Parsing of abbreviated conditions in `EVALUATE WHEN` clauses [#638](https://github.com/OCamlPro/superbol-studio-oss/pull/638)
 - Support for 78-level data items [#634](https://github.com/OCamlPro/superbol-studio-oss/pull/634)
 
 ### Fixed
