@@ -9,6 +9,7 @@
 
 ### Fixed
 - Amount of references reported in codelens, that wrongly included declarations [#640](https://github.com/OCamlPro/superbol-studio-oss/pull/640)
+- Wrong codelens appearing on `COPY`s [#642](https://github.com/OCamlPro/superbol-studio-oss/pull/642)
 - Grammar rules for `VALUE OF` clause [#629](https://github.com/OCamlPro/superbol-studio-oss/pull/629) (fix for [Issue #625](https://github.com/OCamlPro/superbol-studio-oss/issues/625))
 
 

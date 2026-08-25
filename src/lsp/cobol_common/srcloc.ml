@@ -122,6 +122,16 @@ let rec start_pos: type t. t slt -> Lexing.position = function
   | Rpl { old; _ } -> start_pos old
   | Cat { left; _ } -> start_pos left
 
+(** [shallow_start_pos loc] retrieves the starting position of [loc] if it was
+    not subject to any copy, and without traversal of replacements (i.e. returns
+    the start position of replaced text, not the position of its
+    replacement). Returns [None] otherwise. *)
+let rec shallow_start_pos = function
+  | Raw (s, _, _) -> Some s
+  | Cpy _ -> None
+  | Rpl { old; _ } -> shallow_start_pos old
+  | Cat { left; _ } -> shallow_start_pos left
+
 (** [shallow_multiline_lexloc_in ~filename loc] retrieves a lexical location in
     [filename] from [loc], iff [loc] directly originates from [filename] and was
     not subject to any replacement or copy.  Returns [None] otherwise. *)

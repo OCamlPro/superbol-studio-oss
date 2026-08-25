@@ -42,6 +42,11 @@ val range_of_srcloc_in
   -> Cobol_common.Srcloc.srcloc
   -> Lsp.Types.Range.t
 
+val shallow_start_position_in
+  : filename:string
+  -> Cobol_common.Srcloc.srcloc
+  -> Lsp.Types.Position.t option
+
 (** [is_in_srcloc ~filename pos loc] returns [true] iff the {i projection} of
     [loc] on [filename] includes position [pos].
 
@@ -89,6 +94,15 @@ val loc_translator
     whose source location does not include the given position. To be used as a
     mixin component so it overrides [fold'] last. *)
 class ['x] sieve: filename:string -> pos:Lsp.Types.Position.t ->
+  object
+    method fold'
+      : 'n. ('n Cobol_common.Srcloc.with_loc, 'x) Cobol_common.Visitor.fold
+  end
+
+(** [shallow_sieve ~filename] is a folder visitor that skips any localized AST
+    node whose source location does not lie within [filename]. To be used as a
+    mixin component so it overrides [fold'] last. *)
+class ['x] shallow_sieve: filename:string ->
   object
     method fold'
       : 'n. ('n Cobol_common.Srcloc.with_loc, 'x) Cobol_common.Visitor.fold
