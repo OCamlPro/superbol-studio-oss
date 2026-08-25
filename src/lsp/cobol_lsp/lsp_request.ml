@@ -312,25 +312,24 @@ let find_definitions ?allow_notifications loc_translator
                                       Process_environment; _ }; _ } ->
       []                    (* CHECKME: location of ref may be the definition *)
 
-let lookup_definition_in_doc
-    DefinitionParams.{ textDocument; position; _ }
-    ~(doc: Lsp_document.t)
+let lookup_definition_in_doc position ~(doc: Lsp_document.t)
     Cobol_typeck.Outputs.{ group; _ }
   =
   let rootdir = Lsp_project.(string_of_rootdir @@ rootdir doc.project)
-  and filename = Lsp.Uri.to_path textDocument.uri
+  and uri = Lsp_document.uri doc
   and artifacts = doc.artifacts in
+  let filename = Lsp.Uri.to_path uri in
   match Lsp_lookup.element_at_position ~filename position group artifacts with
   | { element_at_position = None; _ } ->
       None
   | { element_at_position = Some element;
       enclosing_compilation_unit_name = cu_name } ->
-      let loc_translator = Lsp_position.loc_translator ~rootdir textDocument in
+      let loc_translator = Lsp_position.loc_translator ~rootdir uri in
       Some (`Location (find_definitions loc_translator ?cu_name element group))
 
 let handle_definition registry (params: DefinitionParams.t) =
   try_with_checked_doc registry params.textDocument
-    ~f:(lookup_definition_in_doc params)
+    ~f:(lookup_definition_in_doc params.position)
 
 (** {3 References} *)
 
@@ -375,14 +374,13 @@ let ppenv_var_reference_locs (loc_translator: Lsp_position.translator)
         None
   end (Cobol_preproc.Trace.events doc.artifacts.pplog)
 
-let lookup_references_in_doc
-    ReferenceParams.{ textDocument; position; context; _ }
-    ~(doc: Lsp_document.t)
+let lookup_references_in_doc position ~with_declaration ~(doc: Lsp_document.t)
     Cobol_typeck.Outputs.{ group; artifacts = { references }; _ }
   =
   let rootdir = Lsp_project.(string_of_rootdir @@ rootdir doc.project)
-  and filename = Lsp.Uri.to_path textDocument.uri
+  and uri = Lsp_document.uri doc
   and artifacts = doc.artifacts in
+  let filename = Lsp.Uri.to_path uri in
   match Lsp_lookup.element_at_position ~filename position group artifacts with
   | { element_at_position = None; _ } ->
       Lsp_debug.message "Lsp_request.lookup_references_in_doc: \
@@ -391,7 +389,7 @@ let lookup_references_in_doc
   | { element_at_position = Some element;
       enclosing_compilation_unit_name = cu_name } ->
       let Lsp_position.{ location_of_srcloc; _ } as loc_translator
-        = Lsp_position.loc_translator ~rootdir textDocument in
+        = Lsp_position.loc_translator ~rootdir uri in
       let data_refs (cu_refs: Cobol_typeck.Outputs.references_in_unit) qn =
         List.rev_map location_of_srcloc
           (Cobol_unit.Qual.MAP.find qn cu_refs.data_refs)
@@ -399,7 +397,7 @@ let lookup_references_in_doc
         List.rev_map location_of_srcloc
           (Cobol_unit.Qual.MAP.find qn cu_refs.proc_refs)
       and def_locs =
-        if context.includeDeclaration then
+        if with_declaration then
           find_definitions ~allow_notifications:false loc_translator
             ?cu_name element group
         else []
@@ -443,7 +441,8 @@ let lookup_references_in_doc
 
 let handle_references state (params: ReferenceParams.t) =
   try_with_checked_doc state params.textDocument
-    ~f:(lookup_references_in_doc params)
+    ~f:(lookup_references_in_doc params.position
+          ~with_declaration:params.context.includeDeclaration)
 
 (** {3 Formatting} *)
 
@@ -706,11 +705,10 @@ let describe_data_definition_for_element_at_pos
       with Not_found ->
         None
 
-let data_references ~textDocument position ~(doc: Lsp_document.t) checked_doc =
-  let context = ReferenceContext.create ~includeDeclaration:true in
-  let params = ReferenceParams.create ~context ~position ~textDocument () in
+let data_references position ~(doc: Lsp_document.t) checked_doc =
   Option.map List.length @@
-  lookup_references_in_doc params ~doc checked_doc
+  lookup_references_in_doc position ~doc checked_doc
+    ~with_declaration:true
 
 let hover_markdown ~filename ~loc value =
   let content = MarkupContent.create ~kind:MarkupKind.Markdown ~value in
@@ -764,9 +762,7 @@ let handle_hover ?show_hover_text_on_definitions
   let filename = Lsp.Uri.to_path textDocument.uri in
   try_with_checked_doc registry textDocument
     ~f:begin fun ~doc checked_doc ->
-      let ref_count () =
-        data_references ~textDocument position ~doc checked_doc
-      in
+      let ref_count () = data_references position ~doc checked_doc in
       match
         describe_data_definition_for_element_at_pos position ~doc ~checked_doc
           ?show_hover_text_on_definitions,
@@ -836,15 +832,13 @@ let handle_document_symbol registry (params: DocumentSymbolParams.t) =
 let handle_codelens registry ({ textDocument; _ }: CodeLensParams.t) =
   try_with_checked_doc registry textDocument
     ~f:begin fun ~doc checked_doc ->
-      let context = ReferenceContext.create ~includeDeclaration:true in
       Lsp_lens.positions ~uri:textDocument.uri
         checked_doc.group doc.artifacts |>
-      List.map begin fun position ->                (* TODO: Change to `rev_map` *)
-        let params =
-          ReferenceParams.create ~context ~position ~textDocument () in
+      List.rev_map begin fun position ->
         let ref_count =
           Option.fold ~none:0 ~some:List.length @@
-          lookup_references_in_doc params ~doc checked_doc
+          lookup_references_in_doc position ~doc checked_doc
+            ~with_declaration:false
         in
         let range = Range.create ~end_:position ~start:position in
         let uri = DocumentUri.yojson_of_t textDocument.uri in
@@ -854,8 +848,7 @@ let handle_codelens registry ({ textDocument; _ }: CodeLensParams.t) =
             ~command:"superbol.editor.action.findReferences"
             ~arguments:[uri; Position.yojson_of_t position] in
         CodeLens.create ~command ~range ()
-      end |>
-      Option.some
+      end |> Option.some
     end
   |> Option.value ~default:[]
 
@@ -869,11 +862,9 @@ let handle_rename
   try_with_checked_doc registry textDocument
     ~f:begin fun ~doc checked_doc ->
       let locations =
-        let context = ReferenceContext.create ~includeDeclaration:true in
         Option.value ~default:[] @@
-        lookup_references_in_doc ~doc
-          (ReferenceParams.create () ~context ~position ~textDocument)
-          checked_doc
+        lookup_references_in_doc ~doc position checked_doc
+          ~with_declaration:true
       in
       let changes, in_copybook =
         List.fold_left begin fun (map, in_copybook) Location.{ range; uri } ->

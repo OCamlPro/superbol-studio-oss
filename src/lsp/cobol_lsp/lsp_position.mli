@@ -80,7 +80,7 @@ val location_of_srcloc
 val loc_translator
   : ?focus_on_main_doc:bool
   -> rootdir:string
-  -> Lsp.Types.TextDocumentIdentifier.t
+  -> Lsp.Uri.t
   -> translator
 
 (* --- *)
