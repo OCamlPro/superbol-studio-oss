@@ -1371,15 +1371,16 @@ let file_block_contents ==
   | CHARACTERS; {FileBlockContainsCharacters}
   | RECORDS;    {FileBlockContainsRecords}
 
-record_clause:
- | RECORD CONTAINS? i = integer CHARACTERS?
-    { FixedLength i }
- | RECORD CONTAINS? i1 = integer TO i2 = integer CHARACTERS?
-    { FixedOrVariableLength { min_length = i1;
-                              max_length = i2 } }
- | RECORD IS? VARYING IN? SIZE?
-   lengths = from_to_characters_opt
-   depending = ro(depending_phrase)
+let record_clause :=
+ | RECORD; CONTAINS?; ~ = loc(integer); CHARACTERS?;
+   <FixedLength>
+ | RECORD; CONTAINS?; i1 = loc(integer);
+   TO; i2 = loc(integer); CHARACTERS?;
+   { FixedOrVariableLength { min_length = i1;
+                             max_length = i2 } }
+ | RECORD; IS?; VARYING; IN?; SIZE?;
+   lengths = from_to_characters_opt;
+   depending = ro(depending_phrase);
    { let min_length, max_length = lengths in
      VariableLength { min_length; max_length; depending } }
 
@@ -1394,11 +1395,12 @@ let recording_mode :=
  | FIXED;    { ModeFixed }
  | VARIABLE; { ModeVariable }
 
-from_to_characters_opt [@default (None, None)]:
- | CHARACTERS?                                    { None,    None }
- | FROM? i1 = integer CHARACTERS?                 { Some i1, None }
- | TO i2 = integer CHARACTERS?                    { None,    Some i2 }
- | FROM? i1 = integer TO i2 = integer CHARACTERS? { Some i1, Some i2 }
+let from_to_characters_opt [@default (None, None)] :=
+ | CHARACTERS?;                           { None,    None }
+ | FROM?; i1 = loc(integer); CHARACTERS?; { Some i1, None }
+ | TO; i2 = loc(integer); CHARACTERS?;    { None,    Some i2 }
+ | FROM?; i1 = loc(integer); TO;
+   i2 = loc(integer); CHARACTERS?;        { Some i1, Some i2 }
 
 label_clause:
  | LABEL mr(RECORD IS? | RECORDS ARE? {}) STANDARD { LabelStandard }
