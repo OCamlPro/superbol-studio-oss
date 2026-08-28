@@ -81,6 +81,7 @@ class ['a] folder = object
   method fold_table_data_value          : (table_data_value            , 'a) fold = default
   method fold_usage_clause              : (usage_clause                , 'a) fold = default
   method fold_validation_clause         : (validation_clause           , 'a) fold = default
+  method fold_file_label                : (file_label                  , 'a) fold = default
   method fold_valueof_clause            : (valueof_clause              , 'a) fold = default
 
 end
@@ -278,14 +279,14 @@ let fold_record_clause (v: _ #folder) =
   handle v#fold_record_clause
     ~continue:begin fun c x -> match c with
       | FixedLength i -> x
-          >> fold_integer v i
+          >> fold_integer' v i
       | VariableLength { min_length; max_length; depending } -> x
-          >> fold_integer_opt v min_length
-          >> fold_integer_opt v max_length
+          >> fold_integer'_opt v min_length
+          >> fold_integer'_opt v max_length
           >> fold_qualname'_opt v depending
       | FixedOrVariableLength { min_length; max_length } -> x
-          >> fold_integer v min_length
-          >> fold_integer v max_length
+          >> fold_integer' v min_length
+          >> fold_integer' v max_length
     end
 
 let fold_recording_mode (v: _ #folder) =
@@ -457,18 +458,25 @@ let fold_validation_clause (v: _ #folder) =
       | Class c -> fold_class_clause v c
       | Default i -> fold_option ~fold:fold_ident_or_literal v i
       | Destination i -> fold_list ~fold:fold_ident v i
-      | InvalidWhen c -> fold_list ~fold:fold_cond' v c
-      | PresentWhen c -> fold_cond' v c
+      | InvalidWhen c -> fold_list ~fold:fold_condition' v c
+      | PresentWhen c -> fold_condition' v c
       | Varying l -> fold_list ~fold:fold_data_varying v l
       | ValidateStatus { is_; when_; on; for_ } -> ignore (when_, on); fun x -> x
         >> fold_ident_or_literal v is_
         >> fold_list ~fold:fold_ident v for_
     end
 
+let fold_file_label (v: _ #folder) =
+  handle v#fold_file_label
+    ~continue:begin function
+      | FileLabelID -> Fun.id
+      | FileLabelName n -> fold_name' v n
+    end
+
 let fold_valueof_clause (v: _ #folder) =
   handle v#fold_valueof_clause
-    ~continue:begin fun { valueof_valued; valueof_value } x -> x
-      >> fold_name' v valueof_valued
+    ~continue:begin fun { valueof_subject; valueof_value } x -> x
+      >> fold_file_label v valueof_subject
       >> fold_qualname_or_literal v valueof_value
     end
 

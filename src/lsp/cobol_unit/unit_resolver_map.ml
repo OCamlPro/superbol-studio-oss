@@ -80,6 +80,9 @@ let fold ~f map acc =
 let bindings map =
   fold ~f:List.cons map []
 
+let cardinal map =
+  fold ~f:(fun _ -> succ) map 0
+
 let binding_qualifiers bindings =
   List.map (fun b -> b.full_qn) bindings
 

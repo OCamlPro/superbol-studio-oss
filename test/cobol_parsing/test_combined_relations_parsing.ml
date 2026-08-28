@@ -21,11 +21,11 @@ open Cobol_parser.Tokens
 open Cobol_parser.INTERNAL.Grammar
 open Cobol_parser.INTERNAL.Dummy
 
-let condition: cond with_loc testable = testable pp_cond' (fun a b -> compare_cond' a b = 0)
+let expanded_cond: expanded_cond with_loc testable = testable (pp_cond' pp_binary_relation) (fun a b -> compare_cond' compare_binary_relation a b = 0)
 let parse_condition = parse_list_as standalone_condition
 let expand_condition = Srcloc.map_payload Terms_helpers.expand_every_abbrev_cond
 let check_condition toks cond =
-  check condition "correct conditions parsing" cond
+  check expanded_cond "correct conditions parsing" cond
     (expand_condition @@ parse_condition toks)
 and fail_condition toks =
   check_raises "syntax-error" Error
@@ -34,7 +34,7 @@ and fail_condition toks =
 
 let test_conditions =
   let alphanum str =
-    ALPHANUM { str; quotation = Double_quote; hexadecimal = false; runtime_repr = Native_bytes }
+    ALPHANUM (Cobol_ptree.alphanum_of_string str)
   in
   let chk descr toks cond =
     test_case descr `Quick (fun () -> check_condition toks cond)
@@ -52,12 +52,12 @@ let test_conditions =
   let ( !. ) a = Not a &@ Srcloc.dummy
   and ( &&. ) a b = Logop (a, LAnd, b) &@ Srcloc.dummy
   and ( ||. ) a b = Logop (a, LOr, b) &@ Srcloc.dummy
-  and ( ==. ) a b : cond with_loc = Relation (a, Eq, b) &@ Srcloc.dummy
-  and ( <>. ) a b : cond with_loc = Relation (a, Ne, b) &@ Srcloc.dummy
-  and ( >. ) a b : cond with_loc = Relation (a, Gt, b) &@ Srcloc.dummy
-  and ( >=. ) a b : cond with_loc = Relation (a, Ge, b) &@ Srcloc.dummy
-  and ( <. ) a b : cond with_loc = Relation (a, Lt, b) &@ Srcloc.dummy
-  and ( <=. ) a b : cond with_loc = Relation (a, Le, b) &@ Srcloc.dummy
+  and ( ==. ) a b : expanded_cond with_loc = Relation (a, Eq, b) &@ Srcloc.dummy
+  and ( <>. ) a b : expanded_cond with_loc = Relation (a, Ne, b) &@ Srcloc.dummy
+  and ( >. ) a b : expanded_cond with_loc = Relation (a, Gt, b) &@ Srcloc.dummy
+  and ( >=. ) a b : expanded_cond with_loc = Relation (a, Ge, b) &@ Srcloc.dummy
+  and ( <. ) a b : expanded_cond with_loc = Relation (a, Lt, b) &@ Srcloc.dummy
+  and ( <=. ) a b : expanded_cond with_loc = Relation (a, Le, b) &@ Srcloc.dummy
   and ( +. ) a b = Binop (a, BPlus, b) &@ Srcloc.dummy in
   [
     chk "NOT A"         [NOT; a]             !.ac;

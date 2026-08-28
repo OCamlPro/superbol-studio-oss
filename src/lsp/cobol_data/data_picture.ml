@@ -324,6 +324,30 @@ let pp_picture_symbols: symbols list Pretty.printer = fun ppf symbols ->
     else List.iter (fun _ -> pp_symbol_cobolized ppf symbol) @@ List.init occ Fun.id)
   symbols
 
+let char_of_symbol = function
+  | A -> 'A'
+  | B -> 'B'
+  | CR -> failwith "CR"                                                   (* ? *)
+  | CS -> '$'                                                             (* ? *)
+  | DB -> failwith "DB"                                                   (* ? *)
+  | DecimalSep -> '.'                                                     (* ? *)
+  | E -> 'E'
+  | GroupingSep -> ','                                                    (* ? *)
+  | Minus -> '-'
+  | N -> 'N'
+  | Nine -> '9'
+  | One -> '1'
+  | P -> 'P'
+  | Plus -> '+'
+  | L -> 'L'
+  | S -> 'S'
+  | Slant -> '/'
+  | Star -> '*'
+  | V -> 'V'
+  | X -> 'X'
+  | Z -> 'Z'
+  | Zero -> '0'
+
 (* --- *)
 
 let is_edited: category -> bool = function

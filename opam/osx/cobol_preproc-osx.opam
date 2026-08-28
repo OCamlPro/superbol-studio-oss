@@ -57,6 +57,7 @@ depends: [
   "cobol_data-osx" {= version}
   "cobol_config-osx" {= version}
   "cobol_common-osx" {= version}
+  "menhir" {>= "20231231" & < "20240715"}
   "odoc" {with-doc}
   "dune" {>= "3.17.0" & < "3.19.0"}
 ]

@@ -17,8 +17,8 @@ let module_name = CArray.of_string "test"
 let module_source = CArray.of_string "test.cob"
 let gc_version = CArray.of_string "3.3-dev"
 let module_formatted_date = CArray.of_string "juin 17 2026 23:13:30"
-let module_date = U32.of_int 20260617
-let module_time = U32.of_int 231330
+let module_date = U32.of_int_unsafe 20260617
+let module_time = U32.of_int_unsafe 231330
 
 let rec test () =
   test_ S32.zero
@@ -80,22 +80,22 @@ and test_ _entry =
 
   (* Increment module active  *)
   CobModule.set_module_active module_
-    (U32.succ (CobModule.get_module_active module_));
+    (U32.succ_unsafe (CobModule.get_module_active module_));
 
   let digits_attrs ?(flags = U16.zero) n =
     CobFieldAttr.create
       ~type_:(CobFieldType.(to_u16 (enc COB_TYPE_NUMERIC_DISPLAY)))
-      ~digits:(U16.of_int n)
+      ~digits:(U16.of_int_unsafe n)
       ~scale:S16.zero
       ~flags
-      ~pic:(CobPicSymbol.create ~symbol:'9' ~times_repeated:(S32.of_int n))
+      ~pic:(CobPicSymbol.create ~symbol:'9' ~times_repeated:(S32.of_int_unsafe n))
   and alphanum_attrs ?(flags = U16.zero) n =
     CobFieldAttr.create
       ~type_:(CobFieldType.(to_u16 (enc COB_TYPE_ALPHANUMERIC)))
       ~digits:U16.zero
       ~scale:S16.zero
       ~flags
-      ~pic:(CobPicSymbol.create ~symbol:'X' ~times_repeated:(S32.of_int n))
+      ~pic:(CobPicSymbol.create ~symbol:'X' ~times_repeated:(S32.of_int_unsafe n))
   and group_attrs ?(flags = U16.zero) () =
     CobFieldAttr.create
       ~type_:(CobFieldType.(to_u16 (enc COB_TYPE_GROUP)))
@@ -111,13 +111,13 @@ and test_ _entry =
   CobPicSymbol.set_symbol a1 '9';
   CobPicSymbol.set_times_repeated a1 S32.one;
   CobPicSymbol.set_symbol a2 'X';
-  CobPicSymbol.set_times_repeated a1 (S32.of_int 3);
+  CobPicSymbol.set_times_repeated a1 (S32.of_int_unsafe 3);
   let _dummy_attrs =
     CobFieldAttr.create
       ~type_:(CobFieldType.(to_u16 (enc COB_TYPE_GROUP)))
       ~digits:U16.zero
       ~scale:S16.zero
-      ~flags:(U16.of_int 42)
+      ~flags:(U16.of_int_unsafe 42)
       ~pic:(CArray.to_ptr pic_array)
   in
 
@@ -131,11 +131,11 @@ and test_ _entry =
   CArray.set_string b_c 8 "var2 = ";
   CArray.set_string b_c 16 "var3 = ";
   let b_c' = CPtr.cast UInt8 (CArray.to_ptr b_c) in
-  let c_1 = CobField.create ~size:(U64.of_int 7) ~attr:a_2
+  let c_1 = CobField.create ~size:(U64.of_int_unsafe 7) ~attr:a_2
               ~data:b_c' in
-  let c_2 = CobField.create ~size:(U64.of_int 7) ~attr:a_2
+  let c_2 = CobField.create ~size:(U64.of_int_unsafe 7) ~attr:a_2
               ~data:(CPtr.add b_c' 8) in
-  let c_3 = CobField.create ~size:(U64.of_int 7) ~attr:a_2
+  let c_3 = CobField.create ~size:(U64.of_int_unsafe 7) ~attr:a_2
               ~data:(CPtr.add b_c' 16) in
 
   let b_w = CArray.create Char ~default:' ' 24 in
@@ -143,15 +143,15 @@ and test_ _entry =
   CArray.set_string b_w 8 "      ";
   CArray.set_string b_w 16 "000";
   let b_w' = CPtr.cast UInt8 (CArray.to_ptr b_w) in
-  let f_17 = CobField.create ~size:(U64.of_int 6) ~attr:a_3
+  let f_17 = CobField.create ~size:(U64.of_int_unsafe 6) ~attr:a_3
                ~data:b_w' in
-  let f_18 = CobField.create ~size:(U64.of_int 3) ~attr:a_1
+  let f_18 = CobField.create ~size:(U64.of_int_unsafe 3) ~attr:a_1
                ~data:b_w' in
-  let f_19 = CobField.create ~size:(U64.of_int 3) ~attr:a_1
+  let f_19 = CobField.create ~size:(U64.of_int_unsafe 3) ~attr:a_1
                ~data:(CPtr.add b_w' 3) in
-  let f_20 = CobField.create ~size:(U64.of_int 6) ~attr:a_4
+  let f_20 = CobField.create ~size:(U64.of_int_unsafe 6) ~attr:a_4
                ~data:(CPtr.add b_w' 8) in
-  let f_21 = CobField.create ~size:(U64.of_int 3) ~attr:a_1
+  let f_21 = CobField.create ~size:(U64.of_int_unsafe 3) ~attr:a_1
                ~data:(CPtr.add b_w' 16) in
 
   CArray.set_string b_w 0 "888";
@@ -160,7 +160,7 @@ and test_ _entry =
   cob_display S32.zero S32.one [| c_1; f_17 |];
 
   let b = CArray.of_string "var3 = var1.left + var1.right" in
-  let f = CobField.create ~size:(U64.of_int 29) ~attr:a_2
+  let f = CobField.create ~size:(U64.of_int_unsafe 29) ~attr:a_2
             ~data:(CPtr.cast UInt8 (CArray.to_ptr b)) in
   cob_display S32.zero S32.one [| f |];
 
@@ -170,7 +170,7 @@ and test_ _entry =
   let _res = cob_decimal_get_field d_0 f_21 S32.zero in
 
   let b = CArray.of_string "memcpy var1 to var2" in
-  let f = CobField.create ~size:(U64.of_int 19) ~attr:a_2
+  let f = CobField.create ~size:(U64.of_int_unsafe 19) ~attr:a_2
             ~data:(CPtr.cast UInt8 (CArray.to_ptr b)) in
   cob_display S32.zero S32.one [| f |];
 
@@ -181,7 +181,7 @@ and test_ _entry =
   cob_display S32.zero S32.one [| c_3; f_21 |];
 
   CobModule.set_module_active module_
-    (U32.pred (CobModule.get_module_active module_));
+    (U32.pred_unsafe (CobModule.get_module_active module_));
 
   cob_module_leave module_;
 

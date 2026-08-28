@@ -14,6 +14,7 @@
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 module LIST = Cobol_common.Basics.LIST
+module NEL = Cobol_common.Basics.NEL
 
 type error =
   | Copybook_lookup_error of { copyloc: srcloc option;
@@ -22,7 +23,7 @@ type error =
   | Feature_error of Cobol_config.DIAG.error
   | Forbidden of { loc: srcloc; stuff: forbidden_stuff }
   | Invalid of { loc: srcloc; stuff: invalid_stuff }
-  | Literal_error of Cobol_data.Diagnostics.error
+  | Literal_error of Cobol_data.Types.error
   | Malformed of { loc: srcloc; stuff: malformed_stuff }
   | Missing of { loc: srcloc; stuff: missing_stuff }
   | Src_error of Src_diagnostics.error
@@ -45,6 +46,7 @@ and missing_stuff =
 
 and unexpected_stuff =
   | Alphanumeric_literal
+  | Constant_literal_kind of Cobol_ptree.literal with_loc
   | Elif_compiler_directive of { suggestion: suggested_missing option }
   | Else_compiler_directive of { suggestion: suggested_missing option }
   | EndIf_compiler_directive
@@ -67,7 +69,7 @@ let error_loc = function
   | Src_error e ->
       Some (Src_diagnostics.error_loc e)
   | Literal_error e ->
-      Some (Cobol_data.Diagnostics.error_loc e)
+      Some (Cobol_data.Error.loc e)
   | Cyclic_copy { copyloc = loc; _ }
   | Forbidden { loc; _ }
   | Invalid { loc; _ }
@@ -116,6 +118,8 @@ let pp_missing_stuff ppf = function
 let pp_unexpected_stuff ppf = function
   | Alphanumeric_literal ->
       Pretty.print ppf "alphanumeric@ literal"
+  | Constant_literal_kind _lit ->
+      Pretty.print ppf "class@ of@ literal@ for@ constant@ definition"
   | Elif_compiler_directive { suggestion } ->
       Pretty.print ppf ">>ELIF@ compiler@ directive";
       Fmt.(option (any ";@ " ++ pp_suggestion)) ppf suggestion
@@ -129,7 +133,8 @@ let pp_unexpected_stuff ppf = function
 
 let pp_unterminated ppf = function
   | If_compiler_directive _ ->
-      Pretty.print ppf ">>IF@ compiler@ directive"
+      Pretty.print ppf ">>IF@ compiler@ directive@ (no@ matching@ >>END-IF@ \
+                        found)"
   | Exec_block ->
       Pretty.print ppf "EXEC/END-EXEC@ block"
 
@@ -145,7 +150,7 @@ let pp_error ppf = function
   | Invalid { stuff; _ } ->
       Pretty.print ppf "Invalid@ %a" pp_invalid_stuff stuff
   | Literal_error e ->
-      Cobol_data.Diagnostics.pp_error ppf e
+      Cobol_data.Printer.pp_error ppf e
   | Malformed { stuff = Compiler_directive; _ } ->
       Pretty.print ppf "Malformed@ compiler@ directive"
   | Malformed { stuff = Preproc_statement stmt; _ } ->
@@ -179,7 +184,7 @@ type warning =
       {
         loc: srcloc;
         var: Preproc_env.var with_loc;
-        prev_def_loc: Preproc_env.definition_loc;
+        prev_def_src: src;
       }
   (* | Compdir_warning of *)
   (*     { *)
@@ -260,14 +265,11 @@ let pp_warning ppf = function
       Pretty.print ppf "Undefined@ %a" pp_undefined_warning_stuff stuff
   | Unexpected_warning { stuff; _ } ->
       Pretty.print ppf "Unexpected@ %a" pp_unexpected_warning_stuff stuff
-  | Redefinition_of_env_variable { var; prev_def_loc; _ } ->
+  | Redefinition_of_env_variable { var; prev_def_src; _ } ->
       Pretty.print ppf "Redefinition@ of@ %a;@ previous@ definition@ was@ from@ \
-                        %t"
+                        %a"
         Preproc_env.VAR.pp ~&var
-        (fun ppf -> match prev_def_loc with
-           | Source_location l -> Cobol_common.Srcloc.pp_file_loc ppf l
-           | Process_parameter -> Pretty.print ppf "process@ parameters"
-           | Process_environment -> Pretty.print ppf "process@ environment")
+        Cobol_common.Srcloc.pp_src prev_def_src
 
 type diagnostics =
   {
@@ -288,10 +290,14 @@ let add_src_diagnostics Src_diagnostics.{ errors; warnings } diags =
   List.fold_right (fun e -> add_error (Src_error e)) errors |>
   List.fold_right (fun w -> add_warning (Src_warning w)) warnings
 
-let add_literal_diagnostics Cobol_data.Diagnostics.{ errors; _ } diags =
-  List.fold_left begin fun diags error ->
-    add_error (Literal_error error) diags
-  end diags errors
+let literal_error diags error =
+  add_error (Literal_error error) diags
+
+let literal_errors diags = function
+  | None ->
+      diags
+  | Some errors ->
+      NEL.fold_left diags errors ~f:literal_error
 
 let translate ({ warnings; errors }: t) =
   let module DIAGS = Cobol_common.Diagnostics in

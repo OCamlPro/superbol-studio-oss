@@ -5,7 +5,7 @@
   (package h2mlstubs)
   ; use field 'dune-libraries' to add libraries without opam deps
   (libraries pretty goblint-cil ez_file camlp-streams )
-  (flags (:standard (:include linking.sexp)))
+  (flags (:standard))
   ; use field 'dune-stanzas' to add more stanzas here
   
   

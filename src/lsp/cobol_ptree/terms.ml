@@ -13,6 +13,8 @@
 
 open Common
 open Numericals
+open Alphanums
+
 open Cobol_common.Srcloc.INFIX
 
 type name = string
@@ -67,16 +69,6 @@ type complex_ = [ `Complex ]
 (* Attributes for distinguishing sign conditions *)
 type strict_ = [ `Strict ]
 type loose_ = [ `Loose ]
-
-type alphanum_quote =
-  | Simple_quote (* '...' *)
-  | Double_quote (* "..." *)
-[@@deriving ord]
-
-type alphanum_repr =
-  | Native_bytes
-  | Null_terminated_bytes
-[@@deriving ord]
 
 type intrinsic_name =
   | ABS
@@ -203,25 +195,6 @@ let show_intrinsic_name i =
 let pp_intrinsic_name ppf i =
   Pretty.string ppf (show_intrinsic_name i)
 
-type alphanum =
-  {
-    str: string;
-    quotation: alphanum_quote;
-    hexadecimal: bool;
-    runtime_repr: alphanum_repr;
-  }
-[@@deriving ord]
-
-let pp_alphanum ppf { hexadecimal; quotation; str; runtime_repr } =
-  if runtime_repr = Null_terminated_bytes then Fmt.char ppf 'Z';
-  if hexadecimal then Fmt.char ppf 'X';
-  match quotation with
-  | Simple_quote -> Fmt.pf ppf "'%s'" str
-  | Double_quote -> Fmt.pf ppf "\"%s\"" str
-
-type national = string                                             (* for now *)
-[@@deriving ord, show]
-
 (** Now comes the type of all/most terms *)
 type _ term =
   | Alphanum: alphanum -> [>alnum_] term
@@ -248,8 +221,8 @@ type _ term =
   | RefMod: base_ident_ term * refmod -> [>refmod_ident_] term (* Reference modification *)
   | ScalarRefMod: scalar_ident_ term * refmod -> [>refmod_scalar_ident_] term
 
-  | StrConcat: strlit_ term * strlit_ term -> [>strlit_] term
-  | Concat: nonnum_ term * nonnum_ term -> [>nonnum_] term
+  | StrConcat: strlit with_loc * strlit with_loc -> [>strlit_] term
+  | Concat: nonnumlit with_loc * nonnumlit with_loc -> [>nonnum_] term
 
 and _ figurative =
   | Zero: [<int_|nonnum_] figurative            (* ALPHA/NAT/BOOL/NUM *)
@@ -257,7 +230,7 @@ and _ figurative =
   | Quote: [>strlit_] figurative                (* ALPHA/NAT *)
   | LowValue: [>strlit_] figurative             (* ALPHA/NAT *)
   | HighValue: [>strlit_] figurative            (* ALPHA/NAT *)
-  | All: nonnumlit -> [<nonnum_] figurative      (* ALPHA/NAT/BOOL + fig const *)
+  | All: nonnumlit with_loc -> [<nonnum_] figurative (* ALPHA/NAT/BOOL + fig const *)
 (* (\* | Symbolic of ident (\* use in alphanum, national *\) *\) *)
 
 (** and then particular instantiations. *)
@@ -267,6 +240,8 @@ and ident = ident_ term
 
 (** (Qualified) name (should be `qualref` for "qualified reference" instead). *)
 and qualname = qualname_ term
+
+and qualname_with_subscripts = qualident_ term
 
 (** Any sort of literal (Boolean, alphanumeric, national, numeric,
     figurative) *)
@@ -320,15 +295,20 @@ and expr =
   | Binop of expr with_loc * binop * expr with_loc (* split arith/bool ? *)
 
 (** Any form of condition {v c v} *)
-and cond =
+and 'r cond =
   | Expr of expr with_loc (** expression used as a condition *)
-  | Relation of binary_relation (** simple binary relation *)
-  | Abbrev of abbrev_combined_relation (** abbreviated relation *)
+  | Relation of 'r (** potentially abbreviated relation (depending on 'r) *)
   | ClassCond of expr with_loc * class_ (** class condition *)
   | SignCond of expr with_loc * signz (** {v e POSITIVE/NEGATIVE/ZERO v} *)
   | Omitted of expr with_loc (** {v c OMITTED v} *)
-  | Not of cond with_loc (** {v NOT c v} *)
-  | Logop of cond with_loc * logop * cond with_loc (** {v c <AND/OR> c' v} *)
+  | Not of 'r cond with_loc (** {v NOT c v} *)
+  | Logop of 'r cond with_loc * logop * 'r cond with_loc (** {v c <AND/OR> c' v} *)
+
+and condition = abbrev_combined_relation cond
+
+and expanded_cond = binary_relation cond
+
+and no_rel = | (** empty type used to forbid the Relation constructor in cond *)
 
 and binary_relation =
   expr with_loc * relop * expr with_loc (** {v e <relop> e' v} *)
@@ -336,7 +316,7 @@ and binary_relation =
 (** An abbreviated combined relation describes a condition of the form
     {v NOT? subject <abbrev-relation-operand> v}.
     The leftmost non AbbrevComb element is always an AbbrevRelOp.
-    Be careful: the COBOL standard imposes that the optional NOT only 
+    Be careful: the COBOL standard imposes that the optional NOT only
     applies to the leftmost object in the abbreviated relational condition. *)
 and abbrev_combined_relation =
   bool * expr with_loc * abbrev_relation_operand with_loc
@@ -347,9 +327,9 @@ and abbrev_relation_operand =
   | AbbrevObject of bool * expr with_loc (** {v NOT? e v} *)
   | AbbrevSubject of abbrev_combined_relation (** {v NOT? e a v} *)
   | AbbrevParen of bool * abbrev_relation_operand with_loc (** {v NOT? (a) v} *)
-  | AbbrevOther of cond (** {v <non-relational condition> v} *)
-  | AbbrevComb (** {v a' <AND/OR> a'' v} *)
-      of (abbrev_relation_operand with_loc as 'x) * logop * 'x  
+  | AbbrevLogop (** {v a' <AND/OR> a'' v} *)
+      of (abbrev_relation_operand with_loc as 'x) * logop * 'x
+  | AbbrevOther of no_rel cond (** {v <non-relational condition> v} *)
 
 
 and logop =
@@ -438,7 +418,7 @@ and qualident =
 
 and subscript =
   | SubSAll
-  | SubSExpr of expr with_loc 
+  | SubSExpr of expr with_loc
   | SubSIdx of name with_loc * sign * integer
 
 and _ sign_cond =
@@ -564,9 +544,9 @@ module COMPARE = struct
       | ScalarRefMod (b1, r1), ScalarRefMod (b2, r2) ->
           compare_struct (compare_term b1 b2) @@ lazy (compare_refmod r1 r2)
       | StrConcat (a, c), StrConcat (b, d) ->
-          compare_struct (compare_term a b) @@ lazy (compare_term c d)
+          compare_struct (compare_term ~&a ~&b) @@ lazy (compare_term ~&c ~&d)
       | Concat(a,c), Concat(b,d) ->
-          compare_struct (compare_term a b) @@ lazy (compare_term c d)
+          compare_struct (compare_term ~&a ~&b) @@ lazy (compare_term ~&c ~&d)
       | a , b ->
           Stdlib.compare a b
 
@@ -601,7 +581,7 @@ module COMPARE = struct
     compare_struct (Bool.compare b1 b2) @@
     lazy (compare_struct (compare_expr' e1 e2) @@
           lazy (compare_with_loc compare_abbrev_relation_operand a1 a2))
-    
+
   and compare_abbrev_relation_operand a b = match a, b with
     | AbbrevRelOp (r1, a1), AbbrevRelOp (r2, a2) ->
         compare_struct (compare_relop r1 r2) @@
@@ -618,30 +598,27 @@ module COMPARE = struct
     | AbbrevSubject _, _ -> -1
     | _, AbbrevSubject _ -> 1
     | AbbrevParen (b1, a1), AbbrevParen (b2, a2) ->
-        compare_struct (Bool.compare b1 b2) @@ 
+        compare_struct (Bool.compare b1 b2) @@
         lazy (compare_with_loc compare_abbrev_relation_operand a1 a2)
     | AbbrevParen _, _ -> -1
     | _, AbbrevParen _ -> 1
-    | AbbrevOther c1, AbbrevOther c2 -> compare_cond c1 c2
+    | AbbrevOther c1, AbbrevOther c2 -> compare_cond (fun (never: no_rel) _ -> match never with _ -> .) c1 c2
     | AbbrevOther _, _ -> -1
     | _, AbbrevOther _ -> 1
-    | AbbrevComb (x1, o1, y1), AbbrevComb (x2, o2, y2) ->
+    | AbbrevLogop (x1, o1, y1), AbbrevLogop (x2, o2, y2) ->
         compare_struct (compare_with_loc compare_abbrev_relation_operand x1 x2) @@
         lazy (compare_struct (compare_logop o1 o2) @@
               lazy (compare_with_loc compare_abbrev_relation_operand y1 y2))
 
-  and compare_cond : cond -> cond -> int =
-    fun a b -> match a, b with
+  and compare_cond: 'r. ('r -> 'r -> int) -> 'r cond -> 'r cond -> int =
+    fun compare_rel a b -> match a, b with
       | Expr x, Expr y ->
           compare_expr' x y
       | Expr _, _ -> -1
       | _, Expr _ -> 1
-      | Relation x, Relation y -> compare_binary_relation x y
+      | Relation x, Relation y -> compare_rel x y
       | Relation _, _ -> -1
       | _, Relation _ -> 1
-      | Abbrev x, Abbrev y -> compare_abbrev_combined_relation x y
-      | Abbrev _, _ -> -1
-      | _, Abbrev _ -> 1
       | ClassCond (x1, c1), ClassCond (x2, c2) ->
           compare_struct (compare_expr' x1 x2) @@
           lazy (compare_class_ c1 c2)
@@ -657,14 +634,14 @@ module COMPARE = struct
       | Omitted _, _ -> -1
       | _, Omitted _ -> 1
       | Not x, Not y ->
-          compare_cond' x y
+          compare_cond' compare_rel x y
       | Not _, _ -> -1
       | _, Not _ -> 1
       | Logop (x1, o1, y1), Logop (x2, o2, y2) ->
           compare_struct (compare_logop o1 o2) @@
-          lazy (compare_struct (compare_cond' x1 x2) @@
-                lazy (compare_cond' y1 y2))
-  and compare_cond' a b = compare_with_loc compare_cond a b
+          lazy (compare_struct (compare_cond' compare_rel x1 x2) @@
+                lazy (compare_cond' compare_rel y1 y2))
+  and compare_cond' compare_rel a b = compare_with_loc (compare_cond compare_rel) a b
   and compare_relop =
     Stdlib.compare
   and compare_logop =
@@ -794,6 +771,8 @@ module COMPARE = struct
     lazy (Option.compare (compare_with_loc compare_name) c d)
 
   and compare_ident: ident compare_fun = fun a b -> compare_term a b
+  and compare_qualname_with_subscripts: qualname_with_subscripts compare_fun =
+    fun a b -> compare_term a b
   and compare_trimming_tip x y =
     match x, y with
     | Leading, Leading | Trailing, Trailing -> 0
@@ -817,6 +796,9 @@ module COMPARE = struct
   let compare_strlit: strlit compare_fun = compare_term
   let compare_strlit_or_intlit: strlit_or_intlit compare_fun = compare_term
   let compare_scalar: scalar compare_fun = compare_term
+
+  let compare_condition a b = compare_cond compare_abbrev_combined_relation a b
+  let compare_condition' a b = compare_cond' compare_abbrev_combined_relation a b
 end
 include COMPARE
 
@@ -839,12 +821,6 @@ include COMPARE
 module FMT = struct
 
   open Fmt
-
-  let pp_boolean: boolean Pretty.printer = fun ppf -> function
-    (* | { bool_width = 0; _ } -> *)
-    (*     string ppf "zero-length-boolean" *)
-    | { bool_value; _ } ->
-        string ppf bool_value
 
   let rec pp_term: type k. k term Pretty.printer = fun ppf -> function
     | Alphanum s -> pp_alphanum ppf s
@@ -870,8 +846,8 @@ module FMT = struct
     | RefMod (i, r) -> fmt "@[%a@ %a@]" ppf pp_term i pp_refmod r
     | ScalarRefMod (i, r) -> fmt "@[%a@ %a@]" ppf pp_term i pp_refmod r
 
-    | StrConcat (a, b) -> fmt "%a@ &@ %a" ppf pp_term a pp_term b
-    | Concat (a, b) -> fmt "%a@ &@ %a" ppf pp_term a pp_term b
+    | StrConcat (a, b) -> fmt "%a@ &@ %a" ppf pp_term ~&a pp_term ~&b
+    | Concat (a, b) -> fmt "%a@ &@ %a" ppf pp_term ~&a pp_term ~&b
 
   and pp_figurative: type k. k figurative Pretty.printer = fun ppf -> function
     | Zero -> string ppf "ZERO"
@@ -879,7 +855,7 @@ module FMT = struct
     | Quote -> string ppf "QUOTE"
     | LowValue -> fmt "LOW-VALUES" ppf
     | HighValue -> fmt "HIGH-VALUES" ppf
-    | All l -> fmt "ALL@ %a" ppf pp_term l
+    | All l -> fmt "ALL@ %a" ppf (pp_with_loc pp_term) l
 
   and pp_subscript ppf : subscript -> unit = function
     | SubSAll -> string ppf "ALL"
@@ -1035,65 +1011,32 @@ module FMT = struct
     | BXor -> "B-XOR"
   and pp_binop ppf o = string ppf (show_binop o)
 
-  and pp_binary_relation ppf (a, o, b) =
-    fmt "%a@ %a@ %a" ppf
-      pp_expr' a pp_relop o pp_expr' b
+  and pp_sign: type k. k sign_cond Pretty.printer = fun ppf -> function
+    | SgnPositive -> string ppf "POSITIVE"
+    | SgnNegative -> string ppf "NEGATIVE"
+    | SgnZero -> string ppf "ZERO"
+  and pp_signz ppf = pp_sign ppf
 
-  and pp_cond ?(pos = true) ppf c = 
-    match c with
-    | Expr e ->
-        fmt "%a%a" ppf not_ pos pp_expr' e
-    | Relation rel ->
-        fmt "%a@[<1>(%a)@]" ppf not_ pos pp_binary_relation rel
-    | Abbrev r ->
-        fmt "%a%a" ppf not_ pos pp_abbrev_combined_relation r
-    | ClassCond (e, c) ->
-        fmt "%a@ %a%a" ppf pp_expr' e not_ pos pp_class_ c
-    | SignCond (e, s) ->
-        fmt "%a@ %a%a" ppf pp_expr' e not_ pos pp_sign s
-    | Omitted e ->
-        fmt "%a@ %aOMITTED" ppf pp_expr' e not_ pos
-    | Not c ->
-        pp_with_loc (pp_cond ~pos:(not pos)) ppf c
-    | Logop (a, o, b) ->
-        fmt "@[<1>%a(%a@ %a@ %a)@]" ppf
-          not_ pos pp_cond' a pp_logop o pp_cond' b
+  and pp_literal: literal Pretty.printer = fun ppf -> pp_term ppf
+  and pp_literal' = fun ppf -> pp_with_loc pp_literal ppf
+  and pp_ident: ident Pretty.printer = fun ppf -> pp_term ppf
 
-  and pp_cond' ppf = pp_with_loc (pp_cond ~pos:true) ppf
+  let not_ ppf = function false -> fmt "NOT@ " ppf | true -> ()
 
-  and pp_abbrev_combined_relation ppf (neg, e, a) =
-    fmt "%a%a@ %a" ppf not_ (not neg) pp_expr' e 
-      pp_abbrev_relation_operand ~&a
-
-  and pp_abbrev_relation_operand ppf = function
-    | AbbrevRelOp (o, a) ->
-        fmt "%a@ %a" ppf pp_relop o pp_abbrev_relation_operand ~&a
-    | AbbrevObject (neg, e) ->
-        fmt "%a%a" ppf not_ (not neg) pp_expr' e
-    | AbbrevSubject r ->
-        pp_abbrev_combined_relation ppf r
-    | AbbrevParen (neg, a) ->
-        fmt "%a@[<1>(%a)@]" ppf not_ (not neg) pp_abbrev_relation_operand ~&a
-    | AbbrevOther c ->
-        pp_cond ppf c
-    | AbbrevComb (a1, o, a2) ->
-        fmt "%a@ %a@ %a" ppf
-          pp_abbrev_relation_operand ~&a1
-          pp_logop o
-          pp_abbrev_relation_operand ~&a2
-
-  and not_ ppf = function false -> fmt "NOT@ " ppf | true -> ()
-
-  and show_relop = function
+  let show_relop = function
     | Gt -> ">"
     | Lt -> "<"
     | Eq -> "="
     | Ne -> "<>"
     | Ge -> ">="
     | Le -> "<="
-  and pp_relop ppf o = string ppf (show_relop o)
+  let pp_relop ppf o = string ppf (show_relop o)
 
-  and show_class_ = function
+  let pp_binary_relation ppf (a, o, b) =
+    fmt "%a@ %a@ %a" ppf
+      pp_expr' a pp_relop o pp_expr' b
+
+  let show_class_ = function
     | AlphabetOrClass n -> str "%a" pp_name' n
     | Alphabetic -> "ALPHABETIC"
     | AlphabeticLower -> "ALPHABETIC-LOWER"
@@ -1107,21 +1050,61 @@ module FMT = struct
     | InArithmeticRange -> "IN-ARITHMETIC-RANGE"
     | NearestToZero -> "NEAREST-TO-ZERO"
     | ClassNumeric -> "NUMERIC"
-  and pp_class_ ppf c = string ppf (show_class_ c)
+  let pp_class_ ppf c = string ppf (show_class_ c)
 
-  and pp_sign: type k. k sign_cond Pretty.printer = fun ppf -> function
-    | SgnPositive -> string ppf "POSITIVE"
-    | SgnNegative -> string ppf "NEGATIVE"
-    | SgnZero -> string ppf "ZERO"
-  and pp_signz ppf = pp_sign ppf
-
-  and pp_logop ppf = function
+  let pp_logop ppf = function
     | LAnd -> string ppf "AND"
     | LOr -> string ppf "OR"
 
-  and pp_literal: literal Pretty.printer = fun ppf -> pp_term ppf
-  and pp_literal' = fun ppf -> pp_with_loc pp_literal ppf
-  and pp_ident: ident Pretty.printer = fun ppf -> pp_term ppf
+  let rec pp_cond:
+    'r. 'r Pretty.printer -> ?pos:bool -> 'r cond Pretty.printer =
+    fun pp_rel ?(pos = true) ppf c ->
+    match c with
+    | Expr e ->
+        fmt "%a%a" ppf not_ pos pp_expr' e
+    | Relation r ->
+        if pos then
+          pp_rel ppf r
+        else
+          fmt "NOT @[<1>(%a)@]" ppf pp_rel r
+    | ClassCond (e, c) ->
+        fmt "%a@ %a%a" ppf pp_expr' e not_ pos pp_class_ c
+    | SignCond (e, s) ->
+        fmt "%a@ %a%a" ppf pp_expr' e not_ pos pp_sign s
+    | Omitted e ->
+        fmt "%a@ %aOMITTED" ppf pp_expr' e not_ pos
+    | Not c ->
+        pp_with_loc (pp_cond pp_rel ~pos:(not pos)) ppf c
+    | Logop (a, o, b) ->
+        fmt "@[<1>%a(%a@ %a@ %a)@]" ppf
+          not_ pos (pp_cond' pp_rel) a pp_logop o (pp_cond' pp_rel) b
+
+  and pp_cond':
+    'r. 'r Pretty.printer -> 'r cond with_loc Pretty.printer =
+    fun pp_rel ppf c -> pp_with_loc (pp_cond pp_rel ~pos:true) ppf c
+
+  let pp_no_rel _ (never: no_rel) = match never with _ -> .
+
+  let rec pp_abbrev_combined_relation ppf (neg, e, a) =
+    fmt "%a%a@ %a" ppf not_ (not neg) pp_expr' e
+      pp_abbrev_relation_operand ~&a
+
+  and pp_abbrev_relation_operand ppf = function
+    | AbbrevRelOp (o, a) ->
+        fmt "%a@ %a" ppf pp_relop o pp_abbrev_relation_operand ~&a
+    | AbbrevObject (neg, e) ->
+        fmt "%a%a" ppf not_ (not neg) pp_expr' e
+    | AbbrevSubject r ->
+        pp_abbrev_combined_relation ppf r
+    | AbbrevParen (neg, a) ->
+        fmt "%a@[<1>(%a)@]" ppf not_ (not neg) pp_abbrev_relation_operand ~&a
+    | AbbrevOther c ->
+        pp_cond pp_no_rel ppf c
+    | AbbrevLogop (a1, o, a2) ->
+        fmt "%a@ %a@ %a" ppf
+          pp_abbrev_relation_operand ~&a1
+          pp_logop o
+          pp_abbrev_relation_operand ~&a2
 
   (** Pretty-printing for named unions of term types (some are yet to be
       renamed) *)
@@ -1140,12 +1123,21 @@ module FMT = struct
   let pp_qualname_or_literal: qualname_or_literal Pretty.printer = pp_term
   let pp_qualname_or_intlit: qualname_or_intlit Pretty.printer = pp_term
   let pp_qualname_or_alphanum: qualname_or_alphanum Pretty.printer = pp_term
+  let pp_qualname_with_subscripts: qualname_with_subscripts Pretty.printer =
+    pp_term
+  let pp_qualname_with_subscripts' =
+    pp_with_loc pp_qualname_with_subscripts
 
+  let pp_condition = pp_cond pp_abbrev_combined_relation
+  let pp_condition' = pp_cond' pp_abbrev_combined_relation
 end
 include FMT
 
 module UPCAST = struct
   (** Exlicit term upcasting utilities, that should all reduce to identity. *)
+  (* For each upcasting operation, we first properly show the equivalence with
+     an implementation, and then re-declare the symbol as "%identity" for
+     performance purposes. *)
 
   let ident_with_alphanum: ident -> ident_or_alphanum = function
     | QualIdent _ as v -> v
@@ -1157,6 +1149,7 @@ module UPCAST = struct
     | Counter _ as v -> v
     | RefMod _ as v -> v
     | ScalarRefMod _ as v -> v
+  external ident_with_alphanum: ident -> ident_or_alphanum = "%identity"
 
   let ident_with_nonnum: ident -> ident_or_nonnum = function
     | QualIdent _ as v -> v
@@ -1168,6 +1161,7 @@ module UPCAST = struct
     | Counter _ as v -> v
     | RefMod _ as v -> v
     | ScalarRefMod _ as v -> v
+  external ident_with_nonnum: ident -> ident_or_nonnum = "%identity"
 
   let ident_with_numeric: ident -> ident_or_numlit = function
     | QualIdent _ as v -> v
@@ -1179,6 +1173,7 @@ module UPCAST = struct
     | Counter _ as v -> v
     | RefMod _ as v -> v
     | ScalarRefMod _ as v -> v
+  external ident_with_numeric: ident -> ident_or_numlit = "%identity"
 
   let ident_with_string: ident -> ident_or_strlit = function
     | QualIdent _ as v -> v
@@ -1190,6 +1185,7 @@ module UPCAST = struct
     | Counter _ as v -> v
     | RefMod _ as v -> v
     | ScalarRefMod _ as v -> v
+  external ident_with_string: ident -> ident_or_strlit = "%identity"
 
   let ident_with_literal: ident -> ident_or_literal = function
     | QualIdent _ as v -> v
@@ -1201,6 +1197,7 @@ module UPCAST = struct
     | Counter _ as v -> v
     | RefMod _ as v -> v
     | ScalarRefMod _ as v -> v
+  external ident_with_literal: ident -> ident_or_literal = "%identity"
 
   let ident_with_integer: ident -> ident_or_intlit = function
     | QualIdent _ as v -> v
@@ -1212,24 +1209,43 @@ module UPCAST = struct
     | Counter _ as v -> v
     | RefMod _ as v -> v
     | ScalarRefMod _ as v -> v
+  external ident_with_integer: ident -> ident_or_intlit = "%identity"
 
   let string_with_name: strlit -> name_or_string = function
     | Alphanum _ as v -> v
     | National _ as v -> v
     | Fig _ as v -> v
     | StrConcat _ as v -> v
+  external string_with_name: strlit -> name_or_string = "%identity"
 
   let string_with_ident: strlit -> ident_or_strlit = function
     | Alphanum _ as v -> v
     | National _ as v -> v
     | Fig _ as v -> v
     | StrConcat _ as v -> v
+  external string_with_ident: strlit -> ident_or_strlit = "%identity"
+
+  let strlit_as_nonnumlit: strlit -> nonnumlit = function
+    | Alphanum _ as v -> v
+    | National _ as v -> v
+    | Fig _ as v -> v
+    | StrConcat _ as v -> v
+  external strlit_as_nonnumlit: strlit -> nonnumlit = "%identity"
+
+  let strlit_as_nonnumlit: strlit -> literal = function
+    | Alphanum _ as v -> v
+    | National _ as v -> v
+    | Fig _ as v -> v
+    | StrConcat _ as v -> v
+  external strlit_as_literal: strlit -> literal = "%identity"
+  external strlit'_as_literal': strlit with_loc -> literal with_loc = "%identity"
 
   let numeric_with_ident: numlit -> ident_or_numlit = function
     | Integer _ as v -> v
     | Fixed _ as v -> v
     | Floating _ as v -> v
     | NumFig _ as v -> v
+  external numeric_with_ident: numlit -> ident_or_numlit = "%identity"
 
   let nonnum_with_ident: nonnumlit -> ident_or_nonnum = function
     | Alphanum _ as v -> v
@@ -1238,6 +1254,17 @@ module UPCAST = struct
     | Fig _ as v -> v
     | StrConcat _ as v -> v
     | Concat _ as v -> v
+  external nonnum_with_ident: nonnumlit -> ident_or_nonnum = "%identity"
+
+  let nonnum_as_literal: nonnumlit -> literal = function
+    | Alphanum _ as v -> v
+    | National _ as v -> v
+    | Boolean _ as v -> v
+    | Fig _ as v -> v
+    | StrConcat _ as v -> v
+    | Concat _ as v -> v
+  external nonnum_as_literal: nonnumlit -> literal = "%identity"
+  external nonnum'_as_literal': nonnumlit with_loc -> literal with_loc = "%identity"
 
   let literal_with_ident: literal -> ident_or_literal = function
     | Alphanum _ as v -> v
@@ -1250,6 +1277,7 @@ module UPCAST = struct
     | Fig _ as v -> v
     | StrConcat _ as v -> v
     | Concat _ as v -> v
+  external literal_with_ident: literal -> ident_or_literal = "%identity"
 
   let literal_with_name: literal -> name_or_literal = function
     | Alphanum _ as v -> v
@@ -1262,8 +1290,9 @@ module UPCAST = struct
     | Fig _ as v -> v
     | StrConcat _ as v -> v
     | Concat _ as v -> v
+  external literal_with_name: literal -> name_or_literal = "%identity"
 
-  let literal_with_qualdatname: literal -> qualname_or_literal = function
+  let literal_with_qualname: literal -> qualname_or_literal = function
     | Alphanum _ as v -> v
     | National _ as v -> v
     | Boolean _ as v -> v
@@ -1274,21 +1303,26 @@ module UPCAST = struct
     | Fig _ as v -> v
     | StrConcat _ as v -> v
     | Concat _ as v -> v
+  external literal_with_qualname: literal -> qualname_or_literal = "%identity"
 
   let qualname_with_alphanum: qualname -> qualname_or_alphanum = function
     | Name _ as v -> v
     | Qual _ as v -> v
+  external qualname_with_alphanum: qualname -> qualname_or_alphanum = "%identity"
 
   let qualname_with_literal: qualname -> qualname_or_literal = function
     | Name _ as v -> v
     | Qual _ as v -> v
+  external qualname_with_literal: qualname -> qualname_or_literal = "%identity"
 
   let qualname_with_integer: qualname -> qualname_or_intlit = function
     | Name _ as v -> v
     | Qual _ as v -> v
+  external qualname_with_integer: qualname -> qualname_or_intlit = "%identity"
 
   let name_with_literal: name_ term -> name_or_literal = function
     | Name _ as v -> v
+  external name_or_literal: name_ term -> name_or_literal = "%identity"
 
   let base_ident_with_refmod: base_ident_ term -> ident = function
     | QualIdent _ as v -> v
@@ -1299,6 +1333,7 @@ module UPCAST = struct
     | Address _ as v -> v
     | Counter _ as v -> v
     | ScalarRefMod _ as v -> v
+  external base_ident_with_refmod: base_ident_ term -> ident = "%identity"
 
   let scalar_ident_as_scalar: scalar_ident_ term -> scalar = function
     | QualIdent _ as v -> v
@@ -1308,12 +1343,14 @@ module UPCAST = struct
     | Address _ as v -> v
     | Counter _ as v -> v
     | ScalarRefMod _ as v -> v
+  external scalar_ident_as_scalar: scalar_ident_ term -> scalar = "%identity"
 
   let numeric_as_scalar: numlit -> scalar = function
     | Integer _ as v -> v
     | Fixed _ as v -> v
     | Floating _ as v -> v
     | NumFig _ as v -> v
+  external numeric_as_scalar: numlit -> scalar = "%identity"
 
   let nonnumlit_as_scalar: nonnumlit -> scalar = function
     | Alphanum _ as v -> v
@@ -1322,6 +1359,7 @@ module UPCAST = struct
     | Fig _ as v -> v
     | StrConcat _ as v -> v
     | Concat _ as v -> v
+  external nonnumlit_as_scalar: nonnumlit -> scalar = "%identity"
 
   let literal_as_scalar: literal -> scalar = function
     | Alphanum _ as v -> v
@@ -1334,6 +1372,7 @@ module UPCAST = struct
     | Fig _ as v -> v
     | StrConcat _ as v -> v
     | Concat _ as v -> v
+  external literal_as_scalar: literal -> scalar = "%identity"
 end
 
 (* --- *)

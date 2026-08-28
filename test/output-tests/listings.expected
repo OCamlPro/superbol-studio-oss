@@ -511,66 +511,6 @@ listings.at-2643-prog.cob:19.18-19.20:
 >> Warning: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:2762:0
-listings.at-2762-prog.cob:22.29:
-  19              05  FL8       PIC X(04).
-  20              05  FL9 REDEFINES FL8 PIC 9(04).
-  21              05  FLA.
-  22 >                10  FLB OCCURS I TIMES.
-----                                ^
-  23                      15  FLC PIC X(02).
-  24                  10  FLD   PIC X(20).
->> Hint: Missing <integer literal>
-
-listings.at-2762-prog.cob:22.30-22.31:
-  19              05  FL8       PIC X(04).
-  20              05  FL9 REDEFINES FL8 PIC 9(04).
-  21              05  FLA.
-  22 >                10  FLB OCCURS I TIMES.
-----                                 ^
-  23                      15  FLC PIC X(02).
-  24                  10  FLD   PIC X(20).
->> Error: Invalid syntax
-
-listings.at-2762-prog.cob:26.26:
-  23                      15  FLC PIC X(02).
-  24                  10  FLD   PIC X(20).
-  25              05  FLD1      PIC X(100).
-  26 >            05  FLD2 OCCURS M TO J TIMES DEPENDING ON FL5.
-----                             ^
-  27                  10  FILLER PIC X(01).
-  28              05  FLD3      PIC X(3).
->> Hint: Missing <integer literal>
-
-listings.at-2762-prog.cob:26.27-26.28:
-  23                      15  FLC PIC X(02).
-  24                  10  FLD   PIC X(20).
-  25              05  FLD1      PIC X(100).
-  26 >            05  FLD2 OCCURS M TO J TIMES DEPENDING ON FL5.
-----                              ^
-  27                  10  FILLER PIC X(01).
-  28              05  FLD3      PIC X(3).
->> Error: Invalid syntax
-
-listings.at-2762-prog.cob:26.31:
-  23                      15  FLC PIC X(02).
-  24                  10  FLD   PIC X(20).
-  25              05  FLD1      PIC X(100).
-  26 >            05  FLD2 OCCURS M TO J TIMES DEPENDING ON FL5.
-----                                  ^
-  27                  10  FILLER PIC X(01).
-  28              05  FLD3      PIC X(3).
->> Hint: Missing <integer literal>
-
-listings.at-2762-prog.cob:26.32-26.33:
-  23                      15  FLC PIC X(02).
-  24                  10  FLD   PIC X(20).
-  25              05  FLD1      PIC X(100).
-  26 >            05  FLD2 OCCURS M TO J TIMES DEPENDING ON FL5.
-----                                   ^
-  27                  10  FILLER PIC X(01).
-  28              05  FLD3      PIC X(3).
->> Error: Invalid syntax
-
 listings.at-2762-prog.cob:31.27:
   28              05  FLD3      PIC X(3).
   29              05  FLD4      PIC X(4).

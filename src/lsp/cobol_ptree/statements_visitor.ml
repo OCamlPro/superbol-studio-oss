@@ -668,9 +668,9 @@ let fold_stop_arg (v: _ #folder) =
   handle v#fold_stop_arg
     ~continue:begin fun a x -> match a with
       | StopWithQualIdent i -> x
-        >> fold_qualident v i
+        >> fold' ~fold:fold_qualname_with_subscripts v i
       | StopWithLiteral l -> x
-        >> fold_literal v l
+        >> fold_literal' v l
     end
 
 let fold_stop' (v: _ #folder) =
@@ -713,15 +713,12 @@ let fold_selection_object (v: _ #folder) =
     ~continue:begin fun selection_object x ->
       match selection_object with
       | SelCond c -> x
-          >> fold_condition v c
+          >> fold_abbrev_relation_operand' v c
       | SelRange { negated; start; stop; alphabet} -> x
           >> fold_bool v negated
           >> fold_expression v start
           >> fold_expression v stop
           >> fold_option ~fold:fold_name' v alphabet
-      | SelRelation { relation; expr } -> x
-          >> fold_relop v relation
-          >> fold_expression v expr
       | SelClassCond { negated; class_specifier } -> x
           >> fold_bool v negated
           >> fold_class v class_specifier
@@ -948,7 +945,7 @@ and fold_display' (v: _ #folder) : display_stmt with_loc -> 'a -> 'a =
 
 and fold_display_items_clauses (v: _ #folder) : display_items_clauses -> 'a -> 'a =
   fun { display_items; display_clauses } x -> x
-    >> fold_list ~fold:fold_ident_or_literal v display_items
+    >> fold_list ~fold:fold_ident_or_literal' v display_items
     >> fold_list ~fold:fold_display_clause' v display_clauses
 
 and fold_display_clause' (v: _ #folder) : display_clause with_loc -> 'a -> 'a =

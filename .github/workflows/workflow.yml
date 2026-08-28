@@ -9,6 +9,11 @@ on:
     branches:
       - master
 
+# Cancel runs upon PR updates:
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
 jobs:
   build:
     strategy:

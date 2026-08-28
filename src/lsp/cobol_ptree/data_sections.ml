@@ -129,7 +129,7 @@ type report_group_clause =
         rounding: rounding;
       }
   | ReportValue of literal
-  | ReportPresentWhen of cond with_loc                              (* +COB2002 *)
+  | ReportPresentWhen of condition with_loc                              (* +COB2002 *)
   | ReportGroupIndicate
   | ReportOccurs of                                             (* +COB2002 *)
       {
@@ -170,7 +170,7 @@ let pp_report_group_clause ppf = function
         ppf reset_on;
       pp_rounding ppf rounding
   | ReportValue v -> Fmt.pf ppf "VALUE %a" pp_literal v
-  | ReportPresentWhen c -> Fmt.pf ppf "PRESENT WHEN %a" pp_cond' c
+  | ReportPresentWhen c -> Fmt.pf ppf "PRESENT WHEN %a" pp_condition' c
   | ReportGroupIndicate -> Fmt.pf ppf "GROUP"
   | ReportOccurs { from; to_; depending; step } ->
       Fmt.pf ppf "OCCURS %a%a%a%a"

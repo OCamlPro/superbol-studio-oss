@@ -2,6 +2,17 @@
 
 ## [_] Next release
 
+### Added
+- Handling of data item documentation that spans over several lines [#639](https://github.com/OCamlPro/superbol-studio-oss/pull/639)
+- Display of documentation for data items defined in copybooks [#641](https://github.com/OCamlPro/superbol-studio-oss/pull/641)
+- Parsing of abbreviated conditions in `EVALUATE WHEN` clauses [#638](https://github.com/OCamlPro/superbol-studio-oss/pull/638)
+- Support for 78-level data items [#634](https://github.com/OCamlPro/superbol-studio-oss/pull/634)
+
+### Fixed
+- Amount of references reported in codelens, that wrongly included declarations [#640](https://github.com/OCamlPro/superbol-studio-oss/pull/640)
+- Wrong codelens appearing on `COPY`s [#642](https://github.com/OCamlPro/superbol-studio-oss/pull/642)
+- Grammar rules for `VALUE OF` clause [#629](https://github.com/OCamlPro/superbol-studio-oss/pull/629) (fix for [Issue #625](https://github.com/OCamlPro/superbol-studio-oss/issues/625))
+
 
 ## [1.0.0] First stable release (2026-07-23)
 
@@ -23,7 +34,8 @@
 - Documentation and renaming to reduce confusion in the typed COBOL AST API [#576](https://github.com/OCamlPro/superbol-studio-oss/pull/576)
 
 ### Removed
-- Remove deprecated Cobol_data.OLD and Cobol_typeck.OLD [#592](https://github.com/OCamlPro/superbol-studio-oss/pull/592)
+- Remove deprecated `Cobol_data.OLD` and `Cobol_typeck.OLD` [#592](https://github.com/OCamlPro/superbol-studio-oss/pull/592)
+
 
 ## [0.3.0] Third release (2026-02-27)
 

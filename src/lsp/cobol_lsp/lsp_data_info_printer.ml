@@ -12,7 +12,7 @@
 (**************************************************************************)
 
 open Cobol_data.Types
-
+open Cobol_preproc.Env.TYPES
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 
@@ -177,7 +177,8 @@ and pp_field_layout: field_layout Pretty.printer = fun ppf x ->
       Fmt.(
         const pp_usage usage
       ++ any "\n\n"
-      ++ const (option ~none:nop (any "VALUE " ++ Cobol_ptree.pp_literal')) init_value)
+      ++ const (option ~none:nop @@ any "VALUE " ++
+                pp_with_loc Cobol_data.Printer.pp_value) init_value)
       ppf x
   | Struct_field { subfields } ->
       Fmt.const pp_struct subfields ppf x
@@ -279,6 +280,17 @@ let pp_record_renaming': record_renaming with_loc Pretty.printer = fun ppf ->
 (*     C ((fun x -> x.record_renamings <> []), *)
 (*        Pretty.vfield "renamings" (fun x -> x.record_renamings) pp_record_renamings); *)
 (*   ] *)
+
+let pp_compilation_var_definition ppf (Preproc_var def | Compilation_var def) =
+  Fmt.pf ppf "Compilation@ variable@ with@ value@ %a%t"
+    Cobol_preproc.Env.pp_value def.src_payload.compvar_value.src_payload
+    (fun ppf -> match def.src_payload.compvar_value.src with
+       | Source_location _ ->
+           ()
+       | Process_parameter ->
+           Fmt.pf ppf "@ (given@ as@ process@ parameter)"
+       | Process_environment ->
+           Fmt.pf ppf "@ (defined@ in@ process@ environment)")
 
 let pp_data_definition ppf = function
   | Data_field { def; _ } ->

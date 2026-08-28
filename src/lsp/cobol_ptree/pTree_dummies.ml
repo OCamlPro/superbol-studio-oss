@@ -89,7 +89,7 @@ let floating_zero =
 let boolean_zero =
   {
     bool_base = `Bool;
-    bool_value = integer_zero;
+    bool_string = integer_zero;
   }
 
 (* --- *)

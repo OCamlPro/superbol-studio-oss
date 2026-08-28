@@ -7,6 +7,11 @@ on:
   # manual run in actions tab - for all branches
   workflow_dispatch:
 
+# Cancel runs upon PR updates:
+concurrency:
+  group: win-tramabol-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
 jobs:
   build:
     runs-on: windows-latest
@@ -79,7 +84,7 @@ jobs:
           # Note: we add the path to git-bash so that we can use the diff
           # command it provides, to workaround a diff bug under the MSYS2 CI
           sed -i 's/-Qunused-arguments//g' ../configure
-          PATH="$PATH:/c/Program Files/Git/usr/bin" ../configure $CFGOPT CFLAGS=-std=c17 --prefix="C:/GnuCOBOL4"
+          PATH="$PATH:/c/Program Files/Git/usr/bin" ../configure $CFGOPT CFLAGS=-std=c17 LDFLAGS=-lintl --prefix="C:/GnuCOBOL4"
 
       - name: Build GnuCOBOL
         shell: msys2 {0}

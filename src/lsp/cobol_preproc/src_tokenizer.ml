@@ -23,17 +23,20 @@ let cdtoks_of_word directive_kind
   let open Compdir_grammar in
   let ( ~@@ ) t = Cobol_common.Srcloc.as_lexloc ~@t in
   let fixedlit f (toks, acc) =
-    let f = Cobol_data.Literal.fixed f in
-    List.cons (FIXEDLIT ~&(f.result), ~@@(f.result)) toks,
-    Preproc_diagnostics.add_literal_diagnostics f.diags acc
-  and boollit ~prefix_length ~base str =
+    let f, errs = Cobol_data.Literal.fixed_with_dummy_fallback f in
+    List.cons (FIXEDLIT ~&f, ~@@f) toks,
+    Preproc_diagnostics.literal_errors acc errs
+  and[@local] boollit ~prefix_length ~base str =
     let l = Cobol_ptree.boolean_of_string ~base str in
     (* CHECKME: remove prefix & quotes from literal location here? *)
     let lloc = Cobol_common.Srcloc.trunc_prefix (prefix_length + 1) ~@word in
     let lloc = Cobol_common.Srcloc.trunc_suffix 1 lloc in
-    let b = Cobol_data.Literal.boolean (l &@ lloc) in
-    [BOOLLIT ~&(b.result), ~@@word],
-    Preproc_diagnostics.add_literal_diagnostics b.diags acc
+    let b, errs = Cobol_data.Literal.boolean_with_dummy_fallback (l &@ lloc) in
+    [BOOLLIT ~&b, ~@@word],
+    Preproc_diagnostics.literal_errors acc errs
+  and[@local] alphanum ~quotation str =
+    let a = Cobol_data.Literal.alphanum_of_string ~quotation str in
+    [ALPHANUM a, ~@@word], acc
   in
   let lexer = Src_lexer.cdtoken directive_kind in
   match ~&word with
@@ -46,18 +49,19 @@ let cdtoks_of_word directive_kind
           ~f:begin fun t -> match ~&t with
             | CDEnd ->
                 Fun.id
-            | CDInt s ->
-                fixedlit (Cobol_ptree.fixed_of_strings s "1" &@<- t)
-            | CDFxd (n, _, f) ->
-                fixedlit (Cobol_ptree.fixed_of_strings n f &@<- t)
+            | CDInt integral ->
+                fixedlit (Cobol_ptree.fixed_of_strings
+                            ~integral ~fractional:"0" &@<- t)
+            | CDFxd (integral, _, fractional) ->
+                fixedlit (Cobol_ptree.fixed_of_strings
+                            ~integral ~fractional &@<- t)
             | CDTok tok ->
                 fun (toks, acc) -> List.cons (tok, ~@@t) toks, acc
           end
       in
       List.rev toks, acc
-  | Alphanum { knd = Basic; str; qte = _ } ->
-      [ALPHANUM str, ~@@word],
-      acc
+  | Alphanum { knd = Basic; str; qte = quotation } ->
+      alphanum ~quotation str
   | Alphanum { knd = Bool; str; qte = _ } ->
       boollit ~prefix_length:1 ~base:`Bool str
   | Alphanum { knd = BoolX; str; qte = _ } ->

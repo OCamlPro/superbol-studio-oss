@@ -62,11 +62,27 @@ module TYPES = struct
 
   (** Values attached with a source location. *)
   type 'a with_loc = { payload: 'a; loc: srcloc [@compare fun _ _ -> 0] }
-  [@@ deriving ord]
+  [@@deriving ord]
+
+  type src =
+    | Source_location of (srcloc [@compare fun _ _ -> 0])
+    | Process_parameter
+    | Process_environment
+  [@@deriving ord]
+
+  type 'a with_src =
+    {
+      src_payload: 'a;
+      src: src [@compare fun _ _ -> 0];
+    }
+  [@@deriving ord]
 
   let pp pe ppf e = pe ppf e.payload            (* ignore source localization *)
   let pp_with_loc = pp
   let show_with_loc pe l = Pretty.to_string "%a" (pp pe) l
+  let pp_src pe ppf e = pe ppf e.src_payload                          (* same *)
+  let pp_with_src = pp_src
+  let show_with_src pe l = Pretty.to_string "%a" (pp_src pe) l
 end
 include TYPES
 
@@ -105,6 +121,16 @@ let rec start_pos: type t. t slt -> Lexing.position = function
   | Cpy { copied; _ } -> start_pos copied
   | Rpl { old; _ } -> start_pos old
   | Cat { left; _ } -> start_pos left
+
+(** [shallow_start_pos loc] retrieves the starting position of [loc] if it was
+    not subject to any copy, and without traversal of replacements (i.e. returns
+    the start position of replaced text, not the position of its
+    replacement). Returns [None] otherwise. *)
+let rec shallow_start_pos = function
+  | Raw (s, _, _) -> Some s
+  | Cpy _ -> None
+  | Rpl { old; _ } -> shallow_start_pos old
+  | Cat { left; _ } -> shallow_start_pos left
 
 (** [shallow_multiline_lexloc_in ~filename loc] retrieves a lexical location in
     [filename] from [loc], iff [loc] directly originates from [filename] and was
@@ -480,6 +506,14 @@ let pp_srcloc ~platform = pp_srcloc_with_optional_caret ~platform
 let pp_file_loc ppf loc =
   pp_file_loc ppf (to_raw_loc @@ as_lexloc loc)
 
+let pp_src ppf = function
+  | Source_location l ->
+      pp_file_loc ppf l
+  | Process_parameter ->
+      Pretty.print ppf "process@ parameters"
+  | Process_environment ->
+      Pretty.print ppf "process@ environment"
+
 (** {2 Constructors} *)
 
 (** [raw ~in_area_a lexloc] builds a raw source location from a pair of left-
@@ -561,6 +595,9 @@ let concat_srclocs: srcloc list -> srcloc option = fun l ->
     | None -> Some loc
     | Some acc -> Some (concat acc loc)
   end None l
+
+let append_srclocs: srcloc -> srcloc list -> srcloc = fun loc l ->
+  List.fold_left concat loc l
 
 (** Direction for {!take} and {!trunc} below (internal) *)
 type direction = Prefix | Suffix
@@ -697,6 +734,15 @@ let map_payload: ('a -> 'b) -> 'a with_loc -> 'b with_loc = fun f a ->
   flagit (f (payload a)) (loc a)
 let map_loc: (srcloc -> srcloc) -> 'a with_loc -> 'a with_loc = fun f a ->
   flagit (payload a) (f (loc a))
+
+let with_src ~src src_payload =
+  { src; src_payload }
+
+let with_loc_as_src ~loc x =
+  with_src ~src:(Source_location loc) x
+
+let lift_loc_as_src x =
+  with_src ~src:(Source_location x.loc) x.payload
 
 module INFIX : sig
   (* Meaning of letters:

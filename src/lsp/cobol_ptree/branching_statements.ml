@@ -15,6 +15,7 @@
 
 open Common
 open Numericals
+open Alphanums
 open Terms
 open Operands
 open Simple_statements
@@ -116,7 +117,7 @@ and perform_mode =
   | PerformUntil of
       {
         with_test: stage option;
-        until: cond with_loc option; (* None = UNTIL EXIT *)
+        until: condition with_loc option; (* None = UNTIL EXIT *)
       }
   | PerformVarying of
       {
@@ -131,7 +132,7 @@ and varying_phrase =
     varying_ident: ident;
     varying_from: scalar;
     varying_by: scalar option;                  (* XXX: more specialized type *)
-    varying_until: cond with_loc;
+    varying_until: condition with_loc;
   }
 
 
@@ -146,7 +147,7 @@ and search_stmt =
 
 and search_when_clause =
   {
-    search_when_cond: cond with_loc;
+    search_when_cond: condition with_loc;
     search_when_stmts: statements;
   }
 
@@ -163,7 +164,7 @@ and search_all_stmt =
 (* IF *)
 and if_stmt =
   {
-    condition: cond with_loc;
+    condition: condition with_loc;
     then_branch: statements;
     else_branch: statements;
   }
@@ -262,7 +263,7 @@ and display_stmt =
 
 and display_items_clauses =
   {
-    display_items: ident_or_literal list; (* non-empty *)
+    display_items: ident_or_literal with_loc list; (* non-empty *)
     display_clauses: display_clause with_loc list;
   }
 
@@ -653,7 +654,7 @@ and pp_perform_mode ppf = function
     Fmt.pf ppf "UNTIL EXIT"
   | PerformUntil { with_test; until = Some until } ->
     Fmt.(option (any " TEST " ++ pp_stage ++ sp)) ppf with_test;
-    Fmt.pf ppf "UNTIL %a" pp_cond' until
+    Fmt.pf ppf "UNTIL %a" pp_condition' until
   | PerformVarying { with_test; varying; after } ->
     Fmt.(option (any " TEST " ++ pp_stage ++ sp)) ppf with_test;
     Fmt.pf ppf "VARYING %a"
@@ -667,7 +668,7 @@ and pp_varying_phrase ppf
     pp_ident vi
     pp_scalar vf
     Fmt.(option (any " BY " ++ pp_scalar)) vb
-    pp_cond' vu
+    pp_condition' vu
 
 (* SEARCH *)
 
@@ -692,7 +693,7 @@ and pp_search_all_stmt ppf { search_all_item = si;
   Fmt.pf ppf "@ END-SEARCH"
 
 and pp_search_when_clause ppf { search_when_cond = c; search_when_stmts = w } =
-  Fmt.pf ppf "WHEN %a@ %a" pp_cond' c pp_statements w
+  Fmt.pf ppf "WHEN %a@ %a" pp_condition' c pp_statements w
 
 (* IF *)
 
@@ -704,7 +705,7 @@ and pp_if_stmt ppf { condition = c; then_branch = t; else_branch = e } =
   in
   let e = match e with [] -> None | _ -> Some e in
   Fmt.pf ppf "@[<v>IF@[<hv>@ %a%t@]@;<1 2>%a%a@ END-IF@]"
-    (Fmt.box pp_cond') c pp_then
+    (Fmt.box pp_condition') c pp_then
     (Fmt.vbox pp_statements) t
     Fmt.(option (any "@ ELSE@;<1 2>" ++ vbox pp_statements)) e
 
@@ -817,7 +818,7 @@ and pp_display_items_clauses ppf
   { display_items; display_clauses }
 =
   Fmt.pf ppf "%a%a"
-    Fmt.(list ~sep:sp pp_ident_or_literal) display_items
+    Fmt.(list ~sep:sp (pp_with_loc pp_ident_or_literal)) display_items
     Fmt.(list ~sep:sp (pp_with_loc pp_display_clause)) display_clauses
 
 and pp_display_clause ppf = function

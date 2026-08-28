@@ -1,4 +1,5 @@
 #!/bin/sh
+
 set -ue
 
 # This script is called by dune to generate the linking flags for static builds
@@ -32,12 +33,6 @@ case "$1" in
 esac
 
 shift
-case "$1" in
-    macosx) shift; EXTRA_LIBS="curses $*";;
-    linux) shift; EXTRA_LIBS="$*";;
-    --) shift; EXTRA_LIBS="$*";;
-    *) echo "Not supported %{ocamlc-config:system} '$1'." >&2; help_exit
-esac
 
 ## Static linking configuration ##
 
@@ -48,40 +43,54 @@ esac
 # from the gcc command-line.
 # The Makefile contains a target to automate this: `make detect-libs`.
 
-case $(uname -s) in
-    Linux)
+case "$1" in
+    linux)
         case $(. /etc/os-release && echo $ID) in
             alpine)
-		# Use `static-alpine-clibs` field to add libs more here
-		# (or `static-clibs` for both Linux and Macos)
-                COMMON_LIBS=" camlstr unix c"
+                COMMON_LIBS="zarith gmp bigstringaf_stubs cstruct_stubs camlstr unix c"
                 # `m` and `pthread` are built-in musl
                 echo2 '(-noautolink'
                 echo2 ' -cclib -Wl,-Bstatic'
                 echo2 ' -cclib -static-libgcc'
-                for l in $EXTRA_LIBS $COMMON_LIBS; do
-                    echo2 " -cclib -l$l"
+                for l in $COMMON_LIBS; do
+                    if [ "${l#-}" != "${l}" ]
+                    then echo2 " -cclib $l"
+                    else echo2 " -cclib -l$l"
+                    fi
                 done
                 echo2 ' -cclib -static)'
                 ;;
             *)
-                echo2 "Error: static linking is only supported in Alpine, to avoids glibc constraints (use scripts/static-build.sh to build through an Alpine Docker container)" >&2
-                exit 3
+                echo2 "Warning: static linking is only supported in Alpine, to avoids glibc constraints (use scripts/static-build.sh to build through an Alpine Docker container)" >&2
+                echo2 "()"
+                # exit 3
         esac
         ;;
-    Darwin)
-	# Use `static-macos-clibs` field to add libs more here
-        COMMON_LIBS=" unix"
+    macosx)
+        shift
+        COMMON_LIBS="zarith ${MACPORTS:-/usr/local/osxcross/macports/pkgs/opt/local}/lib/libgmp.a camlstr bigstringaf_stubs cstruct_stubs ezlibcob_stubs unix"
         # `m` and `pthread` are built-in in libSystem
         echo2 '(-noautolink'
-        for l in $EXTRA_LIBS $COMMON_LIBS; do
-            if [ "${l%.a}" != "${l}" ]; then echo2 " -cclib $l"
+        for l in $COMMON_LIBS $@; do
+            if [ "${l%.a}" != "${l}" ] || [ "${l#-}" != "${l}" ]
+            then echo2 " -cclib $l"
+            else echo2 " -cclib -l$l"
+            fi
+        done
+        echo2 ')'
+        ;;
+    mingw64)
+        shift
+        echo2 '('
+        for l in $@; do
+            if [ "${l%.a}" != "${l}" ] || [ "${l#-}" != "${l}" ]
+            then echo2 " -cclib $l"
             else echo2 " -cclib -l$l"
             fi
         done
         echo2 ')'
         ;;
     *)
-        echo "Static linking is not supported for your platform. See $0 to contribute." >&2
+        echo "Static linking is not supported for your platform ($1). See $0 to contribute." >&2
         exit 3
 esac

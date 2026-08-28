@@ -16,6 +16,7 @@
 open Common
 open Terms
 open Operands
+open Alphanums
 
 
 (*
@@ -824,8 +825,8 @@ type stop_stmt =
 [@@deriving ord]
 
 and stop_arg =
-  | StopWithQualIdent of qualident
-  | StopWithLiteral of literal
+  | StopWithQualIdent of qualname_with_subscripts with_loc
+  | StopWithLiteral of literal with_loc
 
 and stop_run_return =
   | StopReturning of returning
@@ -854,19 +855,26 @@ let pp_stop_run_status ppf { status_kind; status_value } =
     Fmt.(option pp_scalar) status_value
 
 let pp_stop_stmt ppf = function
-  | StopArg None -> Fmt.pf ppf "STOP"
-  | StopArg Some StopWithQualIdent i -> Fmt.pf ppf "STOP %a" pp_qualident i
-  | StopArg Some StopWithLiteral l -> Fmt.pf ppf "STOP %a" pp_literal l
-  | StopRun None -> Fmt.pf ppf "STOP RUN"
+  | StopArg None ->
+      Fmt.pf ppf "STOP"
+  | StopArg Some StopWithQualIdent i ->
+      Fmt.pf ppf "STOP %a" pp_qualname_with_subscripts' i
+  | StopArg Some StopWithLiteral l ->
+      Fmt.pf ppf "STOP %a" pp_literal' l
+  | StopRun None ->
+      Fmt.pf ppf "STOP RUN"
   | StopRun Some StopReturning r ->
     Fmt.pf ppf "STOP@ RUN%a"
       Fmt.(sp ++ pp_returning) r
   | StopRun Some StopWithStatus s ->
     Fmt.pf ppf "STOP@ RUN%a"
       Fmt.(sp ++ pp_stop_run_status) s
-  | StopError -> Fmt.pf ppf "STOP ERROR"
-  | StopThread None -> Fmt.pf ppf "STOP THREAD"
-  | StopThread Some i -> Fmt.pf ppf "STOP THREAD %a" pp_qualident i
+  | StopError ->
+      Fmt.pf ppf "STOP ERROR"
+  | StopThread None ->
+      Fmt.pf ppf "STOP THREAD"
+  | StopThread Some i ->
+      Fmt.pf ppf "STOP THREAD %a" pp_qualident i
 
 type terminate_stmt =
   name with_loc list

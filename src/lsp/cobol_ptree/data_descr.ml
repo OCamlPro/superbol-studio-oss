@@ -39,17 +39,17 @@ let pp_file_block_contents ppf = function
 
 
 type record_clause =
-  | FixedLength of integer
+  | FixedLength of integer with_loc
   | VariableLength of
       {
-        min_length: integer option;
-        max_length: integer option;
+        min_length: integer with_loc option;
+        max_length: integer with_loc option;
         depending: qualname with_loc option;
       }
   | FixedOrVariableLength of
       {
-        min_length: integer;
-        max_length: integer;
+        min_length: integer with_loc;
+        max_length: integer with_loc;
       }
 [@@deriving ord]
 
@@ -57,14 +57,17 @@ let pp_depending_phrase ppf qn =
   Fmt.pf ppf "DEPENDING %a" (pp_with_loc pp_qualname) qn
 
 let pp_record_clause ppf = function
-  | FixedLength n -> Fmt.pf ppf "RECORD %a" pp_integer n
+  | FixedLength n ->
+      Fmt.pf ppf "RECORD %a" (pp_with_loc pp_integer) n
   | VariableLength { min_length; max_length; depending } ->
     Fmt.pf ppf "RECORD VARYING%a%a%a"
-      Fmt.(option (any " " ++ pp_integer)) min_length
-      Fmt.(option (any " TO " ++ pp_integer)) max_length
+      Fmt.(option (any " " ++ pp_with_loc pp_integer)) min_length
+      Fmt.(option (any " TO " ++ pp_with_loc pp_integer)) max_length
       Fmt.(option (any " " ++ pp_depending_phrase)) depending
   | FixedOrVariableLength { min_length; max_length } ->
-    Fmt.pf ppf "RECORD %a TO %a" pp_integer min_length pp_integer max_length
+      Fmt.pf ppf "RECORD %a TO %a"
+        (pp_with_loc pp_integer) min_length
+        (pp_with_loc pp_integer) max_length
 
 type recording_mode =
   | ModeFixedOrVariable
@@ -493,8 +496,8 @@ type validation_clause =
   | Class of class_clause
   | Default of ident_or_literal option
   | Destination of ident list (* non-empty *)
-  | InvalidWhen of cond with_loc list (* non-empty *)
-  | PresentWhen of cond with_loc
+  | InvalidWhen of condition with_loc list (* non-empty *)
+  | PresentWhen of condition with_loc
   | Varying of data_varying list
   | ValidateStatus of
       {
@@ -546,10 +549,10 @@ let pp_destination_clause =
   Fmt.(any "DESTINATION " ++ list ~sep:sp pp_ident)
 
 let pp_invalid_when_clause =
-  Fmt.(list ~sep:sp (any "INVALID WHEN " ++ pp_cond'))
+  Fmt.(list ~sep:sp (any "INVALID WHEN " ++ pp_condition'))
 
 let pp_present_when_clause =
-  Fmt.(any "PRESENT WHEN " ++ pp_cond')
+  Fmt.(any "PRESENT WHEN " ++ pp_condition')
 
 let pp_validation_clause ppf = function
   | Class cc -> pp_class_clause ppf cc
@@ -759,18 +762,24 @@ let pp_source_destination_clause ppf = function
   | Using i -> Fmt.pf ppf "USING %a" pp_ident i
   | Value l -> Fmt.pf ppf "VALUE %a" pp_literal l
 
-type valueof_clause =
+type valueof_clause =                                           (* (obsolete) *)
   {
-    valueof_valued: name with_loc;
+    valueof_subject: file_label;
     valueof_value: qualname_or_literal;
   }
+
+and file_label =
+  | FileLabelID
+  | FileLabelName of name with_loc
 [@@deriving ord]
 
-let pp_valueof_clause ppf { valueof_valued; valueof_value } =
-  Fmt.(
-    pair ~sep:sp pp_name' pp_qualname_or_literal ppf
-      (valueof_valued, valueof_value)
-  )
+let pp_file_label ppf = function
+  | FileLabelID -> Fmt.string ppf "ID"
+  | FileLabelName n -> pp_name' ppf n
+
+let pp_valueof_clause ppf { valueof_subject; valueof_value } =
+  Fmt.(pair ~sep:sp) pp_file_label pp_qualname_or_literal ppf
+    (valueof_subject, valueof_value)
 
 type report_clause =
   | Global

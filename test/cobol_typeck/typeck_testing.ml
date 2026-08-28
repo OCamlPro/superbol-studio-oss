@@ -30,6 +30,16 @@ let show_diagnostics ?(show_data = false)
           Pretty.out "%a@[<v>Record renaming: %a@]@."
             (Cobol_common.Srcloc.pp_srcloc ~platform:Prog_common.platform) loc
             Cobol_data.Printer.pp_record_renaming ren
+        method! fold_record { record_storage; record_item; _ } () =
+          Cobol_common.Visitor.do_children @@
+          match record_storage with
+          | Generic_file _ as s ->
+              Pretty.out "%a@[<v>File storage: %a@]@."
+                (Cobol_common.Srcloc.pp_srcloc ~platform:Prog_common.platform)
+                record_item.loc
+                Cobol_data.Printer.pp_data_storage s;
+          | _ ->
+              ()
       end group ()
   end
 
