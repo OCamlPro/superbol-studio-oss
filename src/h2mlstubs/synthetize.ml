@@ -21,12 +21,14 @@ type va_type =
 
 type env = {
     enums : (string, enum) Hashtbl.t;
-    comps : (string, comp) Hashtbl.t
+    comps : (string, comp) Hashtbl.t;
+    funs : (string, fun_) Hashtbl.t;
   }
 
 let env = {
     enums = Hashtbl.create 50;
     comps = Hashtbl.create 50;
+    funs = Hashtbl.create 50;
   }
 
 module Attr = struct
@@ -77,6 +79,64 @@ module Attr = struct
     | TEnum (_ti, a) -> a
     | TBuiltin_va_list (a) -> a
 end
+
+let ml_type = ref (fun _ -> assert false)
+
+let rec type_sig ty =
+  let open GoblintCil in
+  let raw_type = Cil.unrollTypeDeep ty in
+  let n, al =
+    match raw_type with
+    | TVoid (al) -> "v", al
+    | TInt (IChar, al) -> "c", al
+    | TInt (ISChar, al) -> "i8", al
+    | TInt (IUChar, al) -> "ui8", al
+    | TInt (IShort, al) -> "i16", al
+    | TInt (IUShort, al) -> "ui16", al
+    | TInt (IInt, al) -> "i32", al
+    | TInt (IUInt, al) -> "ui32", al
+    | TInt (ILong, al) -> "i64", al (* Note: 32-bit on 64-bit Windows *)
+    | TInt (IULong, al) -> "ui64", al
+    | TInt (ILongLong, al) -> "i64", al
+    | TInt (IULongLong, al) -> "ui64", al
+    | TFloat (FFloat, al) -> "f", al
+    | TFloat (FDouble, al) -> "d", al
+    | TEnum (ei, al) ->
+        let name =
+          Attr.find_map "TYPEDEF" (function
+              | [AStr (typedef)] -> Some (typedef)
+              | _ -> None
+            ) ei.eattr |>
+            Option.value ~default:ei.ename
+        in
+        Printf.sprintf "e%s" name, al
+    | TComp (ci, al) ->
+        let name =
+          Attr.find_map "TYPEDEF" (function
+              | [AStr (typedef)] -> Some (typedef)
+              | _ -> None
+            ) ci.cattr |>
+            Option.value ~default:ci.cname
+        in
+        let k = if ci.cstruct then 's' else 'u' in
+        Printf.sprintf "%c%s" k name, al
+    | TPtr (ty, al) -> Printf.sprintf "p%s" (type_sig ty), al
+    | TArray (ty, _ex, al) -> Printf.sprintf "a%s" (type_sig ty), al
+    | TFun (_rt, _args, _is_va, al) ->
+        let fsig = fun_sig raw_type in
+        Printf.sprintf "f%s" fsig, al
+    | TInt (_) | TFloat (_) | TNamed (_) | TBuiltin_va_list (_) ->
+        "", []
+  in
+  if Attr.exists "const" al then "c" ^ n else n
+
+and fun_sig ty =
+  let open GoblintCil in
+  let rt, args, _is_va, _attr = Cil.splitFunctionType ty in
+  let args = Option.value ~default:[] args in
+  let rt = type_sig rt in
+  let atl = List.map (fun (_an, ty, _al) -> type_sig ty) args in
+  String.concat "_" (rt :: atl)
 
 let rec synthetize_type ?(for_struct=false) sym (ty, _al) =
   let syn_type_error line = Error.mk_error sym "synthetise_type" line ty in
@@ -141,6 +201,22 @@ let rec synthetize_type ?(for_struct=false) sym (ty, _al) =
         | None -> syn_type_error __LINE__
       end
 
+  | TFun (_rt, _args, _is_va, al) ->
+      let fsig = fun_sig raw_type in
+      begin
+        match Hashtbl.find_opt env.funs fsig with
+        | Some (fun_) -> STFun { const = has_const al; unref = true; fun_ }
+        | None -> syn_type_error __LINE__
+      end
+
+  | TPtr ((TFun (_rt, _args, _is_va, al) as raw_type), _) ->
+      let fsig = fun_sig raw_type in
+      begin
+        match Hashtbl.find_opt env.funs fsig with
+        | Some (fun_) -> STFun { const = has_const al; unref = false; fun_ }
+        | None -> syn_type_error __LINE__
+      end
+
   | TPtr (ty, al) ->
       let type_ = synthetize_type ~for_struct sym (ty, []) in
       STPtr { const = has_const al; type_ }
@@ -156,7 +232,7 @@ let rec synthetize_type ?(for_struct=false) sym (ty, _al) =
       in
       STArray { const = has_const al; type_; size }
 
-  | TNamed (_) | TFun (_) | TBuiltin_va_list (_) ->
+  | TNamed (_) | TBuiltin_va_list (_) ->
       syn_type_error __LINE__
 
 let synthetize_arg sym (an, ty, al) i =
@@ -249,7 +325,7 @@ let synthetize_enum _loc (ei : GoblintCil.enuminfo) =
 
 
 
-let synthetize_comp loc ci =
+let synthetize_comp _loc ci =
   let open GoblintCil in
   let typedef_opt =
     Attr.find_map "TYPEDEF" (function
@@ -279,6 +355,11 @@ let synthetize_comp loc ci =
     }
   in
   Hashtbl.replace env.comps ci.cname comp;
+  comp
+
+let synthetize_comp_fields loc ci =
+  let open GoblintCil in
+  let comp = Hashtbl.find env.comps ci.cname in
   let sym = Error.{
       sym_kind = if ci.cstruct then "struct" else "union";
       sym_name = ci.cname; sym_implem = true; sym_pos = loc;
@@ -289,8 +370,79 @@ let synthetize_comp loc ci =
         fi.fname, synthetize_type ~for_struct:true sym (fi.ftype, fi.fattr)
       ) ci.cfields
   in
-  comp.comp_fields <- fields;
-  comp
+  comp.comp_fields <- fields
+
+
+
+let rec synthetize_fun_types ?(for_fun_decl=false) loc ty =
+  let open GoblintCil in
+  let raw_type = Cil.unrollTypeDeep ty in
+  match raw_type with
+  | TPtr (ty, _al) ->
+      synthetize_fun_types loc ty
+  | TArray (ty, _ex, _al) ->
+      synthetize_fun_types loc ty
+  | TComp (ci, _al) ->
+      let fields = ci.cfields in
+      ci.cfields <- []; (* Break cycles in recursive structs *)
+      begin
+        try
+          let funs =
+            List.fold_left (fun funs fi ->
+                synthetize_fun_types loc fi.ftype @ funs
+              ) [] fields
+          in
+          ci.cfields <- fields;
+          funs
+        with exn ->
+          ci.cfields <- fields;
+          raise exn
+      end
+  | TFun (rt, args, _is_va, _al) ->
+      let fsig = fun_sig raw_type in
+      if Hashtbl.mem env.funs fsig then
+        []
+      else
+        let args = Option.value ~default:[] args in
+        let funs = synthetize_fun_types loc rt in
+        let funs =
+          List.fold_left (fun funs (_an, ty, _al) ->
+              synthetize_fun_types loc ty @ funs
+            ) funs args
+        in
+        if for_fun_decl then
+          funs
+        else
+          let sym = Error.{
+              sym_kind = "function";
+              sym_name = fsig; sym_implem = true; sym_pos = loc;
+            }
+          in
+          let fun_args =
+            List.mapi (fun i arg ->
+                let a = synthetize_arg sym arg i in
+                a.arg_name.name, a.arg_type
+              ) args
+          in
+          let fun_ret = synthetize_type sym (rt, []) in
+          let ml_args =
+            List.map !ml_type (List.map snd fun_args @ [fun_ret]) in
+          let ml_args =
+            match ml_args with [_] -> "unit" :: ml_args | _ -> ml_args in
+          let fun_ml_type = String.concat " -> " ml_args in
+          let fun_ = {
+              fun_ml_type;
+              fun_c_type = "f_" ^ fsig;
+              fun_sig = fsig;
+              fun_ret;
+              fun_args;
+            }
+          in
+          Hashtbl.replace env.funs fsig fun_;
+          fun_ :: funs
+  | TVoid (_) | TInt (_) | TFloat (_) | TEnum (_)
+  | TNamed (_) | TBuiltin_va_list (_) ->
+      []
 
 
 
@@ -415,6 +567,17 @@ let synthetize_stub loc (vi : GoblintCil.varinfo) =
 
 let synthetize ci_file =
   let open GoblintCil in
+
+  (* Get trampoline pool size *)
+  let default_trampoline_pool_size = 16 in
+  let trampoline_pool_size =
+    Cil.foldGlobals ci_file (fun tps glob ->
+        match glob with
+        | GPragma (Attr ("TRAMPOLINE_POOL_SIZE", [AInt (i)]), _loc) -> i
+        | _ -> tps
+      ) default_trampoline_pool_size
+  in
+
   (* Attach typedef names to their enum/struct/union *)
   let () =
     let update_attr name name_attr type_attr =
@@ -436,6 +599,8 @@ let synthetize ci_file =
             ()
       )
   in
+
+  (* Synthetize enum and struct/union declarations *)
   let enums, comps =
     Cil.foldGlobals ci_file (fun (enums, comps) glob ->
         match glob with
@@ -463,6 +628,36 @@ let synthetize ci_file =
             enums, comps
       ) ([], [])
   in
+
+  (* Synthetize function pointer types *)
+  let funs =
+    Cil.foldGlobals ci_file (fun funs glob ->
+        match glob with
+        | GCompTag (ci, loc) (* complete declaration *)
+        | GCompTagDecl (ci, loc) -> (* incomplete/forward declaration *)
+            synthetize_fun_types loc (TComp (ci, [])) @ funs
+        | GVarDecl (vi, loc) when GoblintCil.isFunctionType vi.vtype ->
+            synthetize_fun_types ~for_fun_decl:true loc vi.vtype @ funs
+        | GType (ti, loc) ->
+            synthetize_fun_types loc ti.ttype @ funs
+        | _ ->
+            funs
+      ) []
+  in
+
+  (* Synthetize struct/union fields *)
+  Cil.iterGlobals ci_file (fun glob ->
+      match glob with
+      | GCompTag (ci, loc) (* complete declaration *)
+      | GCompTagDecl (ci, loc) -> (* incomplete/forward declaration *)
+          begin
+            try synthetize_comp_fields loc ci with Exit -> ()
+          end
+      | _ ->
+          ()
+    );
+
+  (* Synthetize function stubs *)
   let stubs =
     GoblintCil.foldGlobals ci_file (fun stubs glob ->
       match glob with
@@ -478,4 +673,9 @@ let synthetize ci_file =
           stubs
     ) []
   in
-  { stubs = List.rev stubs; enums = List.rev enums; comps = List.rev comps }
+
+  { trampoline_pool_size;
+    stubs = List.rev stubs;
+    enums = List.rev enums;
+    comps = List.rev comps;
+    funs = List.rev funs }

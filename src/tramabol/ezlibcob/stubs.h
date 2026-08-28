@@ -25,6 +25,19 @@
 
 #else
 
+/* One trampoline costs between ~80-176 bytes */
+/* Measured average cost of typical pool size (per function pointer type): */
+/*   8 -> ~0.6 Kb */
+/*  16 -> ~2.7 Kb */
+/*  32 -> ~4.5 Kb */
+/*  64 -> ~9.0 Kb */
+/* 128 -> ~19.1 Kb */
+/* 256 -> ~38.9 Kb */
+#pragma TRAMPOLINE_POOL_SIZE(64)
+
+/* Extra function pointer types needed */
+typedef int (*f_int_int)(int);
+
 /* Silence macros not needed by genstub */
 #define DECLNORET
 #define COB_EXPIMP
@@ -181,11 +194,11 @@ typedef struct __cob_decimal cob_decimal;
 /* Call union structures */
 
 typedef union __cob_call_union {
-/* 	void		*(*funcptr)();	/\* Function returning "void *" *\/ */
-/* 	void		(*funcnull)();	/\* Function returning nothing *\/ */
-/* 	cob_field	*(*funcfld)();	/\* Function returning "cob_field *" *\/ */
-/* 	int		(*funcint)();	/\* Function returning "int" *\/ */
-/* 	void		*funcvoid;	/\* Redefine to "void *" *\/ */
+	void		*(*funcptr)();	/* Function returning "void *" */
+	void		(*funcnull)();	/* Function returning nothing */
+	cob_field	*(*funcfld)();	/* Function returning "cob_field *" */
+	int		(*funcint)();	/* Function returning "int" */
+	void		*funcvoid;	/* Redefine to "void *" */
 /* #ifdef	_WIN32				/\* stdcall variants *\/ */
 /* 	void		*(__stdcall *funcptr_std)(); */
 /* 	void		(__stdcall *funcnull_std)(); */
@@ -807,29 +820,21 @@ COB_EXPIMP void cob_unlock_file	(cob_file *, cob_field *);
 // (* functions in fileio.c for the MF style EXTFH interface *)
 COB_EXPIMP int	EXTFH		(unsigned char *opcode, FCD3 *fcd);
 
-NOT_IMPLEMENTED
 COB_EXPIMP void cob_extfh_open		(EXTFH_FUNC callfh, cob_file *,
 					const enum cob_open_mode, const int, cob_field *);
-NOT_IMPLEMENTED
 COB_EXPIMP void cob_extfh_close		(EXTFH_FUNC callfh, cob_file *,
 					cob_field *, const int, const int);
-NOT_IMPLEMENTED
 COB_EXPIMP void cob_extfh_read		(EXTFH_FUNC callfh, cob_file *,
 					cob_field *, cob_field *, const int);
-NOT_IMPLEMENTED
 COB_EXPIMP void cob_extfh_read_next	(EXTFH_FUNC callfh, cob_file *,
 					cob_field *, const int);
-NOT_IMPLEMENTED
 COB_EXPIMP void cob_extfh_rewrite	(EXTFH_FUNC callfh, cob_file *,
 					cob_field *, const int, cob_field * );
-NOT_IMPLEMENTED
 COB_EXPIMP void cob_extfh_delete	(EXTFH_FUNC callfh, cob_file *,
 					cob_field * );
-NOT_IMPLEMENTED
 COB_EXPIMP void cob_extfh_start		(EXTFH_FUNC callfh, cob_file *,
 					const int, cob_field *,
 					cob_field *, cob_field * );
-NOT_IMPLEMENTED
 COB_EXPIMP void cob_extfh_write		(EXTFH_FUNC callfh, cob_file *,
 					cob_field *, const int,
 				 	cob_field *, const unsigned int);
@@ -1075,4 +1080,3 @@ COB_EXPIMP cob_field *cob_intr_hex_to_char (cob_field* );
 // (* Functions in cconv.c *)
 
 COB_EXPIMP int cob_load_collation (const char *, cob_u8_t *, cob_u8_t * );
-

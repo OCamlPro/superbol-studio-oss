@@ -75,6 +75,8 @@ let process_c_file c_file_pp =
           true
       | GEnumTagDecl (_ei, _loc) -> (* Forward enum declaration *)
           true
+      | GPragma (_a, _loc) ->
+          true
       | _ ->
           false
     in

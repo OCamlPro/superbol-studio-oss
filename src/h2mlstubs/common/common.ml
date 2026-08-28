@@ -17,6 +17,7 @@ type !'a comp_kind
 type !'a cint
 type !'a enum
 type !'a comp
+type !'a callback
 type !'a cptr
 type !'a carray
 
