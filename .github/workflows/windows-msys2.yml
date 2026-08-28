@@ -121,7 +121,7 @@ jobs:
         id: cache-opam
         with:
           path: _opam
-          key: v5-4.14.2-msys2-${{ matrix.sys }}-${{ hashFiles('**/*.opam') }}
+          key: v5-4.14.2-msys2-${{ matrix.sys }}-${{ hashFiles('**/*.opam', '.github/workflows/windows-msys2.yml') }}
 
       - run: |
           opam install .\opam\*.opam .\vendors\ANSITerminal\ANSITerminal.opam .\vendors\goblint-cil\goblint-cil.opam .\test\opam\*.opam --deps-only --with-test

@@ -24,7 +24,8 @@ JS_TARGETS = $(addprefix $(JS_OUTDIR)/,superbol-vscode-oss-bundle.js	\
 # (could be a submodule)
 LSP_MODE_SRCDIR ?= ../lsp-mode
 
-MORE_DEV_OPAM_FILES := vendors/ANSITerminal/ANSITerminal.opam vendors/goblint-cil/goblint-cil.opam
+MORE_OPAM_FILES := vendors/goblint-cil/goblint-cil.opam
+MORE_DEV_OPAM_FILES := vendors/ANSITerminal/ANSITerminal.opam
 AUTOFONCE_EXE = dune exec -- src/autofonce/autofonce/main.exe
 
 # ---
@@ -65,9 +66,9 @@ opam-cross: opam-cross-osx opam-cross-windows
 opam-cross-osx opam-cross-windows: opam-cross-%:
 	rm -rf opam/$*/
 	opam exec -- drom dep --cross $*
-	rm -f opam/$*/*-js-*.opam
-	rm -f opam/$*/vscode-debug*.opam
-	rm -f opam/$*/*-vscode-*.opam
+	rm -f opam/$*/*-js-*.opam \
+	      opam/$*/vscode-debug*.opam \
+	      opam/$*/*-vscode-*.opam
 	sed -i opam/$*/*.opam \
 	    -e '/"goblint-cil-$*" *{/ d' \
 	    -e '/"ANSITerminal-$*" *{/ d' \
@@ -79,6 +80,17 @@ DROM_PROJECT_ARGS ?=
 project:
 	opam exec -- drom project $(DROM_PROJECT_ARGS)
 	$(MAKE) opam-fix opam-cross
+	git add opam
+
+# Warning: erases non-skipped user-modified files
+.PHONY: check-project
+check-project:
+	$(MAKE) project DROM_PROJECT_ARGS=--force
+	git update-index --refresh
+#	git diff-index --quiet HEAD -- # <- takes untracked files into account.
+	git ls-files --modified
+
+# ---
 
 # emacs-lsp:
 emacs/lsp-superbol-customs.el: $(LSP_MODE_SRCDIR) package.json

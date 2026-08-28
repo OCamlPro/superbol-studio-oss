@@ -63,7 +63,7 @@ jobs:
         id: cache-opam
         with:
           path: _opam
-          key: v4-${{ runner.os }}-!{name}-${{ matrix.ocaml-compiler }}-${{ hashFiles('opam/*.opam', 'vendors/**/*.opam') }}-skip_tests=${{ matrix.skip_test }}-repo=!(opam-repo)
+          key: v4-${{ runner.os }}-!{name}-${{ matrix.ocaml-compiler }}-${{ hashFiles('**/*.opam', '.github/workflows/workflow.yml') }}-skip_tests=${{ matrix.skip_test }}-repo=!(opam-repo)
 
       # use fields.opam-repo = "git+https://" to add an 'extra' opam repository
 ![if:field:opam-repo]
@@ -72,20 +72,13 @@ jobs:
          sudo apt-get update
 
 ![fi]
-
       # Use fields.github-workflow-before-build to add something here
 !(github-workflow-before-opam)
-      - run: opam pin add . -y --no-action
+      - run: make build-deps
+        if: ${{ ! steps.cache-opam.outputs.cache-hit && matrix.skip_test }}
 
-      - run: |
-          if ${{ matrix.skip_test }}
-          then
-            opam install -y opam/*.opam --deps-only
-          else
-            opam install -y opam/*.opam --deps-only --with-test
-          fi
-        if: steps.cache-opam.outputs.cache-hit != 'true'
-        name: Run opam install -y **/opam/*.opam --deps-only [ --with-test ]
+      - run: make dev-deps
+        if: ${{ ! steps.cache-opam.outputs.cache-hit && ! matrix.skip_test }}
 
       # Use fields.build-scripts to add more scripts to convert here
       - run: dos2unix scripts/*.sh !(build-scripts)
@@ -135,7 +128,7 @@ jobs:
 
       - name: Cleanup local opam switch before caching
         run: |
-          opam pin remove . --yes
+          # opam pin remove . --yes
           opam clean --switch-cleanup --logs
           find _opam -type f -a \( -name '*.cmt' -o -name '*.cmti' \) -delete
         if: steps.cache-opam.outputs.cache-hit != 'true'

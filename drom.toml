@@ -124,6 +124,12 @@ github-workflow-before-opam = """
 """
 
 github-workflow-before-build = """
+      - name: Check project files
+        run: |
+          opam pin --yes \"git+https://github.com/OCamlPro/drom.git#v0.9.3\"
+          make check-project
+        if: ${{ matrix.ocaml-compiler == '4.14.2' && matrix.os == 'ubuntu-latest' && matrix.skip_test == 'true' }}
+
       - uses: actions/setup-node@v4
         with:
           node-version: '>=16'
@@ -137,8 +143,6 @@ github-workflow-before-build = """
 github-workflow-after-build = """
       - run: make check-package.json
 
-      - run: make dev-deps # install test dependencies
-        if: ${{ ! matrix.skip_test }}
 """
 
 github-workflow-after-test = """
@@ -176,7 +180,6 @@ static-binaries = "superbol-free"
 dir = "src/superbol-studio-oss"
 # edit 'src/superbol-studio-oss/package.toml' for package-specific options
 
-
 [[package]]
 dir = "src/vscode/superbol-vscode-lib"
 # edit 'src/vscode/superbol-vscode-lib/package.toml' for package-specific options
@@ -212,8 +215,6 @@ dir = "src/vscode/vscode-debugadapter"
 [[package]]
 dir = "src/vscode/vscode-debugprotocol"
 # edit 'src/vscode/vscode-debugprotocol/package.toml' for package-specific options
-
-
 
 [[package]]
 dir = "src/lsp/superbol-free"
