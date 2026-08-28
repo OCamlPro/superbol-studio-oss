@@ -61,6 +61,7 @@ version = ">=20231231 <20240715"
 
 # package tools dependencies
 [tools]
+menhir = ">=20231231 <20240715"
 ppx_deriving = ">=5.2.1"
 
 # package fields (depends on package skeleton)

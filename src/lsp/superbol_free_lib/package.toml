@@ -76,6 +76,7 @@ lwt = ">=5 <5.9"
 
 # package tools dependencies
 [tools]
+ppx_cobcflags = "version"
 # Ensure `cmdliner` accepts abberviated subcommands
 cmdliner = "<2"
 # ...

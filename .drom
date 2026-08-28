@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-825b39be65d5a3bd9d7c8f808fc90316:.
+6181133cfc7126edef123fa89936461d:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -108,7 +108,7 @@ fc55cf30b49f0426c78e1d4233c5de51:opam/cobol_cfg.opam
 
 # begin context for opam/cobol_config.opam
 # file opam/cobol_config.opam
-2e5e2ab639227ea8a60afe1f5970e134:opam/cobol_config.opam
+9cac62d011ae5e002064db39036da748:opam/cobol_config.opam
 # end context for opam/cobol_config.opam
 
 # begin context for opam/cobol_data.opam
@@ -149,7 +149,7 @@ b325ce331af9c46fc049e660545f8526:opam/cobol_lsp.opam
 
 # begin context for opam/cobol_preproc.opam
 # file opam/cobol_preproc.opam
-c1779c9002a2bea01ae714f5fb8bce85:opam/cobol_preproc.opam
+02eb189e6216a2531071c3111f746725:opam/cobol_preproc.opam
 # end context for opam/cobol_preproc.opam
 
 # begin context for opam/cobol_ptree.opam
@@ -179,7 +179,7 @@ a8476024e6493c398cce979c2dc184b7:opam/cobol_unit.opam
 
 # begin context for opam/ez_toml.opam
 # file opam/ez_toml.opam
-bc48bda7df7940e49ec9cdeff1ad1896:opam/ez_toml.opam
+887153fadd8acc017030deedcf425020:opam/ez_toml.opam
 # end context for opam/ez_toml.opam
 
 # begin context for opam/ez_win32.opam
@@ -259,7 +259,7 @@ c5b147eda5360e971ed791ed7f26ccfd:opam/superbol-vscode-oss.opam
 
 # begin context for opam/superbol_free_lib.opam
 # file opam/superbol_free_lib.opam
-99c5121cd1d0a072b0a3c9bb23cc2d79:opam/superbol_free_lib.opam
+d321795c330be16cbbaf7ab9e6ab390d:opam/superbol_free_lib.opam
 # end context for opam/superbol_free_lib.opam
 
 # begin context for opam/superbol_platform.opam
@@ -305,7 +305,7 @@ e20a36e2a2371141499b1a1e7f888be0:opam/vscode-js-stubs.opam
 
 # begin context for opam/vscode-json.opam
 # file opam/vscode-json.opam
-2b95ef5238fdd00942fd64ed8fb0bf64:opam/vscode-json.opam
+44f4d0e5084fbfc357354786b2b1eb29:opam/vscode-json.opam
 # end context for opam/vscode-json.opam
 
 # begin context for opam/vscode-languageclient-js-stubs.opam

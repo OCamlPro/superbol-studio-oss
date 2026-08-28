@@ -55,6 +55,7 @@ depends: [
   "menhirLib-windows" {> "2019"}
   "ez_file-windows" {>= "0.4"}
   "ISO8601-windows" {>= "0.2"}
+  "menhir" {>= "20231231" & < "20240715"}
   "odoc" {with-doc}
   "dune" {>= "3.17.0" & < "3.19.0"}
 ]
