@@ -30,6 +30,10 @@ Please refer to [the changelog](CHANGELOG.md) for its current implementation sta
    cd ../..
    ```
 
+   **Note 1**: a libtool version mismatch error during the call to `make install` above, can be fixed by first calling `libtoolize`, and then restarting the above procedure at the `./build_aux/bootstrap --install` step.
+
+   **Note 2**: another issue may occur at link stage where a symbol from `libreadline` is not found.  Passing `LDFLAGS="-lreadline"` is a valid workaround here.
+
 6. Build and test the interpreter:
    ```shell
    make GNUCOBOL4_COB_CONFIG=$PWD/_gc4/bin/cob-config tramabol-interpreter
