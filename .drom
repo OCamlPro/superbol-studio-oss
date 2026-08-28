@@ -10,7 +10,7 @@ version:0.9.0
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-1607292b94a69f51587c81ff07e4be0a:.github/workflows/workflow.yml
+fab06bcac93571d2fd5d2d5a70e54adc:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
@@ -50,10 +50,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-19099d8326585caf267f52b5df20ca3c:dune-project
-82161209ae81a51de58e0ad58ccbbfc4:dune-project
-4d97b5ec2856745331d2c7c23cd0cc36:dune-project
-19d914235295199d7da7f5bef0777fef:dune-project
+0a55e3399c177530a4a75668a8cb6f25:dune-project
 # end context for dune-project
 
 # begin context for opam/autofonce.opam
