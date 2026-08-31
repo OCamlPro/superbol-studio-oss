@@ -6,15 +6,29 @@
 # Note: We use node for matching system names, and force to linux if it is missing
 # BUILD_PLAT = $(shell opam exec -- ocamlc -config-var system)
 BUILD_PLAT = $(shell node --print process.platform 2>/dev/null || echo linux)
+BUILD_ARCH = $(shell node --print process.arch 2>/dev/null || echo x64)
+
 TARGET_PLAT ?= $(BUILD_PLAT)
+TARGET_ARCH ?= $(BUILD_ARCH)
 
 DUNE = opam exec -- dune
 DUNE_ARGS ?= --root="$(DUNE_ROOT)"
 DUNE_ROOT = $(if $(filter win32,${BUILD_PLAT}),$$(cygpath -w $$(pwd)),$$(pwd))
+DUNE_BUILD_DIR ?= _build
 ifneq ($(BUILD_PLAT),$(TARGET_PLAT))
-DUNE_CROSS_ARGS = $(strip $(if $(filter  win32,${TARGET_PLAT}),-x windows)	\
-			  $(if $(filter darwin,${TARGET_PLAT}),-x osx))
+  DUNE_CROSS_ARGS =							\
+	$(strip $(if $(filter  win32,${TARGET_PLAT}),-x windows)	\
+		$(if $(filter darwin,${TARGET_PLAT}),-x osx))
+  DUNE_CONTEXT =							\
+	$(strip	$(if $(filter  win32,$(TARGET_PLAT)),.windows)		\
+		$(if $(filter darwin,$(TARGET_PLAT)),.osx))
+else
+  DUNE_CONTEXT =
 endif
+DUNE_BUILD_CONTEXT =   ${DUNE_BUILD_DIR}/default$(DUNE_CONTEXT)
+DUNE_INSTALL_CONTEXT = ${DUNE_BUILD_DIR}/install/default$(DUNE_CONTEXT)
+
+EXE_TARGETS ?=
 
 CP ?= cp -fl
 
@@ -39,13 +53,9 @@ build:
 ifeq ($(TARGET_PLAT)_$(LINKING_MODE),$(BUILD_PLAT)_static)
 	./scripts/static-build.sh
 else
-	${DUNE} build!{build-profile} ${DUNE_ARGS} ${DUNE_CROSS_ARGS} @build
-  # NB: Using $(BUILD_PLAT) below would require generalizing every
-  # check on %context_name in dune files.
-  ifeq ($(TARGET_PLAT),linux)
-	${DUNE} build!{build-profile} ${DUNE_ARGS} ${DUNE_CROSS_ARGS} @install
+	${DUNE} build!{build-profile} ${DUNE_ARGS} ${DUNE_CROSS_ARGS}	\
+		$(addprefix $(DUNE_INSTALL_CONTEXT)/bin/,$(EXE_TARGETS))
 	./scripts/copy-bin.sh !{packages}
-  endif
 endif
 	./scripts/after.sh build
 
