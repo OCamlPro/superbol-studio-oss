@@ -172,4 +172,16 @@ ifneq ($(TARGET_PLAT),universal)
   test-promote: test-tramabol-promote
   test-tramabol-promote:
 	${DUNE} runtest test/tramabol --auto-promote
+
+  .PHONY: clean-tramabol
+  clean-execs: clean-tramabol
+  clean-tramabol:
+	rm -f $(TRAMABOL) $(wildcard $(TRAMABOL)-*-*)
 endif
+
+# ---
+
+.PHONY: clean-extra-execs
+clean-execs: clean-extra-execs
+clean-extra-execs:
+	rm -f h2mlstubs
