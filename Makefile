@@ -28,6 +28,7 @@ endif
 DUNE_BUILD_CONTEXT =   ${DUNE_BUILD_DIR}/default$(DUNE_CONTEXT)
 DUNE_INSTALL_CONTEXT = ${DUNE_BUILD_DIR}/install/default$(DUNE_CONTEXT)
 
+DOT_EXE = $(if $(filter win32,$(TARGET_PLAT)),.exe)
 EXE_TARGETS ?=
 
 CP ?= cp -fl
@@ -53,9 +54,12 @@ build:
 ifeq ($(TARGET_PLAT)_$(LINKING_MODE),$(BUILD_PLAT)_static)
 	./scripts/static-build.sh
 else
+  ifneq ($(EXE_TARGETS),)
 	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS}	\
-		$(addprefix $(DUNE_INSTALL_CONTEXT)/bin/,$(EXE_TARGETS))
+		$(addprefix $(DUNE_INSTALL_CONTEXT)/bin/,		\
+		  $(addsuffix $(DOT_EXE),$(EXE_TARGETS)))
 	./scripts/copy-bin.sh superbol-studio-oss superbol-vscode-lib superbol-vscode-oss interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs vscode-json vscode-debugadapter vscode-debugprotocol superbol-free superbol_free_lib superbol_preprocs superbol_project superbol_platform cobol_common cobol_parser cobol_ptree ebcdic_lib cobol_lsp ppx_cobcflags pretty cobol_config cobol_indent cobol_indent_old cobol_preproc cobol_data cobol_typeck cobol_unit ez_toml ezr_toml sql_preproc sql_ast sql_parser cobol_cfg autofonce autofonce_core autofonce_lib autofonce_m4 autofonce_share autofonce_patch autofonce_config autofonce_misc ez_win32 ez_call h2mlstubs tramabol tramabol_lib ezlibcob cobol_interp cobol_ir
+  endif
 endif
 	./scripts/after.sh build
 

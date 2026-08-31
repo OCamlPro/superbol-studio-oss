@@ -93,10 +93,6 @@ jobs:
       - run: make test
         if: ${{ ! matrix.skip_test }}
 
-      - name: Show test result on failure
-        if: failure()
-        run: cat _build/_autofonce/results.log
-
       # Use fields.github-workflow-after-test to add something here
 !(github-workflow-after-test)
       # - name: Check whether source is well formatted

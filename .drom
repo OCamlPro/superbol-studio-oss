@@ -5,12 +5,12 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-bf81b97a9f15904c63f56b0c4eb9312a:.
+6ac8947def042423772be6afa4121634:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-02fd3fac8981ea37dc559257d683e424:.github/workflows/workflow.yml
+e0aec45084344681cd98b8962639a115:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
@@ -22,6 +22,7 @@ bf81b97a9f15904c63f56b0c4eb9312a:.
 # file Makefile
 8cd31f8eff1c5ecc519df4e8f8aba2ce:Makefile
 8c09c4eb1a406394b92cd1f9f84f6841:Makefile
+c51046d60e2999a38d5adb4cd95865a8:Makefile
 # end context for Makefile
 
 # begin context for docs/README.txt

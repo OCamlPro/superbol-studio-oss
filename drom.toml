@@ -121,14 +121,6 @@ github-workflow-before-opam = """
         run: |
           echo 'HAVE_LIBCOB5=false' >> $GITHUB_ENV
         if: ${{ matrix.os != 'ubuntu-latest' && matrix.os != 'macos-latest' }}
-"""
-
-github-workflow-before-build = """
-      - name: Check project files
-        run: |
-          opam pin --yes \"git+https://github.com/OCamlPro/drom.git#v0.9.3\"
-          make check-project
-        if: ${{ matrix.ocaml-compiler == '4.14.2' && matrix.os == 'ubuntu-latest' && matrix.skip_test == 'true' }}
 
       - uses: actions/setup-node@v7
         with:
@@ -137,17 +129,27 @@ github-workflow-before-build = """
           cache-dependency-path: '**/package-lock.json'
         if: matrix.build_vsix
 
+      - run: make node-deps
+        if: matrix.build_vsix
+"""
+
+github-workflow-before-build = """
+      - name: Check project files
+        run: |
+          opam pin --yes \"git+https://github.com/OCamlPro/drom.git#v0.9.3\"
+          make check-project
+        if: ${{ matrix.ocaml-compiler == '4.14.2' && matrix.os == 'ubuntu-latest' && matrix.skip_test == 'true' }}
 """
 
 # NB: a `before-tests` field would make more sense here.
 github-workflow-after-build = """
       - run: make check-package.json
-
 """
 
 github-workflow-after-test = """
-      - run: make node-deps
-        if: matrix.build_vsix
+      - name: Show test result on failure
+        if: failure()
+        run: cat _build/_autofonce/results.log
 
       - run: make vsix-debug
         if: matrix.build_vsix

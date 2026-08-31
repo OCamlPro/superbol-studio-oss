@@ -9,7 +9,6 @@ ifeq ($(TARGET_PLAT),universal)
 else
   TARGET_SPEC = $(TARGET_PLAT)-$(TARGET_ARCH)
 endif
-DOT_EXE = $(if $(filter win32,$(TARGET_PLAT)),.exe)
 
 TARGET_PROFILE ?= release
 TARGET_VSIX = $(TARGET_NAME)-$(VERSION)-$(TARGET_SPEC)-$(TARGET_PROFILE).vsix
@@ -26,6 +25,7 @@ ifeq ($(TARGET_PLAT),universal)
   SUPERBOL_LSP_JS = $(SUPERBOL_LSP_PKG)/main.bc.js
   SUPERBOL_LSP_BUILT = ${DUNE_BUILD_CONTEXT}/src/$(SUPERBOL_LSP_JS)
   SUPERBOL_LSP_EXE = $(SUPERBOL_LSP).js
+  EXTRA_DIST_TARGETS += $(SUPERBOL_LSP_EXE)
 else
   EXE_TARGETS += $(SUPERBOL_LSP)
   SUPERBOL_LSP_EXE = $(SUPERBOL_LSP)-$(TARGET_SPEC)$(DOT_EXE)
@@ -81,7 +81,7 @@ endif
 ifeq ($(TARGET_PLAT),universal)
   $(SUPERBOL_LSP_EXE): vsix-dist-setup
 	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS} --profile=universal \
-		      $(MAIN_SRCDIR)/$(SUPERBOL_LSP_JS)
+		src/$(SUPERBOL_LSP_JS)
 else				#platform-specific
   $(SUPERBOL_LSP_EXE): build vsix-dist-setup
 
@@ -95,7 +95,7 @@ endif
 build-debug:
 	rm -rf _dist
 	${DUNE} build ${DUNE_ARGS} ${DUNE_BUILD_ARGS} \
-		      $(STUDIO_JS)
+		$(STUDIO_JS)
 	@mkdir -p $(JS_OUTDIR)
 	$(CP) ${DUNE_BUILD_DIR}/default/$(STUDIO_JS) $(JS_OUTDIR)/
 	$(MAKE) bundle-debug
@@ -117,7 +117,7 @@ bundle-debug: $(JS_TARGETS)
 build-release:
 	rm -rf _dist
 	${DUNE} build ${DUNE_ARGS} ${DUNE_BUILD_ARGS} --profile=release \
-		      $(STUDIO_JS)
+		$(STUDIO_JS)
 	@mkdir -p $(JS_OUTDIR)
 	$(CP) ${DUNE_BUILD_DIR}/default/$(STUDIO_JS) $(JS_OUTDIR)/
 	$(MAKE) bundle-release
@@ -194,7 +194,7 @@ clean: clean-execs
 
 .PHONY: node-deps
 node-deps:
-	npm install
+	npm install --package-lock-only --audit=false --fund=false
 build-deps: node-deps
 test-deps: node-deps
 dev-deps: node-deps

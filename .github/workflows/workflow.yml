@@ -100,6 +100,16 @@ jobs:
           echo 'HAVE_LIBCOB5=false' >> $GITHUB_ENV
         if: ${{ matrix.os != 'ubuntu-latest' && matrix.os != 'macos-latest' }}
 
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '>=16'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+        if: matrix.build_vsix
+
+      - run: make node-deps
+        if: matrix.build_vsix
+
       - run: make build-deps
         if: ${{ ! steps.cache-opam.outputs.cache-hit && matrix.skip_test }}
 
@@ -117,30 +127,18 @@ jobs:
           make check-project
         if: ${{ matrix.ocaml-compiler == '4.14.2' && matrix.os == 'ubuntu-latest' && matrix.skip_test == 'true' }}
 
-      - uses: actions/setup-node@v7
-        with:
-          node-version: '>=16'
-          cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
-        if: matrix.build_vsix
-
-
       - run: make build
 
       # Use fields.github-workflow-after-build to add something here
       - run: make check-package.json
 
-
       - run: make test
         if: ${{ ! matrix.skip_test }}
 
+      # Use fields.github-workflow-after-test to add something here
       - name: Show test result on failure
         if: failure()
         run: cat _build/_autofonce/results.log
-
-      # Use fields.github-workflow-after-test to add something here
-      - run: make node-deps
-        if: matrix.build_vsix
 
       - run: make vsix-debug
         if: matrix.build_vsix
