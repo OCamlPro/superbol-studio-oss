@@ -55,25 +55,21 @@ opam-fix:
 	    -e '/"goblint-cil" *{/ d' \
 	    -e '/"ANSITerminal" *{/ d'
 
-# Generates opam files for cross-compilation.  We don't generate
-# specific files for js-only packages.  As a result we also forcibly
-# remove a dependency to `superbol-vscode-oss` (which is js-only)
-# from the platform-specific version of `superbol-studio-oss`. This is
-# ok as those files are only there to grab external dependencies
-# before cross-compiling.
+# Generates opam files for cross-compilation.  We artificially remove
+# any JS-specific build dependency.  This is ok as those files are
+# only there to grab external dependencies before cross-compiling.
 .PHONY: opam-cross opam-cross-osx opam-cross-windows
 opam-cross: opam-cross-osx opam-cross-windows
 opam-cross-osx opam-cross-windows: opam-cross-%:
 	rm -rf opam/$*/
 	opam exec -- drom dep --cross $*
-	rm -f opam/$*/*-js-*.opam \
-	      opam/$*/vscode-debug*.opam \
-	      opam/$*/*-vscode-*.opam
 	sed -i opam/$*/*.opam \
 	    -e '/"goblint-cil-$*" *{/ d' \
 	    -e '/"ANSITerminal-$*" *{/ d' \
-	    -e '/"superbol-vscode-oss-$*" *{/ d' \
-	    -e '/"h2mlstubs" *{/ d'
+	    -e '/"js_of_ocaml-$*" *{/ d' \
+	    -e '/"gen_js_api-$*" *{/ d' \
+	    -e '/"promise_jsoo-$*" *{/ d' \
+	    -e '/"jsonoo-$*" *{/ d'
 
 DROM_PROJECT_ARGS ?=
 .PHONY: project
@@ -89,6 +85,9 @@ check-project:
 	git update-index --refresh
 #	git diff-index --quiet HEAD -- # <- takes untracked files into account.
 	git ls-files --modified
+
+cross-osx-build-deps cross-windows-build-deps: cross-%-build-deps: build-deps
+	opam install ./opam/*.opam ./opam/$*/*.opam --deps-only
 
 # ---
 

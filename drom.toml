@@ -146,7 +146,7 @@ github-workflow-after-build = """
 """
 
 github-workflow-after-test = """
-      - run: npm install && npm install esbuild
+      - run: make node-deps
         if: matrix.build_vsix
 
       - run: make vsix-debug

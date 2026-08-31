@@ -204,7 +204,9 @@ clean: clean-execs
 
 # setup
 
-.PHONY: node-setup
-node-setup:
+.PHONY: node-deps
+node-deps:
 	npm install
-build-deps: node-setup
+build-deps: node-deps
+test-deps: node-deps
+dev-deps: node-deps
