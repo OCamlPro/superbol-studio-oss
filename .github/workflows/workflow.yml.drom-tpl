@@ -41,7 +41,7 @@ jobs:
 !(github-worlflow-env)
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
 
       - name: Set git user
         run: |
@@ -59,11 +59,11 @@ jobs:
           opam-pin: false
 
       - name: Retrieve cache of local opam switch
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: cache-opam
         with:
           path: _opam
-          key: v4-${{ runner.os }}-!{name}-${{ matrix.ocaml-compiler }}-${{ hashFiles('**/*.opam', '.github/workflows/workflow.yml') }}-skip_tests=${{ matrix.skip_test }}-repo=!(opam-repo)
+          key: v5-${{ runner.os }}-${{ matrix.ocaml-compiler }}-!{name}-${{ hashFiles('**/*.opam', '.github/workflows/workflow.yml') }}-skip_tests=${{ matrix.skip_test }}-repo=!(opam-repo)
 
       # use fields.opam-repo = "git+https://" to add an 'extra' opam repository
 ![if:field:opam-repo]

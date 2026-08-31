@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
 
       - name: Set git user
         run: |
@@ -60,11 +60,11 @@ jobs:
           opam-pin: false
 
       - name: Retrieve cache of local opam switch
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: cache-opam
         with:
           path: _opam
-          key: v4-${{ runner.os }}-superbol-studio-oss-${{ matrix.ocaml-compiler }}-${{ hashFiles('**/*.opam', '.github/workflows/workflow.yml') }}-skip_tests=${{ matrix.skip_test }}-repo=
+          key: v5-${{ runner.os }}-${{ matrix.ocaml-compiler }}-superbol-studio-oss-${{ hashFiles('**/*.opam', '.github/workflows/workflow.yml') }}-skip_tests=${{ matrix.skip_test }}-repo=
 
       # use fields.opam-repo = "git+https://" to add an 'extra' opam repository
 
@@ -117,7 +117,7 @@ jobs:
           make check-project
         if: ${{ matrix.ocaml-compiler == '4.14.2' && matrix.os == 'ubuntu-latest' && matrix.skip_test == 'true' }}
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '>=16'
           cache: 'npm'
@@ -146,7 +146,7 @@ jobs:
         if: matrix.build_vsix
 
       - name: Upload VSIX artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: VSIX-${{ matrix.os }}
           path: superbol-vscode-oss-*.vsix
@@ -157,7 +157,7 @@ jobs:
         if: ${{ matrix.build_vsix && matrix.os == 'ubuntu-latest' }}
 
       - name: Upload universal VSIX artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: VSIX-universal
           path: superbol-vscode-oss-*-universal-*.vsix
