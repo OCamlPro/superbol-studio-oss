@@ -11,24 +11,38 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_ir.Types
+open Cir_types
 open Types
 
 let () =
+  Cir_builder.Printer.register_printers ();
+  Cir_logic.Printer.register_printers ();
   Printer.register_printers ()
 
-let errors e =
-  Error e
-let error e =
-  errors (NEL.one e)
+let build_error e =
+  Status.errors (Initialization_errors (NEL.one e))
 
-let vm =
+let builder =
+  Values.builder
+and vm =
   Values.manager
 
-let unit (unit: Cobol_unit.Types.t) =
-  try Runtime.run ~f:(fun () -> Cobol_ir.Main.run_unit ~vm unit) with
-  | FATAL e ->
-      errors e
+let unit unit =
+  try
+    Runtime.run ~f:begin fun () ->
+      match Cir_builder.Module.of_cobol_unit ~builder unit with
+      | Error errs ->
+          Error (Initialization_errors errs)
+      | Ok m ->
+          match Cir_logic.Main.run_module ~vm m () with
+          | Error errs ->
+              Error (Runtime_errors errs)
+          | Ok (_state, x) ->
+              Ok x
+    end
+  with
+  | Cir_logic.Types.FATAL errs ->
+      Error (Runtime_errors errs)
   | e ->
       raise e
 
@@ -37,6 +51,6 @@ let group (group: Cobol_unit.Types.group) =
   | 1 ->
       unit @@ Cobol_unit.Group.choose group
   | 0 ->
-      error @@ Invalid_compilation_group { reason = `empty_group }
+      build_error @@ Invalid_compilation_group { reason = `empty_group }
   | _ ->
-      error @@ Invalid_compilation_group { reason = `non_singleton_group }
+      build_error @@ Invalid_compilation_group { reason = `non_singleton_group }

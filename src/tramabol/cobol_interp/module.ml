@@ -12,14 +12,11 @@
 (**************************************************************************)
 
 open Ezlibcob.V1
-open Cobol_ir.Types
 open Types
-
-open Cobol_common.Srcloc.INFIX
 
 (* --- *)
 
-let create ~name ~source_file =
+let create ~name ~source_file : cob_module_memory =
 
   let module_name = CArray.of_string name in
   let module_source = CArray.of_string source_file in
@@ -81,22 +78,36 @@ let create ~name ~source_file =
   CobModule.set_json_code module_ (CobField.null ());
   CobModule.set_json_status module_ (CobField.null ());
 
-  { module_ptr = CPtr.get pmodule; module_globals = CPtr.get pglobals }
+  { module_ptr = CPtr.get pmodule;
+    module_globals = CPtr.get pglobals;
+    module_initialized = false }
 
 
-let enter (m: module_handle) ~(params: cob_field array) =
-  CobModule.set_cob_procedure_params m.module_memory.module_ptr
+let enter (m: cob_module_memory) ~(params: cob_field array) =
+  CobModule.set_cob_procedure_params m.module_ptr
     (Field.cptr_of_array params);
-  cob_set_cancel m.module_memory.module_ptr;
-  CobModule.set_module_active m.module_memory.module_ptr
-    (U32.succ_unsafe (CobModule.get_module_active m.module_memory.module_ptr))
+  cob_set_cancel m.module_ptr;
+  CobModule.set_module_active m.module_ptr
+    (U32.succ_unsafe (CobModule.get_module_active m.module_ptr))
 
 
-let leave (m: module_handle) =
-  CobModule.set_module_active m.module_memory.module_ptr
-    (U32.pred_unsafe (CobModule.get_module_active m.module_memory.module_ptr));
-  cob_module_leave m.module_memory.module_ptr
+let leave (m: cob_module_memory) =
+  CobModule.set_module_active m.module_ptr
+    (U32.pred_unsafe (CobModule.get_module_active m.module_ptr));
+  cob_module_leave m.module_ptr
 
 
-let cancel (m: module_handle) =                                    (* CHECKME *)
-  cob_cancel CArray.(to_ptr @@ of_string ~&(~&(m.module_unit).unit_name))
+let ws_needs_initialization (m: cob_module_memory) =
+  m.module_initialized
+
+
+let ws_initialization_done (m: cob_module_memory) () =
+  if m.module_initialized
+  then Status.error @@ Module_reinitialzation { module_name = "" }
+  else Status.ok ()
+
+
+let cancel (_m: cob_module_memory) =                               (* CHECKME *)
+  (* cob_cancel CArray.(to_ptr @@ of_string ~&(~&(m.module_unit).unit_name)) *)
+  Status.error
+    (Cir_logic.Types.Unsupported_runtime_operation Module_cancellation)

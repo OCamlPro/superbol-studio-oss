@@ -24,10 +24,10 @@ let printers_for_extended_type type_name =
      aux !l)
 
 let register_unsupported_stuff_printer, pp_unsupported_stuff =
-  printers_for_extended_type "Cobol_ir.Types.unsupported_stuff"
+  printers_for_extended_type "Cir_builder.Types.unsupported_stuff"
 
 let register_error_printer, pp_error =
-  printers_for_extended_type "Cobol_ir.Types.error"
+  printers_for_extended_type "Cir_builder.Types.error"
 
 let pp_undefined_stuff: undefined_stuff Pretty.printer = fun ppf -> function
   | Data_reference qn ->
@@ -58,6 +58,8 @@ let register_printers () =
         Pretty.print ppf "Undefined@ %a" pp_undefined_stuff stuff
     | Ambiguous { stuff; _ } ->
         Pretty.print ppf "Ambiguous@ %a" pp_ambiguous_stuff stuff
+    | Data_error e ->
+        Cobol_data.Printer.pp_error ppf e
     | _ ->
         raise Exit
   end

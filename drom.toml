@@ -372,4 +372,10 @@ dir = "src/tramabol/ezlibcob"
 dir = "src/tramabol/cobol_interp"
 
 [[package]]
-dir = "src/tramabol/cobol_ir"
+dir = "src/tramabol/cir_types"
+
+[[package]]
+dir = "src/tramabol/cir_builder"
+
+[[package]]
+dir = "src/tramabol/cir_logic"

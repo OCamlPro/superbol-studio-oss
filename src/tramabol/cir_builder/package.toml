@@ -1,6 +1,6 @@
 
 # name of package
-name = "cobol_ir"
+name = "cir_builder"
 skeleton = "library"
 
 # version if different from project version
@@ -10,7 +10,7 @@ skeleton = "library"
 # synopsis = ...
 
 # description if different from project description
-description = "Intermediate representation for COBOL programs"
+description = "Intermediate representation for COBOL programs (parametric builder)"
 
 # kind is either "library", "program" or "virtual"
 kind = "library"
@@ -54,7 +54,7 @@ skip = ["index.mld", "main.ml" ]
 [dependencies]
 cobol_unit = "version"
 cobol_data = "version"
-# cobol_ptree = "version"
+cir_types = "version"
 pretty = "version"
 
 # package tools dependencies
@@ -74,4 +74,3 @@ pretty = "version"
 #  static-clibs = "unix" 
 [fields]
 # ...
-dune-flags = ":standard -w -unused-var -w -unused-open"

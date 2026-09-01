@@ -13,19 +13,11 @@
 
 open Ezlibcob.V1
 open Cobol_data.Types
-open Cobol_ir.Types
+open Cir_types
+open Cir_builder.Types
 open Types
 
-open Cobol_ir.Syntax
-
-(* --- *)
-
-let errors e = Error e
-let error e = errors (NEL.one e)
-let lift_ezlibcob_error = function
-  | Ok _ as x -> x
-  | Error e -> error (Ezlibcob_error e)
-
+open Cir_logic.Syntax
 
 (* --- *)
 
@@ -87,9 +79,9 @@ let fixednum_attrs ~constant ~digits ~scale ~sign ~pic =
     then CobFieldFlag.(to_int @@ enc COB_FLAG_CONSTANT)
     else 0
   in
-  let* digits = lift_ezlibcob_error @@ U16.of_int digits
-  and* scale  = lift_ezlibcob_error @@ S16.of_int scale
-  and* flags  = lift_ezlibcob_error @@ U16.of_int flags in
+  let* digits = Status.lift_ezlibcob_build_error @@ U16.of_int digits
+  and* scale  = Status.lift_ezlibcob_build_error @@ S16.of_int scale
+  and* flags  = Status.lift_ezlibcob_build_error @@ U16.of_int flags in
   Ok (CobFieldAttr.create ~digits ~scale ~flags
         ~type_:(CobFieldType.(to_u16 (enc type_)))
         ~pic:(pic_symbols pic))
@@ -138,10 +130,11 @@ let from_literal_value (lit: Cobol_data.Types.literal_value Cobol_ptree.with_loc
       let data = CPtr.cast UInt8 @@ CArray.to_ptr @@ CArray.of_string str in
       let pic = Cobol_data.Picture.alphanumeric ~size in
       let attr = alphanum_attrs ~constant:true ~pic in
-      let* size = lift_ezlibcob_error @@ U64.of_int size in
+      let* size = Status.lift_ezlibcob_build_error @@ U64.of_int size in
       Ok (CobField.create ~attr ~data ~size)
   | _ ->
-      error @@ Unsupported { stuff = Literal_value ~&lit; loc = ~@lit }
+      Status.error @@ Unsupported { stuff = Literal ~&lit;
+                                    loc = ~@lit }
 
 let memory_bytes size =
   Cobol_data.Memory.as_bytes size
@@ -157,12 +150,13 @@ let in_record_memory field_definition (record: cob_record_handle) =
   in
   match field_attrs with
   | None ->
-      error @@ Unsupported { stuff = Field_usage; loc = ~@field_definition }
+      Status.error @@ Unsupported { stuff = Field_usage;
+                                    loc = ~@field_definition }
   | Some attr ->
       let field_offset = memory_bytes ~&field_definition.field_offset
       and field_size = memory_bytes ~&field_definition.field_size in
       let* attr
-      and* size = lift_ezlibcob_error @@ U64.of_int field_size in
+      and* size = Status.lift_ezlibcob_build_error @@ U64.of_int field_size in
       let cob_field =           (* TODO: check sizes against record data size *)
         CobField.create ~attr ~size
           ~data:(CPtr.add record.record_memory.record_data_ptr field_offset)
@@ -183,7 +177,8 @@ let in_record_memory field_definition (record: cob_record_handle) =
 
 (** Operations *)
 
-let init ~vm:_ : cob_field_mutable -> (unit, _) result = function
+let init ~vm:_ (f: cob_field_mutable) () : (state, _) result =
+  match f with
   | { field_initial_value = None; _ } ->
       Ok ()                                  (* Nothing to do? Zeros? Spaces? *)
   | { field_initial_value = Some value;
@@ -191,7 +186,8 @@ let init ~vm:_ : cob_field_mutable -> (unit, _) result = function
       cob_move value field;
       Ok ()
 
-let as_int ~vm:_ : cob_field_handle -> (int, _) result = function
+let as_int ~vm:_ (f: cob_field_handle) () : (state * int, _) result =
+  match f with
   | Field_constant f
   | Field_in_memory { field_value = Fixed_field f; _ } ->
-      lift_ezlibcob_error @@ S32.to_int @@ cob_get_int f
+      Status.lift_ezlibcob_runtime_error () @@ S32.to_int @@ cob_get_int f
