@@ -31,6 +31,9 @@ DUNE_INSTALL_CONTEXT = ${DUNE_BUILD_DIR}/install/default$(DUNE_CONTEXT)
 DOT_EXE = $(if $(filter win32,$(TARGET_PLAT)),.exe)
 EXE_TARGETS ?=
 
+# Add exe extension for dune executable targets on windows
+DUNE_DOT_EXE = $(if $(filter win32,$(BUILD_PLAT)),$(DOT_EXE))
+
 CP ?= cp -fl
 
 VERSION = !{version}
@@ -57,7 +60,7 @@ else
   ifneq ($(EXE_TARGETS),)
 	${DUNE} build!{build-profile} ${DUNE_ARGS} ${DUNE_CROSS_ARGS}	\
 		$(addprefix $(DUNE_INSTALL_CONTEXT)/bin/,		\
-		  $(addsuffix $(DOT_EXE),$(EXE_TARGETS)))
+		  $(addsuffix $(DUNE_DOT_EXE),$(EXE_TARGETS)))
 	./scripts/copy-bin.sh !{packages}
   endif
 endif

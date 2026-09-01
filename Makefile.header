@@ -148,35 +148,37 @@ build-master:
 
 TRAMABOL = $(basename $(notdir $(TRAMABOL_PKG)))
 ifneq ($(TARGET_PLAT),universal)
-  EXE_TARGETS += $(TRAMABOL)
-  TRAMABOL_EXE = $(TRAMABOL)-$(TARGET_SPEC)$(DOT_EXE)
-  ifeq ($(TARGET_PLAT)_$(LINKING_MODE),$(BUILD_PLAT)_static)
-    TRAMABOL_BUILT = $(TRAMABOL)
-  else
-    TRAMABOL_BUILT = ${DUNE_BUILD_CONTEXT}/src/$(TRAMABOL_PKG)/main.exe
-  endif
+  ifneq ($(HAVE_LIBCOB5),false)
+    EXE_TARGETS += $(TRAMABOL)
+    TRAMABOL_EXE = $(TRAMABOL)-$(TARGET_SPEC)$(DOT_EXE)
+    ifeq ($(TARGET_PLAT)_$(LINKING_MODE),$(BUILD_PLAT)_static)
+      TRAMABOL_BUILT = $(TRAMABOL)
+    else
+      TRAMABOL_BUILT = ${DUNE_BUILD_CONTEXT}/src/$(TRAMABOL_PKG)/main.exe
+    endif
 
-  .PHONY: tramabol tramabol-interpreter
-  all: tramabol
-  tramabol: tramabol-interpreter
-  tramabol-interpreter: $(TRAMABOL_BUILT)
+    .PHONY: tramabol tramabol-interpreter
+    all: tramabol
+    tramabol: tramabol-interpreter
+    tramabol-interpreter: $(TRAMABOL_BUILT)
 	$(CP) $(TRAMABOL_BUILT) $(TRAMABOL_EXE)
 
-  $(TRAMABOL_BUILT): build
+    $(TRAMABOL_BUILT): build
 
-  .PHONY: test-tramabol
-  test-tramabol:
+    .PHONY: test-tramabol
+    test-tramabol:
 	${DUNE} runtest test/tramabol
 
-  .PHONY: test-tramabol-promote
-  test-promote: test-tramabol-promote
-  test-tramabol-promote:
+    .PHONY: test-tramabol-promote
+    test-promote: test-tramabol-promote
+    test-tramabol-promote:
 	${DUNE} runtest test/tramabol --auto-promote
 
-  .PHONY: clean-tramabol
-  clean-execs: clean-tramabol
-  clean-tramabol:
+    .PHONY: clean-tramabol
+    clean-execs: clean-tramabol
+    clean-tramabol:
 	rm -f $(TRAMABOL) $(wildcard $(TRAMABOL)-*-*)
+  endif
 endif
 
 # ---
