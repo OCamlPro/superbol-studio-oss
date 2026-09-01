@@ -79,6 +79,7 @@ dot-gitignore-trailer = """
 /node_modules
 /package-json
 /package.json.prev
+/package-lock.json
 /gnucobol-config
 ATTIC
 /out
@@ -126,10 +127,10 @@ github-workflow-before-opam = """
         with:
           node-version: '>=16'
           cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
+          cache-dependency-path: '**/package.json'
         if: matrix.build_vsix
 
-      - run: make node-deps
+      - run: make node-deps && npm list
         if: matrix.build_vsix
 """
 

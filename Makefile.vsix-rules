@@ -194,7 +194,7 @@ clean: clean-execs
 
 .PHONY: node-deps
 node-deps:
-	npm install --package-lock-only --audit=false --fund=false
+	npm install --package-lock=false --audit=false --fund=false
 build-deps: node-deps
 test-deps: node-deps
 dev-deps: node-deps

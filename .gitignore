@@ -27,6 +27,7 @@ _build
 /node_modules
 /package-json
 /package.json.prev
+/package-lock.json
 /gnucobol-config
 ATTIC
 /out
