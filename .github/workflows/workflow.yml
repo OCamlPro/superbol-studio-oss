@@ -191,7 +191,7 @@ jobs:
 
       - name: Cleanup local opam switch before caching
         run: |
-          # opam pin remove . --yes
+          opam pin remove . --yes || true
           opam clean --switch-cleanup --logs
           find _opam -type f -a \( -name '*.cmt' -o -name '*.cmti' \) -delete
         if: steps.cache-opam.outputs.cache-hit != 'true'
