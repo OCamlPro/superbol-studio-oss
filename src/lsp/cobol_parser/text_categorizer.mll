@@ -22,7 +22,15 @@ type output =
 
 type pic_output =
   | PIC_string of string
+  | PIC_string_prefix of string
   | PIC_is
+  | PIC_end
+  | PIC_unexpected of char
+  (* first component is any chars accumulated before the unexpected char *)
+
+type pic_string_prefix =
+  | PIC_string of string
+  | PIC_string_prefix of string
   | PIC_end
   | PIC_unexpected of char
 
@@ -35,7 +43,7 @@ type alphanum_content =
 }
 
 let blank = [' ' '\009' '\r' ]
-let blanks = (blank+ | '\t')
+let blanks = (blank | '\t')+
 let digit = [ '0'-'9' ]
 let sign = [ '+' '-' ]
 let opers = sign | ['*' '/' '>' '<' '=' '&'] | "**" | "::" | ">=" | "<=" | "<>"
@@ -49,8 +57,9 @@ let firstidentchar = [ 'a'-'z' 'A'-'Z' '0'-'9' ]
 let lastidentchar = firstidentchar
 let ident = (firstidentchar (identchar* lastidentchar)?)
 
-let picchar   = _ # [' ' '\t' '\009' '\n' '\r' '\'' '"' ';']
+let picchar   = _ # [' ' '\t' '\009' '\n' '\r' '\'' '"' ';' '(' ')']
 let picstring = (picchar # [',']) (picchar*)
+
 
 (* Text-word tokenizer (after text manipulation phase) *)
 rule token = parse
@@ -91,6 +100,9 @@ and pic_token = parse
   | ['i' 'I'] ['s' 'S']
       { PIC_is }
 
+  | ((picstring '(') as s)
+      { PIC_string_prefix s }
+
   | (picstring as s)
       { PIC_string s }
 
@@ -98,7 +110,30 @@ and pic_token = parse
       { PIC_end }
 
   | (_ as c)
-      { PIC_unexpected c }
+      { PIC_unexpected (c) }
+
+and pic_string_aux in_paren = parse
+
+  | blanks
+      { if not in_paren then PIC_end
+        else pic_string_aux in_paren lexbuf }
+
+  | (picchar+) as s
+      { PIC_string s }
+
+  | ')'
+      { PIC_string ")" }
+
+  | '('
+      { if in_paren then PIC_unexpected ('(')
+        else PIC_string "(" }
+
+  | eof
+      { if in_paren then PIC_string_prefix ""
+        else PIC_end }
+
+  | (_ as c)
+      { (PIC_unexpected (c): pic_string_prefix) }
 
 (* TODO: distinguish lexing entry based on quotation *)
 and alphanum_string = parse
