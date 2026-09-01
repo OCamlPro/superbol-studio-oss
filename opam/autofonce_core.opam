@@ -45,7 +45,6 @@ depends: [
   "autofonce_share" {= version}
   "autofonce_misc" {= version}
   "autofonce_m4" {= version}
-  "ANSITerminal" {>= "0.8"}
   "odoc" {with-doc}
   "dune" {>= "3.17.0" & < "3.19.0"}
 ]

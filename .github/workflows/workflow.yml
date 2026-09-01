@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
 
       - name: Set git user
         run: |
@@ -60,14 +60,13 @@ jobs:
           opam-pin: false
 
       - name: Retrieve cache of local opam switch
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: cache-opam
         with:
           path: _opam
-          key: v4-${{ runner.os }}-superbol-studio-oss-${{ matrix.ocaml-compiler }}-${{ hashFiles('opam/*.opam', 'vendors/ANSITerminal/*.opam', 'vendors/goblint-cil/*.opam') }}-skip_tests=${{ matrix.skip_test }}-repo=
+          key: v5-${{ runner.os }}-${{ matrix.ocaml-compiler }}-superbol-studio-oss-${{ hashFiles('**/*.opam', '.github/workflows/workflow.yml') }}-skip_tests=${{ matrix.skip_test }}-repo=
 
       # use fields.opam-repo = "git+https://" to add an 'extra' opam repository
-
 
       # Use fields.github-workflow-before-build to add something here
       - run: git submodule init
@@ -101,55 +100,51 @@ jobs:
           echo 'HAVE_LIBCOB5=false' >> $GITHUB_ENV
         if: ${{ matrix.os != 'ubuntu-latest' && matrix.os != 'macos-latest' }}
 
-      - run: opam pin add . -y --no-action
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '>=16'
+          cache: 'npm'
+          cache-dependency-path: '**/package.json'
+        if: matrix.build_vsix
 
-      - run: |
-          if ${{ matrix.skip_test }}
-          then
-            opam install -y opam/*.opam --deps-only
-          else
-            opam install -y opam/*.opam --deps-only --with-test
-          fi
-        if: steps.cache-opam.outputs.cache-hit != 'true'
-        name: Run opam install -y **/opam/*.opam --deps-only [ --with-test ]
+      - run: make node-deps && npm list
+        if: matrix.build_vsix
+
+      - run: make build-deps
+        if: ${{ ! steps.cache-opam.outputs.cache-hit && matrix.skip_test }}
+
+      - run: make dev-deps
+        if: ${{ ! steps.cache-opam.outputs.cache-hit && ! matrix.skip_test }}
 
       # Use fields.build-scripts to add more scripts to convert here
       - run: dos2unix scripts/*.sh 
         if: matrix.os == 'windows-latest'
 
       # Use fields.github-workflow-before-build to add something here
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '>=16'
-          cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
-        if: matrix.build_vsix
-
+      - name: Check project files
+        run: |
+          opam pin --yes "git+https://github.com/OCamlPro/drom.git#v0.9.3"
+          make check-project
+        if: ${{ matrix.ocaml-compiler == '4.14.2' && matrix.os == 'ubuntu-latest' && matrix.skip_test == 'true' }}
 
       - run: make build
 
       # Use fields.github-workflow-after-build to add something here
       - run: make check-package.json
 
-      - run: make dev-deps # install test dependencies
-        if: ${{ ! matrix.skip_test }}
-
       - run: make test
         if: ${{ ! matrix.skip_test }}
 
+      # Use fields.github-workflow-after-test to add something here
       - name: Show test result on failure
         if: failure()
         run: cat _build/_autofonce/results.log
-
-      # Use fields.github-workflow-after-test to add something here
-      - run: npm install && npm install esbuild
-        if: matrix.build_vsix
 
       - run: make vsix-debug
         if: matrix.build_vsix
 
       - name: Upload VSIX artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: VSIX-${{ matrix.os }}
           path: superbol-vscode-oss-*.vsix
@@ -160,7 +155,7 @@ jobs:
         if: ${{ matrix.build_vsix && matrix.os == 'ubuntu-latest' }}
 
       - name: Upload universal VSIX artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: VSIX-universal
           path: superbol-vscode-oss-*-universal-*.vsix
@@ -196,7 +191,7 @@ jobs:
 
       - name: Cleanup local opam switch before caching
         run: |
-          opam pin remove . --yes
+          opam pin remove . --yes || true
           opam clean --switch-cleanup --logs
           find _opam -type f -a \( -name '*.cmt' -o -name '*.cmti' \) -delete
         if: steps.cache-opam.outputs.cache-hit != 'true'

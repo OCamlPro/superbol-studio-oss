@@ -5,22 +5,24 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-6181133cfc7126edef123fa89936461d:.
+24865d7547aa5cfc0f6d0ee32936416b:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-1607292b94a69f51587c81ff07e4be0a:.github/workflows/workflow.yml
+da33ce03322570a859125f4b976aa0f2:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
 # file .gitignore
-92d4477bb37b4a98061e5b3009a17147:.gitignore
+6012555ec8a60d4de58c8d904276884e:.gitignore
 # end context for .gitignore
 
 # begin context for Makefile
 # file Makefile
-f555b3ce3545e476b94c403a84e34022:Makefile
+8cd31f8eff1c5ecc519df4e8f8aba2ce:Makefile
+8c09c4eb1a406394b92cd1f9f84f6841:Makefile
+c51046d60e2999a38d5adb4cd95865a8:Makefile
 # end context for Makefile
 
 # begin context for docs/README.txt
@@ -50,10 +52,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-19099d8326585caf267f52b5df20ca3c:dune-project
-82161209ae81a51de58e0ad58ccbbfc4:dune-project
-4d97b5ec2856745331d2c7c23cd0cc36:dune-project
-19d914235295199d7da7f5bef0777fef:dune-project
+0a55e3399c177530a4a75668a8cb6f25:dune-project
 # end context for dune-project
 
 # begin context for opam/autofonce.opam

@@ -175,6 +175,7 @@
    (ppx_deriving_encoding (and (>= 0.3.0) (< 1.0.0)))
    ezjsonm
    (ez_file (and (>= 0.3.0) (< 1.0.0)))
+   (ppx_deriving ( >= 5.2.1 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
@@ -268,6 +269,7 @@
    (cobol_lsp (= :version))
    (cobol_indent (= :version))
    (cobol_common (= :version))
+   (ppx_cobcflags (= :version))
    (cmdliner ( < 2 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
@@ -494,6 +496,7 @@
    (menhirLib (and ( >= 20231231 )( < 20240715 )))
    (cobol_common (= :version))
    (ppx_deriving ( >= 5.2.1 ))
+   (menhir (and ( >= 20231231 )( < 20240715 )))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
@@ -553,6 +556,7 @@
    (cobol_data (= :version))
    (cobol_config (= :version))
    (cobol_common (= :version))
+   (menhir (and ( >= 20231231 )( < 20240715 )))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
@@ -638,6 +642,7 @@
    (menhirLib ( > 2019 ))
    (ez_file ( >= 0.4 ))
    (ISO8601 ( >= 0.2 ))
+   (menhir (and ( >= 20231231 )( < 20240715 )))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )

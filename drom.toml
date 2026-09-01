@@ -79,6 +79,7 @@ dot-gitignore-trailer = """
 /node_modules
 /package-json
 /package.json.prev
+/package-lock.json
 /gnucobol-config
 ATTIC
 /out
@@ -121,35 +122,41 @@ github-workflow-before-opam = """
         run: |
           echo 'HAVE_LIBCOB5=false' >> $GITHUB_ENV
         if: ${{ matrix.os != 'ubuntu-latest' && matrix.os != 'macos-latest' }}
-"""
 
-github-workflow-before-build = """
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '>=16'
           cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
+          cache-dependency-path: '**/package.json'
         if: matrix.build_vsix
 
+      - run: make node-deps && npm list
+        if: matrix.build_vsix
+"""
+
+github-workflow-before-build = """
+      - name: Check project files
+        run: |
+          opam pin --yes \"git+https://github.com/OCamlPro/drom.git#v0.9.3\"
+          make check-project
+        if: ${{ matrix.ocaml-compiler == '4.14.2' && matrix.os == 'ubuntu-latest' && matrix.skip_test == 'true' }}
 """
 
 # NB: a `before-tests` field would make more sense here.
 github-workflow-after-build = """
       - run: make check-package.json
-
-      - run: make dev-deps # install test dependencies
-        if: ${{ ! matrix.skip_test }}
 """
 
 github-workflow-after-test = """
-      - run: npm install && npm install esbuild
-        if: matrix.build_vsix
+      - name: Show test result on failure
+        if: failure()
+        run: cat _build/_autofonce/results.log
 
       - run: make vsix-debug
         if: matrix.build_vsix
 
       - name: Upload VSIX artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: VSIX-${{ matrix.os }}
           path: superbol-vscode-oss-*.vsix
@@ -160,7 +167,7 @@ github-workflow-after-test = """
         if: ${{ matrix.build_vsix && matrix.os == 'ubuntu-latest' }}
 
       - name: Upload universal VSIX artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: VSIX-universal
           path: superbol-vscode-oss-*-universal-*.vsix
@@ -175,7 +182,6 @@ static-binaries = "superbol-free"
 [[package]]
 dir = "src/superbol-studio-oss"
 # edit 'src/superbol-studio-oss/package.toml' for package-specific options
-
 
 [[package]]
 dir = "src/vscode/superbol-vscode-lib"
@@ -212,8 +218,6 @@ dir = "src/vscode/vscode-debugadapter"
 [[package]]
 dir = "src/vscode/vscode-debugprotocol"
 # edit 'src/vscode/vscode-debugprotocol/package.toml' for package-specific options
-
-
 
 [[package]]
 dir = "src/lsp/superbol-free"

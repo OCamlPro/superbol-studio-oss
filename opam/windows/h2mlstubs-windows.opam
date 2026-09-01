@@ -52,7 +52,6 @@ depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "3.17.0"}
   "pretty-windows" {= version}
-  "goblint-cil-windows" {>= "2.0.0"}
   "ez_file-windows" {>= "0.3.0" & < "1.0.0"}
   "camlp-streams-windows" {>= "5"}
   "odoc" {with-doc}

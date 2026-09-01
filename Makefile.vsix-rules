@@ -2,34 +2,19 @@
 
 CP ?= cp -fl # ln -srf
 
-DUNE_BUILD_DIR ?= _build
 DUNE_BUILD_ARGS = ${DUNE_CROSS_ARGS}
-ifneq ($(BUILD_PLAT),$(TARGET_PLAT))
-  DUNE_BUILD_DEFAULT =							\
-	${DUNE_BUILD_DIR}/default$(strip				\
-		$(if $(filter  win32,$(TARGET_PLAT)),.windows)		\
-		$(if $(filter darwin,$(TARGET_PLAT)),.osx))
-else
-  DUNE_BUILD_DEFAULT =							\
-	${DUNE_BUILD_DIR}/default
-endif
-DUNE_BUILD_SRCDIR = ${DUNE_BUILD_DEFAULT}/${MAIN_SRCDIR}
 
-BUILD_PLAT = $(shell node --print process.platform 2>/dev/null || echo linux)
-BUILD_ARCH = $(shell node --print process.arch 2>/dev/null || echo x64)
-
-# TARGET_PLAT should already be defined in Makefile; conditionally assign anyway
-TARGET_PLAT ?= $(BUILD_PLAT)
-TARGET_ARCH ?= $(BUILD_ARCH)
 ifeq ($(TARGET_PLAT),universal)
   TARGET_SPEC = universal
 else
   TARGET_SPEC = $(TARGET_PLAT)-$(TARGET_ARCH)
 endif
-DOT_EXE = $(if $(filter win32,$(TARGET_PLAT)),.exe)
 
 TARGET_PROFILE ?= release
 TARGET_VSIX = $(TARGET_NAME)-$(VERSION)-$(TARGET_SPEC)-$(TARGET_PROFILE).vsix
+
+# Use this variable to integrate a file in _dist into built VSIXs.
+EXTRA_DIST_TARGETS ?=
 
 # ---
 
@@ -38,14 +23,16 @@ STUDIO_JS = $(STUDIO_SRCDIR)/$(STUDIO).bc.js
 SUPERBOL_LSP = $(basename $(notdir $(SUPERBOL_LSP_PKG)))
 ifeq ($(TARGET_PLAT),universal)
   SUPERBOL_LSP_JS = $(SUPERBOL_LSP_PKG)/main.bc.js
-  SUPERBOL_LSP_BUILT = ${DUNE_BUILD_SRCDIR}/$(SUPERBOL_LSP_JS)
+  SUPERBOL_LSP_BUILT = ${DUNE_BUILD_CONTEXT}/src/$(SUPERBOL_LSP_JS)
   SUPERBOL_LSP_EXE = $(SUPERBOL_LSP).js
+  EXTRA_DIST_TARGETS += $(SUPERBOL_LSP_EXE)
 else
+  EXE_TARGETS += $(SUPERBOL_LSP)
   SUPERBOL_LSP_EXE = $(SUPERBOL_LSP)-$(TARGET_SPEC)$(DOT_EXE)
   ifeq ($(TARGET_PLAT)_$(LINKING_MODE),$(BUILD_PLAT)_static)
     SUPERBOL_LSP_BUILT = $(SUPERBOL_LSP)
   else
-    SUPERBOL_LSP_BUILT = ${DUNE_BUILD_SRCDIR}/$(SUPERBOL_LSP_PKG)/main.exe
+    SUPERBOL_LSP_BUILT = ${DUNE_BUILD_CONTEXT}/src/$(SUPERBOL_LSP_PKG)/main.exe
   endif
 endif
 
@@ -77,14 +64,14 @@ all: superbol-lsp-server
 compile: superbol-lsp-server build-release
 package: vsix-package
 
-superbol-lsp-server $(SUPERBOL_LSP_EXE): $(SUPERBOL_LSP_BUILT)
+superbol-lsp-server: $(SUPERBOL_LSP_EXE)
 # Only check/rebuild `package.json` on matching target and build platforms
 ifeq ($(TARGET_PLAT),$(BUILD_PLAT))
 	$(CP) $(SUPERBOL_LSP_BUILT) $(SUPERBOL_LSP_EXE)
 
   ifeq ($(GENERATE_PACKAGE_DOT_JSON),yes)
     .PHONY: rebuild-package.json
-    rebuild-package.json package.json: $(SUPERBOL_LSP_BUILT)
+    rebuild-package.json package.json: build
 	cp -f package.json package.json.prev
 	./$(SUPERBOL_LSP_BUILT) json vscode --gen package.json
 	diff -u package.json.prev package.json && rm -f package.json.prev 
@@ -92,11 +79,11 @@ ifeq ($(TARGET_PLAT),$(BUILD_PLAT))
 endif
 
 ifeq ($(TARGET_PLAT),universal)
-  $(SUPERBOL_LSP_BUILT): vsix-dist-setup
-	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS} --profile universal \
-		      $(MAIN_SRCDIR)/$(SUPERBOL_LSP_JS)
+  $(SUPERBOL_LSP_EXE): vsix-dist-setup
+	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS} --profile=universal \
+		src/$(SUPERBOL_LSP_JS)
 else				#platform-specific
-  $(SUPERBOL_LSP_BUILT): build vsix-dist-setup
+  $(SUPERBOL_LSP_EXE): build vsix-dist-setup
 
   .PHONY: check-package.json
   check-package.json:		#to be used after `build`
@@ -107,7 +94,8 @@ endif
 
 build-debug:
 	rm -rf _dist
-	${DUNE} build ${DUNE_ARGS} ${DUNE_BUILD_ARGS} $(STUDIO_JS)
+	${DUNE} build ${DUNE_ARGS} ${DUNE_BUILD_ARGS} \
+		$(STUDIO_JS)
 	@mkdir -p $(JS_OUTDIR)
 	$(CP) ${DUNE_BUILD_DIR}/default/$(STUDIO_JS) $(JS_OUTDIR)/
 	$(MAKE) bundle-debug
@@ -129,7 +117,7 @@ bundle-debug: $(JS_TARGETS)
 build-release:
 	rm -rf _dist
 	${DUNE} build ${DUNE_ARGS} ${DUNE_BUILD_ARGS} --profile=release \
-		      $(STUDIO_JS)
+		$(STUDIO_JS)
 	@mkdir -p $(JS_OUTDIR)
 	$(CP) ${DUNE_BUILD_DIR}/default/$(STUDIO_JS) $(JS_OUTDIR)/
 	$(MAKE) bundle-release
@@ -163,7 +151,7 @@ gnucobol-config: $(GNUCOBOL_SRCDIR)/config
 vsix-dist-setup:
 	@mkdir -p _dist
 
-vsix-package: package.json gnucobol-config $(EXE_TARGETS) $(SUPERBOL_LSP_BUILT)
+vsix-package: build package.json gnucobol-config $(EXTRA_DIST_TARGETS)
 #	needs 'make build-debug' or 'make build-release' before
 	$(CP) $(SUPERBOL_LSP_BUILT) _dist/$(SUPERBOL_LSP_EXE)
 	$(NPX) vsce package $(VSCE_ARGS) $(VSCE_PACKAGE_ARGS)	\
@@ -204,7 +192,9 @@ clean: clean-execs
 
 # setup
 
-.PHONY: node-setup
-node-setup:
-	npm install
-build-deps: node-setup
+.PHONY: node-deps
+node-deps:
+	npm install --package-lock=false --audit=false --fund=false
+build-deps: node-deps
+test-deps: node-deps
+dev-deps: node-deps
