@@ -1,6 +1,6 @@
 
 # name of package
-name = "cobol_interp"
+name = "cir_types"
 skeleton = "library"
 
 # version if different from project version
@@ -10,7 +10,7 @@ skeleton = "library"
 # synopsis = ...
 
 # description if different from project description
-description = "Interpreter for COBOL programs (libcob-based interpretation logic)"
+description = "High-level intermediate representation for COBOL programs (types)"
 
 # kind is either "library", "program" or "virtual"
 kind = "library"
@@ -43,6 +43,7 @@ gen-version = "version.ml"
 
 # preprocessing options
 #  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))"
+preprocess = "pps ppx_deriving.show ppx_deriving.ord"
 
 # files to skip while updating at package level
 skip = ["index.mld", "main.ml" ]
@@ -54,11 +55,7 @@ skip = ["index.mld", "main.ml" ]
 [dependencies]
 cobol_unit = "version"
 cobol_data = "version"
-cir_types = "version"
-cir_builder = "version"
-cir_logic = "version"
 pretty = "version"
-ezlibcob = "version"
 
 # package tools dependencies
 [tools]
@@ -77,7 +74,3 @@ ezlibcob = "version"
 #  static-clibs = "unix" 
 [fields]
 # ...
-# dune-flags = ":standard -w -unused-var -w -unused-open"
-dune-stanzas = """
- (enabled_if %{env:HAVE_LIBCOB5=true})               ; <- /!\\ enabled by default
-"""

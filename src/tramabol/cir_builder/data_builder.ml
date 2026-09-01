@@ -14,13 +14,14 @@
 open Cobol_common.Srcloc.TYPES
 open Cobol_unit.Types
 open Cobol_data.Types
+open Cir_types
 open Types
 
 open Syntax
 
 (* --- *)
 
-let add_field ~storage ~vm ~record ~(field: field_definition with_loc)
+let add_field ~builder ~storage ~record ~(field: field_definition with_loc)
     ((fields_data, errs) as acc) =
   let[@local] error e =
     fields_data,
@@ -38,7 +39,7 @@ let add_field ~storage ~vm ~record ~(field: field_definition with_loc)
     | None ->                                            (* skip unnamed field *)
         acc
     | Some qn ->
-        match vm.create_mutable_field field record with
+        match builder.create_mutable_field field record with
         | Ok field_value ->
             { (* fields_data with *)
               map = FIELDS_MAP.add ~&qn field_value fields_data.map;
@@ -55,7 +56,7 @@ let add_field ~storage ~vm ~record ~(field: field_definition with_loc)
         | Error e ->
             errors e
 
-let create_fields_map ~vm (unit_data_defs: data_definitions)
+let create_fields_map ~builder (unit_data_defs: data_definitions)
   : (_ fields_data, error NEL.t) result =
   let fields_data =
     {
@@ -68,12 +69,12 @@ let create_fields_map ~vm (unit_data_defs: data_definitions)
     if record_definition.record_storage = Local_storage ||
        record_definition.record_storage = Working_storage then
       try
-        let record = vm.create_record_data record_definition in
+        let record = builder.create_record_data record_definition in
         Cobol_data.Visitor.fold_item_definition' (object
           inherit [_] Cobol_data.Visitor.folder
           method! fold_field_definition' field acc =
             Cobol_common.Visitor.proceed @@
-            add_field ~vm ~record ~field acc
+            add_field ~builder ~record ~field acc
               ~storage:record_definition.record_storage
         end) record_definition.record_item acc
       with Cobol_data.Memory.NOT_SCALAR _ ->                (* ignored for now *)

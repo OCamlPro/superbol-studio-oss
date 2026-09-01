@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
-(*  Copyright (c) 2022-2026 OCamlPro SAS                                  *)
+(*  Copyright (c) 2026 OCamlPro SAS                                       *)
 (*                                                                        *)
 (* All rights reserved.                                                   *)
 (* This source code is licensed under the GNU Affero General Public       *)
@@ -11,11 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val create: name:string -> source_file:string -> Types.cob_module_memory
-val enter: Types.cob_module_memory -> params:Types.cob_field array -> unit
-val leave: Types.cob_module_memory -> unit
-
-val ws_needs_initialization
-  : Types.cob_module_memory -> bool
-val ws_initialization_done
-  : Types.cob_module_memory -> Types.state -> Types.evaluation_result
+val of_cobol_unit
+  : builder:('f, 'r, 'm) Types.value_builder
+  -> Cobol_unit.Types.t
+  -> (('f, 'm) Cir_types.module_handle, Types.errors) result

@@ -11,11 +11,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val create: name:string -> source_file:string -> Types.cob_module_memory
-val enter: Types.cob_module_memory -> params:Types.cob_field array -> unit
-val leave: Types.cob_module_memory -> unit
-
-val ws_needs_initialization
-  : Types.cob_module_memory -> bool
-val ws_initialization_done
-  : Types.cob_module_memory -> Types.state -> Types.evaluation_result
+type t
+val reset: unit -> unit
+val fresh: base:string -> t
+val pp: t Pretty.printer
+include Hashtbl.HashedType with type t := t
+include Set.OrderedType with type t := t

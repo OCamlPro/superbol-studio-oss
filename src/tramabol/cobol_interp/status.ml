@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
-(*  Copyright (c) 2022-2026 OCamlPro SAS                                  *)
+(*  Copyright (c) 2026 OCamlPro SAS                                       *)
 (*                                                                        *)
 (* All rights reserved.                                                   *)
 (* This source code is licensed under the GNU Affero General Public       *)
@@ -11,11 +11,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val create: name:string -> source_file:string -> Types.cob_module_memory
-val enter: Types.cob_module_memory -> params:Types.cob_field array -> unit
-val leave: Types.cob_module_memory -> unit
+open Types
 
-val ws_needs_initialization
-  : Types.cob_module_memory -> bool
-val ws_initialization_done
-  : Types.cob_module_memory -> Types.state -> Types.evaluation_result
+module NEL = Cobol_common.Basics.NEL
+
+let ok x = Ok x
+let errors e = Error e
+let error e = errors (NEL.one e)
+let lift_ezlibcob_build_error = function
+  | Ok _ as x -> x
+  | Error e -> error (Ezlibcob_build_error e)
+let lift_ezlibcob_runtime_error s = function
+  | Ok x -> Ok (s, x)
+  | Error e -> error (Ezlibcob_runtime_error e)

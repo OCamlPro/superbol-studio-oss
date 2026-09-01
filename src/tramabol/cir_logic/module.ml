@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
-(*  Copyright (c) 2022-2026 OCamlPro SAS                                  *)
+(*  Copyright (c) 2026 OCamlPro SAS                                       *)
 (*                                                                        *)
 (* All rights reserved.                                                   *)
 (* This source code is licensed under the GNU Affero General Public       *)
@@ -11,11 +11,30 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val create: name:string -> source_file:string -> Types.cob_module_memory
-val enter: Types.cob_module_memory -> params:Types.cob_field array -> unit
-val leave: Types.cob_module_memory -> unit
+open Cir_types
+open Types
 
-val ws_needs_initialization
-  : Types.cob_module_memory -> bool
-val ws_initialization_done
-  : Types.cob_module_memory -> Types.state -> Types.evaluation_result
+open Syntax
+
+(* --- *)
+
+let init_field ~vm f state =
+  vm.init_field ~vm f state
+
+let init_fields ~vm fields state =
+  List.fold_left begin fun state field ->
+    let* state in
+    init_field ~vm field state
+  end (Ok state) fields
+
+let init ~vm (m: _ module_handle) state =
+  let ws_init = vm.module_ws_needs_initialization m.module_memory in
+  let* state =
+    if ws_init
+    then Ok state
+    else init_fields ~vm m.module_fields.working_storage state
+  in
+  let* state =
+    init_fields ~vm m.module_fields.local_storage state
+  in
+  vm.module_ws_initialization_done m.module_memory state

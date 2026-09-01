@@ -11,11 +11,34 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val create: name:string -> source_file:string -> Types.cob_module_memory
-val enter: Types.cob_module_memory -> params:Types.cob_field array -> unit
-val leave: Types.cob_module_memory -> unit
+open Types
 
-val ws_needs_initialization
-  : Types.cob_module_memory -> bool
-val ws_initialization_done
-  : Types.cob_module_memory -> Types.state -> Types.evaluation_result
+let printers_for_extended_type type_name =
+  let l = ref [] in
+  (fun pp -> l := pp :: !l),
+  (fun ppf e ->
+     let rec aux = function
+       | [] -> Pretty.print ppf "<%s>" type_name
+       | pp :: tl -> try pp ppf e with Exit -> aux tl
+     in
+     aux !l)
+
+let (register_runtime_error_printer: runtime_error Pretty.printer -> unit),
+    pp_runtime_error =
+  printers_for_extended_type "Cir_logic.Types.runtime_error"
+
+let (register_runtime_operation_printer: runtime_operation Pretty.printer -> unit),
+    pp_runtime_operation =
+  printers_for_extended_type "Cir_logic.Types.runtime_operation"
+
+(* --- *)
+
+let register_printers () =
+
+  register_runtime_error_printer begin fun ppf -> function
+    | Unsupported_runtime_operation o ->
+        Pretty.print ppf "Unsupported@ runtime@ operation:@;%a"
+          pp_runtime_operation o
+    | _ ->
+        raise Exit
+  end

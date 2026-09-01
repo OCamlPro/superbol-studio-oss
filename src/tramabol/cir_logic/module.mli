@@ -11,12 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val of_cobol_unit
-  : vm:('f, 'r, 'module_memory) Types.value_manager
-  -> Cobol_unit.Types.t
-  -> (('f, 'module_memory) Types.module_handle, Types.errors) result
-
 val init
-  : vm:('f, 'r, 'module_memory) Types.value_manager
-  -> ('f, 'module_memory) Types.module_handle
-  -> (unit, Types.errors) result
+  : vm:('f, _, 'm, 's) Types.manager
+  -> ('f, 'm) Cir_types.module_handle
+  -> 's
+  -> 's Types.evaluation_result

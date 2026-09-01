@@ -13,15 +13,21 @@
 
 open Types
 
-let manager =
-  Cobol_ir.Types.{
+let builder: value_builder =
+  Cir_builder.Types.{
     create_record_data = Record.create;
     create_mutable_field = Field.in_record_memory;
     create_field_from_literal_value = Field.from_literal_value;
 
-    create_module = Module.create;
+    create_module_memory = Module.create;
+  }
+
+let manager: manager =
+  Cir_logic.Types.{
     enter_module = Module.enter;
     leave_module = Module.leave;
+    module_ws_needs_initialization = Module.ws_needs_initialization;
+    module_ws_initialization_done = Module.ws_initialization_done;
 
     init_field = Field.init;
     field_as_int = Field.as_int;

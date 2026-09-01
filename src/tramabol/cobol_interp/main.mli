@@ -11,5 +11,5 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val unit: Cobol_unit.Types.t -> (int, Cobol_ir.Types.errors) result
-val group: Cobol_unit.Types.group -> (int, Cobol_ir.Types.errors) result
+val unit: Cobol_unit.Types.t -> (int, Types.errors) result
+val group: Cobol_unit.Types.group -> (int, Types.errors) result

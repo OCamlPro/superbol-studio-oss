@@ -51,8 +51,6 @@ let main ?style_renderer ?utf_8 () =
         Pretty.error "Terminated with status: %d@." status;
         Cobol_common.exit ~status ()
     | Error errors ->
-        Cobol_common.Basics.NEL.iter ~f:begin fun e ->
-          Pretty.error "Error: @[%a@]@." Cobol_ir.Printer.pp_error e;
-        end errors;
+        Cobol_interp.Printer.pp_errors Fmt.stderr errors;
         Cobol_common.exit ~status:1 ()
   end

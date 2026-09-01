@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
-(*  Copyright (c) 2026 OCamlPro SAS                                       *)
+(*  Copyright (c) 2022-2026 OCamlPro SAS                                  *)
 (*                                                                        *)
 (* All rights reserved.                                                   *)
 (* This source code is licensed under the GNU Affero General Public       *)
@@ -11,18 +11,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Cobol_common.Srcloc.INFIX
-
-let ( let* ) = Result.bind
-let ( let+ ) = Result.map
-let ( and* ) r s =
-  match r, s with
-  | Ok r, Ok s -> Ok (r, s)
-  | Error e, Ok _ |  Ok _, Error e -> Error e
-  | Error e, Error f -> Error Types.NEL.(append e f)
-let ( and*^ ) r s =
-  match r, s with
-  | Ok r, Ok s -> Ok (r, s)
-  | Error e, Ok _ |  Ok _, Error e -> Error (Types.NEL.one e)
-  | Error e, Error f -> Error Types.NEL.(e :: one f)
-(* let return = Result.ok *)
+type t = { base: string; num: int }
+let count = ref 0
+let reset () = count := 0
+let fresh ~base = incr count; { base; num = !count }
+let pp ppf { base; num } = Pretty.print ppf "%s/%u" base num
+let hash { num; _ } = num
+let equal a b = a.num == b.num
+let compare a b = Int.compare a.num b.num

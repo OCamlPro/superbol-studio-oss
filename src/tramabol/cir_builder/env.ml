@@ -13,7 +13,7 @@
 
 open Cobol_ptree                                                 (* for terms *)
 open Cobol_data.Types
-open Cobol_unit.Types
+open Cir_types
 open Types
 
 open Syntax
@@ -21,6 +21,7 @@ open Syntax
 (* --- *)
 
 let error e = Error (NEL.one e)
+let data_errors errors = Error (NEL.map ~f:(fun e -> Data_error e) errors)
 
 module TYPES = struct
   module CONST_REF = struct
@@ -34,7 +35,7 @@ module TYPES = struct
     {
       named_fields: 'f fields_map;
       const_fields: 'f immutable_field CONST_TABLE.t;
-      vm: ('f, 'r, 'module_memory) value_manager;
+      builder: ('f, 'r, 'module_memory) value_builder;
     }
 end
 open TYPES
@@ -42,18 +43,28 @@ open TYPES
 let lookup_named_field (qn: qualname) env =
   FIELDS_MAP.find qn env.named_fields
 
-let literal_field (lit: literal_value with_loc) env : (_ immutable_field, _) result =
+let immediate (lit: literal_value with_loc) env : (_ immutable_field, _) result =
   match CONST_TABLE.find_opt env.const_fields ~&lit with
   | Some f ->
       Ok f
   | None ->
-      let* f = env.vm.create_field_from_literal_value lit in
+      let* f = env.builder.create_field_from_literal_value lit in
       CONST_TABLE.add env.const_fields ~&lit f;
       Ok f
 
-let make_literal env lit =
-  let* f = literal_field lit env in
-  Ok (Field_constant f)
+let literal: _ env -> literal with_loc -> _ = fun env lit ->
+  match Cobol_data.Literal.value lit with
+  | Ok lit ->
+      let* f = immediate lit env in
+      Ok (Field_constant f)
+  | Error errs ->
+      data_errors errs
+
+let strlit: _ env -> strlit with_loc -> _ = fun env lit ->
+  literal env (Cobol_ptree.UPCAST.strlit'_as_literal' lit)
+
+let nonnumlit: _ env -> nonnumlit with_loc -> _ = fun env lit ->
+  literal env (Cobol_ptree.UPCAST.nonnum'_as_literal' lit)
 
 let resolve_qualname env qn =
   try
@@ -89,9 +100,7 @@ let resolve_term: type k. _ env -> k term with_loc -> _ = fun env t ->
   | StrConcat _
   | Concat _
   | National _ as lit ->
-      (match Cobol_data.Literal.value (lit &@<- t) with
-       | Ok lit -> make_literal env lit
-       | Error _ -> error @@ Unsupported { stuff = Term ~&t; loc = ~@t })
+      literal env (lit &@<- t)
   | Address _
   | Counter _
   | InlineCall _
