@@ -61,7 +61,7 @@ let () =
 
 let log : ( 'a, unit, string, unit) format4 -> 'a =
   let f fmt =
-    Printf.kprintf (fun s ->
+    Printf.ksprintf (fun s ->
         match !oc with
         | None -> ()
         | Some oc ->
