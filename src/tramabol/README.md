@@ -17,7 +17,7 @@ Please refer to [the changelog](CHANGELOG.md) for its current implementation sta
 
 4. Install OCaml dependencies:
    ```shell
-   make build-deps
+   make dev-deps
    ```
 
 5. Install GnuCOBOL4 dependencies.
