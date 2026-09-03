@@ -17,10 +17,17 @@ Please refer to [the changelog](CHANGELOG.md) for its current implementation sta
 
 4. Install OCaml dependencies:
    ```shell
-   make build-deps
+   make dev-deps
    ```
 
-5. Configure and build GnuCOBOL4:
+5. Install GnuCOBOL4 dependencies.
+
+   On a Debian system you can achieve this with:
+   ```shell
+   sudo apt install build-essential automake flex bison help2man texinfo wget libgmp-dev libdb-dev libncurses-dev
+   ```
+
+6. Configure and build GnuCOBOL4:
    ```shell
    mkdir _gc4
    cd import/gnucobol4
@@ -34,7 +41,7 @@ Please refer to [the changelog](CHANGELOG.md) for its current implementation sta
 
    **Note 2**: another issue may occur at link stage where a symbol from `libreadline` is not found.  Passing `LDFLAGS="-lreadline"` is a valid workaround here.
 
-6. Build and test the interpreter:
+7. Build and test the interpreter:
    ```shell
    make GNUCOBOL4_COB_CONFIG=$PWD/_gc4/bin/cob-config tramabol-interpreter
    LD_LIBRARY_PATH=$PWD/_gc4/lib:$LD_LIBRARY_PATH ./tramabol-linux-x64 test/tramabol/01-termio.t/hello-world.cob
