@@ -167,8 +167,8 @@ let fold_table_data_value (v: _ #folder) =
                           table_data_from;
                           table_data_to } x -> x
       >> fold_with_loc_list ~fold:fold_literal v table_data_values
-      >> fold_list ~fold:fold_subscript v table_data_from
-      >> fold_list ~fold:fold_subscript v table_data_to
+      >> fold_list ~fold:fold_subscript' v table_data_from
+      >> fold_list ~fold:fold_subscript' v table_data_to
     end
 
 let fold_data_value_clause (v: _ #folder) =

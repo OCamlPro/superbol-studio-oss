@@ -13,21 +13,26 @@
 
 open Types
 
+open Cir_builder.Syntax
+
+let pp_unit ~builder ppf unit =
+  let* m = Cir_builder.Module.of_cobol_unit ~builder unit in
+  Pretty.print ppf "@[%a@]@\n" Types.pp_module_handle m;
+  Ok ()
+
+(* --- *)
+
 let pp_libcob_error ppf = function
   | Ezlibcob.V1.IntegerOverflow ->
       Pretty.print ppf "integer@ overflow"
 
-let pp_errors ppf = function
+let pp_errors ?platform ppf = function
   | Initialization_errors errors ->
-      Cobol_common.Basics.NEL.iter ~f:begin fun e ->
-        Pretty.print ppf "Error: @[%a@]@."
-          Cir_builder.Printer.pp_error e;
-      end errors
+      Cir_builder.Printer.pp_errors ?platform ppf errors
   | Runtime_errors errors ->
-      Cobol_common.Basics.NEL.iter ~f:begin fun e ->
-        Pretty.print ppf "Error: @[%a@]@."
-          Cir_logic.Printer.pp_runtime_error e;
-      end errors
+      Cir_logic.Printer.pp_localized_runtime_errors ?platform ppf errors
+
+(* --- *)
 
 let register_printers () =
 
@@ -45,8 +50,8 @@ let register_printers () =
         Pretty.print ppf "Empty@ compilation@ group@ given"
     | Invalid_compilation_group { reason = `non_singleton_group } ->
         Pretty.print ppf "Multiple@ units@ found@ in@ compilation@ group"
-    | Ezlibcob_build_error e ->
-        pp_libcob_error ppf e
+    | Ezlibcob_build_error { error; _ } ->
+        pp_libcob_error ppf error
     | _ ->
         raise Exit
   end;
@@ -59,11 +64,18 @@ let register_printers () =
   end;
 
   Cir_logic.Printer.register_runtime_error_printer begin fun ppf -> function
+    | Ezlibcob_runtime_error e ->
+        pp_libcob_error ppf e
+    | Invalid_field_type { expected_descr; got } ->
+        ignore got;                                                (* for now *)
+        Pretty.print ppf "Invalid@ data-type@ encountered@ (%a@ expected)"
+          Fmt.text expected_descr
     | Module_reinitialzation { module_name } ->
         Pretty.print ppf "Invalid@ reinitialization@ of@ module@ `%s'"
           module_name
-    | Ezlibcob_runtime_error e ->
-        pp_libcob_error ppf e
+    | Table_index_out_of_bounds { index_given; index_min; index_max } ->
+        Pretty.print ppf "Index@ is@ out@ of@ bounds:@;got@ %d,@ expected@ in@ \
+                          [%d..%d]" index_given index_min index_max
     | _ ->
         raise Exit
   end

@@ -29,35 +29,60 @@ let register_unsupported_stuff_printer, pp_unsupported_stuff =
 let register_error_printer, pp_error =
   printers_for_extended_type "Cir_builder.Types.error"
 
-let pp_undefined_stuff: undefined_stuff Pretty.printer = fun ppf -> function
-  | Data_reference qn ->
-      Pretty.print ppf "data-name@ %a" Cobol_ptree.pp_qualname qn
-
 let pp_ambiguous_stuff: ambiguous_stuff Pretty.printer = fun ppf -> function
   | Data_reference qn ->
-      Pretty.print ppf "data-name@ %a" Cobol_ptree.pp_qualname qn
+      Pretty.print ppf "data-name@ '%a'" Cobol_ptree.pp_qualname qn
+
+let pp_extraneous_stuff: extraneous_stuff Pretty.printer = fun ppf -> function
+  | Data_reference_subscripts { qn; amount } ->
+      Pretty.print ppf "subscript%s@ for@ data-name@ '%a'"
+        (if amount = 1 then "" else "s") Cobol_ptree.pp_qualname qn
+
+let pp_missing_stuff: missing_stuff Pretty.printer = fun ppf -> function
+  | Data_reference_subscripts { qn; amount } ->
+      Pretty.print ppf "%u@ subscript%s@ for@ data-name@ '%a'"
+        amount (if amount = 1 then "" else "s") Cobol_ptree.pp_qualname qn
+
+let pp_undefined_stuff: undefined_stuff Pretty.printer = fun ppf -> function
+  | Data_reference qn ->
+      Pretty.print ppf "data-name@ '%a'" Cobol_ptree.pp_qualname qn
+
+let pp_errors ?platform ppf errors =
+  NEL.iter ~f:begin fun e ->
+    Option.iter begin fun loc ->
+      Cobol_common.Srcloc.pp_srcloc_with_optional_caret ?platform ppf loc;
+    end (Error.loc e);
+    Pretty.print ppf "Error: @[%a@]@\n" pp_error e
+  end errors
+
+(* --- *)
 
 let register_printers () =
+
   register_unsupported_stuff_printer begin fun ppf -> function
     | Statement _ ->
         Pretty.print ppf "statement"
     | Term t ->
         Pretty.print ppf "term@ %a" Cobol_ptree.pp_term t
-    | Field_in_occurs ->
-        Pretty.print ppf "field@ in@ OCCURS"
     | Variable_length_field ->
         Pretty.print ppf "variable-length field"
+    | Dynamic_table ->
+        Pretty.print ppf "dynamic-capacity table"
     | _ ->
         raise Exit
   end;
 
   register_error_printer begin fun ppf -> function
-    | Unsupported { stuff; _ } ->
-        Pretty.print ppf "Unsupported@ %a" pp_unsupported_stuff stuff
-    | Undefined { stuff; _ } ->
-        Pretty.print ppf "Undefined@ %a" pp_undefined_stuff stuff
     | Ambiguous { stuff; _ } ->
-        Pretty.print ppf "Ambiguous@ %a" pp_ambiguous_stuff stuff
+        Pretty.print ppf "ambiguous@ %a" pp_ambiguous_stuff stuff
+    | Extraneous { stuff; _ } ->
+        Pretty.print ppf "extraneous@ %a" pp_extraneous_stuff stuff
+    | Missing { stuff; _ } ->
+        Pretty.print ppf "missing@ %a" pp_missing_stuff stuff
+    | Unsupported { stuff; _ } ->
+        Pretty.print ppf "unsupported@ %a" pp_unsupported_stuff stuff
+    | Undefined { stuff; _ } ->
+        Pretty.print ppf "undefined@ %a" pp_undefined_stuff stuff
     | Data_error e ->
         Cobol_data.Printer.pp_error ppf e
     | _ ->

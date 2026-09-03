@@ -12,7 +12,7 @@
 (**************************************************************************)
 
 val init
-  : vm:('f, _, 'm, 's) Types.manager
-  -> ('f, 'm) Cir_types.module_handle
+  : vm:('f, 'r, 'm, 's, 'branch) Types.manager
+  -> ('f, 'r, 'm) Cir_types.module_handle
   -> 's
   -> 's Types.evaluation_result

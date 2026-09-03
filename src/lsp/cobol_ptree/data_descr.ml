@@ -577,8 +577,8 @@ type data_value_clause =
 and table_data_value =
   {
     table_data_values: literal with_loc list;                    (* non-empty *)
-    table_data_from: subscript list;                             (* non-empty *)
-    table_data_to: subscript list;
+    table_data_from: subscript with_loc list;                    (* non-empty *)
+    table_data_to: subscript with_loc list;
   }
 [@@deriving ord]
 
@@ -586,10 +586,10 @@ let pp_table_data_value ppf
     { table_data_values = tdv; table_data_from = tdf; table_data_to = tdt } =
   Fmt.pf ppf "%a@ FROM@ %a%a"
     Fmt.(list ~sep:sp pp_literal') tdv
-    Fmt.(list ~sep:sp pp_subscript) tdf
+    Fmt.(list ~sep:sp @@ pp_with_loc pp_subscript) tdf
     Fmt.(if tdt == []
          then nop
-         else any "@ TO@ " ++ list ~sep:sp pp_subscript) tdt
+         else any "@ TO@ " ++ list ~sep:sp (pp_with_loc pp_subscript)) tdt
 
 let pp_data_value_clause ppf = function
   | ValueData lit ->

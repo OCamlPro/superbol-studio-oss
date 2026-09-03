@@ -33,12 +33,12 @@ let translate_display_statement env stmt =
   let* rev_fields =
     List.fold_left begin fun acc { display_items; _ } ->
       List.fold_left begin fun acc term ->
-        let* field = Env.resolve_term env term and* acc in
+        let* field = Expr.resolve_term env term and* acc in
         Ok (field :: acc)
       end acc display_items
     end (Ok []) ~&stmt.display_items_clauses
   in
-  Ok [IR_display { fields = Array.of_list @@ List.rev rev_fields;
+  Ok [IR_display { data_refs = Array.of_list @@ List.rev rev_fields;
                    advancing = not ~&stmt.no_advancing } &@<- stmt]
 
 let translate_stop_statement env stmt =
@@ -46,7 +46,7 @@ let translate_stop_statement env stmt =
   | StopRun None ->
       Ok [IR_stop { optional_status = None } &@<- stmt]
   | StopArg Some StopWithQualIdent ident ->
-      let* f = Env.resolve_term env ident in
+      let* f = Expr.resolve_term env ident in
       Ok [IR_stop { optional_status = Some f } &@<- stmt]
   | StopRun Some _
   | StopArg _
@@ -54,7 +54,7 @@ let translate_stop_statement env stmt =
   | StopThread _ ->
       error @@ Unsupported { stuff = Statement (Stop ~&stmt); loc = ~@stmt }
 
-let translate_procedure env (p: procedure) : (_ code_block, _) result =
+let translate env (p: procedure) : (_ code_block, _) result =
   let append_statements acc r = append_lists r acc in
   let* core_statements =
     Cobol_unit.Visitor.fold_procedure (object

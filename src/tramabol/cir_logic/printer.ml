@@ -31,6 +31,24 @@ let (register_runtime_operation_printer: runtime_operation Pretty.printer -> uni
     pp_runtime_operation =
   printers_for_extended_type "Cir_logic.Types.runtime_operation"
 
+let pp_runtime_errors ?platform ppf errors =
+  NEL.iter ~f:begin fun e ->
+    Option.iter begin fun loc ->
+      Cobol_common.Srcloc.pp_srcloc_with_optional_caret ?platform ppf loc;
+    end (Error.loc e);
+    Pretty.print ppf "Error: @[%a@]@\n"
+      pp_runtime_error e
+  end errors
+
+let pp_localized_runtime_errors ?platform ppf errors =
+  NEL.iter ~f:begin fun { loc; error } ->
+    Option.iter begin fun loc ->
+      Cobol_common.Srcloc.pp_srcloc_with_optional_caret ?platform ppf loc;
+    end loc;
+    Pretty.print ppf "Error: @[%a@]@\n"
+      pp_runtime_error error
+  end errors
+
 (* --- *)
 
 let register_printers () =

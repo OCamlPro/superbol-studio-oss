@@ -11,60 +11,37 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* module LIST = Cobol_common.Basics.LIST *)
+open Types
 
-(* let fatal e = *)
-(*   raise @@ Types.FATAL e *)
+(* --- *)
 
-(* let cons_error r acc = *)
-(*   match r, acc with *)
-(*   | Ok r, Ok acc -> *)
-(*       Ok (r :: acc) *)
-(*   | Ok _, Error _ -> *)
-(*       acc *)
-(*   | Error e, Ok _ -> *)
-(*       Error (Types.NEL.one e) *)
-(*   | Error e, Error e' -> *)
-(*       Error (e :: e') *)
+let localize_errors ~loc =
+  Result.map_error @@ NEL.map ~f:begin fun error ->
+    match error.loc with
+    | None -> { error with loc = Some loc }
+    | Some _ -> error
+  end
 
-(* let cons_errors r acc = *)
-(*   match r, acc with *)
-(*   | Ok r, Ok acc -> *)
-(*       Ok (r :: acc) *)
-(*   | Ok _, acc -> *)
-(*       acc *)
-(*   | Error e, Ok _ -> *)
-(*       Error e *)
-(*   | Error e, Error e' -> *)
-(*       Error (Types.NEL.append e e') *)
+(* --- *)
 
-(* let append_lists r acc = *)
-(*   match r, acc with *)
-(*   | Ok r, Ok acc -> *)
-(*       Ok (LIST.append r acc) *)
-(*   | Ok _, acc -> *)
-(*       acc *)
-(*   | Error e, Ok _ -> *)
-(*       Error e *)
-(*   | Error e, Error e' -> *)
-(*       Error (Types.NEL.append e e') *)
+let loc_retriever_for_extended_type () =
+  let l = ref [] in
+  (fun (g: _ -> Cobol_common.Srcloc.TYPES.srcloc option) -> l := g :: !l),
+  (fun e ->
+     let rec aux = function
+       | [] -> None
+       | g :: tl -> match g e with None -> aux tl | Some _ as res -> res
+     in
+     aux !l)
 
-(* let acc_error r acc = *)
-(*   match r, acc with *)
-(*   | Ok (), Ok () -> *)
-(*       Ok () *)
-(*   | Ok (), acc -> *)
-(*       acc *)
-(*   | Error e, Ok () -> *)
-(*       Error (Types.NEL.one e) *)
-(*   | Error e, Error e' -> *)
-(*       Error (e :: e') *)
+let register_runtime_error_loc_retriever, loc =
+  loc_retriever_for_extended_type ()
 
-let acc_errors r s =
-  match r, s with
-  | Ok (), Ok () ->
-      Ok ()
-  | Ok (), x | x, Ok () ->
-      x
-  | Error e, Error e' ->
-      Error (Types.NEL.append e e')
+let register_loc_retrievers () =
+
+  register_runtime_error_loc_retriever begin function
+    | Unsupported_runtime_operation _ ->
+        None
+    | _ ->
+        None
+  end

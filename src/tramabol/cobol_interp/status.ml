@@ -11,16 +11,24 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cir_logic.Types
 open Types
 
 module NEL = Cobol_common.Basics.NEL
 
 let ok x = Ok x
-let errors e = Error e
-let error e = errors (NEL.one e)
-let lift_ezlibcob_build_error = function
+let build_error e = Error (NEL.one e)
+let lift_ezlibcob_build_error ?loc = function
   | Ok _ as x -> x
-  | Error e -> error (Ezlibcob_build_error e)
-let lift_ezlibcob_runtime_error s = function
-  | Ok x -> Ok (s, x)
-  | Error e -> error (Ezlibcob_runtime_error e)
+  | Error e -> build_error @@ Ezlibcob_build_error { loc; error = e }
+let runtime_error ?loc error = Error (NEL.one { loc; error })
+let lift_ezlibcob_runtime_error ?loc = function
+  | Ok x -> Ok x
+  | Error e -> runtime_error ?loc @@ Ezlibcob_runtime_error e
+
+let union a b =
+  match a, b with
+  | Ok (), e | e, Ok () ->
+      e
+  | Error e, Error e' ->
+      Error (NEL.append e' e)

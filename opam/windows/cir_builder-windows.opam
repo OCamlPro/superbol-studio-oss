@@ -55,6 +55,7 @@ depends: [
   "pretty-windows" {= version}
   "cobol_unit-windows" {= version}
   "cobol_data-windows" {= version}
+  "cobol_common-windows" {= version}
   "cir_types-windows" {= version}
   "odoc" {with-doc}
   "dune" {>= "3.17.0" & < "3.19.0"}

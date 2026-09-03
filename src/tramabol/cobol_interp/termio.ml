@@ -12,8 +12,10 @@
 (**************************************************************************)
 
 open Ezlibcob.V1
+open Cir_logic.Types
+open Types
 
-let display_fields ~vm ~advancing (fields: Types.cob_field_handle array) state =
+let display_fields ~vm:_ ~advancing (fields: cob_field array) state =
   cob_display S32.zero (if advancing then S32.one else S32.zero)
-    (Field.values ~vm fields);
-  Ok state
+    ((* Array.map (Field.value ~vm)  *)fields);
+  Ok (Continue state)

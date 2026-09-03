@@ -21,7 +21,7 @@ let ( and* ) r s =
   match r, s with
   | Ok r, Ok s -> Ok (r, s)
   | Error e, Ok _ |  Ok _, Error e -> Error e
-  | Error e, Error f -> Error Types.NEL.(append e f)
+  | Error e, Error f -> Error Types.NEL.(append f e)
 let ( and+ ) = ( and* )
 (* let ( and*^ ) r s = *)
 (*   match r, s with *)

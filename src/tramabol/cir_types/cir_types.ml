@@ -22,7 +22,6 @@
 open Cobol_common.Srcloc.TYPES
 
 module NEL = Cobol_common.Basics.NEL
-module SYMBOL = Cir_symbol
 
 (* --- *)
 
@@ -31,36 +30,61 @@ module SYMBOL = Cir_symbol
     Representations are parametric in the type ['f] of field values, as well as
     the type ['r] of record memory. *)
 
-(** Manipulated COBOL fields may either be constant or lie in memory. *)
-type 'f field =
-  | Field_constant of 'f immutable_field
-  | Field_in_memory of 'f mutable_field
-  (* Decimal_field? *)
-
-(** A field in memory is addressable and may have an initial value.  It always
-    comes from a definition in a COBOL source. *)
-and 'f mutable_field =
-  {                               (* CHECKME: may we need the record handle?  *)
-    field_value: 'f addressable_field;
-    field_initial_value: 'f immutable_field option;
-    field_definition: Cobol_data.Types.field_definition with_loc;
+(** General-purpose reference to a data field; comes with a source location. *)
+type 'f data_reference =
+  {
+    field_ref: 'f field;
+    field_ref_loc: srcloc [@opaque];
   }
 
-(** Adressable fields may either be fixed, or require subscript data. *)
-and 'f addressable_field =
-  | Fixed_field of 'f                       (* field with constant offset/size *)
-(* TODO: | Occur_field of ... *)
+(** Manipulated COBOL fields may either be constant or lie in memory. *)
+and 'f field =
+  | Constant_field of 'f immutable_field
+  | Field_in_memory of
+      {
+        field: 'f resolved_field;
+        field_info: 'f field_definition_info;
+      } (** A field for which we can compute the location in the record. *)
+(* Decimal_field? *)
 
 (** We directly map immutable fields with their value representation. *)
 and 'f immutable_field =
-  'f                                                                (* for now *)
+  'f
 
-(** Handle for record memory; we just keep the definition. *)
+(** A field in memory is addressable and may have an initial value.  It always
+    comes from a definition in a COBOL source. *)
+and 'f field_definition_info =
+  {                               (* CHECKME: may we need the record handle?  *)
+    field_definition:
+      Cobol_data.Types.field_definition with_loc
+      [@printer Cobol_data.Printer.pp_field_definition'];
+    field_initial_value: 'f immutable_field option;
+  }
+
+(** Resolved fields may either be fixed, or require access to already known
+    indexing data. *)
+and 'f resolved_field =
+  | Fixed_field of 'f
+  | Table_field of 'f resolved_table_cell
+
+and 'f resolved_table_cell =
+  {
+    cell_first_field: 'f resolved_field;
+    cell_index_field: 'f data_reference;
+    cell_index_max: int;
+    cell_stride: int;
+  }
+
+(** Handle for record memory: associates a memory with its definition. *)
 and 'r record_handle =
   {
     record_memory: 'r;
-    record_definition: Cobol_data.Types.record;
+    record_definition:
+      Cobol_data.Types.record
+      [@printer Cobol_data.Printer.pp_record];
   }
+
+[@@deriving show { with_path = false }]
 
 (** {2 Module representation}
 
@@ -71,26 +95,67 @@ module FIELDS_MAP = Cobol_unit.Resolver_map
 
 (** Named fields are always associated with fields that lie in memory (immutable
     fields typically come from literals in source programs). *)
-type 'f fields_map = 'f mutable_field FIELDS_MAP.t
+type 'f fields_map = 'f field_access FIELDS_MAP.t
+
+and 'f field_access =
+  (* TODO: use a struct with optional ranges... *)
+  | Direct_access of 'f fixed_mutable_field
+  | Indirect_access of
+      {
+        base_field: 'f fixed_mutable_field;
+        ranges: 'f access_range NEL.t;
+      }
+
+(** A field that is at a fixed location in a record. *)
+and 'f fixed_mutable_field =
+  {
+    fixed_field: 'f;
+    fixed_field_info: 'f field_definition_info;
+  }
+
+and 'f access_range =
+  | Fixed_range of
+      {
+        max: int;
+      }
+  | Depending_range of
+      {
+        min: int;
+        max: int;
+        odo_field: 'f fixed_mutable_field;
+      }
+
+[@@deriving show { with_path = false }]
+
+let pp_fields_map pe =
+  FIELDS_MAP.pp @@ pp_field_access pe
 
 (** Structure that gathers elements from the DATA DIVISION of a module. *)
-type 'f fields_data =
+type ('f, 'r) data =
   {
-    map: 'f fields_map;
-    working_storage: 'f mutable_field list;
-    local_storage: 'f mutable_field list;
+    map: 'f fields_map [@opaque];
+    working_storage: ('f, 'r) memory_storage;
+    local_storage: ('f, 'r) memory_storage;
   }
+
+and ('f, 'r) memory_storage =
+  {
+    storage_records: 'r record_handle list;
+    storage_fields: 'f field_access list;
+  }
+
+[@@deriving show { with_path = false }]
 
 (** High-level statements for the PROCEDURE DIVISION. *)
 type 'f statement =
   | IR_display of                   (* Note: may actually branch on exception *)
       {
-        fields: 'f field array;
+        data_refs: 'f data_reference array;
         advancing: bool;
       }
   | IR_stop of
       {
-        optional_status: 'f field option;
+        optional_status: 'f data_reference option;
       }
   (* | IR_local_bind of                                             (\* SSA value *\) *)
   (*     { *)
@@ -113,14 +178,17 @@ type 'f statement =
 and 'f code_block =
   'f statement with_loc list                                        (* for now *)
 
-[@@derining show]
+[@@deriving show { with_path = false }]
 
-type ('f, 'm) module_handle =
+type ('f, 'r, 'm) module_handle =
   {
-    module_memory: 'm;
-    module_unit: Cobol_unit.Types.t;
-    module_fields: 'f fields_data;
+    module_memory: 'm (* [@opaque] *);
+    module_unit: Cobol_unit.Types.t
+                  (* [@printer Cobol_unit.Printer.pp_cobol_unit']) *)[@opaque];
+    module_data: ('f, 'r) data;
     module_proc: 'f code_block;                           (* one block for now *)
   }
+
+[@@deriving show { with_path = false }]
 
 (* --- *)

@@ -12,6 +12,6 @@
 (**************************************************************************)
 
 val of_cobol_unit
-  : builder:('f, 'r, 'm) Types.value_builder
+  : builder:('f, 'r, 'm) Types.builder
   -> Cobol_unit.Types.t
-  -> (('f, 'm) Cir_types.module_handle, Types.errors) result
+  -> (('f, 'r, 'm) Cir_types.module_handle, Types.errors) result
