@@ -30,19 +30,12 @@ let of_cobol_unit ~builder (unit: Cobol_unit.Types.t) =
     builder.create_module_memory ~name:~&(~&unit.unit_name)
       ~source_file:(unit_source_file unit)
   in
-  let* module_fields = Data_builder.create_fields_map ~builder ~&unit.unit_data in
-  let env =
-    Env.TYPES.{
-      named_fields = module_fields.map;
-      const_fields = CONST_TABLE.create 42;
-      builder;
-    }
-  in
-  let* proc = Proc_builder.translate_procedure env ~&unit.unit_procedure in
+  let* module_data = Storage.create ~builder ~&unit.unit_data in
+  let env = { named_fields = module_data.map; builder } in
+  let* proc = Procedure.translate env ~&unit.unit_procedure in
   Ok {
     module_memory;
     module_unit = unit;
-    module_fields;
+    module_data;
     module_proc = proc;
-    (* module_initialized = false; *)
   }

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
-(*  Copyright (c) 2026 OCamlPro SAS                                       *)
+(*  Copyright (c)      2026 OCamlPro SAS                                  *)
 (*                                                                        *)
 (* All rights reserved.                                                   *)
 (* This source code is licensed under the GNU Affero General Public       *)
@@ -13,14 +13,13 @@
 
 open Types
 
-(* --- *)
+let one e = Error (NEL.one e)
 
-let localize_errors ~loc =
-  Result.map_error @@ NEL.map ~f:begin fun error ->
-    match error.loc with
-    | None -> { error with loc = Some loc }
-    | Some _ -> error
-  end
+let extra stuff ~locs =
+  one @@ Extraneous { stuff; locs }
+
+let missing stuff ~loc =
+  one @@ Missing { stuff; loc }
 
 (* --- *)
 
@@ -34,14 +33,21 @@ let loc_retriever_for_extended_type () =
      in
      aux !l)
 
-let register_runtime_error_loc_retriever, loc =
+let register_error_loc_retriever, loc =
   loc_retriever_for_extended_type ()
 
 let register_loc_retrievers () =
 
-  register_runtime_error_loc_retriever begin function
-    | Unsupported_runtime_operation _ ->
-        None
+  register_error_loc_retriever begin function
+    | Ambiguous { loc; _ }
+    | Missing { loc; _ }
+    | Undefined { loc; _ }
+    | Unsupported { loc; _ } ->
+        Some loc
+    | Extraneous { locs; _ } ->
+        Cobol_common.Srcloc.concat_srclocs @@ NEL.to_list locs  (* never None *)
+    | Data_error e ->
+        Some (Cobol_data.Error.loc e)
     | _ ->
         None
   end

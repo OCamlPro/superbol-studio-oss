@@ -2338,8 +2338,8 @@ let subscript_following [@recovery SubSAll] [@symbol "<subscript>"] [@cost 0] :=
  | i = name; s = sign; offset = integer; {SubSIdx (i, s, offset): subscript}
 
 let subscripts [@recovery []] [@symbol "<subscripts>"] [@cost 0] :=
- | "("; s = subscript_first; sl = rnel(subscript_following); ")"; { s::sl }
- | "("; s = subscript_first; ")";                                 { [s] }
+ | "("; s = loc(subscript_first); sl = rnel(loc(subscript_following)); ")"; { s::sl }
+ | "("; s = loc(subscript_first); ")";                                      { [s] }
 
 let function_name [@recovery_with_pos dummy_name] [@symbol "<function-name>"]
                   [@completion FunctionName] :=

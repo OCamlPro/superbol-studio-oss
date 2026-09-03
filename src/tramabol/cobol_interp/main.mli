@@ -11,5 +11,26 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val unit: Cobol_unit.Types.t -> (int, Types.errors) result
-val group: Cobol_unit.Types.group -> (int, Types.errors) result
+open Types
+
+val default_options: options
+
+val run_unit
+  : ?options: options
+  -> Cobol_unit.Types.t
+  -> (int, errors) result
+val run_group
+  : ?options: options
+  -> Cobol_unit.Types.group
+  -> (int, errors) result
+
+val print_unit
+  : ?options: options
+  -> Format.formatter
+  -> Cobol_unit.Types.t
+  -> (state, Cir_builder.Types.errors) result
+val print_group
+  : ?options: options
+  -> Format.formatter
+  -> Cobol_unit.Types.group
+  -> (state, Cir_builder.Types.errors) result

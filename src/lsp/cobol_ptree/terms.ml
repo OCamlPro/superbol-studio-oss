@@ -413,7 +413,7 @@ and effective_arg =                  (* TODO: could be an [expr with_loc option]
 and qualident =
   {
     ident_name: qualname with_loc;
-    ident_subscripts: subscript list;
+    ident_subscripts: subscript with_loc list;
   }
 
 and subscript =
@@ -655,8 +655,9 @@ module COMPARE = struct
       { ident_name = a; ident_subscripts = c }
       { ident_name = b; ident_subscripts = d } =
     compare_struct (compare_with_loc compare_term a b) @@
-    lazy (List.compare compare_subscript c d)
-  and compare_subscript x y = match x,y with
+    lazy (List.compare compare_subscript' c d)
+  and compare_subscript' x y = compare_subscript ~&x ~&y
+  and compare_subscript x y = match x, y with
     | SubSExpr a ,SubSExpr b ->
         compare_expr' a b
     | SubSIdx(n1, s1, i1),
@@ -870,7 +871,8 @@ module FMT = struct
   and pp_qualident ppf { ident_name = n; ident_subscripts } =
     pp_qualname' ppf n;
     if ident_subscripts <> []
-    then fmt "@[<1>(%a)@]" ppf (list ~sep:comma pp_subscript) ident_subscripts
+    then fmt "@[<1>(%a)@]" ppf (list ~sep:comma @@ pp_with_loc pp_subscript)
+        ident_subscripts
 
   and pp_qualname ppf = pp_term ppf
   and pp_qualname' ppf = pp_with_loc pp_qualname ppf

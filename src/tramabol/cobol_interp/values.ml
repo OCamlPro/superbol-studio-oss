@@ -13,13 +13,15 @@
 
 open Types
 
-let builder: value_builder =
+let builder ~options : builder =
   Cir_builder.Types.{
     create_record_data = Record.create;
-    create_mutable_field = Field.in_record_memory;
-    create_field_from_literal_value = Field.from_literal_value;
+    create_field_from_definition = Field.from_definition;
+    create_field_from_literal_value = Field.from_literal_value ~options;
 
     create_module_memory = Module.create;
+
+    const_fields = CONST_TABLE.create 42;
   }
 
 let manager: manager =
@@ -30,7 +32,12 @@ let manager: manager =
     module_ws_initialization_done = Module.ws_initialization_done;
 
     init_field = Field.init;
-    field_as_int = Field.as_int;
+    field_value = Field.access;
 
     display_fields = Termio.display_fields;
+
+    stop = Control.stop;
+
+    proceed = Result.ok; (* always proceed; "our" branch type is the same as in
+                            Cir_logic. *)
   }

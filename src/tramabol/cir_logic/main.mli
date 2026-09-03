@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
-(*  Copyright (c) 2022-2026 OCamlPro SAS                                  *)
+(*  Copyright (c) 2026 OCamlPro SAS                                       *)
 (*                                                                        *)
 (* All rights reserved.                                                   *)
 (* This source code is licensed under the GNU Affero General Public       *)
@@ -11,9 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type t
-val reset: unit -> unit
-val fresh: base:string -> t
-val pp: t Pretty.printer
-include Hashtbl.HashedType with type t := t
-include Set.OrderedType with type t := t
+val run_module
+  : vm:('a, 'b, 'c, 'd, 'branch) Types.manager
+  -> ('a, 'b, 'c) Cir_types.module_handle
+  -> 'd
+  -> ('d * int, Types.localized_runtime_errors) result

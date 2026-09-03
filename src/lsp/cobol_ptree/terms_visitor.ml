@@ -45,6 +45,7 @@ class ['a] folder = object
   method fold_object_view_spec: (object_view_spec, 'a) fold = default
   method fold_object_ref: (object_ref, 'a) fold = default
   method fold_subscript: (subscript, 'a) fold = default
+  method fold_subscript': (subscript with_loc, 'a) fold = default
   method fold_refmod: (refmod, 'a) fold = default
   method fold_sign: (sign, 'a) fold = default
   method fold_signz: (signz, 'a) fold = default
@@ -230,7 +231,7 @@ and fold_qualident (v: _ #folder) =
   handle v#fold_qualident
     ~continue:begin fun { ident_name; ident_subscripts } x -> x
       >> fold_qualname' v ident_name
-      >> fold_list ~fold:fold_subscript v ident_subscripts
+      >> fold_list ~fold:fold_subscript' v ident_subscripts
     end
 
 and fold_qualname (v: _ #folder) =
@@ -253,6 +254,9 @@ and fold_subscript (v: _ #folder) =
       | SubSIdx (n, s, l) ->
           fun x -> x >> fold_name' v n >> fold_sign v s >> fold_integer v l
     end
+
+and fold_subscript' (v: _ #folder) =
+  handle' v#fold_subscript' ~fold:fold_subscript v
 
 and fold_refmod (v: _ #folder) =
   handle v#fold_refmod

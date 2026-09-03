@@ -18,48 +18,58 @@ open Syntax
 
 (* --- *)
 
-type ('f, 'r, 'm, 's) internal_data =
+type ('f, 'r, 'm, 's, 'branch) internal_data =
   {
-    vm: ('f, 'r, 'm, 's) manager;
-    module_handle: ('f, 'm) module_handle;
+    vm: ('f, 'r, 'm, 's, 'branch) manager;
+    module_handle: ('f, 'r, 'm) module_handle;
   }
-
-(* TODO: should appear in functions below, in a parametric way. *)
-type 's computation_state =
-  | Running of 's
-  | Stopping of 's * int                             (* int status... for now? *)
 
 (* --- *)
 
+exception STOP of Types.localized_runtime_errors
+
+let eval_data_ref ~vm state f =
+  Error.localize_errors ~loc:f.field_ref_loc @@
+  vm.field_value ~vm f.field_ref state
+
+let eval_data_refs ~vm state data_refs =
+  try
+    Result.ok @@
+    Array.fold_left_map begin fun state data_ref ->
+      match eval_data_ref ~vm state data_ref with
+      | Ok res -> res
+      | Error errors -> raise (STOP errors)
+    end state data_refs
+  with STOP errors ->
+    Error errors
+
 let rec run_block data state statements =
   match state, statements with
-  | Stopping (state, status), _ ->
+  | Stop (state, status), _ ->
       Ok (state, status)
-  | Running state, [] ->
+  | Continue state, [] ->
       Ok (state, 0)
-  | Running state, stmt :: next_statments ->
+  | Continue state, stmt :: next_statments ->
       let* state = run_statement data state stmt in
       run_block data state next_statments
 
 and run_statement { vm; _ } state stmt =
+  Error.localize_errors ~loc:~@stmt @@
   match ~&stmt with
-  | IR_display { fields; advancing } ->
-      let* state = vm.display_fields ~vm ~advancing fields state in
-      Ok (Running state)
+  | IR_display { data_refs; advancing } ->
+      let* state, field_values = eval_data_refs ~vm state data_refs in
+      let* branch = vm.display_fields ~vm ~advancing field_values state in
+      vm.proceed branch
   | IR_stop { optional_status = None } ->
-      Ok (Stopping (state, 0))
+      let* branch = vm.stop ~vm state in
+      vm.proceed branch
   | IR_stop { optional_status = Some f } ->
-      let* state, status = vm.field_as_int ~vm f state in
-      Ok (Stopping (state, status))
-
-(* and update ~vm { state; flow } = *)
-(*   match flow with *)
-(*   | Result res -> *)
-(*       Ok res *)
-(*   | Exception _  *)
+      let* state, status = eval_data_ref ~vm state f in
+      let* branch = vm.stop ~vm ~status state in
+      vm.proceed branch
 
 let run_proc data block state =
-  run_block data (Running state) block
+  run_block data (Continue state) block
 
 let run_module ~vm module_handle state =
   let* state = Module.init ~vm module_handle state in

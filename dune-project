@@ -1083,6 +1083,7 @@
    (pretty (= :version))
    (cobol_unit (= :version))
    (cobol_data (= :version))
+   (cobol_common (= :version))
    (cir_types (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
