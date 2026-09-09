@@ -74,7 +74,7 @@ ifeq ($(TARGET_PLAT),$(BUILD_PLAT))
     rebuild-package.json package.json: build
 	cp -f package.json package.json.prev
 	./$(SUPERBOL_LSP_BUILT) json vscode --gen package.json
-	diff -u package.json.prev package.json && rm -f package.json.prev 
+	diff -u package.json.prev package.json && rm -f package.json.prev
    endif
 endif
 
@@ -139,7 +139,7 @@ bundle-release: $(JS_TARGETS)
 
 # packaging
 
-.PHONY: vsix-dist-setup vsix-package vsix-debug vsix-release
+.PHONY: vsix-dist-setup vsix-package vsix-debug vsix-release vsix-gdb-target-wrapper
 
 gnucobol-config: $(GNUCOBOL_SRCDIR)/config
 	@mkdir -p $@
@@ -152,8 +152,16 @@ vsix-dist-setup:
 	@mkdir -p _dist
 
 vsix-package: build package.json gnucobol-config $(EXTRA_DIST_TARGETS)
+
+SUPERBOL_DEBUGGER=src/vscode/superbol-debugger
+
+vsix-gdb-target-wrapper:
+	cd $(SUPERBOL_DEBUGGER) && $(CC) $(CCFLAGS) -g ./gdb-target-wrapper.c -o gdb-target-wrapper
+
+vsix-package: build package.json gnucobol-config vsix-gdb-target-wrapper $(EXTRA_DIST_TARGETS)
 #	needs 'make build-debug' or 'make build-release' before
 	$(CP) $(SUPERBOL_LSP_BUILT) _dist/$(SUPERBOL_LSP_EXE)
+	$(CP) $(SUPERBOL_DEBUGGER)/gdb-target-wrapper _dist/
 	$(NPX) vsce package $(VSCE_ARGS) $(VSCE_PACKAGE_ARGS)	\
 		--no-git-tag-version				\
 		--no-update-package-json			\

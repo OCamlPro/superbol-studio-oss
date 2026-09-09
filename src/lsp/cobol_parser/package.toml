@@ -21,8 +21,8 @@ kind = "library"
 # name of a file to generate with the current version
 gen-version = "version.ml"
 
-# supported file generators are "ocamllex", "ocamlyacc" and "menhir"
-# default is [ "ocamllex", "ocamlyacc" ]
+# supported file generators are "ocamllex", "ocamlyacc" and "menhir" 
+# default is [ "ocamllex", "ocamlyacc" ] 
 generators = ["ocamllex"]
 
 # menhir options for the package
@@ -42,7 +42,7 @@ generators = ["ocamllex"]
 # pack = "Mylib"
 
 # preprocessing options
-#  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))"
+#  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
 preprocess = "pps ppx_deriving.show"
 
 # files to skip while updating at package level
@@ -51,35 +51,34 @@ skip = ["main.ml", "index.mld"]
 # package library dependencies
 #   [dependencies]
 #   ez_file = ">=0.1 <1.3"
-#   base-unix = { libname = "unix", version = ">=base" }
+#   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
-cobol_ptree = "version"
 cobol_common = "version"
 cobol_preproc = "version"
+cobol_ptree = "version"
 ebcdic_lib = "version"
 ez_file = ">=0.3"
-# autofonce_lib = { version = ">=0.8", for-test = true }
-
 [dependencies.menhirLib]
 libname = "menhirLib"
 version = ">=20231231 <20240715"
 
 # package tools dependencies
 [tools]
-ppx_deriving = ">=5.2.1"
 menhir = ">=20231231 <20240715"
+ppx_deriving = ">=5.2.1"
 
 # package fields (depends on package skeleton)
 #Examples:
-#  dune-stanzas = "(preprocess (pps ppx_deriving_encoding))"
-#  dune-libraries = "bigstring"
-#  dune-trailer = "(install (..))"
-#  opam-trailer = "pin-depends: [..]"
-#  no-opam-test = "yes"
-#  no-opam-doc = "yes"
-#  gen-opam = "some" | "all"
-#  dune-stanzas = "(flags (:standard (:include linking.sexp)))"
-#  static-clibs = "unix"
+#  dune-stanzas = "(preprocess (pps ppx_deriving_encoding))" 
+#  dune-libraries = "bigstring" 
+#  dune-trailer = "(install (..))" 
+#  opam-trailer = "pin-depends: [..]" 
+#  no-opam-test = "yes" 
+#  no-opam-doc = "yes" 
+#  gen-opam = "some" | "all" 
+#  dune-flags = "(:standard (:include linking.sexp))" 
+#  dune-stanzas = "(foreign_stubs (language c) (names mapfile_stubs))" 
+#  static-clibs = "unix" 
 [fields]
 dune-libraries = "str"
 dune-trailer = """

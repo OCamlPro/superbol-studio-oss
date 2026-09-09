@@ -53,22 +53,20 @@ skip = ["main.ml", "index.mld"]
 #   ez_file = ">=0.1 <1.3"
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
-sql_ast = "version"
-cobol_parser = "version"
 cobol_common = "version"
+cobol_parser = "version"
 cobol_preproc = "version"
 ebcdic_lib = "version"
 ez_file = ">=0.3"
-# autofonce_lib = { version = ">=0.8", for-test = true }
-
+sql_ast = "version"
 [dependencies.menhirLib]
 libname = "menhirLib"
 version = ">=20231231 <20240715"
 
 # package tools dependencies
 [tools]
-ppx_deriving = ">=5.2.1"
 menhir = ">=20230415"
+ppx_deriving = ">=5.2.1"
 
 # package fields (depends on package skeleton)
 #Examples:
@@ -79,7 +77,8 @@ menhir = ">=20230415"
 #  no-opam-test = "yes" 
 #  no-opam-doc = "yes" 
 #  gen-opam = "some" | "all" 
-#  dune-stanzas = "(flags (:standard (:include linking.sexp)))" 
+#  dune-flags = "(:standard (:include linking.sexp))" 
+#  dune-stanzas = "(foreign_stubs (language c) (names mapfile_stubs))" 
 #  static-clibs = "unix" 
 [fields]
 dune-libraries = "str"

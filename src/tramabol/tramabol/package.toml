@@ -68,7 +68,8 @@ tramabol_lib = "version"
 #  no-opam-test = "yes" 
 #  no-opam-doc = "yes" 
 #  gen-opam = "some" | "all" 
-#  dune-stanzas = "(flags (:standard (:include linking.sexp)))" 
+#  dune-flags = "(:standard (:include linking.sexp))" 
+#  dune-stanzas = "(foreign_stubs (language c) (names mapfile_stubs))" 
 #  static-clibs = "unix" 
 [fields]
 dune-flags = "(:standard (:include linking.sexp))"
@@ -90,7 +91,7 @@ dune-trailer = """
 ;(alias
 ; (name build)
 ; (deps (glob_files *.bc.js))
-; (enabled_if (= %{profile} \"universal\")))
+; (enabled_if (= %{profile} "universal")))
 
 
 ; Note: ${GNUCOBOL4_LIBDIR}/libcob-bundle is required when
@@ -123,6 +124,6 @@ dune-trailer = """
       (run sh %{read:../ezlibcob/cob_config} --libs)
       (run sed "s/\\\\\\\\/\\\\\\\\\\\\\\\\/g")))))
 """
+static-alpine-clibs = "zarith gmp bigstringaf_stubs cstruct_stubs"
 static-clibs = "%{read:libcob_libs}"
 static-macos-clibs = "zarith ${MACPORTS:-/usr/local/osxcross/macports/pkgs/opt/local}/lib/libgmp.a camlstr bigstringaf_stubs cstruct_stubs ezlibcob_stubs"
-static-alpine-clibs = "zarith gmp bigstringaf_stubs cstruct_stubs"

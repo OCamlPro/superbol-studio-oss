@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-24865d7547aa5cfc0f6d0ee32936416b:.
+895dda8f8e47c453b04473c65c677198:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -20,7 +20,7 @@ da33ce03322570a859125f4b976aa0f2:.github/workflows/workflow.yml
 
 # begin context for Makefile
 # file Makefile
-9329cd139176803f14ec41f51bc9c2a6:Makefile
+9f72712a2ce02f1e25af2c3931390409:Makefile
 # end context for Makefile
 
 # begin context for docs/README.txt
@@ -42,6 +42,11 @@ e739f3026aa997af4026bc428f4c9ef6:docs/favicon.png
 # file docs/style.css
 c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 # end context for docs/style.css
+
+# begin context for drom.toml
+# file drom.toml
+4789fc454f8eb281f79bc4e147ae45ec:drom.toml
+# end context for drom.toml
 
 # begin context for dune
 # file dune
@@ -234,6 +239,11 @@ f8b3df18b351e3f5b74932b5341fcb1a:opam/sql_ast.opam
 757074847ce9859ae96f0922db617240:opam/sql_preproc.opam
 # end context for opam/sql_preproc.opam
 
+# begin context for opam/superbol-debugger.opam
+# file opam/superbol-debugger.opam
+d2d2a251cdf3f4ef3edd41b0cda2612d:opam/superbol-debugger.opam
+# end context for opam/superbol-debugger.opam
+
 # begin context for opam/superbol-free.opam
 # file opam/superbol-free.opam
 ad108188828092cb8cb80a54f92643aa:opam/superbol-free.opam
@@ -360,6 +370,11 @@ b7bfe2578bc462159b9429fe7969a8e1:src/autofonce/autofonce/dune
 9fdfca3cc53df639758ff04fe09d3243:src/autofonce/autofonce/linking_flags.sh
 # end context for src/autofonce/autofonce/linking_flags.sh
 
+# begin context for src/autofonce/autofonce/package.toml
+# file src/autofonce/autofonce/package.toml
+c2d00104dd4c2a5535252eb8743486ed:src/autofonce/autofonce/package.toml
+# end context for src/autofonce/autofonce/package.toml
+
 # begin context for src/autofonce/autofonce/version.mlt
 # file src/autofonce/autofonce/version.mlt
 14bbeb7751d103dc3a35b512a15a52ce:src/autofonce/autofonce/version.mlt
@@ -374,6 +389,11 @@ f95b772c34f6a20ca833bfccc77579a5:src/autofonce/autofonce_config/dune
 # file src/autofonce/autofonce_config/index.mld
 38ba83daa206e27083401022d7cd4694:src/autofonce/autofonce_config/index.mld
 # end context for src/autofonce/autofonce_config/index.mld
+
+# begin context for src/autofonce/autofonce_config/package.toml
+# file src/autofonce/autofonce_config/package.toml
+f2ab8809523872facaa36a53f07ca108:src/autofonce/autofonce_config/package.toml
+# end context for src/autofonce/autofonce_config/package.toml
 
 # begin context for src/autofonce/autofonce_config/version.mlt
 # file src/autofonce/autofonce_config/version.mlt
@@ -390,6 +410,11 @@ fef0a60de6af404f8f2b4544b3c9e2b1:src/autofonce/autofonce_core/dune
 485662608d7dff3d0a0f30061fcabde2:src/autofonce/autofonce_core/index.mld
 # end context for src/autofonce/autofonce_core/index.mld
 
+# begin context for src/autofonce/autofonce_core/package.toml
+# file src/autofonce/autofonce_core/package.toml
+32473abeadc44d7cfa4e3f9af25e4303:src/autofonce/autofonce_core/package.toml
+# end context for src/autofonce/autofonce_core/package.toml
+
 # begin context for src/autofonce/autofonce_core/version.mlt
 # file src/autofonce/autofonce_core/version.mlt
 14bbeb7751d103dc3a35b512a15a52ce:src/autofonce/autofonce_core/version.mlt
@@ -404,6 +429,11 @@ fef0a60de6af404f8f2b4544b3c9e2b1:src/autofonce/autofonce_core/dune
 # file src/autofonce/autofonce_lib/index.mld
 f9438b301884482620f92d77cf47f3ad:src/autofonce/autofonce_lib/index.mld
 # end context for src/autofonce/autofonce_lib/index.mld
+
+# begin context for src/autofonce/autofonce_lib/package.toml
+# file src/autofonce/autofonce_lib/package.toml
+c234ea6660c7246c2058e09a8015ed97:src/autofonce/autofonce_lib/package.toml
+# end context for src/autofonce/autofonce_lib/package.toml
 
 # begin context for src/autofonce/autofonce_lib/version.mlt
 # file src/autofonce/autofonce_lib/version.mlt
@@ -420,6 +450,11 @@ f9438b301884482620f92d77cf47f3ad:src/autofonce/autofonce_lib/index.mld
 e9951a903e7871c514906279b5ad9fb8:src/autofonce/autofonce_m4/index.mld
 # end context for src/autofonce/autofonce_m4/index.mld
 
+# begin context for src/autofonce/autofonce_m4/package.toml
+# file src/autofonce/autofonce_m4/package.toml
+30edb675791924de66ce884311e97c4a:src/autofonce/autofonce_m4/package.toml
+# end context for src/autofonce/autofonce_m4/package.toml
+
 # begin context for src/autofonce/autofonce_m4/version.mlt
 # file src/autofonce/autofonce_m4/version.mlt
 14bbeb7751d103dc3a35b512a15a52ce:src/autofonce/autofonce_m4/version.mlt
@@ -434,6 +469,11 @@ fe7ce04bc869b44dfa07a44426083575:src/autofonce/autofonce_misc/dune
 # file src/autofonce/autofonce_misc/index.mld
 4a8ff3c4d7aa92b48b85ef7f1cb236f6:src/autofonce/autofonce_misc/index.mld
 # end context for src/autofonce/autofonce_misc/index.mld
+
+# begin context for src/autofonce/autofonce_misc/package.toml
+# file src/autofonce/autofonce_misc/package.toml
+87f7efbdde9ae0e4d3a3f8f5f2911e69:src/autofonce/autofonce_misc/package.toml
+# end context for src/autofonce/autofonce_misc/package.toml
 
 # begin context for src/autofonce/autofonce_misc/version.mlt
 # file src/autofonce/autofonce_misc/version.mlt
@@ -450,6 +490,11 @@ fe7ce04bc869b44dfa07a44426083575:src/autofonce/autofonce_misc/dune
 51a84f8e33f214aa915462db5752fa8d:src/autofonce/autofonce_patch/index.mld
 # end context for src/autofonce/autofonce_patch/index.mld
 
+# begin context for src/autofonce/autofonce_patch/package.toml
+# file src/autofonce/autofonce_patch/package.toml
+482419ec7ee3fc915af203387843ee9e:src/autofonce/autofonce_patch/package.toml
+# end context for src/autofonce/autofonce_patch/package.toml
+
 # begin context for src/autofonce/autofonce_patch/version.mlt
 # file src/autofonce/autofonce_patch/version.mlt
 14bbeb7751d103dc3a35b512a15a52ce:src/autofonce/autofonce_patch/version.mlt
@@ -464,6 +509,11 @@ fe7ce04bc869b44dfa07a44426083575:src/autofonce/autofonce_misc/dune
 # file src/autofonce/autofonce_share/index.mld
 2adae1b0aa85cc7d439651ee752ef666:src/autofonce/autofonce_share/index.mld
 # end context for src/autofonce/autofonce_share/index.mld
+
+# begin context for src/autofonce/autofonce_share/package.toml
+# file src/autofonce/autofonce_share/package.toml
+74f8edc5fa58aae38fb2390389e7ae3e:src/autofonce/autofonce_share/package.toml
+# end context for src/autofonce/autofonce_share/package.toml
 
 # begin context for src/autofonce/autofonce_share/version.mlt
 # file src/autofonce/autofonce_share/version.mlt
@@ -480,6 +530,11 @@ a71df1cb0ebc5794edd35ef71693f95c:src/autofonce/ez_call/dune
 99c27dda73b669abbc2ef14e184b04c7:src/autofonce/ez_call/index.mld
 # end context for src/autofonce/ez_call/index.mld
 
+# begin context for src/autofonce/ez_call/package.toml
+# file src/autofonce/ez_call/package.toml
+d48dc49c8ccdc3d1227265cd75b0fb87:src/autofonce/ez_call/package.toml
+# end context for src/autofonce/ez_call/package.toml
+
 # begin context for src/autofonce/ez_call/version.mlt
 # file src/autofonce/ez_call/version.mlt
 1af92d248bdb11b98ed03eb59c6831e5:src/autofonce/ez_call/version.mlt
@@ -495,6 +550,11 @@ a71df1cb0ebc5794edd35ef71693f95c:src/autofonce/ez_call/dune
 b6a8ea9d6eef15ced32d2934e602ed64:src/autofonce/ez_win32/index.mld
 # end context for src/autofonce/ez_win32/index.mld
 
+# begin context for src/autofonce/ez_win32/package.toml
+# file src/autofonce/ez_win32/package.toml
+aac388121edf9742ecd004075a34b109:src/autofonce/ez_win32/package.toml
+# end context for src/autofonce/ez_win32/package.toml
+
 # begin context for src/autofonce/ez_win32/version.mlt
 # file src/autofonce/ez_win32/version.mlt
 1af92d248bdb11b98ed03eb59c6831e5:src/autofonce/ez_win32/version.mlt
@@ -504,6 +564,11 @@ b6a8ea9d6eef15ced32d2934e602ed64:src/autofonce/ez_win32/index.mld
 # file src/h2mlstubs/dune
 3d574ab8e27b5948e6e8aa5e33e7daf0:src/h2mlstubs/dune
 # end context for src/h2mlstubs/dune
+
+# begin context for src/h2mlstubs/package.toml
+# file src/h2mlstubs/package.toml
+76d154d90b0426af12f545772d662d7f:src/h2mlstubs/package.toml
+# end context for src/h2mlstubs/package.toml
 
 # begin context for src/h2mlstubs/version.mlt
 # file src/h2mlstubs/version.mlt
@@ -515,6 +580,11 @@ b6a8ea9d6eef15ced32d2934e602ed64:src/autofonce/ez_win32/index.mld
 cfee3e13c13fa1890123d30809d7a1a3:src/lsp/cobol_cfg/dune
 # end context for src/lsp/cobol_cfg/dune
 
+# begin context for src/lsp/cobol_cfg/package.toml
+# file src/lsp/cobol_cfg/package.toml
+28c54567764ba342be93440171ac859b:src/lsp/cobol_cfg/package.toml
+# end context for src/lsp/cobol_cfg/package.toml
+
 # begin context for src/lsp/cobol_cfg/version.mlt
 # file src/lsp/cobol_cfg/version.mlt
 1af92d248bdb11b98ed03eb59c6831e5:src/lsp/cobol_cfg/version.mlt
@@ -524,6 +594,11 @@ cfee3e13c13fa1890123d30809d7a1a3:src/lsp/cobol_cfg/dune
 # file src/lsp/cobol_common/dune
 51515bb63dbd9115bb7182de79093ebe:src/lsp/cobol_common/dune
 # end context for src/lsp/cobol_common/dune
+
+# begin context for src/lsp/cobol_common/package.toml
+# file src/lsp/cobol_common/package.toml
+9e8bed01021b6e7ba22182ecff995ae4:src/lsp/cobol_common/package.toml
+# end context for src/lsp/cobol_common/package.toml
 
 # begin context for src/lsp/cobol_common/version.mlt
 # file src/lsp/cobol_common/version.mlt
@@ -535,6 +610,11 @@ cfee3e13c13fa1890123d30809d7a1a3:src/lsp/cobol_cfg/dune
 ee51a53d308eff8484e9ccea75be597b:src/lsp/cobol_config/dune
 # end context for src/lsp/cobol_config/dune
 
+# begin context for src/lsp/cobol_config/package.toml
+# file src/lsp/cobol_config/package.toml
+f32c8ba97d3cdaf1b1bd7b36e72bd2b4:src/lsp/cobol_config/package.toml
+# end context for src/lsp/cobol_config/package.toml
+
 # begin context for src/lsp/cobol_config/version.mlt
 # file src/lsp/cobol_config/version.mlt
 1af92d248bdb11b98ed03eb59c6831e5:src/lsp/cobol_config/version.mlt
@@ -544,6 +624,11 @@ ee51a53d308eff8484e9ccea75be597b:src/lsp/cobol_config/dune
 # file src/lsp/cobol_data/dune
 55c0b5e837779a8ad298f2529f49f3d5:src/lsp/cobol_data/dune
 # end context for src/lsp/cobol_data/dune
+
+# begin context for src/lsp/cobol_data/package.toml
+# file src/lsp/cobol_data/package.toml
+3228673c933fd98a573a7cd3e5730417:src/lsp/cobol_data/package.toml
+# end context for src/lsp/cobol_data/package.toml
 
 # begin context for src/lsp/cobol_data/version.mlt
 # file src/lsp/cobol_data/version.mlt
@@ -555,6 +640,11 @@ ee51a53d308eff8484e9ccea75be597b:src/lsp/cobol_config/dune
 d3b7ae62f945ba98a321709cb807d516:src/lsp/cobol_indent/dune
 # end context for src/lsp/cobol_indent/dune
 
+# begin context for src/lsp/cobol_indent/package.toml
+# file src/lsp/cobol_indent/package.toml
+61a5631ce7ac1f48a31ea0aab528e09d:src/lsp/cobol_indent/package.toml
+# end context for src/lsp/cobol_indent/package.toml
+
 # begin context for src/lsp/cobol_indent/version.mlt
 # file src/lsp/cobol_indent/version.mlt
 1af92d248bdb11b98ed03eb59c6831e5:src/lsp/cobol_indent/version.mlt
@@ -564,6 +654,11 @@ d3b7ae62f945ba98a321709cb807d516:src/lsp/cobol_indent/dune
 # file src/lsp/cobol_indent_old/dune
 95e29a1e4344b6f6db820680fe2b2475:src/lsp/cobol_indent_old/dune
 # end context for src/lsp/cobol_indent_old/dune
+
+# begin context for src/lsp/cobol_indent_old/package.toml
+# file src/lsp/cobol_indent_old/package.toml
+8aa6fb37e13063281858e9b61d570b95:src/lsp/cobol_indent_old/package.toml
+# end context for src/lsp/cobol_indent_old/package.toml
 
 # begin context for src/lsp/cobol_indent_old/version.mlt
 # file src/lsp/cobol_indent_old/version.mlt
@@ -575,6 +670,11 @@ d3b7ae62f945ba98a321709cb807d516:src/lsp/cobol_indent/dune
 7f644cbe5fbc6dd6242f157d8e740a9f:src/lsp/cobol_lsp/dune
 # end context for src/lsp/cobol_lsp/dune
 
+# begin context for src/lsp/cobol_lsp/package.toml
+# file src/lsp/cobol_lsp/package.toml
+d249c168dbda7b9ded2bbe276b476701:src/lsp/cobol_lsp/package.toml
+# end context for src/lsp/cobol_lsp/package.toml
+
 # begin context for src/lsp/cobol_lsp/version.mlt
 # file src/lsp/cobol_lsp/version.mlt
 1af92d248bdb11b98ed03eb59c6831e5:src/lsp/cobol_lsp/version.mlt
@@ -584,6 +684,11 @@ d3b7ae62f945ba98a321709cb807d516:src/lsp/cobol_indent/dune
 # file src/lsp/cobol_parser/dune
 a09fbf74cd655417876e2a1882575268:src/lsp/cobol_parser/dune
 # end context for src/lsp/cobol_parser/dune
+
+# begin context for src/lsp/cobol_parser/package.toml
+# file src/lsp/cobol_parser/package.toml
+9e88ae961c7221d3675bddf83ce0c718:src/lsp/cobol_parser/package.toml
+# end context for src/lsp/cobol_parser/package.toml
 
 # begin context for src/lsp/cobol_parser/version.mlt
 # file src/lsp/cobol_parser/version.mlt
@@ -595,6 +700,11 @@ a09fbf74cd655417876e2a1882575268:src/lsp/cobol_parser/dune
 68ef30d82b03c578363e7c17a7de12ce:src/lsp/cobol_preproc/dune
 # end context for src/lsp/cobol_preproc/dune
 
+# begin context for src/lsp/cobol_preproc/package.toml
+# file src/lsp/cobol_preproc/package.toml
+8d999d0aad58072292f9c9067d0c15ee:src/lsp/cobol_preproc/package.toml
+# end context for src/lsp/cobol_preproc/package.toml
+
 # begin context for src/lsp/cobol_preproc/version.mlt
 # file src/lsp/cobol_preproc/version.mlt
 1af92d248bdb11b98ed03eb59c6831e5:src/lsp/cobol_preproc/version.mlt
@@ -604,6 +714,11 @@ a09fbf74cd655417876e2a1882575268:src/lsp/cobol_parser/dune
 # file src/lsp/cobol_ptree/dune
 8c16b85b8b250ca5809d8eac211149fc:src/lsp/cobol_ptree/dune
 # end context for src/lsp/cobol_ptree/dune
+
+# begin context for src/lsp/cobol_ptree/package.toml
+# file src/lsp/cobol_ptree/package.toml
+caed3b5a67370854546c32ec9521936e:src/lsp/cobol_ptree/package.toml
+# end context for src/lsp/cobol_ptree/package.toml
 
 # begin context for src/lsp/cobol_ptree/version.mlt
 # file src/lsp/cobol_ptree/version.mlt
@@ -615,6 +730,11 @@ a09fbf74cd655417876e2a1882575268:src/lsp/cobol_parser/dune
 248d3b43484038697848d8ad03696224:src/lsp/cobol_typeck/dune
 # end context for src/lsp/cobol_typeck/dune
 
+# begin context for src/lsp/cobol_typeck/package.toml
+# file src/lsp/cobol_typeck/package.toml
+fc57b5bdb21f30e4bf19040c66c8dde9:src/lsp/cobol_typeck/package.toml
+# end context for src/lsp/cobol_typeck/package.toml
+
 # begin context for src/lsp/cobol_typeck/version.mlt
 # file src/lsp/cobol_typeck/version.mlt
 1af92d248bdb11b98ed03eb59c6831e5:src/lsp/cobol_typeck/version.mlt
@@ -624,6 +744,11 @@ a09fbf74cd655417876e2a1882575268:src/lsp/cobol_parser/dune
 # file src/lsp/cobol_unit/dune
 af41b915dad9926cd22ae734de26cb04:src/lsp/cobol_unit/dune
 # end context for src/lsp/cobol_unit/dune
+
+# begin context for src/lsp/cobol_unit/package.toml
+# file src/lsp/cobol_unit/package.toml
+174f4126cf53a9f9787f6266972047bf:src/lsp/cobol_unit/package.toml
+# end context for src/lsp/cobol_unit/package.toml
 
 # begin context for src/lsp/cobol_unit/version.mlt
 # file src/lsp/cobol_unit/version.mlt
@@ -640,10 +765,20 @@ af41b915dad9926cd22ae734de26cb04:src/lsp/cobol_unit/dune
 1af92d248bdb11b98ed03eb59c6831e5:src/lsp/ebcdic_lib/ebcdic_version.mlt
 # end context for src/lsp/ebcdic_lib/ebcdic_version.mlt
 
+# begin context for src/lsp/ebcdic_lib/package.toml
+# file src/lsp/ebcdic_lib/package.toml
+f431a6e111a04ad6c04ae8e14a4a8743:src/lsp/ebcdic_lib/package.toml
+# end context for src/lsp/ebcdic_lib/package.toml
+
 # begin context for src/lsp/ezr_toml/dune
 # file src/lsp/ezr_toml/dune
 0595a0e0d515c62357253e67f7d2e43c:src/lsp/ezr_toml/dune
 # end context for src/lsp/ezr_toml/dune
+
+# begin context for src/lsp/ezr_toml/package.toml
+# file src/lsp/ezr_toml/package.toml
+a061094ad259c1894650dc52ebe1055e:src/lsp/ezr_toml/package.toml
+# end context for src/lsp/ezr_toml/package.toml
 
 # begin context for src/lsp/ezr_toml/version.mlt
 # file src/lsp/ezr_toml/version.mlt
@@ -655,6 +790,11 @@ af41b915dad9926cd22ae734de26cb04:src/lsp/cobol_unit/dune
 ef52691ec3bef505aa901bf197009fd1:src/lsp/ppx_cobcflags/dune
 # end context for src/lsp/ppx_cobcflags/dune
 
+# begin context for src/lsp/ppx_cobcflags/package.toml
+# file src/lsp/ppx_cobcflags/package.toml
+8f5f3ab922f460368a3ac8d8b99de943:src/lsp/ppx_cobcflags/package.toml
+# end context for src/lsp/ppx_cobcflags/package.toml
+
 # begin context for src/lsp/ppx_cobcflags/version.mlt
 # file src/lsp/ppx_cobcflags/version.mlt
 1af92d248bdb11b98ed03eb59c6831e5:src/lsp/ppx_cobcflags/version.mlt
@@ -664,6 +804,11 @@ ef52691ec3bef505aa901bf197009fd1:src/lsp/ppx_cobcflags/dune
 # file src/lsp/pretty/dune
 0e8eb67ce55fcd4c99df3c4d0a3cc860:src/lsp/pretty/dune
 # end context for src/lsp/pretty/dune
+
+# begin context for src/lsp/pretty/package.toml
+# file src/lsp/pretty/package.toml
+b0ead6034fb010c8d1d67a92e97ec2e4:src/lsp/pretty/package.toml
+# end context for src/lsp/pretty/package.toml
 
 # begin context for src/lsp/pretty/version.mlt
 # file src/lsp/pretty/version.mlt
@@ -675,6 +820,11 @@ ef52691ec3bef505aa901bf197009fd1:src/lsp/ppx_cobcflags/dune
 3fd19e719bc677c046721e1acc91f181:src/lsp/sql_ast/dune
 # end context for src/lsp/sql_ast/dune
 
+# begin context for src/lsp/sql_ast/package.toml
+# file src/lsp/sql_ast/package.toml
+1150b0dc17f1965f675bc0c53fc344a9:src/lsp/sql_ast/package.toml
+# end context for src/lsp/sql_ast/package.toml
+
 # begin context for src/lsp/sql_ast/version.mlt
 # file src/lsp/sql_ast/version.mlt
 1af92d248bdb11b98ed03eb59c6831e5:src/lsp/sql_ast/version.mlt
@@ -684,6 +834,11 @@ ef52691ec3bef505aa901bf197009fd1:src/lsp/ppx_cobcflags/dune
 # file src/lsp/sql_parser/dune
 008c9577668aba9b4564d538f056858b:src/lsp/sql_parser/dune
 # end context for src/lsp/sql_parser/dune
+
+# begin context for src/lsp/sql_parser/package.toml
+# file src/lsp/sql_parser/package.toml
+a4874f3cbdb498c6f8d2f5d4fc51fd49:src/lsp/sql_parser/package.toml
+# end context for src/lsp/sql_parser/package.toml
 
 # begin context for src/lsp/sql_parser/version.mlt
 # file src/lsp/sql_parser/version.mlt
@@ -700,6 +855,11 @@ ef52691ec3bef505aa901bf197009fd1:src/lsp/ppx_cobcflags/dune
 463623160e481efaf9123695b0a1db58:src/lsp/sql_preproc/index.mld
 # end context for src/lsp/sql_preproc/index.mld
 
+# begin context for src/lsp/sql_preproc/package.toml
+# file src/lsp/sql_preproc/package.toml
+46133003305d329e104f69862065f974:src/lsp/sql_preproc/package.toml
+# end context for src/lsp/sql_preproc/package.toml
+
 # begin context for src/lsp/sql_preproc/version.mlt
 # file src/lsp/sql_preproc/version.mlt
 1af92d248bdb11b98ed03eb59c6831e5:src/lsp/sql_preproc/version.mlt
@@ -715,10 +875,20 @@ ef52691ec3bef505aa901bf197009fd1:src/lsp/ppx_cobcflags/dune
 fd264ba43b014605ebefbd7844b08378:src/lsp/superbol-free/linking_flags.sh
 # end context for src/lsp/superbol-free/linking_flags.sh
 
+# begin context for src/lsp/superbol-free/package.toml
+# file src/lsp/superbol-free/package.toml
+71215c65746acba654dc1b82535891f0:src/lsp/superbol-free/package.toml
+# end context for src/lsp/superbol-free/package.toml
+
 # begin context for src/lsp/superbol_free_lib/dune
 # file src/lsp/superbol_free_lib/dune
 89994317295a6c33fe5ab9fe32b9d44a:src/lsp/superbol_free_lib/dune
 # end context for src/lsp/superbol_free_lib/dune
+
+# begin context for src/lsp/superbol_free_lib/package.toml
+# file src/lsp/superbol_free_lib/package.toml
+f5f998e51f0e8499a77cd1d1c2ced04b:src/lsp/superbol_free_lib/package.toml
+# end context for src/lsp/superbol_free_lib/package.toml
 
 # begin context for src/lsp/superbol_free_lib/version.mlt
 # file src/lsp/superbol_free_lib/version.mlt
@@ -730,6 +900,11 @@ fd264ba43b014605ebefbd7844b08378:src/lsp/superbol-free/linking_flags.sh
 8e3118005069a4a4510334d70b01e16f:src/lsp/superbol_platform/dune
 # end context for src/lsp/superbol_platform/dune
 
+# begin context for src/lsp/superbol_platform/package.toml
+# file src/lsp/superbol_platform/package.toml
+e956053850cadc665459a995003ed523:src/lsp/superbol_platform/package.toml
+# end context for src/lsp/superbol_platform/package.toml
+
 # begin context for src/lsp/superbol_platform/version.mlt
 # file src/lsp/superbol_platform/version.mlt
 1af92d248bdb11b98ed03eb59c6831e5:src/lsp/superbol_platform/version.mlt
@@ -739,6 +914,11 @@ fd264ba43b014605ebefbd7844b08378:src/lsp/superbol-free/linking_flags.sh
 # file src/lsp/superbol_preprocs/dune
 421867647c81bf6b06ed5e36640415f9:src/lsp/superbol_preprocs/dune
 # end context for src/lsp/superbol_preprocs/dune
+
+# begin context for src/lsp/superbol_preprocs/package.toml
+# file src/lsp/superbol_preprocs/package.toml
+f06398fdb39eb5036b22bfb527eac3e4:src/lsp/superbol_preprocs/package.toml
+# end context for src/lsp/superbol_preprocs/package.toml
 
 # begin context for src/lsp/superbol_preprocs/version.mlt
 # file src/lsp/superbol_preprocs/version.mlt
@@ -750,15 +930,30 @@ fd264ba43b014605ebefbd7844b08378:src/lsp/superbol-free/linking_flags.sh
 3d075790a8d9c7cd85514d3f22c7397e:src/lsp/superbol_project/dune
 # end context for src/lsp/superbol_project/dune
 
+# begin context for src/lsp/superbol_project/package.toml
+# file src/lsp/superbol_project/package.toml
+836cb545bdb6e64fea3402edc1418fd7:src/lsp/superbol_project/package.toml
+# end context for src/lsp/superbol_project/package.toml
+
 # begin context for src/lsp/superbol_project/version.mlt
 # file src/lsp/superbol_project/version.mlt
 1af92d248bdb11b98ed03eb59c6831e5:src/lsp/superbol_project/version.mlt
 # end context for src/lsp/superbol_project/version.mlt
 
+# begin context for src/superbol-studio-oss/package.toml
+# file src/superbol-studio-oss/package.toml
+af5e62e2c1d2739b4c874e8890a7783b:src/superbol-studio-oss/package.toml
+# end context for src/superbol-studio-oss/package.toml
+
 # begin context for src/tramabol/cobol_interp/dune
 # file src/tramabol/cobol_interp/dune
 449d8e2af8622194885a15b8586c81ca:src/tramabol/cobol_interp/dune
 # end context for src/tramabol/cobol_interp/dune
+
+# begin context for src/tramabol/cobol_interp/package.toml
+# file src/tramabol/cobol_interp/package.toml
+6fe1fab29136f9b09e53052c26b980c8:src/tramabol/cobol_interp/package.toml
+# end context for src/tramabol/cobol_interp/package.toml
 
 # begin context for src/tramabol/cobol_interp/version.mlt
 # file src/tramabol/cobol_interp/version.mlt
@@ -769,6 +964,11 @@ fd264ba43b014605ebefbd7844b08378:src/lsp/superbol-free/linking_flags.sh
 # file src/tramabol/cobol_ir/dune
 ee62b3b4e887b6f2350a3964d7bf2bfe:src/tramabol/cobol_ir/dune
 # end context for src/tramabol/cobol_ir/dune
+
+# begin context for src/tramabol/cobol_ir/package.toml
+# file src/tramabol/cobol_ir/package.toml
+103acb0f032b7c7e43bdb118cf4f5667:src/tramabol/cobol_ir/package.toml
+# end context for src/tramabol/cobol_ir/package.toml
 
 # begin context for src/tramabol/cobol_ir/version.mlt
 # file src/tramabol/cobol_ir/version.mlt
@@ -785,6 +985,11 @@ ee62b3b4e887b6f2350a3964d7bf2bfe:src/tramabol/cobol_ir/dune
 8dab7cddafae7f541a31059549a93225:src/tramabol/ezlibcob/index.mld
 # end context for src/tramabol/ezlibcob/index.mld
 
+# begin context for src/tramabol/ezlibcob/package.toml
+# file src/tramabol/ezlibcob/package.toml
+e5a847845c0c074c41612d5034d1a596:src/tramabol/ezlibcob/package.toml
+# end context for src/tramabol/ezlibcob/package.toml
+
 # begin context for src/tramabol/ezlibcob/version.mlt
 # file src/tramabol/ezlibcob/version.mlt
 1af92d248bdb11b98ed03eb59c6831e5:src/tramabol/ezlibcob/version.mlt
@@ -800,10 +1005,20 @@ d185c1f3bd851d1f329c33cf7e5f0d1f:src/tramabol/tramabol/dune
 124d63b9160103d9a0f186b7ffd73ce6:src/tramabol/tramabol/linking_flags.sh
 # end context for src/tramabol/tramabol/linking_flags.sh
 
+# begin context for src/tramabol/tramabol/package.toml
+# file src/tramabol/tramabol/package.toml
+8a618a5ee3b99a30aad6deef538a1e63:src/tramabol/tramabol/package.toml
+# end context for src/tramabol/tramabol/package.toml
+
 # begin context for src/tramabol/tramabol_lib/dune
 # file src/tramabol/tramabol_lib/dune
 7df9754c88e7bd6b41810a682210bc36:src/tramabol/tramabol_lib/dune
 # end context for src/tramabol/tramabol_lib/dune
+
+# begin context for src/tramabol/tramabol_lib/package.toml
+# file src/tramabol/tramabol_lib/package.toml
+149ad2ed7e7b4e5b3168c82244c6885f:src/tramabol/tramabol_lib/package.toml
+# end context for src/tramabol/tramabol_lib/package.toml
 
 # begin context for src/tramabol/tramabol_lib/version.mlt
 # file src/tramabol/tramabol_lib/version.mlt
@@ -820,6 +1035,11 @@ d185c1f3bd851d1f329c33cf7e5f0d1f:src/tramabol/tramabol/dune
 c5cd7b2d0a3de0d33ec14e3d433c1cae:src/vendor/ez_toml/index.mld
 # end context for src/vendor/ez_toml/index.mld
 
+# begin context for src/vendor/ez_toml/package.toml
+# file src/vendor/ez_toml/package.toml
+b979ae8c441d0afce65126af0442bfc6:src/vendor/ez_toml/package.toml
+# end context for src/vendor/ez_toml/package.toml
+
 # begin context for src/vendor/ez_toml/version.mlt
 # file src/vendor/ez_toml/version.mlt
 1af92d248bdb11b98ed03eb59c6831e5:src/vendor/ez_toml/version.mlt
@@ -829,6 +1049,11 @@ c5cd7b2d0a3de0d33ec14e3d433c1cae:src/vendor/ez_toml/index.mld
 # file src/vendor/vscode-ocaml-platform/src-bindings/interop/dune
 e088a3c55f477e639db0362f02455e24:src/vendor/vscode-ocaml-platform/src-bindings/interop/dune
 # end context for src/vendor/vscode-ocaml-platform/src-bindings/interop/dune
+
+# begin context for src/vendor/vscode-ocaml-platform/src-bindings/interop/package.toml
+# file src/vendor/vscode-ocaml-platform/src-bindings/interop/package.toml
+61735aa97d2fbe8382b02dca2ac7f55e:src/vendor/vscode-ocaml-platform/src-bindings/interop/package.toml
+# end context for src/vendor/vscode-ocaml-platform/src-bindings/interop/package.toml
 
 # begin context for src/vendor/vscode-ocaml-platform/src-bindings/interop/version.mlt
 # file src/vendor/vscode-ocaml-platform/src-bindings/interop/version.mlt
@@ -840,6 +1065,11 @@ e088a3c55f477e639db0362f02455e24:src/vendor/vscode-ocaml-platform/src-bindings/i
 95595bb68f3287a7e05183d919be06d6:src/vendor/vscode-ocaml-platform/src-bindings/node/dune
 # end context for src/vendor/vscode-ocaml-platform/src-bindings/node/dune
 
+# begin context for src/vendor/vscode-ocaml-platform/src-bindings/node/package.toml
+# file src/vendor/vscode-ocaml-platform/src-bindings/node/package.toml
+5787c34a39b2c0225936d7bd7d18c651:src/vendor/vscode-ocaml-platform/src-bindings/node/package.toml
+# end context for src/vendor/vscode-ocaml-platform/src-bindings/node/package.toml
+
 # begin context for src/vendor/vscode-ocaml-platform/src-bindings/node/version.mlt
 # file src/vendor/vscode-ocaml-platform/src-bindings/node/version.mlt
 1af92d248bdb11b98ed03eb59c6831e5:src/vendor/vscode-ocaml-platform/src-bindings/node/version.mlt
@@ -849,6 +1079,11 @@ e088a3c55f477e639db0362f02455e24:src/vendor/vscode-ocaml-platform/src-bindings/i
 # file src/vendor/vscode-ocaml-platform/src-bindings/vscode/dune
 a66598082ef653ebcf0ce0fd10729a0d:src/vendor/vscode-ocaml-platform/src-bindings/vscode/dune
 # end context for src/vendor/vscode-ocaml-platform/src-bindings/vscode/dune
+
+# begin context for src/vendor/vscode-ocaml-platform/src-bindings/vscode/package.toml
+# file src/vendor/vscode-ocaml-platform/src-bindings/vscode/package.toml
+1850e88c7a22fe2a2dfe695c169ee70d:src/vendor/vscode-ocaml-platform/src-bindings/vscode/package.toml
+# end context for src/vendor/vscode-ocaml-platform/src-bindings/vscode/package.toml
 
 # begin context for src/vendor/vscode-ocaml-platform/src-bindings/vscode/version.mlt
 # file src/vendor/vscode-ocaml-platform/src-bindings/vscode/version.mlt
@@ -860,15 +1095,40 @@ a66598082ef653ebcf0ce0fd10729a0d:src/vendor/vscode-ocaml-platform/src-bindings/v
 672e8ec2d88abcb1dc38cdea9e78f4c4:src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/dune
 # end context for src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/dune
 
+# begin context for src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/package.toml
+# file src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/package.toml
+856f6814161c6648e8fc6fd8b5001ea2:src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/package.toml
+# end context for src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/package.toml
+
 # begin context for src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/version.mlt
 # file src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/version.mlt
 1af92d248bdb11b98ed03eb59c6831e5:src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/version.mlt
 # end context for src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/version.mlt
 
+# begin context for src/vscode/superbol-debugger/dune
+# file src/vscode/superbol-debugger/dune
+4041ac3af31192f839f94e55924e7fbe:src/vscode/superbol-debugger/dune
+# end context for src/vscode/superbol-debugger/dune
+
+# begin context for src/vscode/superbol-debugger/package.toml
+# file src/vscode/superbol-debugger/package.toml
+e08a0356a1c89191a9baee865d4f0401:src/vscode/superbol-debugger/package.toml
+# end context for src/vscode/superbol-debugger/package.toml
+
+# begin context for src/vscode/superbol-debugger/version.mlt
+# file src/vscode/superbol-debugger/version.mlt
+1af92d248bdb11b98ed03eb59c6831e5:src/vscode/superbol-debugger/version.mlt
+# end context for src/vscode/superbol-debugger/version.mlt
+
 # begin context for src/vscode/superbol-vscode-lib/dune
 # file src/vscode/superbol-vscode-lib/dune
 2b3e504969f971e5138555ccc9f6a649:src/vscode/superbol-vscode-lib/dune
 # end context for src/vscode/superbol-vscode-lib/dune
+
+# begin context for src/vscode/superbol-vscode-lib/package.toml
+# file src/vscode/superbol-vscode-lib/package.toml
+0538da575eb739105990d6a10a372803:src/vscode/superbol-vscode-lib/package.toml
+# end context for src/vscode/superbol-vscode-lib/package.toml
 
 # begin context for src/vscode/superbol-vscode-lib/version.mlt
 # file src/vscode/superbol-vscode-lib/version.mlt
@@ -879,6 +1139,11 @@ a66598082ef653ebcf0ce0fd10729a0d:src/vendor/vscode-ocaml-platform/src-bindings/v
 # file src/vscode/superbol-vscode-oss/dune
 fdf11e015b7be08613077faeef040a87:src/vscode/superbol-vscode-oss/dune
 # end context for src/vscode/superbol-vscode-oss/dune
+
+# begin context for src/vscode/superbol-vscode-oss/package.toml
+# file src/vscode/superbol-vscode-oss/package.toml
+b2eb159e2f8072676c3a551cdfc983c7:src/vscode/superbol-vscode-oss/package.toml
+# end context for src/vscode/superbol-vscode-oss/package.toml
 
 # begin context for src/vscode/superbol-vscode-oss/superbol_vscode_oss.ml
 # file src/vscode/superbol-vscode-oss/superbol_vscode_oss.ml
@@ -895,6 +1160,11 @@ fdf11e015b7be08613077faeef040a87:src/vscode/superbol-vscode-oss/dune
 7a660cd154ab627381fb7d8d78c4f6b4:src/vscode/vscode-debugadapter/dune
 # end context for src/vscode/vscode-debugadapter/dune
 
+# begin context for src/vscode/vscode-debugadapter/package.toml
+# file src/vscode/vscode-debugadapter/package.toml
+b7c933f216bc1317b5b498b209a38d58:src/vscode/vscode-debugadapter/package.toml
+# end context for src/vscode/vscode-debugadapter/package.toml
+
 # begin context for src/vscode/vscode-debugadapter/version.mlt
 # file src/vscode/vscode-debugadapter/version.mlt
 1af92d248bdb11b98ed03eb59c6831e5:src/vscode/vscode-debugadapter/version.mlt
@@ -904,6 +1174,11 @@ fdf11e015b7be08613077faeef040a87:src/vscode/superbol-vscode-oss/dune
 # file src/vscode/vscode-debugprotocol/dune
 35adced8214d24af89d82ea73f050d33:src/vscode/vscode-debugprotocol/dune
 # end context for src/vscode/vscode-debugprotocol/dune
+
+# begin context for src/vscode/vscode-debugprotocol/package.toml
+# file src/vscode/vscode-debugprotocol/package.toml
+5bd6ccf497efab5bd5fbfaacedbaace1:src/vscode/vscode-debugprotocol/package.toml
+# end context for src/vscode/vscode-debugprotocol/package.toml
 
 # begin context for src/vscode/vscode-debugprotocol/version.mlt
 # file src/vscode/vscode-debugprotocol/version.mlt
@@ -919,6 +1194,11 @@ fdf11e015b7be08613077faeef040a87:src/vscode/superbol-vscode-oss/dune
 # file src/vscode/vscode-json/index.mld
 5ff1d545a13c31542098b6ec9a1ff3ec:src/vscode/vscode-json/index.mld
 # end context for src/vscode/vscode-json/index.mld
+
+# begin context for src/vscode/vscode-json/package.toml
+# file src/vscode/vscode-json/package.toml
+e1b9242f05e887342cb0fbce7ea84b59:src/vscode/vscode-json/package.toml
+# end context for src/vscode/vscode-json/package.toml
 
 # begin context for src/vscode/vscode-json/version.mlt
 # file src/vscode/vscode-json/version.mlt
