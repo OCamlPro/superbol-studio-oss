@@ -116,6 +116,12 @@ type Cir_logic.Types.runtime_error +=
         expected_descr: string;
         got: cob_field;
       }
+  | Invalid_refmod of
+      {
+        what: [`offset | `length of (*given_offset:*) int ];
+        got: int;
+        expected_max: int;
+      }
   | Module_reinitialzation of
       {
         module_name: string;

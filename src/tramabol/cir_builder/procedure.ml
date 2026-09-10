@@ -33,7 +33,7 @@ let translate_display_statement env stmt =
   let* rev_fields =
     List.fold_left begin fun acc { display_items; _ } ->
       List.fold_left begin fun acc term ->
-        let* field = Expr.resolve_term env term and* acc in
+        let* field = Expr.resolve_data_reference env term and* acc in
         Ok (field :: acc)
       end acc display_items
     end (Ok []) ~&stmt.display_items_clauses
@@ -46,7 +46,7 @@ let translate_stop_statement env stmt =
   | StopRun None ->
       Ok [IR_stop { optional_status = None } &@<- stmt]
   | StopArg Some StopWithQualIdent ident ->
-      let* f = Expr.resolve_term env ident in
+      let* f = Expr.resolve_data_reference env ident in
       Ok [IR_stop { optional_status = Some f } &@<- stmt]
   | StopRun Some _
   | StopArg _

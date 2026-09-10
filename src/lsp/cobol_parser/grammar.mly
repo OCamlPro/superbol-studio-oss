@@ -2456,7 +2456,7 @@ let base_ident ==                 (* identifier without reference modification *
 
 let ident [@symbol "<identifier>"] [@recovery_with_pos dummy_ident] :=
   | i = base_ident; %prec below_RPAR { UPCAST.base_ident_with_refmod i }
-  | i = base_ident; r = refmod;      { RefMod (i, r) }
+  | i = loc(base_ident); r = refmod; { RefMod (i, r) }
 
 let idents [@symbol "<identifiers>"] [@recovery []] :=
   | ~ = rnel(ident); < >
@@ -2471,7 +2471,7 @@ let scalar_ident_ ==        (* scalar identifier without reference modification 
 
 let scalar_ident [@symbol "<scalar identifier>"] [@recovery_with_pos dummy_ident] :=
   | i = scalar_ident_; %prec below_RPAR { i }
-  | i = scalar_ident_; r = refmod;      { ScalarRefMod (i, r) }
+  | i = loc(scalar_ident_); r = refmod; { ScalarRefMod (i, r) }
 
 (* let scalar_idents [@symbol "<scalar identifiers>"] [@recovery []] :=
   | ~ = rnel(scalar_ident); < > *)

@@ -29,8 +29,8 @@ type ('f, 'r, 'm, 's, 'branch) internal_data =
 exception STOP of Types.localized_runtime_errors
 
 let eval_data_ref ~vm state f =
-  Error.localize_errors ~loc:f.field_ref_loc @@
-  vm.field_value ~vm f.field_ref state
+  Error.localize_errors ~loc:f.data_ref_loc @@
+  vm.data_value ~vm f state
 
 let eval_data_refs ~vm state data_refs =
   try

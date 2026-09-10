@@ -218,8 +218,8 @@ type _ term =
   | ObjectView: object_view -> [>object_view_] term
   | ObjectRef: object_ref -> [>object_ref_] term (* Includes predefined address (NULL) *)
   | QualIdent: qualident -> [>qualident_] term  (* Includes subscripts *)
-  | RefMod: base_ident_ term * refmod -> [>refmod_ident_] term (* Reference modification *)
-  | ScalarRefMod: scalar_ident_ term * refmod -> [>refmod_scalar_ident_] term
+  | RefMod: base_ident_ term with_loc * refmod -> [>refmod_ident_] term (* Reference modification *)
+  | ScalarRefMod: scalar_ident_ term with_loc * refmod -> [>refmod_scalar_ident_] term
 
   | StrConcat: strlit with_loc * strlit with_loc -> [>strlit_] term
   | Concat: nonnumlit with_loc * nonnumlit with_loc -> [>nonnum_] term
@@ -540,9 +540,9 @@ module COMPARE = struct
       | QualIdent a, QualIdent b ->
           compare_qualident a b
       | RefMod (b1, r1), RefMod (b2, r2) ->
-          compare_struct (compare_term b1 b2) @@ lazy (compare_refmod r1 r2)
+          compare_struct (compare_term ~&b1 ~&b2) @@ lazy (compare_refmod r1 r2)
       | ScalarRefMod (b1, r1), ScalarRefMod (b2, r2) ->
-          compare_struct (compare_term b1 b2) @@ lazy (compare_refmod r1 r2)
+          compare_struct (compare_term ~&b1 ~&b2) @@ lazy (compare_refmod r1 r2)
       | StrConcat (a, c), StrConcat (b, d) ->
           compare_struct (compare_term ~&a ~&b) @@ lazy (compare_term ~&c ~&d)
       | Concat(a,c), Concat(b,d) ->
@@ -844,8 +844,8 @@ module FMT = struct
     | ObjectView o -> pp_object_view ppf o
     | ObjectRef o -> pp_object_ref ppf o
     | QualIdent i -> pp_qualident ppf i
-    | RefMod (i, r) -> fmt "@[%a@ %a@]" ppf pp_term i pp_refmod r
-    | ScalarRefMod (i, r) -> fmt "@[%a@ %a@]" ppf pp_term i pp_refmod r
+    | RefMod (i, r) -> fmt "@[%a@ %a@]" ppf pp_term ~&i pp_refmod r
+    | ScalarRefMod (i, r) -> fmt "@[%a@ %a@]" ppf pp_term ~&i pp_refmod r
 
     | StrConcat (a, b) -> fmt "%a@ &@ %a" ppf pp_term ~&a pp_term ~&b
     | Concat (a, b) -> fmt "%a@ &@ %a" ppf pp_term ~&a pp_term ~&b
@@ -1336,6 +1336,18 @@ module UPCAST = struct
     | Counter _ as v -> v
     | ScalarRefMod _ as v -> v
   external base_ident_with_refmod: base_ident_ term -> ident = "%identity"
+  external base_ident'_with_refmod': base_ident_ term with_loc -> ident with_loc = "%identity"
+
+  let base_ident_as_term: base_ident_ term -> _ term = function
+    | QualIdent _ as v -> v
+    | InlineCall _ as v -> v
+    | InlineInvoke _ as v -> v
+    | ObjectView _ as v -> v
+    | ObjectRef _ as v -> v
+    | Address _ as v -> v
+    | Counter _ as v -> v
+    | ScalarRefMod _ as v -> v
+  external base_ident_as_term: base_ident_ term -> _ term = "%identity"
 
   let scalar_ident_as_scalar: scalar_ident_ term -> scalar = function
     | QualIdent _ as v -> v

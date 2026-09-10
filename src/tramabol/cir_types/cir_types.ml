@@ -31,7 +31,7 @@ module NEL = Cobol_common.Basics.NEL
     the type ['r] of record memory. *)
 
 (** General-purpose reference to a data field; comes with a source location. *)
-type 'f data_reference =
+type 'f field_reference =
   {
     field_ref: 'f field;
     field_ref_loc: srcloc [@opaque];
@@ -45,7 +45,6 @@ and 'f field =
         field: 'f resolved_field;
         field_info: 'f field_definition_info;
       } (** A field for which we can compute the location in the record. *)
-(* Decimal_field? *)
 
 (** We directly map immutable fields with their value representation. *)
 and 'f immutable_field =
@@ -70,7 +69,7 @@ and 'f resolved_field =
 and 'f resolved_table_cell =
   {
     cell_first_field: 'f resolved_field;
-    cell_index_field: 'f data_reference;
+    cell_index_field: 'f field_reference;
     cell_index_max: int;
     cell_stride: int;
   }
@@ -124,6 +123,23 @@ and 'f access_range =
         max: int;
         odo_field: 'f fixed_mutable_field;
       }
+
+[@@deriving show { with_path = false }]
+
+(** General-purpose reference to data, based on a given field, with optional
+    reference modification. *)
+type 'f data_reference =
+  {
+    data_field: 'f field;
+    data_ref_loc: srcloc [@opaque];
+    data_refmod: 'f refmod option;
+  }
+
+and 'f refmod =
+  {
+    refmod_left: 'f field_reference;
+    refmod_length: 'f field_reference option;
+  }
 
 [@@deriving show { with_path = false }]
 

@@ -185,7 +185,10 @@ and fold_scalar_ident (v: _ #folder) : scalar_ident_ term -> 'a -> 'a = function
   | InlineInvoke ii -> fold_inline_invocation v ii
   | ObjectRef po -> fold_object_ref v po
   | QualIdent qi -> fold_qualident v qi
-  | ScalarRefMod (i, r) -> fun x -> x >> fold_scalar_ident v i >> fold_refmod v r
+  | ScalarRefMod (i, r) -> fun x -> x >> fold_scalar_ident' v i >> fold_refmod v r
+
+and fold_scalar_ident' (v: _ #folder) =
+  fold' ~fold:fold_scalar_ident v
 
 and fold_ident (v: _ #folder) =
   handle v#fold_ident
@@ -199,12 +202,15 @@ and fold_ident (v: _ #folder) =
       | ObjectRef po -> fold_object_ref v po
       | QualIdent qi -> fold_qualident v qi
       | RefMod (i, r) -> fun x -> x
-        >> fold_ident v (UPCAST.base_ident_with_refmod i)
+        >> fold_ident' v (UPCAST.base_ident'_with_refmod' i)
         >> fold_refmod v r
       | ScalarRefMod (i, r) -> fun x -> x
-        >> fold_scalar_ident v i
+        >> fold_scalar_ident' v i
         >> fold_refmod v r
     end
+
+and fold_ident' (v: _ #folder) =
+  fold' ~fold:fold_ident v
 
 and fold_ident_or_nonnum (v: _ #folder) : ident_or_nonnum -> 'a -> 'a = function
   | Address _

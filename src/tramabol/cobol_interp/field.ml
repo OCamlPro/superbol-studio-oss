@@ -19,6 +19,7 @@ open Cir_builder.Types
 open Types
 
 open Cir_logic.Syntax
+open Cir_logic.Syntax.INFIX                                            (* >>= *)
 
 (* --- *)
 
@@ -166,7 +167,7 @@ let from_literal_value ~options lit =
       let data = CPtr.cast UInt8 @@ CArray.to_ptr @@ CArray.of_string str in
       let pic = Cobol_data.Picture.alphanumeric ~size in
       let attr = alphanum_attrs ~constant:true ~pic in
-      let* size = Status.lift_ezlibcob_build_error @@ U64.of_int size in
+      let size = U64.of_int_unsafe size in
       Ok (CobField.create ~attr ~data ~size)
   | Integer_value i ->
       let binary = options.integer_literals = `binary_when_small_enough in
@@ -211,6 +212,9 @@ let from_definition field_definition (record: cob_record_handle) =
 
 (** Internal access *)
 
+let field_size f =
+  Status.lift_ezlibcob_runtime_error @@ U64.to_int @@ CobField.get_size f
+
 let is_numeric f =
   S32.(compare (cob_is_numeric f) zero) = 0
 
@@ -223,25 +227,32 @@ let as_int ?loc f =
   else
     Status.lift_ezlibcob_runtime_error ?loc @@ S32.to_int @@ cob_get_int f
 
+(* Fills data_array with the contents of its first cell *)
+let fill_carray ~data_array ~data_size ~cell_size =
+  let rec aux initialized_size =
+    if initialized_size < data_size then
+      let todo_size = min initialized_size (data_size - initialized_size) in
+      CArray.blit data_array 0 data_array initialized_size todo_size;
+      aux (initialized_size + todo_size)
+  in
+  aux cell_size
+
 (** Operations *)
 
-let rec access_field ~vm (f: cob_field_handle) : (cob_field, _) result =
-  match f with
+let rec access_field ~vm : cob_field_handle -> (cob_field, _) result = function
   | Constant_field f ->
       Ok f
   | Field_in_memory f ->
       access_resolved_field ~vm f.field
 
-and access_resolved_field ~vm (f: cob_field resolved_field) =
-  match f with
+and access_resolved_field ~vm : cob_field resolved_field -> _ = function
   | Fixed_field f ->
       Ok f
   | Table_field c ->
       access_table_cell ~vm c
 
 and access_table_cell ~vm (c: cob_field resolved_table_cell) =
-  let* index = access_field ~vm c.cell_index_field.field_ref in
-  let* i = as_int ~loc:c.cell_index_field.field_ref_loc index in
+  let* i = access_int_field_ref ~vm c.cell_index_field in
   if i <= 0 || i > c.cell_index_max
   then
     Status.runtime_error ~loc:c.cell_index_field.field_ref_loc @@
@@ -249,25 +260,66 @@ and access_table_cell ~vm (c: cob_field resolved_table_cell) =
                                 index_max = c.cell_index_max }
   else
     let* r = access_resolved_field ~vm c.cell_first_field in
+    let* cell_size = field_size r in
     let data = CobField.get_data r
     and attr = CobField.get_attr r
     and size = CobField.get_size r in
-    let* cell_size = Status.lift_ezlibcob_runtime_error @@ U64.to_int size in
     let offset = (i - 1) * cell_size * c.cell_stride in
     (* TODO: tag as temporary so we can free the structure or manage a pool of
        fields. *)
     (* TODO: clone of a field? *)
     Ok (CobField.create ~attr ~size ~data:(CPtr.add data offset))
 
-let access ~vm (f: cob_field_handle) state : (state * cob_field, _) result =
-  let* f = access_field ~vm f in
+and access_int_field_ref ~vm f =
+  access_field ~vm f.field_ref >>= as_int ~loc:f.field_ref_loc
+
+let access_field_reference ~vm (f: _ field_reference) state
+  : (state * cob_field, _) result =
+  let* f = access_field ~vm f.field_ref in
   Ok (state, f)
 
-let fixed_field_size f =
-  Status.lift_ezlibcob_runtime_error @@ U64.to_int @@ CobField.get_size f
+let rec access_data_reference ~vm (d: _ data_reference) state
+  : (state * cob_field, _) result =
+  let* f = access_field ~vm d.data_field in
+  match d.data_refmod with
+  | None ->
+      Ok (state, f)
+  | Some refmod ->
+      let* r = apply_refmod ~vm f refmod in
+      Ok (state, r)
+
+and apply_refmod ~vm f { refmod_left; refmod_length } =
+  let* offset = access_int_field_ref ~vm refmod_left in
+  let* data_size = field_size f in
+  if offset <= 0 || offset > data_size + 1 then
+    Status.runtime_error ~loc:refmod_left.field_ref_loc @@
+    Invalid_refmod { what = `offset; got = offset;
+                     expected_max = data_size + 1 }
+  else
+    let data_array = CArray.of_ptr data_size @@ CobField.get_data f in
+    let result_offset = min data_size (offset - 1) in  (* may data_size be 0? *)
+    let* result_size =
+      match refmod_length with
+      | None ->
+          Ok (data_size - result_offset)
+      | Some refmod_length ->
+          let* length = access_int_field_ref ~vm refmod_length in
+          let expected_max = data_size - result_offset in
+          if length <= 0 || length > expected_max then
+            Status.runtime_error ~loc:refmod_length.field_ref_loc @@
+            Invalid_refmod { what = `length offset; got = length;
+                             expected_max }
+          else
+            Ok (min (data_size - result_offset) length)
+    in
+    let result_data = CArray.get_ptr data_array result_offset in
+    let pic = Cobol_data.Picture.alphanumeric ~size:result_size in
+    let attr = alphanum_attrs ~constant:true ~pic in
+    let size = U64.of_int_unsafe result_size in
+    Ok (CobField.create ~attr ~data:result_data ~size)
 
 let indirect_field_accessible_data_size base_field ranges =
-  let* cell_size = fixed_field_size base_field in
+  let* cell_size = field_size base_field in
   let data_size =
     NEL.fold_left cell_size ranges ~f:begin fun x -> function
       | Fixed_range { max }
@@ -280,16 +332,6 @@ let init_value: cob_field_access -> _ = function
   | Direct_access { fixed_field_info; _ }
   | Indirect_access { base_field = { fixed_field_info; _ }; _ } ->
       fixed_field_info.field_initial_value
-
-(* Fills data_array with the contents of its first cell *)
-let fill_carray ~data_array ~data_size ~cell_size =
-  let rec aux initialized_size =
-    if initialized_size < data_size then
-      let todo_size = min initialized_size (data_size - initialized_size) in
-      CArray.blit data_array 0 data_array initialized_size todo_size;
-      aux (initialized_size + todo_size)
-  in
-  aux cell_size
 
 let init ~vm:_ (f: cob_field_access) () : (state, _) result =
   match init_value f, f with
