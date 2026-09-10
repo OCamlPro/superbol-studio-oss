@@ -35,6 +35,13 @@ type missing_stuff =
         amount: int;
       }
 
+(* Note: call `Printer.register_unexpected_stuff_printer` when extending this
+   type. *)
+type unexpected_stuff = ..
+
+type unexpected_stuff +=
+  | Reference_modification
+
 (* Note: call `Printer.register_unsupported_stuff_printer` when extending this
    type. *)
 type unsupported_stuff = ..
@@ -42,10 +49,12 @@ type unsupported_stuff = ..
 (* Note: edit the corresponding function in `printer.ml` when adjusting this
    type. *)
 type unsupported_stuff +=
+  | Dynamic_table
+  | Expression of Cobol_ptree.expr with_loc
   | Statement of Cobol_ptree.statement
+  | Subscript of Cobol_ptree.subscript with_loc
   | Term: _ Cobol_ptree.term -> unsupported_stuff
   | Variable_length_field
-  | Dynamic_table
 
 type undefined_stuff =
   | Data_reference of Cobol_ptree.qualname
@@ -72,6 +81,11 @@ type error +=
       {
         loc: srcloc;
         stuff: missing_stuff;
+      }
+  | Unexpected of
+      {
+        loc: srcloc;
+        stuff: unexpected_stuff;
       }
   | Unsupported of
       {

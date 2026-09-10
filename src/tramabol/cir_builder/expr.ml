@@ -77,20 +77,31 @@ and resolve_subscript env s =
   | SubSExpr e ->
       resolve_expr env e
   | _ ->
-      failwith ""
+      error @@ Unsupported { stuff = Subscript s; loc = ~@s }
 
 and resolve_expr env e =
   match ~&e with
   | Atom term ->
       resolve_term env (term &@<- e)
   | _ ->
-      failwith ""
+      error @@ Unsupported { stuff = Expression e; loc = ~@e }
 
 and resolve_qualident env qi =
   resolve_data_reference ~subscripts:~&qi.ident_subscripts env ~&qi.ident_name
     ~loc:~@qi
 
-and resolve_term: type k. _ env -> k term with_loc -> _ = fun env t ->
+and resolve_refmod env (r: Cobol_ptree.refmod) =
+  let* refmod_left = resolve_expr env r.refmod_left
+  and* refmod_length =
+    match r.refmod_length with
+    | Some l -> Result.map Option.some @@ resolve_expr env l
+    | None -> Ok None
+  in
+  Ok { refmod_left; refmod_length }
+
+and resolve_term
+  : type k. (('f, _, _) env -> k term with_loc ->
+             ('f field_reference, errors) result) = fun env t ->
   match ~&t with
   | Name _
   | Qual _ as qn ->
@@ -108,13 +119,38 @@ and resolve_term: type k. _ env -> k term with_loc -> _ = fun env t ->
   | Concat _
   | National _ as lit ->
       Literal.create ~builder:env.builder (lit &@<- t)
+  | RefMod _
+  | ScalarRefMod _ ->
+      error @@ Unexpected { stuff = Reference_modification; loc = ~@t }
   | Address _
   | Counter _
   | InlineCall _
   | InlineInvoke _
   | LengthOf _
   | ObjectView _
-  | ObjectRef _
-  | RefMod _
-  | ScalarRefMod _ ->
+  | ObjectRef _ ->
       error @@ Unsupported { stuff = Term ~&t; loc = ~@t }
+
+let resolve_field_reference = resolve_term                           (* alias *)
+
+let resolve_data_reference
+  : type k. (('f, _, _) env -> k term with_loc ->
+             ('f data_reference, errors) result) = fun env t ->
+  match ~&t with
+  | RefMod (ident, refmod) ->
+      let* { field_ref; field_ref_loc } = resolve_term env ident
+      and* refmod = resolve_refmod env refmod in
+      Ok { data_field = field_ref;
+           data_ref_loc = field_ref_loc;
+           data_refmod = Some refmod }
+  | ScalarRefMod (ident, refmod) ->
+      let* { field_ref; field_ref_loc } = resolve_term env ident
+      and* refmod = resolve_refmod env refmod in
+      Ok { data_field = field_ref;
+           data_ref_loc = field_ref_loc;
+           data_refmod = Some refmod }
+  | _ ->
+      let* { field_ref; field_ref_loc } = resolve_term env t in
+      Ok { data_field = field_ref;
+           data_ref_loc = field_ref_loc;
+           data_refmod = None }

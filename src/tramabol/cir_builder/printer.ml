@@ -11,6 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cobol_common.Srcloc.INFIX
 open Types
 
 let printers_for_extended_type type_name =
@@ -22,6 +23,9 @@ let printers_for_extended_type type_name =
        | pp :: tl -> try pp ppf e with Exit -> aux tl
      in
      aux !l)
+
+let register_unexpected_stuff_printer, pp_unexpected_stuff =
+  printers_for_extended_type "Cir_builder.Types.unexpected_stuff"
 
 let register_unsupported_stuff_printer, pp_unsupported_stuff =
   printers_for_extended_type "Cir_builder.Types.unsupported_stuff"
@@ -59,15 +63,26 @@ let pp_errors ?platform ppf errors =
 
 let register_printers () =
 
+  register_unexpected_stuff_printer begin fun ppf -> function
+    | Reference_modification ->
+        Pretty.print ppf "reference@ modification"
+    | _ ->
+        raise Exit
+  end;
+
   register_unsupported_stuff_printer begin fun ppf -> function
+    | Dynamic_table ->
+        Pretty.print ppf "dynamic-capacity@ table"
+    | Expression _ ->
+        Pretty.print ppf "expression"
     | Statement _ ->
         Pretty.print ppf "statement"
+    | Subscript s ->
+        Pretty.print ppf "subscript@ %a" Cobol_ptree.pp_subscript ~&s
     | Term t ->
         Pretty.print ppf "term@ %a" Cobol_ptree.pp_term t
     | Variable_length_field ->
         Pretty.print ppf "variable-length field"
-    | Dynamic_table ->
-        Pretty.print ppf "dynamic-capacity table"
     | _ ->
         raise Exit
   end;
@@ -79,6 +94,8 @@ let register_printers () =
         Pretty.print ppf "extraneous@ %a" pp_extraneous_stuff stuff
     | Missing { stuff; _ } ->
         Pretty.print ppf "missing@ %a" pp_missing_stuff stuff
+    | Unexpected { stuff; _ } ->
+        Pretty.print ppf "unexpected@ %a" pp_unexpected_stuff stuff
     | Unsupported { stuff; _ } ->
         Pretty.print ppf "unsupported@ %a" pp_unsupported_stuff stuff
     | Undefined { stuff; _ } ->

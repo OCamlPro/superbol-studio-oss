@@ -70,6 +70,14 @@ let register_printers () =
         ignore got;                                                (* for now *)
         Pretty.print ppf "Invalid@ data-type@ encountered@ (%a@ expected)"
           Fmt.text expected_descr
+    | Invalid_refmod { what = `offset; got; expected_max } ->
+        Pretty.print ppf "Invalid@ offset@ in@ reference@ modification:@;got@ %d,@ \
+                          expected@ in@ [1..%d]"
+          got expected_max
+    | Invalid_refmod { what = `length offset; got; expected_max } ->
+        Pretty.print ppf "Invalid@ length@ in@ reference@ modification:@;got@ \
+                          %d,@ expected@ in@ [1..%d] when given offset is %d"
+          got expected_max offset
     | Module_reinitialzation { module_name } ->
         Pretty.print ppf "Invalid@ reinitialization@ of@ module@ `%s'"
           module_name

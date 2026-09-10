@@ -69,7 +69,9 @@ type ('f, 'r, 'm, 's, 'branch) manager =
     init_field:
       vm: 'vm -> 'f field_access -> 's -> 's evaluation_result;
     field_value:
-      vm: 'vm -> 'f field -> 's -> ('s * 'f) evaluation_result;
+      vm: 'vm -> 'f field_reference -> 's -> ('s * 'f) evaluation_result;
+    data_value:
+      vm: 'vm -> 'f data_reference -> 's -> ('s * 'f) evaluation_result;
 
     display_fields:
       vm: 'vm -> advancing: bool -> 'f array -> 's -> 'branch evaluation_result;

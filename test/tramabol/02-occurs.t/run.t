@@ -184,7 +184,7 @@
     module_proc =
     [IR_display {
        data_refs =
-       [|{ field_ref =
+       [|{ data_field =
            Field_in_memory {field = (Fixed_field "      ");
              field_info =
              { field_definition = {
@@ -248,12 +248,12 @@
                    }
                  }
                }; field_initial_value = (Some "ABCDEF") }};
-           field_ref_loc = <opaque> }
+           data_ref_loc = <opaque>; data_refmod = None }
          |];
        advancing = true};
       IR_display {
         data_refs =
-        [|{ field_ref =
+        [|{ data_field =
             Field_in_memory {
               field =
               (Table_field
@@ -277,9 +277,10 @@
                     }
                   }
                 }; field_initial_value = None }};
-            field_ref_loc = <opaque> };
-          { field_ref = (Constant_field "*"); field_ref_loc = <opaque> };
-          { field_ref =
+            data_ref_loc = <opaque>; data_refmod = None };
+          { data_field = (Constant_field "*"); data_ref_loc = <opaque>;
+            data_refmod = None };
+          { data_field =
             Field_in_memory {
               field =
               (Table_field
@@ -303,12 +304,12 @@
                     }
                   }
                 }; field_initial_value = None }};
-            field_ref_loc = <opaque> }
+            data_ref_loc = <opaque>; data_refmod = None }
           |];
         advancing = true};
       IR_display {
         data_refs =
-        [|{ field_ref =
+        [|{ data_field =
             Field_in_memory {
               field =
               (Table_field
@@ -332,9 +333,10 @@
                     }
                   }
                 }; field_initial_value = None }};
-            field_ref_loc = <opaque> };
-          { field_ref = (Constant_field "*"); field_ref_loc = <opaque> };
-          { field_ref =
+            data_ref_loc = <opaque>; data_refmod = None };
+          { data_field = (Constant_field "*"); data_ref_loc = <opaque>;
+            data_refmod = None };
+          { data_field =
             Field_in_memory {
               field =
               (Table_field
@@ -358,9 +360,10 @@
                     }
                   }
                 }; field_initial_value = None }};
-            field_ref_loc = <opaque> };
-          { field_ref = (Constant_field "*"); field_ref_loc = <opaque> };
-          { field_ref =
+            data_ref_loc = <opaque>; data_refmod = None };
+          { data_field = (Constant_field "*"); data_ref_loc = <opaque>;
+            data_refmod = None };
+          { data_field =
             Field_in_memory {
               field =
               (Table_field
@@ -384,7 +387,7 @@
                     }
                   }
                 }; field_initial_value = None }};
-            field_ref_loc = <opaque> }
+            data_ref_loc = <opaque>; data_refmod = None }
           |];
         advancing = true};
       IR_stop {optional_status = None}]
@@ -899,7 +902,7 @@
     module_proc =
     [IR_display {
        data_refs =
-       [|{ field_ref =
+       [|{ data_field =
            Field_in_memory {field = (Fixed_field "      ");
              field_info =
              { field_definition = {
@@ -1043,12 +1046,12 @@
                    }
                  }
                }; field_initial_value = (Some "ABCDEF") }};
-           field_ref_loc = <opaque> }
+           data_ref_loc = <opaque>; data_refmod = None }
          |];
        advancing = true};
       IR_display {
         data_refs =
-        [|{ field_ref =
+        [|{ data_field =
             Field_in_memory {
               field =
               (Table_field
@@ -1091,12 +1094,12 @@
                     }
                   }
                 }; field_initial_value = None }};
-            field_ref_loc = <opaque> }
+            data_ref_loc = <opaque>; data_refmod = None }
           |];
         advancing = true};
       IR_display {
         data_refs =
-        [|{ field_ref =
+        [|{ data_field =
             Field_in_memory {
               field =
               (Table_field
@@ -1126,12 +1129,12 @@
                     }
                   }
                 }; field_initial_value = None }};
-            field_ref_loc = <opaque> }
+            data_ref_loc = <opaque>; data_refmod = None }
           |];
         advancing = true};
       IR_display {
         data_refs =
-        [|{ field_ref =
+        [|{ data_field =
             Field_in_memory {
               field =
               (Table_field
@@ -1161,12 +1164,12 @@
                     }
                   }
                 }; field_initial_value = None }};
-            field_ref_loc = <opaque> }
+            data_ref_loc = <opaque>; data_refmod = None }
           |];
         advancing = true};
       IR_display {
         data_refs =
-        [|{ field_ref =
+        [|{ data_field =
             Field_in_memory {
               field =
               (Table_field
@@ -1190,12 +1193,12 @@
                     }
                   }
                 }; field_initial_value = None }};
-            field_ref_loc = <opaque> }
+            data_ref_loc = <opaque>; data_refmod = None }
           |];
         advancing = true};
       IR_display {
         data_refs =
-        [|{ field_ref =
+        [|{ data_field =
             Field_in_memory {
               field =
               (Table_field
@@ -1219,12 +1222,12 @@
                     }
                   }
                 }; field_initial_value = None }};
-            field_ref_loc = <opaque> }
+            data_ref_loc = <opaque>; data_refmod = None }
           |];
         advancing = true};
       IR_display {
         data_refs =
-        [|{ field_ref =
+        [|{ data_field =
             Field_in_memory {
               field =
               (Table_field
@@ -1260,7 +1263,7 @@
                     }
                   }
                 }; field_initial_value = None }};
-            field_ref_loc = <opaque> }
+            data_ref_loc = <opaque>; data_refmod = None }
           |];
         advancing = true};
       IR_stop {optional_status = None}]
