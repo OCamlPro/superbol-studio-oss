@@ -22,18 +22,20 @@ open Syntax
 let error e = Error (NEL.one e)
 
 let rec resolve_data_reference ~loc ?(subscripts = []) env qn =
-  match Env.lookup_named_field ~&qn env, subscripts with
-  | Direct_access f, [] ->
+  let* access = Env.lookup_named_field qn env in
+  let f = access.access_field in
+  match access.access_ranges, subscripts with
+  | [], [] ->
       Ok { field_ref = Field_in_memory { field = Fixed_field f.fixed_field;
                                          field_info = f.fixed_field_info };
            field_ref_loc = loc }
-  | Direct_access _, subscripts ->
+  | [], subscripts ->
       let locs = NEL.of_rev_list @@ List.rev_map (~@) subscripts in
       Error.extra ~locs @@
       Data_reference_subscripts { qn = ~&qn;
                                   amount = List.length subscripts }
-  | Indirect_access { ranges; base_field }, subscripts ->
-      let expected = NEL.length ranges and given = List.length subscripts in
+  | ranges, subscripts ->
+      let expected = List.length ranges and given = List.length subscripts in
       if given < expected then
         Error.missing ~loc:~@qn @@
         Data_reference_subscripts { qn = ~&qn; amount = expected - given }
@@ -43,16 +45,11 @@ let rec resolve_data_reference ~loc ?(subscripts = []) env qn =
         Error.extra ~locs @@
         Data_reference_subscripts { qn = ~&qn; amount = given - expected }
       else
-        resolve_indirect_access_subscripts ~loc env ranges subscripts base_field
-  | exception Not_found ->
-      error @@ Undefined { stuff = Data_reference ~&qn; loc = ~@qn }
-  | exception Cobol_unit.Resolver_map.Ambiguous candidates ->
-      error @@ Ambiguous { stuff = Data_reference ~&qn; loc = ~@qn;
-                           candidates = Lazy.force candidates }
+        resolve_indirect_access_subscripts ~loc env ranges subscripts f
 
 (* Assumes [ranges] and [subscripts] have the same length. *)
 and resolve_indirect_access_subscripts ~loc env ranges subscripts base_field =
-  let rev_ranges = NEL.rev_to_list ranges
+  let rev_ranges = List.rev ranges
   and rev_subscripts = List.rev subscripts in
   let* field, _ =
     List.fold_left2 begin fun acc range (subscript: subscript with_loc) ->

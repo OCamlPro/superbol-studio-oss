@@ -57,17 +57,14 @@ let add_field storage field =
 let resolve_odo_span ~data_map { occurs_depending_min;
                                  occurs_depending_max;
                                  occurs_depending } =
-  match FIELDS_MAP.find ~&occurs_depending data_map with
-  | Direct_access odo_field ->
-      Ok (Depending_range { min = ~&occurs_depending_min;
-                            max = ~&occurs_depending_max;
-                            odo_field })
-  | Indirect_access _ ->
-      Error.one @@ Unexpected { stuff = Item_used_in_depending_clause;
-                                loc = ~@occurs_depending }
-  | exception Not_found ->
-      Error.one @@ Undefined { stuff = Data_reference ~&occurs_depending;
-                               loc = ~@occurs_depending }
+  let* access = Env.lookup_named_field_in_map occurs_depending data_map in
+  if access.access_ranges = [] then
+    Ok (Depending_range { min = ~&occurs_depending_min;
+                          max = ~&occurs_depending_max;
+                          odo_field = access.access_field })
+  else
+    Error.one @@ Unexpected { stuff = Item_used_in_depending_clause;
+                              loc = ~@occurs_depending }
 
 let resolve_leading_ranges ~loc ~data_map leading_ranges =
   List.fold_left begin fun resolved_ranges range ->
@@ -83,7 +80,7 @@ let resolve_leading_ranges ~loc ~data_map leading_ranges =
   end (Ok []) leading_ranges
 
 let resolve_field_access ~builder ~record ~data_map field_definition =
-  let* field_value =
+  let* fixed_field =
     builder.create_field_from_definition field_definition record
   and* field_initial_value =
     match ~&field_definition.field_layout with
@@ -98,13 +95,8 @@ let resolve_field_access ~builder ~record ~data_map field_definition =
       ~data_map ~loc:~@field_definition
   in
   let fixed_field_info = { field_initial_value; field_definition } in
-  let fixed_field = { fixed_field = field_value; fixed_field_info } in
-  match rev_ranges with
-  | [] ->
-      Ok (Direct_access fixed_field)
-  | rev_ranges ->
-      Ok (Indirect_access { ranges = NEL.of_rev_list rev_ranges;
-                            base_field = fixed_field })
+  Ok { access_field = { fixed_field; fixed_field_info };
+       access_ranges = List.rev rev_ranges }
 
 (* Does nothing on unnamed fields *)
 let define_field ~builder ~storage ~record ~field_definition acc =

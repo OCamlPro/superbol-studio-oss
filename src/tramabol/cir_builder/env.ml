@@ -15,7 +15,17 @@ open Cobol_ptree                                            (* for qualname *)
 open Cir_types
 open Types
 
+open Cobol_common.Srcloc.INFIX
+
 (* --- *)
 
-let lookup_named_field (qn: qualname) env =
-  FIELDS_MAP.find qn env.named_fields
+let lookup_named_field_in_map (qn: qualname with_loc) map =
+  try Ok (FIELDS_MAP.find ~&qn map) with
+  | Not_found ->
+      Error.one @@ Undefined { stuff = Data_reference ~&qn; loc = ~@qn }
+  | Cobol_unit.Resolver_map.Ambiguous candidates ->
+      Error.one @@ Ambiguous { stuff = Data_reference ~&qn; loc = ~@qn;
+                               candidates = Lazy.force candidates }
+
+let lookup_named_field (qn: qualname with_loc) env =
+  lookup_named_field_in_map qn env.named_fields

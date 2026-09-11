@@ -101,11 +101,29 @@
             } }
           ];
         storage_fields =
-        [(Direct_access
+        [{ access_field =
+           { fixed_field = " ";
+             fixed_field_info =
+             { field_definition = {
+                 qualname: TWO
+                 offset: 0
+                 size: 8
+                 layout: {
+                   elementary
+                   usage: {
+                     display
+                     category: NUMERIC(digits = 1, scale = 0, signed = false)
+                   }
+                   value: 2
+                 }
+               }; field_initial_value = (Some 2/int32) }
+             };
+           access_ranges = [] };
+          { access_field =
             { fixed_field = " ";
               fixed_field_info =
               { field_definition = {
-                  qualname: TWO
+                  qualname: ONE
                   offset: 0
                   size: 8
                   layout: {
@@ -114,78 +132,65 @@
                       display
                       category: NUMERIC(digits = 1, scale = 0, signed = false)
                     }
-                    value: 2
+                    value: 1
                   }
-                }; field_initial_value = (Some 2/int32) }
-              });
-          (Direct_access
-             { fixed_field = " ";
-               fixed_field_info =
-               { field_definition = {
-                   qualname: ONE
-                   offset: 0
-                   size: 8
-                   layout: {
-                     elementary
-                     usage: {
-                       display
-                       category: NUMERIC(digits = 1, scale = 0, signed = false)
-                     }
-                     value: 1
-                   }
-                 }; field_initial_value = (Some 1/int32) }
-               });
-          (Direct_access
-             { fixed_field = " ";
-               fixed_field_info =
-               { field_definition = {
-                   qualname: ZER
-                   offset: 0
-                   size: 8
-                   layout: {
-                     elementary
-                     usage: {
-                       display
-                       category: NUMERIC(digits = 1, scale = 0, signed = false)
-                     }
-                     value: 0
-                   }
-                 }; field_initial_value = (Some 0/int32) }
-               });
-          (Direct_access
-             { fixed_field = "   ";
-               fixed_field_info =
-               { field_definition = {
-                   qualname: Y
-                   offset: 0
-                   size: 24
-                   layout: {
-                     elementary
-                     usage: {
-                       display
-                       category: NUMERIC(digits = 3, scale = 0, signed = false)
-                     }
-                     value: 123
-                   }
-                 }; field_initial_value = (Some 123/int32) }
-               });
-          (Direct_access
-             { fixed_field = "      ";
-               fixed_field_info =
-               { field_definition = {
-                   qualname: X
-                   offset: 0
-                   size: 48
-                   layout: {
-                     elementary
-                     usage: {
-                       display
-                       category: ALPHANUMERIC(6)
-                     }
-                     value: "ABCDEF"
-                   }
-                 }; field_initial_value = (Some "ABCDEF") }
-               })
+                }; field_initial_value = (Some 1/int32) }
+              };
+            access_ranges = [] };
+          { access_field =
+            { fixed_field = " ";
+              fixed_field_info =
+              { field_definition = {
+                  qualname: ZER
+                  offset: 0
+                  size: 8
+                  layout: {
+                    elementary
+                    usage: {
+                      display
+                      category: NUMERIC(digits = 1, scale = 0, signed = false)
+                    }
+                    value: 0
+                  }
+                }; field_initial_value = (Some 0/int32) }
+              };
+            access_ranges = [] };
+          { access_field =
+            { fixed_field = "   ";
+              fixed_field_info =
+              { field_definition = {
+                  qualname: Y
+                  offset: 0
+                  size: 24
+                  layout: {
+                    elementary
+                    usage: {
+                      display
+                      category: NUMERIC(digits = 3, scale = 0, signed = false)
+                    }
+                    value: 123
+                  }
+                }; field_initial_value = (Some 123/int32) }
+              };
+            access_ranges = [] };
+          { access_field =
+            { fixed_field = "      ";
+              fixed_field_info =
+              { field_definition = {
+                  qualname: X
+                  offset: 0
+                  size: 48
+                  layout: {
+                    elementary
+                    usage: {
+                      display
+                      category: ALPHANUMERIC(6)
+                    }
+                    value: "ABCDEF"
+                  }
+                }; field_initial_value = (Some "ABCDEF") }
+              };
+            access_ranges = [] }
           ]
         };
       local_storage = { storage_records = []; storage_fields = [] } };
