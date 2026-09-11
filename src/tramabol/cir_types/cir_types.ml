@@ -97,13 +97,10 @@ module FIELDS_MAP = Cobol_unit.Resolver_map
 type 'f fields_map = 'f field_access FIELDS_MAP.t
 
 and 'f field_access =
-  (* TODO: use a struct with optional ranges... *)
-  | Direct_access of 'f fixed_mutable_field
-  | Indirect_access of
-      {
-        base_field: 'f fixed_mutable_field;
-        ranges: 'f access_range NEL.t;
-      }
+  {
+    access_field: 'f fixed_mutable_field;
+    access_ranges: 'f access_range list;
+  }
 
 (** A field that is at a fixed location in a record. *)
 and 'f fixed_mutable_field =

@@ -73,8 +73,7 @@
            } }
           ];
         storage_fields =
-        [Indirect_access {
-           base_field =
+        [{ access_field =
            { fixed_field = "  ";
              fixed_field_info =
              { field_definition = {
@@ -92,9 +91,8 @@
                  }
                }; field_initial_value = None }
              };
-           ranges = [Fixed_range {max = 3}]};
-          Indirect_access {
-            base_field =
+           access_ranges = [Fixed_range {max = 3}] };
+          { access_field =
             { fixed_field = " ";
               fixed_field_info =
               { field_definition = {
@@ -112,72 +110,73 @@
                   }
                 }; field_initial_value = None }
               };
-            ranges = [Fixed_range {max = 6}]};
-          (Direct_access
-             { fixed_field = "      ";
-               fixed_field_info =
-               { field_definition = {
-                   qualname: X
-                   offset: 0
-                   size: 48
-                   size-max: 48
-                   layout: {
-                     elementary
-                     usage: {
-                       display
-                       category: ALPHANUMERIC(6)
-                     }
-                     value: "ABCDEF"
-                   }
-                   redefs: {
-                     table
-                     redefines: X
-                     offset: 0
-                     size: 48
-                     size-max: 48
-                     range: {
-                       span: fixed-length: 6
-                     }
-                     field: {
-                       qualname: Y
-                       leading ranges: 1
-                       offset: 0
-                       size: 8
-                       size-max: 8
-                       layout: {
-                         elementary
-                         usage: {
-                           display
-                           category: ALPHANUMERIC(1)
-                         }
-                       }
-                     }
-                   }{
-                     table
-                     redefines: X
-                     offset: 0
-                     size: 48
-                     size-max: 48
-                     range: {
-                       span: fixed-length: 3
-                     }
-                     field: {
-                       qualname: Z
-                       leading ranges: 1
-                       offset: 0
-                       size: 16
-                       size-max: 16
-                       layout: {
-                         elementary
-                         usage: {
-                           display
-                           category: ALPHANUMERIC(2)
-                         }
-                       }
-                     }
-                   }
-                 }; field_initial_value = (Some "ABCDEF") }
-               })
+            access_ranges = [Fixed_range {max = 6}] };
+          { access_field =
+            { fixed_field = "      ";
+              fixed_field_info =
+              { field_definition = {
+                  qualname: X
+                  offset: 0
+                  size: 48
+                  size-max: 48
+                  layout: {
+                    elementary
+                    usage: {
+                      display
+                      category: ALPHANUMERIC(6)
+                    }
+                    value: "ABCDEF"
+                  }
+                  redefs: {
+                    table
+                    redefines: X
+                    offset: 0
+                    size: 48
+                    size-max: 48
+                    range: {
+                      span: fixed-length: 6
+                    }
+                    field: {
+                      qualname: Y
+                      leading ranges: 1
+                      offset: 0
+                      size: 8
+                      size-max: 8
+                      layout: {
+                        elementary
+                        usage: {
+                          display
+                          category: ALPHANUMERIC(1)
+                        }
+                      }
+                    }
+                  }{
+                    table
+                    redefines: X
+                    offset: 0
+                    size: 48
+                    size-max: 48
+                    range: {
+                      span: fixed-length: 3
+                    }
+                    field: {
+                      qualname: Z
+                      leading ranges: 1
+                      offset: 0
+                      size: 16
+                      size-max: 16
+                      layout: {
+                        elementary
+                        usage: {
+                          display
+                          category: ALPHANUMERIC(2)
+                        }
+                      }
+                    }
+                  }
+                }; field_initial_value = (Some "ABCDEF") }
+              };
+            access_ranges = [] }
           ]
         };
       local_storage = { storage_records = []; storage_fields = [] } };
@@ -554,8 +553,7 @@
            } }
           ];
         storage_fields =
-        [Indirect_access {
-           base_field =
+        [{ access_field =
            { fixed_field = "  ";
              fixed_field_info =
              { field_definition = {
@@ -573,10 +571,11 @@
                  }
                }; field_initial_value = None }
              };
-           ranges =
-           [Fixed_range {max = 1}, Fixed_range {max = 1}, Fixed_range {max = 3}]};
-          Indirect_access {
-            base_field =
+           access_ranges =
+           [Fixed_range {max = 1}; Fixed_range {max = 1}; Fixed_range {max = 3}
+             ]
+           };
+          { access_field =
             { fixed_field = "      ";
               fixed_field_info =
               { field_definition = {
@@ -613,9 +612,8 @@
                   }
                 }; field_initial_value = None }
               };
-            ranges = [Fixed_range {max = 1}, Fixed_range {max = 1}]};
-          Indirect_access {
-            base_field =
+            access_ranges = [Fixed_range {max = 1}; Fixed_range {max = 1}] };
+          { access_field =
             { fixed_field = "      ";
               fixed_field_info =
               { field_definition = {
@@ -671,9 +669,8 @@
                   }
                 }; field_initial_value = None }
               };
-            ranges = [Fixed_range {max = 1}]};
-          Indirect_access {
-            base_field =
+            access_ranges = [Fixed_range {max = 1}] };
+          { access_field =
             { fixed_field = "  ";
               fixed_field_info =
               { field_definition = {
@@ -691,9 +688,8 @@
                   }
                 }; field_initial_value = None }
               };
-            ranges = [Fixed_range {max = 3}]};
-          Indirect_access {
-            base_field =
+            access_ranges = [Fixed_range {max = 3}] };
+          { access_field =
             { fixed_field = " ";
               fixed_field_info =
               { field_definition = {
@@ -711,9 +707,8 @@
                   }
                 }; field_initial_value = None }
               };
-            ranges = [Fixed_range {max = 2}, Fixed_range {max = 3}]};
-          Indirect_access {
-            base_field =
+            access_ranges = [Fixed_range {max = 2}; Fixed_range {max = 3}] };
+          { access_field =
             { fixed_field = "   ";
               fixed_field_info =
               { field_definition = {
@@ -750,152 +745,153 @@
                   }
                 }; field_initial_value = None }
               };
-            ranges = [Fixed_range {max = 2}]};
-          (Direct_access
-             { fixed_field = "      ";
-               fixed_field_info =
-               { field_definition = {
-                   qualname: X
-                   offset: 0
-                   size: 48
-                   size-max: 48
-                   layout: {
-                     elementary
-                     usage: {
-                       display
-                       category: ALPHANUMERIC(6)
-                     }
-                     value: "ABCDEF"
-                   }
-                   redefs: {
-                     table
-                     redefines: X
-                     offset: 0
-                     size: 48
-                     size-max: 48
-                     range: {
-                       span: fixed-length: 2
-                     }
-                     field: {
-                       qualname: Y-1
-                       leading ranges: 1
-                       offset: 0
-                       size: 24
-                       size-max: 24
-                       layout: {
-                         structure
-                         fields: {
-                           table
-                           offset: 0
-                           size: 24
-                           size-max: 24
-                           range: {
-                             span: fixed-length: 3
-                           }
-                           field: {
-                             qualname: Y-2 IN Y-1
-                             leading ranges: 2
-                             offset: 0
-                             size: 8
-                             size-max: 8
-                             layout: {
-                               elementary
-                               usage: {
-                                 display
-                                 category: ALPHANUMERIC(1)
-                               }
-                             }
-                           }
-                         }
-                       }
-                     }
-                   }{
-                     table
-                     redefines: X
-                     offset: 0
-                     size: 48
-                     size-max: 48
-                     range: {
-                       span: fixed-length: 3
-                     }
-                     field: {
-                       qualname: Z-1
-                       leading ranges: 1
-                       offset: 0
-                       size: 16
-                       size-max: 16
-                       layout: {
-                         elementary
-                         usage: {
-                           display
-                           category: ALPHANUMERIC(2)
-                         }
-                       }
-                     }
-                   }{
-                     table
-                     redefines: X
-                     offset: 0
-                     size: 48
-                     size-max: 48
-                     range: {
-                       span: fixed-length: 1
-                     }
-                     field: {
-                       qualname: T-1
-                       leading ranges: 1
-                       offset: 0
-                       size: 48
-                       size-max: 48
-                       layout: {
-                         structure
-                         fields: {
-                           table
-                           offset: 0
-                           size: 48
-                           size-max: 48
-                           range: {
-                             span: fixed-length: 1
-                           }
-                           field: {
-                             qualname: T-2 IN T-1
-                             leading ranges: 2
-                             offset: 0
-                             size: 48
-                             size-max: 48
-                             layout: {
-                               structure
-                               fields: {
-                                 table
-                                 offset: 0
-                                 size: 48
-                                 size-max: 48
-                                 range: {
-                                   span: fixed-length: 3
-                                 }
-                                 field: {
-                                   qualname: T-3 IN T-2 IN T-1
-                                   leading ranges: 3
-                                   offset: 0
-                                   size: 16
-                                   size-max: 16
-                                   layout: {
-                                     elementary
-                                     usage: {
-                                       display
-                                       category: ALPHANUMERIC(2)
-                                     }
-                                   }
-                                 }
-                               }
-                             }
-                           }
-                         }
-                       }
-                     }
-                   }
-                 }; field_initial_value = (Some "ABCDEF") }
-               })
+            access_ranges = [Fixed_range {max = 2}] };
+          { access_field =
+            { fixed_field = "      ";
+              fixed_field_info =
+              { field_definition = {
+                  qualname: X
+                  offset: 0
+                  size: 48
+                  size-max: 48
+                  layout: {
+                    elementary
+                    usage: {
+                      display
+                      category: ALPHANUMERIC(6)
+                    }
+                    value: "ABCDEF"
+                  }
+                  redefs: {
+                    table
+                    redefines: X
+                    offset: 0
+                    size: 48
+                    size-max: 48
+                    range: {
+                      span: fixed-length: 2
+                    }
+                    field: {
+                      qualname: Y-1
+                      leading ranges: 1
+                      offset: 0
+                      size: 24
+                      size-max: 24
+                      layout: {
+                        structure
+                        fields: {
+                          table
+                          offset: 0
+                          size: 24
+                          size-max: 24
+                          range: {
+                            span: fixed-length: 3
+                          }
+                          field: {
+                            qualname: Y-2 IN Y-1
+                            leading ranges: 2
+                            offset: 0
+                            size: 8
+                            size-max: 8
+                            layout: {
+                              elementary
+                              usage: {
+                                display
+                                category: ALPHANUMERIC(1)
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }{
+                    table
+                    redefines: X
+                    offset: 0
+                    size: 48
+                    size-max: 48
+                    range: {
+                      span: fixed-length: 3
+                    }
+                    field: {
+                      qualname: Z-1
+                      leading ranges: 1
+                      offset: 0
+                      size: 16
+                      size-max: 16
+                      layout: {
+                        elementary
+                        usage: {
+                          display
+                          category: ALPHANUMERIC(2)
+                        }
+                      }
+                    }
+                  }{
+                    table
+                    redefines: X
+                    offset: 0
+                    size: 48
+                    size-max: 48
+                    range: {
+                      span: fixed-length: 1
+                    }
+                    field: {
+                      qualname: T-1
+                      leading ranges: 1
+                      offset: 0
+                      size: 48
+                      size-max: 48
+                      layout: {
+                        structure
+                        fields: {
+                          table
+                          offset: 0
+                          size: 48
+                          size-max: 48
+                          range: {
+                            span: fixed-length: 1
+                          }
+                          field: {
+                            qualname: T-2 IN T-1
+                            leading ranges: 2
+                            offset: 0
+                            size: 48
+                            size-max: 48
+                            layout: {
+                              structure
+                              fields: {
+                                table
+                                offset: 0
+                                size: 48
+                                size-max: 48
+                                range: {
+                                  span: fixed-length: 3
+                                }
+                                field: {
+                                  qualname: T-3 IN T-2 IN T-1
+                                  leading ranges: 3
+                                  offset: 0
+                                  size: 16
+                                  size-max: 16
+                                  layout: {
+                                    elementary
+                                    usage: {
+                                      display
+                                      category: ALPHANUMERIC(2)
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }; field_initial_value = (Some "ABCDEF") }
+              };
+            access_ranges = [] }
           ]
         };
       local_storage = { storage_records = []; storage_fields = [] } };

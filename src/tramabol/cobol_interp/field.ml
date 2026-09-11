@@ -321,30 +321,30 @@ and apply_refmod ~vm f { refmod_left; refmod_length } =
 let indirect_field_accessible_data_size base_field ranges =
   let* cell_size = field_size base_field in
   let data_size =
-    NEL.fold_left cell_size ranges ~f:begin fun x -> function
+    List.fold_left begin fun x -> function
       | Fixed_range { max }
       | Depending_range { max; _ } -> x * max  (* TODO check init rule for ODO *)
-    end
+    end cell_size ranges
   in
   Ok (cell_size, data_size)
 
-let init_value: cob_field_access -> _ = function
-  | Direct_access { fixed_field_info; _ }
-  | Indirect_access { base_field = { fixed_field_info; _ }; _ } ->
-      fixed_field_info.field_initial_value
+let init_value: cob_field_access -> _ = fun f ->
+  f.access_field.fixed_field_info.field_initial_value
 
 let init ~vm:_ (f: cob_field_access) () : (state, _) result =
-  match init_value f, f with
-  | None, _ ->
+  match init_value f with
+  | None ->
       Ok ()
-  | Some value, Direct_access { fixed_field; _ } ->
+  | Some value ->
+      let fixed_field = f.access_field.fixed_field in
       cob_move value fixed_field;
-      Ok ()
-  | Some value, Indirect_access { base_field = { fixed_field; _ }; ranges } ->
-      cob_move value fixed_field;
-      let* cell_size, data_size =
-        indirect_field_accessible_data_size fixed_field ranges
-      in
-      let data_array = CArray.of_ptr data_size @@ CobField.get_data fixed_field in
-      fill_carray ~cell_size ~data_size ~data_array;
-      Ok ()
+      match f.access_ranges with
+      | [] ->
+          Ok ()
+      | ranges ->
+          let* cell_size, data_size =
+            indirect_field_accessible_data_size fixed_field ranges
+          in
+          let data_array = CArray.of_ptr data_size @@ CobField.get_data fixed_field in
+          fill_carray ~cell_size ~data_size ~data_array;
+          Ok ()
