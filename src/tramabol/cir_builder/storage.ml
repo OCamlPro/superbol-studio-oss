@@ -54,33 +54,60 @@ let add_field storage field =
 
 (* --- *)
 
-let resolve_leading_ranges ~data_map leading_ranges =
+let resolve_odo_span ~data_map { occurs_depending_min;
+                                 occurs_depending_max;
+                                 occurs_depending } =
+  match FIELDS_MAP.find ~&occurs_depending data_map with
+  | Direct_access odo_field ->
+      Ok (Depending_range { min = ~&occurs_depending_min;
+                            max = ~&occurs_depending_max;
+                            odo_field })
+  | Indirect_access _ ->
+      Error.one @@ Unexpected { stuff = Item_used_in_depending_clause;
+                                loc = ~@occurs_depending }
+  | exception Not_found ->
+      Error.one @@ Undefined { stuff = Data_reference ~&occurs_depending;
+                               loc = ~@occurs_depending }
+
+let resolve_leading_ranges ~loc ~data_map leading_ranges =
   List.fold_left begin fun resolved_ranges range ->
     let* resolved_ranges in
     match range.range_span with
     | Fixed_span { occurs_times } ->
         Ok (Fixed_range { max = ~&occurs_times } :: resolved_ranges)
-    | Depending_span { occurs_depending_min;
-                       occurs_depending_max;
-                       occurs_depending } ->
-        (match FIELDS_MAP.find ~&occurs_depending data_map with
-         | Direct_access odo_field ->
-             Ok (Depending_range { min = ~&occurs_depending_min;
-                                   max = ~&occurs_depending_max;
-                                   odo_field } :: resolved_ranges)
-         | Indirect_access _ ->
-             Ok resolved_ranges                                     (* error! *)
-         | exception Not_found ->
-             (* CHECKME: Not_found -> invalid ODO? (or just skip in that
-                case)? *)
-             Ok resolved_ranges)                                    (* error! *)
-    | _ ->
-        Ok resolved_ranges
+    | Depending_span odo ->
+        let* range = resolve_odo_span ~data_map odo in
+        Ok (range :: resolved_ranges)
+    | Dynamic_span _ ->
+        Error.one @@ Unsupported { stuff = Dynamic_span; loc }
   end (Ok []) leading_ranges
 
+let resolve_field_access ~builder ~record ~data_map field_definition =
+  let* field_value =
+    builder.create_field_from_definition field_definition record
+  and* field_initial_value =
+    match ~&field_definition.field_layout with
+    | Elementary_field { init_value = Some v; _ } ->
+        Result.map Option.some @@
+        builder.create_field_from_literal_value v
+    | Elementary_field _
+    | Struct_field _ ->
+        Ok None
+  and* rev_ranges =
+    resolve_leading_ranges ~&field_definition.field_leading_ranges
+      ~data_map ~loc:~@field_definition
+  in
+  let fixed_field_info = { field_initial_value; field_definition } in
+  let fixed_field = { fixed_field = field_value; fixed_field_info } in
+  match rev_ranges with
+  | [] ->
+      Ok (Direct_access fixed_field)
+  | rev_ranges ->
+      Ok (Indirect_access { ranges = NEL.of_rev_list rev_ranges;
+                            base_field = fixed_field })
+
 (* Does nothing on unnamed fields *)
-let add_field ~builder ~storage ~record
-    ~(field_definition: field_definition with_loc) acc =
+let define_field ~builder ~storage ~record ~field_definition acc =
   let ( let* ) x f = continue_on_error ~acc x f in
   match ~&field_definition.field_qualname with
   | None ->                                              (* skip unnamed field *)
@@ -90,29 +117,9 @@ let add_field ~builder ~storage ~record
         error acc @@ Unsupported { stuff = Variable_length_field;
                                    loc = ~@field_definition }
       else
-        let* rev_ranges =
-          resolve_leading_ranges ~&field_definition.field_leading_ranges
+        let* field_access =
+          resolve_field_access ~builder ~record field_definition
             ~data_map:acc.data.map
-        and* field_value =
-          builder.create_field_from_definition field_definition record
-        and* field_initial_value =
-          match ~&field_definition.field_layout with
-          | Elementary_field { init_value = Some v; _ } ->
-              Result.map Option.some @@
-              builder.create_field_from_literal_value v
-          | Elementary_field _
-          | Struct_field _ ->
-              Ok None
-        in
-        let fixed_field_info = { field_initial_value; field_definition } in
-        let fixed_field = { fixed_field = field_value; fixed_field_info } in
-        let field_access =
-          match rev_ranges with
-          | [] ->
-              Direct_access fixed_field
-          | rev_ranges ->
-              Indirect_access { ranges = NEL.of_rev_list rev_ranges;
-                                base_field = fixed_field }
         in
         { acc with
           data =
@@ -131,7 +138,7 @@ let definitions_visitor ~builder ~record ~storage ~skip_depending_tables =
     inherit [_] Cobol_data.Visitor.folder
     method! fold_field_definition' field_definition acc =
       Cobol_common.Visitor.proceed @@
-      add_field ~builder ~record ~field_definition ~storage acc
+      define_field ~builder ~record ~field_definition ~storage acc
     method! fold_table_definition' table_definition acc =
       (* CHECKME: other special handling needed?  Maybe to detect overlapping
          initialization/VALUE clauses? *)
