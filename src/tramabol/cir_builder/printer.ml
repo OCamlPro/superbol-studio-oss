@@ -64,6 +64,8 @@ let pp_errors ?platform ppf errors =
 let register_printers () =
 
   register_unexpected_stuff_printer begin fun ppf -> function
+    | Item_used_in_depending_clause ->
+        Pretty.print ppf "item@ used@ in@ DEPENDING@ clause"
     | Reference_modification ->
         Pretty.print ppf "reference@ modification"
     | _ ->
@@ -75,6 +77,8 @@ let register_printers () =
         Pretty.print ppf "condition"
     | Dynamic_table ->
         Pretty.print ppf "dynamic-capacity@ table"
+    | Dynamic_span ->
+        Pretty.print ppf "span@ of@ dynamic-capacity@ table"
     | Expression _ ->
         Pretty.print ppf "expression"
     | Statement _ ->

@@ -39,7 +39,10 @@ type missing_stuff =
    type. *)
 type unexpected_stuff = ..
 
+(* Note: edit the corresponding function in `printer.ml` when adjusting this
+   type. *)
 type unexpected_stuff +=
+  | Item_used_in_depending_clause
   | Reference_modification
 
 (* Note: call `Printer.register_unsupported_stuff_printer` when extending this
@@ -50,6 +53,7 @@ type unsupported_stuff = ..
    type. *)
 type unsupported_stuff +=
   | Condition of Cobol_ptree.condition with_loc
+  | Dynamic_span
   | Dynamic_table
   | Expression of Cobol_ptree.expr with_loc
   | Statement of Cobol_ptree.statement
