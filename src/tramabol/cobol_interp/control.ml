@@ -22,3 +22,8 @@ let stop ~vm:_ ?status state =
   | Some f ->
       let* status = Field.as_int f in
       Ok (Stop (state, status))
+
+let conditional ~vm:_ c yes_branch no_branch state =
+  if c
+  then Ok (Perform (state, yes_branch))
+  else Ok (Perform (state, no_branch))

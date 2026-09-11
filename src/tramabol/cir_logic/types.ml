@@ -13,7 +13,11 @@
 
 (* In addition to the type variables mentioned in {!Cir_types}, this file uses:
 
-   - ['s] to denote the type of runtime states;
+   - ['bool] to denote the type of evaluated conditions; a concrete interpreter
+     will typically use ['bool = bool];
+
+   - ['s] to denote the type of runtime states; a concrete imperative
+     interpreter will typically use ['s = unit];
 
    - ['branch] to denote control-flow branching behaviors. *)
 
@@ -46,16 +50,17 @@ and localized_runtime_error =
 (* --- *)
 
 (** Type of {b concrete} branches. *)
-type 's branch =
+type ('s, 'code_target) branch =
   | Continue of 's
   | Stop of 's * int
+  | Perform of 's * 'code_target
 
 (** COBOL exceptions... not represented for now.  May need to be part of
     Cir_type if this kind of data needs to be manipulated explicitly by COBOL
     operations... *)
 type cobol_exception = |
 
-type ('f, 'r, 'm, 's, 'branch) manager =
+type ('f, 'bool, 'r, 'm, 's, 'branch) manager =
   {
     enter_module:
       'm -> params: 'f array -> unit;
@@ -73,14 +78,19 @@ type ('f, 'r, 'm, 's, 'branch) manager =
     data_value:
       vm: 'vm -> 'f data_reference -> 's -> ('s * 'f) evaluation_result;
 
+    eval_condition:
+      vm: 'vm -> 'f condition -> 's -> ('s * 'bool) evaluation_result;
+
     display_fields:
       vm: 'vm -> advancing: bool -> 'f array -> 's -> 'branch evaluation_result;
     stop:
       vm: 'vm -> ?status: 'f -> 's -> 'branch evaluation_result;
+    conditional:
+      vm: 'vm -> 'bool -> 'f code_block -> 'f code_block -> 's -> 'branch evaluation_result;
 
     proceed:
-      'branch -> 's branch evaluation_result;
+      'branch -> ('s, 'f code_block) branch evaluation_result;
   }
-  constraint 'vm = ('f, 'r, 'm, 's, 'branch) manager
+  constraint 'vm = ('f, 'bool, 'r, 'm, 's, 'branch) manager
 
 and 's evaluation_result = ('s, localized_runtime_errors) result

@@ -12,7 +12,7 @@
 (**************************************************************************)
 
 val run_module
-  : vm:('a, 'b, 'c, 'd, 'branch) Types.manager
-  -> ('a, 'b, 'c) Cir_types.module_handle
-  -> 'd
-  -> ('d * int, Types.localized_runtime_errors) result
+  : vm:('f, 'b, 'r, 'm, 's, 'branch) Types.manager
+  -> ('f, 'r, 'm) Cir_types.module_handle
+  -> 's
+  -> ('s * int, Types.localized_runtime_errors) result

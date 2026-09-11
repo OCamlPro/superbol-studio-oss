@@ -154,3 +154,17 @@ let resolve_data_reference
       Ok { data_field = field_ref;
            data_ref_loc = field_ref_loc;
            data_refmod = None }
+
+let resolve_condition
+  : ('f, _, _) env -> Cobol_ptree.condition with_loc -> ('f condition, errors) result =
+  fun env c ->
+  match ~&c with
+  | CondSubject (subject,
+                 { payload = CondRelOp ({ payload = Eq; _ },
+                                        { payload = CondObjectOrExpr expr; _ });
+                   _ }) ->
+      let* subject = resolve_expr env subject
+      and* expr = resolve_expr env expr in
+      Ok (false, subject, expr)
+  | _ ->
+      error @@ Unsupported { stuff = Condition c; loc = ~@c }

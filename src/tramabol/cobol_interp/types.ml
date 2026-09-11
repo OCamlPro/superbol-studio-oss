@@ -58,15 +58,20 @@ let pp_module_handle ppf =
 
 (** CIR builder with values that are managed by libcob. *)
 type builder =
-  (cob_field, cob_record_data, cob_module_memory) Cir_builder.Types.builder
+  (cob_field, cob_record_data, cob_module_memory)
+    Cir_builder.Types.builder
 
-(** Value manager for the libcob-based CIR *)
+(** Manager for the libcob-based CIR interpretation logic *)
 type manager =
-  (cob_field, cob_record_data, cob_module_memory,
-   state, state Cir_logic.Types.branch) Cir_logic.Types.manager
+  (cob_field, condition_result, cob_record_data, cob_module_memory,
+   state, (state, cob_field Cir_types.code_block) Cir_logic.Types.branch)
+    Cir_logic.Types.manager
 
 (** The libcob-based CIR is purely imperative, so it's state is [unit]. *)
 and state = unit
+
+(** Evaluating conditions directly provides us with a concrete result. *)
+and condition_result = bool
 
 (** State, or else runtime errors *)
 type evaluation_result =

@@ -38,6 +38,9 @@ let manager: manager =
     display_fields = Termio.display_fields;
 
     stop = Control.stop;
+    conditional = Control.conditional;
+
+    eval_condition = Eval.condition;
 
     proceed = Result.ok; (* always proceed; "our" branch type is the same as in
                             Cir_logic. *)
