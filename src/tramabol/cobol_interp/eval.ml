@@ -11,19 +11,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cir_logic.Types
+open Ezlibcob.V1
+open Cir_types
+open Types
 
 open Cir_logic.Syntax
 
-let stop ~vm:_ ?status state =
-  match status with
-  | None ->
-      Ok (Stop (state, 0))
-  | Some f ->
-      let* status = Field.as_int f in
-      Ok (Stop (state, status))
-
-let conditional ~vm:_ c yes_branch no_branch state =
-  if c
-  then Ok (Perform (state, yes_branch))
-  else Ok (Perform (state, no_branch))
+let condition ~vm ((polarity, a, b) : _ condition) () : (state * bool, _) result =
+  let* (), a = Field.access_field_reference ~vm a () in
+  let* (), b = Field.access_field_reference ~vm b () in
+  let res = cob_cmp a b in
+  Ok ((), S32.to_int_unsafe res != 0 = polarity)

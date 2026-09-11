@@ -143,6 +143,11 @@ and 'f refmod =
 
 [@@deriving show { with_path = false }]
 
+type 'f condition =                 (* WIP implicit equality condition for now *)
+  bool * 'f field_reference * 'f field_reference
+
+[@@deriving show { with_path = false }]
+
 let pp_fields_map pe =
   FIELDS_MAP.pp @@ pp_field_access pe
 
@@ -173,21 +178,12 @@ type 'f statement =
       {
         optional_status: 'f data_reference option;
       }
-  (* | IR_local_bind of                                             (\* SSA value *\) *)
-  (*     { *)
-  (*       symbol_binding: 'f symbol_binding; *)
-  (*       block: 'f code_block;  (\* where [symbol -> 'f immutable_field \in env] *\) *)
-  (*     } *)
-
-(* and 'f symbol_binding = *)
-(*   { *)
-(*     symbol: SYMBOL.t; *)
-(*     (\* symbol_field: 'f mutable_field; *\) *)
-(*     symbol_value: 'f expr; *)
-(*   } *)
-
-(* and 'f expr = *)
-(*   | IR_expr_field of 'f field *)
+  | IR_conditional of
+      {
+        condition: 'f condition;
+        then_branch: 'f code_block;
+        else_branch: 'f code_block;
+      }
 
 (** A block of code that is amenable to interpretation; for now, only a list of
     statements. *)
@@ -198,9 +194,8 @@ and 'f code_block =
 
 type ('f, 'r, 'm) module_handle =
   {
-    module_memory: 'm (* [@opaque] *);
-    module_unit: Cobol_unit.Types.t
-                  (* [@printer Cobol_unit.Printer.pp_cobol_unit']) *)[@opaque];
+    module_memory: 'm;
+    module_unit: Cobol_unit.Types.t [@opaque];
     module_data: ('f, 'r) data;
     module_proc: 'f code_block;                           (* one block for now *)
   }

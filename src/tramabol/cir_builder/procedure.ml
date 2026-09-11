@@ -17,6 +17,7 @@ open Cir_types
 open Types
 
 open Syntax
+open Syntax.INFIX
 
 (* --- *)
 
@@ -28,6 +29,18 @@ let append_lists r r' =
   Ok (LIST.append ~loc:__LOC__ r r')
 
 (* --- *)
+
+type 'f code_block_builder =
+  ('f Cir_types.code_block, error nel) result Cobol_unit.Visitor.folder
+
+let translate_statements (visitor: _ code_block_builder) statements =
+  List.rev =|< Cobol_ptree.Visitor.fold_statements visitor statements (Ok [])
+
+let translate_if_statement env visitor stmt =
+  let* condition = Expr.resolve_condition env ~&stmt.condition
+  and* then_branch = translate_statements visitor ~&stmt.then_branch
+  and* else_branch = translate_statements visitor ~&stmt.else_branch in
+  Ok [IR_conditional { condition; then_branch; else_branch } &@<- stmt]
 
 let translate_display_statement env stmt =
   let* rev_fields =
@@ -54,26 +67,34 @@ let translate_stop_statement env stmt =
   | StopThread _ ->
       error @@ Unsupported { stuff = Statement (Stop ~&stmt); loc = ~@stmt }
 
-let translate env (p: procedure) : (_ code_block, _) result =
+let translate_procedure visitor p =
+  (* TODO: for now, assumes a sequence of statements *)
+  List.rev =|< Cobol_unit.Visitor.fold_procedure visitor p (Ok [])
+
+let statements_builder env =
   let append_statements acc r = append_lists r acc in
-  let* core_statements =
-    Cobol_unit.Visitor.fold_procedure (object
-      inherit [_] Cobol_unit.Visitor.folder
-      method! fold_statement' s acc =
-        Cobol_common.Visitor.do_children_and_then acc begin fun acc' ->
-          if acc == acc'                    (* Note: rely on physical equality *)
-          then error @@ Unsupported { stuff = Statement ~&s; loc = ~@s }
-          else acc'
-        end
+  object (visitor)
+    inherit [_] Cobol_unit.Visitor.folder
+    method! fold_statement' s acc =
+      Cobol_common.Visitor.do_children_and_then acc begin fun acc' ->
+        if acc == acc'                      (* Note: rely on physical equality *)
+        then error @@ Unsupported { stuff = Statement ~&s; loc = ~@s }
+        else acc'
+      end
 
-      method! fold_display' s acc =
-        Cobol_common.Visitor.skip @@
-        append_statements acc @@ translate_display_statement env s
+    method! fold_if' s acc =
+      Cobol_common.Visitor.skip @@
+      append_statements acc @@ translate_if_statement env visitor s
 
-      method! fold_stop' s acc =
-        Cobol_common.Visitor.skip @@
-        append_statements acc @@ translate_stop_statement env s
+    method! fold_display' s acc =
+      Cobol_common.Visitor.skip @@
+      append_statements acc @@ translate_display_statement env s
 
-    end) p (Ok [])
-  in
-  Ok (List.rev core_statements)
+    method! fold_stop' s acc =
+      Cobol_common.Visitor.skip @@
+      append_statements acc @@ translate_stop_statement env s
+  end
+
+let translate env (p: procedure) : (_ code_block, _) result =
+  let visitor = statements_builder env in
+  translate_procedure visitor p

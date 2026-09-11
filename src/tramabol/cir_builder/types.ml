@@ -49,6 +49,7 @@ type unsupported_stuff = ..
 (* Note: edit the corresponding function in `printer.ml` when adjusting this
    type. *)
 type unsupported_stuff +=
+  | Condition of Cobol_ptree.condition with_loc
   | Dynamic_table
   | Expression of Cobol_ptree.expr with_loc
   | Statement of Cobol_ptree.statement

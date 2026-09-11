@@ -71,6 +71,8 @@ let register_printers () =
   end;
 
   register_unsupported_stuff_printer begin fun ppf -> function
+    | Condition _ ->
+        Pretty.print ppf "condition"
     | Dynamic_table ->
         Pretty.print ppf "dynamic-capacity@ table"
     | Expression _ ->
