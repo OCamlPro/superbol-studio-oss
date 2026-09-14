@@ -79,14 +79,10 @@ let _editor_action_findReferences =
 
 (** {2 Workspace-wide analysis} *)
 
-(* Opening a document is enough to get diagnostics for it: the client notifies
-   the server about every open document, even when no editor shows it.  The
-   diagnostics stay in the Problems view after the document is closed, as the
-   server does not clear them on `textDocument/didClose'. *)
+(* An open document gets diagnostics even with no editor showing it, and they
+   stay in the Problems view once it is closed. *)
 
-(* Same file extensions as the `cobol' language contribution (see
-   `cob_extensions_pattern' in `vscode_extension.ml').  Copybooks are included;
-   the server detects and skips them. *)
+(* Same extensions as the `cobol' language contribution. *)
 let cobol_file_patterns =
   [
     "**/*.[cC]{ob,OB,bl,BL,py,PY,bx,BX,bsql}";
@@ -104,10 +100,8 @@ let find_cobol_files ~token =
   in
   aux [] cobol_file_patterns
 
-(* The server only answers this request once it has processed the `didOpen' for
-   [uri], so waiting for the reply paces the loop on actual analysis work.  We
-   ignore the answer, and only care about the diagnostics published in the
-   meantime. *)
+(* The reply only comes once the server has handled the `didOpen' for [uri], so
+   waiting for it paces the loop on real work. *)
 let await_analysis_of ~uri instance =
   Superbol_instance.lsp_request instance
     ~meth:"textDocument/documentSymbol"
@@ -159,23 +153,73 @@ let analyze_workspace instance ~progress ~token =
   in
   loop 0 uris
 
+(* The server drops all diagnostics unless `forceSyntaxDiagnostics' is set or
+   the dialect is COBOL85 (see `dispatch_diagnostics' in `lsp_server.ml').  The
+   dialect is per project, so we warn instead of refusing. *)
+let check_diagnostics_reported () =
+  if Superbol_workspace.bool "forceSyntaxDiagnostics" ||
+     Superbol_workspace.string "cobol.dialect" = "cobol85" then
+    Promise.return `Scan
+  else
+    let open Promise.Syntax in
+    let+ choice =
+      Window.showWarningMessage ()
+        ~message:"SuperBOL only reports diagnostics for projects that use the \
+                  COBOL85 dialect, unless `superbol.forceSyntaxDiagnostics' is \
+                  enabled.  The scan may find nothing to report."
+        ~choices:["Enable and Restart Server", `Enable;
+                  "Scan Anyway", `Scan]
+    in
+    Option.value choice ~default:`Abort
+
+(* Writing the setting restarts the server.  We cannot await that, so we ask
+   for a new run. *)
+let enable_syntax_diagnostics () =
+  let open Promise.Syntax in
+  let target =
+    if Workspace.workspaceFolders () = []
+    then ConfigurationTarget.Global
+    else ConfigurationTarget.Workspace
+  in
+  let+ () =
+    WorkspaceConfiguration.update
+      (Workspace.getConfiguration ~section:"superbol" ())
+      ~section:"forceSyntaxDiagnostics"
+      ~value:(Ojs.bool_to_js true)
+      ~configurationTarget:(`ConfigurationTarget target) ()
+  in
+  let _ =
+    Window.showInformationMessage ()
+      ~message:"Diagnostics enabled.  The language server is restarting; \
+                please run the analysis again."
+  in
+  ()
+
+let scan_workspace instance =
+  Window.withProgress (module Interop.Js.Unit)
+    ~options:(ProgressOptions.create
+                ~location:(`ProgressLocation ProgressLocation.Notification)
+                ~title:"SuperBOL: analyzing COBOL files"
+                ~cancellable:true ())
+    ~task:(analyze_workspace instance)
+
+let run_analysis instance =
+  match Superbol_instance.client instance with
+  | None ->
+      Superbol_printer.show_error_message @@
+      Error Superbol_types.Client_not_running
+  | Some _ ->
+      let open Promise.Syntax in
+      let* decision = check_diagnostics_reported () in
+      match decision with
+      | `Abort -> Promise.return ()
+      | `Enable -> enable_syntax_diagnostics ()
+      | `Scan -> scan_workspace instance
+
 let _analyze_workspace =
   command "superbol.analyze.workspace" @@ Instance
     begin fun instance ~args:_ ->
-      let _: unit Promise.t =
-        match Superbol_instance.client instance with
-        | None ->
-            Superbol_printer.show_error_message @@
-            Error Superbol_types.Client_not_running
-        | Some _ ->
-            Window.withProgress (module Interop.Js.Unit)
-              ~options:(ProgressOptions.create
-                          ~location:(`ProgressLocation
-                                       ProgressLocation.Notification)
-                          ~title:"SuperBOL: analyzing COBOL files"
-                          ~cancellable:true ())
-              ~task:(analyze_workspace instance)
-      in
+      let _: unit Promise.t = run_analysis instance in
       ()
     end
 
