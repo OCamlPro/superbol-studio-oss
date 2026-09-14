@@ -4,7 +4,7 @@
   (name superbol_vscode_lib)
   (public_name superbol-vscode-lib)
   (wrapped true)
-  (libraries vscode-languageclient-js-stubs vscode-js-stubs promise_jsoo node-js-stubs jsonoo js_of_ocaml )
+  (libraries vscode-languageclient-js-stubs vscode-js-stubs promise_jsoo node-js-stubs jsonoo js_of_ocaml interop-js-stubs )
   (modes byte)
   (preprocess (pps gen_js_api.ppx))
   

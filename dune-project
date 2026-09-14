@@ -43,6 +43,7 @@
    (node-js-stubs (= :version))
    (jsonoo (and (>= 0.2.1) (< 1.0.0)))
    (js_of_ocaml ( >= 4 ))
+   (interop-js-stubs (= :version))
    (js_of_ocaml-ppx ( >= 4 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))

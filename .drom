@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-24865d7547aa5cfc0f6d0ee32936416b:.
+66562d845a80506998721b866da845e5:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -50,7 +50,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-0a55e3399c177530a4a75668a8cb6f25:dune-project
+1c7721d6c63c706bcad8ab4199b53447:dune-project
 # end context for dune-project
 
 # begin context for opam/autofonce.opam
@@ -246,7 +246,7 @@ a034879e862514ca15e74e5bb1e42d7c:opam/superbol-studio-oss.opam
 
 # begin context for opam/superbol-vscode-lib.opam
 # file opam/superbol-vscode-lib.opam
-7642ec78ac986013c8a8b1d521c6b5f6:opam/superbol-vscode-lib.opam
+70a21fe12bd06b2dcd597c1ec9b8ac44:opam/superbol-vscode-lib.opam
 # end context for opam/superbol-vscode-lib.opam
 
 # begin context for opam/superbol-vscode-oss.opam

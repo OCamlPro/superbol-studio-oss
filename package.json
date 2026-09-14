@@ -26,6 +26,11 @@
         "category": "SuperBOL"
       },
       {
+        "command": "superbol.analyze.workspace",
+        "title": "Analyze All COBOL Files in Workspace",
+        "category": "SuperBOL"
+      },
+      {
         "command": "superbol.coverage.show",
         "title": "Show Coverage",
         "category": "SuperBOL"
