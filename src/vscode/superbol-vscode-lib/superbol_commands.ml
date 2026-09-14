@@ -77,6 +77,152 @@ let _editor_action_findReferences =
         OutputChannel.appendLine oc ~value
     end
 
+(** {2 Workspace-wide analysis} *)
+
+(* An open document gets diagnostics even with no editor showing it, and they
+   stay in the Problems view once it is closed. *)
+
+(* Same extensions as the `cobol' language contribution. *)
+let cobol_file_patterns =
+  [
+    "**/*.[cC]{ob,OB,bl,BL,py,PY,bx,BX,bsql}";
+    "**/*.[pP]{co,CO}";
+  ]
+
+let find_cobol_files ~token =
+  let open Promise.Syntax in
+  let rec aux acc = function
+    | [] ->
+        Promise.return (List.rev acc)
+    | pattern :: patterns ->
+        let* uris = Workspace.findFiles () ~includes:(`String pattern) ~token in
+        aux (List.rev_append uris acc) patterns
+  in
+  aux [] cobol_file_patterns
+
+(* The reply only comes once the server has handled the `didOpen' for [uri], so
+   waiting for it paces the loop on real work. *)
+let await_analysis_of ~uri instance =
+  Superbol_instance.lsp_request instance
+    ~meth:"textDocument/documentSymbol"
+    ~data:Jsonoo.Encode.(object_ [
+        "textDocument", object_ ["uri", string @@ Uri.toString uri ()];
+      ]) |>
+  Promise.then_
+    ~fulfilled:(fun _ -> Promise.return ())
+    ~rejected:(fun _ -> Promise.return ())
+
+let analyze_document ~uri instance =
+  Promise.catch ~rejected:(fun _ -> Promise.return ()) @@
+  let open Promise.Syntax in
+  let* _doc = Workspace.openTextDocument (`Uri uri) in
+  await_analysis_of ~uri instance
+
+let report_completion ~analyzed ~missed =
+  let _ =
+    Window.showInformationMessage ()
+      ~message:begin
+        if missed = 0 then
+          Printf.sprintf "SuperBOL: analyzed %u file(s); diagnostics are \
+                          listed in the Problems view" analyzed
+        else
+          Printf.sprintf "SuperBOL: analysis interrupted after %u of %u file(s)"
+            analyzed (analyzed + missed)
+      end
+  in
+  Promise.return ()
+
+let analyze_workspace instance ~progress ~token =
+  let open Promise.Syntax in
+  let* uris = find_cobol_files ~token in
+  let total = List.length uris in
+  let percent i = i * 100 / max 1 total in
+  let rec loop i = function
+    | remaining when CancellationToken.isCancellationRequested token ->
+        report_completion ~analyzed:i ~missed:(List.length remaining)
+    | [] ->
+        report_completion ~analyzed:i ~missed:0
+    | uri :: remaining ->
+        Progress.report progress ~value:Progress.{
+            message = Some (Printf.sprintf "%u/%u: %s" (succ i) total @@
+                            Workspace.asRelativePath () ~pathOrUri:(`Uri uri));
+            increment = Some (percent (succ i) - percent i);
+          };
+        let* () = analyze_document ~uri instance in
+        loop (succ i) remaining
+  in
+  loop 0 uris
+
+(* The server drops all diagnostics unless `forceSyntaxDiagnostics' is set or
+   the dialect is COBOL85 (see `dispatch_diagnostics' in `lsp_server.ml').  The
+   dialect is per project, so we warn instead of refusing. *)
+let check_diagnostics_reported () =
+  if Superbol_workspace.bool "forceSyntaxDiagnostics" ||
+     Superbol_workspace.string "cobol.dialect" = "cobol85" then
+    Promise.return `Scan
+  else
+    let open Promise.Syntax in
+    let+ choice =
+      Window.showWarningMessage ()
+        ~message:"SuperBOL only reports diagnostics for projects that use the \
+                  COBOL85 dialect, unless `superbol.forceSyntaxDiagnostics' is \
+                  enabled.  The scan may find nothing to report."
+        ~choices:["Enable and Restart Server", `Enable;
+                  "Scan Anyway", `Scan]
+    in
+    Option.value choice ~default:`Abort
+
+(* Writing the setting restarts the server.  We cannot await that, so we ask
+   for a new run. *)
+let enable_syntax_diagnostics () =
+  let open Promise.Syntax in
+  let target =
+    if Workspace.workspaceFolders () = []
+    then ConfigurationTarget.Global
+    else ConfigurationTarget.Workspace
+  in
+  let+ () =
+    WorkspaceConfiguration.update
+      (Workspace.getConfiguration ~section:"superbol" ())
+      ~section:"forceSyntaxDiagnostics"
+      ~value:(Ojs.bool_to_js true)
+      ~configurationTarget:(`ConfigurationTarget target) ()
+  in
+  let _ =
+    Window.showInformationMessage ()
+      ~message:"Diagnostics enabled.  The language server is restarting; \
+                please run the analysis again."
+  in
+  ()
+
+let scan_workspace instance =
+  Window.withProgress (module Interop.Js.Unit)
+    ~options:(ProgressOptions.create
+                ~location:(`ProgressLocation ProgressLocation.Notification)
+                ~title:"SuperBOL: analyzing COBOL files"
+                ~cancellable:true ())
+    ~task:(analyze_workspace instance)
+
+let run_analysis instance =
+  match Superbol_instance.client instance with
+  | None ->
+      Superbol_printer.show_error_message @@
+      Error Superbol_types.Client_not_running
+  | Some _ ->
+      let open Promise.Syntax in
+      let* decision = check_diagnostics_reported () in
+      match decision with
+      | `Abort -> Promise.return ()
+      | `Enable -> enable_syntax_diagnostics ()
+      | `Scan -> scan_workspace instance
+
+let _analyze_workspace =
+  command "superbol.analyze.workspace" @@ Instance
+    begin fun instance ~args:_ ->
+      let _: unit Promise.t = run_analysis instance in
+      ()
+    end
+
 let _restart_language_server =
   command "superbol.server.restart" @@ Instance
     begin fun instance ~args:_ ->

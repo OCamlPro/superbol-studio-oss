@@ -612,6 +612,10 @@ let commands =
       ~category:"SuperBOL"
     (* ~enablement:"!inDebugMode" *);
     Manifest.command ()
+      ~command:"superbol.analyze.workspace"
+      ~title:"Analyze Every COBOL File in the Workspace"
+      ~category:"SuperBOL";
+    Manifest.command ()
       ~command:"superbol.coverage.show"
       ~title:"Show Coverage"
       ~category:"SuperBOL";
