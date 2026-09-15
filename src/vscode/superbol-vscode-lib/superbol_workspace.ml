@@ -46,7 +46,7 @@ let create_report () =
       let dir =
         Node.Path.join [Uri.fsPath (WorkspaceFolder.uri folder); "_superbol"]
       in
-      let file = Node.Path.join [dir; "analysis-report.txt"] in
+      let file = Node.Path.join [dir; "analysis-report.md"] in
       try
         (* The bindings drop the label: this is a plain, non-recursive mkdir,
            and it fails if the directory is already there. *)
@@ -117,7 +117,7 @@ let analyze_document ~uri ~report instance =
           (Node.JsError.message error)
       in
       Superbol_printer.log_error "SuperBOL: %s" value;
-      append_to_report report (value ^ "\n");
+      append_to_report report ("- " ^ value ^ "\n");
       Promise.return false
     end @@
   if is_already_open uri then
@@ -136,10 +136,18 @@ let severity_name = function
   | DiagnosticSeverity.Information -> "note"
   | DiagnosticSeverity.Hint -> "hint"
 
+(* Markdown link, so that a click jumps to the reported line.  The target is
+   relative to the report, which lies one directory below the workspace. *)
+let report_link ~path ~line ~char =
+  let target = if Node.Path.isAbsolute path then path else "../" ^ path in
+  Printf.sprintf "[%s:%u:%u](<%s#L%u>)" path line char target line
+
 let report_line ~path diag =
   let pos = Range.start @@ Diagnostic.range diag in
-  Printf.sprintf "%s:%u:%u: %s: %s\n" path
-    (succ @@ Position.line pos) (succ @@ Position.character pos)
+  Printf.sprintf "- %s: %s: %s\n"
+    (report_link ~path
+       ~line:(succ @@ Position.line pos)
+       ~char:(succ @@ Position.character pos))
     (severity_name @@ Diagnostic.severity diag)
     (Diagnostic.message diag)
 
