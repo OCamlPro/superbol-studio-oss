@@ -18,8 +18,7 @@ let plural n one many = if n = 1 then one else many
 
 (** {2 Workspace-wide analysis} *)
 
-(* An open document gets diagnostics even with no editor showing it, and they
-   stay in the Problems view once it is closed. *)
+(* Diagnostics stay in the Problems view once the document is closed. *)
 
 (* Same extensions as the `cobol' language contribution. *)
 let cobol_file_patterns =
@@ -39,23 +38,55 @@ let find_cobol_files ~token =
   in
   aux [] cobol_file_patterns
 
+let text_document_id uri =
+  Jsonoo.Encode.(object_ ["uri", string @@ Uri.toString uri ()])
+
 (* The reply only comes once the server has handled the `didOpen' for [uri], so
    waiting for it paces the loop on real work. *)
 let await_analysis_of ~uri instance =
   Superbol_instance.lsp_request instance
     ~meth:"textDocument/documentSymbol"
-    ~data:Jsonoo.Encode.(object_ [
-        "textDocument", object_ ["uri", string @@ Uri.toString uri ()];
-      ]) |>
+    ~data:Jsonoo.Encode.(object_ ["textDocument", text_document_id uri]) |>
   Promise.then_
     ~fulfilled:(fun _ -> Promise.return ())
     ~rejected:(fun _ -> Promise.return ())
 
+(* VS Code cannot close a document opened with `openTextDocument', so we
+   notify the server ourselves and keep one document in memory at a time. *)
+let notify_did_open ~uri ~text instance =
+  Superbol_instance.lsp_notification instance
+    ~meth:"textDocument/didOpen"
+    ~data:Jsonoo.Encode.(object_ [
+        "textDocument", object_ [
+          "uri", string @@ Uri.toString uri ();
+          "languageId", string "cobol";
+          "version", int 1;
+          "text", string text;
+        ];
+      ])
+
+let notify_did_close ~uri instance =
+  Superbol_instance.lsp_notification instance
+    ~meth:"textDocument/didClose"
+    ~data:Jsonoo.Encode.(object_ ["textDocument", text_document_id uri])
+
+(* Documents already open are synced by the client: do not close them. *)
+let is_already_open uri =
+  let uri = Uri.toString uri () in
+  List.exists
+    (fun doc -> Uri.toString (TextDocument.uri doc) () = uri)
+    (Workspace.textDocuments ())
+
 let analyze_document ~uri instance =
   Promise.catch ~rejected:(fun _ -> Promise.return ()) @@
-  let open Promise.Syntax in
-  let* _doc = Workspace.openTextDocument (`Uri uri) in
-  await_analysis_of ~uri instance
+  if is_already_open uri then
+    await_analysis_of ~uri instance
+  else
+    let open Promise.Syntax in
+    let* text = Node.Fs.readFile (Uri.fsPath uri) in
+    notify_did_open ~uri ~text instance;
+    let+ () = await_analysis_of ~uri instance in
+    notify_did_close ~uri instance
 
 let report_completion ~analyzed ~missed =
   let _ =
