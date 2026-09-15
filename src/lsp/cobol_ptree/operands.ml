@@ -87,7 +87,7 @@ let pp_position ppf = function
 type call_using_clause =
   {
     call_using_by: call_using_by option;
-    call_using_expr: expr with_loc option with_loc;        (** OMITTED if [None] *)
+    call_using_expr: scalar with_loc option with_loc;   (** OMITTED if [None] *)
   }
 [@@deriving ord]
 
@@ -104,7 +104,8 @@ let pp_call_using_by ppf = function
 
 let pp_call_using_clause ppf { call_using_by = cub; call_using_expr = cue } =
   Fmt.(option (pp_call_using_by ++ sp)) ppf cub;
-  Fmt.(pp_with_loc @@ option ~none:(any "OMITTED") pp_expr') ppf cue
+  Fmt.(pp_with_loc @@ option ~none:(any "OMITTED") @@
+       pp_with_loc pp_scalar) ppf cue
 
 
 (* DELETE, OPEN, REWRITE, WRITE, READ (through on_lock_or_retry) *)
@@ -298,7 +299,7 @@ let pp_selection_subject ppf = function
   | SubjectConst b -> Fmt.pf ppf (if b then "TRUE" else "FALSE")
 
 type selection_object =
-  | SelCond of abbrev_relation_operand with_loc (** Condition with a potentially omitted subject 
+  | SelCond of abbrev_relation_operand with_loc (** Condition with a potentially omitted subject
       interpreted as an abbreviated condition prepended by the corresponding subject in EVALUATE.
       May start with AbbrevSubject to denote an independant condition.
       Typically used for clauses such as:

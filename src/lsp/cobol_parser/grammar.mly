@@ -2617,7 +2617,6 @@ let qualname_or_literal :=
  | n = qualname; { UPCAST.qualname_with_literal n }
  | l = literal;  { UPCAST.literal_with_qualname l }
 
-let x == scalar                                       (* alias, as in GnuCOBOL *)
 let scalar :=
  | i = scalar_ident;       { UPCAST.scalar_ident_as_scalar i }
  | l = numeric_literal;    { UPCAST.numeric_as_scalar l }
@@ -2774,16 +2773,8 @@ let atomic_no_leftmost_length [@recovery dummy_expr] [@symbol "<atomic expressio
 
 (* --- *)
 
-let arithmetic_term :=                                            (* `arith_x` *)
- | i = scalar_ident;         { Atom (UPCAST.scalar_ident_as_scalar i) } (* numeric or boolean *)
- | i = integer;              { Atom (Integer i) }
- | f = fixedlit;             { Atom (Fixed f) }
- | f = floatlit;             { Atom (Floating f) }
- | b = BOOLIT;               { Atom (Boolean b) } (* boolean *)
- | f = figurative_constant;  { Atom (Fig f) } (* numeric or boolean (NB: or strlits) *)
- | a = alphanum;             { Atom (Alphanum a) } (* NB: quick relaxation for now *)
- | n = NATLIT;               { Atom (National n) }
- | l = length_of_expression; { Atom l }
+let arithmetic_term ==                                            (* `arith_x` *)
+ | t = x; { Atom t }
 
 let arithmetic_term_no_all :=
  | i = scalar_ident;    { Atom (UPCAST.scalar_ident_as_scalar i) } (* numeric or boolean *)
@@ -2794,7 +2785,7 @@ let arithmetic_term_no_all :=
  | a = alphanum; { Atom (Alphanum a) }         (* NB: quick relaxation for now *)
  | n = NATLIT;   { Atom (National n) }
  | f = figurative_constant_no_all; { Atom (Fig f) } (* numeric or boolean (NB: or strlits) *)
- | l = length_of_expression; { Atom l }
+ | l = length_of_expr; { Atom l }
 
 let arithmetic_term_no_length :=
  | i = scalar_ident;         { Atom (UPCAST.scalar_ident_as_scalar i) }
@@ -2805,9 +2796,6 @@ let arithmetic_term_no_length :=
  | f = figurative_constant;  { Atom (Fig f) }
  | a = alphanum;             { Atom (Alphanum a) }
  | n = NATLIT;               { Atom (National n) }
-
-let length_of_expression ==
-  | ~ = length_of_expr; < >
 
 (* ---------- Conditions ---------- *)
 
@@ -2985,8 +2973,19 @@ COB2002:
   (BY VALUE)? identifier/literal/expression
 *)
 
+let x :=                                                 (* `x` as in GnuCOBOL *)
+ | i = scalar_ident;         { UPCAST.scalar_ident_as_scalar i } (* numeric or boolean *)
+ | i = integer;              { Integer i }
+ | f = fixedlit;             { Fixed f }
+ | f = floatlit;             { Floating f }
+ | b = BOOLIT;               { Boolean b } (* boolean *)
+ | f = figurative_constant;  { Fig f } (* numeric or boolean (NB: or strlits) *)
+ | a = alphanum;             { Alphanum a } (* NB: quick relaxation for now *)
+ | n = NATLIT;               { National n }
+ | l = length_of_expr;       { l }
+
 let using_by :=
- | b = call_using_by?; e = loc(arithmetic_term);
+ | b = call_using_by?; e = loc(x);
    { { call_using_by = b;                       (* COB85: ident, COB2002: exp *)
        call_using_expr = Some e &@<- e } }
  | b = call_using_by?; omitted = loc(OMITTED);
@@ -3185,12 +3184,12 @@ let accept_with_clause [@recovery AcceptAttribute Highlight] [@symbol "<accept-w
 
 %public let unconditional_action := ~ = add_statement; < >
 add_statement:
- | ADD inl = rnel(x) TO irl = rounded_idents
+ | ADD inl = rnel(scalar) TO irl = rounded_idents
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR) end_add
    { Add { basic_arith_operands =
              ArithSimple { sources = inl; targets = irl };
            basic_arith_on_size_error = h } }
- | ADD inl = rnel(x) TO in_ = x
+ | ADD inl = rnel(scalar) TO in_ = scalar
    GIVING irl = rounded_idents
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR) end_add
    { Add { basic_arith_operands =
@@ -3198,7 +3197,7 @@ add_statement:
                            to_or_from_item = in_;
                            targets = irl };
            basic_arith_on_size_error = h } }
- | ADD inl = rnel(x) (* Same as above without 'TO' *)
+ | ADD inl = rnel(scalar) (* Same as above without 'TO' *)
    GIVING irl = rounded_idents
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR) end_add
    { let in_, inl = split_last inl in
@@ -3394,11 +3393,11 @@ let display_with_clause [@recovery DisplayAttribute Highlight] [@symbol "<displa
 
 %public let unconditional_action := ~ = divide_statement; <Divide>
 divide_statement:
- | DIVIDE in_ = x INTO irl = rounded_idents
+ | DIVIDE in_ = scalar INTO irl = rounded_idents
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); end_divide
    { { divide_operands = DivideInto { divisor = in_; dividends = irl };
        divide_on_size_error = h } }
- | DIVIDE in1 = x INTO in2 = x
+ | DIVIDE in1 = scalar INTO in2 = scalar
    GIVING irl = rounded_idents ro = ro(pf(REMAINDER,ident))
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); (* no remainder: single ir *)
    end_divide
@@ -3408,7 +3407,7 @@ divide_statement:
                                         into = true;
                                         remainder = ro };
        divide_on_size_error = h } }
- | DIVIDE in1 = x BY in2 = x
+ | DIVIDE in1 = scalar BY in2 = scalar
    GIVING irl = rounded_idents ro = ro(pf(REMAINDER,ident))
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); (* no remainder: single ir *)
    end_divide
@@ -4281,12 +4280,12 @@ let s_delimited_by :=
 
 %public let unconditional_action := ~ = subtract_statement; < >
 let subtract_statement :=
- | SUBTRACT; inl = rnel(x); FROM; irl = rounded_idents;
+ | SUBTRACT; inl = rnel(scalar); FROM; irl = rounded_idents;
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); end_subtract;
    { Subtract { basic_arith_operands =
                   ArithSimple { sources = inl; targets = irl };
                 basic_arith_on_size_error = h } }
- | SUBTRACT; inl = rnel(x); FROM; in_ = x;
+ | SUBTRACT; inl = rnel(scalar); FROM; in_ = scalar;
    GIVING; irl = rounded_idents;
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); end_subtract;
    { Subtract { basic_arith_operands =
