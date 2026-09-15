@@ -14,6 +14,14 @@
 
 open Superbol_types
 
+let extension_oc : Vscode.OutputChannel.t Lazy.t =
+  lazy (Vscode.Window.createOutputChannel ~name:"SuperBOL Studio Extension")
+
+let log_error fmt =
+  Printf.ksprintf
+    (fun value -> Vscode.OutputChannel.appendLine (Lazy.force extension_oc) ~value)
+    fmt
+
 let show_error = function
   | Client_not_running ->
       Option.some @@

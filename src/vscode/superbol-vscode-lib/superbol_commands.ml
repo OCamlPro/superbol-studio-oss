@@ -27,8 +27,7 @@ type t =
     handler: handler;
   }
 
-let extension_oc : Vscode.OutputChannel.t Lazy.t =
-  lazy (Vscode.Window.createOutputChannel ~name:"SuperBOL Studio Extension")
+let extension_oc = Superbol_printer.extension_oc
 
 let commands = ref []
 

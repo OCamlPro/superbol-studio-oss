@@ -12,6 +12,7 @@ globalThis.__SUPERBOL__.fs = {
   existsSync: fs.existsSync,
   realpathSync: fs.realpathSync,
   writeFileSync: fs.writeFileSync,
+  appendFileSync: fs.appendFileSync,
   mkdirSync: fs.mkdirSync,
   unlinkSync: fs.unlinkSync,
 };

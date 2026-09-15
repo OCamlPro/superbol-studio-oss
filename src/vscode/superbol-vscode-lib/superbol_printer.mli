@@ -12,6 +12,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+val extension_oc: Vscode.OutputChannel.t Lazy.t
+val log_error: ('a, unit, string, unit) format4 -> 'a
 val register_error_reporter: (Superbol_types.error -> string option) list -> unit
 val show_error: Superbol_types.error -> string
 val show_error_message: (_, Superbol_types.error) result -> unit Promise.t
