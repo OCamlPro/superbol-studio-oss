@@ -406,6 +406,9 @@ and fold_scalar (v: _ #folder) : scalar -> 'a -> 'a = function
   | Concat _ as s -> fold_literal v s
   | LengthOf _ as l -> fold_length_of v l
 
+and fold_scalar' (v: _ #folder) =
+  fold' ~fold:fold_scalar v
+
 and fold_length_of (v: _ #folder): length_of_ term -> 'a -> 'a =
   handle v#fold_length_of
     ~continue:(function LengthOf i -> fold_ident_or_literal v i)

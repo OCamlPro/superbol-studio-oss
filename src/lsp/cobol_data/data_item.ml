@@ -103,3 +103,9 @@ let def_has_issues: data_definition -> bool = function
   | Data_renaming _ -> false
   | Data_condition { field; _ } -> ~&field.field_has_definition_issues
   | Table_index { table; _ } -> ~&table.table_has_definition_issues
+
+let def_leading_ranges: data_definition -> table_range list = function
+  | Data_field { def; _} -> ~&def.field_leading_ranges
+  | Data_renaming _ -> []
+  | Data_condition { field; _} -> ~&field.field_leading_ranges
+  | Table_index _ -> []
