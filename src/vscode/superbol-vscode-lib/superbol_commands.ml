@@ -223,6 +223,173 @@ let _analyze_workspace =
       ()
     end
 
+(** {2 Copybook directory retrieval} *)
+
+(* Extensions used to look up copybooks.  Lowercased like the server does. *)
+let copybook_extensions () =
+  List.map String.lowercase_ascii @@
+  Superbol_workspace.strings Superbol_tasks.copyexts_setting
+
+let copybook_file_pattern exts =
+  Printf.sprintf "**/*.{%s}" @@
+  String.concat "," @@
+  List.concat_map (fun ext -> [ext; String.uppercase_ascii ext]) exts
+
+module Json_list = Interop.Js.List (Jsonoo)
+
+let superbol_config () =
+  Workspace.getConfiguration ~section:"superbol" ()
+
+(* Workspace value only: the default and the user-wide value must not be
+   copied into the workspace settings.  Malformed entries are skipped. *)
+let configured_copybook_dirs () =
+  match
+    WorkspaceConfiguration.inspect (module Json_list) (superbol_config ())
+      ~section:Superbol_tasks.copybooks_setting
+  with
+  | Some { WorkspaceConfiguration.workspaceValue = Some entries; _ } ->
+      List.filter_map
+        (Jsonoo.Decode.try_optional Superbol_tasks.copybook_path_of_jsonoo)
+        entries
+  | _ ->
+      []
+
+let find_copybook_files exts =
+  Workspace.findFiles () ~includes:(`String (copybook_file_pattern exts))
+
+(* `asRelativePath' always uses "/", on every platform.  It gives back the
+   whole path for a file that is outside the workspace folder. *)
+let relative_dir_of uri =
+  Filename.dirname @@
+  Workspace.asRelativePath ~pathOrUri:(`Uri uri) ~includeWorkspaceFolder:false ()
+
+(* A file-relative entry covers any directory ending with it, like the
+   server's `file_is_in_libpath'. *)
+let covered_by existing dir =
+  List.exists begin fun Superbol_tasks.{ dir = d; file_relative } ->
+    if file_relative then String.ends_with ~suffix:d dir else d = dir
+  end existing
+
+let missing_dirs ~root_fs existing =
+  List.filter begin fun Superbol_tasks.{ dir; file_relative } ->
+    not file_relative &&
+    not (Node.Fs.existsSync (Node.Path.join [root_fs; dir]))
+  end existing
+
+let plural n one many = if n = 1 then one else many
+
+let report_retrieval ~added ~total ~missing =
+  let outcome =
+    if added = 0 then
+      Printf.sprintf "SuperBOL: copybook paths are already up to date \
+                      (%u director%s configured)"
+        total (plural total "y" "ies")
+    else
+      Printf.sprintf "SuperBOL: added %u copybook director%s to the \
+                      workspace settings"
+        added (plural added "y" "ies")
+  and stale =
+    match List.length missing with
+    | 0 -> ""
+    | n -> Printf.sprintf "; %u configured director%s no longer exist%s"
+             n (plural n "y" "ies") (plural n "s" "")
+  in
+  let message = outcome ^ stale in
+  (* Do not wait for the answer: the message only closes when the user acts on
+     it, and the progress notification would stay up until then. *)
+  let _ =
+    Window.showInformationMessage () ~message ~choices:["Show Settings", ()] |>
+    Promise.then_ ~fulfilled:begin function
+      | Some () ->
+          let _ =
+            Commands.executeCommand ~args:[]
+              ~command:"workbench.action.openWorkspaceSettingsFile"
+          in
+          Promise.return ()
+      | None ->
+          Promise.return ()
+    end
+  in
+  Promise.return ()
+
+let retrieve_copybook_dirs ~exts ~root_fs =
+  let open Promise.Syntax in
+  let* uris = find_copybook_files exts in
+  let existing = configured_copybook_dirs () in
+  let missing = missing_dirs ~root_fs existing in
+  let found =
+    List.sort_uniq String.compare @@ List.map relative_dir_of uris
+  in
+  let added =
+    List.filter_map begin fun dir ->
+      if covered_by existing dir
+      then None
+      else Some Superbol_tasks.{ dir; file_relative = false }
+    end found
+  in
+  if found = [] then begin
+    let _ =
+      Window.showInformationMessage ()
+        ~message:(Printf.sprintf
+                    "SuperBOL: no copybook found in the workspace (looking \
+                     for %s files)" @@
+                  String.concat ", " @@
+                  List.map (fun ext -> "`." ^ ext ^ "'") exts)
+    in
+    Promise.return ()
+  end else if added = [] then
+    report_retrieval ~added:0 ~total:(List.length existing) ~missing
+  else
+    let* () =
+      WorkspaceConfiguration.update (superbol_config ())
+        ~section:Superbol_tasks.copybooks_setting
+        ~value:(Jsonoo.t_to_js @@
+                Jsonoo.Encode.list Superbol_tasks.copybook_path_to_jsonoo
+                  (existing @ added))
+        ~configurationTarget:
+          (`ConfigurationTarget ConfigurationTarget.Workspace) ()
+    in
+    report_retrieval ~added:(List.length added)
+      ~total:(List.length existing + List.length added) ~missing
+
+(* Relative paths resolve against the server's working directory, ie. the
+   first workspace folder.  Only safe with a single folder. *)
+let run_copybook_retrieval () =
+  match Workspace.workspaceFolders () with
+  | [] ->
+      let _ =
+        Window.showWarningMessage ()
+          ~message:"SuperBOL: open a folder before retrieving copybook \
+                    directories"
+      in
+      Promise.return ()
+  | _ :: _ :: _ ->
+      let _ =
+        Window.showWarningMessage ()
+          ~message:"SuperBOL: copybook retrieval is not supported in \
+                    multi-root workspaces yet"
+      in
+      Promise.return ()
+  | [folder] ->
+      match copybook_extensions () with
+      | [] ->
+          let _ =
+            Window.showWarningMessage ()
+              ~message:"SuperBOL: no extension listed in \
+                        `superbol.cobol.copyexts'"
+          in
+          Promise.return ()
+      | exts ->
+          retrieve_copybook_dirs ~exts
+            ~root_fs:(Uri.fsPath @@ WorkspaceFolder.uri folder)
+
+let _retrieve_copybooks =
+  command "superbol.copybooks.retrieve" @@ Instance
+    begin fun _instance ~args:_ ->
+      let _: unit Promise.t = run_copybook_retrieval () in
+      ()
+    end
+
 let _restart_language_server =
   command "superbol.server.restart" @@ Instance
     begin fun instance ~args:_ ->

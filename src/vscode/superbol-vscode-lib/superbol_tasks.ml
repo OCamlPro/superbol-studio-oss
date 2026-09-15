@@ -79,6 +79,9 @@ let attr_string_opt key ~append ~attributes args =
 (* let config_strings key ~config:_ ~append args = *)
 (*   append (Superbol_workspace.string_list key) args *)
 
+let copybooks_setting = "cobol.copybooks"
+let copyexts_setting = "cobol.copyexts"
+
 type copybook_path =
   {
     dir: string;
@@ -90,6 +93,13 @@ let copybook_path_of_jsonoo: Jsonoo.t -> copybook_path = fun j ->
     dir = field "dir" string j;
     file_relative = (try_default false @@ field "file-relative" bool) j;
   }
+
+(* `file-relative' is only written when set, to keep the setting short. *)
+let copybook_path_to_jsonoo: copybook_path -> Jsonoo.t =
+  fun { dir; file_relative } ->
+  Jsonoo.Encode.object_ @@
+  ("dir", Jsonoo.Encode.string dir) ::
+  if file_relative then ["file-relative", Jsonoo.Encode.bool true] else []
 
 let config_copybook_paths key ~config ~append =
   append @@
@@ -112,7 +122,7 @@ let cobc_execution ?config attributes =
   let config = match config with Some t -> t | None -> Hashtbl.create 0 in
   let args =
     ["${relativeFile}"] |>
-    config_copybook_paths "cobol.copybooks" ~config
+    config_copybook_paths copybooks_setting ~config
       ~append:begin fun l args ->
         List.flatten @@
         List.map begin fun { dir; file_relative } ->
@@ -125,7 +135,7 @@ let cobc_execution ?config attributes =
         end l |>
         List.append args
       end |>
-    config_strings "cobol.copyexts" ~config
+    config_strings copyexts_setting ~config
       ~append:begin fun exts ->
         List.append @@ List.flatten @@ List.map (fun e -> ["-ext"; e]) exts
       end |>
