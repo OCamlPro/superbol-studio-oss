@@ -718,7 +718,9 @@ let fixed_alphanum_lit ?(doubled_opener = false)
     let end_state =
       if String.contains s '\t' then
         lex_warn end_state @@
-        Tab_in_alphanum_literal { loc = raw_loc ~start_pos ~end_pos start_state ~end_state }
+        Warn_unexpected
+          { loc = raw_loc ~start_pos ~end_pos start_state ~end_state;
+            item = Tab_character_in_alphanum_literal }
       else
         end_state
     in

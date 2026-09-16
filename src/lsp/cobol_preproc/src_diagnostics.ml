@@ -43,6 +43,7 @@ and unexpected_stuff =
   | Indicator_string of string
   | Non_blank_area_A_on_continuation_line
   | Opening_alphanumeric_literal_delimiter of string
+  | Tab_character_in_alphanum_literal
   | Word
   | Word_in_pseudotext of Text.text_word
 
@@ -60,6 +61,10 @@ let pp_unexpected_stuff ppf = function
   | Opening_alphanumeric_literal_delimiter str ->
       Pretty.print ppf "opening@ delimiter@ for@ alphanumeric@ literal: \
                         `%s'" str
+  | Tab_character_in_alphanum_literal ->
+      Pretty.print ppf "tab@ character@ in@ alphanumeric@ literal@ \
+      (visual@ column@ alignment@ may@ differ@ from@ \
+      character@ column@ in@ fixed-format@ source)"
   | Word ->
       Pretty.print ppf "text@ word"
   | Word_in_pseudotext word ->
@@ -90,22 +95,13 @@ type warning =
         loc: srcloc;
         item: unexpected_stuff;
       }
-  | Tab_in_alphanum_literal of
-      {
-        loc: srcloc;
-      }
 
 let warning_loc = function
-  | Warn_unexpected { loc; _ }
-  | Tab_in_alphanum_literal { loc } -> loc
+  | Warn_unexpected { loc; _ } -> loc
 
 let pp_warning ppf = function
   | Warn_unexpected { item; _ } ->
       Pretty.print ppf "Unexpected@ %a" pp_unexpected_stuff item
-  | Tab_in_alphanum_literal _ ->
-      Pretty.print ppf "Tab@ character@ in@ alphanumeric@ literal:@ \
-                        visual@ column@ alignment@ may@ differ@ from@ \
-                        character@ column@ in@ fixed-format@ source"
 
 (* --- *)
 
