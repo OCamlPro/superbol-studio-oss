@@ -125,7 +125,7 @@ jobs:
         run: |
           opam pin --yes "git+https://github.com/OCamlPro/drom.git#v0.9.3"
           make check-project
-        if: ${{ matrix.ocaml-compiler == '4.14.2' && matrix.os == 'ubuntu-latest' && matrix.skip_test == 'true' }}
+        if: ${{ matrix.skip_test }}
 
       - run: make build
 
