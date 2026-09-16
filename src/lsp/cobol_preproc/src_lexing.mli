@@ -13,7 +13,7 @@
 
 type 'k state
 
-val init_state: 'k Src_format.source_format -> 'k state
+val init_state: ?tab_stops:int list -> 'k Src_format.source_format -> 'k state
 val diagnostics: _ state -> Src_diagnostics.t
 val rev_comments: _ state -> Text.comments
 val rev_ignored: _ state -> Cobol_common.Srcloc.lexloc list

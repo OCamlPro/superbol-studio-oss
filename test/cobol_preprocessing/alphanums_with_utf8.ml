@@ -83,9 +83,9 @@ let%expect_test "alphanum-tab-in-code-area-with-utf8" =
   [%expect {|
     "α"@<prog.cob:2-8|2-11>
     "αβ"@<prog.cob:3-8|3-12>
-    "εζ                                                      @<prog.cob:5-8|5-65>
-    "αβ                                                      γδ"@Cat {
-    left = <prog.cob:7-8|7-65>; right = <prog.cob:8-68|8-72> } |}]
+    "εζ                                                             @<prog.cob:5-8|5-72>
+    "αβ                                                             γδ"@Cat {
+    left = <prog.cob:7-8|7-72>; right = <prog.cob:8-68|8-72> } |}]
 
 let%expect_test "alphanum-tab-in-sna-with-utf8" =
   (* Tab at byte 0 expands past the indicator column (visual col 7), so the
@@ -115,9 +115,9 @@ let%expect_test "alphanum-tab-in-sna-with-utf8" =
   [%expect {|
     "α"@<prog.cob:2-2|2-5>
     "αβ"@<prog.cob:3-2|3-6>
-    "εζ                                                             @<prog.cob:5-2|5-66>
-    "αβ                                                             γδ"@Cat {
-    left = <prog.cob:7-2|7-66>; right = <prog.cob:8-68|8-72> } |}]
+    "εζ                                                            @<prog.cob:5-2|5-65>
+    "αβ                                                            γδ"@Cat {
+    left = <prog.cob:7-2|7-65>; right = <prog.cob:8-68|8-72> } |}]
 
 let%expect_test "alphanum-tab-inside-literal-with-utf8" =
   Prog_preproc.show_text ~source_format:(SF SFFixed) {cobol|

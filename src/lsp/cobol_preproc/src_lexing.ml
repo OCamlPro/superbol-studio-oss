@@ -68,11 +68,12 @@ and 'k config =
   {
     debug: bool;
     source_format: 'k source_format;
+    tab_stops: int list;
   }
 
 let position_encoding_in_bytes = false
 
-let init_state source_format : _ state =
+let init_state ?(tab_stops = Src_format.default_tab_stops) source_format : _ state =
   {
     lex_prods = [];
     continued = CNone;
@@ -88,6 +89,7 @@ let init_state source_format : _ state =
       {
         debug = false;
         source_format;
+        tab_stops;
       }
   }
 
@@ -364,36 +366,13 @@ let flush_continued ?(force = false) state = match state.continued with
          stage to account for quotes in comment paragraphs. *)
       emit (AlphanumPrefix { knd; qte; str } &@ loc) (reset_cont state)
 
-(** Tab stop widths, matching the semantics of GnuCOBOL's [-ftab-width] option:
-    each entry is the distance from the previous stop to the next, starting
-    from column 1.  The last entry repeats for all subsequent stops.
-
-    [7; 8] reproduces the classic fixed-format layout: first stop at column 8
-    (code area), then every 8 columns (16, 24, …).
-    [6; 1; 8] reproduces the fixed-format layout with the first stop leading
-    to the 7th column for indicator char. *)
-let tab_stops = [7; 8]
-
-(** Returns the column of the first character after a tab at column [col],
-    using [tab_stops] widths accumulated from column 1. *)
-let next_tab_stop col =
-  let rec go pos = function
-    | [w] ->
-        if pos + w > col then pos + w
-        else pos + ((col - pos) / w + 1) * w
-    | w :: rest ->
-        let stop = pos + w in
-        if stop > col then stop
-        else go stop rest
-    | [] -> col + 1
-  in
-  go 1 tab_stops
-
 (** Computes the 0-indexed visual column of the first character after a tab at
     [start_pos] and returns it together with the updated state. *)
 let compute_tab_shift state (start_pos: Lexing.position) =
   let col      = pos_column state start_pos in   (* 1-indexed *)
-  let next_col = next_tab_stop col in
+  let next_col =
+    Src_format.next_tab_stop ~tab_stops:state.config.tab_stops col
+  in
   next_col - 1,
   { state with
     current_cpos_shift = state.current_cpos_shift - (next_col - col - 1) }
