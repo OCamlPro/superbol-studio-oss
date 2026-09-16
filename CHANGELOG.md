@@ -3,6 +3,8 @@
 ## [_] Next release
 
 ### Added
+- Command to retrieve the directories that contain copybooks into the workspace settings [#654](https://github.com/OCamlPro/superbol-studio-oss/pull/654)
+- Command to analyze every COBOL file of the workspace [#653](https://github.com/OCamlPro/superbol-studio-oss/pull/653)
 - Detection of preprocessor variables that are of category numeric [#651](https://github.com/OCamlPro/superbol-studio-oss/pull/651)
 - Warning on ignored `VALUE` clause for items with `REDEFINES` clause [#650](https://github.com/OCamlPro/superbol-studio-oss/pull/650)
 - Handling of data item documentation that spans over several lines [#639](https://github.com/OCamlPro/superbol-studio-oss/pull/639)
