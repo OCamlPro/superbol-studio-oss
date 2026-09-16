@@ -71,9 +71,10 @@ let fold_picture (v: _ #folder) = leaf v#fold_picture      (* leaf (for now?) *)
 let fold_usage (v: _ #folder) =
   handle v#fold_usage
     ~continue:begin function
-      | Binary pic
+      | Alphanumeric { picture = pic; _ }
+      | Binary { picture = Some pic; _ }
       | Bit pic
-      | Display pic
+      | Display_numeric { picture = pic; _ }
       | National pic
       | Packed_decimal { picture = pic; _ } ->
           fold_picture v pic
@@ -82,11 +83,7 @@ let fold_usage (v: _ #folder) =
       | Pointer Some name
       | Program_pointer Some name ->
           Cobol_ptree.Terms_visitor.fold_name' v name
-      | Binary_C_long _
-      | Binary_char _
-      | Binary_double _
-      | Binary_long _
-      | Binary_short _
+      | Binary { picture = None; _ }
       | Float_binary _
       | Float_decimal _
       | Float_extended

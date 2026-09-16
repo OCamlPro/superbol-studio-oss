@@ -312,7 +312,7 @@ let%expect_test "hover-datadef-vars" =
     ```cobol
     PIC 999 USAGE DISPLAY
     ```
-    NUMERIC(digits = 3, scale = 0, sign = unsigned)
+    NUMERIC(digits = 3, scale = 0, signed = false)
     *e.g,* [`000`] (0), [`123`] (123)
     VALUE 123
     ---
@@ -387,8 +387,10 @@ let%expect_test "hover-datadef-vars" =
     DATA-NAME-BIS
     ```
     ```cobol
-    USAGE BINARY-DOUBLE SIGNED
+    PIC S9(9)V9(9) USAGE BINARY-DOUBLE
     ```
+    NUMERIC(digits = 18, scale = 9, signed = true)
+    *e.g,* [`+000000000.000000000`] (0), [`+123456789.123000000`] (123456789.123)
     ---
     References: 1
     (line 13, character 18):
@@ -440,7 +442,7 @@ let%expect_test "hover-datadef-vars" =
     ```cobol
     PIC 999 USAGE DISPLAY
     ```
-    NUMERIC(digits = 3, scale = 0, sign = unsigned)
+    NUMERIC(digits = 3, scale = 0, signed = false)
     *e.g,* [`000`] (0), [`123`] (123)
     VALUE 123
     ---
@@ -523,7 +525,7 @@ let%expect_test "hover-datadef-vars-usage" =
     ```cobol
     PIC -BZZZ,ZZ9.99 USAGE DISPLAY
     ```
-    NUMERIC(digits = 8, scale = 2, sign = unsigned)
+    NUMERIC(digits = 8, scale = 2, signed = false)
     *e.g,* [`        0.00`] (0), [`  123,456.78`] (123456.78)
     ---
     References: 1
@@ -542,7 +544,7 @@ let%expect_test "hover-datadef-vars-usage" =
     ```cobol
     PIC 9 USAGE BINARY
     ```
-    NUMERIC(digits = 1, scale = 0, sign = unsigned)
+    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
     ---
     References: 1
@@ -628,7 +630,7 @@ let%expect_test "hover-datadef-vars-usage" =
     ```cobol
     PIC 9 USAGE PACKED-DECIMAL
     ```
-    NUMERIC(digits = 1, scale = 0, sign = unsigned)
+    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
     ---
     References: 1
@@ -647,7 +649,7 @@ let%expect_test "hover-datadef-vars-usage" =
     ```cobol
     PIC $++/+.+B+ USAGE DISPLAY
     ```
-    NUMERIC(digits = 4, scale = 2, sign = unsigned)
+    NUMERIC(digits = 4, scale = 2, signed = false)
     *e.g,* [`         `] (0), [`$+1/2.3 4`] (12.34)
     ---
     References: 1
@@ -950,7 +952,7 @@ let%expect_test "hover-datadef-renames" =
     ```cobol
     PIC 9 USAGE DISPLAY
     ```
-    NUMERIC(digits = 1, scale = 0, sign = unsigned)
+    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
     ---
     References: 2
@@ -970,7 +972,7 @@ let%expect_test "hover-datadef-renames" =
     ```cobol
     PIC 9 USAGE DISPLAY
     ```
-    NUMERIC(digits = 1, scale = 0, sign = unsigned)
+    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
     ---
     References: 2
@@ -989,7 +991,7 @@ let%expect_test "hover-datadef-renames" =
     ```cobol
     PIC 9 USAGE DISPLAY
     ```
-    NUMERIC(digits = 1, scale = 0, sign = unsigned)
+    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
     ---
     References: 4
@@ -1043,7 +1045,7 @@ let%expect_test "hover-datadef-renames" =
     ```cobol
     PIC 9 USAGE DISPLAY
     ```
-    NUMERIC(digits = 1, scale = 0, sign = unsigned)
+    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
     ---
     References: 2 |}];;
@@ -1105,7 +1107,7 @@ let%expect_test "hover-datadef-redefines" =
     ```cobol
     PIC 9 USAGE DISPLAY
     ```
-    NUMERIC(digits = 1, scale = 0, sign = unsigned)
+    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
     ---
     References: 2
@@ -1143,7 +1145,7 @@ let%expect_test "hover-datadef-redefines" =
     ```cobol
     PIC 9 USAGE DISPLAY
     ```
-    NUMERIC(digits = 1, scale = 0, sign = unsigned)
+    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
     ---
     References: 2
@@ -2280,7 +2282,7 @@ let%expect_test "78-level-in-copybook-with-replacement" =
     ```cobol
     PIC 9 USAGE DISPLAY
     ```
-    NUMERIC(digits = 1, scale = 0, sign = unsigned)
+    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
     VALUE "A"
     ---

@@ -16,6 +16,8 @@ open Data_types
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 
+module PIC = Data_picture
+
 let pp_alphanum_value ppf a =                      (* print as escaped string *)
   Pretty.print ppf "%S" a
 let pp_boolean_value ppf b =
@@ -106,41 +108,75 @@ let pp_data_storage ppf = function
 
 (* usage *)
 
+let pp_sign_config ppf = function
+  | Display_unsigned ->
+      Fmt.string ppf "unsigned"
+  | Display_signed { sign_position; sign_separate } ->
+      Fmt.pf ppf "%s %s"
+        (match sign_position with Leading -> "leading" | Trailing -> "trailing")
+        (if sign_separate then "separate" else "nonseparate")
+
 let pp_usage: usage Pretty.printer =
-  let pp_usage_with_picture ppf name (picture: Data_picture.t) =
-    Pretty.record [
-      Fmt.(styled `Yellow @@ any name);
-      Fmt.field "category" (fun () -> picture.category) Data_picture.pp_detailed_category;
+  let pp_usage_with_picture ppf name_fmt ({ category; _ }: picture) =
+    Pretty.string_to begin fun name ->
+      Pretty.record [
+        Fmt.(styled `Yellow @@ fun ppf () -> string ppf name);
+        Fmt.field "category" (fun () -> category) PIC.pp_detailed_category;
+      ] ppf ()
+    end name_fmt
+  and pp_display_numeric ppf sign ({ category; _ }: picture) =
+    Pretty.record_with_conditional_fields [
+      T Fmt.(styled `Yellow @@ any "display");
+      T (Fmt.field "category" (fun () -> category) PIC.pp_detailed_category);
+      C'(sign <> Display_unsigned,
+         Fmt.field "sign-position" (fun () -> sign) pp_sign_config);
     ] ppf ()
-  and pp_usage_with_sign ppf name signed =
-    Fmt.(styled `Yellow @@ (if signed then any "signed-" else nop) ++ any name)
-      ppf ()
   and pp_width_tag ppf tag =
     Fmt.int ppf @@
     match tag with `W16 -> 16 | `W32 -> 32 | `W34 -> 34 | `W64 -> 64 | `W128 -> 128
-  and pp_range_extended_tag ppf digits =
-    if digits = None then Fmt.string ppf "(range-extended)"
+  in
+  let pp_usage_with_optional_picture ppf name_fmt picture =
+    match picture with
+    | Some picture ->
+        pp_usage_with_picture ppf name_fmt picture
+    | None ->
+        Pretty.string_to begin fun name ->
+          Pretty.record [
+            Fmt.(styled `Yellow @@ fun ppf () -> string ppf name);
+          ] ppf ()
+        end name_fmt
   in
   fun ppf -> function
-    | Binary picture ->
-        pp_usage_with_picture ppf "binary" picture
-    | Binary_C_long { signed } ->
-        pp_usage_with_sign ppf "binary-c-long" signed
-    | Binary_char { signed } ->
-        pp_usage_with_sign ppf "binary-char" signed
-    | Binary_double { signed; digits; _ } ->
-        pp_usage_with_sign ppf "binary-double" signed;
-        pp_range_extended_tag ppf digits
-    | Binary_long { signed; digits; _ } ->
-        pp_usage_with_sign ppf "binary-long" signed;
-        pp_range_extended_tag ppf digits
-    | Binary_short { signed; digits; _ } ->
-        pp_usage_with_sign ppf "binary-short" signed;
-        pp_range_extended_tag ppf digits
+    | Alphanumeric { picture; _ } ->
+        pp_usage_with_picture ppf "display" picture
+    | Binary { picture; byte_size = Byte_size;
+               truncation = Truncate_to_native_size; _ } ->
+        pp_usage_with_optional_picture ppf "binary-char" picture
+    | Binary { picture; byte_size = Short_size;
+               truncation = Truncate_to_native_size; _ } ->
+        pp_usage_with_optional_picture ppf "binary-short" picture
+    | Binary { picture; byte_size = Long_size;
+               truncation = Truncate_to_native_size; _ } ->
+        pp_usage_with_optional_picture ppf "binary-long" picture
+    | Binary { picture; byte_size = Double_size;
+               truncation = Truncate_to_native_size; _ } ->
+        pp_usage_with_optional_picture ppf "binary-double" picture
+    | Binary { picture; byte_size = Long_double_size;
+               truncation = Truncate_to_native_size; _ } ->
+        pp_usage_with_optional_picture ppf "binary-long-double" picture
+    | Binary { picture; byte_size = C_long_size;
+               truncation = Truncate_to_native_size; _ } ->
+        pp_usage_with_optional_picture ppf "binary-c-long" picture
+    | Binary { picture; byte_size = Custom_size n;
+               truncation = Truncate_to_native_size; _ } ->
+        pp_usage_with_optional_picture ppf "binary-%d" picture n
+    | Binary { picture;
+               truncation = Truncate_to_digits _; _ } ->
+        pp_usage_with_optional_picture ppf "binary" picture
     | Bit picture ->
         pp_usage_with_picture ppf "bit" picture
-    | Display picture ->
-        pp_usage_with_picture ppf "display" picture
+    | Display_numeric { picture; sign } ->
+        pp_display_numeric ppf sign picture
     | Float_binary { width; endian = _ } ->
         Pretty.record [
           Fmt.(styled `Yellow @@ any "float-binary");

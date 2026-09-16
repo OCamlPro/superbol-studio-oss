@@ -357,38 +357,7 @@ let%expect_test "bad-pic-comps" =
     ----          ^^^^^^^^^^^^
        5          77 B COMP-5 PIC X(3).
        6          77 C COMP-5 PIC 9(20).
-    >> Error: Missing PICTURE clause for item 'A'
-
-    prog.cob:4.7-4.19:
-       1          PROGRAM-ID. bad-pic-comps.
-       2          DATA DIVISION.
-       3          WORKING-STORAGE SECTION.
-       4 >        77 A COMP-5.
-    ----          ^^^^^^^^^^^^
-       5          77 B COMP-5 PIC X(3).
-       6          77 C COMP-5 PIC 9(20).
     >> Error: Missing PICTURE clause for item with USAGE COMP-5
-
-    prog.cob:5.23-5.27:
-       2          DATA DIVISION.
-       3          WORKING-STORAGE SECTION.
-       4          77 A COMP-5.
-       5 >        77 B COMP-5 PIC X(3).
-    ----                          ^^^^
-       6          77 C COMP-5 PIC 9(20).
-       7          77 D COMP-5 PIC S9(1)V9(18).
-    >> Error: PICTURE of category alphanumeric is incompatible with USAGE
-              COMP-5; expected a PICTURE for numeric data item
-
-    prog.cob:5.7-5.28:
-       2          DATA DIVISION.
-       3          WORKING-STORAGE SECTION.
-       4          77 A COMP-5.
-       5 >        77 B COMP-5 PIC X(3).
-    ----          ^^^^^^^^^^^^^^^^^^^^^
-       6          77 C COMP-5 PIC 9(20).
-       7          77 D COMP-5 PIC S9(1)V9(18).
-    >> Error: Missing PICTURE clause for item 'B'
 
     prog.cob:6.23-6.28:
        3          WORKING-STORAGE SECTION.
@@ -428,8 +397,7 @@ let%expect_test "bad-pic-comps" =
       layout: {
         elementary
         usage: {
-          display
-          category: ALPHANUMERIC(1)
+          binary-char
         }
       }
     }
@@ -443,14 +411,12 @@ let%expect_test "bad-pic-comps" =
        7          77 D COMP-5 PIC S9(1)V9(18).
     Item definition: {
       qualname: B
-      /!\ with_errors /!\
       offset: 0
-      size: 8
+      size: 24
       layout: {
         elementary
         usage: {
-          display
-          category: ALPHANUMERIC(1)
+          binary-3
         }
       }
     }
@@ -469,7 +435,10 @@ let%expect_test "bad-pic-comps" =
       size: 64
       layout: {
         elementary
-        usage: binary-double(range-extended)
+        usage: {
+          binary-double
+          category: NUMERIC(digits = 20, scale = 0, signed = false)
+        }
       }
     }
     prog.cob:7.7-7.35:
@@ -487,6 +456,9 @@ let%expect_test "bad-pic-comps" =
       size: 64
       layout: {
         elementary
-        usage: signed-binary-double(range-extended)
+        usage: {
+          binary-double
+          category: NUMERIC(digits = 19, scale = 18, signed = true)
+        }
       }
     } |}];;

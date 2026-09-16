@@ -171,13 +171,13 @@ let example_of ~picture value =
     match picture.category with
     | Alphabetic _ | Boolean _ | National _ | Alphanumeric _ -> ""
     | FloatNum _ -> raise @@ Invalid_argument "No example for floatnum yet"
-    | FixedNum { digits; scale; sign; _ }
+    | FixedNum { digits; scale; signed; _ }
       when not @@ is_edited picture  ->
-      (if Option.is_some sign then "+" else "")
-      ^ simple_example_of ~digits ~scale ~with_dot:true value
-    | FixedNum { digits; scale; sign;
+        (if signed then "+" else "")
+        ^ simple_example_of ~digits ~scale ~with_dot:true value
+    | FixedNum { digits; scale; signed;
                  editions = { basics; floating; zerorepl } } ->
-      ignore (sign);
+      ignore signed;
       let is_negative = value < 0. in
       let edit_zerorepl = Option.fold ~none:Fun.id
           ~some:(fun { zero_replacement_symbol = symbol;

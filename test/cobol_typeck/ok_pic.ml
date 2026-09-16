@@ -39,7 +39,7 @@ let%expect_test "numeric-pic-for-bin-usage" =
         elementary
         usage: {
           binary
-          category: NUMERIC(digits = 2, scale = 0, sign = unsigned)
+          category: NUMERIC(digits = 2, scale = 0, signed = false)
         }
       }
     }
@@ -59,7 +59,7 @@ let%expect_test "numeric-pic-for-bin-usage" =
         elementary
         usage: {
           binary
-          category: NUMERIC(digits = 6, scale = 0, sign = trailing nonseparate)
+          category: NUMERIC(digits = 6, scale = 0, signed = true)
         }
       }
     }
@@ -79,7 +79,7 @@ let%expect_test "numeric-pic-for-bin-usage" =
         elementary
         usage: {
           packed-decimal
-          category: NUMERIC(digits = 7, scale = 2, sign = trailing nonseparate)
+          category: NUMERIC(digits = 7, scale = 2, signed = true)
         }
       }
     } |}];;
@@ -110,7 +110,7 @@ let%expect_test "signed-numeric-sizes" =
         elementary
         usage: {
           display
-          category: NUMERIC(digits = 5, scale = 0, sign = unsigned)
+          category: NUMERIC(digits = 5, scale = 0, signed = false)
         }
       }
     }
@@ -130,7 +130,8 @@ let%expect_test "signed-numeric-sizes" =
         elementary
         usage: {
           display
-          category: NUMERIC(digits = 5, scale = 0, sign = trailing nonseparate)
+          category: NUMERIC(digits = 5, scale = 0, signed = true)
+          sign-position: leading nonseparate
         }
       }
     }
@@ -150,7 +151,8 @@ let%expect_test "signed-numeric-sizes" =
         elementary
         usage: {
           display
-          category: NUMERIC(digits = 5, scale = 0, sign = leading nonseparate)
+          category: NUMERIC(digits = 5, scale = 0, signed = true)
+          sign-position: leading nonseparate
         }
       }
     }
@@ -170,7 +172,8 @@ let%expect_test "signed-numeric-sizes" =
         elementary
         usage: {
           display
-          category: NUMERIC(digits = 5, scale = 0, sign = leading separate)
+          category: NUMERIC(digits = 5, scale = 0, signed = true)
+          sign-position: leading separate
         }
       }
     }
@@ -190,7 +193,8 @@ let%expect_test "signed-numeric-sizes" =
         elementary
         usage: {
           display
-          category: NUMERIC(digits = 5, scale = 0, sign = trailing separate)
+          category: NUMERIC(digits = 5, scale = 0, signed = true)
+          sign-position: trailing separate
         }
       }
     } |}];;

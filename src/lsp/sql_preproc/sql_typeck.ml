@@ -99,20 +99,21 @@ let get_type cu name =
         match field_layout with
         | Elementary_field { usage = Packed_decimal { picture; with_sign_nibble }; _ } ->
             (match picture.category with
-            | FixedNum { sign = Some _; _ } when with_sign_nibble ->
+            | FixedNum { signed = true; _ } when with_sign_nibble ->
             COBOL_TYPE_SIGNED_NUMBER_PD
             | FixedNum _ ->
             COBOL_TYPE_UNSIGNED_NUMBER_PD
             | _ -> UNKNOWN)
-        | Elementary_field { usage = Display picture; _ } -> (
+        | Elementary_field { usage = Alphanumeric { picture; _ } |
+                                     Display_numeric { picture; _ }; _ } -> (
           match picture.category with
           | Alphabetic _ -> COBOL_TYPE_ALPHANUMERIC (*?*)
           | Alphanumeric _ -> COBOL_TYPE_ALPHANUMERIC
           | Boolean _ -> COBOL_TYPE_UNSIGNED_BINARY (*?*)
           | National _ -> COBOL_TYPE_NATIONAL
-          | FixedNum { sign = Some _; _ } ->
+          | FixedNum { signed = true; _ } ->
               COBOL_TYPE_SIGNED_NUMBER_TC
-          | FixedNum { sign = None; _ } ->
+          | FixedNum { signed = false; _ } ->
               COBOL_TYPE_UNSIGNED_NUMBER
           | FloatNum _ -> UNKNOWN )
         | Elementary_field _
@@ -137,7 +138,7 @@ let get_scale cu name =
     | Data_field { def = { payload = { field_layout; _ }; _ }; _ } -> begin
       match field_layout with
       | Elementary_field { usage = Packed_decimal { picture; _ }; _ }
-      | Elementary_field { usage = Display picture; _ } -> (
+      | Elementary_field { usage = Display_numeric { picture; _ }; _ } -> (
         match picture.category with
         | FixedNum { scale; _ }
         | FloatNum { scale; _ } ->
@@ -196,18 +197,15 @@ let is_varying_len cu name =
                           {payload = Field len; _ }::NEL.One {payload = Field arr; _} } ->
          (match len.field_layout with
           | Elementary_field {
-            (* FIXME this is wrong, it should be PIC 9(8) USAGE COMP-5 but
-             for now it's unsupported *)
-              usage = Display {
-                category = Alphanumeric { length = 1; _ }; _ }; _ } ->
-                  true
+              (* FIXME this is wrong, it should be PIC 9(8) USAGE COMP-5 but for
+                 now it's unsupported *)
+              usage = Alphanumeric { size = 1; _ };
+              _ } -> true
           | _ -> false)
          &&
          (match arr.field_layout with
-          | Elementary_field {
-              usage = Display {
-                category = Alphanumeric { length = _; _ }; _ }; _ } ->
-                  true
+          | Elementary_field { usage = Alphanumeric _ ; _ } ->
+              true
           | _ -> false)
         | _ -> false)
     | _ -> false
@@ -229,10 +227,11 @@ let print_name (cu : Cobol_unit.Types.cobol_unit) =
       Cobol_data.Memory.(as_bits field_size / 8);
     begin
       match field_layout with
-      | Elementary_field { usage = Display picture; _ } -> (
+      | Elementary_field { usage = Alphanumeric { picture; _ } |
+                                   Display_numeric { picture; _ }; _ } -> (
         Pretty.out "PIC is %a@." Cobol_data.Picture.pp picture;
         match picture.category with
-        | FixedNum { digits = _; scale = _; sign = _; _ } -> ()
+        | FixedNum _ -> ()
         | _ -> () )
       | Elementary_field _
       | Struct_field _ ->
