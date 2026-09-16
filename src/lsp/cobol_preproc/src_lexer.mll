@@ -541,7 +541,7 @@ and fixed_continue_line state
   = parse
   | '\t'
     {
-      Src_lexing.tab ~k:fixed_continue_line state lexbuf
+      Src_lexing.tab ~flush:false ~k:fixed_continue_line state lexbuf
     }
   | blank*
       {

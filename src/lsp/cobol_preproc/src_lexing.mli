@@ -28,7 +28,8 @@ val eof: 'a state -> Lexing.lexbuf -> 'a state
 val new_line: 'a state -> Lexing.lexbuf -> 'a state * Text.text
 val skip: 'a state -> Lexing.lexbuf -> 'a state
 val tab
-  : k:('s -> Lexing.lexbuf -> 'b)
+  : ?flush:bool
+  -> k:('s -> Lexing.lexbuf -> 'b)
   -> ('a state as 's)
   -> Lexing.lexbuf -> 'b
 

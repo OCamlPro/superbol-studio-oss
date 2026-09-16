@@ -49,3 +49,18 @@ let%expect_test "fixed-format-no-tab-byte-65-in-code-area" =
   Preproc_testing.preprocess
     "       A COMPUTE WS-RES = WS-ORIG * 12.                          INCODE";
   [%expect {| A COMPUTE WS-RES = WS-ORIG * 12 . INCODE |}]
+
+(* --- Tab used as indentation on a continuation line --- *)
+
+let%expect_test "fixed-format-tab-after-continuation-indicator" =
+  (* The literal on the first line is deliberately left open (no closing
+     quote, and long enough to overflow past column 72, so it is genuinely
+     continued rather than padded).  The continuation line uses a real '-'
+     indicator at column 7, followed by a *tab* (instead of a space) before
+     the resuming quote.  The tab must only shift columns, not disturb the
+     pending continuation: the two halves are expected to merge into a
+     single Alphanum literal. *)
+  Preproc_testing.preprocess
+    "       MOVE \"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n\
+    \      -\t\"BBB\" TO X.";
+  [%expect {| MOVE "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBB" TO X . |}]

@@ -402,10 +402,10 @@ let sna_tab ~k_indicator ~k_nominal state lexbuf =
   else
     k_indicator state lexbuf
 
-let tab ~k state lexbuf =
+let tab ?(flush = true) ~k state lexbuf =
   let _, start_pos, _ = lexeme_info lexbuf in
   let _, state = compute_tab_shift state start_pos in
-  k (flush_continued state) lexbuf
+  k (if flush then flush_continued state else state) lexbuf
 
 let eof state lexbuf =
   let _, start_pos, end_pos = lexeme_info lexbuf in
