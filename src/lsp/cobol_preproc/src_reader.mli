@@ -21,6 +21,7 @@ type t
 
 val from
   : ?source_format: Src_format.any
+  -> ?tab_stops:int list
   -> platform:Cobol_common.Platform.TYPES.platform
   -> Src_input.t
   -> t
@@ -66,8 +67,16 @@ val with_source_format
     the input.} *)
 
 val restart_on_string
-  : ?source_format: Src_format.any -> ?position: Lexing.position
-  -> string -> t -> t
+  : ?tab_stops: int list
+  -> ?source_format: Src_format.any
+  -> ?position: Lexing.position
+  -> string
+  -> t
+  -> t
 val restart_on_channel
-  : ?source_format: Src_format.any -> ?position: Lexing.position
-  -> in_channel -> t -> t
+  : ?tab_stops: int list
+  -> ?source_format: Src_format.any
+  -> ?position: Lexing.position
+  -> in_channel
+  -> t
+  -> t

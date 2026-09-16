@@ -79,6 +79,7 @@ val lex_input
   : platform: Cobol_common.Platform.TYPES.platform
   -> dialect: Cobol_config.dialect
   -> source_format: Cobol_config.source_format_spec
+  -> ?tab_stops:int list
   -> ?ppf:Format.formatter
   -> Src_input.t
   -> unit Preproc_outputs.with_diags
@@ -87,6 +88,7 @@ val lex_file
   : platform: Cobol_common.Platform.TYPES.platform
   -> dialect: Cobol_config.dialect
   -> source_format: Cobol_config.source_format_spec
+  -> ?tab_stops:int list
   -> ?ppf:Format.formatter
   -> string
   -> unit Preproc_outputs.with_diags
@@ -96,6 +98,7 @@ val lex_lib
   -> dialect: Cobol_config.dialect
   -> source_format: Cobol_config.source_format_spec
   -> lookup_config: Cobol_common.Copybook.TYPES.lookup_config
+  -> ?tab_stops:int list
   -> ?ppf:Format.formatter
   -> Cobol_common.Copybook.TYPES.fileloc
   -> unit Preproc_outputs.with_diags
