@@ -202,6 +202,8 @@ module Fs = struct
 
     val writeFileSync : string -> string -> unit [@@js.global "__SUPERBOL__.fs.writeFileSync"]
 
+    val appendFileSync : string -> string -> unit [@@js.global "__SUPERBOL__.fs.appendFileSync"]
+
     val mkdirSync : string -> recursive:bool -> unit [@@js.global "__SUPERBOL__.fs.mkdirSync"]
 
     val unlinkSync : string -> unit [@@js.global "__SUPERBOL__.fs.unlinkSync"]]

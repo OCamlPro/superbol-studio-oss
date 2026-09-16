@@ -40,6 +40,12 @@ val lsp_request
   -> t
   -> (Jsonoo.t, Superbol_types.error) result Promise.t
 
+val lsp_notification
+  : meth:string
+  -> data:Jsonoo.t
+  -> t
+  -> unit
+
 val current_document_uri
   : ?text_editor:Vscode.TextEditor.t
   -> unit
