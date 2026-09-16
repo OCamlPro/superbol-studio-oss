@@ -18,7 +18,7 @@ let rand_digits () =
 let create ?(mode=0o700) ?dir pat =
   let dir = match dir with
     | Some d -> d
-    | None   -> Filename.get_temp_dir_name ()
+    | None   -> Ez_file.V1.Slashifier.slashify @@ Filename.get_temp_dir_name ()
   in
   let raise_err msg = raise (Sys_error msg) in
   let rec loop count =

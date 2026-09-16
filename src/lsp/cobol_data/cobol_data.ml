@@ -22,4 +22,4 @@ module Literal = Data_literal
 module Printer = Data_printer
 module Visitor = Data_visitor
 
-module Diagnostics = Data_diagnostics                         (* for literals *)
+module Error = Data_error

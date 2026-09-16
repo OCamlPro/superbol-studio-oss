@@ -10,18 +10,23 @@ cd $(dirname "$0")/..
 set -o pipefail
 
 # Use `docker-alpine-image` field to replace ocamlpro/ocaml:4.14
-# and `docker-alpine-packages` to add more apk packages
-git ls-files -z | xargs -0 tar c --exclude vendors/autofonce --exclude _build | \
+# Use `docker-alpine-packages` to add more apk packages
+# Use `docker-alpine-extra-opam` to specify additional opam files for build dependencies
+# Use `static-binaries` to specify the set of binary targets
+git ls-files -z | xargs -0 tar c --exclude _build | \
 docker run --rm -i \
     !(docker-alpine-image:default:ocamlpro/ocaml:4.14) \
     sh -uexc \
       'tar x >&2 &&
-       sudo apk add g++ openssl-libs-static bash !(docker-alpine-packages) >&2 &&
+       sudo apk add gcc bash !(docker-alpine-packages) >&2 &&
        opam update >&2 &&
        opam switch create . --empty >&2 &&
        opam switch set-invariant ocaml-system >&2 &&
-       opam install opam/*.opam --deps-only --locked >&2 &&
-       opam exec make LINKING_MODE=static >&2 &&
+       opam install opam/*.opam !(docker-alpine-extra-opam) --deps-only --locked >&2 &&
+       LINKING_MODE=static opam exec -- dune build \
+          $(for b in !(static-binaries); do \
+              echo "_build/install/default/bin/$b"; \
+            done) >&2 &&
        tar c -hC _build/install/default/bin .' | \
   tar vx
 

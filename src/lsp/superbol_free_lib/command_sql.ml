@@ -65,8 +65,9 @@ let parse ~sql_in_copybooks ~copy_exts ~test_extension common files =
        let platform = common.platform in
        let cobol_unit = typeck_file ~platform common filename in
        let contents =
-         Sql_preproc.Main.preproc ~sql_in_copybooks ~copy_path ~copy_exts
-           ~filename ~source_format () ~cobol_unit
+         Sql_preproc.Main.preproc ()
+           ~platform ~sql_in_copybooks ~copy_path ~copy_exts ~filename
+           ~source_format ~cobol_unit
        in
        let output_file filename s =
          match filename with

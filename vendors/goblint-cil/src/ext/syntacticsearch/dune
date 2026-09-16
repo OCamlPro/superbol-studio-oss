@@ -1,0 +1,6 @@
+(library
+  (public_name goblint-cil.syntacticsearch)
+  (name syntacticsearch)
+  (libraries goblint-cil yojson ppx_deriving_yojson.runtime)
+  (preprocess (pps ppx_deriving_yojson))
+)

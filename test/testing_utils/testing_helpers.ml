@@ -11,10 +11,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Srcloc.INFIX
+open Cobol_common
+open Srcloc.INFIX
 
 module type TAGS = sig
-  val loc: Cobol_common.Srcloc.srcloc
+  val loc: Srcloc.srcloc
 end
 
 module Make (Tags: TAGS) = struct
@@ -27,13 +28,21 @@ module Make (Tags: TAGS) = struct
       { ident_name = name x &@ Tags.loc; ident_subscripts = [] }
     let ident x : scalar = QualIdent (qualident x)
     let strlit str : scalar =
-      Alphanum { str; quotation = Double_quote; hexadecimal = false; runtime_repr = Native_bytes }
+      Alphanum (Cobol_ptree.alphanum_of_string str)
+  end
 
+  module Expr = struct
+    open Term
+    let atom s : expr with_loc = Atom s &@ Srcloc.dummy
+    let ident x = atom (ident x)
+    let strlit str = atom (strlit str)
+    let integer x = atom (Integer x)
   end
 
   module Cond = struct
-    open Term
-    let ident x : condition = Expr (Atom (ident x))
+    open Expr
+    let expr e : 'r cond with_loc = Expr e &@ Srcloc.dummy
+    let ident x = expr (ident x)
   end
 
 end

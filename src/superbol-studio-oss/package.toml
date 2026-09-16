@@ -6,5 +6,5 @@ skip = []
 description = "Virtual package that depends on both the VSCode extension and the LSP server."
 
 [dependencies]
-superbol-vscode-platform = "version"
+superbol-vscode-oss = "version"
 superbol-free = "version"

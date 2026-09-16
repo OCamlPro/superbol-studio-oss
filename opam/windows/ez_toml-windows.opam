@@ -2,7 +2,7 @@
 # Do not modify, or add to the `skip` field of `drom.toml`.
 opam-version: "2.0"
 name: "ez_toml"
-version: "0.3.1"
+version: "1.0.1"
 license: "MIT"
 synopsis: "SuperBOL Studio OSS Project"
 description: "SuperBOL Studio OSS is a new platform for COBOL"
@@ -53,8 +53,9 @@ depends: [
   "dune" {>= "3.17.0"}
   "ocplib_stuff-windows" {}
   "menhirLib-windows" {> "2019"}
-  "ez_file-windows" {>= "0.3"}
+  "ez_file-windows" {>= "0.4"}
   "ISO8601-windows" {>= "0.2"}
+  "menhir" {>= "20231231" & < "20240715"}
   "odoc" {with-doc}
   "dune" {>= "3.17.0" & < "3.19.0"}
 ]

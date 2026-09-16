@@ -2029,6 +2029,16 @@ run_misc.at-13066-prog.cob:14.36-14.37:
   16          01  THEDOG    PIC X(6) VALUE DOGGY.
 >> Error: Invalid syntax
 
+run_misc.at-13066-prog.cob:14.21-14.65:
+  11             05  FLD4   PIC X(4).
+  12             05  FLD5   PIC X(4).
+  13          01  PICX      PIC XXX VALUE 'Abc'.
+  14 >        78  HUN       VALUE 10 * (10 + LENGTH OF PICX) + 12.35-2+3.
+----                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15          78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
+  16          01  THEDOG    PIC X(6) VALUE DOGGY.
+>> Error: Unexpected multiple values for 78-level data item `HUN'
+
 run_misc.at-13066-prog.cob:14.65-14.66:
   11             05  FLD4   PIC X(4).
   12             05  FLD5   PIC X(4).
@@ -2069,6 +2079,16 @@ run_misc.at-13066-prog.cob:15.37-15.38:
   17          78  DIV1      VALUE 100 / 3.
 >> Error: Invalid syntax
 
+run_misc.at-13066-prog.cob:15.21-15.57:
+  12             05  FLD5   PIC X(4).
+  13          01  PICX      PIC XXX VALUE 'Abc'.
+  14          78  HUN       VALUE 10 * (10 + LENGTH OF PICX) + 12.35-2+3.
+  15 >        78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
+----                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  16          01  THEDOG    PIC X(6) VALUE DOGGY.
+  17          78  DIV1      VALUE 100 / 3.
+>> Error: Unexpected multiple values for 78-level data item `HUN2'
+
 run_misc.at-13066-prog.cob:15.57-15.58:
   12             05  FLD5   PIC X(4).
   13          01  PICX      PIC XXX VALUE 'Abc'.
@@ -2089,26 +2109,6 @@ run_misc.at-13066-prog.cob:15.57:
   17          78  DIV1      VALUE 100 / 3.
 >> Hint: Missing FROM <subscripts>
 
-run_misc.at-13066-prog.cob:16.35:
-  13          01  PICX      PIC XXX VALUE 'Abc'.
-  14          78  HUN       VALUE 10 * (10 + LENGTH OF PICX) + 12.35-2+3.
-  15          78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
-  16 >        01  THEDOG    PIC X(6) VALUE DOGGY.
-----                                      ^
-  17          78  DIV1      VALUE 100 / 3.
-  18          78  NUM2      VALUE 1 + 2 * 3.
->> Hint: Missing <literal>
-
-run_misc.at-13066-prog.cob:16.36-16.41:
-  13          01  PICX      PIC XXX VALUE 'Abc'.
-  14          78  HUN       VALUE 10 * (10 + LENGTH OF PICX) + 12.35-2+3.
-  15          78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
-  16 >        01  THEDOG    PIC X(6) VALUE DOGGY.
-----                                       ^^^^^
-  17          78  DIV1      VALUE 100 / 3.
-  18          78  NUM2      VALUE 1 + 2 * 3.
->> Error: Invalid syntax
-
 run_misc.at-13066-prog.cob:17.31-17.32:
   14          78  HUN       VALUE 10 * (10 + LENGTH OF PICX) + 12.35-2+3.
   15          78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
@@ -2118,6 +2118,16 @@ run_misc.at-13066-prog.cob:17.31-17.32:
   18          78  NUM2      VALUE 1 + 2 * 3.
   19          LINKAGE SECTION.
 >> Error: Invalid syntax
+
+run_misc.at-13066-prog.cob:17.21-17.34:
+  14          78  HUN       VALUE 10 * (10 + LENGTH OF PICX) + 12.35-2+3.
+  15          78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
+  16          01  THEDOG    PIC X(6) VALUE DOGGY.
+  17 >        78  DIV1      VALUE 100 / 3.
+----                        ^^^^^^^^^^^^^
+  18          78  NUM2      VALUE 1 + 2 * 3.
+  19          LINKAGE SECTION.
+>> Error: Unexpected multiple values for 78-level data item `DIV1'
 
 run_misc.at-13066-prog.cob:17.34-17.35:
   14          78  HUN       VALUE 10 * (10 + LENGTH OF PICX) + 12.35-2+3.
@@ -2158,6 +2168,16 @@ run_misc.at-13066-prog.cob:18.33-18.34:
   19          LINKAGE SECTION.
   20          01  XMYREC.
 >> Error: Invalid syntax
+
+run_misc.at-13066-prog.cob:18.21-18.36:
+  15          78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
+  16          01  THEDOG    PIC X(6) VALUE DOGGY.
+  17          78  DIV1      VALUE 100 / 3.
+  18 >        78  NUM2      VALUE 1 + 2 * 3.
+----                        ^^^^^^^^^^^^^^^
+  19          LINKAGE SECTION.
+  20          01  XMYREC.
+>> Error: Unexpected multiple values for 78-level data item `NUM2'
 
 run_misc.at-13066-prog.cob:18.36-18.37:
   15          78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
@@ -2270,6 +2290,16 @@ run_misc.at-13144-prog.cob:18.36-18.37:
   20          78  DIV1      VALUE 100 / 3.
 >> Error: Invalid syntax
 
+run_misc.at-13144-prog.cob:18.21-18.65:
+  15          01  CAT       CONSTANT  'Cat '.
+  16          01  DOG       CONSTANT  'Dog '.
+  17          01  YARD      CONSTANT  CAT & "& " & DOG.
+  18 >        78  HUN       VALUE 10 * (10 + LENGTH OF PICX) + 12.35-2+3.
+----                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  19          78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
+  20          78  DIV1      VALUE 100 / 3.
+>> Error: Unexpected multiple values for 78-level data item `HUN'
+
 run_misc.at-13144-prog.cob:18.65-18.66:
   15          01  CAT       CONSTANT  'Cat '.
   16          01  DOG       CONSTANT  'Dog '.
@@ -2310,6 +2340,16 @@ run_misc.at-13144-prog.cob:19.37-19.38:
   21          78  NUM2      VALUE 1 + 2 * 3.
 >> Error: Invalid syntax
 
+run_misc.at-13144-prog.cob:19.21-19.57:
+  16          01  DOG       CONSTANT  'Dog '.
+  17          01  YARD      CONSTANT  CAT & "& " & DOG.
+  18          78  HUN       VALUE 10 * (10 + LENGTH OF PICX) + 12.35-2+3.
+  19 >        78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
+----                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  20          78  DIV1      VALUE 100 / 3.
+  21          78  NUM2      VALUE 1 + 2 * 3.
+>> Error: Unexpected multiple values for 78-level data item `HUN2'
+
 run_misc.at-13144-prog.cob:19.57-19.58:
   16          01  DOG       CONSTANT  'Dog '.
   17          01  YARD      CONSTANT  CAT & "& " & DOG.
@@ -2339,6 +2379,16 @@ run_misc.at-13144-prog.cob:20.31-20.32:
   21          78  NUM2      VALUE 1 + 2 * 3.
   22          01  CON3      CONSTANT (((1 + 2) * NUM2) - 4).
 >> Error: Invalid syntax
+
+run_misc.at-13144-prog.cob:20.21-20.34:
+  17          01  YARD      CONSTANT  CAT & "& " & DOG.
+  18          78  HUN       VALUE 10 * (10 + LENGTH OF PICX) + 12.35-2+3.
+  19          78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
+  20 >        78  DIV1      VALUE 100 / 3.
+----                        ^^^^^^^^^^^^^
+  21          78  NUM2      VALUE 1 + 2 * 3.
+  22          01  CON3      CONSTANT (((1 + 2) * NUM2) - 4).
+>> Error: Unexpected multiple values for 78-level data item `DIV1'
 
 run_misc.at-13144-prog.cob:20.34-20.35:
   17          01  YARD      CONSTANT  CAT & "& " & DOG.
@@ -2379,6 +2429,16 @@ run_misc.at-13144-prog.cob:21.33-21.34:
   22          01  CON3      CONSTANT (((1 + 2) * NUM2) - 4).
   23          01  CON4      CONSTANT AS 3.1416 + CON3.
 >> Error: Invalid syntax
+
+run_misc.at-13144-prog.cob:21.21-21.36:
+  18          78  HUN       VALUE 10 * (10 + LENGTH OF PICX) + 12.35-2+3.
+  19          78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
+  20          78  DIV1      VALUE 100 / 3.
+  21 >        78  NUM2      VALUE 1 + 2 * 3.
+----                        ^^^^^^^^^^^^^^^
+  22          01  CON3      CONSTANT (((1 + 2) * NUM2) - 4).
+  23          01  CON4      CONSTANT AS 3.1416 + CON3.
+>> Error: Unexpected multiple values for 78-level data item `NUM2'
 
 run_misc.at-13144-prog.cob:21.36-21.37:
   18          78  HUN       VALUE 10 * (10 + LENGTH OF PICX) + 12.35-2+3.

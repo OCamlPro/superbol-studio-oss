@@ -29,7 +29,7 @@ let combined_tokens =
   List.to_seq Text_keywords.combined_keywords
 
 let pp_alphanum_string_prefix ppf Cobol_ptree.{ hexadecimal; quotation; str;
-                                                runtime_repr } =
+                                                runtime_repr; _ } =
   if runtime_repr = Null_terminated_bytes then Fmt.char ppf 'Z';
   if hexadecimal then Fmt.char ppf 'X';
   match quotation with

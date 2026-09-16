@@ -33,9 +33,9 @@ and alphanum =
     qte: quotation;
     str: string;
   }
-and quotation =
-  | Quote
-  | Apostrophe
+and quotation = Cobol_ptree.alphanum_quote =
+  | Simple_quote
+  | Double_quote
 and literal_kind =
   | Basic
   | Bool | BoolX                                           (* B, BX *)

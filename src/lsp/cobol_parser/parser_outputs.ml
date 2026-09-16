@@ -14,6 +14,7 @@
 (** Gathers some types used to define outputs for the parser engine. *)
 (* We are only defining types here so an MLI would only be redundant. *)
 
+open EzCompat                                                    (* StringMap *)
 open Cobol_common.Srcloc.TYPES
 
 type tokens_with_locs = Grammar_tokens.token with_loc list
@@ -22,7 +23,7 @@ type artifacts =
   {
     tokens: tokens_with_locs Lazy.t;
     pplog: Cobol_preproc.Trace.log;
-    rev_comments: Cobol_preproc.Text.comments;
+    rev_comments: Cobol_preproc.Text.comments StringMap.t;
     rev_ignored: lexloc list;
   }
 

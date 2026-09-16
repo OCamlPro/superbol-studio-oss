@@ -90,6 +90,7 @@ let int: int -> factor = AE.int
 let valof s : factor = AE.var (Valof s)
 
 let point_size: size = AE.zero
+let zero_size = point_size
 let const_size: int -> size = function
   | 0 -> point_size
   | i -> AE.factor (int i)
@@ -98,6 +99,9 @@ let elementary_size: elementary_size -> size = AE.const
 
 let as_bits ?memory_config s =
   AE.as_int ?const_values:memory_config s
+
+let as_bytes ?memory_config s =
+  (as_bits ?memory_config s + 7) / 8
 
 let add: size -> size -> size = AE.add
 let diff: size -> size -> size = fun a b -> AE.sub a b

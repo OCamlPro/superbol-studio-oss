@@ -14,6 +14,10 @@
 open Ez_file.V1
 open EzFile.OP
 
+let () =
+  (* Force use of `/` as directory separator, even on win32. *)
+  Slashifier.enable ()
+
 let find_dir anchor =
   let curdir = Sys.getcwd () in
   let rec iter path =

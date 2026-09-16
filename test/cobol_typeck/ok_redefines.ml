@@ -130,6 +130,102 @@ let%expect_test "qualified-redefines-occurs" =
       }
     } |}];;
 
+let%expect_test "redefines-with-value" =
+  dotest @@ prog "redefines-with-value"
+    ~working_storage:{|
+       01 X             PIC X(6).
+       01 Y REDEFINES X PIC X    OCCURS 6 VALUE "A".
+       01 Z REDEFINES X PIC XX   OCCURS 3 VALUE "AA".
+    |};
+  [%expect {|
+    prog.cob:5.42-5.51:
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4          01 X             PIC X(6).
+       5 >        01 Y REDEFINES X PIC X    OCCURS 6 VALUE "A".
+    ----                                             ^^^^^^^^^
+       6          01 Z REDEFINES X PIC XX   OCCURS 3 VALUE "AA".
+       7          PROCEDURE DIVISION.
+    >> Warning: Ignored VALUE clause for item 'Y' with REDEFINES clause
+
+    prog.cob:6.42-6.52:
+       3          WORKING-STORAGE SECTION.
+       4          01 X             PIC X(6).
+       5          01 Y REDEFINES X PIC X    OCCURS 6 VALUE "A".
+       6 >        01 Z REDEFINES X PIC XX   OCCURS 3 VALUE "AA".
+    ----                                             ^^^^^^^^^^
+       7          PROCEDURE DIVISION.
+       8
+    >> Warning: Ignored VALUE clause for item 'Z' with REDEFINES clause
+
+    prog.cob:4.7-6.53:
+       1          PROGRAM-ID. redefines-with-value.
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4 >        01 X             PIC X(6).
+    ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+       5 >        01 Y REDEFINES X PIC X    OCCURS 6 VALUE "A".
+    ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+       6 >        01 Z REDEFINES X PIC XX   OCCURS 3 VALUE "AA".
+    ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+       7          PROCEDURE DIVISION.
+       8
+    Item definition: {
+      qualname: X
+      offset: 0
+      size: 48
+      layout: {
+        elementary
+        usage: {
+          display
+          category: ALPHANUMERIC(6)
+        }
+      }
+      redefs: {
+        table
+        redefines: X
+        offset: 0
+        size: 48
+        range: {
+          span: fixed-length: 6
+        }
+        field: {
+          qualname: Y
+          leading ranges: 1
+          offset: 0
+          size: 8
+          layout: {
+            elementary
+            usage: {
+              display
+              category: ALPHANUMERIC(1)
+            }
+          }
+        }
+      }{
+        table
+        redefines: X
+        offset: 0
+        size: 48
+        range: {
+          span: fixed-length: 3
+        }
+        field: {
+          qualname: Z
+          leading ranges: 1
+          offset: 0
+          size: 16
+          layout: {
+            elementary
+            usage: {
+              display
+              category: ALPHANUMERIC(2)
+            }
+          }
+        }
+      }
+    } |}];;
+
 let%expect_test "occurs-n-redefines-1" =
   dotest @@ prog "occurs-n-redefines-1"
     ~working_storage:{|

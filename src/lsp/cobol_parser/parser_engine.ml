@@ -16,7 +16,10 @@ open Cobol_common.Srcloc.INFIX
 open Parser_options                               (* import types for options *)
 open Parser_outputs                               (* import types for outputs *)
 
+module LIST = Cobol_common.Basics.LIST
 module OUT = Parser_outputs
+module DIAGS = Parser_diagnostics
+module TOK = Grammar_tokens
 
 module Tokzr = Text_tokenizer
 module Overlay_manager = Grammar_utils.Overlay_manager
@@ -25,7 +28,7 @@ module Grammar_recovery =
   Recovery.Make (Grammar_interpr) (struct
     include Grammar_recover
     include Grammar_printer
-    let benign_assumption: Grammar_tokens.token -> bool = function
+    let benign_assumption: TOK.token -> bool = function
       | PERIOD -> true
       | _ -> false
   end)
@@ -153,6 +156,10 @@ and update_tokzr ps tokzr =
   if tokzr == ps.preproc.tokzr then ps
   else { ps with preproc = { ps.preproc with tokzr } }
 
+let error ({ preproc = ({ diags; _ } as pp); _ } as ps) e =
+  let diags = Parser_diagnostics.add_error e diags in
+  { ps with preproc = { pp with diags } }
+
 let add_diag ({ preproc = ({ diags; _ } as pp); _ } as ps) severity ?loc diag =
   let diags = Parser_diagnostics.add_diag ~severity ?loc diag diags in
   { ps with preproc = { pp with diags } }
@@ -199,9 +206,46 @@ let rec produce_tokens (ps: _ state as 's) : 's * Text_tokenizer.tokens =
   | Ok tokens, tokzr ->
       update_tokzr ps tokzr, tokens
 
+let try_compilation_variable_substitution ps var : (TOK.token * _) option =
+  match Cobol_preproc.lookup_compilation_variable ps.preproc.pp var with
+  | None ->
+      None
+  | Some ({ src_payload = { compvar_value; _ }; _ } as def) ->
+      match compvar_value.src_payload with
+      | Alphanum a ->
+          Some (TOK.ALPHANUM (Cobol_data.Value.ptree_of_alphanum a), def)
+      | Boolean b ->
+          Some (TOK.BOOLIT (Cobol_data.Value.ptree_of_boolean b), def)
+      | Numeric n ->
+          match Cobol_data.Value.categorize_fixed n with
+          | `Z z ->
+              let s = Cobol_data.Value.string_of_integer z in
+              if Z.sign z < 0
+              then Some (TOK.SINTLIT s, def)
+              else Some (TOK.DIGITS s, def)
+          | `Q f ->
+              let q = Cobol_data.Value.ptree_of_fixed f in
+              let fixedlit = q.fixed_integral, '.', q.fixed_fractional in
+              Some (TOK.FIXEDLIT fixedlit, def)
+
 let rec next_token ({ preproc = { tokzr; _ }; _ } as ps) tokens =
   match Tokzr.next_token tokzr tokens with
   | Some (tokzr, token, tokens) ->
+      let ps, token =
+        match ~&token with
+        | WORD w | WORD_IN_AREA_A w ->
+            let var = Cobol_preproc.Env.var w in
+            (match try_compilation_variable_substitution ps var with
+             | None ->
+                 ps, token
+             | Some (token', def) ->
+                 update_pp ps @@
+                 Cobol_preproc.record_compilation_variable_substitution
+                   ~var ~loc:~@token ~def ps.preproc.pp,
+                 token' &@<-token)
+        | _ ->
+            ps, token
+      in
       update_tokzr ps tokzr, token, tokens
   | None ->
       let ps, tokens = produce_tokens ps in
@@ -350,6 +394,48 @@ let on_repository_paragraph repository ps token tokens =
         acc
   end (ps, token, tokens) repository
 
+let isolate_value_clause ps data_clauses
+  : _ state * Cobol_ptree.data_value_clause with_loc option =
+  List.fold_left begin fun (ps, value_clause) -> function
+    | { payload = Cobol_ptree.DataValue c; loc }
+      when value_clause = None ->
+        ps, Some (c &@ loc)
+    | { payload = Cobol_ptree.DataGlobal; _ } ->    (* TODO: scope compil vars *)
+        (* error ps @@ Unsupported { loc; *)
+        (*                           stuff = Global_clause_for_78_level_item }, *)
+        ps, value_clause
+    | clause ->
+        error ps @@ Unexpected { loc = ~@clause;
+                                 stuff = Clause_for_78_level_item clause },
+        value_clause
+  end (ps, None) data_clauses
+
+let on_data_descr_entry (e: Cobol_ptree.data_item) ps token tokens =
+  let ps =
+    if ~&(e.data_level) == 78 then
+      let loc =
+        Cobol_common.Srcloc.append_srclocs ~@(e.data_level) @@
+        Option.(to_list ~@?(e.data_name)) @ (List.map (~@) e.data_clauses)
+      in
+      match e.data_name with              (* CHECKME: is `78 FILLER` allowed? *)
+      | Some { payload = DataFiller; _ } | None ->
+          error ps @@ Malformed { loc; stuff = Data_item_at_level_78 }
+      | Some ({ payload = DataName name; _ } as dn) ->
+          let ps, value = isolate_value_clause ps e.data_clauses in
+          match value with
+          | Some { payload = ValueData literal; _ } ->
+              update_pp ps @@
+              Cobol_preproc.bind_78_constant ps.preproc.pp ~loc name literal
+          | Some { payload = ValueTable _; loc } ->
+              let stuff = DIAGS.Multiple_values_for_78_level_item dn in
+              error ps @@ Unexpected { loc; stuff }
+          | None ->
+              let stuff = DIAGS.Value_for_78_level_item dn in
+              error ps @@ Missing { loc; stuff }
+    else ps
+  in
+  ps, token, tokens
+
 let on_procedure_division_header ps token tokens =
   let tokzr, token, tokens
     = Tokzr.enable_intrinsics ps.preproc.tokzr token tokens in
@@ -375,6 +461,8 @@ let post_production ps token tokens prod env =
       on_special_names s ps token tokens
   | Post_repository_paragraph p ->
       on_repository_paragraph p ps token tokens
+  | Post_data_descr_entry e ->
+      on_data_descr_entry e ps token tokens
   | Post_procedure_division_header () ->
       on_procedure_division_header ps token tokens
   | Post_procedure_division p ->
@@ -448,13 +536,13 @@ and on_interim_stage ?(stop_before_eof = false) (ps, tokens, env) =
   let c = Grammar_interpr.input_needed env in
   let { prev_limit; _ } as ps, token, tokens = next_token ps tokens in
   match ~&token with
-  | Grammar_tokens.EOF when stop_before_eof ->
+  | TOK.EOF when stop_before_eof ->
       Final (ps, None, Env env)
   | _ ->
       let _t, _, e as tok = token_n_srcloc_limits ~prev_limit token in
       let ps = { ps with prev_limit = e; prev_limit' = prev_limit } in
       check ps token tokens env @@ Grammar_interpr.offer c @@ match tok with
-      | Grammar_tokens.INTERVENING_ '.', l, r -> Grammar_tokens.PERIOD, l, r
+      | TOK.INTERVENING_ '.', l, r -> TOK.PERIOD, l, r
       | tok -> tok
 
 and check ps token tokens env = function
@@ -503,7 +591,7 @@ and recover ps tokens candidates ~report_syntax_hints_n_error =
   let _, _, e as tok = token_n_srcloc_limits ~prev_limit token in
   let ps = { ps with prev_limit = e; prev_limit' = prev_limit } in
   match Grammar_recovery.attempt candidates tok with
-  | `Fail when ~&token <> Grammar_tokens.EOF ->             (* ignore one token *)
+  | `Fail when ~&token <> TOK.EOF ->                        (* ignore one token *)
       recover ps tokens candidates ~report_syntax_hints_n_error
   | `Fail when Option.is_none candidates.final ->         (* unable to recover *)
       Final (report_syntax_hints_n_error ps [], None, Sink)

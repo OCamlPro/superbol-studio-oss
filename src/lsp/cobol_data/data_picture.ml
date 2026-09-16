@@ -195,6 +195,13 @@ module TYPES = struct
         }
   [@@deriving ord]
 
+  type common_numeric_info =
+    {
+      signed: bool;
+      digits: int;
+      scale: int;
+    }
+
   let pp_sign_config ppf = function
     | None -> Fmt.string ppf "unsigned"
     | Some { sign_position; sign_separate } ->
@@ -316,6 +323,30 @@ let pp_picture_symbols: symbols list Pretty.printer = fun ppf symbols ->
       Fmt.pf ppf "(%d)" occ end
     else List.iter (fun _ -> pp_symbol_cobolized ppf symbol) @@ List.init occ Fun.id)
   symbols
+
+let char_of_symbol = function
+  | A -> 'A'
+  | B -> 'B'
+  | CR -> failwith "CR"                                                   (* ? *)
+  | CS -> '$'                                                             (* ? *)
+  | DB -> failwith "DB"                                                   (* ? *)
+  | DecimalSep -> '.'                                                     (* ? *)
+  | E -> 'E'
+  | GroupingSep -> ','                                                    (* ? *)
+  | Minus -> '-'
+  | N -> 'N'
+  | Nine -> '9'
+  | One -> '1'
+  | P -> 'P'
+  | Plus -> '+'
+  | L -> 'L'
+  | S -> 'S'
+  | Slant -> '/'
+  | Star -> '*'
+  | V -> 'V'
+  | X -> 'X'
+  | Z -> 'Z'
+  | Zero -> '0'
 
 (* --- *)
 
@@ -1275,6 +1306,17 @@ let is_signed_numeric pic = match pic.category with
   | FixedNum { sign; _ } -> Option.is_some sign
   | FloatNum { with_sign; _ } -> with_sign
   | _ -> false
+let numeric_scale pic = match pic.category with
+  | FixedNum { scale; _ }
+  | FloatNum { scale; _ } -> Ok scale
+  | cat -> Error cat
+let numeric_info pic = match pic.category with
+  | FixedNum { sign; digits; scale; _ } ->
+      Ok { signed = Option.is_some sign; digits; scale }
+  | FloatNum { with_sign; digits; scale; _ } ->
+      Ok { signed = with_sign; digits; scale }
+  | cat ->
+      Error cat
 let data_size pic = data_size pic.category
 let display_size pic = display_size pic.category
 let edited_size pic = edited_size pic.category

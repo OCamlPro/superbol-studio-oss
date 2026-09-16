@@ -56,6 +56,9 @@ let dummy_alphanum =
 let dummy_expr =
   Atom (Fig Zero)
 
+let dummy_cond ~pos =
+  Expr (dummy_expr &@ Cobol_common.Srcloc.raw (pos, pos))
+
 let dummy_picture ~pos =
   {
     picture_string = "X" &@ Cobol_common.Srcloc.raw (pos, pos);
@@ -86,7 +89,7 @@ let floating_zero =
 let boolean_zero =
   {
     bool_base = `Bool;
-    bool_value = integer_zero;
+    bool_string = integer_zero;
   }
 
 (* --- *)

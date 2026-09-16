@@ -56,7 +56,7 @@ let to_string = function
     [~&name; Pretty.to_string "%a" Cobol_ptree.pp_qualname qualname]
   | _ -> []
 
-let approx_type_to_string = function
+let approx_type_to_string: approx_typing_info -> string = function
   | Alphanum -> "Alphanum"
   | Any -> ""
   | Boolean -> "Boolean"
@@ -68,17 +68,20 @@ let approx_type_to_string = function
   | ObjectRef -> "Object Ref"
   | Pointer -> "Pointer"
 
-let approx_type_of_pic ({ category; _ }: picture) =
+let approx_type_of_pic ({ category; _ }: picture) : approx_typing_info =
   match category with
-  | National _ | Alphabetic _ | Alphanumeric _ -> Alphanum
+  | National _ | Alphabetic _ | Alphanumeric _ ->
+      Alphanum
   | FixedNum { editions; _ } when (editions.basics <> [] ||
                                    editions.floating <> None ||
-                                   editions.zerorepl <> None)
-    -> NumericEdited
-  | FloatNum { editions; _ } when editions <> []
-    -> NumericEdited
-  | FloatNum _ | FixedNum _ -> Numeric
-  | Boolean _ -> Boolean
+                                   editions.zerorepl <> None) ->
+      NumericEdited
+  | FloatNum { editions; _ } when editions <> [] ->
+      NumericEdited
+  | FloatNum _ | FixedNum _ ->
+      Numeric
+  | Boolean _ ->
+      Boolean
 
 let approx_type_of_usage : usage -> approx_typing_info = function
   | Binary _
@@ -113,7 +116,7 @@ let approx_type_of_datadef : data_definition -> (approx_typing_info * bool) =
       { def = { payload = {
             renaming_layout = Renamed_elementary { usage; _ };
             _ }; _ }; _ } ->
-    (approx_type_of_usage usage, false)
+      (approx_type_of_usage usage, false)
   | Data_field
       { def = { payload = {
             field_layout = Struct_field _;
@@ -122,9 +125,11 @@ let approx_type_of_datadef : data_definition -> (approx_typing_info * bool) =
       { def = { payload = {
             renaming_layout = Renamed_struct _;
             _ }; _ }; _ } ->
-    (Alphanum, true)
-  | Data_condition _ -> (Condition, false)
-  | Table_index _ -> (Index, false)
+      Alphanum, true
+  | Data_condition _ ->
+      Condition, false
+  | Table_index _ ->
+      Index, false
 
 let is_valid ~expected data =
   let (data_cat, is_group) = approx_type_of_datadef data in

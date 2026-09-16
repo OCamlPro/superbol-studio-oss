@@ -104,6 +104,8 @@ module NEL = struct
   type 'a t =
     | One of 'a
     | (::) of 'a * 'a t
+  let one a =
+    One a
   let compare_lazy cmp a b =
     (** [compare_lazy cmp nel0 nel1] compares [nel0] and [nel1] using [cmp].
       [compare_lazy] is slightly more lazy than its [compare] counterpart,
@@ -189,6 +191,9 @@ module NEL = struct
     function
     | [] -> Pretty.invalid_arg "of_rev_list"
     | last :: tl -> aux (One last) tl
+  let rec iter ~f = function
+    | One x -> f x
+    | x :: l -> f x; iter ~f l
   let map ~f l =
     let rec aux acc = function
       | One x -> of_rev_list (List.cons (f x) acc)

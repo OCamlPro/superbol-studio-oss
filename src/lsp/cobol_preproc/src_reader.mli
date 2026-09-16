@@ -29,7 +29,7 @@ val from
 
 val diags: t -> Src_diagnostics.t
 val position: t -> Lexing.position
-val input_file: t -> string option
+val input_filename: t -> string option
 val platform: t -> Cobol_common.Platform.TYPES.platform
 val source_format: t -> Src_format.any
 val rev_comments: t -> Text.comments
