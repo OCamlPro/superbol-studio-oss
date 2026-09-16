@@ -117,11 +117,13 @@ let pp_sign_config ppf = function
         (if sign_separate then "separate" else "nonseparate")
 
 let pp_usage: usage Pretty.printer =
-  let pp_usage_with_picture ppf name ({ category; _ }: picture) =
-    Pretty.record [
-      Fmt.(styled `Yellow @@ any name);
-      Fmt.field "category" (fun () -> category) PIC.pp_detailed_category;
-    ] ppf ()
+  let pp_usage_with_picture ppf name_fmt ({ category; _ }: picture) =
+    Pretty.string_to begin fun name ->
+      Pretty.record [
+        Fmt.(styled `Yellow @@ fun ppf () -> string ppf name);
+        Fmt.field "category" (fun () -> category) PIC.pp_detailed_category;
+      ] ppf ()
+    end name_fmt
   and pp_display_numeric ppf sign ({ category; _ }: picture) =
     Pretty.record_with_conditional_fields [
       T Fmt.(styled `Yellow @@ any "display");
@@ -133,12 +135,16 @@ let pp_usage: usage Pretty.printer =
     Fmt.int ppf @@
     match tag with `W16 -> 16 | `W32 -> 32 | `W34 -> 34 | `W64 -> 64 | `W128 -> 128
   in
-  let pp_usage_with_optional_picture ppf name picture =
+  let pp_usage_with_optional_picture ppf name_fmt picture =
     match picture with
     | Some picture ->
-        pp_usage_with_picture ppf name picture
+        pp_usage_with_picture ppf name_fmt picture
     | None ->
-        Pretty.record [ Fmt.(styled `Yellow @@ any name); ] ppf ()
+        Pretty.string_to begin fun name ->
+          Pretty.record [
+            Fmt.(styled `Yellow @@ fun ppf () -> string ppf name);
+          ] ppf ()
+        end name_fmt
   in
   fun ppf -> function
     | Alphanumeric { picture; _ } ->
@@ -161,6 +167,9 @@ let pp_usage: usage Pretty.printer =
     | Binary { picture; byte_size = C_long_size;
                truncation = Truncate_to_native_size; _ } ->
         pp_usage_with_optional_picture ppf "binary-c-long" picture
+    | Binary { picture; byte_size = Custom_size n;
+               truncation = Truncate_to_native_size; _ } ->
+        pp_usage_with_optional_picture ppf "binary-%d" picture n
     | Binary { picture;
                truncation = Truncate_to_digits _; _ } ->
         pp_usage_with_optional_picture ppf "binary" picture

@@ -403,27 +403,42 @@ let display_usage ~item_loc ~data_config ?value_literal ?picture diags =
 (** Items with USAGE COMP-5 *)
 let range_extended_usage diags ~item_loc given_picture usage =
   let diags, picture =
-    ensure_picture diags ~only:`Numeric_category ~item_loc ~required:true
-      ~usage given_picture
+    ensure_picture diags ~only:`Numeric_or_alphanum_category
+      ~item_loc ~required:true ~usage given_picture
   in
-  match PIC.numeric_info picture with                   (* TODO: check scale? *)
-  | Ok ({ digits; _ } as numeric_info)
-    when digits >= 1 && digits <= 18 ->
-      binary_from_numeric_info diags ~picture ~min_size_is_short:true
-        ~native_truncation:true numeric_info
-  | Ok { digits; scale = scaling; signed } ->
-      let picture = Result.get_ok @@ Option.get given_picture in
-      let feature = Digits { given = digits ; min = 1; max = 18 } in
-      data_error diags @@ Invalid_picture_feature { picture; usage; feature },
-      if digits < 0
-      then Ok (Binary { picture = Some ~&picture;
-                        signed; scaling; byte_size = Short_size;
+  if PIC.is_numeric picture then
+    match PIC.numeric_info picture with                 (* TODO: check scale? *)
+    | Ok ({ digits; _ } as numeric_info)
+      when digits >= 1 && digits <= 18 ->
+        binary_from_numeric_info diags ~picture ~min_size_is_short:true
+          ~native_truncation:true numeric_info
+    | Ok { digits; scale = scaling; signed } ->
+        let picture = Result.get_ok @@ Option.get given_picture in
+        let feature = Digits { given = digits ; min = 1; max = 18 } in
+        data_error diags @@ Invalid_picture_feature { picture; usage; feature },
+        if digits < 0
+        then Ok (Binary { picture = Some ~&picture;
+                          signed; scaling; byte_size = Short_size;
+                          truncation = Truncate_to_native_size })
+        else Ok (Binary { picture = Some ~&picture;
+                          signed; scaling; byte_size = Double_size;
+                          truncation = Truncate_to_native_size })
+    | Error _ ->
+        diags, Error None               (* already reported in `ensure_picture` *)
+  else if PIC.is_alphanum picture then
+    let byte_size =                (* MF extension (we should emit a warning) *)
+      match PIC.data_size picture with
+      | 1 -> Byte_size
+      | 2 -> Short_size
+      | 4 -> Long_size
+      | 8 -> Double_size
+      | 16 -> Long_double_size
+      | n -> Custom_size n
+    in
+    diags, Ok (Binary { picture = None; signed = false; scaling = 0; byte_size;
                         truncation = Truncate_to_native_size })
-      else Ok (Binary { picture = Some ~&picture;
-                        signed; scaling; byte_size = Double_size;
-                        truncation = Truncate_to_native_size })
-  | Error _ ->
-      diags, Error None               (* already reported in `ensure_picture` *)
+  else
+    diags, Error None                 (* already reported in `ensure_picture` *)
 
 
 let packed_decimal_usage diags ~item_loc ~picture comp =

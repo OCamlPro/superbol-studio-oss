@@ -153,7 +153,7 @@ and byte_size =
   | Double_size
   | Long_double_size
   | C_long_size
-  (* | Custom_size *)
+  | Custom_size of int                                    (* > 2, != 4, 8, 16 *)
 and display_sign =
   | Display_unsigned
   | Display_signed of display_sign_config

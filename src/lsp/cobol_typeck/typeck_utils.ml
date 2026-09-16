@@ -30,6 +30,8 @@ let size_of ~usage =
       MEM.(mult_int byte_size 16)
   | Binary { byte_size = C_long_size; _ } ->
       MEM.size_of_C_long
+  | Binary { byte_size = Custom_size n; _ } ->
+      MEM.(mult_int byte_size n)
   | Bit picture ->                                     (* TODO: probably wrong *)
       MEM.(mult_int bit_size @@ PIC.data_size picture)
   | Alphanumeric { picture; _ }
