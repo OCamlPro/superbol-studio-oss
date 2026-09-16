@@ -38,22 +38,23 @@ let find_cobol_files ~token =
   in
   aux [] cobol_file_patterns
 
+type report = {
+  file: string;              (* the report file, in [root]/_superbol *)
+  root: string;              (* the workspace folder it was made for *)
+}
+
 (* Written while the analysis runs, so a crash keeps the results found so far. *)
 let create_report () =
   match Workspace.workspaceFolders () with
   | [] -> None
   | folder :: _ ->
-      let dir =
-        Node.Path.join [Uri.fsPath (WorkspaceFolder.uri folder); "_superbol"]
-      in
+      let root = Uri.fsPath (WorkspaceFolder.uri folder) in
+      let dir = Node.Path.join [root; "_superbol"] in
       let file = Node.Path.join [dir; "analysis-report.md"] in
       try
-        (* The bindings drop the label: this is a plain, non-recursive mkdir,
-           and it fails if the directory is already there. *)
-        if not (Node.Fs.existsSync dir) then
-          Node.Fs.mkdirSync dir ~recursive:true;
+        Node.Fs.mkdirSync dir ~recursive:true;
         Node.Fs.writeFileSync file "";
-        Some file
+        Some { file; root }
       with e ->
         Superbol_printer.log_error
           "SuperBOL: cannot create %s: %s" file (Printexc.to_string e);
@@ -62,7 +63,7 @@ let create_report () =
 let append_to_report report text =
   match report with
   | None -> ()
-  | Some file ->
+  | Some { file; _ } ->
       try Node.Fs.appendFileSync file text with e ->
         Superbol_printer.log_error
           "SuperBOL: cannot write %s: %s" file (Printexc.to_string e)
@@ -136,28 +137,42 @@ let severity_name = function
   | DiagnosticSeverity.Information -> "note"
   | DiagnosticSeverity.Hint -> "hint"
 
-(* Markdown link, so that a click jumps to the reported line.  The target is
-   relative to the report, which lies one directory below the workspace. *)
-let report_link ~path ~line ~char =
-  let target = if Node.Path.isAbsolute path then path else "../" ^ path in
+(* The report is in [root]/_superbol, so a file in [root] is one "../" away.
+   Other roots are outside [root]: link those by URI. *)
+let report_target ~root uri =
+  let path = Uri.fsPath uri in
+  let prefix = root ^ String.make 1 Node.Path.sep in
+  if String.starts_with ~prefix path then
+    let rest =
+      String.sub path (String.length prefix)
+        (String.length path - String.length prefix)
+    in
+    (* Markdown wants "/", even on Windows. *)
+    "../" ^ String.concat "/" (String.split_on_char Node.Path.sep rest)
+  else
+    Uri.toString uri ()
+
+(* Markdown link, so that a click jumps to the reported line. *)
+let report_link ~path ~target ~line ~char =
   Printf.sprintf "[%s:%u:%u](<%s#L%u>)" path line char target line
 
-let report_line ~path diag =
+let report_line ~path ~target diag =
   let pos = Range.start @@ Diagnostic.range diag in
   Printf.sprintf "- %s: %s: %s\n"
-    (report_link ~path
+    (report_link ~path ~target
        ~line:(succ @@ Position.line pos)
        ~char:(succ @@ Position.character pos))
     (severity_name @@ Diagnostic.severity diag)
     (Diagnostic.message diag)
 
 let report_diagnostics_of ~uri report =
-  match Languages.getDiagnostics uri with
-  | [] -> ()
-  | diags ->
+  match report, Languages.getDiagnostics uri with
+  | None, _ | _, [] -> ()
+  | Some { root; _ }, diags ->
       let path = Workspace.asRelativePath () ~pathOrUri:(`Uri uri) in
+      let target = report_target ~root uri in
       append_to_report report @@
-      String.concat "" @@ List.map (report_line ~path) diags
+      String.concat "" @@ List.map (report_line ~path ~target) diags
 
 let report_completion report ~analyzed ~skipped ~missed =
   let outcome =
@@ -177,7 +192,7 @@ let report_completion report ~analyzed ~skipped ~missed =
     match report with
     | None ->
         "; diagnostics are listed in the Problems view"
-    | Some file ->
+    | Some { file; _ } ->
         Printf.sprintf "; diagnostics are listed in the Problems view and in %s"
           (Workspace.asRelativePath () ~pathOrUri:(`Uri (Uri.file file)))
   in
@@ -188,7 +203,7 @@ let report_completion report ~analyzed ~skipped ~missed =
     | None ->
         Window.showInformationMessage () ~message |>
         Promise.then_ ~fulfilled:(fun (_: unit option) -> Promise.return ())
-    | Some file ->
+    | Some { file; _ } ->
         Window.showInformationMessage () ~message
           ~choices:["Show Report", ()] |>
         Promise.then_ ~fulfilled:begin function

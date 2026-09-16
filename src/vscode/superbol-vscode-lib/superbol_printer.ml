@@ -19,7 +19,8 @@ let extension_oc : Vscode.OutputChannel.t Lazy.t =
 
 let log_error fmt =
   Printf.ksprintf
-    (fun value -> Vscode.OutputChannel.appendLine (Lazy.force extension_oc) ~value)
+    (fun value ->
+       Vscode.OutputChannel.appendLine (Lazy.force extension_oc) ~value)
     fmt
 
 let show_error = function
