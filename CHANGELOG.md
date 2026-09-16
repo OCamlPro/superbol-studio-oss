@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Support tabs in source file [#591](https://github.com/OCamlPro/superbol-studio-oss/pull/591)
 - Detection of preprocessor variables that are of category numeric [#651](https://github.com/OCamlPro/superbol-studio-oss/pull/651)
 - Warning on ignored `VALUE` clause for items with `REDEFINES` clause [#650](https://github.com/OCamlPro/superbol-studio-oss/pull/650)
 - Handling of data item documentation that spans over several lines [#639](https://github.com/OCamlPro/superbol-studio-oss/pull/639)
@@ -15,7 +16,6 @@
 - Amount of references reported in codelens, that wrongly included declarations [#640](https://github.com/OCamlPro/superbol-studio-oss/pull/640)
 - Wrong codelens appearing on `COPY`s [#642](https://github.com/OCamlPro/superbol-studio-oss/pull/642)
 - Grammar rules for `VALUE OF` clause [#629](https://github.com/OCamlPro/superbol-studio-oss/pull/629) (fix for [Issue #625](https://github.com/OCamlPro/superbol-studio-oss/issues/625))
-- Support tabs in source file [#591](https://github.com/OCamlPro/superbol-studio-oss/pull/591)
 
 
 ## [1.0.0] First stable release (2026-07-23)

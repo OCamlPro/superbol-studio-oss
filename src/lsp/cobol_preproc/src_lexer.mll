@@ -272,8 +272,7 @@ and fixed_indicator state
       }
   | '\t'
       {
-        Src_lexing.tab
-          ~k:(fun state -> fixed_nominal_line @@ Src_lexing.flush_continued state) state lexbuf
+        Src_lexing.tab ~k:fixed_nominal_line state lexbuf
       }
   | '-'                                                  (* continuation line *)
       {
@@ -396,8 +395,7 @@ and cobolx_line state                                 (* COBOLX format (GCOS) *)
       }
   | '\t'
       {
-        Src_lexing.tab
-          ~k:(fun state -> fixed_nominal_line @@ Src_lexing.flush_continued state) state lexbuf
+        Src_lexing.tab ~k:fixed_nominal_line state lexbuf
       }
   | '-'                                                  (* continuation line *)
       {
@@ -441,8 +439,7 @@ and fixed_nominal_line state
   = parse
   | '\t'
     {
-      Src_lexing.tab
-        ~k:(fun state -> fixed_nominal_line @@ Src_lexing.flush_continued state) state lexbuf
+      Src_lexing.tab ~k:fixed_nominal_line state lexbuf
     }
   | blanks
       {
@@ -469,8 +466,7 @@ and fixed_nominal state
   = parse
   | '\t'
       {
-        Src_lexing.tab
-          ~k:(fun state -> fixed_nominal @@ Src_lexing.flush_continued state) state lexbuf
+        Src_lexing.tab ~k:fixed_nominal state lexbuf
       }
   | blanks
       {
@@ -519,9 +515,7 @@ and fixed_mf_cdir_line marker state   (* Micro-focus compiler directive (`$`) *)
   = parse
   | '\t'
     {
-      Src_lexing.tab
-        ~k:(fun state -> fixed_mf_cdir_line marker @@ Src_lexing.flush_continued state)
-        state lexbuf
+      Src_lexing.tab ~k:(fixed_mf_cdir_line marker) state lexbuf
     }
   | blanks? cdir_word_suffix
       {
@@ -547,7 +541,7 @@ and fixed_continue_line state
   = parse
   | '\t'
     {
-      Src_lexing.tab ~k:fixed_continue_line state lexbuf
+      Src_lexing.tab ~before_indicator:false ~k:fixed_continue_line state lexbuf
     }
   | blank*
       {
@@ -654,8 +648,7 @@ and free_line state
       }
   | '\t'
       {
-        Src_lexing.tab
-          ~k:(fun state -> free_line @@ Src_lexing.flush_continued state) state lexbuf
+        Src_lexing.tab ~k:free_line state lexbuf
       }
   | (cdir_word | mf_cdir_word)
       {
@@ -684,8 +677,7 @@ and free_nominal state
       }
   | '\t'
       {
-        Src_lexing.tab
-          ~k:(fun state -> free_nominal @@ Src_lexing.flush_continued state) state lexbuf
+        Src_lexing.tab ~k:free_nominal state lexbuf
       }
   | (separator as char) (blanks*)
       {
