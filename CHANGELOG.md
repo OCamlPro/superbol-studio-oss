@@ -15,6 +15,7 @@
 - Amount of references reported in codelens, that wrongly included declarations [#640](https://github.com/OCamlPro/superbol-studio-oss/pull/640)
 - Wrong codelens appearing on `COPY`s [#642](https://github.com/OCamlPro/superbol-studio-oss/pull/642)
 - Grammar rules for `VALUE OF` clause [#629](https://github.com/OCamlPro/superbol-studio-oss/pull/629) (fix for [Issue #625](https://github.com/OCamlPro/superbol-studio-oss/issues/625))
+- Support tabs in source file [#591](https://github.com/OCamlPro/superbol-studio-oss/pull/591)
 
 
 ## [1.0.0] First stable release (2026-07-23)
@@ -24,7 +25,6 @@
 - Enforcement of Area A checks only when the source format is `COBOL85` [#555](https://github.com/OCamlPro/superbol-studio-oss/pull/555) [#556](https://github.com/OCamlPro/superbol-studio-oss/pull/556)
 - Support for USAGE `COMP-5` and `COMP-6` [#548](https://github.com/OCamlPro/superbol-studio-oss/pull/548) [#606](https://github.com/OCamlPro/superbol-studio-oss/pull/606)
 - Warnings on unsupported usage, where the reported data item size may be be wrong [#570](https://github.com/OCamlPro/superbol-studio-oss/pull/570)
-- Support tabs in source file [#587](https://github.com/OCamlPro/superbol-studio-oss/pull/587)
 
 ### Fixed
 - Handling of some operators in abbreviated combined relation conditions [#611](https://github.com/OCamlPro/superbol-studio-oss/issues/611)
