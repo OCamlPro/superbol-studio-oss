@@ -279,7 +279,10 @@ let from_dialect ?search_path ?verbose d =
   let search_path = retrieve_search_path ?search_path () in
   let config_filename = function
     | DIALECT.GnuCOBOL -> "default.conf"
-    | dialect -> Pretty.to_string "%s.conf" (DIALECT.to_string dialect)
+    | dialect ->
+        if String.ends_with ~suffix:".conf" (DIALECT.to_string dialect)
+        then DIALECT.to_string dialect
+        else Pretty.to_string "%s.conf" (DIALECT.to_string dialect)
   in
   let load_gnucobol_conf conf =
     from_file ~search_path ?verbose @@
