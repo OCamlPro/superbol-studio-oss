@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
-(*  Copyright (c) 2022-2023 OCamlPro SAS                                  *)
+(*  Copyright (c) 2022-2026 OCamlPro SAS                                  *)
 (*                                                                        *)
 (* All rights reserved.                                                   *)
 (* This source code is licensed under the GNU Affero General Public       *)
@@ -11,16 +11,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** This module implements functions to type the COBOL data.*)
-
-module Memory = Data_memory
-module Types = Data_types
-module Item = Data_item
-module Usage = Data_usage
-module Picture = Data_picture
-module Value = Data_value
-module Literal = Data_literal
-module Printer = Data_printer
-module Visitor = Data_visitor
-
-module Error = Data_error
+val size: Data_types.usage -> Data_memory.size

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
-(*  Copyright (c) 2022-2023 OCamlPro SAS                                  *)
+(*  Copyright (c) 2022-2026 OCamlPro SAS                                  *)
 (*                                                                        *)
 (* All rights reserved.                                                   *)
 (* This source code is licensed under the GNU Affero General Public       *)
@@ -11,13 +11,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_data.Types
+open Data_types
 
-module MEM = Cobol_data.Memory
-module PIC = Cobol_data.Picture
+module MEM = Data_memory
+module PIC = Data_picture
 
-let size_of ~usage =
-  match usage with
+let size = function
   | Binary { byte_size = Byte_size; _ } ->
       MEM.byte_size
   | Binary { byte_size = Short_size; _ } ->

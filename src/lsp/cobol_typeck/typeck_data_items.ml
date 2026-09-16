@@ -360,7 +360,7 @@ let field_layout_n_size ~usage ~init_value { item_name;
   | [], Ok usage ->
       [],
       Elementary_field { usage; init_value },
-      Typeck_utils.size_of ~usage
+      Cobol_data.Usage.size usage
   | [], Error Some diag ->                                    (* missing usage *)
       let picture = PIC.alphanumeric ~size:1 in
       [data_warning diag],
