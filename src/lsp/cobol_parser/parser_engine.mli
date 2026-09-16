@@ -117,6 +117,11 @@ val rewind_and_parse
   -> (((Cobol_ptree.compilation_group option, 'm) output as 'x) * 'x rewinder)
     with_diags
 
+(** [forget rewinder] unloads internal structures that are necessary for the
+    given rewinder.  Feeding [rewinder] to {!rewind_and_parse} or
+    {!rewind_for_inspection} aftwerward is an unforgivable error. *)
+val forget: 'x rewinder -> unit
+
 (** {1 Rewinding for inspection} *)
 
 (** Type of parser states that can be inspected using the interpreter that is

@@ -11,6 +11,7 @@
 - Support for 78-level data items [#634](https://github.com/OCamlPro/superbol-studio-oss/pull/634)
 
 ### Fixed
+- Performances of the LSP server when many documents are opened and closed in a single session [#659](https://github.com/OCamlPro/superbol-studio-oss/pull/659)
 - Internal type of `CALL` arguments [#655](https://github.com/OCamlPro/superbol-studio-oss/pull/655)
 - Amount of references reported in codelens, that wrongly included declarations [#640](https://github.com/OCamlPro/superbol-studio-oss/pull/640)
 - Wrong codelens appearing on `COPY`s [#642](https://github.com/OCamlPro/superbol-studio-oss/pull/642)
