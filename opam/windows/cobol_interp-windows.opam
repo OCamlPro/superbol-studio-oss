@@ -5,7 +5,8 @@ name: "cobol_interp"
 version: "1.0.1"
 license: "MIT"
 synopsis: "SuperBOL Studio OSS Project"
-description: "Interpreter for COBOL programs (core interpretation logic)"
+description:
+  "Interpreter for COBOL programs (libcob-based interpretation logic)"
 authors: [
   "Nicolas Berthier <nicolas.berthier@ocamlpro.com>"
   "David Declerck <david.declerck@ocamlpro.com>"
@@ -54,8 +55,10 @@ depends: [
   "pretty-windows" {= version}
   "ezlibcob-windows" {= version}
   "cobol_unit-windows" {= version}
-  "cobol_ir-windows" {= version}
   "cobol_data-windows" {= version}
+  "cir_types-windows" {= version}
+  "cir_logic-windows" {= version}
+  "cir_builder-windows" {= version}
   "odoc" {with-doc}
   "dune" {>= "3.17.0" & < "3.19.0"}
 ]

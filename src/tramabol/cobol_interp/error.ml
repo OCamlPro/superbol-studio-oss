@@ -11,4 +11,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let fatal = Cobol_ir.Error.fatal
+open Types
+
+let register_loc_retrievers () =
+
+  Cir_builder.Error.register_error_loc_retriever begin function
+    | Invalid_compilation_group _ ->
+        None
+    | Ezlibcob_build_error { loc; _ } ->
+        loc
+    | _ ->
+        None
+  end

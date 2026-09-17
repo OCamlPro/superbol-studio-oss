@@ -148,6 +148,12 @@ module NEL = struct
   let rec last = function
     | One x -> x
     | _ :: tl -> last tl
+  let length l =
+    let rec aux acc = function
+      | One _ -> succ acc
+      | _ :: tl -> aux (succ acc) tl
+    in
+    aux 0 l
   let fold_left ~f acc l =
     let rec aux acc = function
       | One x -> f acc x

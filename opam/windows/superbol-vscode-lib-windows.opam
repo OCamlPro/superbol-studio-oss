@@ -54,6 +54,7 @@ depends: [
   "vscode-languageclient-js-stubs-windows" {= version}
   "vscode-js-stubs-windows" {= version}
   "node-js-stubs-windows" {= version}
+  "interop-js-stubs-windows" {= version}
   "js_of_ocaml-ppx" {>= "4"}
   "odoc" {with-doc}
   "dune" {>= "3.17.0" & < "3.19.0"}
