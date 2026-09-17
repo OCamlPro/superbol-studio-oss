@@ -33,16 +33,15 @@ let pp_size =
 let pp_total_size =
   Fmt.(any "Total size: " ++ pp_readable_size)
 
-(* The record name is only worth showing when the item is not the record
-   itself; on a root item it would just repeat the item name, or expose the
-   placeholder name given to unnamed records. *)
+(* Show the record name only for items that are inside a record. On a record
+   itself it would just repeat the item name. *)
 let enclosing_record ~record_name
   : Cobol_ptree.qualname with_loc option -> string option = function
   | Some qualname ->
       (match ~&qualname with
        | Cobol_ptree.Qual _ -> record_name
        | Name _ -> None)
-  | None ->                                         (* FILLER: keep the record *)
+  | None ->                                    (* FILLER: show the record name *)
       record_name
 
 let pp_offset_in record ppf offset =
@@ -322,19 +321,15 @@ let pp_data_definition ppf = function
   | Table_index { table; _ } ->
       pp_table_definition' ppf table
 
-(* Memory information: size and offset of an item. Unlike the data description
-   above, these cannot be read off the source, so they are always worth
-   displaying. *)
+(* Size and offset of an item. They cannot be read in the source. *)
 
-(* Records without a name of their own are given a placeholder ("FILLER 1") by
-   the type-checker; showing it would not help. *)
 let named_record { record_name; record_item; _ } =
   match Cobol_data.Item.qualname ~&record_item with
   | None -> None
   | Some _ -> Some record_name
 
-(* [prefix] is only printed along with the information itself, so that callers
-   can separate it from what precedes without leaving a dangling break. *)
+(* [prefix] is printed only when there is something to print, so that callers
+   never get a line break on its own. *)
 let pp_memory_info ?(prefix = "") ppf def =
   let pp ppf ~has_issues ~pp_size ~size ~offset qualname record =
     if not has_issues then

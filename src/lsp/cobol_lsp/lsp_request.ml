@@ -667,12 +667,11 @@ let pp_data_definition_info ppf = function
   | Preproc def ->
       Lsp_data_info_printer.pp_compilation_var_definition ppf def
 
-(* Compilation variables have no memory layout of their own *)
 let pp_data_memory_info ?prefix ppf = function
   | Regular def ->
       Lsp_data_info_printer.pp_memory_info ?prefix ppf def
   | Preproc _ ->
-      ()
+      ()                         (* those variables use no memory at run time *)
 
 let describe_data_definition_for_element_at_pos
     ?(show_data_description_on_definitions = false)
@@ -699,9 +698,8 @@ let describe_data_definition_for_element_at_pos
           if doc_comments <> ""
           then Pretty.print ppf "\n---\n%s" doc_comments
         in
-        (* The data description mostly repeats the hovered line, so it may be
-           hidden on definitions; size and offset cannot be read off the
-           source, and are always shown. *)
+        (* The description mostly repeats the hovered line, so it can be
+           hidden on definitions. Size and offset are always shown. *)
         let text =
           if show_data_description_on_definitions ||
              not (Lsp_position.is_in_src ~filename position data_def_src)
