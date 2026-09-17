@@ -158,14 +158,15 @@ let callGetCFG ?render_options ~uri ~name client =
   Vscode_languageclient.LanguageClient.sendRequest client ()
     ~meth:"superbol/getCFG" ~data |>
   Promise.then_
-    ~rejected:begin fun _ ->
+    ~rejected:(fun err ->
+      let err_js = Promise.error_to_js err in
+      let msg = Ojs.string_of_js (Ojs.get_prop_ascii err_js "message") in
       VS.Window.showErrorMessage
-        ~message:"Impossible to render graph, \
-                  try closing and reopening the webview" ()
-    end
-    ~fulfilled:begin fun jsonoo ->
+        ~message:("Impossible to render graph: " ^ msg) ()
+    )
+    ~fulfilled:(fun jsonoo ->
       Promise.return (Some (decode_graph jsonoo))
-    end
+    )
 
 (* WEBVIEW MANAGEMENT *)
 
