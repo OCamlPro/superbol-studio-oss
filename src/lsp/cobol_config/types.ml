@@ -315,6 +315,12 @@ module Value = struct
     end
 
   let int = def ~kind:(kind_from_fmt ~name:"int" "%d")
+  let int_list = def ~kind:(object
+    inherit [_] kind ~name:"int_list"
+    method parse s =
+      String.split_on_char ',' s
+      |> List.map (fun tok -> int_of_string (String.trim tok))
+  end)
   let bool = def ~kind:(kind_from_fmt ~name:"bool" "%B")
 
 end
@@ -545,7 +551,7 @@ module type PP_OPTS = sig
   (** Preprocessor options*)
 
   (* int options *)
-  val tab_width: int valued_option
+  val tab_width: int list valued_option
 
   (* support options *)
   val comment_paragraphs: unit feature_support

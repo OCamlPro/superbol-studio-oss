@@ -42,7 +42,8 @@ type 'k state =
     comments: comments;
     ignored: lexloc list;               (** lexical locations of ignored text *)
     cdir_seen: bool;
-    current_cpos_shift: int;
+    current_cpos_shift: int;   (** net column shift: positive from UTF-8 multi-byte
+                                    overhead, negative from tab expansion *)
     newline: bool;
     newline_cnums: int list;    (** index of all newline characters encountered
                                     so far (in reverse order) *)
@@ -67,11 +68,12 @@ and 'k config =
   {
     debug: bool;
     source_format: 'k source_format;
+    tab_stops: int list;
   }
 
 let position_encoding_in_bytes = false
 
-let init_state source_format : _ state =
+let init_state ?(tab_stops = Src_format.default_tab_stops) source_format : _ state =
   {
     lex_prods = [];
     continued = CNone;
@@ -87,6 +89,7 @@ let init_state source_format : _ state =
       {
         debug = false;
         source_format;
+        tab_stops;
       }
   }
 
@@ -129,12 +132,16 @@ let change_source_format ({ config; _ } as state) sf =
   else Error ()
 
 let pos_column { current_cpos_shift; _ } Lexing.{ pos_bol; pos_cnum; _ } =
-  pos_cnum - pos_bol + 1 - current_cpos_shift            (* count cols from 1 *)
+  pos_cnum - pos_bol + 1 - current_cpos_shift  (* count cols from 1 *)
 
-let adjust_postion { current_cpos_shift; _ } pos =
-  if current_cpos_shift = 0 || position_encoding_in_bytes
+let adjust_position ?(base_cpos_shift = 0) { current_cpos_shift; _ } pos =
+  (* Strips only the UTF-8 overhead: (current - base) counts the extra bytes
+     added within the token, leaving the tab contribution (negative, in base)
+     out of the position adjustment. *)
+  let utf8_shift = current_cpos_shift - min 0 base_cpos_shift in
+  if utf8_shift = 0 || position_encoding_in_bytes
   then pos
-  else Lexing.{ pos with pos_cnum = pos.pos_cnum - current_cpos_shift }
+  else Lexing.{ pos with pos_cnum = pos.pos_cnum - utf8_shift }
 
 let raw_loc ~start_pos ~end_pos ?end_state start_state =
   let in_area_a =
@@ -145,8 +152,9 @@ let raw_loc ~start_pos ~end_pos ?end_state start_state =
     | Some c -> pos_column start_state start_pos < c
   in
   let end_state = Option.value end_state ~default:start_state in
-  let start_pos = adjust_postion start_state start_pos
-  and   end_pos = adjust_postion   end_state   end_pos in
+  let base = start_state.current_cpos_shift in
+  let start_pos = adjust_position ~base_cpos_shift:base start_state start_pos
+  and   end_pos = adjust_position ~base_cpos_shift:base end_state   end_pos in
   Cobol_common.Srcloc.raw ~in_area_a (start_pos, end_pos)
 
 type lexeme_info = string * Lexing.position * Lexing.position
@@ -158,8 +166,9 @@ let lexeme_info lexbuf : lexeme_info =
 
 let ignore_lexloc ~start_pos ~end_pos ?start_state end_state =
   let start_state = Option.value start_state ~default:end_state in
-  let start_pos = adjust_postion start_state start_pos
-  and   end_pos = adjust_postion   end_state   end_pos in
+  let base = start_state.current_cpos_shift in
+  let start_pos = adjust_position ~base_cpos_shift:base start_state start_pos
+  and   end_pos = adjust_position ~base_cpos_shift:base end_state   end_pos in
   { end_state with ignored = (start_pos, end_pos) :: end_state.ignored }
 
 let count_utf8_codepoints s =
@@ -356,6 +365,47 @@ let flush_continued ?(force = false) state = match state.continued with
       (* Missing continuation error is delayed until the final tokenization
          stage to account for quotes in comment paragraphs. *)
       emit (AlphanumPrefix { knd; qte; str } &@ loc) (reset_cont state)
+
+(** Computes the 0-indexed visual column of the first character after a tab at
+    [start_pos] and returns it together with the updated state. *)
+let compute_tab_shift state (start_pos: Lexing.position) =
+  let col      = pos_column state start_pos in   (* 1-indexed *)
+  let next_col =
+    Src_format.next_tab_stop ~tab_stops:state.config.tab_stops col
+  in
+  next_col - 1,
+  { state with
+    current_cpos_shift = state.current_cpos_shift - (next_col - col - 1) }
+
+(** Handles a non-tab character in the SNA area: ignores it in the produced
+    locations and calls [~k_done state lexbuf] when [remaining]
+    reaches 1 (last SNA column), or [~k_continue (remaining-1) state lexbuf]
+    otherwise. *)
+let sna_char ~k_continue ~k_done remaining state lexbuf =
+  let _, start_pos, end_pos = lexeme_info lexbuf in
+  let state = ignore_lexloc ~start_pos ~end_pos state in
+  if remaining <= 1 then
+    k_done state lexbuf
+  else
+    k_continue (remaining - 1) state lexbuf
+
+(** Handles a tab character in the SNA area: updates [tab_col_shift] and adds
+    the character to the ignored locations list, then dispatches to
+    [~k_indicator] if the expansion lands at or before the indicator column
+    (0-indexed column 6), or to [~k_nominal] (with [flush_continued] applied)
+    if the tab jumped past the indicator column. *)
+let sna_tab ~k_indicator ~k_nominal state lexbuf =
+  let _, start_pos, _ = lexeme_info lexbuf in
+  let next_stop, state = compute_tab_shift state start_pos in
+  if next_stop > 6 then
+    k_nominal (flush_continued state) lexbuf
+  else
+    k_indicator state lexbuf
+
+let tab ?(before_indicator = true) ~k state lexbuf =
+  let _, start_pos, _ = lexeme_info lexbuf in
+  let _, state = compute_tab_shift state start_pos in
+  k (if before_indicator then flush_continued state else state) lexbuf
 
 let eof state lexbuf =
   let _, start_pos, end_pos = lexeme_info lexbuf in
@@ -665,6 +715,15 @@ let fixed_alphanum_lit ?(doubled_opener = false)
       trunc_to_col cut_at_col lexinf ~start_state ~end_state
     in
     let s, knd, end_state = extract_knd s end_state lexbuf in
+    let end_state =
+      if String.contains s '\t' then
+        lex_warn end_state @@
+        Warn_unexpected
+          { loc = raw_loc ~start_pos ~end_pos start_state ~end_state;
+            item = Tab_character_in_alphanum_literal }
+      else
+        end_state
+    in
     let s, end_pos, fitting =
       (* Actually double the opening delimiter ('\'' or '"'), to have the
          doubled quote/apostrophe character prefix after stripping of opening

@@ -22,7 +22,7 @@ let escaped_string ppf (item: CompletionItem.t) =
     (String.sub quoted 1 (-2 + String.length quoted))
     detail
 
-let completion_positions (doc, positions) : string -> unit =
+let completion_positions (doc, positions) : ?expand_carets:bool -> string -> unit =
   let { end_with_postproc; projdir }, server = make_lsp_project () in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let location_as_srcloc = new srcloc_resuscitator_cache in

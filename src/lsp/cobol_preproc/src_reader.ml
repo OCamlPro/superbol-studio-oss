@@ -244,12 +244,12 @@ let print_lines ~dialect ?skip_compiler_directives_text ppf pl =
 
 (* --- *)
 
-let make make_lexing ?filename ~source_format ~platform input =
+let make make_lexing ?tab_stops ?filename ~source_format ~platform input =
   let Src_format.SF source_format = source_format in
   (* Be sure to provide position informations *)
   let lexbuf = make_lexing ?with_positions:(Some true) input in
   Option.iter (Lexing.set_filename lexbuf) filename;
-  Plx (Src_lexing.init_state source_format, lexbuf, platform)
+  Plx (Src_lexing.init_state ?tab_stops source_format, lexbuf, platform)
 
 (* --- *)
 
@@ -270,20 +270,20 @@ let decide_on_source_format ~platform ?source_format input =
             | String source_contents -> source_contents
             | Channel ic -> platform.peek_channel_prefix ~len:20 ic)
 
-let from ?source_format ~platform (input: Src_input.t) =
+let from ?source_format ?tab_stops ~platform (input: Src_input.t) =
   let source_format = decide_on_source_format ~platform ?source_format input in
   match input with
   | { source = String contents; filename } ->
-      from_string ~source_format ~filename ~platform contents
+      from_string ?tab_stops ~source_format ~filename ~platform contents
   | { source = Channel ic; filename } ->
-      from_channel ~source_format ~filename ~platform ic
+      from_channel ?tab_stops ~source_format ~filename ~platform ic
 
 (* --- *)
 
 (** Note: If given, assumes [position] corresponds to the beginning of the
     input, which {e must} also be at the beginning of a line.  If absent,
     restarts from first position.  File name is kept from the previous input. *)
-let restart make_lexing make_input ?source_format ?position
+let restart make_lexing make_input ?tab_stops ?source_format ?position
     input (Plx (s, prev_lexbuf, platform)) =
   match position with
   | Some position when position.Lexing.pos_cnum > 0 ->
@@ -292,7 +292,7 @@ let restart make_lexing make_input ?source_format ?position
       Lexing.set_filename lexbuf position.Lexing.pos_fname;        (* useful? *)
       Plx (s, lexbuf, platform)
   | Some _ | None ->
-      from ?source_format ~platform @@
+      from ?source_format ?tab_stops ~platform @@
       make_input ~filename:prev_lexbuf.Lexing.lex_curr_p.pos_fname input
 
 let restart_on_string = restart Lexing.from_string Src_input.string

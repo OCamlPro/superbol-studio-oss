@@ -14,7 +14,7 @@
 open Lsp.Types
 open Lsp_testing
 
-let codelens ?(copybooks = []) doc : string -> unit =
+let codelens ?(copybooks = []) doc : ?expand_carets:bool -> string -> unit =
   let { end_with_postproc; projdir }, server = make_lsp_project () in
   let server =
     List.fold_left begin fun server (copybook_name, copybook) ->
