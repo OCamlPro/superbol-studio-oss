@@ -701,7 +701,10 @@ let did_change DidChangeTextDocumentParams.{ textDocument = { uri; _ };
 
 
 let did_close DidCloseTextDocumentParams.{ textDocument = { uri } } registry =
-  { registry with docs = URIMap.remove uri registry.docs }
+  Option.iter Lsp_document.unload @@ URIMap.find_opt uri registry.docs;
+  { registry with
+    docs = URIMap.remove uri registry.docs;
+    indirect_diags = URIMap.remove uri registry.indirect_diags }
 
 
 (** {2 Miscellaneous} *)

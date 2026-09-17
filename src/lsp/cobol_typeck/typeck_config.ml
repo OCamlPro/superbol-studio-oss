@@ -25,11 +25,18 @@ type acc =
     diags: Typeck_diagnostics.t;
   }
 
+(** Default sign configuration for DISPLAY items: leading, non-separate. *)
+let default_display_sign_config: Cobol_data.Types.display_sign_config =
+  Cobol_data.Types.{
+    sign_position = Leading;
+    sign_separate = false;
+  }
+
 let default_config =
   Cobol_unit.Types.{
     unit_decimal_point = '.';
     unit_currency_signs = CharSet.empty;
-    unit_sign_config = Cobol_data.Picture.default_sign_config;
+    unit_display_sign_config = default_display_sign_config;
   }
 
 let init config =

@@ -39,12 +39,22 @@ type 'a resolved_qualname =
 
 (* config *)
 
+type display_sign =
+  {
+    sign_position: sign_position; (** relevant for non-binary representations *)
+    sign_separate: bool;         (** [true] = separate character (extra byte) *)
+  }
+
+(* FIXME: these are not properties that can be derived from picture
+   strings. They should be attached to the relevant usage instead. *)
+and sign_position = Leading | Trailing
+
 (** Corresponds to the contents of the CONFIGURATION SECTION. *)
 type unit_config =
   {
     unit_currency_signs: Cobol_common.Basics.CharSet.t;
     unit_decimal_point: char;
-    unit_sign_config: Cobol_data.Picture.TYPES.sign_config;
+    unit_display_sign_config: Cobol_data.Types.display_sign_config;
   }
 
 (* TODO: add a dedicated type to hold info from the INPUT-OUTPUT SECTION. Maybe

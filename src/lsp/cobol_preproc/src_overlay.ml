@@ -36,6 +36,7 @@ module type MANAGER = sig
   val link_limits: limit -> limit -> unit
   val join_limits: limit * limit -> srcloc
   val restart: ?at: limit -> unit -> unit
+  val forget: file_of: limit -> unit
   val with_temporary_copy: f: ('a -> 'b) -> 'a -> 'b
 end
 
@@ -183,29 +184,43 @@ let join_limits: manager -> limit * limit -> srcloc = fun ctx (s, e) ->
   with Not_found ->
     join_failure (s, e)
 
+(* Recursively traverse and empty `right_of` and `over_right_gap` from the
+   given right limit, if given; empties the full context otherwise. *)
+let rec clear_right_of ctx left =
+  match HLnks.find_opt ctx.right_of left with
+  | Some (_, right) ->
+      HLnks.remove ctx.right_of left;
+      clear_right_gap ctx right
+  | None -> ()
+and clear_right_gap ctx right =
+  match HLnks.find_opt ctx.over_right_gap right with
+  | Some left ->
+      HLnks.remove ctx.over_right_gap right;
+      clear_right_of ctx left
+  | None -> ()
+
 let restart ?at ctx =
-  (* Recursively traverse and empty `right_of` and `over_right_gap` from the
-     given right limit. *)
-  let rec clear_right_of left =
-    match HLnks.find_opt ctx.right_of left with
-    | Some (_, right) ->
-        HLnks.remove ctx.right_of left;
-        clear_right_gap right
-    | None -> ()
-  and clear_right_gap right =
-    match HLnks.find_opt ctx.over_right_gap right with
-    | Some left ->
-        HLnks.remove ctx.over_right_gap right;
-        clear_right_of left
-    | None -> ()
-  in
   WLnks.clear ctx.cache;
   match at with
   | Some right ->
-      clear_right_of @@ HLnks.find ctx.over_right_gap right
+      clear_right_of ctx @@ HLnks.find ctx.over_right_gap right
   | None ->
       HLnks.clear  ctx.right_of;
       HLnks.clear  ctx.over_right_gap
+
+let forget ~file_of ctx =
+  let filename = file_of.Lexing.pos_fname in
+  WLnks.clear ctx.cache;
+  HLnks.filter_map_inplace begin fun left ((_, right) as next) ->
+    if left.pos_fname = filename
+    then (clear_right_gap ctx right; None)
+    else Some next
+  end ctx.right_of;
+  HLnks.filter_map_inplace begin fun right left ->
+    if right.pos_fname = filename
+    then (clear_right_of ctx left; None)
+    else Some left
+  end ctx.over_right_gap
 
 let with_temporary_copy ~f ctx a =
   WLnks.clear ctx.cache;
@@ -230,5 +245,6 @@ module New_manager (Id: sig val name: string end) () : MANAGER = struct
   let link_limits = link_limits ctx
   let join_limits = join_limits ctx
   let restart ?at () = restart ?at ctx
+  let forget ~file_of = forget ~file_of ctx
   let with_temporary_copy = with_temporary_copy ctx
 end

@@ -56,22 +56,22 @@ let pic_symbols (pic: picture) =       (* TODO: pass env for special symbols? *)
   CobPicSymbol.set_times_repeated p S32.zero;
   CArray.to_ptr array
 
-let sign_flags (sign: Cobol_data.Picture.TYPES.sign_config option) =
+let sign_flags (sign: Cobol_data.Types.display_sign) =
   let with_sign = CobFieldFlag.(to_int @@ enc COB_FLAG_HAVE_SIGN) in
   match sign with
-  | None ->
+  | Display_unsigned ->
       0
-  | Some { sign_position = Leading; sign_separate = false } ->
+  | Display_signed { sign_position = Leading; sign_separate = false } ->
       with_sign lor
       CobFieldFlag.(to_int @@ enc COB_FLAG_SIGN_LEADING)
-  | Some { sign_position = Leading; sign_separate = true } ->
+  | Display_signed { sign_position = Leading; sign_separate = true } ->
       with_sign lor
       CobFieldFlag.(to_int @@ enc COB_FLAG_SIGN_LEADING) lor
       CobFieldFlag.(to_int @@ enc COB_FLAG_SIGN_SEPARATE)
-  | Some { sign_position = Trailing; sign_separate = false } ->
+  | Display_signed { sign_position = Trailing; sign_separate = false } ->
       with_sign lor
       CobFieldFlag.(to_int @@ enc COB_FLAG_SIGN_LEADING)
-  | Some { sign_position = Trailing; sign_separate = true } ->
+  | Display_signed { sign_position = Trailing; sign_separate = true } ->
       with_sign lor
       CobFieldFlag.(to_int @@ enc COB_FLAG_SIGN_LEADING) lor
       CobFieldFlag.(to_int @@ enc COB_FLAG_SIGN_SEPARATE)
@@ -120,9 +120,11 @@ let group_attrs =
     ~pic:(CobPicSymbol.null ())
 
 let elementary_field_attrs = function
-  | Display ({ category = Alphabetic _ | Alphanumeric _; _ } as pic) ->
+  | Alphanumeric { picture = { category = Alphabetic _ |
+                                          Alphanumeric _; _ } as pic; _ } ->
       Some (Ok (alphanum_attrs ~constant:false ~pic))
-  | Display ({ category = FixedNum { digits; scale; sign; _ }; _ } as pic) ->
+  | Display_numeric { picture = { category = FixedNum { digits; scale; _ }; _ }
+                        as pic; sign } ->
       Some (fixednum_attrs ~constant:false ~digits ~scale ~sign ~pic)
   | _ ->                                                  (* not supported yet *)
       None

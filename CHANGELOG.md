@@ -4,6 +4,9 @@
 
 ### Added
 - Support tabs in source file [#591](https://github.com/OCamlPro/superbol-studio-oss/pull/591)
+- Unified internal epresentation of binary data items [#656](https://github.com/OCamlPro/superbol-studio-oss/pull/656)
+- Command to retrieve the directories that contain copybooks into the workspace settings [#654](https://github.com/OCamlPro/superbol-studio-oss/pull/654)
+- Command to analyze every COBOL file of the workspace [#653](https://github.com/OCamlPro/superbol-studio-oss/pull/653)
 - Detection of preprocessor variables that are of category numeric [#651](https://github.com/OCamlPro/superbol-studio-oss/pull/651)
 - Warning on ignored `VALUE` clause for items with `REDEFINES` clause [#650](https://github.com/OCamlPro/superbol-studio-oss/pull/650)
 - Handling of data item documentation that spans over several lines [#639](https://github.com/OCamlPro/superbol-studio-oss/pull/639)
@@ -12,6 +15,7 @@
 - Support for 78-level data items [#634](https://github.com/OCamlPro/superbol-studio-oss/pull/634)
 
 ### Fixed
+- Performances of the LSP server when many documents are opened and closed in a single session [#659](https://github.com/OCamlPro/superbol-studio-oss/pull/659)
 - Internal type of `CALL` arguments [#655](https://github.com/OCamlPro/superbol-studio-oss/pull/655)
 - Amount of references reported in codelens, that wrongly included declarations [#640](https://github.com/OCamlPro/superbol-studio-oss/pull/640)
 - Wrong codelens appearing on `COPY`s [#642](https://github.com/OCamlPro/superbol-studio-oss/pull/642)

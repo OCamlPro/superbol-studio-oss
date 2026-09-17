@@ -204,6 +204,9 @@ let load ~project ~params doc =
   try parse_and_analyze doc
   with e -> raise @@ Internal_error (doc, e, Printexc.get_raw_backtrace ())
 
+let unload doc =
+  Option.iter Cobol_parser.forget doc.rewinder
+
 let first_change_pos changes =
   let line, char =
     List.fold_left begin fun ((l, c) as acc) -> function

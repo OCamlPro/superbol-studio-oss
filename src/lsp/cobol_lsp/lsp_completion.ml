@@ -84,12 +84,9 @@ let approx_type_of_pic ({ category; _ }: picture) : approx_typing_info =
       Boolean
 
 let approx_type_of_usage : usage -> approx_typing_info = function
+  | Alphanumeric _
+  | National _ -> Alphanum
   | Binary _
-  | Binary_C_long _
-  | Binary_char _
-  | Binary_double _
-  | Binary_long _
-  | Binary_short _
   | Float_long
   | Float_short
   | Float_binary _
@@ -101,10 +98,9 @@ let approx_type_of_usage : usage -> approx_typing_info = function
   | Pointer _
   | Program_pointer _ -> Pointer
   | Index -> Index
-  | National _ -> Alphanum
   | Object_reference _ -> ObjectRef
   | Bit _ -> Boolean
-  | Display pic -> approx_type_of_pic pic
+  | Display_numeric { picture; _ } -> approx_type_of_pic picture
 
 let approx_type_of_datadef : data_definition -> (approx_typing_info * bool) =
   function

@@ -41,6 +41,8 @@ type 'x rewinder =
       ?stop_before_eof:bool -> preprocessor_rewind -> position: position ->
       ('x * ('x rewinder)) with_diags;
     last_env_stage: inspectable_parser_state;
+    forget: unit -> unit; (* Don't use a rewinder after forget has been
+                            called. *)
   }
 and preprocessor_rewind
   = last_pp: (Cobol_preproc.preprocessor as 'r)
@@ -646,6 +648,7 @@ let parse_once ~options (type m) ~(memory: m memory) ~make_checkpoint pp
   : (('a option, m) output) with_diags =
   let ps = make_parser options ~tokenizer_memory:memory pp in
   let res, ps = full_parse @@ first_stage ~make_checkpoint ps in
+  Overlay_manager.forget ~file_of:ps.preproc.persist.leftmost_limit;
   OUT.with_diags (aggregate_output ps res) (all_diags ps)
 
 (* --- *)
@@ -754,6 +757,10 @@ let find_history_event_preceding ~position ({ store; _ } as rwps) =
 
 (* --- *)
 
+let forget rwps () =
+  Overlay_manager.forget
+    ~file_of:rwps.init.preproc.persist.leftmost_limit
+
 let rec rewind_n_parse
   : type m. ('a, m) rewindable_parsing_state -> make_checkpoint:_
     -> ?stop_before_eof:bool -> preprocessor_rewind -> position: position
@@ -780,8 +787,10 @@ let rec rewind_n_parse
   let ps = rewindable_parser_state rwps in
   let output = aggregate_output ps res in
   let rewind_n_parse = rewind_n_parse rwps ~make_checkpoint
-  and last_env_stage = last_env_stage rwps in
-  OUT.with_diags (output, { rewind_n_parse; last_env_stage }) (all_diags ps)
+  and last_env_stage = last_env_stage rwps
+  and forget = forget rwps in
+  OUT.with_diags (output, { rewind_n_parse; last_env_stage; forget })
+    (all_diags ps)
 
 let rewindable_parse
   : options:_ -> memory:'m memory -> make_checkpoint:_
@@ -796,8 +805,10 @@ let rewindable_parse
   let ps = rewindable_parser_state rwps in
   let output = aggregate_output ps res in
   let rewind_n_parse = rewind_n_parse rwps ~make_checkpoint
-  and last_env_stage = last_env_stage rwps in
-  OUT.with_diags (output, { rewind_n_parse; last_env_stage }) (all_diags ps)
+  and last_env_stage = last_env_stage rwps
+  and forget = forget rwps in
+  OUT.with_diags (output, { rewind_n_parse; last_env_stage; forget })
+    (all_diags ps)
 
 (* --- *)
 
@@ -830,6 +841,9 @@ let rewindable_parse_with_artifacts = rewindable_parse ~memory:Eidetic
 
 let rewind_and_parse { rewind_n_parse; _ } rewind_preproc ~position =
   rewind_n_parse rewind_preproc ~position
+
+let forget { forget; _ } =
+  forget ()
 
 (* Rewinding for inspection *)
 

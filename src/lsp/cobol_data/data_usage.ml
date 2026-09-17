@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
-(*  Copyright (c) 2022-2023 OCamlPro SAS                                  *)
+(*  Copyright (c) 2022-2026 OCamlPro SAS                                  *)
 (*                                                                        *)
 (* All rights reserved.                                                   *)
 (* This source code is licensed under the GNU Affero General Public       *)
@@ -11,37 +11,33 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_data.Types
+open Data_types
 
-module MEM = Cobol_data.Memory
-module PIC = Cobol_data.Picture
+module MEM = Data_memory
+module PIC = Data_picture
 
-let size_of ~usage =
-  match usage with
-  | Binary picture ->
-      let len = PIC.data_size picture in
-      let num_bytes =                   (* (from David's analyzer) *)
-        if len < 3 then 1               (* 1-2 = 1 byte *)
-        else if len < 5 then 2          (* 3-4 = 2 bytes *)
-        else if len < 10 then 4         (* 5-9 = 4 bytes *)
-        else if len < 20 then 8         (* 10-19 = 8 bytes *) (* 18 if signed *)
-        else 16
-      in
-      MEM.(mult_int byte_size num_bytes)
-  | Binary_char _ ->
+let size = function
+  | Binary { byte_size = Byte_size; _ } ->
       MEM.byte_size
-  | Binary_C_long _ ->
-      MEM.size_of_C_long
-  | Binary_double _ ->
-      MEM.(mult_int byte_size 8)
-  | Binary_long _ ->
-      MEM.(mult_int byte_size 4)
-  | Binary_short _ ->
+  | Binary { byte_size = Short_size; _ } ->
       MEM.(mult_int byte_size 2)
+  | Binary { byte_size = Long_size; _ } ->
+      MEM.(mult_int byte_size 4)
+  | Binary { byte_size = Double_size; _ } ->
+      MEM.(mult_int byte_size 8)
+  | Binary { byte_size = Long_double_size; _ } ->
+      MEM.(mult_int byte_size 16)
+  | Binary { byte_size = C_long_size; _ } ->
+      MEM.size_of_C_long
+  | Binary { byte_size = Custom_size n; _ } ->
+      MEM.(mult_int byte_size n)
   | Bit picture ->                                     (* TODO: probably wrong *)
       MEM.(mult_int bit_size @@ PIC.data_size picture)
-  | Display picture ->
+  | Alphanumeric { picture; _ }
+  | Display_numeric { picture; sign = Display_unsigned } ->
       MEM.(mult_int byte_size @@ PIC.display_size picture)
+  | Display_numeric { picture; sign = Display_signed { sign_separate; _ } } ->
+      MEM.(mult_int byte_size @@ PIC.display_size picture ~sign_separate)
   | Float_binary { width = `W32; _ } ->
       MEM.(mult_int byte_size 4)
   | Float_binary { width = `W64; _ } ->

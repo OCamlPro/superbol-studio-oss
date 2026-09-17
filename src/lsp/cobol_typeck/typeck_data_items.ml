@@ -44,7 +44,7 @@ type acc =
     filler_count: int;
     definitions: Cobol_unit.Types.data_definitions;
     references: srcloc list Cobol_unit.Qual.MAP.t;
-    picture_config: Cobol_data.Types.picture_config;
+    data_config: Typeck_clauses.data_config;
     diags: Typeck_diagnostics.t;
   }
 and item_stack = item_under_construction list
@@ -98,13 +98,15 @@ let init (config: unit_config) =
         data_records = [];
       };
     references = Cobol_unit.Qual.MAP.empty;
-    picture_config =
-      {
-        max_pic_length = 100;
-        decimal_char = config.unit_decimal_point;
-        currency_signs = config.unit_currency_signs;
-        sign_config = config.unit_sign_config;
-      };
+    data_config = {
+      picture_config =
+        {
+          max_pic_length = 100;
+          decimal_char = config.unit_decimal_point;
+          currency_signs = config.unit_currency_signs;
+        };
+      display_sign_config = config.unit_display_sign_config;
+    };
     diags = [];
   }
 
@@ -358,16 +360,18 @@ let field_layout_n_size ~usage ~init_value { item_name;
   | [], Ok usage ->
       [],
       Elementary_field { usage; init_value },
-      Typeck_utils.size_of ~usage
+      Cobol_data.Usage.size usage
   | [], Error Some diag ->                                    (* missing usage *)
+      let picture = PIC.alphanumeric ~size:1 in
       [data_warning diag],
-      Elementary_field { usage = Display (PIC.alphanumeric ~size:1);
+      Elementary_field { usage = Alphanumeric { picture; size = 1 };
                          init_value = None },
       Cobol_data.Memory.byte_size
   | [], Error None ->        (* missing usage (reported as missing pic string) *)
+      let picture = PIC.alphanumeric ~size:1 in
       [data_error @@
        Missing_picture_clause_for_elementary_item { item_name; item_loc }],
-      Elementary_field { usage = Display (PIC.alphanumeric ~size:1);
+      Elementary_field { usage = Alphanumeric { picture; size = 1 };
                          init_value = None },
       Cobol_data.Memory.byte_size
   | flds, _ ->
@@ -396,7 +400,7 @@ let item_definition acc ({ item_name;
                            item_diagnostics; _ } as item) =
   let diags, usage, init_value =
     Typeck_clauses.to_usage_n_value item_clauses ~item_name ~item_loc
-      ~picture_config:acc.picture_config
+      ~data_config:acc.data_config
   in
   let diags', field_layout, field_size =
     field_layout_n_size item ~usage ~init_value
@@ -698,7 +702,8 @@ let on_item acc ~at_level
 
 
 let dummy_renamed_elementary =
-  Renamed_elementary { usage = Display (PIC.alphanumeric ~size:0) }
+  let picture = PIC.alphanumeric ~size:0 in
+  Renamed_elementary { usage = Alphanumeric { picture; size = 0 } }
 
 
 let report_occurs acc operand field =
@@ -762,10 +767,14 @@ let renaming acc
           let bits = Cobol_data.Memory.as_bits size_ in
           let size = bits / 8 in
           if size > 0 && bits mod 8 = 0 then
-            [], Renamed_elementary { usage = Display (PIC.alphanumeric ~size) }
+            let picture = PIC.alphanumeric ~size in
+            let usage = Alphanumeric { picture; size } in
+            [], Renamed_elementary { usage }
           else if size > 0 then
+            let picture = PIC.alphanumeric ~size in
+            let usage = Alphanumeric { picture; size } in
             [Invalid_renaming_size { loc; from_field; thru_field; bits }],
-            Renamed_elementary { usage = Display (PIC.alphanumeric ~size) }
+            Renamed_elementary { usage }
           else
             [Invalid_renaming_range { loc; from_field; thru_field }],
             dummy_renamed_elementary

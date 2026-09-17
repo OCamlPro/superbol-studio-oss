@@ -12,7 +12,9 @@ globalThis.__SUPERBOL__.fs = {
   existsSync: fs.existsSync,
   realpathSync: fs.realpathSync,
   writeFileSync: fs.writeFileSync,
-  mkdirSync: fs.mkdirSync,
+  appendFileSync: fs.appendFileSync,
+  // The OCaml label is gone by now, but `fs' wants an options object here.
+  mkdirSync: (path, recursive) => fs.mkdirSync(path, { recursive }),
   unlinkSync: fs.unlinkSync,
 };
 

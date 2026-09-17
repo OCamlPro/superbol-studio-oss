@@ -58,19 +58,16 @@ let rec c_type ty =
     let ptr = if ptr then " *" else "" in
     Printf.sprintf "%s%s%s" type_ ptr const
   in
-  let p_int const sign type_ ptr =
-    let sign =
-      match sign with
-        | Signed -> "signed "
-        | Unsigned -> "unsigned "
-    in
-    Printf.sprintf "%s%s" sign (p const type_ ptr)
-  in
-  let ikind = function
-    | Int8 -> "char"
-    | Int16 -> "short"
-    | Int32 -> "int"
-    | Int64 -> "long long"
+  let ikind sign kind =
+    match sign, kind with
+    | Signed,   Int8  -> "int8_t"
+    | Unsigned, Int8  -> "uint8_t"
+    | Signed,   Int16 -> "int16_t"
+    | Unsigned, Int16 -> "uint16_t"
+    | Signed,   Int32 -> "int32_t"
+    | Unsigned, Int32 -> "uint32_t"
+    | Signed,   Int64 -> "int64_t"
+    | Unsigned, Int64 -> "uint64_t"
   in
   let fkind = function
     | Float -> "float"
@@ -79,7 +76,7 @@ let rec c_type ty =
   match ty with
   | STVoid { const } -> p const "void" false
   | STChar { const } -> p const "char" false
-  | STInt { const; kind; sign } -> p_int const sign (ikind kind) false
+  | STInt { const; kind; sign } -> p const (ikind sign kind) false
   | STFloat { const; kind } -> p const (fkind kind) false
   | STEnum { const; enum } -> p const enum.enum_c_type false
   | STComp { const; unref; comp } -> p const comp.comp_c_type false ^ (if not unref then " *" else "")

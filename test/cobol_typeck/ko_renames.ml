@@ -114,7 +114,7 @@ let%expect_test "renames-errors-1" =
               elementary
               usage: {
                 display
-                category: NUMERIC(digits = 1, scale = 0, sign = unsigned)
+                category: NUMERIC(digits = 1, scale = 0, signed = false)
               }
             }
           }
@@ -126,7 +126,7 @@ let%expect_test "renames-errors-1" =
             elementary
             usage: {
               display
-              category: NUMERIC(digits = 1, scale = 0, sign = unsigned)
+              category: NUMERIC(digits = 1, scale = 0, signed = false)
             }
           }
         }{
@@ -137,7 +137,7 @@ let%expect_test "renames-errors-1" =
             elementary
             usage: {
               display
-              category: NUMERIC(digits = 1, scale = 0, sign = unsigned)
+              category: NUMERIC(digits = 1, scale = 0, signed = false)
             }
           }
         }{
@@ -189,7 +189,7 @@ let%expect_test "renames-errors-1" =
         elementary
         usage: {
           display
-          category: NUMERIC(digits = 1, scale = 0, sign = unsigned)
+          category: NUMERIC(digits = 1, scale = 0, signed = false)
         }
       }
     }
