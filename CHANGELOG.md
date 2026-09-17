@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Display of the size and offset of data items on hover [#665](https://github.com/OCamlPro/superbol-studio-oss/pull/665)
 - Support tabs in source file [#591](https://github.com/OCamlPro/superbol-studio-oss/pull/591)
 - Unified internal epresentation of binary data items [#656](https://github.com/OCamlPro/superbol-studio-oss/pull/656)
 - Command to retrieve the directories that contain copybooks into the workspace settings [#654](https://github.com/OCamlPro/superbol-studio-oss/pull/654)

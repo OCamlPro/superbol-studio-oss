@@ -51,7 +51,7 @@ module INTERNAL: sig
     -> Lsp.Types.ReferenceParams.t
     -> Lsp.Types.Location.t list option
   val hover
-    : ?show_hover_text_on_definitions: bool
+    : ?show_data_description_on_definitions: bool
     -> Lsp_server.t
     -> Lsp.Types.HoverParams.t
     -> Lsp.Types.Hover.t option
