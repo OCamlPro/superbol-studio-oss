@@ -391,16 +391,18 @@ let sna_char ~k_continue ~k_done remaining state lexbuf =
 
 (** Handles a tab character in the SNA area: updates [tab_col_shift] and adds
     the character to the ignored locations list, then dispatches to
-    [~k_indicator] if the expansion lands at or before the indicator column
+    [~k_indicator] if the expansion lands the indicator column
     (0-indexed column 6), or to [~k_nominal] (with [flush_continued] applied)
-    if the tab jumped past the indicator column. *)
-let sna_tab ~k_indicator ~k_nominal state lexbuf =
+    if it lands after the indicator, or to [~k_sna] if it lands before *)
+let sna_tab ~k_sna ~k_indicator ~k_nominal state lexbuf =
   let _, start_pos, _ = lexeme_info lexbuf in
   let next_stop, state = compute_tab_shift state start_pos in
   if next_stop > 6 then
     k_nominal (flush_continued state) lexbuf
-  else
+  else if next_stop = 6 then
     k_indicator state lexbuf
+  else
+    k_sna (6 - next_stop) state lexbuf
 
 let tab ?(before_indicator = true) ~k state lexbuf =
   let _, start_pos, _ = lexeme_info lexbuf in

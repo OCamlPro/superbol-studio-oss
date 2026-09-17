@@ -308,6 +308,7 @@ and fixed_sna_continuation remaining state
   | '\t'    (* tab in SNA: check expanded col vs indicator position (col 7) *)
       {
         Src_lexing.sna_tab state lexbuf
+          ~k_sna:fixed_sna_continuation
           ~k_indicator:fixed_indicator
           ~k_nominal:fixed_nominal_line
       }
