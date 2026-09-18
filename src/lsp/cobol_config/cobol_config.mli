@@ -57,3 +57,5 @@ val from_dialect
   -> (module T) Cobol_common.Diagnostics.with_diags
 
 val dialect: t -> dialect
+
+val tab_stops: t -> int list

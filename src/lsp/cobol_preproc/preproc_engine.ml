@@ -173,7 +173,7 @@ let preprocessor input = function
       let module Om = Src_overlay.New_manager (Om_name) () in
       let module Pp = Preproc_grammar.Make (Config) (Om) in
       let source_format = source_format_config source_format in
-      let tab_stops = Config.tab_width#value in
+      let tab_stops = Config.tab_stops#value in
       {
         buff = [];
         reader = Src_reader.from input ?source_format ~platform ~tab_stops;

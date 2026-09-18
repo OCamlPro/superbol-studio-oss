@@ -90,7 +90,7 @@ let%expect_test "tab-free-indicator-comment" =
 let%expect_test "tab-lands-in-sna-comment" =
   (* TAB -> column 5, two spaces fill columns 5-6, `*' lands on the indicator
      column 7: this is a comment line, exactly like the reference above. *)
-  Preproc_testing.preprocess ~tab_width:[4]
+  Preproc_testing.preprocess ~tab_stops:[4]
     "\t  * comment";
   [%expect {| |}]
 
@@ -104,7 +104,7 @@ let%expect_test "tab-lands-in-sna-star-still-in-sna" =
   (* TAB -> column 5, one space fills column 5, `*' lands on column 6, which is
      still the SNA area: NOT a comment.  Off-by-one guard: a [k_sna] argument
      of [7 - next_stop] would wrongly turn this into a comment. *)
-  Preproc_testing.preprocess ~tab_width:[4]
+  Preproc_testing.preprocess ~tab_stops:[4]
     "\t * comment";
   [%expect {| comment |}]
 
@@ -119,7 +119,7 @@ let%expect_test "tab-lands-in-sna-star-in-area-a" =
      indicator, hence blank), `*' lands on column 8, in area A.  Off-by-one
      guard: a [k_sna] argument of [5 - next_stop] would wrongly consume one SNA
      column too few and read `*' as the indicator. *)
-  Preproc_testing.preprocess ~tab_width:[4]
+  Preproc_testing.preprocess ~tab_stops:[4]
     "\t   * comment";
   [%expect {| * comment |}]
 
@@ -127,7 +127,7 @@ let%expect_test "tab-lands-exactly-on-indicator-comment" =
   (* [tab-width: 6] puts the first stop on column 7: the tab lands exactly on
      the indicator column, which is the [k_indicator] case, and `*' is the
      indicator itself. *)
-  Preproc_testing.preprocess ~tab_width:[6]
+  Preproc_testing.preprocess ~tab_stops:[6]
     "\t* comment";
   [%expect {| |}]
 
@@ -143,7 +143,7 @@ let%expect_test "two-tabs-jump-past-indicator" =
   (* [tab-width: 4]: the first tab lands on column 5 ([k_sna]), the second one
      is then at column 5 and jumps to column 9 ([k_nominal]), past the
      indicator: `*' is plain text. *)
-  Preproc_testing.preprocess ~tab_width:[4]
+  Preproc_testing.preprocess ~tab_stops:[4]
     "\t\t* comment";
   [%expect {| * comment |}]
 
@@ -158,7 +158,7 @@ let%expect_test "tab-lands-in-sna-continuation" =
   (* TAB -> column 5, two spaces fill columns 5-6, `-' lands on the indicator
      column: the pending literal must still be continued.  Guards that
      [flush_continued] is *not* applied on the new [k_sna] path. *)
-  Preproc_testing.preprocess ~tab_width:[4]
+  Preproc_testing.preprocess ~tab_stops:[4]
     "       MOVE \"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n\
     \t  -\"BBB\" TO X.";
   [%expect {| MOVE "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBB" TO X . |}]

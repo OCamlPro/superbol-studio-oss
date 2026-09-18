@@ -153,19 +153,8 @@ let enforceable_area_a (type k) : k source_format -> bool = function
   | _ -> false
 
 (* --- *)
-let default_tab_stops = [8]
-
-let next_tab_stop ?(tab_stops = default_tab_stops) col =
-  let rec go pos = function
-    | [w] ->
-        if pos + w > col then pos + w
-        else pos + ((col - pos) / w  + 1) * w
-    | w :: rest ->
-        let stop = pos + w in
-        if stop > col then stop else go stop rest
-    | [] -> col + 1
-  in
-  go 1 tab_stops
+let default_tab_stops = Cobol_common.Tab_stops.default
+let next_tab_stop = Cobol_common.Tab_stops.next_stop
 
 let looks_like_fixed_format ?tab_stops contents_prefix =
   let rec sna ap vp =

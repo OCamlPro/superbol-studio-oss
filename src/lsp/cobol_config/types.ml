@@ -317,9 +317,7 @@ module Value = struct
   let int = def ~kind:(kind_from_fmt ~name:"int" "%d")
   let int_list = def ~kind:(object
     inherit [_] kind ~name:"int_list"
-    method parse s =
-      String.split_on_char ',' s
-      |> List.map (fun tok -> int_of_string (String.trim tok))
+    method parse s = Cobol_common.Tab_stops.of_string s
   end)
   let bool = def ~kind:(kind_from_fmt ~name:"bool" "%B")
 
@@ -551,7 +549,7 @@ module type PP_OPTS = sig
   (** Preprocessor options*)
 
   (* int options *)
-  val tab_width: int list valued_option
+  val tab_stops: int list valued_option
 
   (* support options *)
   val comment_paragraphs: unit feature_support

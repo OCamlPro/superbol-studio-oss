@@ -387,7 +387,7 @@ let sna_char ~k_continue ~k_done remaining state lexbuf =
   else
     k_continue (remaining - 1) state lexbuf
 
-(** Handles a tab character in the SNA area: updates [tab_col_shift] and adds
+(** Handles a tab character in the SNA area: updates [tab_cpos_shift] and adds
     the character to the ignored locations list, then dispatches to
     [~k_indicator] if the expansion lands the indicator column
     (0-indexed column 6), or to [~k_nominal] (with [flush_continued] applied)

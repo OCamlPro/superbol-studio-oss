@@ -95,7 +95,7 @@ module Make
     with LookupError -> default
 
   (* int values *)
-  let tab_width = parse_string_value tab_width Default.tab_width
+  let tab_stops = parse_string_value tab_stops Default.tab_stops
   let text_column = parse_int_value text_column Default.text_column
   let pic_length = parse_int_value pic_length Default.pic_length
   let word_length = parse_int_value word_length Default.word_length
