@@ -11,6 +11,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let of_string s =
+  String.split_on_char ',' s |> List.map (fun t -> int_of_string (String.trim t))
+
+let is_valid = function
+  | [] -> false
+  | l -> List.for_all ((<) 0) l
+
 let default = [8]
 
 let next_stop ?(tab_width = default) col =
