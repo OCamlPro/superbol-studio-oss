@@ -14,10 +14,25 @@
 open EzCompat
 open Cobol_common.Srcloc.INFIX
 
+(** [config_with_tab_width widths] is the default COBOL configuration, with its
+    [tab-width] option overridden with [widths] (see {!Cobol_config.Options}).
+    Tab stops are only reachable through the configuration (they are read in
+    [Cobol_preproc]'s engine via [Config.tab_width#value]), so tests that need
+    non-default tab stops must go through a configuration module. *)
+let config_with_tab_width widths: Cobol_config.t =
+  let module Default = (val Cobol_config.default: Cobol_config.T) in
+  (module struct
+    include Default
+    let tab_width =
+      Cobol_config.Options.tab_width#from_val
+        ~config:Cobol_config.{ name = "test" } widths
+  end)
+
 let options
     ?(verbose = false)
     ?(source_format = Cobol_config.(SF SFFixed))
     ?(copybooks = [])
+    ?tab_width
     () =
   let platform =
       { Prog_common.platform with verbosity = if verbose then 1 else 0 }
@@ -40,17 +55,24 @@ let options
         );
     }
   in
-  { (Cobol_preproc.Options.default ~platform)
-    with source_format }
+  let defaults = Cobol_preproc.Options.default ~platform in
+  { defaults with
+    source_format;
+    config = match tab_width with
+      | None -> defaults.config
+      | Some widths -> config_with_tab_width widths }
 
-let preprocess ?verbose ?(filename = "prog.cob") ?source_format ?copybooks contents =
+let preprocess
+    ?verbose ?(filename = "prog.cob") ?source_format ?copybooks ?tab_width
+    contents =
   Cobol_preproc.Outputs.show_n_forget ~ppf:Fmt.stdout @@
   Cobol_preproc.preprocess_input
-    ~options:(options ?verbose ?source_format ?copybooks ()) @@
+    ~options:(options ?verbose ?source_format ?copybooks ?tab_width ()) @@
   Cobol_preproc.Input.string ~filename contents
 
-let show_text ?verbose ?(filename = "prog.cob") ?source_format contents =
-  let options = options ?verbose ?source_format () in
+let show_text ?verbose ?(filename = "prog.cob") ?source_format ?tab_width
+    contents =
+  let options = options ?verbose ?source_format ?tab_width () in
   let text =
     Cobol_preproc.Outputs.show_n_forget ~ppf:Fmt.stdout @@
     Cobol_preproc.text_of_input ~options @@

@@ -42,8 +42,10 @@ type 'k state =
     comments: comments;
     ignored: lexloc list;               (** lexical locations of ignored text *)
     cdir_seen: bool;
-    current_cpos_shift: int;   (** net column shift: positive from UTF-8 multi-byte
-                                    overhead, negative from tab expansion *)
+    utf8_cpos_shift: int;               (** extra bytes contributed by multi-bytes
+                                            characters on the current line *)
+    tab_cpos_shift: int;                (** extra columns contributed by tab characters
+                                            on the current line *)
     newline: bool;
     newline_cnums: int list;    (** index of all newline characters encountered
                                     so far (in reverse order) *)
@@ -68,12 +70,12 @@ and 'k config =
   {
     debug: bool;
     source_format: 'k source_format;
-    tab_stops: int list;
+    tab_width: int list;
   }
 
 let position_encoding_in_bytes = false
 
-let init_state ?(tab_stops = Src_format.default_tab_stops) source_format : _ state =
+let init_state ?(tab_width = Src_format.default_tab_width) source_format : _ state =
   {
     lex_prods = [];
     continued = CNone;
@@ -81,7 +83,8 @@ let init_state ?(tab_stops = Src_format.default_tab_stops) source_format : _ sta
     comments = [];
     ignored = [];
     cdir_seen = false;
-    current_cpos_shift = 0;
+    utf8_cpos_shift = 0;
+    tab_cpos_shift = 0;
     newline = true;
     newline_cnums = [];
     diags = Src_diagnostics.none;
@@ -89,7 +92,7 @@ let init_state ?(tab_stops = Src_format.default_tab_stops) source_format : _ sta
       {
         debug = false;
         source_format;
-        tab_stops;
+        tab_width;
       }
   }
 
@@ -131,17 +134,13 @@ let change_source_format ({ config; _ } as state) sf =
   then Ok { state with config = { config with source_format = sf } }
   else Error ()
 
-let pos_column { current_cpos_shift; _ } Lexing.{ pos_bol; pos_cnum; _ } =
-  pos_cnum - pos_bol + 1 - current_cpos_shift  (* count cols from 1 *)
+let pos_column { utf8_cpos_shift; tab_cpos_shift; _ } Lexing.{ pos_bol; pos_cnum; _ } =
+  pos_cnum - pos_bol + 1 - utf8_cpos_shift + tab_cpos_shift  (* count cols from 1 *)
 
-let adjust_position ?(base_cpos_shift = 0) { current_cpos_shift; _ } pos =
-  (* Strips only the UTF-8 overhead: (current - base) counts the extra bytes
-     added within the token, leaving the tab contribution (negative, in base)
-     out of the position adjustment. *)
-  let utf8_shift = current_cpos_shift - min 0 base_cpos_shift in
-  if utf8_shift = 0 || position_encoding_in_bytes
+let adjust_position { utf8_cpos_shift; _ } pos =
+  if utf8_cpos_shift = 0 || position_encoding_in_bytes
   then pos
-  else Lexing.{ pos with pos_cnum = pos.pos_cnum - utf8_shift }
+  else Lexing.{ pos with pos_cnum = pos.pos_cnum - utf8_cpos_shift }
 
 let raw_loc ~start_pos ~end_pos ?end_state start_state =
   let in_area_a =
@@ -152,9 +151,8 @@ let raw_loc ~start_pos ~end_pos ?end_state start_state =
     | Some c -> pos_column start_state start_pos < c
   in
   let end_state = Option.value end_state ~default:start_state in
-  let base = start_state.current_cpos_shift in
-  let start_pos = adjust_position ~base_cpos_shift:base start_state start_pos
-  and   end_pos = adjust_position ~base_cpos_shift:base end_state   end_pos in
+  let start_pos = adjust_position start_state start_pos
+  and end_pos = adjust_position end_state end_pos in
   Cobol_common.Srcloc.raw ~in_area_a (start_pos, end_pos)
 
 type lexeme_info = string * Lexing.position * Lexing.position
@@ -166,9 +164,8 @@ let lexeme_info lexbuf : lexeme_info =
 
 let ignore_lexloc ~start_pos ~end_pos ?start_state end_state =
   let start_state = Option.value start_state ~default:end_state in
-  let base = start_state.current_cpos_shift in
-  let start_pos = adjust_position ~base_cpos_shift:base start_state start_pos
-  and   end_pos = adjust_position ~base_cpos_shift:base end_state   end_pos in
+  let start_pos = adjust_position start_state start_pos
+  and end_pos = adjust_position end_state end_pos in
   { end_state with ignored = (start_pos, end_pos) :: end_state.ignored }
 
 let count_utf8_codepoints s =
@@ -179,10 +176,10 @@ let count_utf8_codepoints s =
 let lexeme_with_utf8_chars state lexbuf =
   let (s, _start_pos, _end_pos) as lexinf = lexeme_info lexbuf in
   let additional_shift = String.length s - count_utf8_codepoints s in
-  let end_cpos_shift = state.current_cpos_shift + additional_shift in
-  if end_cpos_shift == state.current_cpos_shift
+  let end_cpos_shift = state.utf8_cpos_shift + additional_shift in
+  if end_cpos_shift == state.utf8_cpos_shift
   then lexinf, state
-  else lexinf, { state with current_cpos_shift = end_cpos_shift }
+  else lexinf, { state with utf8_cpos_shift = end_cpos_shift }
 
 let skip state lexbuf =
   (* Note: we use `lexeme_with_utf8_chars` here in case skipped lexeme contain
@@ -241,7 +238,8 @@ let new_line state lexbuf =
   Lexing.new_line lexbuf;
   let state =
     { state with
-      current_cpos_shift = 0;
+      utf8_cpos_shift = 0;
+      tab_cpos_shift = 0;
       newline = true;
       newline_cnums = Lexing.lexeme_end lexbuf :: state.newline_cnums }
   in
@@ -371,11 +369,11 @@ let flush_continued ?(force = false) state = match state.continued with
 let compute_tab_shift state (start_pos: Lexing.position) =
   let col      = pos_column state start_pos in   (* 1-indexed *)
   let next_col =
-    Src_format.next_tab_stop ~tab_stops:state.config.tab_stops col
+    Src_format.next_tab_stop ~tab_width:state.config.tab_width col
   in
   next_col - 1,
   { state with
-    current_cpos_shift = state.current_cpos_shift - (next_col - col - 1) }
+    tab_cpos_shift = state.tab_cpos_shift + (next_col - col - 1) }
 
 (** Handles a non-tab character in the SNA area: ignores it in the produced
     locations and calls [~k_done state lexbuf] when [remaining]
@@ -391,16 +389,18 @@ let sna_char ~k_continue ~k_done remaining state lexbuf =
 
 (** Handles a tab character in the SNA area: updates [tab_col_shift] and adds
     the character to the ignored locations list, then dispatches to
-    [~k_indicator] if the expansion lands at or before the indicator column
+    [~k_indicator] if the expansion lands the indicator column
     (0-indexed column 6), or to [~k_nominal] (with [flush_continued] applied)
-    if the tab jumped past the indicator column. *)
-let sna_tab ~k_indicator ~k_nominal state lexbuf =
+    if it lands after the indicator, or to [~k_sna] if it lands before *)
+let sna_tab ~k_sna ~k_indicator ~k_nominal state lexbuf =
   let _, start_pos, _ = lexeme_info lexbuf in
   let next_stop, state = compute_tab_shift state start_pos in
   if next_stop > 6 then
     k_nominal (flush_continued state) lexbuf
-  else
+  else if next_stop = 6 then
     k_indicator state lexbuf
+  else
+    k_sna (6 - next_stop) state lexbuf
 
 let tab ?(before_indicator = true) ~k state lexbuf =
   let _, start_pos, _ = lexeme_info lexbuf in
@@ -651,8 +651,8 @@ let trunc_to_col n ((s, sp, ep) as info: lexeme_info) ~start_state ~end_state =
   then
     info, (if ec = n + 1 then Tacked else Nominal), end_state
   else                  (* truncate lexeme and shift end position accordingly *)
-  if start_state.current_cpos_shift == end_state.current_cpos_shift
-  then          (* no extra character postion shift: use regular substitution *)
+  if start_state.utf8_cpos_shift == end_state.utf8_cpos_shift
+  then
     let s' = String.sub s 0 (n - sc + 1) in
     let ep' = { ep with pos_cnum = ep.pos_cnum - ec + n + 1 } in
     (s', sp, ep'), Tacked, ignore_lexloc ~start_pos:ep' ~end_pos:ep end_state

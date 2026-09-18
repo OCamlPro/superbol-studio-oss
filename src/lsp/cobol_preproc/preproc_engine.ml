@@ -53,7 +53,7 @@ and preprocessor_persist =
     copybook_rev_comments: Text.comments StringMap.t;
     copybook_lookup_config: Cobol_common.Copybook.TYPES.lookup_config;
     dialect: Cobol_config.dialect;
-    tab_stops: int list;
+    tab_width: int list;
     source_format: Src_format.any option;  (* to keep auto-detecting on reset *)
     exec_preprocs: exec_preprocessor EXEC_MAP.t;
     platform: Cobol_common.Platform.TYPES.platform;     (* == reader.platform *)
@@ -173,10 +173,10 @@ let preprocessor input = function
       let module Om = Src_overlay.New_manager (Om_name) () in
       let module Pp = Preproc_grammar.Make (Config) (Om) in
       let source_format = source_format_config source_format in
-      let tab_stops = Config.tab_width#value in
+      let tab_width = Config.tab_width#value in
       {
         buff = [];
-        reader = Src_reader.from input ?source_format ~platform ~tab_stops;
+        reader = Src_reader.from input ?source_format ~platform ~tab_width;
         ppstate = Preproc_state.initial;
         pplog = Preproc_trace.empty;
         diags = Preproc_diagnostics.none;
@@ -192,7 +192,7 @@ let preprocessor input = function
             copybook_rev_comments = StringMap.empty;
             copybook_lookup_config;
             dialect = Config.dialect;
-            tab_stops;
+            tab_width;
             source_format;
             exec_preprocs;
             platform;
@@ -205,7 +205,7 @@ let preprocessor input = function
       {
         from with
         buff = [];
-        reader = Src_reader.from input ~source_format ~platform ~tab_stops:persist.tab_stops;
+        reader = Src_reader.from input ~source_format ~platform ~tab_width:persist.tab_width;
         rev_ignored = [];
         (* CHECKME: context and ignored? *)
         persist =
@@ -609,9 +609,9 @@ let reset_preprocessor_for_string string ?new_position pp =
     | Some Lexing.{ pos_cnum; _ } -> EzString.after string (pos_cnum - 1)
     | None -> string
   and source_format = pp.persist.source_format
-  and tab_stops = pp.persist.tab_stops in
+  and tab_width = pp.persist.tab_width in
   reset_preprocessor ?new_position pp contents
-    ~restart:(Src_reader.restart_on_string ?source_format ~tab_stops)
+    ~restart:(Src_reader.restart_on_string ?source_format ~tab_width)
 
 (* --- *)
 
@@ -622,27 +622,27 @@ let preprocessor ~(options: preproc_options) input =
     {!preprocess_file}. *)
 let default_oppf = Fmt.stdout
 
-let lex_input ~platform ~dialect ~source_format ?(tab_stops=Src_format.default_tab_stops)
+let lex_input ~platform ~dialect ~source_format ?(tab_width=Src_format.default_tab_width)
     ?(ppf = default_oppf) input =
   OUT.result @@
   Src_reader.print_lines ~dialect ~skip_compiler_directives_text:true ppf @@
-  Src_reader.from input ?source_format:(source_format_config source_format) ~tab_stops
+  Src_reader.from input ?source_format:(source_format_config source_format) ~tab_width
     ~platform
 
-let lex_file ~platform ~dialect ~source_format ?(tab_stops=Src_format.default_tab_stops)
+let lex_file ~platform ~dialect ~source_format ?(tab_width=Src_format.default_tab_width)
     ?ppf filename =
   Src_input.from ~filename ~platform
-    ~f:(lex_input ~dialect ~source_format ~tab_stops ~platform ?ppf)
+    ~f:(lex_input ~dialect ~source_format ~tab_width ~platform ?ppf)
 
 let lex_lib ~platform ~dialect ~source_format ~lookup_config
-    ?(tab_stops=Src_format.default_tab_stops) ?(ppf = default_oppf) lib =
+    ?(tab_width=Src_format.default_tab_width) ?(ppf = default_oppf) lib =
   match platform.find_lib ~lookup_config lib with
   | Ok filename ->
       Src_input.from ~platform ~filename ~f:begin fun input ->
         OUT.result @@
         Src_reader.print_lines ~dialect ~skip_compiler_directives_text:true ppf @@
         Src_reader.from input ?source_format:(source_format_config source_format)
-          ~tab_stops ~platform
+          ~tab_width ~platform
       end
   | Error lnf ->
       OUT.error_result () @@ Copybook_lookup_error { lnf; copyloc = None }

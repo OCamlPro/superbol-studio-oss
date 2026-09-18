@@ -21,6 +21,7 @@ include module type of Types
 
 module Options = Options
 module Default = Default
+module Tab_width = Tab_width
 module Diagnostics = Config_diagnostics
 
 exception ERROR of Diagnostics.error
@@ -57,3 +58,5 @@ val from_dialect
   -> (module T) Cobol_common.Diagnostics.with_diags
 
 val dialect: t -> dialect
+
+val tab_width: t -> int list

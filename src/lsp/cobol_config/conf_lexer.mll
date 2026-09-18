@@ -31,6 +31,7 @@ let yes = "yes"
 let no = "no"
 let boolean = true | false | yes | no
 let integer = ('+' | '-')? digit+
+let int_list = integer (',' ' '* integer)+
 let ident_chars = letter | '-' | digit
 let ident = letter ident_chars*
 let value_char = letter | digit
@@ -76,6 +77,7 @@ rule main = parse
 | include                { INCLUDE }
 | true | yes             { BOOLEAN true }
 | false | no             { BOOLEAN false }
+| int_list as l          { ANY l }
 | integer as i           { INT (int_of_string i) }
 | ident as i             { IDENT i }
 | value as x             { ANY x }

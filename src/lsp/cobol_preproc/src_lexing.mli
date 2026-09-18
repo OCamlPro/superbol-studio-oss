@@ -13,7 +13,7 @@
 
 type 'k state
 
-val init_state: ?tab_stops:int list -> 'k Src_format.source_format -> 'k state
+val init_state: ?tab_width:int list -> 'k Src_format.source_format -> 'k state
 val diagnostics: _ state -> Src_diagnostics.t
 val rev_comments: _ state -> Text.comments
 val rev_ignored: _ state -> Cobol_common.Srcloc.lexloc list
@@ -76,7 +76,8 @@ val sna_char
   -> k_done:('s -> Lexing.lexbuf -> 'b)
   -> int -> 's -> Lexing.lexbuf -> 'b
 val sna_tab
-  : k_indicator:('s -> Lexing.lexbuf -> 'b)
+  : k_sna:(int -> 's -> Lexing.lexbuf -> 'b)
+  -> k_indicator:('s -> Lexing.lexbuf -> 'b)
   -> k_nominal:('s -> Lexing.lexbuf -> 'b)
   -> (Src_format.fixed state as 's)
   -> Lexing.lexbuf -> 'b

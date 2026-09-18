@@ -153,25 +153,14 @@ let enforceable_area_a (type k) : k source_format -> bool = function
   | _ -> false
 
 (* --- *)
-let default_tab_stops = [8]
+let default_tab_width = Cobol_config.Tab_width.default
+let next_tab_stop = Cobol_config.Tab_width.next_stop
 
-let next_tab_stop ?(tab_stops = default_tab_stops) col =
-  let rec go pos = function
-    | [w] ->
-        if pos + w > col then pos + w
-        else pos + ((col - pos) / w  + 1) * w
-    | w :: rest ->
-        let stop = pos + w in
-        if stop > col then stop else go stop rest
-    | [] -> col + 1
-  in
-  go 1 tab_stops
-
-let looks_like_fixed_format ?tab_stops contents_prefix =
+let looks_like_fixed_format ?tab_width contents_prefix =
   let rec sna ap vp =
     match contents_prefix.[ap] with
     | '\n' -> sna (succ ap) 1
-    | '\t' -> sna (succ ap) (next_tab_stop ?tab_stops vp)
+    | '\t' -> sna (succ ap) (next_tab_stop ?tab_width vp)
     | '\r' -> sna (succ ap) vp
     | _ when vp <> 7 -> sna (succ ap) (succ vp)
     | ' ' | '-' | 'd' | 'D' | '*' | '/' | '\\' | '$' when vp = 7 -> true

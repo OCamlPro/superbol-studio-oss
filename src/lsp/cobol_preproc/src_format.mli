@@ -49,8 +49,8 @@ exception INVALID of string
 
 val equal: 'k source_format -> 'r source_format -> bool
 
-val default_tab_stops: int list
-val next_tab_stop: ?tab_stops:int list -> int -> int
+val default_tab_width: int list
+val next_tab_stop: ?tab_width:int list -> int -> int
 
 val from_config: Cobol_config.source_format -> any
 (* val to_config: 'k source_format -> Cobol_config.source_format *)
