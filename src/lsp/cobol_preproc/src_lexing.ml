@@ -70,12 +70,12 @@ and 'k config =
   {
     debug: bool;
     source_format: 'k source_format;
-    tab_stops: int list;
+    tab_width: int list;
   }
 
 let position_encoding_in_bytes = false
 
-let init_state ?(tab_stops = Src_format.default_tab_stops) source_format : _ state =
+let init_state ?(tab_width = Src_format.default_tab_width) source_format : _ state =
   {
     lex_prods = [];
     continued = CNone;
@@ -92,7 +92,7 @@ let init_state ?(tab_stops = Src_format.default_tab_stops) source_format : _ sta
       {
         debug = false;
         source_format;
-        tab_stops;
+        tab_width;
       }
   }
 
@@ -369,7 +369,7 @@ let flush_continued ?(force = false) state = match state.continued with
 let compute_tab_shift state (start_pos: Lexing.position) =
   let col      = pos_column state start_pos in   (* 1-indexed *)
   let next_col =
-    Src_format.next_tab_stop ~tab_stops:state.config.tab_stops col
+    Src_format.next_tab_stop ~tab_width:state.config.tab_width col
   in
   next_col - 1,
   { state with

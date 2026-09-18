@@ -20,6 +20,7 @@ include Types
 
 module Options = Options
 module Default = Default
+module Tab_width = Tab_width
 module Diagnostics = Config_diagnostics
 
 module DIAGS = Cobol_common.Diagnostics
@@ -293,3 +294,5 @@ let from_dialect ?search_path ?verbose d =
   | d               -> load_gnucobol_conf d
 
 let dialect (module C: T) = C.dialect
+
+let tab_width (module C: T) = C.tab_width#value
