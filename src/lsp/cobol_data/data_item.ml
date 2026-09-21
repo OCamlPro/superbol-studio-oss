@@ -100,7 +100,7 @@ let def_offset: data_definition -> Data_memory.offset = function
 
 let def_has_issues: data_definition -> bool = function
   | Data_field { def; _ } -> ~&def.field_has_definition_issues
-  | Data_renaming _ -> false
+  | Data_renaming { def; _ } -> ~&def.renaming_has_definition_issues
   | Data_condition { field; _ } -> ~&field.field_has_definition_issues
   | Table_index { table; _ } -> ~&table.table_has_definition_issues
 

@@ -36,13 +36,10 @@ let pp_total_size =
 (* Show the record name only for items that are inside a record. On a record
    itself it would just repeat the item name. *)
 let enclosing_record ~record_name
-  : Cobol_ptree.qualname with_loc option -> string option = function
-  | Some qualname ->
-      (match ~&qualname with
-       | Cobol_ptree.Qual _ -> record_name
-       | Name _ -> None)
-  | None ->                                    (* FILLER: show the record name *)
-      record_name
+  : Cobol_ptree.qualname option -> string option = function
+  | Some (Cobol_ptree.Qual _) -> record_name
+  | Some (Name _) -> None
+  | None -> record_name                        (* FILLER: show the record name *)
 
 let pp_offset_in record ppf offset =
   Fmt.pf ppf "Offset: %a%a" pp_readable_size offset
@@ -331,24 +328,14 @@ let named_record { record_name; record_item; _ } =
 (* [prefix] is printed only when there is something to print, so that callers
    never get a line break on its own. *)
 let pp_memory_info ?(prefix = "") ppf def =
-  let pp ppf ~has_issues ~pp_size ~size ~offset qualname record =
-    if not has_issues then
-      let record = enclosing_record ~record_name:(named_record record) qualname in
-      Fmt.pf ppf "%s%a  \n%a" prefix (pp_offset_in record) offset pp_size size
-  in
-  match def with
-  | Data_field { def; record }
-  | Data_condition { field = def; record; _ } ->
-      let x = ~&def in
-      pp ppf ~has_issues:x.field_has_definition_issues ~pp_size ~size:x.field_size
-        ~offset:x.field_offset x.field_qualname record
-  | Data_renaming { def; record } ->
-      let x = ~&def in
-      pp ppf ~has_issues:x.renaming_has_definition_issues ~pp_size
-        ~size:x.renaming_size ~offset:x.renaming_offset
-        (Some x.renaming_name) record
-  | Table_index { table; record; _ } ->
-      let x = ~&table in
-      pp ppf ~has_issues:x.table_has_definition_issues ~pp_size:pp_total_size
-        ~size:x.table_size ~offset:x.table_offset
-        ~&(x.table_field).field_qualname record
+  let open Cobol_data.Item in
+  if not (def_has_issues def) then
+    let pp_size = match def with
+      | Table_index _ -> pp_total_size     (* an index spans every occurrence *)
+      | _ -> pp_size
+    and record =
+      enclosing_record ~record_name:(named_record (def_record def))
+        (def_qualname def)
+    in
+    Fmt.pf ppf "%s%a  \n%a" prefix
+      (pp_offset_in record) (def_offset def) pp_size (def_size def)

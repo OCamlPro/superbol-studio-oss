@@ -897,7 +897,7 @@ let%expect_test "hover-datadef-simple-condition" =
     PIC X USAGE DISPLAY
     ```
     ALPHANUMERIC(1)
-    Offset: 0 bytes
+    Offset: 0 bytes in VAL
     Size: 1 byte
     ---
     References: 2
@@ -920,7 +920,7 @@ let%expect_test "hover-datadef-simple-condition" =
     PIC X USAGE DISPLAY
     ```
     ALPHANUMERIC(1)
-    Offset: 0 bytes
+    Offset: 0 bytes in VAL
     Size: 1 byte
     ---
     References: 2 |}];;
