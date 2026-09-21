@@ -165,7 +165,7 @@ let to_channel ?minify oc json = value_to_channel ?minify oc (json :> value)
 exception Parse_error of value * string
 
 let parse_error t fmt =
-  Printf.kprintf (fun msg ->
+  Printf.ksprintf (fun msg ->
       raise (Parse_error (t, msg))
     ) fmt
 
