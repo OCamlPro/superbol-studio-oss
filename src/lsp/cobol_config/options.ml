@@ -16,7 +16,7 @@ open Types
 (** This module contains all the option available *)
 
 (* int options *)
-let tab_width: int list value =
+let tab_stops: int list value =
   Value.int_list ~name:"tab-width"
     "Number@ of@ spaces@ that@ are@ assumed@ for@ tabs."
 

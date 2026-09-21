@@ -76,7 +76,8 @@ val sna_char
   -> k_done:('s -> Lexing.lexbuf -> 'b)
   -> int -> 's -> Lexing.lexbuf -> 'b
 val sna_tab
-  : k_indicator:('s -> Lexing.lexbuf -> 'b)
+  : k_sna:(int -> 's -> Lexing.lexbuf -> 'b)
+  -> k_indicator:('s -> Lexing.lexbuf -> 'b)
   -> k_nominal:('s -> Lexing.lexbuf -> 'b)
   -> (Src_format.fixed state as 's)
   -> Lexing.lexbuf -> 'b
