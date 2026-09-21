@@ -369,6 +369,22 @@ let on_pending ?(severity = Cobol_common.Diagnostics.Warn) descr ps env =
   then add_diag ps severity ?loc:(env_loc env) (Implementation_pending descr)
   else ps
 
+(* Report the WHEN phrases that were ignored because they carry no imperative statement
+   and directly precede WHEN OTHER, as well as an EVALUATE that has no actual WHEN branch. *)
+let on_evaluate_body (b: Grammar_utils.evaluate_body) ps =
+  match b.eb_when_other with
+  | None -> ps
+  | Some (ign_when_locs, when_other_loc, _) ->
+    let ps = List.fold_left (fun ps loc ->
+          add_diag ps Cobol_common.Diagnostics.Warn ~loc Fallthrough_to_when_other
+        ) ps ign_when_locs
+    in
+    match b.eb_branches with
+    | [] ->
+      add_diag ps Cobol_common.Diagnostics.Warn ~loc:when_other_loc
+        No_when_branch_before_when_other
+    | _ -> ps
+
 let on_special_names special_names ps token tokens =
   match special_names with
   | Cobol_ptree.DecimalPointIsComma ->
@@ -471,6 +487,8 @@ let post_production ps token tokens prod env =
       on_procedure_division p ps token tokens
   | Post_method_definitions d ->
       on_method_definitions d ps token tokens
+  | Post_evaluate_body b ->
+      on_evaluate_body b ps, token, tokens
   | Post_pending descr ->
       on_pending descr ps env, token, tokens
   | NoPost ->

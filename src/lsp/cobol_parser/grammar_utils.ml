@@ -87,6 +87,49 @@ let build_data_division = function
       in
       Some (rebuild_sections list empty_data_division &@ loc)
 
+type evaluate_body =
+  {
+    eb_branches: evaluate_branch list;
+    eb_when_other: (srcloc list * srcloc * statements) option; 
+  }
+
+let evaluate_body_when_other when_other_loc stmts =
+  {
+    eb_branches = [];
+    eb_when_other = Some ([], when_other_loc, stmts);
+  }
+
+let evaluate_body_last_branch when_objects actions =
+  {
+    eb_branches = [ { eval_selection = [ ~&when_objects ];
+                      eval_actions = actions } ];
+    eb_when_other = None;
+  }
+
+let evaluate_body_prepend_when when_objects actions eval_body_suffix =
+  match actions, eval_body_suffix.eb_branches, eval_body_suffix.eb_when_other with
+  | [], branch :: branches, _ -> (* fall-through into the following branch *)
+      { eval_body_suffix with
+        eb_branches = { branch with
+                        eval_selection =
+                          ~&when_objects :: branch.eval_selection } :: branches }
+  | [], [], Some (ign_whens, when_other_loc, when_other_stmts) ->
+      { eval_body_suffix with
+        eb_when_other = Some (~@when_objects :: ign_whens, when_other_loc, when_other_stmts) }
+  | _ ->
+      { eval_body_suffix with
+        eb_branches = { eval_selection = [ ~&when_objects ];
+                        eval_actions = actions } :: eval_body_suffix.eb_branches }
+
+let evaluate_stmt subjects eval_body =
+  {
+    eval_subjects = subjects;
+    eval_branches = eval_body.eb_branches;
+    eval_otherwise = (match eval_body.eb_when_other with
+      | None -> []
+      | Some (_, _, when_other_stmts) -> when_other_stmts);
+  }
+
 let build_simple_program opts_par env_div datat_div proc_div ~pos =
   Program {
     program_name =

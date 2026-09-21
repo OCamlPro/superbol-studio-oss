@@ -11,7 +11,7 @@
 
 (library
  (name test_cobol_parser)
- (modules cS_tokens decimal_point tokens exec_blocks
+ (modules cS_tokens decimal_point tokens exec_blocks evaluate
 	  test_intrinsics_registration)
  (preprocess
   (pps ppx_expect))

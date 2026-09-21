@@ -1792,46 +1792,6 @@ syn_misc.at-5295-prog.cob:9.27-9.33:
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5344:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5520:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5611:0
-syn_misc.at-5611-prog.cob:39.11-39.23:
-  36              WHEN  A = B
-  37                  move var      to othervar
-  38              WHEN OTHER
-  39 >            END-EVALUATE
-----              ^^^^^^^^^^^^
-  40   
-  41              PERFORM WITH TEST BEFORE UNTIL 1 <> 3
->> Error: Invalid syntax
-
-syn_misc.at-5611-prog.cob:47.11-47.23:
-  44              EVALUATE FALSE
-  45              WHEN  A = B
-  46              WHEN  B = A
-  47 >            END-EVALUATE.
-----              ^^^^^^^^^^^^
-  48   
-  49              EVALUATE TRUE
->> Error: Invalid syntax
-
-syn_misc.at-5611-prog.cob:53.11-53.12:
-  50              WHEN  A = B
-  51                  move var      to othervar
-  52              WHEN OTHER
-  53 >            .
-----              ^
-  54   
-  55              EVALUATE TRUE
->> Error: Invalid syntax
-
-syn_misc.at-5611-prog.cob:58.11-58.12:
-  55              EVALUATE TRUE
-  56              WHEN  A = B
-  57              WHEN  B = A
-  58 >            .
-----              ^
-  59   
-  60              STOP RUN.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5684:0
 syn_misc.at-5684-prog.cob:12.53:
    9              05  item-05-b     pic x(01).
