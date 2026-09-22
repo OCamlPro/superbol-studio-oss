@@ -16,16 +16,21 @@ open Cobol_preproc.Env.TYPES
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 
+let size_in_bits size =
+  try Some (Cobol_data.Memory.as_bits size)
+  with Cobol_data.Memory.NOT_SCALAR _ -> None
+
+let pp_bits ppf bits =
+  if Int.rem bits 8 = 0 then
+    let bytes = bits / 8 in
+    Fmt.pf ppf "%u byte%s" bytes (if bytes <> 1 then "s" else "")
+  else
+    Fmt.pf ppf "%u bit%s" bits (if bits <> 1 then "s" else "")
+
 let pp_readable_size ppf size =
-  try
-    let bits = Cobol_data.Memory.as_bits size in
-    if Int.rem bits 8 = 0 then
-      let bytes = bits / 8 in
-      Fmt.pf ppf "%u byte%s" bytes (if bytes <> 1 then "s" else "")
-    else
-      Fmt.pf ppf "%u bit%s" bits (if bits <> 1 then "s" else "")
-  with Cobol_data.Memory.NOT_SCALAR _ ->
-    Fmt.pf ppf "*variable*"
+  match size_in_bits size with
+  | Some bits -> pp_bits ppf bits
+  | None -> Fmt.pf ppf "*variable*"
 
 let pp_size =
   Fmt.(any "Size: " ++ pp_readable_size)
@@ -214,20 +219,20 @@ and pp_field_definition: field_definition Pretty.printer = fun ppf x ->
   let pp_qualname_opt_in_block' =
     pp_cobol_block Fmt.(option ~none:(any "FILLER") Cobol_ptree.pp_qualname')
   in
+  let pp_redefines ppf x =
+    Fmt.(option @@ any "Redefines:\n" ++ pp_cobol_block Cobol_ptree.pp_qualname')
+      ppf x.field_redefines
+  in
   match x.field_layout with
   | Elementary_field _ when definition_has_issues ->
       Fmt.(const pp_qualname_opt_in_block' x.field_qualname ++ any "\n\n" ++
            any "*(layout omitted due to issues in item definition)*  \n" ++
-           const (option @@
-                  any "Redefines:\n" ++ pp_cobol_block Cobol_ptree.pp_qualname')
-             x.field_redefines)
+           pp_redefines)
         ppf x
   | _ ->
       Fmt.(const pp_qualname_opt_in_block' x.field_qualname ++ any "\n\n" ++
            const pp_field_layout x.field_layout ++ any "  \n" ++
-           const (option @@
-                  any "Redefines:\n" ++ pp_cobol_block Cobol_ptree.pp_qualname')
-             x.field_redefines)
+           pp_redefines)
         ppf x
 
 and pp_field_definition': field_definition with_loc Pretty.printer = fun ppf ->
@@ -325,6 +330,47 @@ let named_record { record_name; record_item; _ } =
   | None -> None
   | Some _ -> Some record_name
 
+(* REDEFINES. The size of the other item cannot be read in the source. *)
+
+(* Size of the redefinition over the size of the item it redefines. Both are
+   given in the same unit when we can. *)
+let pp_sizes ppf (redef, redefined) =
+  match size_in_bits redef, size_in_bits redefined with
+  | Some a, Some b when Int.rem a 8 = 0 && Int.rem b 8 = 0 ->
+      Fmt.pf ppf "%u/%a" (a / 8) pp_bits b
+  | _ ->
+      Fmt.pf ppf "%a/%a" pp_readable_size redef pp_readable_size redefined
+
+let pp_redefinition ppf (kind, redef, redefined) =
+  let does_not_fit, mismatch =
+    match size_in_bits redef, size_in_bits redefined with
+    | Some a, Some b -> a > b, a <> b
+    | _ -> false, false                    (* one of the sizes is variable *)
+  in
+  let bold = if mismatch then "**" else "" in
+  Fmt.pf ppf "  \n%s%s of size %s%a%s"
+    (if does_not_fit then "⚠️ " else "") kind
+    bold pp_sizes (redef, redefined) bold
+
+(* The description already names the redefined item, so we do not repeat it.
+   Redefinitions are in the same record, so their name is not qualified. *)
+let pp_redefinition_info ppf def =
+  let open Cobol_data.Item in
+  match def_item def with
+  | None -> ()
+  | Some item ->
+      let own = size item in
+      Option.iter begin fun redefined ->
+        pp_redefinition ppf ("Redefinition", own, size redefined)
+      end (def_redefined def);
+      List.iter begin fun redef ->
+        let name = match item_qualname ~&redef with
+          | Some qn -> Cobol_unit.Qual.name_of ~&qn
+          | None -> "FILLER"
+        in
+        pp_redefinition ppf ("Redefined by " ^ name, size ~&redef, own)
+      end (redefinitions item)
+
 (* [prefix] is printed only when there is something to print, so that callers
    never get a line break on its own. *)
 let pp_memory_info ?(prefix = "") ppf def =
@@ -337,5 +383,6 @@ let pp_memory_info ?(prefix = "") ppf def =
       enclosing_record ~record_name:(named_record (def_record def))
         (def_qualname def)
     in
-    Fmt.pf ppf "%s%a  \n%a" prefix
+    Fmt.pf ppf "%s%a  \n%a%a" prefix
       (pp_offset_in record) (def_offset def) pp_size (def_size def)
+      pp_redefinition_info def
