@@ -495,8 +495,8 @@ and statement =
   | Evaluate of evaluate_stmt
   | ExecBlock of Cobol_common.Exec_block.t
   | Exit of exit_stmt
-  | Free of name with_loc list
-  | Generate of name with_loc
+  | Free of qualname list
+  | Generate of qualname
   | GoTo of goto_stmt
   | GoBack of goback_stmt
   | If of if_stmt
@@ -843,9 +843,8 @@ and pp_display_with_clause ppf = function
 
 (* ADD & SUBTRACT *)
 
-and pp_basic_arithmetic_stmt ~sep op ppf
-  { basic_arith_operands = ops; basic_arith_on_size_error = dh }
-=
+and pp_basic_arithmetic_stmt ~sep op ppf { basic_arith_operands = ops;
+                                           basic_arith_on_size_error = dh } =
   pp_arithmetic_stmt op (pp_basic_arithmetic_operands ~sep) pp_statement
     ppf (ops, dh)
 
@@ -1064,10 +1063,10 @@ and pp_statement ppf = function
   | Evaluate s -> pp_evaluate_stmt ppf s
   | ExecBlock b -> Cobol_common.Exec_block.pp ppf b
   | Exit s -> pp_exit_stmt ppf s
-  | Free names ->
-      Fmt.pf ppf "FREE@ @[%a@]" Fmt.(list ~sep:sp (pp_with_loc pp_name)) names
-  | Generate name ->
-      Fmt.pf ppf "GENERATE@ %a" (pp_with_loc pp_name) name
+  | Free qualnames ->
+      Fmt.pf ppf "FREE@ @[%a@]" Fmt.(list ~sep:sp pp_qualname) qualnames
+  | Generate qn ->
+      Fmt.pf ppf "GENERATE@ %a" pp_qualname qn
   | GoTo s -> pp_goto_stmt ppf s
   | GoBack s ->
     Fmt.pf ppf "GOBACK%a"

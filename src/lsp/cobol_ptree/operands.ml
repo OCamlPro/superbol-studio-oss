@@ -199,50 +199,52 @@ let pp_date_time ppf = function
   | Time -> Fmt.pf ppf "TIME"
 
 
-
 (* ADD, SUBTRACT *)
 type basic_arithmetic_operands =
-  | ArithSimple of
+  | ArithSimple of               (* ADD/SUBTRACT <operands> TO/FROM <targets> *)
       {
-        sources: scalar list;
+        operands: scalar list;          (* (non-empty) *)
         targets: rounded_idents;
       }
-  | ArithGiving of
+  | ArithGiving of   (* ADD/SUBTRACT <leading_operands> (TO)/FROM <base_operand>
+                        GIVING <targets> *)
       {
-        sources: scalar list;
-        to_or_from_item: scalar;
+        leading_operands: scalar list;                           (* non-empty *)
+        base_operand: scalar;
         targets: rounded_idents;
       }
-  | ArithCorresponding of
+  | ArithCorresponding of (* ADD/SUBTRACT CORRESPONDING <source> TO/FROM
+                             <target> *)
       {
         source: qualname;
         target: rounded_ident;
       }
 [@@deriving ord]
 
-let pp_arithmetic_operands ?modifier ~sep pp_lhs pp_rhs ppf (args, body) =
+let pp_arithmetic_operands ?modifier ?(sep = "TO/FROM") pp_lhs pp_rhs ppf
+    (args, body) =
   let pp_lhs = Fmt.box pp_lhs and pp_rhs = Fmt.box pp_rhs in
   Fmt.pf ppf "%a@;<1 2>%a"
-    Fmt.(option (any " " ++ string)) modifier
+    Fmt.(option (sp ++ string)) modifier
     Fmt.(box (pair ~sep:Fmt.(sp ++ const string sep ++ sp) pp_lhs pp_rhs)) args;
-  Fmt.(list ~sep:nop (any "@ " ++ box ~indent:2 (fun ppf pf -> pf ppf ()))) ppf body
+  Fmt.(list ~sep:nop (sp ++ box ~indent:2 (fun ppf pf -> pf ppf ()))) ppf body
 
 let pp_giving targets =
   [ Fmt.(any "GIVING@ " ++ const (box pp_rounded_idents) targets) ]
 
-let pp_basic_arithmetic_operands ?(sep = "TO") ppf bao =
+let pp_basic_arithmetic_operands ?sep ppf bao =
   let pp_sources = Fmt.(list ~sep:sp pp_scalar) in
   match bao with
-  | ArithSimple { sources; targets } ->
-    pp_arithmetic_operands ~sep pp_sources pp_rounded_idents
-      ppf ((sources, targets), [])
-  | ArithGiving { sources; to_or_from_item; targets } ->
-    pp_arithmetic_operands ~sep pp_sources pp_scalar
-      ppf ((sources, to_or_from_item), pp_giving targets)
+  | ArithSimple { operands; targets } ->
+      pp_arithmetic_operands ?sep pp_sources pp_rounded_idents
+        ppf ((operands, targets), [])
+  | ArithGiving { leading_operands; base_operand; targets } ->
+      pp_arithmetic_operands ?sep pp_sources pp_scalar
+        ppf ((leading_operands, base_operand), pp_giving targets)
   | ArithCorresponding { source; target } ->
-    pp_arithmetic_operands ~modifier:"CORRESPONDING" ~sep
-      pp_qualname pp_rounded_ident
-      ppf ((source, target), [])
+      pp_arithmetic_operands ~modifier:"CORRESPONDING" ?sep
+        pp_qualname pp_rounded_ident
+        ppf ((source, target), [])
 
 
 (*
