@@ -16,10 +16,11 @@
 module Memory = Data_memory
 module Types = Data_types
 module Item = Data_item
+module Usage = Data_usage
 module Picture = Data_picture
 module Value = Data_value
 module Literal = Data_literal
 module Printer = Data_printer
 module Visitor = Data_visitor
 
-module Diagnostics = Data_diagnostics                         (* for literals *)
+module Error = Data_error

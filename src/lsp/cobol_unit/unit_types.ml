@@ -39,12 +39,22 @@ type 'a resolved_qualname =
 
 (* config *)
 
+type display_sign =
+  {
+    sign_position: sign_position; (** relevant for non-binary representations *)
+    sign_separate: bool;         (** [true] = separate character (extra byte) *)
+  }
+
+(* FIXME: these are not properties that can be derived from picture
+   strings. They should be attached to the relevant usage instead. *)
+and sign_position = Leading | Trailing
+
 (** Corresponds to the contents of the CONFIGURATION SECTION. *)
 type unit_config =
   {
     unit_currency_signs: Cobol_common.Basics.CharSet.t;
     unit_decimal_point: char;
-    unit_sign_config: Cobol_data.Picture.TYPES.sign_config;
+    unit_display_sign_config: Cobol_data.Types.display_sign_config;
   }
 
 (* TODO: add a dedicated type to hold info from the INPUT-OUTPUT SECTION. Maybe
@@ -52,14 +62,14 @@ type unit_config =
 
 (* data items *)
 
-(** [data_definitions] exposes two views on the items (fields and tables) in DATA DIVISION: 
+(** [data_definitions] exposes two views on the items (fields and tables) in DATA DIVISION:
    - [data_items] contains all the items with direct access by name.
-   - [data_records] is a list of record trees where each element represents 
+   - [data_records] is a list of record trees where each element represents
       a record definition (typically a level 01 or 77 data item) *)
 type data_definitions =
   {
-    data_items: Cobol_data.Types.data_definition named_n_ordered; (* 
-      LATER: recheck if the list of ordered data_definition is useful here. 
+    data_items: Cobol_data.Types.data_definition named_n_ordered; (*
+      LATER: recheck if the list of ordered data_definition is useful here.
       All the structure information should already be accessible trhough [data_records]. *)
     data_records: Cobol_data.Types.record list;
   }

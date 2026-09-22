@@ -29,8 +29,10 @@ let empty_accumulator =
 let error acc err =
   { acc with diags = Proc_error err :: acc.diags }
 
-(** May raise {!Not_found} when [strict = true] (the default) *)
-let resolve_data_qualname ~data_definitions ?(strict = true)
+(** Emits a warning diagnostic on undefined data-name unless
+    [assume_partial_data_definitions] is explictly set to [true]. *)
+let resolve_data_qualname ~data_definitions
+    ?(assume_partial_data_definitions = false)
     ({ loc; payload = qn } as qn') acc =
   try
     let bnd = Resolver_map.find_binding qn data_definitions.data_items.named in
@@ -38,16 +40,16 @@ let resolve_data_qualname ~data_definitions ?(strict = true)
     { acc with
       refs = Typeck_outputs.register_data_qualref ~loc bnd.full_qn acc.refs }
   with
-  | Not_found when not strict ->
-      (* TODO: error acc @@ Undefined_data_item { qualname = qn' } *)
+  | Not_found ->
       Error (),
-      acc
+      if assume_partial_data_definitions
+      then acc                                 (* skip "undefined" diagnostic *)
+      else error acc @@ Undefined_data_name qn'
   | Resolver_map.Ambiguous (lazy matching_qualnames) ->
       Error (),
-      error acc @@ Ambiguous_data_name { given_qualname = qn &@ loc;
+      error acc @@ Ambiguous_data_name { given_qualname = qn';
                                          matching_qualnames }
 
-(** May raise {!Not_found} *)
 let resolve_record_name ~data_definitions name acc =
   let res, acc =
     resolve_data_qualname (Cobol_ptree.Name name &@<- name) acc
@@ -59,8 +61,8 @@ let resolve_record_name ~data_definitions name acc =
 let register_data_qualname ~data_definitions qn' acc =
   snd @@
   resolve_data_qualname ~data_definitions qn' acc
-    ~strict:false  (* ignore missing defs unfil we process all the DATA
-                      DIVISION. *)
+    ~assume_partial_data_definitions:true (* ignore missing defs unfil we
+                                             process all the DATA DIVISION. *)
 
 let register_name ~data_definitions name acc =
   register_data_qualname (Cobol_ptree.Name name &@<- name) acc

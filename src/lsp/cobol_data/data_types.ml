@@ -21,23 +21,112 @@ open Cobol_common.Srcloc.TYPES
 module NEL = Cobol_common.Basics.NEL
 type 'a nel = 'a NEL.t
 
+(** {2 Literals} *)
+
+type alphanum_literal =
+  {
+    alphanum_ptree: Cobol_ptree.alphanum [@compare fun _ _ -> 0];
+    alphanum_value: alphanum_value;
+    (** differs from [alphanum_ptree.given_str] iff [alphanum_ptree.hexadecimal]
+        holds *)
+  }
+
+and alphanum_value = string
+
+and boolean_literal =
+  {
+    bool_ptree: Cobol_ptree.boolean [@compare fun _ _ -> 0];
+    bool_value: boolean_value;
+  }
+
+and boolean_value =
+  {
+    bool_width: int;                                (** may be 0 *)
+    bool_bits: Z.t; [@printer Z.pp_print]           (** irrelevant if 0-width *)
+  }
+
+and integer_literal =
+  {
+    int_ptree: Cobol_ptree.integer [@compare fun _ _ -> 0];
+    int_value: integer_value;
+  }
+
+and integer_value = Z.t [@printer Z.pp_print]
+
+and fixed_literal =
+  {
+    fixed_ptree: Cobol_ptree.fixed [@compare fun _ _ -> 0];
+    fixed_value: fixed_value;
+  }
+
+and fixed_value = Q.t [@printer Q.pp_print]
+
+and floating_literal =
+  {
+    float_ptree: Cobol_ptree.floating [@compare fun _ _ -> 0];
+    float_value: floating_value;
+  }
+
+and floating_value =
+  {
+    float_significand: fixed_value;
+    float_exponent: int;                    (* 0 <= . <= 9999 in ISO/IEC 2014 *)
+  }
+
+(** Values that may come from literals only. *)
+and literal_value =
+  | Alphanum_value of alphanum_value
+  | Boolean_value of boolean_value
+  | Integer_value of integer_value
+  | Fixed_value of fixed_value
+  | Floating_value of floating_value
+  | Zero_value
+  | Space_value
+  | Quote_value
+  | Low_value
+  | High_value
+  | All_alphanum_value of alphanum_value
+
+[@@deriving ord]
+
+(** {2 Storage} *)
+
 type picture_config = Data_picture.TYPES.config
 type picture = Data_picture.t
 
 type usage =
-  | Binary of (* [`numeric] *) picture
-  | Binary_C_long of signedness                         (* GnuCOBOL *)
-  | Binary_char of signedness                           (* +COB2002 *)
-  | Binary_double of signedness                         (* +COB2002 *)
-  | Binary_long of signedness                           (* +COB2002 *)
-  | Binary_short of signedness                          (* +COB2002 *)
+  | Alphanumeric of                                   (* ALPHANUMERIC DISPLAY *)
+      {
+        picture: picture;
+        size: int;
+      }
+  | Binary of
+      {
+        picture: (* [`numeric] *) picture option;
+        signed: bool;
+        scaling: int;
+        byte_size: byte_size;
+        truncation: binary_truncation;
+        (* always_bigendian: bool;             (\** always use big-endian representation *)
+        (*                                         (COMP-5/X) *\) *)
+      }
   | Bit of (* [`boolean] *) picture
-  | Display of (* [any] *) picture
-  | Float_binary of { width: [`W32|`W64|`W128];                   (* +COB2002 *)
-                      endian: Cobol_ptree.endianness_mode }
-  | Float_decimal of { width: [`W16 | `W34];                      (* +COB2002 *)
-                       endian: Cobol_ptree.endianness_mode;
-                       encoding: Cobol_ptree.encoding_mode }
+  | Display_numeric of
+      {
+        picture: picture;
+        sign: display_sign;
+      }
+  | Float_binary of
+      {
+        width: [`W32|`W64|`W128];                                 (* +COB2002 *)
+        endian: Cobol_ptree.endianness_mode;
+      }
+  | Float_decimal of
+      {
+        width: [`W16 | `W34];                                     (* +COB2002 *)
+        endian: Cobol_ptree.endianness_mode;
+        encoding: Cobol_ptree.encoding_mode;
+      }
   | Float_extended                                                (* +COB2002 *)
   | Float_long                                                    (* +COB2002 *)
   | Float_short                                                   (* +COB2002 *)
@@ -54,17 +143,64 @@ type usage =
   | Pointer of Cobol_ptree.name with_loc option                        (* tmp *)
   | Program_pointer of Cobol_ptree.name with_loc option                (* tmp *)
 and signedness = { signed: bool }
+and binary_truncation =
+  | Truncate_to_digits of { digits: int }
+  | Truncate_to_native_size
+and byte_size =
+  | Byte_size
+  | Short_size
+  | Long_size
+  | Double_size
+  | Long_double_size
+  | C_long_size
+  | Custom_size of int                                    (* > 2, != 4, 8, 16 *)
+and display_sign =
+  | Display_unsigned
+  | Display_signed of display_sign_config
+and display_sign_config =
+  {
+    sign_position: display_sign_position;
+    sign_separate: bool;         (** [true] = separate character (extra byte) *)
+  }
+and display_sign_position = Leading | Trailing
 
 type data_storage =
-  | File of Cobol_ptree.name with_loc
+  | Generic_file of
+      {
+        file_name: Cobol_ptree.name with_loc;
+        file_record_size_info: file_record_size_info option;
+      }
+  | Sort_merge_file of
+      {
+        file_name: Cobol_ptree.name with_loc;
+      }
   | Local_storage
   | Working_storage
-  | Linkage                                                          (* file? *)
+  | Linkage
+
+and file_record_size_info =
+  | Fixed_record_size of
+      {
+        size: int with_loc;
+      }
+  | Varying_record_size of
+      {
+        min: int with_loc option;
+        max: int with_loc option;
+        depending: Cobol_ptree.qualname with_loc option;
+      }
+  | Bound_record_size of    (* either fixed or variable (implementor-defined) *)
+      {
+        min: int with_loc;
+        max: int with_loc;
+      }
 
 type length_variability =
   | Fixed_length
   | Variable_length
   (* Note: OCCURS DYNAMIC is considered fixed-length in ISO/IEC *)
+
+(** {2 Records} *)
 
 type record =
   {
@@ -89,9 +225,9 @@ and field_definition =
     field_layout: field_layout;
     field_length_variability: length_variability;
     field_conditions: condition_names; (** Named conditions on the value of this field. *)
-    field_redefines: Cobol_ptree.qualname with_loc option; (** 
-      Set iff this field is a redefinition. 
-      In that case this field appears inside item_redefinitions of the item it redefines. 
+    field_redefines: Cobol_ptree.qualname with_loc option; (**
+      Set iff this field is a redefinition.
+      In that case this field appears inside item_redefinitions of the item it redefines.
       Later, we may create instead a item_redefinition type. *)
     field_redefinitions: item_redefinitions; (** List of alternative definitions for this field *)
     field_has_definition_issues: bool;
@@ -101,7 +237,7 @@ and field_layout =
   | Elementary_field of
       {
         usage: usage;
-        init_value: Cobol_ptree.literal with_loc option;
+        init_value: literal_value with_loc option;
       }
   | Struct_field of
       {
@@ -116,8 +252,8 @@ and table_definition =
     table_range: table_range;
     table_init_values: Cobol_ptree.literal with_loc list;     (* list for now *)
     table_redefines: Cobol_ptree.qualname with_loc option; (* same as [field_redefines] but for tables *)
-    table_redefinitions: item_redefinitions; (** 
-      List of alternative definitions for the full table. 
+    table_redefinitions: item_redefinitions; (**
+      List of alternative definitions for the full table.
       Note that by default the typechecker generates a warning on table redefinition. *)
     table_has_definition_issues: bool;
   }
@@ -223,3 +359,29 @@ type data_definition =
       }
 
 (* screen: "_ OCCURS n TIMES" only. Max 2 dimensions. *)
+
+(** {2 Diagnostics} *)
+
+type error =
+  | Invalid of { loc: srcloc; stuff: invalid_stuff }
+  | Unsupported of { loc: srcloc; stuff: unsupported_stuff }
+  | Overlong_literal of { loc: srcloc;
+                          literal_string: string;
+                          max_length: int }       (* TODO: +kind *)
+
+and invalid_stuff =
+  | Character_in_literal of { literal_class: literal_class; char: char }
+
+and literal_class =
+  | Boolean
+  | Fixed
+  | Floating
+  | Hexadecimal
+  | Integer
+
+and unsupported_stuff =
+  | Figurative_constant: 'x. 'x Cobol_ptree.figurative -> unsupported_stuff
+  | National_literal
+  | Concatenation_of_literals              (* FIXME: may just be a user error *)
+
+type errors = error NEL.t

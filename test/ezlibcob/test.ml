@@ -1,0 +1,242 @@
+(**************************************************************************)
+(*                                                                        *)
+(*                        SuperBOL OSS Studio                             *)
+(*                                                                        *)
+(*  Copyright (c) 2022-2026 OCamlPro SAS                                  *)
+(*                                                                        *)
+(* All rights reserved.                                                   *)
+(* This source code is licensed under the GNU Affero General Public       *)
+(* License version 3 found in the LICENSE.md file in the root directory   *)
+(* of this source tree.                                                   *)
+(*                                                                        *)
+(**************************************************************************)
+
+open Ezlibcob.V1
+
+let module_name = CArray.of_string "test"
+let module_source = CArray.of_string "test.cob"
+let gc_version = CArray.of_string "3.3-dev"
+let module_formatted_date = CArray.of_string "juin 17 2026 23:13:30"
+let module_date = U32.of_int_unsafe 20260617
+let module_time = U32.of_int_unsafe 231330
+
+let rec test () =
+  test_ S32.zero
+
+and test_ _entry =
+
+  (* CANCEL callback *)
+  if _entry < S32.zero then
+    raise Exit;
+
+  (* Decimal structures *)
+  let d_0 = CobDecimal.create () in
+  let d_1 = CobDecimal.create () in
+
+  (* Call parameters *)
+  let cob_procedure_params =
+    CArray.create ~default:(CobField.null ())
+      (CPtr (CComp CobField.kind)) 1 in
+
+  (* Check initialized, check module allocated, set global pointer *)
+  let pmodule = CPtr.create (CPtr (CComp CobModule.kind)) in
+  let pglobal = CPtr.create (CPtr (CComp CobGlobal.kind)) in
+  let _res = cob_module_global_enter pmodule pglobal S32.zero S32.zero in
+
+  (* Module structure pointer *)
+  let module_ = CPtr.get pmodule in
+
+  (* Global variable pointer *)
+  let _global = CPtr.get pglobal in
+
+  (* Set address of module parameter list *)
+  CobModule.set_cob_procedure_params module_ (CArray.to_ptr cob_procedure_params);
+
+  (* Program initialization *)
+  test_module_init module_;
+
+  CobModule.set_collating_sequence module_ (CPtr.null UInt8);
+  CobModule.set_crt_status module_ (CobField.null ());
+  CobModule.set_cursor_pos module_ (CobField.null ());
+  CobModule.set_xml_code module_ (CobField.null ());
+  CobModule.set_xml_event module_ (CobField.null ());
+  CobModule.set_xml_information module_ (CobField.null ());
+  CobModule.set_xml_namespace module_ (CobField.null ());
+  CobModule.set_xml_namespace_prefix module_ (CobField.null ());
+  CobModule.set_xml_nnamespace module_ (CobField.null ());
+  CobModule.set_xml_nnamespace_prefix module_ (CobField.null ());
+  CobModule.set_xml_ntext module_ (CobField.null ());
+  CobModule.set_xml_text module_ (CobField.null ());
+  CobModule.set_json_code module_ (CobField.null ());
+  CobModule.set_json_status module_ (CobField.null ());
+
+  (* Initialize cancel callback *)
+  cob_set_cancel module_;
+
+  (* Allocate decimal numbers *)
+  let pd_0 = CPtr.create ~default:d_0 (CPtr (CComp CobDecimal.kind)) in
+  let pd_1 = CPtr.create ~default:d_1 (CPtr (CComp CobDecimal.kind)) in
+  cob_decimal_alloc [| pd_0; pd_1 |];
+
+  (* Increment module active  *)
+  CobModule.set_module_active module_
+    (U32.succ_unsafe (CobModule.get_module_active module_));
+
+  let digits_attrs ?(flags = U16.zero) n =
+    CobFieldAttr.create
+      ~type_:(CobFieldType.(to_u16 (enc COB_TYPE_NUMERIC_DISPLAY)))
+      ~digits:(U16.of_int_unsafe n)
+      ~scale:S16.zero
+      ~flags
+      ~pic:(CobPicSymbol.create ~symbol:'9' ~times_repeated:(S32.of_int_unsafe n))
+  and alphanum_attrs ?(flags = U16.zero) n =
+    CobFieldAttr.create
+      ~type_:(CobFieldType.(to_u16 (enc COB_TYPE_ALPHANUMERIC)))
+      ~digits:U16.zero
+      ~scale:S16.zero
+      ~flags
+      ~pic:(CobPicSymbol.create ~symbol:'X' ~times_repeated:(S32.of_int_unsafe n))
+  and group_attrs ?(flags = U16.zero) () =
+    CobFieldAttr.create
+      ~type_:(CobFieldType.(to_u16 (enc COB_TYPE_GROUP)))
+      ~digits:U16.zero
+      ~scale:S16.zero
+      ~flags
+      ~pic:(CobPicSymbol.null ())
+  in
+
+  let pic_array = CArray.create (CComp CobPicSymbol.kind) 3 in
+  let a1 = CArray.get_ptr pic_array 0 in
+  let a2 = CArray.get_ptr pic_array 1 in
+  CobPicSymbol.set_symbol a1 '9';
+  CobPicSymbol.set_times_repeated a1 S32.one;
+  CobPicSymbol.set_symbol a2 'X';
+  CobPicSymbol.set_times_repeated a1 (S32.of_int_unsafe 3);
+  let _dummy_attrs =
+    CobFieldAttr.create
+      ~type_:(CobFieldType.(to_u16 (enc COB_TYPE_GROUP)))
+      ~digits:U16.zero
+      ~scale:S16.zero
+      ~flags:(U16.of_int_unsafe 42)
+      ~pic:(CArray.to_ptr pic_array)
+  in
+
+  let a_1 = digits_attrs 3 in
+  let a_2 = alphanum_attrs  7 ~flags:CobFieldFlag.(to_u16 (enc COB_FLAG_CONSTANT)) in
+  let a_3 = group_attrs () in
+  let a_4 = alphanum_attrs 6 in
+
+  let b_c = CArray.create Char ~default:' ' 24 in
+  CArray.set_string b_c 0 "var1 = ";
+  CArray.set_string b_c 8 "var2 = ";
+  CArray.set_string b_c 16 "var3 = ";
+  let b_c' = CPtr.cast UInt8 (CArray.to_ptr b_c) in
+  let c_1 = CobField.create ~size:(U64.of_int_unsafe 7) ~attr:a_2
+              ~data:b_c' in
+  let c_2 = CobField.create ~size:(U64.of_int_unsafe 7) ~attr:a_2
+              ~data:(CPtr.add b_c' 8) in
+  let c_3 = CobField.create ~size:(U64.of_int_unsafe 7) ~attr:a_2
+              ~data:(CPtr.add b_c' 16) in
+
+  let b_w = CArray.create Char ~default:' ' 24 in
+  CArray.set_string b_w 0 "000000";
+  CArray.set_string b_w 8 "      ";
+  CArray.set_string b_w 16 "000";
+  let b_w' = CPtr.cast UInt8 (CArray.to_ptr b_w) in
+  let f_17 = CobField.create ~size:(U64.of_int_unsafe 6) ~attr:a_3
+               ~data:b_w' in
+  let f_18 = CobField.create ~size:(U64.of_int_unsafe 3) ~attr:a_1
+               ~data:b_w' in
+  let f_19 = CobField.create ~size:(U64.of_int_unsafe 3) ~attr:a_1
+               ~data:(CPtr.add b_w' 3) in
+  let f_20 = CobField.create ~size:(U64.of_int_unsafe 6) ~attr:a_4
+               ~data:(CPtr.add b_w' 8) in
+  let f_21 = CobField.create ~size:(U64.of_int_unsafe 3) ~attr:a_1
+               ~data:(CPtr.add b_w' 16) in
+
+  CArray.set_string b_w 0 "888";
+  cob_display S32.zero S32.one [| c_1; f_17 |];
+  CArray.set_string b_w 3 "999";
+  cob_display S32.zero S32.one [| c_1; f_17 |];
+
+  let b = CArray.of_string "var3 = var1.left + var1.right" in
+  let f = CobField.create ~size:(U64.of_int_unsafe 29) ~attr:a_2
+            ~data:(CPtr.cast UInt8 (CArray.to_ptr b)) in
+  cob_display S32.zero S32.one [| f |];
+
+  cob_decimal_set_field d_0 f_18;
+  cob_decimal_set_field d_1 f_19;
+  cob_decimal_add d_0 d_1;
+  let _res = cob_decimal_get_field d_0 f_21 S32.zero in
+
+  let b = CArray.of_string "memcpy var1 to var2" in
+  let f = CobField.create ~size:(U64.of_int_unsafe 19) ~attr:a_2
+            ~data:(CPtr.cast UInt8 (CArray.to_ptr b)) in
+  cob_display S32.zero S32.one [| f |];
+
+  CArray.blit b_w 0 b_w 8 6;
+
+  cob_display S32.zero S32.one [| c_1; f_17 |];
+  cob_display S32.zero S32.one [| c_2; f_20 |];
+  cob_display S32.zero S32.one [| c_3; f_21 |];
+
+  CobModule.set_module_active module_
+    (U32.pred_unsafe (CobModule.get_module_active module_));
+
+  cob_module_leave module_;
+
+  S32.zero
+
+and test_module_init module_ =
+
+  let cb_test = Callback.create_i32 test in
+  let module_entry = CobCallUnion.create_funcptr (Callback.cast cb_test) in
+
+  let cb_test_ = Callback.create_i32_i32 test_ in
+  let module_cancel = CobCallUnion.create_funcptr (Callback.cast cb_test_) in
+
+  let pcob_module_path = CPtr.create ~default:(CPtr.null Char) (CPtr Char) in
+
+  CobModule.set_module_name module_ (CArray.to_ptr module_name);
+  CobModule.set_module_formatted_date module_ (CArray.to_ptr module_formatted_date);
+  CobModule.set_module_source module_ (CArray.to_ptr module_source);
+  CobModule.set_gc_version module_ (CArray.to_ptr gc_version);
+  CobModule.set_module_entry module_ module_entry;
+  CobModule.set_module_cancel module_ module_cancel;
+  CobModule.set_module_ref_count module_ (CPtr.null UInt32);
+  CobModule.set_module_path module_ pcob_module_path;
+  CobModule.set_module_active module_ U32.zero;
+  CobModule.set_module_date module_ module_date;
+  CobModule.set_module_time module_ module_time;
+  CobModule.set_module_type module_ U32.zero;
+  CobModule.set_module_param_cnt module_ U32.zero;
+  CobModule.set_ebcdic_sign module_ U8.zero;
+  CobModule.set_decimal_point module_ (U8.of_char '.');
+  CobModule.set_currency_symbol module_ (U8.of_char '$');
+  CobModule.set_numeric_separator module_ (U8.of_char ',');
+  CobModule.set_flag_filename_mapping module_ U8.one;
+  CobModule.set_flag_binary_truncate module_ U8.one;
+  CobModule.set_flag_pretty_display module_ U8.one;
+  CobModule.set_flag_host_sign module_ U8.zero;
+  CobModule.set_flag_no_phys_canc module_ U8.one;
+  CobModule.set_flag_main module_ U8.one;
+  CobModule.set_flag_fold_call module_ U8.zero;
+  CobModule.set_flag_exit_program module_ U8.zero;
+  CobModule.set_flag_debug_trace module_ U8.zero;
+  CobModule.set_flag_dump_ready module_ U8.zero;
+  CobModule.set_xml_mode module_ U8.one;
+  CobModule.set_module_stmt module_ U32.zero;
+  CobModule.set_module_sources module_ (CPtr.null (CPtr Char))
+
+let () =
+
+  let argv = CArray.create (CPtr Char) 2 in
+  CArray.set argv 0 (CArray.to_ptr (CArray.of_string "main"));
+  CArray.set argv 1 (CPtr.null Char);
+
+  cob_init S32.one (CArray.to_ptr argv);
+  let _ =
+    try test ()
+    with Exit -> S32.zero
+  in
+  cob_stop_run S32.zero

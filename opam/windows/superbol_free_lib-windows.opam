@@ -2,7 +2,7 @@
 # Do not modify, or add to the `skip` field of `drom.toml`.
 opam-version: "2.0"
 name: "superbol_free_lib"
-version: "0.3.1"
+version: "1.0.1"
 license: "MIT"
 synopsis: "SuperBOL Studio OSS Project"
 description: "SuperBOL Studio OSS is a new platform for COBOL"
@@ -55,9 +55,9 @@ depends: [
   "superbol_preprocs-windows" {= version}
   "superbol_platform-windows" {= version}
   "sql_preproc-windows" {= version}
-  "lwt-windows" {>= "5"}
+  "lwt-windows" {>= "5" & < "5.9"}
   "ez_toml-windows" {= version}
-  "ez_file-windows" {>= "0.3"}
+  "ez_file-windows" {>= "0.4"}
   "ez_cmdliner-windows" {>= "0.3.0" & < "1.0.0"}
   "ez_api-windows" {>= "2.0"}
   "cobol_typeck-windows" {= version}
@@ -65,6 +65,8 @@ depends: [
   "cobol_lsp-windows" {= version}
   "cobol_indent-windows" {= version}
   "cobol_common-windows" {= version}
+  "ppx_cobcflags" {= version}
+  "cmdliner" {< "2"}
   "odoc" {with-doc}
   "dune" {>= "3.17.0" & < "3.19.0"}
 ]

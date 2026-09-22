@@ -122,8 +122,6 @@ rule token = parse
       { END_EXEC }
   | "end-exec"
       { END_EXEC }
-  | "END-EXEC."
-      { END_EXEC }
   | ':' (['a'-'z' 'A'-'Z']['A'-'Z' 'a'-'z' '0'-'9' '_' '-']* as s)
       { COBOL_VAR s }
   | '\\' (['a'-'z' 'A'-'Z']['A'-'Z' 'a'-'z' '0'-'9' '_']* as s)
@@ -167,7 +165,7 @@ rule token = parse
       { STAR }
   | ';'
       { SEMICOLON }
-  | ' '
+  | [ ' ' '\t' ]
       { token lexbuf }
   | _ as c
       { failwith (Printf.sprintf "unexpected character: %C" c) }

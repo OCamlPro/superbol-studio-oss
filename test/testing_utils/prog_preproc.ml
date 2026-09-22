@@ -14,22 +14,37 @@
 open EzCompat
 open Cobol_common.Srcloc.INFIX
 
+(** [config_with_tab_stops widths] is the default COBOL configuration, with its
+    [tab-width] option overridden with [widths] (see {!Cobol_config.Options}).
+    Tab stops are only reachable through the configuration (they are read in
+    [Cobol_preproc]'s engine via [Config.tab_stops#value]), so tests that need
+    non-default tab stops must go through a configuration module. *)
+let config_with_tab_stops widths: Cobol_config.t =
+  let module Default = (val Cobol_config.default: Cobol_config.T) in
+  (module struct
+    include Default
+    let tab_stops =
+      Cobol_config.Options.tab_stops#from_val
+        ~config:Cobol_config.{ name = "test" } widths
+  end)
+
 let options
-    ?(verbose = false) 
+    ?(verbose = false)
     ?(source_format = Cobol_config.(SF SFFixed))
     ?(copybooks = [])
+    ?tab_stops
     () =
-  let platform = 
+  let platform =
       { Prog_common.platform with verbosity = if verbose then 1 else 0 }
   in
   let platform = if copybooks = [] then platform else
       let copy_map = StringMap.of_list copybooks in
-      { platform with 
-        read_file = (fun file ->
+      { platform with
+        read_text_file = (fun file ->
             match StringMap.find_opt file copy_map with
             | Some contents -> contents
-            | None -> platform.read_file file);
-        find_lib = (fun ~lookup_config ?fromfile ?libname textname -> 
+            | None -> platform.read_text_file file);
+        find_lib = (fun ~lookup_config ?fromfile ?libname textname ->
             match textname with
             | `Alphanum w
             | `Word w ->
@@ -40,17 +55,24 @@ let options
         );
     }
   in
-  { (Cobol_preproc.Options.default ~platform)
-    with source_format }
+  let defaults = Cobol_preproc.Options.default ~platform in
+  { defaults with
+    source_format;
+    config = match tab_stops with
+      | None -> defaults.config
+      | Some widths -> config_with_tab_stops widths }
 
-let preprocess ?verbose ?(filename = "prog.cob") ?source_format ?copybooks contents =
+let preprocess
+    ?verbose ?(filename = "prog.cob") ?source_format ?copybooks ?tab_stops
+    contents =
   Cobol_preproc.Outputs.show_n_forget ~ppf:Fmt.stdout @@
   Cobol_preproc.preprocess_input
-    ~options:(options ?verbose ?source_format ?copybooks ()) @@
+    ~options:(options ?verbose ?source_format ?copybooks ?tab_stops ()) @@
   Cobol_preproc.Input.string ~filename contents
 
-let show_text ?verbose ?(filename = "prog.cob") ?source_format contents =
-  let options = options ?verbose ?source_format () in
+let show_text ?verbose ?(filename = "prog.cob") ?source_format ?tab_stops
+    contents =
+  let options = options ?verbose ?source_format ?tab_stops () in
   let text =
     Cobol_preproc.Outputs.show_n_forget ~ppf:Fmt.stdout @@
     Cobol_preproc.text_of_input ~options @@

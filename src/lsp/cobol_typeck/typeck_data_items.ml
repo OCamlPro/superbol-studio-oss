@@ -44,7 +44,7 @@ type acc =
     filler_count: int;
     definitions: Cobol_unit.Types.data_definitions;
     references: srcloc list Cobol_unit.Qual.MAP.t;
-    picture_config: Cobol_data.Types.picture_config;
+    data_config: Typeck_clauses.data_config;
     diags: Typeck_diagnostics.t;
   }
 and item_stack = item_under_construction list
@@ -73,6 +73,11 @@ and condition_name_under_construction =
 
 (* --- *)
 
+let int: Cobol_ptree.integer with_loc -> int with_loc =
+  Cobol_common.Srcloc.map_payload int_of_string
+
+let opt = Option.map
+
 let name = Cobol_unit.Qual.name
 let qual = Cobol_unit.Qual.qual
 let name_of = Cobol_unit.Qual.name_of
@@ -93,13 +98,15 @@ let init (config: unit_config) =
         data_records = [];
       };
     references = Cobol_unit.Qual.MAP.empty;
-    picture_config =
-      {
-        max_pic_length = 100;
-        decimal_char = config.unit_decimal_point;
-        currency_signs = config.unit_currency_signs;
-        sign_config = config.unit_sign_config;
-      };
+    data_config = {
+      picture_config =
+        {
+          max_pic_length = 100;
+          decimal_char = config.unit_decimal_point;
+          currency_signs = config.unit_currency_signs;
+        };
+      display_sign_config = config.unit_display_sign_config;
+    };
     diags = [];
   }
 
@@ -293,13 +300,10 @@ let check_inherited_usage ~item_name item_clauses item_stack =
       in
       diags, item_clauses
 
-
 let item_range ~item_qualifier
     (item_clauses: Typeck_clauses.data_clauses) (item_stack: item_stack) =
   let qualify_as_subordinate n = qual n item_qualifier &@<- n in
   let qualify n = qualify n item_stack in                         (* CHECKME! *)
-  let opt = Option.map in
-  let int = Cobol_common.Srcloc.map_payload int_of_string in
   let range = match Option.map (~&) item_clauses.occurs with
     | None ->
         None
@@ -356,16 +360,18 @@ let field_layout_n_size ~usage ~init_value { item_name;
   | [], Ok usage ->
       [],
       Elementary_field { usage; init_value },
-      Typeck_utils.size_of ~usage
+      Cobol_data.Usage.size usage
   | [], Error Some diag ->                                    (* missing usage *)
+      let picture = PIC.alphanumeric ~size:1 in
       [data_warning diag],
-      Elementary_field { usage = Display (PIC.alphanumeric ~size:1);
+      Elementary_field { usage = Alphanumeric { picture; size = 1 };
                          init_value = None },
       Cobol_data.Memory.byte_size
   | [], Error None ->        (* missing usage (reported as missing pic string) *)
+      let picture = PIC.alphanumeric ~size:1 in
       [data_error @@
        Missing_picture_clause_for_elementary_item { item_name; item_loc }],
-      Elementary_field { usage = Display (PIC.alphanumeric ~size:1);
+      Elementary_field { usage = Alphanumeric { picture; size = 1 };
                          init_value = None },
       Cobol_data.Memory.byte_size
   | flds, _ ->
@@ -394,7 +400,7 @@ let item_definition acc ({ item_name;
                            item_diagnostics; _ } as item) =
   let diags, usage, init_value =
     Typeck_clauses.to_usage_n_value item_clauses ~item_name ~item_loc
-      ~picture_config:acc.picture_config
+      ~data_config:acc.data_config
   in
   let diags', field_layout, field_size =
     field_layout_n_size item ~usage ~init_value
@@ -609,6 +615,17 @@ let on_redefinition_item acc item_clauses
               acc                                                       (* ok *)
         end acc redefined_item.item_rev_fields
       in
+      let acc, item_clauses =
+        match item_clauses.Typeck_clauses.value with
+        | None ->
+            acc, item_clauses
+        | Some c ->
+            warn acc @@
+            Ignored_clause_in_redefinition { clause_loc = ~@c;
+                                             clause_name = "VALUE";
+                                             redef_name = item_name },
+            { item_clauses with value = None }
+      in
       let item_diagnostics, item_clauses =
         check_inherited_usage ~item_name item_clauses base_stack
       and item_qualname = qualname item_name base_stack
@@ -640,7 +657,7 @@ let on_item acc ~at_level
                               data_clauses }; loc }
   =
   let item_clauses = Typeck_clauses.of_data_item data_clauses in
-  let item_diagnostics = item_clauses.clause_diags in
+  let item_diagnostics = item_clauses.data_clause_diags in
   match item_clauses.redefines with
   | Some redefined_name ->
       on_redefinition_item acc item_clauses
@@ -685,7 +702,8 @@ let on_item acc ~at_level
 
 
 let dummy_renamed_elementary =
-  Renamed_elementary { usage = Display (PIC.alphanumeric ~size:0) }
+  let picture = PIC.alphanumeric ~size:0 in
+  Renamed_elementary { usage = Alphanumeric { picture; size = 0 } }
 
 
 let report_occurs acc operand field =
@@ -749,10 +767,14 @@ let renaming acc
           let bits = Cobol_data.Memory.as_bits size_ in
           let size = bits / 8 in
           if size > 0 && bits mod 8 = 0 then
-            [], Renamed_elementary { usage = Display (PIC.alphanumeric ~size) }
+            let picture = PIC.alphanumeric ~size in
+            let usage = Alphanumeric { picture; size } in
+            [], Renamed_elementary { usage }
           else if size > 0 then
+            let picture = PIC.alphanumeric ~size in
+            let usage = Alphanumeric { picture; size } in
             [Invalid_renaming_size { loc; from_field; thru_field; bits }],
-            Renamed_elementary { usage = Display (PIC.alphanumeric ~size) }
+            Renamed_elementary { usage }
           else
             [Invalid_renaming_range { loc; from_field; thru_field }],
             dummy_renamed_elementary
@@ -817,19 +839,50 @@ let on_condition_name (cond_name: Cobol_ptree.condition_name_item with_loc) acc 
 
 (* --- *)
 
+(* TODO: add checks for RECORD clause *)
+let optional_fd_record_clause: Cobol_ptree.record_clause with_loc option -> _ = function
+  | None ->
+      None
+  | Some { payload = FixedLength i; _ } ->
+      Some (Fixed_record_size { size = int i })
+  | Some { payload = VariableLength { min_length = i;
+                                      max_length = j;
+                                      depending }; _ } ->
+      Some (Varying_record_size { min = opt int i;
+                                  max = opt int j;
+                                  depending })
+  | Some { payload = FixedOrVariableLength { min_length = i;
+                                             max_length = j }; _ } ->
+      Some (Bound_record_size { min = int i; max = int j })
+
+let file_storage Cobol_ptree.{ file_name; file_clauses; _ } acc =
+  match file_clauses with
+  | Cobol_ptree.FileSD _ ->
+      Sort_merge_file { file_name },
+      acc
+  | FileFD clauses ->
+      let fd_clauses = Typeck_clauses.of_fd clauses in
+      let fd_diagnostics = fd_clauses.fd_clause_diags in
+      let file_record_size_info = optional_fd_record_clause fd_clauses.fd_record in
+      Generic_file { file_name; file_record_size_info },
+      { acc with diags = Typeck_diagnostics.union acc.diags fd_diagnostics }
+
+(* --- *)
+
 
 let enter_section section acc =
   let acc = flush_item_stack acc in
   { acc with current_storage = section }
 
-let data_definitions = object
+let data_definitions_folder = object
   inherit [acc] Cobol_ptree.Visitor.folder
 
   method! fold_nested_programs _ =
     Visitor.skip
 
-  method! fold_file_descr { file_name; _ } acc =
-    Visitor.do_children @@ enter_section (File file_name) acc
+  method! fold_file_descr file_descr acc =
+    let file_storage, acc = file_storage file_descr acc in
+    Visitor.do_children @@ enter_section file_storage acc
   method! fold_working_storage_section _ acc =
     Visitor.do_children @@ enter_section Working_storage acc
   method! fold_local_storage_section _ acc =
@@ -842,8 +895,7 @@ let data_definitions = object
   method! fold_report_section _  = Visitor.skip
   method! fold_screen_section _  = Visitor.skip
 
-  method! fold_data_item' ({ payload = { data_level; _ };
-                             loc } as item) acc =
+  method! fold_data_item' ({ payload = { data_level; _ }; _ } as item) acc =
     Visitor.skip_children @@ match ~&data_level, acc.current_storage with
     | l, _ when 1 <= l && l <= 49 ->
         on_item ~at_level:~&data_level acc item                    (* regular *)
@@ -852,7 +904,7 @@ let data_definitions = object
     | 77, section ->
         error acc (Item_not_allowed_in_section { level = data_level; section })
     | 78, _ ->
-        error acc (Pending_feature { name = "level 78 constant item"; loc })
+        acc                                       (* handled by parser engine *)
     | _, _ ->
         error acc (Invalid_level_number { level = data_level })
 
@@ -882,6 +934,6 @@ end
 
 let of_compilation_unit config cu' =
   init config |>
-  Cobol_ptree.Visitor.fold_compilation_unit' data_definitions cu' |>
+  Cobol_ptree.Visitor.fold_compilation_unit' data_definitions_folder cu' |>
   flush_item_stack |>
   result

@@ -42,7 +42,7 @@
   (mode    promote)
   (action
     (with-stdout-to %{targets}
-       (run %{exe:./keywords/gen_keywords.exe} %{deps}
+       (run %{exe:../grammarware/keywords/gen_keywords.exe} %{deps}
             --external-tokens Grammar_tokens --with-is-intrinsic))))
 
 (rule
@@ -52,7 +52,7 @@
   (mode    promote)
   (action
     (with-stdout-to %{targets}
-       (run %{exe:./expect/gen_expect.exe} %{deps}
+       (run %{exe:../grammarware/expect/gen_expect.exe} %{deps}
             --external-tokens Grammar_tokens
             --extra-default-attribute-name recovery
             --nel-module Cobol_common.Basics.NEL))))
@@ -64,7 +64,7 @@
   (mode    promote)
   (action
     (with-stdout-to %{targets}
-       (run %{exe:./post/gen_post_actions.exe} %{deps}))))
+       (run %{exe:../grammarware/post/gen_post_actions.exe} %{deps}))))
 
 (rule
   (targets grammar_recover.ml)
@@ -73,7 +73,7 @@
   (mode    promote)
   (action
     (with-stdout-to %{targets}
-       (run %{exe:./recover/gen_recover.exe} %{deps}))))
+       (run %{exe:../grammarware/recover/gen_recover.exe} %{deps}))))
 
 (rule
   (targets grammar_contexts.ml)
@@ -82,7 +82,7 @@
   (mode promote)
   (action
     (with-stdout-to %{targets}
-      (run %{exe:./context/gen_contexts.exe} %{deps}
+      (run %{exe:../grammarware/context/gen_contexts.exe} %{deps}
         --external-tokens Grammar_tokens))))
 
 (rule
@@ -92,7 +92,7 @@
   (mode    promote)
   (action
     (with-stdout-to %{targets}
-       (run %{exe:./context/gen_context.exe} %{deps}))))
+       (run %{exe:../grammarware/context/gen_context.exe} %{deps}))))
 
 (rule
   (targets grammar_printer.ml)
@@ -101,5 +101,5 @@
   (mode    promote)
   (action
     (with-stdout-to %{targets}
-       (run %{exe:./printer/gen_printer.exe} %{deps}))))
+       (run %{exe:../grammarware/printer/gen_printer.exe} %{deps}))))
 

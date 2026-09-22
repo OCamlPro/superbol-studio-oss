@@ -1,0 +1,7 @@
+var1 = 888000
+var1 = 888999
+var3 = var1.left + var1.right
+memcpy var1 to var2
+var1 = 888999
+var2 = 888999
+var3 = 887

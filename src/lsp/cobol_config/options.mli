@@ -14,7 +14,7 @@
 (** Definition for all options *)
 open Types
 
-val tab_width: int value
+val tab_stops: int list value
 
 val text_column: int value
 

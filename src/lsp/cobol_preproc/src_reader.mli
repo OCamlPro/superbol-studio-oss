@@ -21,6 +21,7 @@ type t
 
 val from
   : ?source_format: Src_format.any
+  -> ?tab_stops:int list
   -> platform:Cobol_common.Platform.TYPES.platform
   -> Src_input.t
   -> t
@@ -29,7 +30,7 @@ val from
 
 val diags: t -> Src_diagnostics.t
 val position: t -> Lexing.position
-val input_file: t -> string option
+val input_filename: t -> string option
 val platform: t -> Cobol_common.Platform.TYPES.platform
 val source_format: t -> Src_format.any
 val rev_comments: t -> Text.comments
@@ -66,8 +67,16 @@ val with_source_format
     the input.} *)
 
 val restart_on_string
-  : ?source_format: Src_format.any -> ?position: Lexing.position
-  -> string -> t -> t
+  : ?tab_stops: int list
+  -> ?source_format: Src_format.any
+  -> ?position: Lexing.position
+  -> string
+  -> t
+  -> t
 val restart_on_channel
-  : ?source_format: Src_format.any -> ?position: Lexing.position
-  -> in_channel -> t -> t
+  : ?tab_stops: int list
+  -> ?source_format: Src_format.any
+  -> ?position: Lexing.position
+  -> in_channel
+  -> t
+  -> t

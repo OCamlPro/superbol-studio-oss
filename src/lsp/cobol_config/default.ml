@@ -60,8 +60,8 @@ module Default: Types.T = struct
 
   (* int options *)
   open Options
-  let tab_width
-    = tab_width#from_val ~config 8
+  let tab_stops
+    = tab_stops#from_val ~config [8]
   let text_column
     = text_column#from_val ~config 72
   let pic_length

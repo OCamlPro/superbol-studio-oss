@@ -4,7 +4,7 @@
 # Contributing
 
 ```
-yarn install
+npm install
 ```
 
 

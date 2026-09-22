@@ -25,7 +25,7 @@ type t = Plx: 'k reader -> t                                           [@@unboxe
 
 let diags (Plx (pl, _, _)) = Src_lexing.diagnostics pl
 let position (Plx (_, lexbuf, _)) = lexbuf.Lexing.lex_curr_p
-let input_file r = match (position r).pos_fname with "" -> None | s -> Some s
+let input_filename r = match (position r).pos_fname with "" -> None | s -> Some s
 let platform (Plx (_, _, platform)) = platform
 let source_format (Plx (pl, _, _)) = Src_format.SF (Src_lexing.source_format pl)
 let rev_comments (Plx (pl, _, _)) = Src_lexing.rev_comments pl
@@ -244,25 +244,17 @@ let print_lines ~dialect ?skip_compiler_directives_text ppf pl =
 
 (* --- *)
 
-let make make_lexing ?filename ~source_format ~platform input =
+let make make_lexing ?tab_stops ?filename ~source_format ~platform input =
   let Src_format.SF source_format = source_format in
   (* Be sure to provide position informations *)
   let lexbuf = make_lexing ?with_positions:(Some true) input in
   Option.iter (Lexing.set_filename lexbuf) filename;
-  Plx (Src_lexing.init_state source_format, lexbuf, platform)
+  Plx (Src_lexing.init_state ?tab_stops source_format, lexbuf, platform)
 
 (* --- *)
 
 let from_string = make Lexing.from_string
 let from_channel = make Lexing.from_channel
-
-let fill buff ~lookup_len (input: Src_input.t) =
-  match input.source with
-  | String str ->
-      Buffer.add_substring buff str 0 (min lookup_len (String.length str))
-  | Channel ic ->
-      (try Buffer.add_channel buff ic lookup_len with End_of_file -> ());
-      Stdlib.seek_in ic 0                        (* FIXME: may break on pipes *)
 
 let decide_on_source_format ~platform ?source_format input =
   match source_format with
@@ -271,28 +263,27 @@ let decide_on_source_format ~platform ?source_format input =
          pos_cnum. *)
       format
   | None ->
-      let autodetected_format =
-        platform.autodetect_format input.filename
-          ?source_contents:(match input.Src_input.source with
-              | String source_contents -> Some source_contents
-              | Channel _ -> None)
-      in
-      Src_format.from_config autodetected_format
+      (* TODO: skip any utf-8 BOM while shifting initial pos_cnum. *)
+      Src_format.from_config @@ platform.autodetect_format
+        ~filename:input.filename
+        ~source_contents:(match input.Src_input.source with
+            | String source_contents -> source_contents
+            | Channel ic -> platform.peek_channel_prefix ~len:20 ic)
 
-let from ?source_format ~platform (input: Src_input.t) =
+let from ?source_format ?tab_stops ~platform (input: Src_input.t) =
   let source_format = decide_on_source_format ~platform ?source_format input in
   match input with
   | { source = String contents; filename } ->
-      from_string ~source_format ~filename ~platform contents
+      from_string ?tab_stops ~source_format ~filename ~platform contents
   | { source = Channel ic; filename } ->
-      from_channel ~source_format ~filename ~platform ic
+      from_channel ?tab_stops ~source_format ~filename ~platform ic
 
 (* --- *)
 
 (** Note: If given, assumes [position] corresponds to the beginning of the
     input, which {e must} also be at the beginning of a line.  If absent,
     restarts from first position.  File name is kept from the previous input. *)
-let restart make_lexing make_input ?source_format ?position
+let restart make_lexing make_input ?tab_stops ?source_format ?position
     input (Plx (s, prev_lexbuf, platform)) =
   match position with
   | Some position when position.Lexing.pos_cnum > 0 ->
@@ -301,7 +292,7 @@ let restart make_lexing make_input ?source_format ?position
       Lexing.set_filename lexbuf position.Lexing.pos_fname;        (* useful? *)
       Plx (s, lexbuf, platform)
   | Some _ | None ->
-      from ?source_format ~platform @@
+      from ?source_format ?tab_stops ~platform @@
       make_input ~filename:prev_lexbuf.Lexing.lex_curr_p.pos_fname input
 
 let restart_on_string = restart Lexing.from_string Src_input.string

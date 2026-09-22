@@ -55,6 +55,25 @@ let%expect_test "tokens-with-attached-ampersand" =
     DISPLAY, WORD[A], &, X"00", ., DISPLAY, X"100", &, X"00", ., EOF
 |}];;
 
+let%expect_test "tokens-operators-after-parenthesis" =
+  (* Just check we extract tokens properly *)
+  Parser_testing.show_parsed_tokens {|
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       PROCEDURE DIVISION.
+           IF A >= 1 THEN DISPLAY "A" END-IF
+           IF A (>= 1 OR 2) THEN DISPLAY "A" END-IF
+           IF A ( >= 1 OR 2) THEN DISPLAY "A" END-IF
+           STOP RUN.
+  |};
+  [%expect {|
+    IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[prog], ., PROCEDURE,
+    DIVISION, ., IF, WORD[A], >=, DIGITS[1], THEN, DISPLAY, "A", END-IF, IF,
+    WORD[A], LPAR BEFORE RELOP, >=, DIGITS[1], OR, DIGITS[2], ), THEN, DISPLAY,
+    "A", END-IF, IF, WORD[A], LPAR BEFORE RELOP, >=, DIGITS[1], OR, DIGITS[2], ),
+    THEN, DISPLAY, "A", END-IF, STOP, RUN, ., EOF
+|}];;
+
 (* --- *)
 
 let%expect_test "token-locations" =
@@ -146,3 +165,46 @@ let%expect_test "token-locations-with-missing-program-id" =
       WORD[x]@<prog.cob:11-20|11-21>
       .@<prog.cob:11-21|11-22>
       EOF@<prog.cob:11-22|11-22> |}];;
+
+let%expect_test "tokens-with-tabs" =
+  Parser_testing.show_parsed_tokens ~source_format:Auto
+    ~parser_options:(Parser_testing.options ~verbose:true ())
+     "
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-RES PIC XXX.
+       01 WS-ORIG PIC X VALUE 8.
+       PROCEDURE DIVISION.
+       MAIN-PROC.
+       \t\tCOMPUTE\tWS-RES\t= WS-ORIG * 12\t.
+         STOP RUN.
+";
+    [%expect {|
+      Tks: IDENTIFICATION, DIVISION, .
+      Tks: PROGRAM-ID, ., INFO_WORD[prog], .
+      Incoming: {RECURSIVE}
+      Tks': ., INFO_WORD[prog], .
+      Tks: DATA, DIVISION, .
+      Outgoing: {RECURSIVE}
+      Tks: WORKING-STORAGE, SECTION, .
+      Tks: DIGITS[01], WORD[WS-RES], PICTURE, PICTURE_STRING[XXX], .
+      Tks: DIGITS[01], WORD[WS-ORIG], PICTURE, PICTURE_STRING[X], VALUE, DIGITS[8],
+           .
+      Tks: PROCEDURE, DIVISION, .
+      Tks':
+      Tks: WORD[MAIN-PROC], .
+      Tks: COMPUTE, WORD[WS-RES], =, WORD[WS-ORIG], *, DIGITS[12], .
+      Tks: STOP, RUN, .
+      Incoming: {NORMAL}
+      Tks': .
+      Outgoing: {NORMAL}
+      Tks: EOF
+      Tks':
+      IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[prog], ., DATA,
+      DIVISION, ., WORKING-STORAGE, SECTION, ., DIGITS[01], WORD[WS-RES], PICTURE,
+      PICTURE_STRING[XXX], ., DIGITS[01], WORD[WS-ORIG], PICTURE,
+      PICTURE_STRING[X], VALUE, DIGITS[8], ., PROCEDURE, DIVISION, .,
+      WORD[MAIN-PROC], ., COMPUTE, WORD[WS-RES], =, WORD[WS-ORIG], *, DIGITS[12],
+      ., STOP, RUN, ., EOF |}];;

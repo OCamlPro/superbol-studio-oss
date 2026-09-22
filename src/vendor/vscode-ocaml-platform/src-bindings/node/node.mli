@@ -167,6 +167,8 @@ module Fs : sig
 
   val writeFileSync : string -> string -> unit
 
+  val appendFileSync : string -> string -> unit
+
   val mkdirSync : string -> recursive:bool -> unit
 
   val unlinkSync : string -> unit

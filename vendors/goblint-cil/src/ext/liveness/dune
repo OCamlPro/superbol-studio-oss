@@ -1,0 +1,5 @@
+(library
+  (public_name goblint-cil.liveness)
+  (name liveness)
+  (libraries goblint-cil stdlib-shims)
+)

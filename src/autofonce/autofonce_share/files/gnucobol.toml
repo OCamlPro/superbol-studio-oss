@@ -1,0 +1,42 @@
+[project]
+# name to use to infer config
+name = "gnucobol"
+
+# files used to locate the project top directory
+#   and to set the AUTOFONCE_SOURCE_DIR
+source_anchors = [ "tests/testsuite.at", "!" ]
+
+# files used to locate the project build directory
+#   where the _autofonce/ directory will be created
+#   and to set the AUTOFONCE_BUILD_DIR
+build_anchors = [ "cobc/cobc", "!" ]
+
+build_dir_candidates = [ "_build" ]
+
+[testsuites]
+# alias = "path-from-topdir"
+[testsuites.testsuite]
+file = "tests/testsuite.at"
+path = [ "tests/testsuite.src"]
+env = "testsuite"
+
+[testsuites.nist]
+file = "tests/nistrun.at"
+path = [ "tests/nistrun.src"]
+env = "testsuite"
+
+[envs]
+# env_name = """..."""
+# env_name = "<path-to-env"
+testsuite = """
+# look at 'build_anchors' to see how the build dir is detected among upper dirs
+
+abs_builddir=${AUTOFONCE_BUILD_DIR}/tests
+
+# these files are generated during configure or first `make check`
+
+. ${abs_builddir}/atconfig
+. ${abs_builddir}/atlocal
+
+"""
+

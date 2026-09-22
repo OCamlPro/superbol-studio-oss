@@ -445,8 +445,15 @@ server and the VSCode extension from sources.
    make build-deps vsix-release
    ```
 
+## Premium Features
+
+SuperBOL Studio includes a set of Premium features, that are only
+available in paid editions.  Please contact superbol@ocamlpro.com for
+more information and commercial offers.
+
 ## Resources
 
 * Website: https://ocamlpro.github.io/superbol-studio-oss
-* General Documentation: https://ocamlpro.github.io/superbol-studio-oss/sphinx
+* User Manuals: https://superbol.eu/solutions/superbol-studio/user-manual
+* Developper Documentation: https://ocamlpro.github.io/superbol-studio-oss/sphinx
 * Sources: https://github.com/ocamlpro/superbol-studio-oss

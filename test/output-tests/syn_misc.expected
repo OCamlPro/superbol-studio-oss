@@ -1779,16 +1779,6 @@ syn_misc.at-5295-prog.cob:8.27-8.33:
   10          77  othervar  PIC X(const1).
 >> Error: Invalid syntax
 
-syn_misc.at-5295-prog.cob:9.26:
-   6          78  const1    value 115.
-   7          01  const2    CONSTANT 200.
-   8          78  const3    value const2.
-   9 >        78  const4    value const2 + const1.
-----                             ^
-  10          77  othervar  PIC X(const1).
-  11          01  var       PIC X(const2).
->> Hint: Missing <literal>
-
 syn_misc.at-5295-prog.cob:9.27-9.33:
    6          78  const1    value 115.
    7          01  const2    CONSTANT 200.

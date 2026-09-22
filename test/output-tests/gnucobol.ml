@@ -18,6 +18,8 @@ open Autofonce_core.Types
 open Testsuite_utils
 
 let () =
+  (* Be sure we can diff reference expected outputs: *)
+  Stdlib.set_binary_mode_out stdout true;
   Cobol_common.init_default_exn_printers ();
   (* Disable backtrace recording so `OCAMLRUNPARAM=b` has no effect on the
      output of tests that fail expectedly. *)
@@ -71,7 +73,7 @@ let make_n_enter_rundir () =
 (* Read the testsuite: should be named `testsuite` in `.autofonce` file *)
 
 let _pconf, _tconf, testsuite =
-  let toml = Filename.concat srcdir ".autofonce" in
+  let toml = EzFile.concat srcdir ".autofonce" in
   let contents = EzFile.read_file toml in
   let project_config =
     Project_config.from_string ~computed:false ~file:toml contents in
@@ -187,6 +189,7 @@ let default_parser_options =
 
 let do_check_parse (test_filename, contents, _, { check_loc;
                                                   check_command; _ }) =
+  let check_loc = { check_loc with file = Slashifier.slashify check_loc.file } in
   let filename = filename_for_loc test_filename check_loc in
   let terminate result_fmt =
     delete_file ~filename;

@@ -15,13 +15,25 @@ module TYPES: sig
   type lexloc = Lexing.position * Lexing.position
   type srcloc
   type copylocs
+  type src =
+    | Source_location of (srcloc [@compare fun _ _ -> 0])
+    | Process_parameter
+    | Process_environment
   type 'a with_loc = { payload: 'a; loc: srcloc; }          [@@deriving ord, show]
+  type 'a with_src =
+    {
+      src_payload: 'a;
+      src: src;
+    }                                                     [@@deriving ord, show]
 end
 type lexloc = TYPES.lexloc
 type srcloc = TYPES.srcloc
 type copylocs = TYPES.copylocs
+type src = TYPES.src
 type 'a with_loc = 'a TYPES.with_loc =
   { payload: 'a; loc: srcloc; }                                  [@@deriving ord]
+type 'a with_src = 'a TYPES.with_src =
+  { src_payload: 'a; src: src; }                                 [@@deriving ord]
 
 module INFIX: sig
   (* Meaning of letters:
@@ -104,9 +116,11 @@ val is_pointwise: srcloc -> bool
 val start_pos: srcloc -> Lexing.position    (* only suitable for Area A checks *)
 val start_pos_in: filename: string -> srcloc -> Lexing.position
 val end_pos_in: filename: string -> srcloc -> Lexing.position
+val shallow_start_pos: srcloc -> Lexing.position option
 
 val concat: srcloc -> srcloc -> srcloc
 val concat_srclocs: srcloc list -> srcloc option
+val append_srclocs: srcloc -> srcloc list -> srcloc
 val prefix: int -> srcloc -> srcloc
 val suffix: int -> srcloc -> srcloc
 val trunc_prefix: int -> srcloc -> srcloc
@@ -114,7 +128,9 @@ val trunc_suffix: int -> srcloc -> srcloc
 val sub : srcloc -> pos:int -> len:int -> srcloc
 
 val pp: 'a Pretty.printer -> 'a with_loc Pretty.printer
+val pp_src: src Pretty.printer
 val pp_with_loc: 'a Pretty.printer -> 'a with_loc Pretty.printer
+val pp_with_src: 'a Pretty.printer -> 'a with_src Pretty.printer
 val pp_raw_loc
   : ?platform:Platform.TYPES.platform
   -> (string * (int * int) * (int * int)) Pretty.printer
@@ -127,6 +143,10 @@ val as_pair: 'a with_loc -> 'a * srcloc
 val locfrom: 'a -> 'b with_loc -> 'a with_loc
 val map_payload: ('a -> 'b) -> 'a with_loc -> 'b with_loc
 val map_loc: (srcloc -> srcloc) -> 'a with_loc -> 'a with_loc
+
+val with_src: src:src -> 'a -> 'a with_src
+val with_loc_as_src: loc:srcloc -> 'a -> 'a with_src
+val lift_loc_as_src: 'a with_loc -> 'a with_src
 
 val lift_option: 'a option with_loc -> 'a with_loc option
 val lift_result: ('a, 'e) result with_loc -> ('a with_loc, 'e with_loc) result

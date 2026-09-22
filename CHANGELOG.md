@@ -3,11 +3,36 @@
 ## [_] Next release
 
 ### Added
+- Support tabs in source file [#591](https://github.com/OCamlPro/superbol-studio-oss/pull/591)
+- Unified internal epresentation of binary data items [#656](https://github.com/OCamlPro/superbol-studio-oss/pull/656)
+- Command to retrieve the directories that contain copybooks into the workspace settings [#654](https://github.com/OCamlPro/superbol-studio-oss/pull/654)
+- Command to analyze every COBOL file of the workspace [#653](https://github.com/OCamlPro/superbol-studio-oss/pull/653)
+- Detection of preprocessor variables that are of category numeric [#651](https://github.com/OCamlPro/superbol-studio-oss/pull/651)
+- Warning on ignored `VALUE` clause for items with `REDEFINES` clause [#650](https://github.com/OCamlPro/superbol-studio-oss/pull/650)
+- Handling of data item documentation that spans over several lines [#639](https://github.com/OCamlPro/superbol-studio-oss/pull/639)
+- Display of documentation for data items defined in copybooks [#641](https://github.com/OCamlPro/superbol-studio-oss/pull/641)
+- Parsing of abbreviated conditions in `EVALUATE WHEN` clauses [#638](https://github.com/OCamlPro/superbol-studio-oss/pull/638)
+- Support for 78-level data items [#634](https://github.com/OCamlPro/superbol-studio-oss/pull/634)
+
+### Fixed
+- Performances of the LSP server when many documents are opened and closed in a single session [#659](https://github.com/OCamlPro/superbol-studio-oss/pull/659)
+- Internal type of `CALL` arguments [#655](https://github.com/OCamlPro/superbol-studio-oss/pull/655)
+- Amount of references reported in codelens, that wrongly included declarations [#640](https://github.com/OCamlPro/superbol-studio-oss/pull/640)
+- Wrong codelens appearing on `COPY`s [#642](https://github.com/OCamlPro/superbol-studio-oss/pull/642)
+- Grammar rules for `VALUE OF` clause [#629](https://github.com/OCamlPro/superbol-studio-oss/pull/629) (fix for [Issue #625](https://github.com/OCamlPro/superbol-studio-oss/issues/625))
+
+
+## [1.0.0] First stable release (2026-07-23)
+
+### Added
+- Improvements of the parsed AST for expressions and conditions [#615](https://github.com/OCamlPro/superbol-studio-oss/pull/615)
 - Enforcement of Area A checks only when the source format is `COBOL85` [#555](https://github.com/OCamlPro/superbol-studio-oss/pull/555) [#556](https://github.com/OCamlPro/superbol-studio-oss/pull/556)
-- Support for COMP-6 usage [#548](https://github.com/OCamlPro/superbol-studio-oss/pull/548)
+- Support for USAGE `COMP-5` and `COMP-6` [#548](https://github.com/OCamlPro/superbol-studio-oss/pull/548) [#606](https://github.com/OCamlPro/superbol-studio-oss/pull/606)
 - Warnings on unsupported usage, where the reported data item size may be be wrong [#570](https://github.com/OCamlPro/superbol-studio-oss/pull/570)
 
 ### Fixed
+- Handling of some operators in abbreviated combined relation conditions [#611](https://github.com/OCamlPro/superbol-studio-oss/issues/611)
+- Misbehaviors of CFG visualization due to issues in underlying JS bindings [#596](https://github.com/OCamlPro/superbol-studio-oss/issues/596)
 - Details shown on hover of data items with definition issues [#575](https://github.com/OCamlPro/superbol-studio-oss/pull/575)
 - Handling of alphanumeric literals with UTF-8 characters in fixed-format COBOL code [#564](https://github.com/OCamlPro/superbol-studio-oss/pull/564)
 - Handling of queries about `LINKAGE` items given in `USING` phrases [#561](https://github.com/OCamlPro/superbol-studio-oss/pull/561)
@@ -17,7 +42,8 @@
 - Documentation and renaming to reduce confusion in the typed COBOL AST API [#576](https://github.com/OCamlPro/superbol-studio-oss/pull/576)
 
 ### Removed
-- Remove deprecated Cobol_data.OLD and Cobol_typeck.OLD [#592](https://github.com/OCamlPro/superbol-studio-oss/pull/592)
+- Remove deprecated `Cobol_data.OLD` and `Cobol_typeck.OLD` [#592](https://github.com/OCamlPro/superbol-studio-oss/pull/592)
+
 
 ## [0.3.0] Third release (2026-02-27)
 

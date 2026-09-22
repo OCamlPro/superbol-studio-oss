@@ -14,7 +14,7 @@
 open Lsp.Types
 open Lsp_testing
 
-let print_hovered ?(always_show_hover_definition_text_in_data_div=true)
+let print_hovered ?(show_hover_text_on_definitions = true)
     server ~projdir (prog, prog_positions) =
   let server, prog = add_cobol_doc server ~projdir "prog.cob" prog in
   let location_as_srcloc = new srcloc_resuscitator_cache in
@@ -25,7 +25,7 @@ let print_hovered ?(always_show_hover_definition_text_in_data_div=true)
       position.line position.character;
     match
       LSP.Request.INTERNAL.hover server params
-        ~always_show_hover_definition_text_in_data_div
+        ~show_hover_text_on_definitions
     with
     | None ->
         Pretty.out "Hovering nothing worthy@."
@@ -237,6 +237,7 @@ let%expect_test "hover-datadef-vars" =
           02 STR_|_UCT-2 PICTURE X VALUE QUOTE.
           02 STRUCT-3 PICTURE X(6) VAL_|_UE "ABC456".
         01 BIG_|_ PIC X(38) VALUE "************************************".
+        77 DATA-N_|_AME-BIS PIC S9(9)V9(9) COMP-5.
         PROCEDURE DIVISION.
           DISPLAY _|_DATA-NAME STRUC_|_T S_|_TRUCT-1 STR_|_UCT-2 STR_|_UCT-3
           STOP RUN.
@@ -311,7 +312,7 @@ let%expect_test "hover-datadef-vars" =
     ```cobol
     PIC 999 USAGE DISPLAY
     ```
-    NUMERIC(digits = 3, scale = 0, sign = unsigned)
+    NUMERIC(digits = 3, scale = 0, signed = false)
     *e.g,* [`000`] (0), [`123`] (123)
     VALUE 123
     ---
@@ -343,7 +344,7 @@ let%expect_test "hover-datadef-vars" =
       10 >           02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
     ----             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
       11           01 BIG PIC X(38) VALUE "************************************".
-      12           PROCEDURE DIVISION.
+      12           77 DATA-NAME-BIS PIC S9(9)V9(9) COMP-5.
     ```cobol
     STRUCT-3 IN STRUCT
     ```
@@ -361,8 +362,8 @@ let%expect_test "hover-datadef-vars" =
       10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
       11 >         01 BIG PIC X(38) VALUE "************************************".
     ----              ^^^
-      12           PROCEDURE DIVISION.
-      13             DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
+      12           77 DATA-NAME-BIS PIC S9(9)V9(9) COMP-5.
+      13           PROCEDURE DIVISION.
     ```cobol
     BIG
     ```
@@ -373,15 +374,34 @@ let%expect_test "hover-datadef-vars" =
     VALUE "************************************"
     ---
     References: 1
-    (line 12, character 18):
-    __rootdir__/prog.cob:13.18-13.27:
+    (line 11, character 17):
+    __rootdir__/prog.cob:12.11-12.24:
+       9             02 STRUCT-2 PICTURE X VALUE QUOTE.
       10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
       11           01 BIG PIC X(38) VALUE "************************************".
-      12           PROCEDURE DIVISION.
-      13 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
+      12 >         77 DATA-NAME-BIS PIC S9(9)V9(9) COMP-5.
+    ----              ^^^^^^^^^^^^^
+      13           PROCEDURE DIVISION.
+      14             DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
+    ```cobol
+    DATA-NAME-BIS
+    ```
+    ```cobol
+    PIC S9(9)V9(9) USAGE BINARY-DOUBLE
+    ```
+    NUMERIC(digits = 18, scale = 9, signed = true)
+    *e.g,* [`+000000000.000000000`] (0), [`+123456789.123000000`] (123456789.123)
+    ---
+    References: 1
+    (line 13, character 18):
+    __rootdir__/prog.cob:14.18-14.27:
+      11           01 BIG PIC X(38) VALUE "************************************".
+      12           77 DATA-NAME-BIS PIC S9(9)V9(9) COMP-5.
+      13           PROCEDURE DIVISION.
+      14 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
     ----                     ^^^^^^^^^
-      14             STOP RUN.
-      15
+      15             STOP RUN.
+      16
     ```cobol
     DATA-NAME
     ```
@@ -391,15 +411,15 @@ let%expect_test "hover-datadef-vars" =
     ALPHANUMERIC(1)
     ---
     References: 2
-    (line 12, character 33):
-    __rootdir__/prog.cob:13.28-13.34:
-      10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
+    (line 13, character 33):
+    __rootdir__/prog.cob:14.28-14.34:
       11           01 BIG PIC X(38) VALUE "************************************".
-      12           PROCEDURE DIVISION.
-      13 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
+      12           77 DATA-NAME-BIS PIC S9(9)V9(9) COMP-5.
+      13           PROCEDURE DIVISION.
+      14 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
     ----                               ^^^^^^
-      14             STOP RUN.
-      15
+      15             STOP RUN.
+      16
     ```cobol
     STRUCT
     ```
@@ -407,35 +427,35 @@ let%expect_test "hover-datadef-vars" =
     Size: 10 bytes
     ---
     References: 2
-    (line 12, character 36):
-    __rootdir__/prog.cob:13.35-13.43:
-      10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
+    (line 13, character 36):
+    __rootdir__/prog.cob:14.35-14.43:
       11           01 BIG PIC X(38) VALUE "************************************".
-      12           PROCEDURE DIVISION.
-      13 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
+      12           77 DATA-NAME-BIS PIC S9(9)V9(9) COMP-5.
+      13           PROCEDURE DIVISION.
+      14 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
     ----                                      ^^^^^^^^
-      14             STOP RUN.
-      15
+      15             STOP RUN.
+      16
     ```cobol
     STRUCT-1 IN STRUCT
     ```
     ```cobol
     PIC 999 USAGE DISPLAY
     ```
-    NUMERIC(digits = 3, scale = 0, sign = unsigned)
+    NUMERIC(digits = 3, scale = 0, signed = false)
     *e.g,* [`000`] (0), [`123`] (123)
     VALUE 123
     ---
     References: 2
-    (line 12, character 47):
-    __rootdir__/prog.cob:13.44-13.52:
-      10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
+    (line 13, character 47):
+    __rootdir__/prog.cob:14.44-14.52:
       11           01 BIG PIC X(38) VALUE "************************************".
-      12           PROCEDURE DIVISION.
-      13 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
+      12           77 DATA-NAME-BIS PIC S9(9)V9(9) COMP-5.
+      13           PROCEDURE DIVISION.
+      14 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
     ----                                               ^^^^^^^^
-      14             STOP RUN.
-      15
+      15             STOP RUN.
+      16
     ```cobol
     STRUCT-2 IN STRUCT
     ```
@@ -446,15 +466,15 @@ let%expect_test "hover-datadef-vars" =
     VALUE QUOTE
     ---
     References: 2
-    (line 12, character 56):
-    __rootdir__/prog.cob:13.53-13.61:
-      10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
+    (line 13, character 56):
+    __rootdir__/prog.cob:14.53-14.61:
       11           01 BIG PIC X(38) VALUE "************************************".
-      12           PROCEDURE DIVISION.
-      13 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
+      12           77 DATA-NAME-BIS PIC S9(9)V9(9) COMP-5.
+      13           PROCEDURE DIVISION.
+      14 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
     ----                                                        ^^^^^^^^
-      14             STOP RUN.
-      15
+      15             STOP RUN.
+      16
     ```cobol
     STRUCT-3 IN STRUCT
     ```
@@ -465,6 +485,41 @@ let%expect_test "hover-datadef-vars" =
     VALUE "ABC456"
     ---
     References: 2 |}];;
+
+let%expect_test "hover-datadef-value-with-tab" =
+  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  print_hovered server ~projdir @@ extract_position_markers {cobol|
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. prog.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 TAB-_|_ITEM PIC X(10) VALUE "ABC	DEF".
+        PROCEDURE DIVISION.
+          DISPLAY TAB-ITEM
+          STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[{"message":"Unexpected tab character in alphanumeric literal (visual column alignment may differ from character column in fixed-format source)","range":{"end":{"character":45,"line":5},"start":{"character":36,"line":5}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    (line 5, character 15):
+    __rootdir__/prog.cob:6.11-6.19:
+       3           PROGRAM-ID. prog.
+       4           DATA DIVISION.
+       5           WORKING-STORAGE SECTION.
+       6 >         01 TAB-ITEM PIC X(10) VALUE "ABC	DEF".
+    ----              ^^^^^^^^
+       7           PROCEDURE DIVISION.
+       8             DISPLAY TAB-ITEM
+    ```cobol
+    TAB-ITEM
+    ```
+    ```cobol
+    PIC X(10) USAGE DISPLAY
+    ```
+    ALPHANUMERIC(10)
+    VALUE "ABC\tDEF"
+    ---
+    References: 2 |}]
 
 let%expect_test "hover-datadef-vars-usage" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -505,7 +560,7 @@ let%expect_test "hover-datadef-vars-usage" =
     ```cobol
     PIC -BZZZ,ZZ9.99 USAGE DISPLAY
     ```
-    NUMERIC(digits = 8, scale = 2, sign = unsigned)
+    NUMERIC(digits = 8, scale = 2, signed = false)
     *e.g,* [`        0.00`] (0), [`  123,456.78`] (123456.78)
     ---
     References: 1
@@ -524,7 +579,7 @@ let%expect_test "hover-datadef-vars-usage" =
     ```cobol
     PIC 9 USAGE BINARY
     ```
-    NUMERIC(digits = 1, scale = 0, sign = unsigned)
+    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
     ---
     References: 1
@@ -610,7 +665,7 @@ let%expect_test "hover-datadef-vars-usage" =
     ```cobol
     PIC 9 USAGE PACKED-DECIMAL
     ```
-    NUMERIC(digits = 1, scale = 0, sign = unsigned)
+    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
     ---
     References: 1
@@ -629,7 +684,7 @@ let%expect_test "hover-datadef-vars-usage" =
     ```cobol
     PIC $++/+.+B+ USAGE DISPLAY
     ```
-    NUMERIC(digits = 4, scale = 2, sign = unsigned)
+    NUMERIC(digits = 4, scale = 2, signed = false)
     *e.g,* [`         `] (0), [`$+1/2.3 4`] (12.34)
     ---
     References: 1
@@ -932,7 +987,7 @@ let%expect_test "hover-datadef-renames" =
     ```cobol
     PIC 9 USAGE DISPLAY
     ```
-    NUMERIC(digits = 1, scale = 0, sign = unsigned)
+    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
     ---
     References: 2
@@ -952,7 +1007,7 @@ let%expect_test "hover-datadef-renames" =
     ```cobol
     PIC 9 USAGE DISPLAY
     ```
-    NUMERIC(digits = 1, scale = 0, sign = unsigned)
+    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
     ---
     References: 2
@@ -971,7 +1026,7 @@ let%expect_test "hover-datadef-renames" =
     ```cobol
     PIC 9 USAGE DISPLAY
     ```
-    NUMERIC(digits = 1, scale = 0, sign = unsigned)
+    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
     ---
     References: 4
@@ -1025,7 +1080,7 @@ let%expect_test "hover-datadef-renames" =
     ```cobol
     PIC 9 USAGE DISPLAY
     ```
-    NUMERIC(digits = 1, scale = 0, sign = unsigned)
+    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
     ---
     References: 2 |}];;
@@ -1087,7 +1142,7 @@ let%expect_test "hover-datadef-redefines" =
     ```cobol
     PIC 9 USAGE DISPLAY
     ```
-    NUMERIC(digits = 1, scale = 0, sign = unsigned)
+    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
     ---
     References: 2
@@ -1125,7 +1180,7 @@ let%expect_test "hover-datadef-redefines" =
     ```cobol
     PIC 9 USAGE DISPLAY
     ```
-    NUMERIC(digits = 1, scale = 0, sign = unsigned)
+    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
     ---
     References: 2
@@ -1466,6 +1521,473 @@ let%expect_test "hover-datadef-table-and-index" =
     ---
     References: 2 |}];;
 
+let%expect_test "hover-preproc-directives" =
+  Unix.putenv "ABCD" "ABCD-VALUE"; (* Warning: left in environment after the test *)
+  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let prog_n_markers =
+    extract_position_markers {cobol|
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       >>DEFINE _|_X AS 1
+       >>DEFINE _|_B AS b'10'
+       >>IF B_|_
+       77 WS VALUE "OK".
+       >>ELSE
+       77 WS VALUE "KO".
+       >>END-IF
+       >>DEFINE _|_ABCD AS PARAMETER
+       >>IF _|_ABCD IS DEFINED
+       >>END-IF
+      * Some documentation for bis
+      * ...
+      * on several lines.
+       >>DEFINE _|_BIS AS 42.24
+    |cobol}
+  in
+  print_hovered server ~projdir ~show_hover_text_on_definitions:false
+    prog_n_markers;
+  Pretty.out "Now with hover text on defintions@\n";
+  print_hovered server ~projdir ~show_hover_text_on_definitions:true
+    prog_n_markers;
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    (line 5, character 16):
+    __rootdir__/prog.cob:6.16-6.17:
+       3          PROGRAM-ID. prog.
+       4          DATA DIVISION.
+       5          WORKING-STORAGE SECTION.
+       6 >        >>DEFINE X AS 1
+    ----                   ^
+       7          >>DEFINE B AS b'10'
+       8          >>IF B
+    References: 1
+    (line 6, character 16):
+    __rootdir__/prog.cob:7.16-7.17:
+       4          DATA DIVISION.
+       5          WORKING-STORAGE SECTION.
+       6          >>DEFINE X AS 1
+       7 >        >>DEFINE B AS b'10'
+    ----                   ^
+       8          >>IF B
+       9          77 WS VALUE "OK".
+    References: 2
+    (line 7, character 13):
+    __rootdir__/prog.cob:8.12-8.13:
+       5          WORKING-STORAGE SECTION.
+       6          >>DEFINE X AS 1
+       7          >>DEFINE B AS b'10'
+       8 >        >>IF B
+    ----               ^
+       9          77 WS VALUE "OK".
+      10          >>ELSE
+    Compilation variable with value b"10"
+    ---
+    References: 2
+    (line 12, character 16):
+    __rootdir__/prog.cob:13.16-13.20:
+      10          >>ELSE
+      11          77 WS VALUE "KO".
+      12          >>END-IF
+      13 >        >>DEFINE ABCD AS PARAMETER
+    ----                   ^^^^
+      14          >>IF ABCD IS DEFINED
+      15          >>END-IF
+    References: 2
+    (line 13, character 12):
+    __rootdir__/prog.cob:14.12-14.16:
+      11          77 WS VALUE "KO".
+      12          >>END-IF
+      13          >>DEFINE ABCD AS PARAMETER
+      14 >        >>IF ABCD IS DEFINED
+    ----               ^^^^
+      15          >>END-IF
+      16         * Some documentation for bis
+    Compilation variable with value "ABCD-VALUE" (defined in process environment)
+    ---
+    References: 2
+    (line 18, character 16):
+    __rootdir__/prog.cob:19.16-19.19:
+      16         * Some documentation for bis
+      17         * ...
+      18         * on several lines.
+      19 >        >>DEFINE BIS AS 42.24
+    ----                   ^^^
+      20
+    References: 1
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    Now with hover text on defintions
+    (line 5, character 16):
+    __rootdir__/prog.cob:6.16-6.17:
+       3          PROGRAM-ID. prog.
+       4          DATA DIVISION.
+       5          WORKING-STORAGE SECTION.
+       6 >        >>DEFINE X AS 1
+    ----                   ^
+       7          >>DEFINE B AS b'10'
+       8          >>IF B
+    Compilation variable with value 1.0
+    ---
+    References: 1
+    (line 6, character 16):
+    __rootdir__/prog.cob:7.16-7.17:
+       4          DATA DIVISION.
+       5          WORKING-STORAGE SECTION.
+       6          >>DEFINE X AS 1
+       7 >        >>DEFINE B AS b'10'
+    ----                   ^
+       8          >>IF B
+       9          77 WS VALUE "OK".
+    Compilation variable with value b"10"
+    ---
+    References: 2
+    (line 7, character 13):
+    __rootdir__/prog.cob:8.12-8.13:
+       5          WORKING-STORAGE SECTION.
+       6          >>DEFINE X AS 1
+       7          >>DEFINE B AS b'10'
+       8 >        >>IF B
+    ----               ^
+       9          77 WS VALUE "OK".
+      10          >>ELSE
+    Compilation variable with value b"10"
+    ---
+    References: 2
+    (line 12, character 16):
+    __rootdir__/prog.cob:13.16-13.20:
+      10          >>ELSE
+      11          77 WS VALUE "KO".
+      12          >>END-IF
+      13 >        >>DEFINE ABCD AS PARAMETER
+    ----                   ^^^^
+      14          >>IF ABCD IS DEFINED
+      15          >>END-IF
+    Compilation variable with value "ABCD-VALUE" (defined in process environment)
+    ---
+    References: 2
+    (line 13, character 12):
+    __rootdir__/prog.cob:14.12-14.16:
+      11          77 WS VALUE "KO".
+      12          >>END-IF
+      13          >>DEFINE ABCD AS PARAMETER
+      14 >        >>IF ABCD IS DEFINED
+    ----               ^^^^
+      15          >>END-IF
+      16         * Some documentation for bis
+    Compilation variable with value "ABCD-VALUE" (defined in process environment)
+    ---
+    References: 2
+    (line 18, character 16):
+    __rootdir__/prog.cob:19.16-19.19:
+      16         * Some documentation for bis
+      17         * ...
+      18         * on several lines.
+      19 >        >>DEFINE BIS AS 42.24
+    ----                   ^^^
+      20
+    Compilation variable with value 42.24
+    ---
+     Some documentation for bis
+     ...
+     on several lines.
+    ---
+    References: 1
+  |}];;
+
+let%expect_test "hover-preproc-directives-numeric" =
+  Unix.putenv "ONE_HALF" "0.5"; (* Warning: left in environment after the test *)
+  Unix.putenv "ONE_OVER_2" "1/2"; (* Warning: left in environment after the test *)
+  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let prog_n_markers =
+    extract_position_markers {cobol|
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       >>DEFINE _|_ONE_HALF AS PARAMETER
+       >>IF ONE_HALF_|_ = 0000.5
+       77 WS VALUE "OK".
+       >>ELSE
+       77 WS VALUE "KO".
+       >>END-IF
+       >>DEFINE _|_ONE_OVER_2 AS PARAMETER
+       >>IF ONE_HALF <> ONE_OVER_2_|_
+       77 WX VALUE "KO".
+       >>ELSE
+       77 WX VALUE "OK".
+       >>END-IF
+       PROCEDURE DIVISION.
+         DISPLAY W_|_S W_|_X
+         GOBACK.
+    |cobol}
+  in
+  print_hovered server ~projdir ~show_hover_text_on_definitions:false
+    prog_n_markers;
+  Pretty.out "Now with hover text on defintions@\n";
+  print_hovered server ~projdir ~show_hover_text_on_definitions:true
+    prog_n_markers;
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    (line 5, character 16):
+    __rootdir__/prog.cob:6.16-6.24:
+       3          PROGRAM-ID. prog.
+       4          DATA DIVISION.
+       5          WORKING-STORAGE SECTION.
+       6 >        >>DEFINE ONE_HALF AS PARAMETER
+    ----                   ^^^^^^^^
+       7          >>IF ONE_HALF = 0000.5
+       8          77 WS VALUE "OK".
+    References: 3
+    (line 6, character 20):
+    __rootdir__/prog.cob:7.12-7.20:
+       4          DATA DIVISION.
+       5          WORKING-STORAGE SECTION.
+       6          >>DEFINE ONE_HALF AS PARAMETER
+       7 >        >>IF ONE_HALF = 0000.5
+    ----               ^^^^^^^^
+       8          77 WS VALUE "OK".
+       9          >>ELSE
+    Compilation variable with value 0.5 (defined in process environment)
+    ---
+    References: 3
+    (line 11, character 16):
+    __rootdir__/prog.cob:12.16-12.26:
+       9          >>ELSE
+      10          77 WS VALUE "KO".
+      11          >>END-IF
+      12 >        >>DEFINE ONE_OVER_2 AS PARAMETER
+    ----                   ^^^^^^^^^^
+      13          >>IF ONE_HALF <> ONE_OVER_2
+      14          77 WX VALUE "KO".
+    References: 2
+    (line 12, character 34):
+    __rootdir__/prog.cob:13.24-13.34:
+      10          77 WS VALUE "KO".
+      11          >>END-IF
+      12          >>DEFINE ONE_OVER_2 AS PARAMETER
+      13 >        >>IF ONE_HALF <> ONE_OVER_2
+    ----                           ^^^^^^^^^^
+      14          77 WX VALUE "KO".
+      15          >>ELSE
+    Compilation variable with value 0.5 (defined in process environment)
+    ---
+    References: 2
+    (line 18, character 18):
+    __rootdir__/prog.cob:19.17-19.19:
+      16          77 WX VALUE "OK".
+      17          >>END-IF
+      18          PROCEDURE DIVISION.
+      19 >          DISPLAY WS WX
+    ----                    ^^
+      20            GOBACK.
+      21
+    ```cobol
+    WS
+    ```
+    ```cobol
+    PIC XX USAGE DISPLAY
+    ```
+    ALPHANUMERIC(2)
+    VALUE "OK"
+    ---
+    References: 2
+    (line 18, character 21):
+    __rootdir__/prog.cob:19.20-19.22:
+      16          77 WX VALUE "OK".
+      17          >>END-IF
+      18          PROCEDURE DIVISION.
+      19 >          DISPLAY WS WX
+    ----                       ^^
+      20            GOBACK.
+      21
+    ```cobol
+    WX
+    ```
+    ```cobol
+    PIC XX USAGE DISPLAY
+    ```
+    ALPHANUMERIC(2)
+    VALUE "OK"
+    ---
+    References: 2
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    Now with hover text on defintions
+    (line 5, character 16):
+    __rootdir__/prog.cob:6.16-6.24:
+       3          PROGRAM-ID. prog.
+       4          DATA DIVISION.
+       5          WORKING-STORAGE SECTION.
+       6 >        >>DEFINE ONE_HALF AS PARAMETER
+    ----                   ^^^^^^^^
+       7          >>IF ONE_HALF = 0000.5
+       8          77 WS VALUE "OK".
+    Compilation variable with value 0.5 (defined in process environment)
+    ---
+    References: 3
+    (line 6, character 20):
+    __rootdir__/prog.cob:7.12-7.20:
+       4          DATA DIVISION.
+       5          WORKING-STORAGE SECTION.
+       6          >>DEFINE ONE_HALF AS PARAMETER
+       7 >        >>IF ONE_HALF = 0000.5
+    ----               ^^^^^^^^
+       8          77 WS VALUE "OK".
+       9          >>ELSE
+    Compilation variable with value 0.5 (defined in process environment)
+    ---
+    References: 3
+    (line 11, character 16):
+    __rootdir__/prog.cob:12.16-12.26:
+       9          >>ELSE
+      10          77 WS VALUE "KO".
+      11          >>END-IF
+      12 >        >>DEFINE ONE_OVER_2 AS PARAMETER
+    ----                   ^^^^^^^^^^
+      13          >>IF ONE_HALF <> ONE_OVER_2
+      14          77 WX VALUE "KO".
+    Compilation variable with value 0.5 (defined in process environment)
+    ---
+    References: 2
+    (line 12, character 34):
+    __rootdir__/prog.cob:13.24-13.34:
+      10          77 WS VALUE "KO".
+      11          >>END-IF
+      12          >>DEFINE ONE_OVER_2 AS PARAMETER
+      13 >        >>IF ONE_HALF <> ONE_OVER_2
+    ----                           ^^^^^^^^^^
+      14          77 WX VALUE "KO".
+      15          >>ELSE
+    Compilation variable with value 0.5 (defined in process environment)
+    ---
+    References: 2
+    (line 18, character 18):
+    __rootdir__/prog.cob:19.17-19.19:
+      16          77 WX VALUE "OK".
+      17          >>END-IF
+      18          PROCEDURE DIVISION.
+      19 >          DISPLAY WS WX
+    ----                    ^^
+      20            GOBACK.
+      21
+    ```cobol
+    WS
+    ```
+    ```cobol
+    PIC XX USAGE DISPLAY
+    ```
+    ALPHANUMERIC(2)
+    VALUE "OK"
+    ---
+    References: 2
+    (line 18, character 21):
+    __rootdir__/prog.cob:19.20-19.22:
+      16          77 WX VALUE "OK".
+      17          >>END-IF
+      18          PROCEDURE DIVISION.
+      19 >          DISPLAY WS WX
+    ----                       ^^
+      20            GOBACK.
+      21
+    ```cobol
+    WX
+    ```
+    ```cobol
+    PIC XX USAGE DISPLAY
+    ```
+    ALPHANUMERIC(2)
+    VALUE "OK"
+    ---
+    References: 2
+  |}];;
+
+let%expect_test "hover-datadef-78" =
+  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  print_hovered server ~projdir @@ extract_position_markers {cobol|
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       78 CO_|_NST VALUE "ABCD".
+      *Note: currently handled as hovering over `01 VAR ... CONST.`
+       77 VAR VALUE CON_|_ST.
+       PROCEDURE DIVISION.
+           DISPLAY "VAR: " _|_VAR ", CONST: " CON_|_ST
+           STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    (line 5, character 12):
+    __rootdir__/prog.cob:6.7-6.28:
+       3          PROGRAM-ID. prog.
+       4          DATA DIVISION.
+       5          WORKING-STORAGE SECTION.
+       6 >        78 CONST VALUE "ABCD".
+    ----          ^^^^^^^^^^^^^^^^^^^^^
+       7         *Note: currently handled as hovering over `01 VAR ... CONST.`
+       8          77 VAR VALUE CONST.
+    Compilation variable with value "ABCD"
+    ---
+    References: 3
+    (line 7, character 23):
+    __rootdir__/prog.cob:8.7-8.26:
+       5          WORKING-STORAGE SECTION.
+       6          78 CONST VALUE "ABCD".
+       7         *Note: currently handled as hovering over `01 VAR ... CONST.`
+       8 >        77 VAR VALUE CONST.
+    ----          ^^^^^^^^^^^^^^^^^^^
+       9          PROCEDURE DIVISION.
+      10              DISPLAY "VAR: " VAR ", CONST: " CONST
+    ```cobol
+    VAR
+    ```
+    ```cobol
+    PIC X(4) USAGE DISPLAY
+    ```
+    ALPHANUMERIC(4)
+    VALUE "ABCD"
+    ---
+    Note: currently handled as hovering over `01 VAR ... CONST.`
+    ---
+    References: 2
+    (line 9, character 27):
+    __rootdir__/prog.cob:10.27-10.30:
+       7         *Note: currently handled as hovering over `01 VAR ... CONST.`
+       8          77 VAR VALUE CONST.
+       9          PROCEDURE DIVISION.
+      10 >            DISPLAY "VAR: " VAR ", CONST: " CONST
+    ----                              ^^^
+      11              STOP RUN.
+      12
+    ```cobol
+    VAR
+    ```
+    ```cobol
+    PIC X(4) USAGE DISPLAY
+    ```
+    ALPHANUMERIC(4)
+    VALUE "ABCD"
+    ---
+    Note: currently handled as hovering over `01 VAR ... CONST.`
+    ---
+    References: 2
+    (line 9, character 46):
+    __rootdir__/prog.cob:10.43-10.48:
+       7         *Note: currently handled as hovering over `01 VAR ... CONST.`
+       8          77 VAR VALUE CONST.
+       9          PROCEDURE DIVISION.
+      10 >            DISPLAY "VAR: " VAR ", CONST: " CONST
+    ----                                              ^^^^^
+      11              STOP RUN.
+      12
+    Compilation variable with value "ABCD"
+    ---
+    References: 3
+  |}];;
+
 let%expect_test "hover-datadef-communication-section" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
   print_hovered server ~projdir @@ extract_position_markers {cobol|
@@ -1504,40 +2026,46 @@ let%expect_test "hover-comment" =
          02 VAL-1 PIC X. *> val1 only inline comment
       * val2 only line comment
          02 VAL-2 PIC X.
+      * val3 several line
+      * comments
+         02 VAL-3 PIC X.
+      * val4 several line
+      * comments and...
+         02 VAL-4 PIC X. *> an inline comment.
        PROCEDURE DIVISION.
-         DISPLAY S_|_TRUCT V_|_AL-1 V_|_AL-2.
+         DISPLAY S_|_TRUCT V_|_AL-1 V_|_AL-2 V_|_AL-3 V_|_AL-4.
          STOP RUN.
     |cobol};
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-    (line 12, character 18):
-    __rootdir__/prog.cob:13.17-13.23:
-      10         * val2 only line comment
-      11            02 VAL-2 PIC X.
-      12          PROCEDURE DIVISION.
-      13 >          DISPLAY STRUCT VAL-1 VAL-2.
+    (line 18, character 18):
+    __rootdir__/prog.cob:19.17-19.23:
+      16         * comments and...
+      17            02 VAL-4 PIC X. *> an inline comment.
+      18          PROCEDURE DIVISION.
+      19 >          DISPLAY STRUCT VAL-1 VAL-2 VAL-3 VAL-4.
     ----                    ^^^^^^
-      14            STOP RUN.
-      15
+      20            STOP RUN.
+      21
     ```cobol
     STRUCT
     ```
-    Group of 2 subfields
-    Size: 2 bytes
+    Group of 4 subfields
+    Size: 4 bytes
     ---
      inline comment
     ---
     References: 2
-    (line 12, character 25):
-    __rootdir__/prog.cob:13.24-13.29:
-      10         * val2 only line comment
-      11            02 VAL-2 PIC X.
-      12          PROCEDURE DIVISION.
-      13 >          DISPLAY STRUCT VAL-1 VAL-2.
+    (line 18, character 25):
+    __rootdir__/prog.cob:19.24-19.29:
+      16         * comments and...
+      17            02 VAL-4 PIC X. *> an inline comment.
+      18          PROCEDURE DIVISION.
+      19 >          DISPLAY STRUCT VAL-1 VAL-2 VAL-3 VAL-4.
     ----                           ^^^^^
-      14            STOP RUN.
-      15
+      20            STOP RUN.
+      21
     ```cobol
     VAL-1 IN STRUCT
     ```
@@ -1549,15 +2077,15 @@ let%expect_test "hover-comment" =
      val1 only inline comment
     ---
     References: 2
-    (line 12, character 31):
-    __rootdir__/prog.cob:13.30-13.35:
-      10         * val2 only line comment
-      11            02 VAL-2 PIC X.
-      12          PROCEDURE DIVISION.
-      13 >          DISPLAY STRUCT VAL-1 VAL-2.
+    (line 18, character 31):
+    __rootdir__/prog.cob:19.30-19.35:
+      16         * comments and...
+      17            02 VAL-4 PIC X. *> an inline comment.
+      18          PROCEDURE DIVISION.
+      19 >          DISPLAY STRUCT VAL-1 VAL-2 VAL-3 VAL-4.
     ----                                 ^^^^^
-      14            STOP RUN.
-      15
+      20            STOP RUN.
+      21
     ```cobol
     VAL-2 IN STRUCT
     ```
@@ -1567,6 +2095,47 @@ let%expect_test "hover-comment" =
     ALPHANUMERIC(1)
     ---
      val2 only line comment
+    ---
+    References: 2
+    (line 18, character 37):
+    __rootdir__/prog.cob:19.36-19.41:
+      16         * comments and...
+      17            02 VAL-4 PIC X. *> an inline comment.
+      18          PROCEDURE DIVISION.
+      19 >          DISPLAY STRUCT VAL-1 VAL-2 VAL-3 VAL-4.
+    ----                                       ^^^^^
+      20            STOP RUN.
+      21
+    ```cobol
+    VAL-3 IN STRUCT
+    ```
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
+    ALPHANUMERIC(1)
+    ---
+     val3 several line
+     comments
+    ---
+    References: 2
+    (line 18, character 43):
+    __rootdir__/prog.cob:19.42-19.47:
+      16         * comments and...
+      17            02 VAL-4 PIC X. *> an inline comment.
+      18          PROCEDURE DIVISION.
+      19 >          DISPLAY STRUCT VAL-1 VAL-2 VAL-3 VAL-4.
+    ----                                             ^^^^^
+      20            STOP RUN.
+      21
+    ```cobol
+    VAL-4 IN STRUCT
+    ```
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
+    ALPHANUMERIC(1)
+    ---
+     an inline comment.
     ---
     References: 2 |}];;
 
@@ -1611,11 +2180,13 @@ let%expect_test "hover-comment-copy" =
     ```
     ALPHANUMERIC(1)
     ---
+     copy inline comment
+    ---
     References: 2 |}]
 
 let%expect_test "hover-data-division-ref-count-only" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
-  print_hovered ~always_show_hover_definition_text_in_data_div:false
+  print_hovered ~show_hover_text_on_definitions:false
     server ~projdir @@ extract_position_markers {cobol|
        IDENTIFICATION DIVISION.
        PROGRAM-ID. prog.
@@ -1674,3 +2245,80 @@ let%expect_test "hover-procedure-using" =
     ALPHANUMERIC(1)
     ---
     References: 3 |}]
+
+
+let%expect_test "78-level-in-copybook" =
+  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let server,    _ = add_cobol_doc server ~projdir "lib.cpy" {cobol|
+       >> DEFINE X AS "CONST"
+       78 A VALUE "ABC".
+  |cobol} in
+  print_hovered server ~projdir @@ extract_position_markers {cobol|
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       COPY lib. *> inline comment
+       PROCEDURE DIVISION.
+          DISPLAY _|_A
+          STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect{|
+    {"params":{"message":"file://__rootdir__/lib.cpy appears to be a copybook","type":4},"method":"window/logMessage","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/lib.cpy"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    (line 7, character 18):
+    __rootdir__/prog.cob:8.18-8.19:
+       5          WORKING-STORAGE SECTION.
+       6          COPY lib. *> inline comment
+       7          PROCEDURE DIVISION.
+       8 >           DISPLAY A
+    ----                     ^
+       9             STOP RUN.
+      10
+    Compilation variable with value "ABC"
+    ---
+    References: 2 |}]
+
+let%expect_test "78-level-in-copybook-with-replacement" =
+  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let server,    _ = add_cobol_doc server ~projdir "lib.cpy" {cobol|
+       78 A VALUE "A".
+  |cobol} in
+  print_hovered server ~projdir @@ extract_position_markers {cobol|
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       COPY lib REPLACING ==A== BY ==B==. *> inline comment
+       77 C PIC 9 VALUE B.
+       PROCEDURE DIVISION.
+          DISPLAY _|_C
+          STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect{|
+    {"params":{"message":"file://__rootdir__/lib.cpy appears to be a copybook","type":4},"method":"window/logMessage","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/lib.cpy"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    (line 8, character 18):
+    __rootdir__/prog.cob:9.18-9.19:
+       6          COPY lib REPLACING ==A== BY ==B==. *> inline comment
+       7          77 C PIC 9 VALUE B.
+       8          PROCEDURE DIVISION.
+       9 >           DISPLAY C
+    ----                     ^
+      10             STOP RUN.
+      11
+    ```cobol
+    C
+    ```
+    ```cobol
+    PIC 9 USAGE DISPLAY
+    ```
+    NUMERIC(digits = 1, scale = 0, signed = false)
+    *e.g,* [`0`] (0), [`1`] (1)
+    VALUE "A"
+    ---
+    References: 2 |}]

@@ -151,6 +151,13 @@ let lsp_request ~meth ~data instance =
     Promise.Result.return result
   end
 
+let lsp_notification ~meth ~data instance =
+  match client instance with
+  | None -> ()
+  | Some client ->
+      Vscode_languageclient.LanguageClient.sendNotification client meth
+        (Jsonoo.t_to_js data)
+
 let get_project_config instance =
   match Vscode.Window.activeTextEditor () with
   | None ->

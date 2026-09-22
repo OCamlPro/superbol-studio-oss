@@ -52,7 +52,7 @@ let server_command ~server_prefix ~context ?cmd () =
     (* Use the global state URI as the server stores caches on a per-project
        basis (ie. for each workspace directory), not on a per-workspace
        basis. *)
-    if Superbol_workspace.bool "cacheInGlobalStorage"
+    if Superbol_config.bool "cacheInGlobalStorage"
     then Some (Vscode.ExtensionContext.globalStorageUri context)
     else None
   in
@@ -71,7 +71,7 @@ let server_command ~server_prefix ~context ?cmd () =
       Node.Process.Env.env
   in
   let args =
-    let force_diagnostics = Superbol_workspace.bool "forceSyntaxDiagnostics" in
+    let force_diagnostics = Superbol_config.bool "forceSyntaxDiagnostics" in
     "lsp" ::
     (if force_diagnostics then ["--force-syntax-diagnostics"] else []) @
     (match storage_uri with
@@ -92,7 +92,7 @@ let server_command ~server_prefix ~context ?cmd () =
 
 
 let server_access ~context ~server_prefix =
-  match Superbol_workspace.superbol_exe () with
+  match Superbol_config.superbol_exe () with
   | None ->
       server_command ~server_prefix ~context ()
   | Some cmd ->

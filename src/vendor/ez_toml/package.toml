@@ -54,12 +54,13 @@ skip = [ "main.ml" ]
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
 ocplib_stuff = ""
-ez_file = "0.3"
+ez_file = "0.4"
 ISO8601 = ">=0.2"
 menhirLib = ">2019"
 
 # package tools dependencies
 [tools]
+menhir = ">=20231231 <20240715"
 
 # package fields (depends on package skeleton)
 #Examples:

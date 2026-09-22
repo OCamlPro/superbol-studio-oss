@@ -121,186 +121,6 @@ run_file.at-2109-prog.cob:22.16-22.24:
   24              .
 >> Error: Invalid syntax
 
-run_file.at-2109-prog.cob:80.54:
-  77              05  FILLER PIC X(8) VALUE "PRE00000".
-  78   
-  79            02  DATA-CUST-NUM REDEFINES DATA-CUST-NUM-TBL
-  80 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                         ^
-  81            02  DATA-COMPANY-TBL.
-  82   
->> Hint: Missing <integer literal>
-
-run_file.at-2109-prog.cob:80.55-80.62:
-  77              05  FILLER PIC X(8) VALUE "PRE00000".
-  78   
-  79            02  DATA-CUST-NUM REDEFINES DATA-CUST-NUM-TBL
-  80 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                          ^^^^^^^
-  81            02  DATA-COMPANY-TBL.
-  82   
->> Error: Invalid syntax
-
-run_file.at-2109-prog.cob:101.55:
-  98              05  FILLER PIC X(25) VALUE "PRESTIGE OFFICE FURNITURE".
-  99   
- 100            02  DATA-COMPANY  REDEFINES DATA-COMPANY-TBL
- 101 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                          ^
- 102            02  DATA-ADDRESS-1-TBL.
- 103   
->> Hint: Missing <integer literal>
-
-run_file.at-2109-prog.cob:101.56-101.63:
-  98              05  FILLER PIC X(25) VALUE "PRESTIGE OFFICE FURNITURE".
-  99   
- 100            02  DATA-COMPANY  REDEFINES DATA-COMPANY-TBL
- 101 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 102            02  DATA-ADDRESS-1-TBL.
- 103   
->> Error: Invalid syntax
-
-run_file.at-2109-prog.cob:122.55:
- 119              05  FILLER PIC X(25) VALUE "114A MAPLE GROVE         ".
- 120   
- 121            02  DATA-ADDRESS-1 REDEFINES DATA-ADDRESS-1-TBL
- 122 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                          ^
- 123            02  DATA-ADDRESS-2-TBL.
- 124   
->> Hint: Missing <integer literal>
-
-run_file.at-2109-prog.cob:122.56-122.63:
- 119              05  FILLER PIC X(25) VALUE "114A MAPLE GROVE         ".
- 120   
- 121            02  DATA-ADDRESS-1 REDEFINES DATA-ADDRESS-1-TBL
- 122 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 123            02  DATA-ADDRESS-2-TBL.
- 124   
->> Error: Invalid syntax
-
-run_file.at-2109-prog.cob:143.55:
- 140              05  FILLER PIC X(10) VALUE "WHITEPLAIN".
- 141   
- 142            02  DATA-ADDRESS-2 REDEFINES DATA-ADDRESS-2-TBL
- 143 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                          ^
- 144            02  DATA-ADDRESS-3-TBL.
- 145   
->> Hint: Missing <integer literal>
-
-run_file.at-2109-prog.cob:143.56-143.63:
- 140              05  FILLER PIC X(10) VALUE "WHITEPLAIN".
- 141   
- 142            02  DATA-ADDRESS-2 REDEFINES DATA-ADDRESS-2-TBL
- 143 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 144            02  DATA-ADDRESS-3-TBL.
- 145   
->> Error: Invalid syntax
-
-run_file.at-2109-prog.cob:164.55:
- 161              05  FILLER PIC X(10) VALUE "N.Y.      ".
- 162   
- 163            02  DATA-ADDRESS-3 REDEFINES DATA-ADDRESS-3-TBL
- 164 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                          ^
- 165            02  DATA-TELEPHONE-TBL.
- 166   
->> Hint: Missing <integer literal>
-
-run_file.at-2109-prog.cob:164.56-164.63:
- 161              05  FILLER PIC X(10) VALUE "N.Y.      ".
- 162   
- 163            02  DATA-ADDRESS-3 REDEFINES DATA-ADDRESS-3-TBL
- 164 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 165            02  DATA-TELEPHONE-TBL.
- 166   
->> Error: Invalid syntax
-
-run_file.at-2109-prog.cob:185.55:
- 182              05  FILLER PIC 9(10) VALUE 4169898509.
- 183   
- 184            02  DATA-TELEPHONE REDEFINES DATA-TELEPHONE-TBL
- 185 >                                        PIC 9(10) OCCURS MAX-SUB.
-----                                                          ^
- 186            02  DATA-DP-MGR-TBL.
- 187   
->> Hint: Missing <integer literal>
-
-run_file.at-2109-prog.cob:185.56-185.63:
- 182              05  FILLER PIC 9(10) VALUE 4169898509.
- 183   
- 184            02  DATA-TELEPHONE REDEFINES DATA-TELEPHONE-TBL
- 185 >                                        PIC 9(10) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 186            02  DATA-DP-MGR-TBL.
- 187   
->> Error: Invalid syntax
-
-run_file.at-2109-prog.cob:206.55:
- 203              05  FILLER PIC X(20) VALUE "MR. THOMAS JEFFERSON".
- 204   
- 205            02  DATA-DP-MGR    REDEFINES DATA-DP-MGR-TBL
- 206 >                                        PIC X(20) OCCURS MAX-SUB.
-----                                                          ^
- 207            02  DATA-MACHINE-TBL.
- 208   
->> Hint: Missing <integer literal>
-
-run_file.at-2109-prog.cob:206.56-206.63:
- 203              05  FILLER PIC X(20) VALUE "MR. THOMAS JEFFERSON".
- 204   
- 205            02  DATA-DP-MGR    REDEFINES DATA-DP-MGR-TBL
- 206 >                                        PIC X(20) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 207            02  DATA-MACHINE-TBL.
- 208   
->> Error: Invalid syntax
-
-run_file.at-2109-prog.cob:227.54:
- 224              05  FILLER PIC X(8) VALUE "UNI-9040".
- 225   
- 226            02  DATA-MACHINE   REDEFINES DATA-MACHINE-TBL
- 227 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                         ^
- 228            02  DATA-NO-TERMINALS-TBL.
- 229   
->> Hint: Missing <integer literal>
-
-run_file.at-2109-prog.cob:227.55-227.62:
- 224              05  FILLER PIC X(8) VALUE "UNI-9040".
- 225   
- 226            02  DATA-MACHINE   REDEFINES DATA-MACHINE-TBL
- 227 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                          ^^^^^^^
- 228            02  DATA-NO-TERMINALS-TBL.
- 229   
->> Error: Invalid syntax
-
-run_file.at-2109-prog.cob:248.61:
- 245              05  FILLER PIC 9(3) COMP-3 VALUE 86.
- 246   
- 247            02  DATA-NO-TERMINALS REDEFINES DATA-NO-TERMINALS-TBL
- 248 >                                        PIC 9(3) COMP-3 OCCURS MAX-SUB.
-----                                                                ^
- 249   
- 250          78  REC-MAX                     VALUE 10.
->> Hint: Missing <integer literal>
-
-run_file.at-2109-prog.cob:248.62-248.69:
- 245              05  FILLER PIC 9(3) COMP-3 VALUE 86.
- 246   
- 247            02  DATA-NO-TERMINALS REDEFINES DATA-NO-TERMINALS-TBL
- 248 >                                        PIC 9(3) COMP-3 OCCURS MAX-SUB.
-----                                                                 ^^^^^^^
- 249   
- 250          78  REC-MAX                     VALUE 10.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:2312:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:2551:0
 run_file.at-2551-prog.cob:16.19-16.27:
@@ -325,86 +145,6 @@ run_file.at-2551-prog.cob:206.18-206.22:
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:2927:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:3242:0
-run_file.at-3242-prog.cob:57.54:
-  54              05  FILLER PIC X(8) VALUE "GAM00000".
-  55   
-  56            02  DATA-CUST-NUM REDEFINES DATA-CUST-NUM-TBL
-  57 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                         ^
-  58            02  DATA-COMPANY-TBL.
-  59   
->> Hint: Missing <integer literal>
-
-run_file.at-3242-prog.cob:57.55-57.62:
-  54              05  FILLER PIC X(8) VALUE "GAM00000".
-  55   
-  56            02  DATA-CUST-NUM REDEFINES DATA-CUST-NUM-TBL
-  57 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                          ^^^^^^^
-  58            02  DATA-COMPANY-TBL.
-  59   
->> Error: Invalid syntax
-
-run_file.at-3242-prog.cob:67.55:
-  64              05  FILLER PIC X(25) VALUE "FORTUNE COOKIE COMPANY   ".
-  65              05  FILLER PIC X(25) VALUE "GAMMA X-RAY TECHNOLOGY   ".
-  66            02  DATA-COMPANY  REDEFINES DATA-COMPANY-TBL
-  67 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                          ^
-  68            02  DATA-ADDRESS-2-TBL.
-  69   
->> Hint: Missing <integer literal>
-
-run_file.at-3242-prog.cob:67.56-67.63:
-  64              05  FILLER PIC X(25) VALUE "FORTUNE COOKIE COMPANY   ".
-  65              05  FILLER PIC X(25) VALUE "GAMMA X-RAY TECHNOLOGY   ".
-  66            02  DATA-COMPANY  REDEFINES DATA-COMPANY-TBL
-  67 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
-  68            02  DATA-ADDRESS-2-TBL.
-  69   
->> Error: Invalid syntax
-
-run_file.at-3242-prog.cob:77.55:
-  74              05  FILLER PIC X(10) VALUE "WASHINGTON".
-  75              05  FILLER PIC X(10) VALUE "WHITEPLAIN".
-  76            02  DATA-ADDRESS   REDEFINES DATA-ADDRESS-2-TBL
-  77 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                          ^
-  78   
-  79            02  DATA-NO-TERMINALS-TBL.
->> Hint: Missing <integer literal>
-
-run_file.at-3242-prog.cob:77.56-77.63:
-  74              05  FILLER PIC X(10) VALUE "WASHINGTON".
-  75              05  FILLER PIC X(10) VALUE "WHITEPLAIN".
-  76            02  DATA-ADDRESS   REDEFINES DATA-ADDRESS-2-TBL
-  77 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
-  78   
-  79            02  DATA-NO-TERMINALS-TBL.
->> Error: Invalid syntax
-
-run_file.at-3242-prog.cob:89.61:
-  86              05  FILLER PIC 9(3) COMP-3 VALUE 254.
-  87   
-  88            02  DATA-NO-TERMINALS REDEFINES DATA-NO-TERMINALS-TBL
-  89 >                                        PIC 9(3) COMP-3 OCCURS MAX-SUB.
-----                                                                ^
-  90          01  WORK-AREA.
-  91              05  SUB                             BINARY-SHORT UNSIGNED.
->> Hint: Missing <integer literal>
-
-run_file.at-3242-prog.cob:89.62-89.69:
-  86              05  FILLER PIC 9(3) COMP-3 VALUE 254.
-  87   
-  88            02  DATA-NO-TERMINALS REDEFINES DATA-NO-TERMINALS-TBL
-  89 >                                        PIC 9(3) COMP-3 OCCURS MAX-SUB.
-----                                                                 ^^^^^^^
-  90          01  WORK-AREA.
-  91              05  SUB                             BINARY-SHORT UNSIGNED.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:3305:0
 run_file.at-3305-prog.cob:23.18-23.22:
   20          01  TESTSTAT     PIC XX.
@@ -789,186 +529,6 @@ run_file.at-7248-prog.cob:36.18-36.22:
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:7419:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:7514:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:8181:0
-run_file.at-8181-prog.cob:110.54:
- 107              05  FILLER PIC X(8) VALUE "PRE00000".
- 108   
- 109            02  DATA-CUST-NUM REDEFINES DATA-CUST-NUM-TBL
- 110 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                         ^
- 111            02  DATA-COMPANY-TBL.
- 112   
->> Hint: Missing <integer literal>
-
-run_file.at-8181-prog.cob:110.55-110.62:
- 107              05  FILLER PIC X(8) VALUE "PRE00000".
- 108   
- 109            02  DATA-CUST-NUM REDEFINES DATA-CUST-NUM-TBL
- 110 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                          ^^^^^^^
- 111            02  DATA-COMPANY-TBL.
- 112   
->> Error: Invalid syntax
-
-run_file.at-8181-prog.cob:131.55:
- 128              05  FILLER PIC X(25) VALUE "PRESTIGE OFFICE FURNITURE".
- 129   
- 130            02  DATA-COMPANY  REDEFINES DATA-COMPANY-TBL
- 131 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                          ^
- 132            02  DATA-ADDRESS-1-TBL.
- 133   
->> Hint: Missing <integer literal>
-
-run_file.at-8181-prog.cob:131.56-131.63:
- 128              05  FILLER PIC X(25) VALUE "PRESTIGE OFFICE FURNITURE".
- 129   
- 130            02  DATA-COMPANY  REDEFINES DATA-COMPANY-TBL
- 131 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 132            02  DATA-ADDRESS-1-TBL.
- 133   
->> Error: Invalid syntax
-
-run_file.at-8181-prog.cob:152.55:
- 149              05  FILLER PIC X(25) VALUE "114A MAPLE GROVE         ".
- 150   
- 151            02  DATA-ADDRESS-1 REDEFINES DATA-ADDRESS-1-TBL
- 152 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                          ^
- 153            02  DATA-ADDRESS-2-TBL.
- 154   
->> Hint: Missing <integer literal>
-
-run_file.at-8181-prog.cob:152.56-152.63:
- 149              05  FILLER PIC X(25) VALUE "114A MAPLE GROVE         ".
- 150   
- 151            02  DATA-ADDRESS-1 REDEFINES DATA-ADDRESS-1-TBL
- 152 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 153            02  DATA-ADDRESS-2-TBL.
- 154   
->> Error: Invalid syntax
-
-run_file.at-8181-prog.cob:173.55:
- 170              05  FILLER PIC X(10) VALUE "WHITEPLAIN".
- 171   
- 172            02  DATA-ADDRESS-2 REDEFINES DATA-ADDRESS-2-TBL
- 173 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                          ^
- 174            02  DATA-ADDRESS-3-TBL.
- 175   
->> Hint: Missing <integer literal>
-
-run_file.at-8181-prog.cob:173.56-173.63:
- 170              05  FILLER PIC X(10) VALUE "WHITEPLAIN".
- 171   
- 172            02  DATA-ADDRESS-2 REDEFINES DATA-ADDRESS-2-TBL
- 173 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 174            02  DATA-ADDRESS-3-TBL.
- 175   
->> Error: Invalid syntax
-
-run_file.at-8181-prog.cob:194.55:
- 191              05  FILLER PIC X(10) VALUE "N.Y.      ".
- 192   
- 193            02  DATA-ADDRESS-3 REDEFINES DATA-ADDRESS-3-TBL
- 194 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                          ^
- 195            02  DATA-TELEPHONE-TBL.
- 196   
->> Hint: Missing <integer literal>
-
-run_file.at-8181-prog.cob:194.56-194.63:
- 191              05  FILLER PIC X(10) VALUE "N.Y.      ".
- 192   
- 193            02  DATA-ADDRESS-3 REDEFINES DATA-ADDRESS-3-TBL
- 194 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 195            02  DATA-TELEPHONE-TBL.
- 196   
->> Error: Invalid syntax
-
-run_file.at-8181-prog.cob:215.55:
- 212              05  FILLER PIC 9(10) VALUE 4169898509.
- 213   
- 214            02  DATA-TELEPHONE REDEFINES DATA-TELEPHONE-TBL
- 215 >                                        PIC 9(10) OCCURS MAX-SUB.
-----                                                          ^
- 216            02  DATA-DP-MGR-TBL.
- 217   
->> Hint: Missing <integer literal>
-
-run_file.at-8181-prog.cob:215.56-215.63:
- 212              05  FILLER PIC 9(10) VALUE 4169898509.
- 213   
- 214            02  DATA-TELEPHONE REDEFINES DATA-TELEPHONE-TBL
- 215 >                                        PIC 9(10) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 216            02  DATA-DP-MGR-TBL.
- 217   
->> Error: Invalid syntax
-
-run_file.at-8181-prog.cob:236.55:
- 233              05  FILLER PIC X(20) VALUE "MR. THOMAS JEFFERSON".
- 234   
- 235            02  DATA-DP-MGR    REDEFINES DATA-DP-MGR-TBL
- 236 >                                        PIC X(20) OCCURS MAX-SUB.
-----                                                          ^
- 237            02  DATA-MACHINE-TBL.
- 238   
->> Hint: Missing <integer literal>
-
-run_file.at-8181-prog.cob:236.56-236.63:
- 233              05  FILLER PIC X(20) VALUE "MR. THOMAS JEFFERSON".
- 234   
- 235            02  DATA-DP-MGR    REDEFINES DATA-DP-MGR-TBL
- 236 >                                        PIC X(20) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 237            02  DATA-MACHINE-TBL.
- 238   
->> Error: Invalid syntax
-
-run_file.at-8181-prog.cob:257.54:
- 254              05  FILLER PIC X(8) VALUE "UNI-9040".
- 255   
- 256            02  DATA-MACHINE   REDEFINES DATA-MACHINE-TBL
- 257 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                         ^
- 258            02  DATA-NO-TERMINALS-TBL.
- 259   
->> Hint: Missing <integer literal>
-
-run_file.at-8181-prog.cob:257.55-257.62:
- 254              05  FILLER PIC X(8) VALUE "UNI-9040".
- 255   
- 256            02  DATA-MACHINE   REDEFINES DATA-MACHINE-TBL
- 257 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                          ^^^^^^^
- 258            02  DATA-NO-TERMINALS-TBL.
- 259   
->> Error: Invalid syntax
-
-run_file.at-8181-prog.cob:278.61:
- 275              05  FILLER PIC 9(3) COMP-3 VALUE 86.
- 276   
- 277            02  DATA-NO-TERMINALS REDEFINES DATA-NO-TERMINALS-TBL
- 278 >                                        PIC 9(3) COMP-3 OCCURS MAX-SUB.
-----                                                                ^
- 279   
- 280          78  REC-MAX                     VALUE 10.
->> Hint: Missing <integer literal>
-
-run_file.at-8181-prog.cob:278.62-278.69:
- 275              05  FILLER PIC 9(3) COMP-3 VALUE 86.
- 276   
- 277            02  DATA-NO-TERMINALS REDEFINES DATA-NO-TERMINALS-TBL
- 278 >                                        PIC 9(3) COMP-3 OCCURS MAX-SUB.
-----                                                                 ^^^^^^^
- 279   
- 280          78  REC-MAX                     VALUE 10.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:8830:0
 run_file.at-8830-prog.cob:9.6-9.17:
    6          ENVIRONMENT DIVISION.
@@ -979,186 +539,6 @@ run_file.at-8830-prog.cob:9.6-9.17:
   10          INPUT-OUTPUT SECTION.
   11          FILE-CONTROL.
 >> Error: Malformed compiler directive
-
-run_file.at-8830-prog.cob:88.54:
-  85              05  FILLER PIC X(8) VALUE "PRE00000".
-  86   
-  87            02  DATA-CUST-NUM REDEFINES DATA-CUST-NUM-TBL
-  88 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                         ^
-  89            02  DATA-COMPANY-TBL.
-  90   
->> Hint: Missing <integer literal>
-
-run_file.at-8830-prog.cob:88.55-88.62:
-  85              05  FILLER PIC X(8) VALUE "PRE00000".
-  86   
-  87            02  DATA-CUST-NUM REDEFINES DATA-CUST-NUM-TBL
-  88 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                          ^^^^^^^
-  89            02  DATA-COMPANY-TBL.
-  90   
->> Error: Invalid syntax
-
-run_file.at-8830-prog.cob:109.55:
- 106              05  FILLER PIC X(25) VALUE "PRESTIGE OFFICE FURNITURE".
- 107   
- 108            02  DATA-COMPANY  REDEFINES DATA-COMPANY-TBL
- 109 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                          ^
- 110            02  DATA-ADDRESS-1-TBL.
- 111   
->> Hint: Missing <integer literal>
-
-run_file.at-8830-prog.cob:109.56-109.63:
- 106              05  FILLER PIC X(25) VALUE "PRESTIGE OFFICE FURNITURE".
- 107   
- 108            02  DATA-COMPANY  REDEFINES DATA-COMPANY-TBL
- 109 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 110            02  DATA-ADDRESS-1-TBL.
- 111   
->> Error: Invalid syntax
-
-run_file.at-8830-prog.cob:130.55:
- 127              05  FILLER PIC X(25) VALUE "114A MAPLE GROVE         ".
- 128   
- 129            02  DATA-ADDRESS-1 REDEFINES DATA-ADDRESS-1-TBL
- 130 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                          ^
- 131            02  DATA-ADDRESS-2-TBL.
- 132   
->> Hint: Missing <integer literal>
-
-run_file.at-8830-prog.cob:130.56-130.63:
- 127              05  FILLER PIC X(25) VALUE "114A MAPLE GROVE         ".
- 128   
- 129            02  DATA-ADDRESS-1 REDEFINES DATA-ADDRESS-1-TBL
- 130 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 131            02  DATA-ADDRESS-2-TBL.
- 132   
->> Error: Invalid syntax
-
-run_file.at-8830-prog.cob:151.55:
- 148              05  FILLER PIC X(10) VALUE "WHITEPLAIN".
- 149   
- 150            02  DATA-ADDRESS-2 REDEFINES DATA-ADDRESS-2-TBL
- 151 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                          ^
- 152            02  DATA-ADDRESS-3-TBL.
- 153   
->> Hint: Missing <integer literal>
-
-run_file.at-8830-prog.cob:151.56-151.63:
- 148              05  FILLER PIC X(10) VALUE "WHITEPLAIN".
- 149   
- 150            02  DATA-ADDRESS-2 REDEFINES DATA-ADDRESS-2-TBL
- 151 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 152            02  DATA-ADDRESS-3-TBL.
- 153   
->> Error: Invalid syntax
-
-run_file.at-8830-prog.cob:172.55:
- 169              05  FILLER PIC X(10) VALUE "N.Y.      ".
- 170   
- 171            02  DATA-ADDRESS-3 REDEFINES DATA-ADDRESS-3-TBL
- 172 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                          ^
- 173            02  DATA-TELEPHONE-TBL.
- 174   
->> Hint: Missing <integer literal>
-
-run_file.at-8830-prog.cob:172.56-172.63:
- 169              05  FILLER PIC X(10) VALUE "N.Y.      ".
- 170   
- 171            02  DATA-ADDRESS-3 REDEFINES DATA-ADDRESS-3-TBL
- 172 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 173            02  DATA-TELEPHONE-TBL.
- 174   
->> Error: Invalid syntax
-
-run_file.at-8830-prog.cob:193.55:
- 190              05  FILLER PIC 9(10) VALUE 4169898509.
- 191   
- 192            02  DATA-TELEPHONE REDEFINES DATA-TELEPHONE-TBL
- 193 >                                        PIC 9(10) OCCURS MAX-SUB.
-----                                                          ^
- 194            02  DATA-DP-MGR-TBL.
- 195   
->> Hint: Missing <integer literal>
-
-run_file.at-8830-prog.cob:193.56-193.63:
- 190              05  FILLER PIC 9(10) VALUE 4169898509.
- 191   
- 192            02  DATA-TELEPHONE REDEFINES DATA-TELEPHONE-TBL
- 193 >                                        PIC 9(10) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 194            02  DATA-DP-MGR-TBL.
- 195   
->> Error: Invalid syntax
-
-run_file.at-8830-prog.cob:214.55:
- 211              05  FILLER PIC X(20) VALUE "MR. THOMAS JEFFERSON".
- 212   
- 213            02  DATA-DP-MGR    REDEFINES DATA-DP-MGR-TBL
- 214 >                                        PIC X(20) OCCURS MAX-SUB.
-----                                                          ^
- 215            02  DATA-MACHINE-TBL.
- 216   
->> Hint: Missing <integer literal>
-
-run_file.at-8830-prog.cob:214.56-214.63:
- 211              05  FILLER PIC X(20) VALUE "MR. THOMAS JEFFERSON".
- 212   
- 213            02  DATA-DP-MGR    REDEFINES DATA-DP-MGR-TBL
- 214 >                                        PIC X(20) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 215            02  DATA-MACHINE-TBL.
- 216   
->> Error: Invalid syntax
-
-run_file.at-8830-prog.cob:235.54:
- 232              05  FILLER PIC X(8) VALUE "UNI-9040".
- 233   
- 234            02  DATA-MACHINE   REDEFINES DATA-MACHINE-TBL
- 235 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                         ^
- 236            02  DATA-NO-TERMINALS-TBL.
- 237   
->> Hint: Missing <integer literal>
-
-run_file.at-8830-prog.cob:235.55-235.62:
- 232              05  FILLER PIC X(8) VALUE "UNI-9040".
- 233   
- 234            02  DATA-MACHINE   REDEFINES DATA-MACHINE-TBL
- 235 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                          ^^^^^^^
- 236            02  DATA-NO-TERMINALS-TBL.
- 237   
->> Error: Invalid syntax
-
-run_file.at-8830-prog.cob:256.61:
- 253              05  FILLER PIC 9(3) COMP-3 VALUE 86.
- 254   
- 255            02  DATA-NO-TERMINALS REDEFINES DATA-NO-TERMINALS-TBL
- 256 >                                        PIC 9(3) COMP-3 OCCURS MAX-SUB.
-----                                                                ^
- 257   
- 258          01  WORK-AREA.
->> Hint: Missing <integer literal>
-
-run_file.at-8830-prog.cob:256.62-256.69:
- 253              05  FILLER PIC 9(3) COMP-3 VALUE 86.
- 254   
- 255            02  DATA-NO-TERMINALS REDEFINES DATA-NO-TERMINALS-TBL
- 256 >                                        PIC 9(3) COMP-3 OCCURS MAX-SUB.
-----                                                                 ^^^^^^^
- 257   
- 258          01  WORK-AREA.
->> Error: Invalid syntax
 
 run_file.at-8830-prog.cob:270.11-270.29:
  267          LINKAGE SECTION.
@@ -1173,86 +553,6 @@ run_file.at-8830-prog.cob:270.11-270.29:
           - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:9162:0
-run_file.at-9162-prog.cob:44.54:
-  41              05  FILLER PIC X(8) VALUE "FOR00000".
-  42   
-  43            02  DATA-CUST-NUM REDEFINES DATA-CUST-NUM-TBL
-  44 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                         ^
-  45            02  DATA-COMPANY-TBL.
-  46   
->> Hint: Missing <integer literal>
-
-run_file.at-9162-prog.cob:44.55-44.62:
-  41              05  FILLER PIC X(8) VALUE "FOR00000".
-  42   
-  43            02  DATA-CUST-NUM REDEFINES DATA-CUST-NUM-TBL
-  44 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                          ^^^^^^^
-  45            02  DATA-COMPANY-TBL.
-  46   
->> Error: Invalid syntax
-
-run_file.at-9162-prog.cob:54.55:
-  51              05  FILLER PIC X(25) VALUE "EPSILON EQUIPMENT SUPPLY ".
-  52              05  FILLER PIC X(25) VALUE "FORTUNE COOKIE COMPANY   ".
-  53            02  DATA-COMPANY  REDEFINES DATA-COMPANY-TBL
-  54 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                          ^
-  55            02  DATA-ADDRESS-2-TBL.
-  56   
->> Hint: Missing <integer literal>
-
-run_file.at-9162-prog.cob:54.56-54.63:
-  51              05  FILLER PIC X(25) VALUE "EPSILON EQUIPMENT SUPPLY ".
-  52              05  FILLER PIC X(25) VALUE "FORTUNE COOKIE COMPANY   ".
-  53            02  DATA-COMPANY  REDEFINES DATA-COMPANY-TBL
-  54 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
-  55            02  DATA-ADDRESS-2-TBL.
-  56   
->> Error: Invalid syntax
-
-run_file.at-9162-prog.cob:65.55:
-  62              05  FILLER PIC X(10) VALUE "WHITEPLAIN".
-  63   
-  64            02  DATA-ADDRESS   REDEFINES DATA-ADDRESS-2-TBL
-  65 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                          ^
-  66   
-  67            02  DATA-NO-TERMINALS-TBL.
->> Hint: Missing <integer literal>
-
-run_file.at-9162-prog.cob:65.56-65.63:
-  62              05  FILLER PIC X(10) VALUE "WHITEPLAIN".
-  63   
-  64            02  DATA-ADDRESS   REDEFINES DATA-ADDRESS-2-TBL
-  65 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
-  66   
-  67            02  DATA-NO-TERMINALS-TBL.
->> Error: Invalid syntax
-
-run_file.at-9162-prog.cob:77.61:
-  74              05  FILLER PIC 9(3) COMP-3 VALUE 254.
-  75   
-  76            02  DATA-NO-TERMINALS REDEFINES DATA-NO-TERMINALS-TBL
-  77 >                                        PIC 9(3) COMP-3 OCCURS MAX-SUB.
-----                                                                ^
-  78          01  WORK-AREA.
-  79              05  SUB                             BINARY-SHORT UNSIGNED.
->> Hint: Missing <integer literal>
-
-run_file.at-9162-prog.cob:77.62-77.69:
-  74              05  FILLER PIC 9(3) COMP-3 VALUE 254.
-  75   
-  76            02  DATA-NO-TERMINALS REDEFINES DATA-NO-TERMINALS-TBL
-  77 >                                        PIC 9(3) COMP-3 OCCURS MAX-SUB.
-----                                                                 ^^^^^^^
-  78          01  WORK-AREA.
-  79              05  SUB                             BINARY-SHORT UNSIGNED.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:9400:0
 run_file.at-9400-prog.cob:15.50:
   12          01  I                       PIC XX COMP-X.
@@ -1448,348 +748,140 @@ run_file.at-11348-prog.cob:15.51-15.55:
   17          01  WS-FCD-SIZE             PIC 9(04) VALUE   0       COMP-5.
 >> Error: Invalid syntax
 
-run_file.at-11348-prog.cob:97.18:
+run_file.at-11348-prog.cob:97.40-97.41:
   94                78 fcd--auto-lock-bit            value h"02".
   95                78 fcd--exclusive-bit            value h"01".
   96                78 fcd--sharing-bits
   97 >              value fcd--manual-lock-bit + fcd--auto-lock-bit.
-----                     ^
+----                                           ^
   98              05  FCD-OTHER-FLAGS      PIC 9(2) COMP-X.
   99                78 fcd--optional-file            value h"80".
->> Hint: Missing <literal>
+>> Error: Invalid syntax
 
-run_file.at-11348-prog.cob:97.19-97.39:
+run_file.at-11348-prog.cob:97.13-97.60:
   94                78 fcd--auto-lock-bit            value h"02".
   95                78 fcd--exclusive-bit            value h"01".
   96                78 fcd--sharing-bits
   97 >              value fcd--manual-lock-bit + fcd--auto-lock-bit.
-----                      ^^^^^^^^^^^^^^^^^^^^
+----                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  98              05  FCD-OTHER-FLAGS      PIC 9(2) COMP-X.
+  99                78 fcd--optional-file            value h"80".
+>> Error: Unexpected multiple values for 78-level data item `fcd--sharing-bits'
+
+run_file.at-11348-prog.cob:97.60-97.61:
+  94                78 fcd--auto-lock-bit            value h"02".
+  95                78 fcd--exclusive-bit            value h"01".
+  96                78 fcd--sharing-bits
+  97 >              value fcd--manual-lock-bit + fcd--auto-lock-bit.
+----                                                               ^
   98              05  FCD-OTHER-FLAGS      PIC 9(2) COMP-X.
   99                78 fcd--optional-file            value h"80".
 >> Error: Invalid syntax
 
-run_file.at-11348-prog.cob:108.18:
+run_file.at-11348-prog.cob:97.60:
+  94                78 fcd--auto-lock-bit            value h"02".
+  95                78 fcd--exclusive-bit            value h"01".
+  96                78 fcd--sharing-bits
+  97 >              value fcd--manual-lock-bit + fcd--auto-lock-bit.
+----                                                               ^
+  98              05  FCD-OTHER-FLAGS      PIC 9(2) COMP-X.
+  99                78 fcd--optional-file            value h"80".
+>> Hint: Missing FROM <subscripts>
+
+run_file.at-11348-prog.cob:109.13-109.14:
+ 106                78 fcd--line-advancing           value h"01".
+ 107                78 fcd--special-sequential
+ 108                value fcd--optional-file
+ 109 >              + fcd--multiple-reel + fcd--line-advancing.
+----                ^
+ 110              05  FILLER               PIC X(2).
+ 111              05  FCD-HANDLE           USAGE POINTER.
+>> Error: Invalid syntax
+
+run_file.at-11348-prog.cob:109.34-109.35:
+ 106                78 fcd--line-advancing           value h"01".
+ 107                78 fcd--special-sequential
+ 108                value fcd--optional-file
+ 109 >              + fcd--multiple-reel + fcd--line-advancing.
+----                                     ^
+ 110              05  FILLER               PIC X(2).
+ 111              05  FCD-HANDLE           USAGE POINTER.
+>> Error: Invalid syntax
+
+run_file.at-11348-prog.cob:108.13-109.55:
  105                78 fcd--multiple-reel            value h"02".
  106                78 fcd--line-advancing           value h"01".
  107                78 fcd--special-sequential
  108 >              value fcd--optional-file
-----                     ^
- 109                + fcd--multiple-reel + fcd--line-advancing.
+----                ^^^^^^^^^^^^^^^^^^^^^^^^
+ 109 >              + fcd--multiple-reel + fcd--line-advancing.
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
  110              05  FILLER               PIC X(2).
->> Hint: Missing <literal>
+ 111              05  FCD-HANDLE           USAGE POINTER.
+>> Error: Unexpected multiple values for 78-level data item `fcd--special-sequential'
 
-run_file.at-11348-prog.cob:108.19-108.37:
- 105                78 fcd--multiple-reel            value h"02".
+run_file.at-11348-prog.cob:109.55-109.56:
  106                78 fcd--line-advancing           value h"01".
  107                78 fcd--special-sequential
- 108 >              value fcd--optional-file
-----                      ^^^^^^^^^^^^^^^^^^
- 109                + fcd--multiple-reel + fcd--line-advancing.
+ 108                value fcd--optional-file
+ 109 >              + fcd--multiple-reel + fcd--line-advancing.
+----                                                          ^
  110              05  FILLER               PIC X(2).
+ 111              05  FCD-HANDLE           USAGE POINTER.
 >> Error: Invalid syntax
 
-run_file.at-11348-prog.cob:160.18:
+run_file.at-11348-prog.cob:109.55:
+ 106                78 fcd--line-advancing           value h"01".
+ 107                78 fcd--special-sequential
+ 108                value fcd--optional-file
+ 109 >              + fcd--multiple-reel + fcd--line-advancing.
+----                                                          ^
+ 110              05  FILLER               PIC X(2).
+ 111              05  FCD-HANDLE           USAGE POINTER.
+>> Hint: Missing FROM <subscripts>
+
+run_file.at-11348-prog.cob:160.38-160.39:
  157                78 fcd--nfs-file-lock            value h"08".
  158                78 fcd--nfs-file-lock-hp         value h"04".
  159                78 fcd--nfs-file-locks
  160 >              value fcd--nfs-file-lock + fcd--nfs-file-lock-hp.
-----                     ^
+----                                         ^
  161              05  FCD-FS-FLAGS         PIC 99   COMP-X.
  162              05  FCD-CONFIG-FLAGS     PIC 99   COMP-X.
->> Hint: Missing <literal>
+>> Error: Invalid syntax
 
-run_file.at-11348-prog.cob:160.19-160.37:
+run_file.at-11348-prog.cob:160.13-160.61:
  157                78 fcd--nfs-file-lock            value h"08".
  158                78 fcd--nfs-file-lock-hp         value h"04".
  159                78 fcd--nfs-file-locks
  160 >              value fcd--nfs-file-lock + fcd--nfs-file-lock-hp.
-----                      ^^^^^^^^^^^^^^^^^^
+----                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 161              05  FCD-FS-FLAGS         PIC 99   COMP-X.
+ 162              05  FCD-CONFIG-FLAGS     PIC 99   COMP-X.
+>> Error: Unexpected multiple values for 78-level data item `fcd--nfs-file-locks'
+
+run_file.at-11348-prog.cob:160.61-160.62:
+ 157                78 fcd--nfs-file-lock            value h"08".
+ 158                78 fcd--nfs-file-lock-hp         value h"04".
+ 159                78 fcd--nfs-file-locks
+ 160 >              value fcd--nfs-file-lock + fcd--nfs-file-lock-hp.
+----                                                                ^
  161              05  FCD-FS-FLAGS         PIC 99   COMP-X.
  162              05  FCD-CONFIG-FLAGS     PIC 99   COMP-X.
 >> Error: Invalid syntax
+
+run_file.at-11348-prog.cob:160.61:
+ 157                78 fcd--nfs-file-lock            value h"08".
+ 158                78 fcd--nfs-file-lock-hp         value h"04".
+ 159                78 fcd--nfs-file-locks
+ 160 >              value fcd--nfs-file-lock + fcd--nfs-file-lock-hp.
+----                                                                ^
+ 161              05  FCD-FS-FLAGS         PIC 99   COMP-X.
+ 162              05  FCD-CONFIG-FLAGS     PIC 99   COMP-X.
+>> Hint: Missing FROM <subscripts>
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:11598:0
-run_file.at-11598-prog.cob:57.54:
-  54              05  FILLER PIC X(8) VALUE "FOR00000".
-  55   
-  56            02  DATA-CUST-NUM REDEFINES DATA-CUST-NUM-TBL
-  57 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                         ^
-  58            02  DATA-COMPANY-TBL.
-  59   
->> Hint: Missing <integer literal>
-
-run_file.at-11598-prog.cob:57.55-57.62:
-  54              05  FILLER PIC X(8) VALUE "FOR00000".
-  55   
-  56            02  DATA-CUST-NUM REDEFINES DATA-CUST-NUM-TBL
-  57 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                          ^^^^^^^
-  58            02  DATA-COMPANY-TBL.
-  59   
->> Error: Invalid syntax
-
-run_file.at-11598-prog.cob:67.55:
-  64              05  FILLER PIC X(25) VALUE "EPSILON EQUIPMENT SUPPLY ".
-  65              05  FILLER PIC X(25) VALUE "FORTUNE COOKIE COMPANY   ".
-  66            02  DATA-COMPANY  REDEFINES DATA-COMPANY-TBL
-  67 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                          ^
-  68            02  DATA-ADDRESS-2-TBL.
-  69   
->> Hint: Missing <integer literal>
-
-run_file.at-11598-prog.cob:67.56-67.63:
-  64              05  FILLER PIC X(25) VALUE "EPSILON EQUIPMENT SUPPLY ".
-  65              05  FILLER PIC X(25) VALUE "FORTUNE COOKIE COMPANY   ".
-  66            02  DATA-COMPANY  REDEFINES DATA-COMPANY-TBL
-  67 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
-  68            02  DATA-ADDRESS-2-TBL.
-  69   
->> Error: Invalid syntax
-
-run_file.at-11598-prog.cob:78.55:
-  75              05  FILLER PIC X(10) VALUE "WHITEPLAIN".
-  76   
-  77            02  DATA-ADDRESS   REDEFINES DATA-ADDRESS-2-TBL
-  78 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                          ^
-  79   
-  80            02  DATA-NO-TERMINALS-TBL.
->> Hint: Missing <integer literal>
-
-run_file.at-11598-prog.cob:78.56-78.63:
-  75              05  FILLER PIC X(10) VALUE "WHITEPLAIN".
-  76   
-  77            02  DATA-ADDRESS   REDEFINES DATA-ADDRESS-2-TBL
-  78 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
-  79   
-  80            02  DATA-NO-TERMINALS-TBL.
->> Error: Invalid syntax
-
-run_file.at-11598-prog.cob:90.61:
-  87              05  FILLER PIC 9(3) COMP-3 VALUE 254.
-  88   
-  89            02  DATA-NO-TERMINALS REDEFINES DATA-NO-TERMINALS-TBL
-  90 >                                        PIC 9(3) COMP-3 OCCURS MAX-SUB.
-----                                                                ^
-  91          01  WORK-AREA.
-  92              05  SUB                             BINARY-SHORT UNSIGNED.
->> Hint: Missing <integer literal>
-
-run_file.at-11598-prog.cob:90.62-90.69:
-  87              05  FILLER PIC 9(3) COMP-3 VALUE 254.
-  88   
-  89            02  DATA-NO-TERMINALS REDEFINES DATA-NO-TERMINALS-TBL
-  90 >                                        PIC 9(3) COMP-3 OCCURS MAX-SUB.
-----                                                                 ^^^^^^^
-  91          01  WORK-AREA.
-  92              05  SUB                             BINARY-SHORT UNSIGNED.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:12438:0
-run_file.at-12438-prog.cob:84.54:
-  81              05  FILLER PIC X(8) VALUE "PRE00000".
-  82   
-  83            02  DATA-CUST-NUM REDEFINES DATA-CUST-NUM-TBL
-  84 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                         ^
-  85            02  DATA-COMPANY-TBL.
-  86   
->> Hint: Missing <integer literal>
-
-run_file.at-12438-prog.cob:84.55-84.62:
-  81              05  FILLER PIC X(8) VALUE "PRE00000".
-  82   
-  83            02  DATA-CUST-NUM REDEFINES DATA-CUST-NUM-TBL
-  84 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                          ^^^^^^^
-  85            02  DATA-COMPANY-TBL.
-  86   
->> Error: Invalid syntax
-
-run_file.at-12438-prog.cob:105.55:
- 102              05  FILLER PIC X(25) VALUE "PRESTIGE OFFICE FURNITURE".
- 103   
- 104            02  DATA-COMPANY  REDEFINES DATA-COMPANY-TBL
- 105 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                          ^
- 106            02  DATA-ADDRESS-1-TBL.
- 107   
->> Hint: Missing <integer literal>
-
-run_file.at-12438-prog.cob:105.56-105.63:
- 102              05  FILLER PIC X(25) VALUE "PRESTIGE OFFICE FURNITURE".
- 103   
- 104            02  DATA-COMPANY  REDEFINES DATA-COMPANY-TBL
- 105 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 106            02  DATA-ADDRESS-1-TBL.
- 107   
->> Error: Invalid syntax
-
-run_file.at-12438-prog.cob:126.55:
- 123              05  FILLER PIC X(25) VALUE "114A MAPLE GROVE         ".
- 124   
- 125            02  DATA-ADDRESS-1 REDEFINES DATA-ADDRESS-1-TBL
- 126 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                          ^
- 127            02  DATA-ADDRESS-2-TBL.
- 128   
->> Hint: Missing <integer literal>
-
-run_file.at-12438-prog.cob:126.56-126.63:
- 123              05  FILLER PIC X(25) VALUE "114A MAPLE GROVE         ".
- 124   
- 125            02  DATA-ADDRESS-1 REDEFINES DATA-ADDRESS-1-TBL
- 126 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 127            02  DATA-ADDRESS-2-TBL.
- 128   
->> Error: Invalid syntax
-
-run_file.at-12438-prog.cob:147.55:
- 144              05  FILLER PIC X(10) VALUE "WHITEPLAIN".
- 145   
- 146            02  DATA-ADDRESS-2 REDEFINES DATA-ADDRESS-2-TBL
- 147 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                          ^
- 148            02  DATA-ADDRESS-3-TBL.
- 149   
->> Hint: Missing <integer literal>
-
-run_file.at-12438-prog.cob:147.56-147.63:
- 144              05  FILLER PIC X(10) VALUE "WHITEPLAIN".
- 145   
- 146            02  DATA-ADDRESS-2 REDEFINES DATA-ADDRESS-2-TBL
- 147 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 148            02  DATA-ADDRESS-3-TBL.
- 149   
->> Error: Invalid syntax
-
-run_file.at-12438-prog.cob:168.55:
- 165              05  FILLER PIC X(10) VALUE "N.Y.      ".
- 166   
- 167            02  DATA-ADDRESS-3 REDEFINES DATA-ADDRESS-3-TBL
- 168 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                          ^
- 169            02  DATA-TELEPHONE-TBL.
- 170   
->> Hint: Missing <integer literal>
-
-run_file.at-12438-prog.cob:168.56-168.63:
- 165              05  FILLER PIC X(10) VALUE "N.Y.      ".
- 166   
- 167            02  DATA-ADDRESS-3 REDEFINES DATA-ADDRESS-3-TBL
- 168 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 169            02  DATA-TELEPHONE-TBL.
- 170   
->> Error: Invalid syntax
-
-run_file.at-12438-prog.cob:189.55:
- 186              05  FILLER PIC 9(10) VALUE 4169898509.
- 187   
- 188            02  DATA-TELEPHONE REDEFINES DATA-TELEPHONE-TBL
- 189 >                                        PIC 9(10) OCCURS MAX-SUB.
-----                                                          ^
- 190            02  DATA-DP-MGR-TBL.
- 191   
->> Hint: Missing <integer literal>
-
-run_file.at-12438-prog.cob:189.56-189.63:
- 186              05  FILLER PIC 9(10) VALUE 4169898509.
- 187   
- 188            02  DATA-TELEPHONE REDEFINES DATA-TELEPHONE-TBL
- 189 >                                        PIC 9(10) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 190            02  DATA-DP-MGR-TBL.
- 191   
->> Error: Invalid syntax
-
-run_file.at-12438-prog.cob:210.55:
- 207              05  FILLER PIC X(20) VALUE "MR. THOMAS JEFFERSON".
- 208   
- 209            02  DATA-DP-MGR    REDEFINES DATA-DP-MGR-TBL
- 210 >                                        PIC X(20) OCCURS MAX-SUB.
-----                                                          ^
- 211            02  DATA-MACHINE-TBL.
- 212   
->> Hint: Missing <integer literal>
-
-run_file.at-12438-prog.cob:210.56-210.63:
- 207              05  FILLER PIC X(20) VALUE "MR. THOMAS JEFFERSON".
- 208   
- 209            02  DATA-DP-MGR    REDEFINES DATA-DP-MGR-TBL
- 210 >                                        PIC X(20) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
- 211            02  DATA-MACHINE-TBL.
- 212   
->> Error: Invalid syntax
-
-run_file.at-12438-prog.cob:231.54:
- 228              05  FILLER PIC X(8) VALUE "UNI-9040".
- 229   
- 230            02  DATA-MACHINE   REDEFINES DATA-MACHINE-TBL
- 231 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                         ^
- 232            02  DATA-NO-TERMINALS-TBL.
- 233   
->> Hint: Missing <integer literal>
-
-run_file.at-12438-prog.cob:231.55-231.62:
- 228              05  FILLER PIC X(8) VALUE "UNI-9040".
- 229   
- 230            02  DATA-MACHINE   REDEFINES DATA-MACHINE-TBL
- 231 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                          ^^^^^^^
- 232            02  DATA-NO-TERMINALS-TBL.
- 233   
->> Error: Invalid syntax
-
-run_file.at-12438-prog.cob:252.61:
- 249              05  FILLER PIC 9(3) COMP-3 VALUE 86.
- 250   
- 251            02  DATA-NO-TERMINALS REDEFINES DATA-NO-TERMINALS-TBL
- 252 >                                        PIC 9(3) COMP-3 OCCURS MAX-SUB.
-----                                                                ^
- 253   
- 254          78  REC-MAX                    VALUE MAX-SUB.
->> Hint: Missing <integer literal>
-
-run_file.at-12438-prog.cob:252.62-252.69:
- 249              05  FILLER PIC 9(3) COMP-3 VALUE 86.
- 250   
- 251            02  DATA-NO-TERMINALS REDEFINES DATA-NO-TERMINALS-TBL
- 252 >                                        PIC 9(3) COMP-3 OCCURS MAX-SUB.
-----                                                                 ^^^^^^^
- 253   
- 254          78  REC-MAX                    VALUE MAX-SUB.
->> Error: Invalid syntax
-
-run_file.at-12438-prog.cob:254.43:
- 251            02  DATA-NO-TERMINALS REDEFINES DATA-NO-TERMINALS-TBL
- 252                                          PIC 9(3) COMP-3 OCCURS MAX-SUB.
- 253   
- 254 >        78  REC-MAX                    VALUE MAX-SUB.
-----                                              ^
- 255          01  WORK-AREA.
- 256              05  REC-NUM                BINARY-SHORT UNSIGNED VALUE 0.
->> Hint: Missing <literal>
-
-run_file.at-12438-prog.cob:254.44-254.51:
- 251            02  DATA-NO-TERMINALS REDEFINES DATA-NO-TERMINALS-TBL
- 252                                          PIC 9(3) COMP-3 OCCURS MAX-SUB.
- 253   
- 254 >        78  REC-MAX                    VALUE MAX-SUB.
-----                                               ^^^^^^^
- 255          01  WORK-AREA.
- 256              05  REC-NUM                BINARY-SHORT UNSIGNED VALUE 0.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:12694:0
 run_file.at-12694-prog1.cob:2.7-4.32:
    1   
@@ -1917,187 +1009,7 @@ run_file.at-12943-prog.cob:46.11-46.38:
 >> Error: Invalid >>TURN compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:13156:0
-run_file.at-13156-prog.cob:44.54:
-  41              05  FILLER PIC X(8) VALUE "FOR00000".
-  42   
-  43            02  DATA-CUST-NUM REDEFINES DATA-CUST-NUM-TBL
-  44 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                         ^
-  45            02  DATA-COMPANY-TBL.
-  46   
->> Hint: Missing <integer literal>
-
-run_file.at-13156-prog.cob:44.55-44.62:
-  41              05  FILLER PIC X(8) VALUE "FOR00000".
-  42   
-  43            02  DATA-CUST-NUM REDEFINES DATA-CUST-NUM-TBL
-  44 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                          ^^^^^^^
-  45            02  DATA-COMPANY-TBL.
-  46   
->> Error: Invalid syntax
-
-run_file.at-13156-prog.cob:54.55:
-  51              05  FILLER PIC X(25) VALUE "EPSILON EQUIPMENT SUPPLY ".
-  52              05  FILLER PIC X(25) VALUE "FORTUNE COOKIE COMPANY   ".
-  53            02  DATA-COMPANY  REDEFINES DATA-COMPANY-TBL
-  54 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                          ^
-  55            02  DATA-ADDRESS-2-TBL.
-  56   
->> Hint: Missing <integer literal>
-
-run_file.at-13156-prog.cob:54.56-54.63:
-  51              05  FILLER PIC X(25) VALUE "EPSILON EQUIPMENT SUPPLY ".
-  52              05  FILLER PIC X(25) VALUE "FORTUNE COOKIE COMPANY   ".
-  53            02  DATA-COMPANY  REDEFINES DATA-COMPANY-TBL
-  54 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
-  55            02  DATA-ADDRESS-2-TBL.
-  56   
->> Error: Invalid syntax
-
-run_file.at-13156-prog.cob:65.55:
-  62              05  FILLER PIC X(10) VALUE "WHITEPLAIN".
-  63   
-  64            02  DATA-ADDRESS   REDEFINES DATA-ADDRESS-2-TBL
-  65 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                          ^
-  66   
-  67            02  DATA-NO-TERMINALS-TBL.
->> Hint: Missing <integer literal>
-
-run_file.at-13156-prog.cob:65.56-65.63:
-  62              05  FILLER PIC X(10) VALUE "WHITEPLAIN".
-  63   
-  64            02  DATA-ADDRESS   REDEFINES DATA-ADDRESS-2-TBL
-  65 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
-  66   
-  67            02  DATA-NO-TERMINALS-TBL.
->> Error: Invalid syntax
-
-run_file.at-13156-prog.cob:77.54:
-  74              05  FILLER PIC 9(5) VALUE 254.
-  75   
-  76            02  DATA-NO-TERMINALS REDEFINES DATA-NO-TERMINALS-TBL
-  77 >                                        PIC 9(5) OCCURS MAX-SUB.
-----                                                         ^
-  78          01  WORK-AREA.
-  79              05  SUB                     USAGE BINARY-SHORT UNSIGNED.
->> Hint: Missing <integer literal>
-
-run_file.at-13156-prog.cob:77.55-77.62:
-  74              05  FILLER PIC 9(5) VALUE 254.
-  75   
-  76            02  DATA-NO-TERMINALS REDEFINES DATA-NO-TERMINALS-TBL
-  77 >                                        PIC 9(5) OCCURS MAX-SUB.
-----                                                          ^^^^^^^
-  78          01  WORK-AREA.
-  79              05  SUB                     USAGE BINARY-SHORT UNSIGNED.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:13400:0
-run_file.at-13400-prog.cob:43.54:
-  40              05  FILLER PIC X(8) VALUE "DEL00000".
-  41   
-  42            02  DATA-CUST-NUM REDEFINES DATA-CUST-NUM-TBL
-  43 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                         ^
-  44            02  DATA-COMPANY-TBL.
-  45              05  FILLER PIC X(25) VALUE "SPACE COMPANY            ".
->> Hint: Missing <integer literal>
-
-run_file.at-13400-prog.cob:43.55-43.62:
-  40              05  FILLER PIC X(8) VALUE "DEL00000".
-  41   
-  42            02  DATA-CUST-NUM REDEFINES DATA-CUST-NUM-TBL
-  43 >                                        PIC X(8) OCCURS MAX-SUB.
-----                                                          ^^^^^^^
-  44            02  DATA-COMPANY-TBL.
-  45              05  FILLER PIC X(25) VALUE "SPACE COMPANY            ".
->> Error: Invalid syntax
-
-run_file.at-13400-prog.cob:51.55:
-  48              05  FILLER PIC X(25) VALUE "GAMMA X-RAY TECHNOLOGY   ".
-  49              05  FILLER PIC X(25) VALUE "DELTA LUGGAGE REPAIRS    ".
-  50            02  DATA-COMPANY  REDEFINES DATA-COMPANY-TBL
-  51 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                          ^
-  52            02  DATA-ADDRESS-2-TBL.
-  53              05  FILLER PIC X(10) VALUE "EARTH     ".
->> Hint: Missing <integer literal>
-
-run_file.at-13400-prog.cob:51.56-51.63:
-  48              05  FILLER PIC X(25) VALUE "GAMMA X-RAY TECHNOLOGY   ".
-  49              05  FILLER PIC X(25) VALUE "DELTA LUGGAGE REPAIRS    ".
-  50            02  DATA-COMPANY  REDEFINES DATA-COMPANY-TBL
-  51 >                                        PIC X(25) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
-  52            02  DATA-ADDRESS-2-TBL.
-  53              05  FILLER PIC X(10) VALUE "EARTH     ".
->> Error: Invalid syntax
-
-run_file.at-13400-prog.cob:59.55:
-  56              05  FILLER PIC X(10) VALUE "WASHINGTON".
-  57              05  FILLER PIC X(10) VALUE "TORONTO   ".
-  58            02  DATA-ADDRESS   REDEFINES DATA-ADDRESS-2-TBL
-  59 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                          ^
-  60   
-  61            02  DATA-NO-TERMINALS-TBL.
->> Hint: Missing <integer literal>
-
-run_file.at-13400-prog.cob:59.56-59.63:
-  56              05  FILLER PIC X(10) VALUE "WASHINGTON".
-  57              05  FILLER PIC X(10) VALUE "TORONTO   ".
-  58            02  DATA-ADDRESS   REDEFINES DATA-ADDRESS-2-TBL
-  59 >                                        PIC X(10) OCCURS MAX-SUB.
-----                                                           ^^^^^^^
-  60   
-  61            02  DATA-NO-TERMINALS-TBL.
->> Error: Invalid syntax
-
-run_file.at-13400-prog.cob:68.54:
-  65              05  FILLER PIC 9(3) VALUE 9.
-  66              05  FILLER PIC 9(3) VALUE 9.
-  67            02  DATA-NO-TERMINALS REDEFINES DATA-NO-TERMINALS-TBL
-  68 >                                        PIC 9(3) OCCURS MAX-SUB.
-----                                                         ^
-  69            02  DATA-NO-TERMINALS-TBL2.
-  70              05  FILLER PIC 9(3) VALUE 50.
->> Hint: Missing <integer literal>
-
-run_file.at-13400-prog.cob:68.55-68.62:
-  65              05  FILLER PIC 9(3) VALUE 9.
-  66              05  FILLER PIC 9(3) VALUE 9.
-  67            02  DATA-NO-TERMINALS REDEFINES DATA-NO-TERMINALS-TBL
-  68 >                                        PIC 9(3) OCCURS MAX-SUB.
-----                                                          ^^^^^^^
-  69            02  DATA-NO-TERMINALS-TBL2.
-  70              05  FILLER PIC 9(3) VALUE 50.
->> Error: Invalid syntax
-
-run_file.at-13400-prog.cob:76.54:
-  73              05  FILLER PIC 9(3) VALUE 3.
-  74              05  FILLER PIC 9(3) VALUE 254.
-  75            02  DATA-NO-TERMINALS2 REDEFINES DATA-NO-TERMINALS-TBL2
-  76 >                                        PIC 9(3) OCCURS MAX-SUB.
-----                                                         ^
-  77          01  WORK-AREA.
-  78              05  SUB                             BINARY-SHORT UNSIGNED.
->> Hint: Missing <integer literal>
-
-run_file.at-13400-prog.cob:76.55-76.62:
-  73              05  FILLER PIC 9(3) VALUE 3.
-  74              05  FILLER PIC 9(3) VALUE 254.
-  75            02  DATA-NO-TERMINALS2 REDEFINES DATA-NO-TERMINALS-TBL2
-  76 >                                        PIC 9(3) OCCURS MAX-SUB.
-----                                                          ^^^^^^^
-  77          01  WORK-AREA.
-  78              05  SUB                             BINARY-SHORT UNSIGNED.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:13540:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:13609:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:13696:0

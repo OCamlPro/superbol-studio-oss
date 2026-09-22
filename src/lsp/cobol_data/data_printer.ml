@@ -16,6 +16,43 @@ open Data_types
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 
+module PIC = Data_picture
+
+let pp_alphanum_value ppf a =                      (* print as escaped string *)
+  Pretty.print ppf "%S" a
+let pp_boolean_value ppf b =
+  Cobol_ptree.pp_boolean ppf (Data_value.ptree_of_boolean b)
+let pp_integer_value =
+  Z.pp_print
+let pp_fixed_value ppf q =
+  Cobol_ptree.pp_fixed ppf (Data_value.ptree_of_fixed q)
+let pp_floating_value ppf f =
+  Cobol_ptree.pp_floating ppf (Data_value.ptree_of_floating f)
+
+let pp_value ppf = function
+  | Alphanum_value x -> pp_alphanum_value ppf x
+  | Boolean_value x -> pp_boolean_value ppf x
+  | Integer_value x -> pp_integer_value ppf x
+  | Fixed_value x -> pp_fixed_value ppf x
+  | Floating_value x -> pp_floating_value ppf x
+  | Zero_value -> Fmt.string ppf "ZERO"
+  | Space_value -> Fmt.string ppf "SPACE"
+  | Quote_value -> Fmt.string ppf "QUOTE"
+  | Low_value -> Fmt.string ppf "LOW-VALUE"
+  | High_value -> Fmt.string ppf "HIGH-VALUE"
+  | All_alphanum_value a -> Fmt.pf ppf "ALL@ %a" pp_alphanum_value a
+let pp_value'_opt = Fmt.option (pp_with_loc pp_value)
+
+(** Pretty-prints the given alphanum as a literal; appends a slash and an
+    escaped "real value" only if the alphanum value was given in hexadeciaml. *)
+let pp_alphanum_literal ppf (a: alphanum_literal) =
+  Cobol_ptree.pp_alphanum ppf a.alphanum_ptree;
+  if a.alphanum_ptree.hexadecimal then Fmt.pf ppf "/%S" a.alphanum_value
+let pp_boolean_literal  ppf b = pp_boolean_value  ppf b.bool_value
+let pp_integer_literal  ppf i = pp_integer_value  ppf i.int_value
+let pp_fixed_literal    ppf f = pp_fixed_value    ppf f.fixed_value
+let pp_floating_literal ppf f = pp_floating_value ppf f.float_value
+
 let pp_offset = Data_memory.pp_offset
 let pp_size = Data_memory.pp_size
 
@@ -24,47 +61,122 @@ let pp_int'_opt = Fmt.option pp_int'
 let pp_qualname'_opt = Fmt.option Cobol_ptree.pp_qualname'
 let pp_qualname'_list = Fmt.(hbox (list ~sep:comma Cobol_ptree.pp_qualname'))
 (* Pretty.list ~fopen:"@[<h>" ~fsep:",@;" ~fclose:"@]" Cobol_ptree.pp_qualname' *)
-let pp_literal'_opt = Fmt.option Cobol_ptree.pp_literal'
-let pp_literal'_list = Fmt.list Cobol_ptree.pp_literal'
+
+let pp_file_record_size_info ppf = function
+  | Fixed_record_size { size } ->
+      Pretty.record_with_conditional_fields [
+        T Fmt.(styled `Yellow @@ any "fixed");
+        T (Fmt.field "size" (fun () -> size) pp_int');
+      ] ppf ()
+  | Varying_record_size { min; max; depending } ->
+      Pretty.record_with_conditional_fields [
+        T Fmt.(styled `Yellow @@ any "varying");
+        C'(min <> None,
+           Fmt.field "min" (fun () -> min) pp_int'_opt);
+        C'(max <> None,
+           Fmt.field "max" (fun () -> max) pp_int'_opt);
+        C'(depending <> None,
+           Fmt.field "depending" (fun () -> depending) pp_qualname'_opt);
+      ] ppf ()
+  | Bound_record_size { min; max } ->
+      Pretty.record_with_conditional_fields [
+        T Fmt.(styled `Yellow @@ any "fixed-or-variable");
+        T (Fmt.field "min" (fun () -> min) pp_int');
+        T (Fmt.field "max" (fun () -> max) pp_int');
+      ] ppf ()
 
 let pp_data_storage ppf = function
-  | File n -> Fmt.pf ppf "FILE@ %a" Cobol_ptree.pp_name' n
-  | Local_storage -> Fmt.string ppf "LOCAL-STORAGE"
-  | Working_storage -> Fmt.string ppf "WORKING-STORAGE"
-  | Linkage -> Fmt.string ppf "LINKAGE"
+  | Generic_file { file_name; file_record_size_info } ->
+      Pretty.record_with_conditional_fields [
+        T Fmt.(styled `Yellow @@ any "file");
+        T Fmt.(field "name" (fun () -> file_name) Cobol_ptree.pp_name');
+        C'(file_record_size_info <> None,
+           Pretty.vfield "record-size" (fun () -> file_record_size_info)
+             (Fmt.option pp_file_record_size_info));
+      ] ppf ()
+  | Sort_merge_file { file_name } ->
+      Pretty.record_with_conditional_fields [
+        T Fmt.(styled `Yellow @@ any "sort-merge-file");
+        T Fmt.(field "name" (fun () -> file_name) Cobol_ptree.pp_name');
+      ] ppf ()
+  | Local_storage ->
+      Fmt.string ppf "LOCAL-STORAGE"
+  | Working_storage ->
+      Fmt.string ppf "WORKING-STORAGE"
+  | Linkage ->
+      Fmt.string ppf "LINKAGE"
 
 (* usage *)
 
+let pp_sign_config ppf = function
+  | Display_unsigned ->
+      Fmt.string ppf "unsigned"
+  | Display_signed { sign_position; sign_separate } ->
+      Fmt.pf ppf "%s %s"
+        (match sign_position with Leading -> "leading" | Trailing -> "trailing")
+        (if sign_separate then "separate" else "nonseparate")
+
 let pp_usage: usage Pretty.printer =
-  let pp_usage_with_picture ppf name (picture: Data_picture.t) =
-    Pretty.record [
-      Fmt.(styled `Yellow @@ any name);
-      Fmt.field "category" (fun () -> picture.category) Data_picture.pp_detailed_category;
+  let pp_usage_with_picture ppf name_fmt ({ category; _ }: picture) =
+    Pretty.string_to begin fun name ->
+      Pretty.record [
+        Fmt.(styled `Yellow @@ fun ppf () -> string ppf name);
+        Fmt.field "category" (fun () -> category) PIC.pp_detailed_category;
+      ] ppf ()
+    end name_fmt
+  and pp_display_numeric ppf sign ({ category; _ }: picture) =
+    Pretty.record_with_conditional_fields [
+      T Fmt.(styled `Yellow @@ any "display");
+      T (Fmt.field "category" (fun () -> category) PIC.pp_detailed_category);
+      C'(sign <> Display_unsigned,
+         Fmt.field "sign-position" (fun () -> sign) pp_sign_config);
     ] ppf ()
-  and pp_usage_with_sign ppf name signed =
-    Fmt.(styled `Yellow @@ (if signed then any "signed-" else nop) ++ any name)
-      ppf ()
   and pp_width_tag ppf tag =
     Fmt.int ppf @@
     match tag with `W16 -> 16 | `W32 -> 32 | `W34 -> 34 | `W64 -> 64 | `W128 -> 128
   in
+  let pp_usage_with_optional_picture ppf name_fmt picture =
+    match picture with
+    | Some picture ->
+        pp_usage_with_picture ppf name_fmt picture
+    | None ->
+        Pretty.string_to begin fun name ->
+          Pretty.record [
+            Fmt.(styled `Yellow @@ fun ppf () -> string ppf name);
+          ] ppf ()
+        end name_fmt
+  in
   fun ppf -> function
-    | Binary picture ->
-        pp_usage_with_picture ppf "binary" picture
-    | Binary_C_long { signed } ->
-        pp_usage_with_sign ppf "binary-c-long" signed
-    | Binary_char { signed } ->
-        pp_usage_with_sign ppf "binary-char" signed
-    | Binary_double { signed } ->
-        pp_usage_with_sign ppf "binary-double" signed
-    | Binary_long { signed } ->
-        pp_usage_with_sign ppf "binary-long" signed
-    | Binary_short { signed } ->
-        pp_usage_with_sign ppf "binary-short" signed
+    | Alphanumeric { picture; _ } ->
+        pp_usage_with_picture ppf "display" picture
+    | Binary { picture; byte_size = Byte_size;
+               truncation = Truncate_to_native_size; _ } ->
+        pp_usage_with_optional_picture ppf "binary-char" picture
+    | Binary { picture; byte_size = Short_size;
+               truncation = Truncate_to_native_size; _ } ->
+        pp_usage_with_optional_picture ppf "binary-short" picture
+    | Binary { picture; byte_size = Long_size;
+               truncation = Truncate_to_native_size; _ } ->
+        pp_usage_with_optional_picture ppf "binary-long" picture
+    | Binary { picture; byte_size = Double_size;
+               truncation = Truncate_to_native_size; _ } ->
+        pp_usage_with_optional_picture ppf "binary-double" picture
+    | Binary { picture; byte_size = Long_double_size;
+               truncation = Truncate_to_native_size; _ } ->
+        pp_usage_with_optional_picture ppf "binary-long-double" picture
+    | Binary { picture; byte_size = C_long_size;
+               truncation = Truncate_to_native_size; _ } ->
+        pp_usage_with_optional_picture ppf "binary-c-long" picture
+    | Binary { picture; byte_size = Custom_size n;
+               truncation = Truncate_to_native_size; _ } ->
+        pp_usage_with_optional_picture ppf "binary-%d" picture n
+    | Binary { picture;
+               truncation = Truncate_to_digits _; _ } ->
+        pp_usage_with_optional_picture ppf "binary" picture
     | Bit picture ->
         pp_usage_with_picture ppf "bit" picture
-    | Display picture ->
-        pp_usage_with_picture ppf "display" picture
+    | Display_numeric { picture; sign } ->
+        pp_display_numeric ppf sign picture
     | Float_binary { width; endian = _ } ->
         Pretty.record [
           Fmt.(styled `Yellow @@ any "float-binary");
@@ -192,7 +304,7 @@ and pp_field_layout: field_layout Pretty.printer = fun ppf -> function
         T Fmt.(styled `Yellow @@ any "elementary");
         T (Pretty.vfield "usage" (fun () -> usage) pp_usage);
         C'(init_value <> None,
-           Fmt.field "value" (fun () -> init_value) pp_literal'_opt);
+           Fmt.field "value" (fun () -> init_value) pp_value'_opt);
       ] ppf ()
   | Struct_field { subfields } ->
       Pretty.record_with_conditional_fields [
@@ -308,3 +420,39 @@ let pp_data_definition ppf = function
         T (Fmt.field "record" (fun () -> record_name) Fmt.string);
         T (Pretty.vfield "table" (fun () -> table) pp_table_definition');
       ] ppf ()
+
+(* --- *)
+
+let pp_literal_class ppf = function
+  | Boolean ->
+      Pretty.string ppf "Boolean"
+  | Fixed ->
+      Pretty.print ppf "fixed-point@ numeric"
+  | Floating ->
+      Pretty.print ppf "floating-point@ numeric"
+  | Hexadecimal ->
+      Pretty.string ppf "hexadecimal"
+  | Integer ->
+      Pretty.print ppf "Integer"
+
+let pp_invalid_stuff ppf = function
+  | Character_in_literal { literal_class; char } ->
+      Pretty.print ppf "character@ `%c'@ in@ %a@ literal"
+        char pp_literal_class literal_class
+
+let pp_unsupported_stuff ppf = function
+  | Figurative_constant x ->
+      Pretty.print ppf "figurative@ constant@ %a" Cobol_ptree.pp_figurative x
+  | National_literal ->
+      Pretty.print ppf "national@ literal"
+  | Concatenation_of_literals ->
+      Pretty.print ppf "concatenation@ of@ literals"
+
+let pp_error ppf = function
+  | Invalid { stuff; _ } ->
+      Pretty.print ppf "Invalid@ %a" pp_invalid_stuff stuff
+  | Unsupported { stuff; _ } ->
+      Pretty.print ppf "Unsupported@ %a" pp_unsupported_stuff stuff
+  | Overlong_literal { max_length; literal_string; _ } ->
+      Pretty.print ppf "Literal@ of@ length@ %u@ exceeds@ maximum@ allowed@ \
+                        length@ %u" (String.length literal_string) max_length

@@ -24,14 +24,6 @@ module Overlay_manager =
     let name = __MODULE__
   end) ()
 
-let relation_condition (abbrev_rel: abbrev_combined_relation) =
-  match abbrev_rel with
-  | neg, subject, AbbrevRelOp (op, AbbrevObject (obj_neg, obj)) ->
-      let neg = if neg then not obj_neg else obj_neg in
-      Cobol_ptree.Terms_helpers.neg_condition ~neg @@ Relation (subject, op, obj)
-  | _ ->
-      Abbrev abbrev_rel
-
 
 type data_division_sentence =
   | S_DATA_DIVISION_HEADER of srcloc

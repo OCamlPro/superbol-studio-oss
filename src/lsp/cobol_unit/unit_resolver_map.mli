@@ -40,3 +40,6 @@ val find: Cobol_ptree.qualname -> 'a resolver_map -> 'a
 
 val bindings: 'a resolver_map -> 'a binding list
 val find_binding: Cobol_ptree.qualname -> 'a resolver_map -> 'a binding
+
+val is_empty: _ t -> bool
+val cardinal: _ t -> int

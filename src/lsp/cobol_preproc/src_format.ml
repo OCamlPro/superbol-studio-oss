@@ -153,12 +153,14 @@ let enforceable_area_a (type k) : k source_format -> bool = function
   | _ -> false
 
 (* --- *)
+let default_tab_stops = Cobol_common.Tab_stops.default
+let next_tab_stop = Cobol_common.Tab_stops.next_stop
 
-let looks_like_fixed_format ?(tab_stop = 8) contents_prefix =
+let looks_like_fixed_format ?tab_stops contents_prefix =
   let rec sna ap vp =
     match contents_prefix.[ap] with
     | '\n' -> sna (succ ap) 1
-    | '\t' -> sna (succ ap) (vp + (tab_stop - (vp + tab_stop) mod tab_stop))
+    | '\t' -> sna (succ ap) (next_tab_stop ?tab_stops vp)
     | '\r' -> sna (succ ap) vp
     | _ when vp <> 7 -> sna (succ ap) (succ vp)
     | ' ' | '-' | 'd' | 'D' | '*' | '/' | '\\' | '$' when vp = 7 -> true

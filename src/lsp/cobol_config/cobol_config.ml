@@ -102,6 +102,12 @@ let meet_support (s1: Conf_ast.support_value as 's) (s2: 's) : 's =
   | Error, (Error | Unconformable) -> Error
   | _ -> s2
 
+let valid_tab_stops : Conf_ast.value -> bool = function
+  | Int i -> Cobol_common.Tab_stops.is_valid [i]
+  | Any s | String s ->
+    (try Cobol_common.Tab_stops.is_valid (Cobol_common.Tab_stops.of_string s) with _ -> false)
+  | _ -> false
+
 let make_conf (module Words: Words.S) conf_ptree =
   (* NB: a needlessly mutable state is hidden in `Words` (aarggghh...). *)
   let error k v = raise @@ ERROR (Invalid_key_value_pair (k, v)) in
@@ -156,6 +162,8 @@ let make_conf (module Words: Words.S) conf_ptree =
           conf
       | Value {key = "not-register"; value} ->
           error "not-register" value
+      | Value { key = "tab-width"; value } when not (valid_tab_stops value) ->
+          error "tab-width" value
       | Value {key; value} ->
           let value = match value with
             | Support (Additional s) ->
@@ -279,7 +287,10 @@ let from_dialect ?search_path ?verbose d =
   let search_path = retrieve_search_path ?search_path () in
   let config_filename = function
     | DIALECT.GnuCOBOL -> "default.conf"
-    | dialect -> Pretty.to_string "%s.conf" (DIALECT.to_string dialect)
+    | dialect ->
+        if String.ends_with ~suffix:".conf" (DIALECT.to_string dialect)
+        then DIALECT.to_string dialect
+        else Pretty.to_string "%s.conf" (DIALECT.to_string dialect)
   in
   let load_gnucobol_conf conf =
     from_file ~search_path ?verbose @@
@@ -290,3 +301,5 @@ let from_dialect ?search_path ?verbose d =
   | d               -> load_gnucobol_conf d
 
 let dialect (module C: T) = C.dialect
+
+let tab_stops (module C: T) = C.tab_stops#value

@@ -12,7 +12,7 @@
 (**************************************************************************)
 
 open Cobol_data.Types
-
+open Cobol_preproc.Env.TYPES
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 
@@ -68,35 +68,47 @@ let pp_usage: usage Pretty.printer =
   let pp_usage_with_picture ppf name (picture: Cobol_data.Picture.t) =
     Fmt.pf ppf "%a\n\n%a%a"
       (pp_cobol_block (fun ppf _ ->
-           Fmt.pf ppf "PIC %a USAGE %s"
+           Fmt.pf ppf ("PIC %a USAGE " ^^ name)
              Cobol_data.Picture.pp_picture_symbols picture.pic
-             name)) ()
+         )) ()
       Cobol_data.Picture.pp_category picture.category
       pp_example_of picture
-  and pp_usage_with_sign ppf name signed =
-    pp_cobol_block Fmt.(any "USAGE " ++ any name ++ any (if signed then " SIGNED" else " UNSIGNED"))
-    ppf ()
   and pp_width_tag ppf tag =
     Fmt.int ppf @@
     match tag with `W16 -> 16 | `W32 -> 32 | `W34 -> 34 | `W64 -> 64 | `W128 -> 128
   in
+  let pp_usage_with_optional_picture ppf name signed picture =
+    match picture with
+    | Some picture ->
+        pp_usage_with_picture ppf name picture
+    | None ->
+        pp_cobol_block Fmt.(any "USAGE " ++ any name ++
+                            any (if signed then " SIGNED" else " UNSIGNED"))
+          ppf ()
+  in
   fun ppf -> function
-    | Binary picture ->
-        pp_usage_with_picture ppf "BINARY" picture
-    | Binary_C_long { signed } ->
-        pp_usage_with_sign ppf "BINARY-C-LONG" signed
-    | Binary_char { signed } ->
-        pp_usage_with_sign ppf "BINARY-CHAR" signed
-    | Binary_double { signed } ->
-        pp_usage_with_sign ppf "BINARY-DOUBLE" signed
-    | Binary_long { signed } ->
-        pp_usage_with_sign ppf "BINARY-LONG" signed
-    | Binary_short { signed } ->
-        pp_usage_with_sign ppf "BINARY-SHORT" signed
+    | Alphanumeric { picture; _ }
+    | Display_numeric { picture; _ } ->
+        pp_usage_with_picture ppf "DISPLAY" picture
+    | Binary { picture; byte_size = Byte_size; signed;
+               truncation = Truncate_to_native_size; _ } ->
+        pp_usage_with_optional_picture ppf "BINARY-CHAR" signed picture
+    | Binary { picture; byte_size = Short_size; signed;
+               truncation = Truncate_to_native_size; _ } ->
+        pp_usage_with_optional_picture ppf "BINARY-SHORT" signed picture
+    | Binary { picture; byte_size = Long_size; signed;
+               truncation = Truncate_to_native_size; _ } ->
+        pp_usage_with_optional_picture ppf "BINARY-LONG" signed picture
+    | Binary { picture; byte_size = Double_size; signed;
+               truncation = Truncate_to_native_size; _ } ->
+        pp_usage_with_optional_picture ppf "BINARY-DOUBLE" signed picture
+    | Binary { picture; byte_size = C_long_size; signed;
+               truncation = Truncate_to_native_size; _ } ->
+        pp_usage_with_optional_picture ppf "BINARY-C-LONG" signed picture
+    | Binary { picture; signed; _ } ->
+        pp_usage_with_optional_picture ppf "BINARY" signed picture
     | Bit picture ->
         pp_usage_with_picture ppf "BIT" picture
-    | Display picture ->
-        pp_usage_with_picture ppf "DISPLAY" picture
     | Float_binary { width; endian = _ } ->
         Pretty.record [
           Fmt.(styled `Yellow @@ any "float-binary");
@@ -176,7 +188,8 @@ and pp_field_layout: field_layout Pretty.printer = fun ppf x ->
       Fmt.(
         const pp_usage usage
       ++ any "\n\n"
-      ++ const (option ~none:nop (any "VALUE " ++ Cobol_ptree.pp_literal')) init_value)
+      ++ const (option ~none:nop @@ any "VALUE " ++
+                pp_with_loc Cobol_data.Printer.pp_value) init_value)
       ppf x
   | Struct_field { subfields } ->
       Fmt.const pp_struct subfields ppf x
@@ -278,6 +291,17 @@ let pp_record_renaming': record_renaming with_loc Pretty.printer = fun ppf ->
 (*     C ((fun x -> x.record_renamings <> []), *)
 (*        Pretty.vfield "renamings" (fun x -> x.record_renamings) pp_record_renamings); *)
 (*   ] *)
+
+let pp_compilation_var_definition ppf (Preproc_var def | Compilation_var def) =
+  Fmt.pf ppf "Compilation@ variable@ with@ value@ %a%t"
+    Cobol_preproc.Env.pp_value def.src_payload.compvar_value.src_payload
+    (fun ppf -> match def.src_payload.compvar_value.src with
+       | Source_location _ ->
+           ()
+       | Process_parameter ->
+           Fmt.pf ppf "@ (given@ as@ process@ parameter)"
+       | Process_environment ->
+           Fmt.pf ppf "@ (defined@ in@ process@ environment)")
 
 let pp_data_definition ppf = function
   | Data_field { def; _ } ->

@@ -176,17 +176,17 @@
 
 let newline = '\r'* '\n'
 let nnl = _ # ['\r' '\n']                             (* anything but newline *)
-let sna = nnl nnl nnl nnl nnl nnl              (* 6 chars; TODO: exclude tabs *)
-let spaces = ([' ' '\t']*)
-let    blank        = [' ' '\009' '\r']
-let nonblank        = nnl # blank
-let    blanks       =(blank+ | '\t')
-let    blank_area_A = blank blank blank blanks | '\t'
+let nnl_nt = nnl # [ '\t' ]
+let sna = nnl_nt nnl_nt nnl_nt nnl_nt nnl_nt nnl_nt
+let spaces = ' '*
+let    blank        = [' ' '\r']
+let nonblank        = (nnl # blank) # [ '\t' ]
+let    blanks       = blank+
+let    blank_area_A = blank blank blank blanks
 let nonblank_area_A =(nonblank nnl nnl nnl |
                       blank nonblank nnl nnl |
                       blank blank nonblank nnl |
                       blank blank blank nonblank)
-let nonblank = nonblank # ['\t']    (* now, also exclude tab from blank chars *)
 let separator = [ ',' ';' ]
 let epsilon = ""
 let letter = [ 'a'-'z' 'A'-'Z' ]                      (* TODO: '\128'-'\255'? *)
@@ -233,9 +233,14 @@ let currency_sign_char =                                    (* as per ISO/IEC *)
 let text_char = nonblank # ['\'' '"' '&']
 let neq = text_char # ['=']
 let text_word =
-  (* Note: accepts words that include floating comment markers `*>'; these are
-     processed in `Src_lexing.text_word`. *)
-  (neq* '='? neq+)+ | '=' | ">=" | "<=" | '&'
+  (* A text-word shoud not termninate with an equal sign to explicitly deal with
+     pseudotext markers `==`.  Yet, we allow some punctuation characters before
+     a single equal sign to deal with `(>=` and co, that may appear in
+     abbreviated relational conditions.
+
+     Note: accepts words that include floating comment markers `*>'; these are
+     processed in `Src_lexing.text_word`.  *)
+  (neq* '='? neq+)+ | ((neq # letter # digit # sign)* ['>' '<']? '=' neq*) | '&'
 
 let cdir_char =
   (letter | digit | ':')                            (* colon for pseudo-words *)
@@ -251,27 +256,23 @@ let mf_cdir_word =
 
 rule fixed_line state
   = shortest
-  | sna                                                            (* nominal *)
+  | sna (* sna fast path *)
       {
         fixed_indicator (Src_lexing.sna state lexbuf) lexbuf
       }
-  | '\t'
+  | epsilon
       {
-        fixed_nominal_line (Src_lexing.flush_continued state) lexbuf
-      }
-  | (nnl* newline)                                  (* blank line (too short) *)
-      {
-        Src_lexing.new_line (Src_lexing.sna state lexbuf) lexbuf
-      }
-  | (nnl* eof)           (* blank line (too short), without newline character *)
-      {
-        Src_lexing.(flush @@ eof (Src_lexing.sna state lexbuf) lexbuf)
+        fixed_sna_continuation 6 state lexbuf (*TODO: Parametrize 6 *)
       }
 and fixed_indicator state
   = parse
-  | ' ' | '\t' (* second tab *)                                    (* nominal *)
+  | ' '
       {
         fixed_nominal_line (Src_lexing.flush_continued state) lexbuf
+      }
+  | '\t'
+      {
+        Src_lexing.tab ~k:fixed_nominal_line state lexbuf
       }
   | '-'                                                  (* continuation line *)
       {
@@ -293,7 +294,7 @@ and fixed_indicator state
       {
         fixed_debug_line state lexbuf
       }
-  | (_#['\n' '\r'] as c)                                 (* unknown indicator *)
+  | (_ # ['\n' '\r'] as c)                                (* unknown indicator *)
       {
         Src_lexing.unexpected (Indicator_char c) state lexbuf
           ~k:(fun state -> fixed_nominal_line (Src_lexing.flush_continued state))
@@ -301,6 +302,35 @@ and fixed_indicator state
   | epsilon
       {
         gobble_line (Src_lexing.sna state lexbuf) lexbuf
+      }
+and fixed_sna_continuation remaining state
+  = parse
+  | '\t'    (* tab in SNA: check expanded col vs indicator position (col 7) *)
+      {
+        Src_lexing.sna_tab state lexbuf
+          ~k_sna:fixed_sna_continuation
+          ~k_indicator:fixed_indicator
+          ~k_nominal:fixed_nominal_line
+      }
+  | ' '                                                         (* SNA space *)
+      {
+        if remaining <= 1
+        then fixed_indicator state lexbuf
+        else fixed_sna_continuation (remaining - 1) state lexbuf
+      }
+  | nnl # [ '\t' ' ' ]                                           (* SNA char *)
+      {
+        Src_lexing.sna_char remaining state lexbuf
+          ~k_continue:fixed_sna_continuation
+          ~k_done:fixed_indicator
+      }
+  | newline                           (* line ends before 6 SNA chars: blank *)
+      {
+        Src_lexing.new_line state lexbuf
+      }
+  | eof
+      {
+        Src_lexing.(flush @@ eof state lexbuf)
       }
 and xopen_line state                                     (* X/Open free-form  *)
   = parse                            (* (note no continuation line indicator) *)
@@ -360,9 +390,13 @@ and xopen_or_crt_or_acutrm_followup state
       }
 and cobolx_line state                                 (* COBOLX format (GCOS) *)
   = parse
-  | [' ' '\t']                                                     (* nominal *)
+  | ' '                                                     (* nominal *)
       {
         fixed_nominal_line (Src_lexing.flush_continued state) lexbuf
+      }
+  | '\t'
+      {
+        Src_lexing.tab ~k:fixed_nominal_line state lexbuf
       }
   | '-'                                                  (* continuation line *)
       {
@@ -404,6 +438,10 @@ and fixed_debug_line state
       }
 and fixed_nominal_line state
   = parse
+  | '\t'
+    {
+      Src_lexing.tab ~k:fixed_nominal_line state lexbuf
+    }
   | blanks
       {
         fixed_nominal_line state lexbuf
@@ -427,6 +465,10 @@ and fixed_nominal_line state
       }
 and fixed_nominal state
   = parse
+  | '\t'
+      {
+        Src_lexing.tab ~k:fixed_nominal state lexbuf
+      }
   | blanks
       {
         fixed_nominal state lexbuf
@@ -472,6 +514,10 @@ and fixed_cdir_line marker state          (* `>>`-prefixed compiler directive *)
       }
 and fixed_mf_cdir_line marker state   (* Micro-focus compiler directive (`$`) *)
   = parse
+  | '\t'
+    {
+      Src_lexing.tab ~k:(fixed_mf_cdir_line marker) state lexbuf
+    }
   | blanks? cdir_word_suffix
       {
         Src_lexing.cdir_word ~ktkd:gobble_line ~knom:fixed_nominal
@@ -494,6 +540,10 @@ and maybe_fixed_cdir_line c state (* we just read [c='>'] in indicator column *)
       }
 and fixed_continue_line state
   = parse
+  | '\t'
+    {
+      Src_lexing.tab ~before_indicator:false ~k:fixed_continue_line state lexbuf
+    }
   | blank*
       {
         (* Special rule for double-quoted alphanum continuation and continuation
@@ -502,10 +552,10 @@ and fixed_continue_line state
            NB: The ISO/IEC standard is less specific than IBM docs on this. *)
         let cont = match Src_lexing.continue_quoted_alphanum state with
           | Nominal -> fixed_continue_open
-          | Closed Quote -> fixed_continue_quoted
-          | Closed Apostrophe -> fixed_continue_apostrophed
-          | UnclosedEBCDICs Quote -> fixed_continue_quoted_ebcdics
-          | UnclosedEBCDICs Apostrophe -> fixed_continue_apostrophed_ebcdics
+          | Closed Double_quote -> fixed_continue_quoted
+          | Closed Simple_quote -> fixed_continue_apostrophed
+          | UnclosedEBCDICs Double_quote -> fixed_continue_quoted_ebcdics
+          | UnclosedEBCDICs Simple_quote -> fixed_continue_apostrophed_ebcdics
         in
         cont state lexbuf
       }
@@ -593,9 +643,13 @@ and fixed_continue_quoted_ebcdics state
 
 and free_line state
   = parse
-  | blanks | '\t'
+  | blanks
       {
         free_line state lexbuf
+      }
+  | '\t'
+      {
+        Src_lexing.tab ~k:free_line state lexbuf
       }
   | (cdir_word | mf_cdir_word)
       {
@@ -621,6 +675,10 @@ and free_nominal state
   | blanks
       {
         free_nominal state lexbuf
+      }
+  | '\t'
+      {
+        Src_lexing.tab ~k:free_nominal state lexbuf
       }
   | (separator as char) (blanks*)
       {

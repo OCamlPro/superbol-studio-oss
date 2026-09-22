@@ -28,5 +28,5 @@ val deactivate
 
 module Printer = Superbol_printer
 module Instance = Superbol_instance
-module Workspace = Superbol_workspace
+module Config = Superbol_config
 module Extension = Superbol_extension

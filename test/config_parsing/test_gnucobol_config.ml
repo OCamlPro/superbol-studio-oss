@@ -56,7 +56,7 @@ let%test_module _ = (module struct
 end)
 
 let%test "int values" = true
-  && Default_conf.tab_width#value = Parsed_conf.tab_width#value
+  && Default_conf.tab_stops#value = Parsed_conf.tab_stops#value
   && Default_conf.text_column#value = Parsed_conf.text_column#value
   && Default_conf.pic_length#value = Parsed_conf.pic_length#value
   && Default_conf.word_length#value = Parsed_conf.word_length#value
@@ -179,3 +179,63 @@ let%test "support options" = true
   && Default_conf.self_call_recursive#level = Parsed_conf.self_call_recursive#level
   && Default_conf.record_contains_depending_clause#level = Parsed_conf.record_contains_depending_clause#level
   && Default_conf.picture_l#level = Parsed_conf.picture_l#level
+
+module Tab_stops = Cobol_common.Tab_stops
+
+let%test "tab width values" = true
+  && Tab_stops.of_string "8" = [8]
+  && Tab_stops.of_string "6,1,8" = [6;1;8]
+  && Tab_stops.of_string " 4 , 2 " = [4;2]
+
+let%test "tab width validity" = true
+  && Tab_stops.is_valid [8]
+  && Tab_stops.is_valid [6;1;8]
+  && Tab_stops.is_valid [4;2]
+  && not (Tab_stops.is_valid [])
+  && not (Tab_stops.is_valid [0])
+  && not (Tab_stops.is_valid [-4])
+  && not (Tab_stops.is_valid [4;0])
+
+let%test "tab stops" = true
+  && Tab_stops.next_stop ~tab_stops:[8] 1 = 9
+  && Tab_stops.next_stop ~tab_stops:[4] 1 = 5
+  && Tab_stops.next_stop ~tab_stops:[4] 5 = 9
+  && Tab_stops.next_stop ~tab_stops:[4;2] 1 = 5
+  && Tab_stops.next_stop ~tab_stops:[4;2] 5 = 7
+  && Tab_stops.next_stop ~tab_stops:[6;1;8] 1 = 7
+  && Tab_stops.next_stop ~tab_stops:[6;1;8] 7 = 8
+  && Tab_stops.next_stop ~tab_stops:[6;1;8] 8 = 16
+
+let load_conf contents =
+  let file = Filename.temp_file "superbol_tab_stops" ".conf" in
+  let oc = open_out file in
+  output_string oc contents;
+  close_out oc;
+  let search_path = Filename.dirname file :: confdir :: search_path in
+  Fun.protect ~finally:(fun () -> Sys.remove file) @@ fun () ->
+  Cobol_common.Diagnostics.show_n_forget @@
+  Cobol_config.from_file ~search_path (Filename.basename file)
+
+let tab_stops_of_conf value =
+  let module Conf =
+    (val load_conf (Printf.sprintf "include \"default.conf\"\ntab-width: %s\n"
+                      value))
+  in
+  Conf.tab_stops#value
+
+let rejected value =
+  match tab_stops_of_conf value with
+  | _ -> false
+  | exception
+      Cobol_config.ERROR (Invalid_key_value_pair ("tab-width", _)) -> true
+
+let%test "tab width from configuration" = true
+  && tab_stops_of_conf "4" = [4]
+  && tab_stops_of_conf "6,1,8" = [6;1;8]
+  && tab_stops_of_conf "4, 2" = [4;2]
+  && tab_stops_of_conf "\"6,1,8\"" = [6;1;8]      (* former only spelling *)
+
+let%test "invalid tab width from configuration" = true
+  && rejected "0"
+  && rejected "-4"
+  && rejected "4,0"

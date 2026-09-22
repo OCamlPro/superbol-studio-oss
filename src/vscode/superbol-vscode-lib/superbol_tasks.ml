@@ -47,7 +47,7 @@ let module_spec = attributes_spec ~executable:false
 let attr_bool_flag key ~ok ?(ko = Fun.id) ~attributes args =
   match List.assoc_opt key attributes with
   | Some flag when [%js.to: bool] flag -> ok args
-  | None when Superbol_workspace.bool key -> ok args
+  | None when Superbol_config.bool key -> ok args
   | _ -> ko args
 
 let string_arg ?(allow_empty = false) ~append s args =
@@ -56,12 +56,12 @@ let string_arg ?(allow_empty = false) ~append s args =
 let config_string key ~config =
   string_arg @@
   try Jsonoo.Decode.string @@ Hashtbl.find config key
-  with Not_found -> Superbol_workspace.string key
+  with Not_found -> Superbol_config.string key
 
 let config_strings key ~config ~append =
   append @@
   try Jsonoo.Decode.(list string) @@ Hashtbl.find config key
-  with Not_found -> Superbol_workspace.strings key
+  with Not_found -> Superbol_config.strings key
      | Jsonoo.Decode_error _ -> []  (* Warning: silenced decode errors for now *)
 
 let attr_strings key ?(append = List.append) ~attributes args =
@@ -77,7 +77,10 @@ let attr_string_opt key ~append ~attributes args =
     | Some s -> string_arg s ~allow_empty:false ~append args
 
 (* let config_strings key ~config:_ ~append args = *)
-(*   append (Superbol_workspace.string_list key) args *)
+(*   append (Superbol_config.string_list key) args *)
+
+let copybooks_setting = "cobol.copybooks"
+let copyexts_setting = "cobol.copyexts"
 
 type copybook_path =
   {
@@ -91,12 +94,19 @@ let copybook_path_of_jsonoo: Jsonoo.t -> copybook_path = fun j ->
     file_relative = (try_default false @@ field "file-relative" bool) j;
   }
 
+(* `file-relative' is only written when set, to keep the setting short. *)
+let copybook_path_to_jsonoo: copybook_path -> Jsonoo.t =
+  fun { dir; file_relative } ->
+  Jsonoo.Encode.object_ @@
+  ("dir", Jsonoo.Encode.string dir) ::
+  if file_relative then ["file-relative", Jsonoo.Encode.bool true] else []
+
 let config_copybook_paths key ~config ~append =
   append @@
   try
     Jsonoo.Decode.(list copybook_path_of_jsonoo) @@
     try Hashtbl.find config key
-    with Not_found -> Jsonoo.t_of_js (Superbol_workspace.any key)
+    with Not_found -> Jsonoo.t_of_js (Superbol_config.any key)
   with Jsonoo.Decode_error _ ->
     (* Warning: silenced decode errors for now *)
     []
@@ -104,7 +114,7 @@ let config_copybook_paths key ~config ~append =
 let cobc_path attributes =
   match [%js.to: string] @@ List.assoc "cobcPath" attributes with
   | exception Not_found | "" ->                       (* fallback to WS config *)
-      Option.value (Superbol_workspace.cobc_exe ()) ~default:"cobc"
+      Option.value (Superbol_config.cobc_exe ()) ~default:"cobc"
   | path ->
       path
 
@@ -112,7 +122,7 @@ let cobc_execution ?config attributes =
   let config = match config with Some t -> t | None -> Hashtbl.create 0 in
   let args =
     ["${relativeFile}"] |>
-    config_copybook_paths "cobol.copybooks" ~config
+    config_copybook_paths copybooks_setting ~config
       ~append:begin fun l args ->
         List.flatten @@
         List.map begin fun { dir; file_relative } ->
@@ -125,7 +135,7 @@ let cobc_execution ?config attributes =
         end l |>
         List.append args
       end |>
-    config_strings "cobol.copyexts" ~config
+    config_strings copyexts_setting ~config
       ~append:begin fun exts ->
         List.append @@ List.flatten @@ List.map (fun e -> ["-ext"; e]) exts
       end |>

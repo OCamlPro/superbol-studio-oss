@@ -11,6 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open EzCompat                                                    (* StringMap *)
 open Lsp_project.TYPES
 open Ez_file.V1
 open Lsp_types
@@ -55,7 +56,7 @@ module TYPES = struct
       doc_cache_version: int;
       doc_cache_pplog: Cobol_preproc.Trace.log;
       doc_cache_tokens: Cobol_parser.Outputs.tokens_with_locs;
-      doc_cache_comments: Cobol_preproc.Text.comments;
+      doc_cache_comments: Cobol_preproc.Text.comments StringMap.t;
       doc_cache_ignored: Cobol_common.Srcloc.lexloc list;
       doc_cache_checked: checked_doc option;
       doc_cache_parsing_diags: Cobol_parser.Diagnostics.ALL.t;
@@ -100,7 +101,7 @@ let rewindable_parse ({ project; textdoc; _ } as doc) =
 let no_artifacts =
   Cobol_parser.Outputs.{ tokens = lazy [];
                          pplog = Cobol_preproc.Trace.empty;
-                         rev_comments = [];
+                         rev_comments = StringMap.empty;
                          rev_ignored = [] }
 
 let check doc ptree =
@@ -202,6 +203,9 @@ let load ~project ~params doc =
   let doc = blank ~project textdoc in
   try parse_and_analyze doc
   with e -> raise @@ Internal_error (doc, e, Printexc.get_raw_backtrace ())
+
+let unload doc =
+  Option.iter Cobol_parser.forget doc.rewinder
 
 let first_change_pos changes =
   let line, char =

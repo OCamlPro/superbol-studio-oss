@@ -12,6 +12,8 @@
 (**************************************************************************)
 
 open Cobol_common.Srcloc.TYPES
+open Cobol_common.Srcloc.INFIX
+
 module LIST = Cobol_common.Basics.LIST
 
 type error =
@@ -19,18 +21,26 @@ type error =
   | Malformed of { loc: srcloc; stuff: malformed_stuff }
   | Missing of { loc: srcloc; stuff: missing_stuff }
   | Unexpected of { loc: srcloc; stuff: unexpected_stuff }
+  | Unsupported of { loc: srcloc; stuff: unsupported_stuff }
   | Unterminated of { loc: srcloc; stuff: unterminated_stuff }
 
 and malformed_stuff =
   | Alphanumeric_literal
+  | Data_item_at_level_78
 
 and missing_stuff =
   | Continuation_of of string
+  | Value_for_78_level_item of Cobol_ptree.data_name with_loc
 
 and unexpected_stuff =
   | Pseudotext
   | Character_in_symbolic_EBCDIC of char
+  | Clause_for_78_level_item of Cobol_ptree.data_clause with_loc
+  | Multiple_values_for_78_level_item of Cobol_ptree.data_name with_loc
   | Symbolic_EBCDIC_orginal of int
+
+and unsupported_stuff =
+  | Global_clause_for_78_level_item
 
 and unterminated_stuff =
   | Comment_entry
@@ -38,19 +48,33 @@ and unterminated_stuff =
 let pp_malformed_stuff ppf = function
   | Alphanumeric_literal ->
       Pretty.print ppf "alphanumeric@ literal"
+  | Data_item_at_level_78 ->
+      Pretty.print ppf "78-level@ data@ item"
 
 let pp_missing_stuff ppf = function
   | Continuation_of str ->
       Pretty.print ppf "continuation@ of@ `%s'" str
+  | Value_for_78_level_item data_name ->
+      Pretty.print ppf "value@ for@ 78-level@ data@ item@ `%a'"
+        Cobol_ptree.pp_data_name ~&data_name
 
 let pp_unexpected_stuff ppf = function
   | Pseudotext ->
       Pretty.string ppf "pseudotext"
   | Character_in_symbolic_EBCDIC c ->
       Pretty.print ppf "character:@ `%c'" c
+  | Clause_for_78_level_item _ ->
+      Pretty.print ppf "clause@ for@ 78-level@ data@ item"
+  | Multiple_values_for_78_level_item data_name ->
+      Pretty.print ppf "multiple@ values@ for@ 78-level@ data@ item@ `%a'"
+        Cobol_ptree.pp_data_name ~&data_name
   | Symbolic_EBCDIC_orginal i ->
       Pretty.print ppf "symbolic@ character@ ordinal@ %d@ (expected@ range@ is@ \
                         {1, ..., 256})" i
+
+let pp_unsupported_stuff ppf = function
+  | Global_clause_for_78_level_item ->
+      Pretty.print ppf "GLOBAL@ clause@ for@ 78-level@ data@ item"
 
 let pp_unterminated_stuff ppf = function
   | Comment_entry ->
@@ -62,6 +86,7 @@ let error_loc = function
   | Malformed { loc; _ }
   | Missing { loc; _ }
   | Unexpected { loc; _ }
+  | Unsupported { loc; _ }
   | Unterminated { loc; _ } ->
       Some loc
 
@@ -74,6 +99,8 @@ let pp_error ppf = function
       Pretty.print ppf "Missing@ %a" pp_missing_stuff stuff
   | Unexpected { stuff; _ } ->
       Pretty.print ppf "Unexpected@ %a" pp_unexpected_stuff stuff
+  | Unsupported { stuff; _ } ->
+      Pretty.print ppf "Unsupported@ %a" pp_unsupported_stuff stuff
   | Unterminated { stuff; _ } ->
       Pretty.print ppf "Unterminated@ %a" pp_unterminated_stuff stuff
 

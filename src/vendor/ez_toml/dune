@@ -13,8 +13,8 @@
   
   )
 
-(menhir (modules internal_parser))
 (ocamllex internal_lexer)
+(menhir (modules internal_parser))
 
 (rule
     (targets version.ml)

@@ -2,16 +2,10 @@
 	path = import/gnucobol
 	url = https://github.com/OcamlPro/gnucobol.git
 	branch = gnucobol-3.x
-[submodule "import/merlin"]
-	path = import/merlin
-	url = https://github.com/OCamlPro/merlin.git
 [submodule "import/superbol-vscode-debug"]
 	path = import/superbol-vscode-debug
 	url = https://github.com/OCamlPro/superbol-vscode-debug.git
 	branch = superbol-vscode-debug
-[submodule "vendors/autofonce"]
-	path = vendors/autofonce
-	url = https://github.com/OCamlPro/autofonce
 [submodule "import/gnucobol4"]
 	path = import/gnucobol4
 	url = https://github.com/OcamlPro/gnucobol.git

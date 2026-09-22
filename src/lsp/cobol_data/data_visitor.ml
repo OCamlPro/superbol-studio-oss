@@ -23,6 +23,7 @@ open Cobol_common.Srcloc.INFIX
 class ['a] folder = object
   (* inherit ['a] Cobol_common.Visitor.Fold.folder *)
   inherit ['a] Cobol_ptree.Terms_visitor.folder
+  method fold_literal_value: (literal_value, 'a) fold = default
   method fold_record: (record, 'a) fold = default
   method fold_storage: (data_storage, 'a) fold = default
   method fold_picture: (picture, 'a) fold = default
@@ -56,6 +57,12 @@ end
 
 (* --- *)
 
+let fold_literal_value (v: _ #folder) =
+  leaf v#fold_literal_value
+
+let fold_literal_value' (v: _ #folder) =
+  fold' ~fold:fold_literal_value v
+
 let fold_storage (v: _ #folder) = leaf v#fold_storage
 let fold_memory_offset (v: _ #folder) = leaf v#fold_memory_offset
 let fold_memory_size (v: _ #folder) = leaf v#fold_memory_size
@@ -64,9 +71,10 @@ let fold_picture (v: _ #folder) = leaf v#fold_picture      (* leaf (for now?) *)
 let fold_usage (v: _ #folder) =
   handle v#fold_usage
     ~continue:begin function
-      | Binary pic
+      | Alphanumeric { picture = pic; _ }
+      | Binary { picture = Some pic; _ }
       | Bit pic
-      | Display pic
+      | Display_numeric { picture = pic; _ }
       | National pic
       | Packed_decimal { picture = pic; _ } ->
           fold_picture v pic
@@ -75,11 +83,7 @@ let fold_usage (v: _ #folder) =
       | Pointer Some name
       | Program_pointer Some name ->
           Cobol_ptree.Terms_visitor.fold_name' v name
-      | Binary_C_long _
-      | Binary_char _
-      | Binary_double _
-      | Binary_long _
-      | Binary_short _
+      | Binary { picture = None; _ }
       | Float_binary _
       | Float_decimal _
       | Float_extended
@@ -188,7 +192,7 @@ and fold_field_layout (v: _ #folder) =
     ~continue:begin fun l x -> match l with
       | Elementary_field { usage; init_value } -> x
           >> fold_usage v usage
-          >> Cobol_ptree.Terms_visitor.fold_literal'_opt v init_value
+          >> fold_option ~fold:fold_literal_value' v init_value
       | Struct_field { subfields } -> x
           >> fold_item_definitions v subfields
     end

@@ -16,14 +16,6 @@ open Cobol_common.Srcloc.TYPES
 (* --- *)
 
 module TYPES: sig
-  type sign_position = Leading | Trailing
-
-  type sign_config = {
-    sign_position: sign_position;
-    sign_separate: bool;
-  }
-
-  val pp_sign_config: sign_config option Pretty.printer
 
   type symbol =
     | A
@@ -81,14 +73,14 @@ module TYPES: sig
         {
           digits: int;
           scale: int;
-          sign: sign_config option;
+          signed: bool;
           editions: editions;
         }
     | FloatNum of
         {
           digits: int;
           scale: int;
-          with_sign: bool;
+          signed: bool;
           exponent_digits: int;
           editions: basic_edition list;
         }
@@ -147,11 +139,17 @@ module TYPES: sig
     }
   [@@deriving show, ord]
 
+  type common_numeric_info =
+    {
+      signed: bool;
+      digits: int;
+      scale: int;
+    }
+
   type config = {
     max_pic_length: int;
     decimal_char: char;
     currency_signs: Cobol_common.Basics.CharSet.t;
-    sign_config: sign_config;
   }
 
   type error =
@@ -187,11 +185,13 @@ val pp_detailed_category: category Pretty.printer
 val pp_category: category Pretty.printer
 val pp_category_name: category Pretty.printer
 val pp_picture_symbols: symbols list Pretty.printer
+val char_of_symbol: symbol -> char
 
 (** [is_edited pic] indicates whether the given picture string represents an
     edited item *)
 val is_edited: picture -> bool
 
+val is_alphanum: picture -> bool
 val is_boolean: picture -> bool
 val is_national: picture -> bool
 
@@ -199,19 +199,18 @@ val is_national: picture -> bool
     numeric *)
 val is_numeric: picture -> bool
 val is_signed_numeric: picture -> bool
+val numeric_scale: picture -> (int, category) result
+val numeric_info: picture -> (common_numeric_info, category) result
 
 (** Size of the underlying data; corresponds to the number of "characters" for
     usage DISPLAY; does not take the sign of numeric items into account. *)
 val data_size: picture -> int
 
 (** Actual storage size for items of usage DISPLAY. *)
-val display_size: picture -> int
+val display_size: ?sign_separate: bool -> picture -> int
 
 (** Display size after editions; corresponds to "size" in standards *)
-val edited_size: picture -> int
-
-(** Alias for {!edited_size}. *)
-val size: picture -> int
+val edited_size: ?sign_separate: bool -> picture -> int
 
 val of_string: config -> string ->
   (picture,
@@ -229,7 +228,7 @@ val digits: int -> picture
 val fixed_numeric
   : ?basics: basic_edition list
   -> ?floating: floating_insertion
-  -> ?sign: sign_config option
+  -> ?sign: bool
   -> (* integral_digits: *)int
   -> (* decimal_digits: *)int
   -> picture
@@ -244,9 +243,6 @@ val error_diagnostics: loc:srcloc -> (error * (int * int)) list ->
 
 val pp_meaning_of_precedence_index
   : decimal_char: char -> Format.formatter -> int -> unit
-
-(** Default sign configuration: trailing, non-separate. *)
-val default_sign_config: sign_config
 
 (** Verifies that the picture string is interpreted as `expect`,
    i.e. the result of `pp_picture`. If not, displays the difference on

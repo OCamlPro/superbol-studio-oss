@@ -25,6 +25,7 @@ type qualname_ambiguity =
 
 type error =
   | Unknown_proc_name of Cobol_ptree.qualname with_loc
+  | Undefined_data_name of Cobol_ptree.qualname with_loc
   | Ambiguous_data_name of qualname_ambiguity
   | Ambiguous_proc_name of qualname_ambiguity
   | Invalid_proc_arg_storage of
@@ -39,6 +40,7 @@ type error =
 
 let error_loc = function
   | Unknown_proc_name { loc; _ }
+  | Undefined_data_name { loc; _ }
   | Ambiguous_data_name { given_qualname = { loc; _ }; _ }
   | Ambiguous_proc_name { given_qualname = { loc; _ }; _ }
   | Invalid_proc_arg_storage { arg_name = { loc; _ }; _ }
@@ -55,6 +57,8 @@ let pp_qualname_ambiguity ~kind ppf { given_qualname; matching_qualnames } =
 let pp_error ppf = function
   | Unknown_proc_name qn ->
       Pretty.print ppf "Unknown@ procedure-name@ '%a'" QUAL.pp ~&qn
+  | Undefined_data_name qn ->
+      Pretty.print ppf "Undefined@ data-name@ '%a'" QUAL.pp ~&qn
   | Ambiguous_data_name ambiguity ->
       pp_qualname_ambiguity ~kind:"data-name" ppf ambiguity
   | Ambiguous_proc_name ambiguity ->

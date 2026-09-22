@@ -55,6 +55,13 @@ module type MANAGER = sig
       parsers for various input files. *)
   val restart: ?at: limit -> unit -> unit
 
+  (** [forget ~file_of] proactively instructs the manager to forget any source
+      location limit related to the file of the given limit.  [file_of] should
+      be the leftmost limit given to the manager when starting to parse a file.
+      Limits related to this file should not be used or queried once a call to
+      [forget ~file_of] returns. *)
+  val forget: file_of: limit -> unit
+
   (** [with_temporary_copy ~f a] saves the internal state {i s} of the manager,
       evaluates [f a], and then restores {i s}. *)
   val with_temporary_copy: f: ('a -> 'b) -> 'a -> 'b

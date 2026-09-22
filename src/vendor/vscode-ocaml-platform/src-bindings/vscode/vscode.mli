@@ -1134,6 +1134,8 @@ end
 
 module Extension : sig
   include Js.T
+
+  val packageJSON : t -> Jsonoo.t
 end
 
 module Extensions : sig
@@ -1302,6 +1304,8 @@ module ExtensionContext : sig
   val logUri : t -> Uri.t
 
   val extensionMode : t -> ExtensionMode.t
+
+  val extension : t -> Extension.t
 
   val subscribe : t -> disposable:Disposable.t -> unit
 end

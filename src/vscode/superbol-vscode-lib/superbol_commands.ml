@@ -27,9 +27,6 @@ type t =
     handler: handler;
   }
 
-let extension_oc : Vscode.OutputChannel.t Lazy.t =
-  lazy (Vscode.Window.createOutputChannel ~name:"SuperBOL Studio Extension")
-
 let commands = ref []
 
 let command id handler =
@@ -70,11 +67,23 @@ let _editor_action_findReferences =
         in ()
       | _ ->
         let types_given = List.map Ojs.type_of args |> String.concat ", " in
-        let lazy oc = extension_oc in
-        let value = Printf.sprintf
-            "Internal warning: unexpected arguments given to %s: \
-             expected uri & position, got [%s]" command_name types_given in
-        OutputChannel.appendLine oc ~value
+        Superbol_printer.log_error
+          "Internal warning: unexpected arguments given to %s: \
+           expected uri & position, got [%s]" command_name types_given
+    end
+
+let _analyze_workspace =
+  command "superbol.analyze.workspace" @@ Instance
+    begin fun instance ~args:_ ->
+      let _: unit Promise.t = Superbol_workspace.run_analysis instance in
+      ()
+    end
+
+let _retrieve_copybooks =
+  command "superbol.copybooks.retrieve" @@ Instance
+    begin fun _instance ~args:_ ->
+      let _: unit Promise.t = Superbol_workspace.run_copybook_retrieval () in
+      ()
     end
 
 let _restart_language_server =

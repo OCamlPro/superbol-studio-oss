@@ -22,6 +22,7 @@ module Behaviors = Behaviors
 module Tokenizing = Tokenizing
 module Symbolic = Symbolic           (* for now; may be moved elsewhere later *)
 module Platform = Platform
+module Tab_stops = Tab_stops
 
 exception FatalError of string
 let fatal fmt = Pretty.string_to (fun s -> raise @@ FatalError s) fmt

@@ -19,7 +19,7 @@ let error fmt =
       exit 2
     ) fmt
 
-let current_dir = Sys.getcwd ()
+let current_dir = Slashifier.slashify @@ Sys.getcwd ()
 
 (* Use Directories instead *)
 let home_dir = try Sys.getenv "HOME" with _ -> current_dir

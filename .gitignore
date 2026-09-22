@@ -1,5 +1,5 @@
 /superbol-studio-oss
-/superbol-vscode-platform
+/superbol-vscode-oss
 /interop-js-stubs
 /node-js-stubs
 /vscode-js-stubs
@@ -8,6 +8,10 @@
 /vscode-debugadapter
 /vscode-debugprotocol
 /superbol-free
+/autofonce
+/h2mlstubs
+/tramabol
+/ezlibcob
 *~
 _build
 .merlin
@@ -18,18 +22,19 @@ _build
 .drom.config
 # Edit drom.toml to change the following lines
 /superbol-free-*
+/tramabol-*
 /_*
 /node_modules
-/yarn-error.log
-/yarn.lock
 /package-json
 /package.json.prev
+/package-lock.json
 /gnucobol-config
 ATTIC
 /out
 !.vscode/tasks.json
 !.vscode/launch.json
 *.vsix
+/*.js
 *.opam.locked
 /emacs/lsp-superbol-customs.el
 _superbol

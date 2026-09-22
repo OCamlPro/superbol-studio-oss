@@ -16,7 +16,7 @@ open Lsp.Types
 open Lsp_testing
 
 
-let inspect_positions (doc, positions) : string -> unit =
+let inspect_positions (doc, positions) : ?expand_carets:bool -> string -> unit =
   let { end_with_postproc; projdir }, server = make_lsp_project () in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let doc = LSP.Server.find_document prog server in

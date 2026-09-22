@@ -71,6 +71,7 @@ let dual_handler_none =
 %[@post.tag procedure_division_header unit]
 %[@post.tag procedure_division Cobol_ptree.procedure_division]
 %[@post.tag method_definitions Cobol_ptree.method_definitions]
+%[@post.tag data_descr_entry Cobol_ptree.data_item]
 
 %[@post.tag pending string]
 
@@ -207,7 +208,7 @@ let dual_handler_none =
 (* Entry points *)
 
 %start <Cobol_ptree.compilation_group> compilation_group
-%start <condition> standalone_condition
+%start <condition with_loc> standalone_condition
 
 %%
 
@@ -226,7 +227,7 @@ let loc_result (X) ==
   | res = loc (X); { Cobol_common.Srcloc.lift_result res }
 
 let loc (X) ==
-  | x = X; { x &@ Grammar_utils.Overlay_manager.join_limits $sloc }
+  | x = X; { with_loc x $sloc }
 
 let ioloc (X) ==
   |             {None}
@@ -1269,9 +1270,9 @@ let report_descr_entry :=
        report_items = crl } }
 
 let constant_or_data_descr_entry :=
-  | e = constant;
+  | e = constant; ".";
     { Constant e }
-  | e = data_descr_entry;
+  | e = data_descr_entry; ".";
     { Data e }                                  (* including level 77 entries *)
   | l = loc(elementary_level); dn = name; RENAMES; ri = loc(qualname);
     to_ = o(THROUGH; ~ = loc(qualname); < >); ".";
@@ -1370,15 +1371,16 @@ let file_block_contents ==
   | CHARACTERS; {FileBlockContainsCharacters}
   | RECORDS;    {FileBlockContainsRecords}
 
-record_clause:
- | RECORD CONTAINS? i = integer CHARACTERS?
-    { FixedLength i }
- | RECORD CONTAINS? i1 = integer TO i2 = integer CHARACTERS?
-    { FixedOrVariableLength { min_length = i1;
-                              max_length = i2 } }
- | RECORD IS? VARYING IN? SIZE?
-   lengths = from_to_characters_opt
-   depending = ro(depending_phrase)
+let record_clause :=
+ | RECORD; CONTAINS?; ~ = loc(integer); CHARACTERS?;
+   <FixedLength>
+ | RECORD; CONTAINS?; i1 = loc(integer);
+   TO; i2 = loc(integer); CHARACTERS?;
+   { FixedOrVariableLength { min_length = i1;
+                             max_length = i2 } }
+ | RECORD; IS?; VARYING; IN?; SIZE?;
+   lengths = from_to_characters_opt;
+   depending = ro(depending_phrase);
    { let min_length, max_length = lengths in
      VariableLength { min_length; max_length; depending } }
 
@@ -1393,20 +1395,24 @@ let recording_mode :=
  | FIXED;    { ModeFixed }
  | VARIABLE; { ModeVariable }
 
-from_to_characters_opt [@default (None, None)]:
- | CHARACTERS?                                    { None,    None }
- | FROM? i1 = integer CHARACTERS?                 { Some i1, None }
- | TO i2 = integer CHARACTERS?                    { None,    Some i2 }
- | FROM? i1 = integer TO i2 = integer CHARACTERS? { Some i1, Some i2 }
+let from_to_characters_opt [@default (None, None)] :=
+ | CHARACTERS?;                           { None,    None }
+ | FROM?; i1 = loc(integer); CHARACTERS?; { Some i1, None }
+ | TO; i2 = loc(integer); CHARACTERS?;    { None,    Some i2 }
+ | FROM?; i1 = loc(integer); TO;
+   i2 = loc(integer); CHARACTERS?;        { Some i1, Some i2 }
 
 label_clause:
  | LABEL mr(RECORD IS? | RECORDS ARE? {}) STANDARD { LabelStandard }
  | LABEL mr(RECORD IS? | RECORDS ARE? {}) OMITTED  { LabelOmitted }
 
-valueof_clause:
- | VALUE OF iil = nel(i = name IS? il = qualname_or_literal
-                        { { valueof_valued = i; valueof_value = il; } })
-  { iil }
+let valueof_clause :=
+ | VALUE; OF; ~ = nel(valueof_binding); < >
+
+let valueof_binding :=
+  | s = mr(~ = name; <FileLabelName> | ID; { FileLabelID }); IS?;
+    v = qualname_or_literal;
+    { { valueof_subject = s; valueof_value = v } }
 
 data_clause:
  | DATA_RECORD IS? il = names   { il }
@@ -1470,7 +1476,7 @@ let constant :=
   (* BYTE-LENGTH is sensitive throughout "constant entry" w.r.t ISO/IEC 2014.
      However, like in GnuCOBOL we restrict the scope to the only places where
      the keyword is relevant. *)
-  | l = loc(elementary_level); n = name; spec = constant_spec; ".";
+  | l = loc(elementary_level); n = name; spec = constant_spec;
     { let go, cv = spec in
       { constant_level = l;
         constant_name = n;
@@ -1481,8 +1487,8 @@ let constant_spec_prefix ==
   | CONSTANT; ~ = ibo(global_clause); < >
 
 let constant_spec :=
-  | go = constant_spec_prefix; AS?; e = loc(expression_no_leftmost_length);
-    { go, ConstExpr ~&e &@<- e } (* or plain ident *)
+  | go = constant_spec_prefix; AS?; e = expression_no_leftmost_length;
+    { go, ConstExpr e &@<- e } (* or plain ident *)
   | p = constant_value_length; OF?; n = name;
     { fst p, match snd p with
         | `ByteLength -> ConstByteLength n &@<- n
@@ -1494,10 +1500,10 @@ let constant_value_length [@context constant] :=
   | go = constant_spec_prefix; AS?; BYTE_LENGTH; {go, `ByteLength}
   | go = constant_spec_prefix; AS?; LENGTH;      {go, `Length}
 
-let data_descr_entry :=
+let data_descr_entry [@post.data_descr_entry] :=
   | l = loc(elementary_level);
     eno = ro(entry_name_clause);
-    dcl = rl(loc(data_descr_clause)); ".";
+    dcl = rl(loc(data_descr_clause));
     { { data_level = l;
         data_name = eno;
         data_clauses = dcl } }
@@ -1974,8 +1980,8 @@ source_clause:
 
 (* Not rigorously exact (see P389), but too complicated to parse otherwise  *)
 source_operands:
- | e = expression            { [e] }
- | el = ntl(arithmetic_term) { el }
+ | e = expression                 { [e] }
+ | el = ntl(loc(arithmetic_term)) { el }
 
 sum_clause:
  | sl = nel(sum_phrase)
@@ -1989,8 +1995,8 @@ sum_phrase:
 
 (* Not sure which expressions are valid here (see P381) *)
 sum_operands:
- | e = expression            { [e] }
- | el = ntl(arithmetic_term) { el }
+ | e = expression                 { [e] }
+ | el = ntl(loc(arithmetic_term)) { el }
 
 let report_data_name_or_final :=
   | ~ = qualident; <ReportDataName>
@@ -2284,8 +2290,8 @@ let qualnames := ~ = rnel(qualname); < >
 let reference == qualname
 
 let refmod ==
- | "("; refmod_left = loc(expression_no_all);
-   ":"; refmod_length = ro(loc(expression_no_all)); ")";
+ | "("; refmod_left = expression_no_all;
+   ":"; refmod_length = ro(expression_no_all); ")";
    { { refmod_left; refmod_length } }
 
 let literal_int_ident :=
@@ -2481,7 +2487,7 @@ let ident_or_literal
 
 let figurative_constant [@recovery Zero] [@symbol "<figurative constant>"] :=
   |      ~ = figurative_constant_no_all; < >
-  | ALL; l = nonnumeric_literal_no_all;  { All l }
+  | ALL; l = loc(nonnumeric_literal_no_all); { All l }
 (*ALL symbolic-character (alphanum, national) (defined in SPECIAL-NAMES)*)
 
 let figurative_constant_no_all ==
@@ -2500,11 +2506,13 @@ let integer [@recovery integer_zero] [@symbol "<integer literal>"] :=
 
 let fixedlit [@recovery fixed_zero] [@cost 10]
       [@symbol "<fixed-point literal>"] :=
-  | (i, _, d) = FIXEDLIT; { Cobol_ptree.fixed_of_strings i d }
+  | (integral, _, fractional) = FIXEDLIT;
+    { Cobol_ptree.fixed_of_strings ~integral ~fractional }
 
 let floatlit [@recovery floating_zero] [@cost 10]
       [@symbol "<floating-point literal>"] :=
-  | (i, _, d, e) = FLOATLIT; { Cobol_ptree.floating_of_strings i d e }
+  | (integral, _, fractional, exponent) = FLOATLIT;
+    { Cobol_ptree.floating_of_strings ~integral ~fractional ~exponent }
 
 let alphanum [@recovery dummy_alphanum] [@symbol "<alphanumeric literal>"] :=
   | ~ = ALPHANUM; < >
@@ -2517,8 +2525,8 @@ let literal [@recovery dummy_literal] [@symbol "<literal>"] :=
  | f = fixedlit;  {Fixed f}
  | f = floatlit;  {Floating f}
  | f = figurative_constant;            {Fig f}
- | l1 = nonnumeric_literal_no_all; "&";
-   l2 = nonnumeric_literal_no_all;     {Concat (l1, l2): literal}
+ | l1 = loc(nonnumeric_literal_no_all); "&";
+   l2 = loc(nonnumeric_literal_no_all);     {Concat (l1, l2): literal}
 
 (*
 literal_no_all:
@@ -2550,16 +2558,16 @@ let elementary_string_literal ==
  | n = NATLIT;   { National n : strlit }
 
 let string_literal [@symbol "<string literal>"] :=
- | l = elementary_string_literal;  { l }
- | f = figurative_constant;        { Fig f }
- | l1 = string_literal_no_all; "&";
-   l2 = string_literal_no_all;     { StrConcat (l1, l2) : strlit }
+ | l = elementary_string_literal;        { l }
+ | f = figurative_constant;              { Fig f }
+ | l1 = loc(string_literal_no_all); "&";
+   l2 = loc(string_literal_no_all);      { StrConcat (l1, l2) : strlit }
 
 let string_literal_no_all [@symbol "<string literal>"] :=
- | l = elementary_string_literal;  { l: strlit }
- | f = figurative_constant_no_all; { Fig f }
- | l1 = string_literal_no_all; "&";
-   l2 = string_literal_no_all;     { StrConcat (l1, l2) : strlit }
+ | l = elementary_string_literal;        { l: strlit }
+ | f = figurative_constant_no_all;       { Fig f }
+ | l1 = loc(string_literal_no_all); "&";
+   l2 = loc(string_literal_no_all);      { StrConcat (l1, l2) : strlit }
 
 
 
@@ -2572,8 +2580,8 @@ elementary_string_or_int_literal:
 string_or_int_literal:
  | l = elementary_string_or_int_literal { l }
  | f = figurative_constant              { Fig f }
- | l1 = string_literal_no_all "&"
-   l2 = string_literal_no_all       { StrConcat (l1, l2) : strlit_or_intlit }
+ | l1 = loc(string_literal_no_all) "&"
+   l2 = loc(string_literal_no_all)      { StrConcat (l1, l2) : strlit_or_intlit }
 
 (*
 string_or_int_literal_no_all:
@@ -2589,16 +2597,16 @@ elementary_nonnumeric_literal:
  | b = BOOLIT   { Boolean b }
 
 nonnumeric_literal:
- | l = elementary_nonnumeric_literal  { l }
- | f = figurative_constant            { Fig f }
- | l1 = nonnumeric_literal_no_all "&"
-   l2 = nonnumeric_literal_no_all     { Concat (l1, l2): nonnumlit }
+ | l = elementary_nonnumeric_literal       { l }
+ | f = figurative_constant                 { Fig f }
+ | l1 = loc(nonnumeric_literal_no_all) "&"
+   l2 = loc(nonnumeric_literal_no_all)     { Concat (l1, l2): nonnumlit }
 
 nonnumeric_literal_no_all:
- | l = elementary_nonnumeric_literal  { l }
- | f = figurative_constant_no_all     { Fig f }
- | l1 = nonnumeric_literal_no_all "&"
-   l2 = nonnumeric_literal_no_all     { Concat (l1, l2): nonnumlit }
+ | l = elementary_nonnumeric_literal       { l }
+ | f = figurative_constant_no_all          { Fig f }
+ | l1 = loc(nonnumeric_literal_no_all) "&"
+   l2 = loc(nonnumeric_literal_no_all)     { Concat (l1, l2): nonnumlit }
 
 
 
@@ -2607,9 +2615,8 @@ nonnumeric_literal_no_all:
 (* Used in many *)
 let qualname_or_literal :=
  | n = qualname; { UPCAST.qualname_with_literal n }
- | l = literal;  { UPCAST.literal_with_qualdatname l }
+ | l = literal;  { UPCAST.literal_with_qualname l }
 
-let x == scalar                                       (* alias, as in GnuCOBOL *)
 let scalar :=
  | i = scalar_ident;       { UPCAST.scalar_ident_as_scalar i }
  | l = numeric_literal;    { UPCAST.numeric_as_scalar l }
@@ -2677,34 +2684,36 @@ let ident_or_integer :=
 
 (* ---------- Expressions ---------- *)
 
-(* TODO: rename `expression` into `subscript_expression`, and
-   `expression_no_all` into `expression`. *)
-
 let expr_(leftmost_term,term) :=
-  | ~ = expr_(leftmost_term,term); ~ = expr_binop; ~ = term; <Binop>
-  | ~ = leftmost_term;                                       <     >
+  | ~ = loc(expr_(leftmost_term,term)); ~ = expr_binop; ~ = loc(term); <Binop>
+  | ~ = leftmost_term;                                                 <     >
 
 let expr_binop ==
   | "+"; {BPlus}
   | "-"; {BMinus}
 
-let expression [@recovery dummy_expr] [@symbol "<expression>"] [@cost 0] :=
+let expr [@recovery dummy_expr] [@symbol "<expression>"] [@cost 0] :=
       expr_(term(atomic),
             term(atomic))
 
-let expression_no_all ==
+let expr_no_all ==
       expr_(term(atomic_no_all),
             term(atomic_no_all))
 
-let expression_par_unop ==
+let expr_par_unop ==
       expr_(term_(factor_(atomic_no_all),
                   factor(atomic,atomic)),
             term(atomic))
 
-let expression_no_leftmost_length :=
+let expr_no_leftmost_length :=
       expr_(term_(factor_(atomic_no_leftmost_length),
                   factor(atomic,atomic)),
             term(atomic))
+
+let expression == loc(expr)
+let expression_no_all == loc(expr_no_all)
+let expression_par_unop == loc(expr_par_unop)
+let expression_no_leftmost_length == loc(expr_no_leftmost_length)
 
 (* --- *)
 
@@ -2715,8 +2724,8 @@ let term_with_leftmost(leftmost_atomic,atomic) ==
             factor(atomic,atomic))
 
 let term_(f1,f2) :=
-  | ~ = term_(f1,f2); ~ = binop; ~ = f2; <Binop>
-  | ~ = f1;                              <     >
+  | ~ = loc(term_(f1,f2)); ~ = binop; ~ = loc(f2); <Binop>
+  | ~ = f1;                                        <     >
 
 let binop ==
   | "*";   { BMul }
@@ -2730,8 +2739,8 @@ let binop ==
 let factor(leftmost_atomic,atomic) == factor_(unary_(leftmost_atomic,atomic))
 
 let factor_(e) :=
-  | ~ = e; ~ = powop; ~ = factor_(e); <Binop>
-  | ~ = e;                            <     >
+  | ~ = loc(e); ~ = powop; ~ = loc(factor_(e)); <Binop>
+  | ~ = e;                                      <     >
 
 let powop ==
   | "**"; {BPow}
@@ -2739,8 +2748,8 @@ let powop ==
 (* --- *)
 
 let unary_(l,e) :=
-  | ~ = l;           <    >
-  | ~ = unop; ~ = e; <Unop>
+  | ~ = l;                <    >
+  | ~ = unop; ~ = loc(e); <Unop>
 
 let unop ==
   | "+";   { UPlus }
@@ -2754,26 +2763,18 @@ let atomic_(term,expr_in_paren) :=
   | "("; ~ = expr_in_paren; ")"; < >                      (* arith or boolean *)
 
 let atomic [@recovery dummy_expr] [@symbol "<atomic expression>"] :=
-  | atomic_(arithmetic_term, expression)
+  | atomic_(arithmetic_term, expr)
 
 let atomic_no_all [@recovery dummy_expr] [@symbol "<atomic expression>"] :=
-  | atomic_(arithmetic_term_no_all, expression_no_all)
+  | atomic_(arithmetic_term_no_all, expr_no_all)
 
 let atomic_no_leftmost_length [@recovery dummy_expr] [@symbol "<atomic expression>"] :=
-  | atomic_(arithmetic_term_no_length, expression)
+  | atomic_(arithmetic_term_no_length, expr)
 
 (* --- *)
 
-let arithmetic_term :=                                            (* `arith_x` *)
- | i = scalar_ident;         { Atom (UPCAST.scalar_ident_as_scalar i) } (* numeric or boolean *)
- | i = integer;              { Atom (Integer i) }
- | f = fixedlit;             { Atom (Fixed f) }
- | f = floatlit;             { Atom (Floating f) }
- | b = BOOLIT;               { Atom (Boolean b) } (* boolean *)
- | f = figurative_constant;  { Atom (Fig f) } (* numeric or boolean (NB: or strlits) *)
- | a = alphanum;             { Atom (Alphanum a) } (* NB: quick relaxation for now *)
- | n = NATLIT;               { Atom (National n) }
- | l = length_of_expression; { Atom l }
+let arithmetic_term ==                                            (* `arith_x` *)
+ | t = x; { Atom t }
 
 let arithmetic_term_no_all :=
  | i = scalar_ident;    { Atom (UPCAST.scalar_ident_as_scalar i) } (* numeric or boolean *)
@@ -2784,7 +2785,7 @@ let arithmetic_term_no_all :=
  | a = alphanum; { Atom (Alphanum a) }         (* NB: quick relaxation for now *)
  | n = NATLIT;   { Atom (National n) }
  | f = figurative_constant_no_all; { Atom (Fig f) } (* numeric or boolean (NB: or strlits) *)
- | l = length_of_expression; { Atom l }
+ | l = length_of_expr; { Atom l }
 
 let arithmetic_term_no_length :=
  | i = scalar_ident;         { Atom (UPCAST.scalar_ident_as_scalar i) }
@@ -2796,71 +2797,64 @@ let arithmetic_term_no_length :=
  | a = alphanum;             { Atom (Alphanum a) }
  | n = NATLIT;               { Atom (National n) }
 
-let length_of_expression ==
-  | ~ = length_of_expr; < >
-
 (* ---------- Conditions ---------- *)
 
+let condition :=
+ | ~ = loc(cond); <>
 
+let cond [@symbol "<condition>"] [@recovery_with_pos dummy_cond] :=
+ | ~ = nonrel_condition;                     < >
+ | ~ = relation_condition;      %prec lowest < >
+ | l = condition; op = logop; r = condition; { Logop (l, op, r) }
 
-condition:
- | complex_condition { $1 }
+let logop ==
+ | AND;           { LAnd }
+ | OR;            { LOr }
 
-complex_condition:
- | nonrel_condition { $1 }
- | relation_condition %prec lowest { $1 }
- | complex_condition logop complex_condition { Logop ($1, $2, $3) }
+let any_lpar ==
+ | LPAR;              {}
+ | LPAR_BEFORE_RELOP; {}
 
-%inline logop:
- | AND           { LAnd }
- | OR            { LOr }
-
-%inline any_lpar:
- | LPAR              {}
- | LPAR_BEFORE_RELOP {}
-
-%inline relation_condition:
- | neg = ibo(NOT) e = expression pred = abbrev_relop_operand { relation_condition (neg, e, pred) }
+let relation_condition ==
+ | neg = ibo(NOT); e = expression; pred = loc(abbrev_relop_operand);
+    { Relation (neg, e, pred) }
 
 nonrel_condition:
- | n = ibo(NOT)     e = expression %prec lowest { neg_simple_cond ~neg:n @@ Expr e }
- | n = ibo(NOT)     c = extended_condition      { neg_condition ~neg:n c }
- | n = ibo(NOT) "(" c  = complex_condition ")"  { neg_condition ~neg:n c }
+ | n = ibo(NOT)     e = expression %prec lowest { neg_condition ~neg:n (Expr e &@<- e) }
+ | n = ibo(NOT)     c = loc(extended_condition) { neg_condition ~neg:n (cast_no_rel_cond ~&c &@<- c) }
+ | n = ibo(NOT) "(" c  = condition ")"          { neg_condition ~neg:n c }
 
 abbrev_relop_atom:
- | r = relop             e = abbrev_object_atom          { AbbrevRelOp (r, e) }
- |     LPAR_BEFORE_RELOP c = abbrev_relop_operand RPAR   { c }
- | NOT LPAR_BEFORE_RELOP c = abbrev_relop_operand RPAR   { AbbrevNot c }
+ | r = relop e = loc(abbrev_object_atom)                             { AbbrevRelOp (r, e) }
+ | n = ibo(NOT) LPAR_BEFORE_RELOP c = loc(abbrev_relop_operand) RPAR { AbbrevParen (n, c) }
 
 abbrev_relop_operand:
  | abbrev_relop_atom { $1 }
- | abbrev_relop_operand logop abbrev_relation_operand    { AbbrevComb ($1, $2, $3) }
+ | loc(abbrev_relop_operand) logop loc(abbrev_relation_operand)    { AbbrevLogop ($1, $2, $3) }
 
 abbrev_object_atom:
  | n = ibo(NOT)     e = expression          %prec lowest { AbbrevObject (n, e) }
- |      "(" c = abbrev_object_operand ")"                { c }
- | NOT  "(" c = abbrev_object_operand ")"                { AbbrevNot c }
+ | n = ibo(NOT) "(" c = loc(abbrev_object_operand) ")"   { AbbrevParen (n, c) }
 
 abbrev_object_operand:
  | abbrev_object_atom { $1 }
- | abbrev_object_operand logop abbrev_relation_operand   { AbbrevComb ($1, $2, $3) }
+ | loc(abbrev_object_operand) logop loc(abbrev_relation_operand)   { AbbrevLogop ($1, $2, $3) }
 
 abbrev_relation_operand:
- | r = relop    e = abbrev_object_atom                   { AbbrevRelOp (r, e) }
- | n = ibo(NOT) e = expression              %prec lowest { AbbrevObject (n, e) }
- | n = ibo(NOT) e = expression a = abbrev_relop_atom     { AbbrevSubject (n, e, a) }
- | n = ibo(NOT) c = extended_condition                   { AbbrevOther (neg_condition ~neg:n c) }
- |     any_lpar c = abbrev_relation_operand RPAR         { c }
- | NOT any_lpar c = abbrev_relation_operand RPAR         { AbbrevNot c }
- | abbrev_relation_operand logop abbrev_relation_operand { AbbrevComb ($1, $2, $3) }
+ | r = relop    e = loc(abbrev_object_atom)                        { AbbrevRelOp (r, e) }
+ | n = ibo(NOT) e = expression                        %prec lowest { AbbrevObject (n, e) }
+ | n = ibo(NOT) e = expression a = loc(abbrev_relop_atom)          { AbbrevSubject (n, e, a) }
+ | n = ibo(NOT) c = loc(extended_condition)                        { AbbrevOther (neg_condition ~neg:n c) }
+ | n = ibo(NOT) any_lpar c = loc(abbrev_relation_operand) RPAR     { AbbrevParen (n, c) }
+ | loc(abbrev_relation_operand) logop loc(abbrev_relation_operand) { AbbrevLogop ($1, $2, $3) }
 
 extended_condition:
  | e = expression io(IS) n = bo(NOT) c = class_condition
-    { neg_simple_cond ~neg:n @@ ClassCond (e, c) } (* exp = ident *)
+    { neg_condition ~neg:n (with_loc (ClassCond (e, c)) $sloc) }
  | e = expression io(IS) n = bo(NOT) s = sign_condition
-    { neg_simple_cond ~neg:n @@ SignCond (e, s) } (* exp = arith exp *)
+    { neg_condition ~neg:n (with_loc (SignCond (e, s)) $sloc) }
  | e = expression io(IS) n = bo(NOT) OMITTED
-    { neg_simple_cond ~neg:n @@ Omitted e } (* exp = ident *)
+    { neg_condition ~neg:n (with_loc (Omitted e) $sloc) }
 
 relop [@recovery Eq] [@symbol "<relational arithmetic operator>"]:
  | io(IS) n = ibo(NOT) GREATER THAN?
@@ -2979,10 +2973,21 @@ COB2002:
   (BY VALUE)? identifier/literal/expression
 *)
 
+let x :=                                                 (* `x` as in GnuCOBOL *)
+ | i = scalar_ident;         { UPCAST.scalar_ident_as_scalar i } (* numeric or boolean *)
+ | i = integer;              { Integer i }
+ | f = fixedlit;             { Fixed f }
+ | f = floatlit;             { Floating f }
+ | b = BOOLIT;               { Boolean b } (* boolean *)
+ | f = figurative_constant;  { Fig f } (* numeric or boolean (NB: or strlits) *)
+ | a = alphanum;             { Alphanum a } (* NB: quick relaxation for now *)
+ | n = NATLIT;               { National n }
+ | l = length_of_expr;       { l }
+
 let using_by :=
- | b = call_using_by?; e = loc(arithmetic_term);
+ | b = call_using_by?; e = loc(x);
    { { call_using_by = b;                       (* COB85: ident, COB2002: exp *)
-       call_using_expr = Cobol_common.Srcloc.map_payload Option.some e } }
+       call_using_expr = Some e &@<- e } }
  | b = call_using_by?; omitted = loc(OMITTED);
    { { call_using_by = b;
        call_using_expr = None &@<- omitted } }                    (* +COB2002 *)
@@ -3179,12 +3184,12 @@ let accept_with_clause [@recovery AcceptAttribute Highlight] [@symbol "<accept-w
 
 %public let unconditional_action := ~ = add_statement; < >
 add_statement:
- | ADD inl = rnel(x) TO irl = rounded_idents
+ | ADD inl = rnel(scalar) TO irl = rounded_idents
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR) end_add
    { Add { basic_arith_operands =
              ArithSimple { sources = inl; targets = irl };
            basic_arith_on_size_error = h } }
- | ADD inl = rnel(x) TO in_ = x
+ | ADD inl = rnel(scalar) TO in_ = scalar
    GIVING irl = rounded_idents
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR) end_add
    { Add { basic_arith_operands =
@@ -3192,7 +3197,7 @@ add_statement:
                            to_or_from_item = in_;
                            targets = irl };
            basic_arith_on_size_error = h } }
- | ADD inl = rnel(x) (* Same as above without 'TO' *)
+ | ADD inl = rnel(scalar) (* Same as above without 'TO' *)
    GIVING irl = rounded_idents
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR) end_add
    { let in_, inl = split_last inl in
@@ -3340,15 +3345,15 @@ let display_statement [@context display_stmt] :=
 let end_display := oterm_(END_DISPLAY)
 
 let display_items_clauses_list :=
- | ill = ident_or_literal+;
+ | ill = loc(ident_or_literal)+;
    { [ { display_items = ill; display_clauses = []; } ] }
  | dicl = nell(display_items_clauses);
    { dicl }
- | dicl = nell(display_items_clauses); ill = ident_or_literal+;
+ | dicl = nell(display_items_clauses); ill = loc(ident_or_literal)+;
    { dicl @ [ { display_items = ill; display_clauses = []; } ] }
 
 let display_items_clauses :=
- | ill = ident_or_literal+; dcl = loc(display_clause)+;
+ | ill = loc(ident_or_literal)+; dcl = loc(display_clause)+;
    { { display_items = ill; display_clauses = dcl; } }
 
 let display_clause :=
@@ -3388,11 +3393,11 @@ let display_with_clause [@recovery DisplayAttribute Highlight] [@symbol "<displa
 
 %public let unconditional_action := ~ = divide_statement; <Divide>
 divide_statement:
- | DIVIDE in_ = x INTO irl = rounded_idents
+ | DIVIDE in_ = scalar INTO irl = rounded_idents
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); end_divide
    { { divide_operands = DivideInto { divisor = in_; dividends = irl };
        divide_on_size_error = h } }
- | DIVIDE in1 = x INTO in2 = x
+ | DIVIDE in1 = scalar INTO in2 = scalar
    GIVING irl = rounded_idents ro = ro(pf(REMAINDER,ident))
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); (* no remainder: single ir *)
    end_divide
@@ -3402,7 +3407,7 @@ divide_statement:
                                         into = true;
                                         remainder = ro };
        divide_on_size_error = h } }
- | DIVIDE in1 = x BY in2 = x
+ | DIVIDE in1 = scalar BY in2 = scalar
    GIVING irl = rounded_idents ro = ro(pf(REMAINDER,ident))
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); (* no remainder: single ir *)
    end_divide
@@ -3483,12 +3488,12 @@ let selection_objects :=
  | so = selection_object; ALSO; sol = selection_objects; { so :: sol }
 
 let selection_object :=
- | c = condition;           {SelCond c}                 (* also arith/bool exp*)
- | ~ = range_expression;    < >
- | ~ = partial_expression;  < >                                   (* +COB2002 *)
- | TRUE;                    {SelConst true}
- | FALSE;                   {SelConst false}
- | ANY;                     {SelAny: selection_object}
+ | c = loc(abbrev_relation_operand); {SelCond c}                 (* also arith/bool exp*)
+ | ~ = range_expression;             < >
+ | ~ = partial_expression;           < >                                   (* +COB2002 *)
+ | TRUE;                             {SelConst true}
+ | FALSE;                            {SelConst false}
+ | ANY;                              {SelAny}
 
 let range_expression :=
  | b = ibo(NOT); i1 = expression; THROUGH;
@@ -3496,8 +3501,6 @@ let range_expression :=
    { SelRange { negated = b; start = i1; stop = i2; alphabet = i } }
 
 let partial_expression :=
- | o = relop; e = expression;
-   { SelRelation { relation = o; expr = e } } (* relation (general, bool, pointer) *)
  | IS; n = bo(NOT); c = class_condition;
    { SelClassCond { negated = n; class_specifier = c } } (* class *) (* exp = ident *)
  | n = bo(NOT); c = class_condition_no_ident;
@@ -4236,9 +4239,9 @@ let stop_body [@context stop_stmt] := (* with context: should not accept empty *
   | THREAD; ~ = o(qualident); <StopThread>
 
 let stop_with_arg :=
-  | ~ = qualident; <StopWithQualIdent>                   (* ~COB85, -COB2002 *)
-  | ~ = literal; <StopWithLiteral> (* obsolete in COB85 (but MF allows ZERO,
-                                      SPACE & QUOTE) *)
+  | q = loc(qualident); {StopWithQualIdent ((QualIdent ~&q) &@<-q)} (* ~COB85, -COB2002 *)
+  | ~ = loc(literal); <StopWithLiteral> (* obsolete in COB85 (but MF allows ZERO,
+                                           SPACE & QUOTE) *)
 
 let with_status :=
   | WITH; status_kind = status_kind;
@@ -4277,12 +4280,12 @@ let s_delimited_by :=
 
 %public let unconditional_action := ~ = subtract_statement; < >
 let subtract_statement :=
- | SUBTRACT; inl = rnel(x); FROM; irl = rounded_idents;
+ | SUBTRACT; inl = rnel(scalar); FROM; irl = rounded_idents;
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); end_subtract;
    { Subtract { basic_arith_operands =
                   ArithSimple { sources = inl; targets = irl };
                 basic_arith_on_size_error = h } }
- | SUBTRACT; inl = rnel(x); FROM; in_ = x;
+ | SUBTRACT; inl = rnel(scalar); FROM; in_ = scalar;
    GIVING; irl = rounded_idents;
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); end_subtract;
    { Subtract { basic_arith_operands =

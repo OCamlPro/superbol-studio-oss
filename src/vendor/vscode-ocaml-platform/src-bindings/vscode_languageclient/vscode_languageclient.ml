@@ -304,14 +304,14 @@ module LanguageClient = struct
       -> ?forceDebug:bool
       -> unit
       -> t
-      [@@js.new "vscode_languageclient.LanguageClient"]
+      [@@js.new "__SUPERBOL__.vscode_languageclient.LanguageClient"]
 
     val from_stream :
          id:string
       -> name:string
       -> (unit -> StreamInfo.t Promise.t)
       -> t
-      [@@js.new "vscode_languageclient.LanguageClient"]
+      [@@js.new "__SUPERBOL__.vscode_languageclient.LanguageClient"]
 
     val start : t -> unit Promise.t [@@js.call]
 

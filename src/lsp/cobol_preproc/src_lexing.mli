@@ -13,7 +13,7 @@
 
 type 'k state
 
-val init_state: 'k Src_format.source_format -> 'k state
+val init_state: ?tab_stops:int list -> 'k Src_format.source_format -> 'k state
 val diagnostics: _ state -> Src_diagnostics.t
 val rev_comments: _ state -> Text.comments
 val rev_ignored: _ state -> Cobol_common.Srcloc.lexloc list
@@ -27,6 +27,11 @@ val flush_continued: ?force:bool -> 'a state -> 'a state
 val eof: 'a state -> Lexing.lexbuf -> 'a state
 val new_line: 'a state -> Lexing.lexbuf -> 'a state * Text.text
 val skip: 'a state -> Lexing.lexbuf -> 'a state
+val tab
+  : ?before_indicator:bool
+  -> k:('s -> Lexing.lexbuf -> 'b)
+  -> ('a state as 's)
+  -> Lexing.lexbuf -> 'b
 
 val comment
   : ?marker:string
@@ -66,6 +71,16 @@ val eqeq'
 val sna
   : (Src_format.fixed state as 's)
   -> Lexing.lexbuf -> 's
+val sna_char
+  : k_continue:(int -> (Src_format.fixed state as 's) -> Lexing.lexbuf -> 'b)
+  -> k_done:('s -> Lexing.lexbuf -> 'b)
+  -> int -> 's -> Lexing.lexbuf -> 'b
+val sna_tab
+  : k_sna:(int -> 's -> Lexing.lexbuf -> 'b)
+  -> k_indicator:('s -> Lexing.lexbuf -> 'b)
+  -> k_nominal:('s -> Lexing.lexbuf -> 'b)
+  -> (Src_format.fixed state as 's)
+  -> Lexing.lexbuf -> 'b
 val cdir_word
   : ?marker:string
   -> (Src_format.fixed state as 's)

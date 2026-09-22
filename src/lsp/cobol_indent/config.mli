@@ -28,6 +28,7 @@ val source_format :
 
  *)
 val load :
+  platform:Cobol_common.Types.platform ->
   source_format:Types.source_format ->
   filename:string -> Types.config
 
