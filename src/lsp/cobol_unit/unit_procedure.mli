@@ -14,13 +14,13 @@
 (** Utilities to deal with sections/paragraphs of PROCEDURE DIVISIONs *)
 
 val find
-  : ?in_section: Unit_types.procedure_section
+  : ?enclosing_section: Unit_types.procedure_section
   -> Cobol_ptree.qualname
   -> Unit_types.procedure
   -> Unit_types.procedure_block
 
 val full_qn
-  : ?in_section: Unit_types.procedure_section
+  : ?enclosing_section: Unit_types.procedure_section
   -> Cobol_ptree.qualname
   -> Unit_types.procedure
   -> Cobol_ptree.qualname

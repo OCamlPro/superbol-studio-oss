@@ -73,17 +73,17 @@ let call_stmt_section_name = "__CALL_STMT__"
 let reset_global_counter () =
   node_idx := 0
 
-let build_node 
-    ?(is_section=false) 
-    ?(display_name_type=Full) 
-    ~in_section ~cu paragraph =
+let build_node
+    ?(is_section=false)
+    ?(display_name_type=Full)
+    ~enclosing_section ~cu paragraph =
   let { jumps; will_fallthru; terminal; skip_remaining = _ }
     : JumpsCollector.acc = Visitor.fold_procedure_paragraph'
-      (JumpsCollector.folder ~in_section ~cu) paragraph JumpsCollector.init in
+      (JumpsCollector.folder ~enclosing_section ~cu) paragraph JumpsCollector.init in
   let typ, loc, section_name = match ~&paragraph.paragraph_name with
     | None -> Entry `Paragraph, ~@paragraph, ""
     | Some qn ->
-      let fullqn = full_qn' ~in_section ~cu qn in
+      let fullqn = full_qn' ~enclosing_section ~cu qn in
       let full_name = qn_to_fullname fullqn in
       let short_name, section_name =
         let name, qualifier = qn_to_strings fullqn in
@@ -188,10 +188,10 @@ let cfg_of ~(cu: cobol_unit) =
   let nodes = List.fold_left begin fun acc block ->
       match block with
       | Paragraph para ->
-        build_node ~in_section:None ~cu para :: acc
+        build_node ~enclosing_section:None ~cu para :: acc
       | Section { payload = { section_paragraphs; _ } as section; _ } ->
         fst @@ List.fold_left begin fun (acc, is_section) p ->
-          build_node ~is_section ~in_section:(Some section) ~cu p :: acc,
+          build_node ~is_section ~enclosing_section:(Some section) ~cu p :: acc,
           false
         end (acc, true) section_paragraphs.list
     end [] cu.unit_procedure.procedure_blocks.list
@@ -207,8 +207,8 @@ let cfg_of_section ~cu (section: procedure_section) =
   reset_global_counter ();
   let nodes =
     List.fold_left (fun (acc, is_section) p ->
-        build_node ~is_section ~display_name_type:Short 
-          ~in_section:(Some section) ~cu p
+        build_node ~is_section ~display_name_type:Short
+          ~enclosing_section:(Some section) ~cu p
           :: acc,
         false
       ) ([], true) section.section_paragraphs.list

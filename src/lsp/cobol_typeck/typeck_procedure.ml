@@ -268,10 +268,10 @@ let collect_references
       Cobol_ptree.Proc_division_visitor.fold_paragraph' v paragraph acc
 
     method! fold_procedure_name' qn
-        ({ current_section = in_section; _ } as acc) =
-      let register ?in_section qn acc =
+        ({ current_section = enclosing_section; _ } as acc) =
+      let register ?enclosing_section qn acc =
         let loc = baseloc_of_qualname ~&qn in
-        match Cobol_unit.Procedure.find ~&qn ?in_section procedure with
+        match Cobol_unit.Procedure.find ~&qn ?enclosing_section procedure with
         | block ->
             { acc with
               refs = Typeck_outputs.register_procedure_ref ~loc block acc.refs }
@@ -281,7 +281,7 @@ let collect_references
             error acc @@ Ambiguous_proc_name { given_qualname = qn;
                                                matching_qualnames }
       in
-      let acc = register ?in_section qn acc in
+      let acc = register ?enclosing_section qn acc in
       let acc = match ~&qn with
         | Name _ -> acc
         | Qual (_, section_qn) ->

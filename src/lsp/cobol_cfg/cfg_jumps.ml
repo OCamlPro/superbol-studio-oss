@@ -41,10 +41,11 @@ module Jumps = Set.Make(struct
       | _ -> to_int j2 - to_int j1
   end)
 
-let full_qn ~in_section ~cu qn =
-  Procedure.full_qn ?in_section qn cu.unit_procedure
+let full_qn ~enclosing_section ~cu qn =
+  Procedure.full_qn ?enclosing_section qn cu.unit_procedure
 
-let full_qn' ~in_section ~cu qn = full_qn ~in_section ~cu ~&qn
+let full_qn' ~enclosing_section ~cu qn =
+  full_qn ~enclosing_section ~cu ~&qn
 
 
 module JumpsCollector = struct
@@ -61,7 +62,7 @@ module JumpsCollector = struct
                skip_remaining = false;
              }
 
-  let folder ~in_section ~cu = object (v)
+  let folder ~enclosing_section ~cu = object (v)
     inherit [acc] Visitor.folder
 
     method! fold_goback' _ acc =
@@ -136,14 +137,14 @@ module JumpsCollector = struct
       | GoToSimple { target } ->
         {
           acc with
-          jumps = Jumps.add (Go (full_qn' ~in_section ~cu target)) acc.jumps;
+          jumps = Jumps.add (Go (full_qn' ~enclosing_section ~cu target)) acc.jumps;
           will_fallthru = false;
           skip_remaining = true;
         }
       | GoToDepending { targets; _ } ->
         Cobol_common.Basics.NEL.(
           targets
-          |> map ~f:(full_qn' ~in_section ~cu)
+          |> map ~f:(full_qn' ~enclosing_section ~cu)
           |> fold_left ~f:begin fun acc target ->
             Jumps.add (GoDepending target) acc
           end acc.jumps)
@@ -151,7 +152,7 @@ module JumpsCollector = struct
 
     method! fold_perform_target' { payload; _ } acc =
       let start =
-        full_qn' ~in_section ~cu payload.perform_target.procedure_start
+        full_qn' ~enclosing_section ~cu payload.perform_target.procedure_start
       in
       skip { acc with jumps = Jumps.add (Perform start) acc.jumps }
 

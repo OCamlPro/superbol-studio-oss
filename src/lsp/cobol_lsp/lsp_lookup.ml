@@ -41,7 +41,7 @@ module TYPES = struct
     | Proc_name of
         {
           qn: Cobol_ptree.qualname;
-          in_section: Cobol_unit.Types.procedure_section option;
+          enclosing_section: Cobol_unit.Types.procedure_section option;
         }
     | Preproc_or_compilation_variable_ref of
         {
@@ -192,8 +192,10 @@ let element_at_position ~filename pos (group: Cobol_unit.Types.group) artifacts
       elt = { elt with element_at_position = Some element } }
   and on_proc_name qn ({ elt; context } as acc) =
     let element_at_position = match context with
-      | Data_decls -> Some (Proc_name { qn; in_section = None })   (* unlikely *)
-      | Procedure in_section -> Some (Proc_name { qn; in_section })
+      | Data_decls ->
+          Some (Proc_name { qn; enclosing_section = None })       (* unlikely *)
+      | Procedure enclosing_section ->
+          Some (Proc_name { qn; enclosing_section })
     in
     { acc with elt = { elt with element_at_position } }
   in
