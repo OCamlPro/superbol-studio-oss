@@ -88,12 +88,12 @@ let fold_rounded_idents (v: _ #folder) =
 let fold_basic_arithmetic_operands (v: _ #folder) =
   handle v#fold_basic_arithmetic_operands
     ~continue:begin fun o x -> match o with
-      | ArithSimple { sources; targets } -> x
-          >> fold_list ~fold:fold_scalar v sources
+      | ArithSimple { operands; targets } -> x
+          >> fold_list ~fold:fold_scalar v operands
           >> fold_rounded_idents v targets
-      | ArithGiving { sources; to_or_from_item; targets } -> x
-          >> fold_list ~fold:fold_scalar v sources
-          >> fold_scalar v to_or_from_item
+      | ArithGiving { leading_operands; last_operand; targets } -> x
+          >> fold_list ~fold:fold_scalar v leading_operands
+          >> fold_scalar v last_operand
           >> fold_rounded_idents v targets
       | ArithCorresponding { source; target } -> x
           >> fold_qualname v source

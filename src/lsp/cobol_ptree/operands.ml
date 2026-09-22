@@ -204,13 +204,13 @@ let pp_date_time ppf = function
 type basic_arithmetic_operands =
   | ArithSimple of
       {
-        sources: scalar list;
+        operands: scalar list;                                   (* non-empty *)
         targets: rounded_idents;
       }
   | ArithGiving of
       {
-        sources: scalar list;
-        to_or_from_item: scalar;
+        leading_operands: scalar list;                           (* non-empty *)
+        last_operand: scalar;
         targets: rounded_idents;
       }
   | ArithCorresponding of
@@ -233,16 +233,16 @@ let pp_giving targets =
 let pp_basic_arithmetic_operands ?(sep = "TO") ppf bao =
   let pp_sources = Fmt.(list ~sep:sp pp_scalar) in
   match bao with
-  | ArithSimple { sources; targets } ->
-    pp_arithmetic_operands ~sep pp_sources pp_rounded_idents
-      ppf ((sources, targets), [])
-  | ArithGiving { sources; to_or_from_item; targets } ->
-    pp_arithmetic_operands ~sep pp_sources pp_scalar
-      ppf ((sources, to_or_from_item), pp_giving targets)
+  | ArithSimple { operands; targets } ->
+      pp_arithmetic_operands ~sep pp_sources pp_rounded_idents
+        ppf ((operands, targets), [])
+  | ArithGiving { leading_operands; last_operand; targets } ->
+      pp_arithmetic_operands ~sep pp_sources pp_scalar
+        ppf ((leading_operands, last_operand), pp_giving targets)
   | ArithCorresponding { source; target } ->
-    pp_arithmetic_operands ~modifier:"CORRESPONDING" ~sep
-      pp_qualname pp_rounded_ident
-      ppf ((source, target), [])
+      pp_arithmetic_operands ~modifier:"CORRESPONDING" ~sep
+        pp_qualname pp_rounded_ident
+        ppf ((source, target), [])
 
 
 (*

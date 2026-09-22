@@ -110,8 +110,8 @@ class virtual ['a] folder = object
   method fold_evaluate'      : (evaluate_stmt with_loc        , 'a) fold = default
   method fold_exec_block'    : (exec_block with_loc           , 'a) fold = default
   method fold_exit'          : (exit_stmt with_loc            , 'a) fold = default
-  method fold_free'          : (name with_loc list with_loc   , 'a) fold = default
-  method fold_generate'      : (name with_loc with_loc        , 'a) fold = default
+  method fold_free'          : (qualname list with_loc        , 'a) fold = default
+  method fold_generate'      : (qualname with_loc             , 'a) fold = default
   method fold_goback'        : (goback_stmt    with_loc       , 'a) fold = default
   method fold_goto'          : (goto_stmt with_loc            , 'a) fold = default
   method fold_if'            : (if_stmt with_loc              , 'a) fold = default
@@ -486,10 +486,10 @@ let fold_exit' (v: _ #folder) =
     end
 
 let fold_free' (v: _ #folder) =
-  handle' v#fold_free' v ~fold:(fold_list ~fold:fold_name')
+  handle' v#fold_free' v ~fold:(fold_list ~fold:fold_qualname)
 
 let fold_generate' (v: _ #folder) =
-  handle' v#fold_generate' v ~fold:fold_name'
+  handle' v#fold_generate' v ~fold:fold_qualname
 
 let fold_goback' (v: _ #folder) =
   handle' v#fold_goback' v

@@ -377,11 +377,11 @@ let semtoks_from_ptree ~filename ?range ptree =
     (*TODO: Exit *)
 
     method! fold_free' names acc = acc
-      |> add_list add_name' ~&names VarModif
+      |> add_list add_qualname ~&names VarModif
       |> Visitor.skip_children
 
     method! fold_generate' name acc = acc
-      |> add_name' ~&name VarModif
+      |> add_qualname ~&name VarModif
       |> Visitor.skip_children
 
     method! fold_procedure_name name acc = acc

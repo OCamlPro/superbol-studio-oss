@@ -3188,14 +3188,14 @@ add_statement:
  | ADD inl = rnel(scalar) TO irl = rounded_idents
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR) end_add
    { Add { basic_arith_operands =
-             ArithSimple { sources = inl; targets = irl };
+             ArithSimple { operands = inl; targets = irl };
            basic_arith_on_size_error = h } }
  | ADD inl = rnel(scalar) TO in_ = scalar
    GIVING irl = rounded_idents
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR) end_add
    { Add { basic_arith_operands =
-             ArithGiving { sources = inl;
-                           to_or_from_item = in_;
+             ArithGiving { leading_operands = inl;
+                           last_operand = in_;
                            targets = irl };
            basic_arith_on_size_error = h } }
  | ADD inl = rnel(scalar) (* Same as above without 'TO' *)
@@ -3203,8 +3203,8 @@ add_statement:
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR) end_add
    { let in_, inl = split_last inl in
      Add { basic_arith_operands =
-             ArithGiving { sources = inl;
-                           to_or_from_item = in_;
+             ArithGiving { leading_operands = inl;
+                           last_operand = in_;
                            targets = irl };
            basic_arith_on_size_error = h } }
  | ADD CORRESPONDING i = qualname TO ir = rounded_ident
@@ -3566,14 +3566,14 @@ let exit_spec [@recovery ExitSimple] :=
 
 %public let unconditional_action := ~ = free_statement; < >
 let free_statement :=
- | FREE; ~ = names; <Free>
+ | FREE; ~ = qualnames; <Free>
 
 
 (* GENERATE STATEMENT (+COB85, -COB2002) *)
 
 %public let unconditional_action := ~ = generate_statement; < >
 let generate_statement :=
- | GENERATE; ~ = name; <Generate>
+ | GENERATE; ~ = qualname; <Generate>
 
 
 
@@ -4289,14 +4289,14 @@ let subtract_statement :=
  | SUBTRACT; inl = rnel(scalar); FROM; irl = rounded_idents;
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); end_subtract;
    { Subtract { basic_arith_operands =
-                  ArithSimple { sources = inl; targets = irl };
+                  ArithSimple { operands = inl; targets = irl };
                 basic_arith_on_size_error = h } }
  | SUBTRACT; inl = rnel(scalar); FROM; in_ = scalar;
    GIVING; irl = rounded_idents;
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); end_subtract;
    { Subtract { basic_arith_operands =
-                  ArithGiving { sources = inl;
-                                to_or_from_item = in_;
+                  ArithGiving { leading_operands = inl;
+                                last_operand = in_;
                                 targets = irl };
                 basic_arith_on_size_error = h } }
  | SUBTRACT; CORRESPONDING; i = qualname; FROM; ir = rounded_ident;

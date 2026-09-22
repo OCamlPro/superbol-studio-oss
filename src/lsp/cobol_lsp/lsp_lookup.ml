@@ -354,14 +354,14 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
       (* add / subtract *)
       method! fold_basic_arithmetic_operands o acc =
         begin match o with
-          | ArithSimple { sources; targets } ->
+          | ArithSimple { operands; targets } ->
             acc
-            |> Numeric @>@ fold_list ~fold:fold_scalar v sources
+            |> Numeric @>@ fold_list ~fold:fold_scalar v operands
             |> Numeric @>@ fold_rounded_idents v targets
-          | ArithGiving { sources; to_or_from_item; targets } ->
+          | ArithGiving { leading_operands; last_operand; targets } ->
             acc
-            |> Numeric @>@ fold_list ~fold:fold_scalar v sources
-            |> Numeric @>@ fold_scalar v to_or_from_item
+            |> Numeric @>@ fold_list ~fold:fold_scalar v leading_operands
+            |> Numeric @>@ fold_scalar v last_operand
             |> [Numeric; NumericEdited] @>>@ fold_rounded_idents v targets
           | ArithCorresponding { source; target } ->
             acc
@@ -436,7 +436,7 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
 
       method! fold_free' { payload = f; _ } acc =
         acc
-        |> Pointer @>@ fold_list ~fold:fold_name' v f
+        |> Pointer @>@ fold_list ~fold:fold_qualname v f
         |> skip
 
       method! fold_goto' { payload = g; _ } acc =
