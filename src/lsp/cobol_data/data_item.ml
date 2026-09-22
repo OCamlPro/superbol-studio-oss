@@ -18,7 +18,8 @@ open Cobol_common.Srcloc.INFIX
 module Visitor = Cobol_common.Visitor
 
 (* ignores redefs by default *)
-let fold_definitions ?(fold_redefinitions = false) ~field ~table def acc =
+let fold_definitions ?(fold_redefinitions = false) ~field ~table ?visit_item
+    def acc =
   Data_visitor.fold_item_definition' object
     inherit [_] Data_visitor.folder
     method! fold_field_definition' def acc =
@@ -26,6 +27,10 @@ let fold_definitions ?(fold_redefinitions = false) ~field ~table def acc =
     method! fold_table_definition' def acc =
       Visitor.do_children (table def acc)
     method! fold_usage _ = Visitor.skip
+    method! fold_item_definition' def acc =
+      match visit_item with
+      | None -> Visitor.do_children acc
+      | Some f -> f def acc
     method! fold_item_redefinitions _ acc =
       if fold_redefinitions
       then Visitor.do_children acc
