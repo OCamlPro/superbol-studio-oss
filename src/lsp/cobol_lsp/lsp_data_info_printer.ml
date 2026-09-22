@@ -21,14 +21,29 @@ let pp_readable_size ppf size =
     let bits = Cobol_data.Memory.as_bits size in
     if Int.rem bits 8 = 0 then
       let bytes = bits / 8 in
-      Fmt.pf ppf "%u byte%s" bytes (if bytes > 1 then "s" else "")
+      Fmt.pf ppf "%u byte%s" bytes (if bytes <> 1 then "s" else "")
     else
-      Fmt.pf ppf "%u bit%s" bits (if bits > 1 then "s" else "")
+      Fmt.pf ppf "%u bit%s" bits (if bits <> 1 then "s" else "")
   with Cobol_data.Memory.NOT_SCALAR _ ->
     Fmt.pf ppf "*variable*"
 
 let pp_size =
   Fmt.(any "Size: " ++ pp_readable_size)
+
+let pp_total_size =
+  Fmt.(any "Total size: " ++ pp_readable_size)
+
+(* Show the record name only for items that are inside a record. On a record
+   itself it would just repeat the item name. *)
+let enclosing_record ~record_name
+  : Cobol_ptree.qualname option -> string option = function
+  | Some (Cobol_ptree.Qual _) -> record_name
+  | Some (Name _) -> None
+  | None -> record_name                        (* FILLER: show the record name *)
+
+let pp_offset_in record ppf offset =
+  Fmt.pf ppf "Offset: %a%a" pp_readable_size offset
+    Fmt.(option (any " in " ++ string)) record
 
 let pp_int' = Cobol_ptree.pp_with_loc Fmt.int
 
@@ -198,12 +213,6 @@ and pp_field_definition: field_definition Pretty.printer = fun ppf x ->
   let definition_has_issues = x.field_has_definition_issues in
   let pp_qualname_opt_in_block' =
     pp_cobol_block Fmt.(option ~none:(any "FILLER") Cobol_ptree.pp_qualname')
-  and pp_size ppf x =
-    match x.field_layout with
-    | Struct_field _ when not x.field_has_definition_issues ->
-        Fmt.fmt "  \n%a" ppf pp_size x.field_size
-    | _ ->
-        ()
   in
   match x.field_layout with
   | Elementary_field _ when definition_has_issues ->
@@ -215,8 +224,7 @@ and pp_field_definition: field_definition Pretty.printer = fun ppf x ->
         ppf x
   | _ ->
       Fmt.(const pp_qualname_opt_in_block' x.field_qualname ++ any "\n\n" ++
-           const pp_field_layout x.field_layout ++
-           const pp_size x ++ any "  \n" ++
+           const pp_field_layout x.field_layout ++ any "  \n" ++
            const (option @@
                   any "Redefines:\n" ++ pp_cobol_block Cobol_ptree.pp_qualname')
              x.field_redefines)
@@ -271,10 +279,7 @@ let pp_record_renaming: record_renaming Pretty.printer = fun ppf r ->
           r.renaming_thru
     end ++ any "\n\n" ++
     if r.renaming_has_definition_issues then nop else
-      const pp_renamed_item_layout r.renaming_layout ++
-      match r.renaming_layout with
-      | Renamed_struct _ -> any "  \n" ++ const pp_size r.renaming_size
-      | _ -> nop
+      const pp_renamed_item_layout r.renaming_layout
   end ppf r
 
 let pp_record_renaming': record_renaming with_loc Pretty.printer = fun ppf ->
@@ -312,3 +317,25 @@ let pp_data_definition ppf = function
       Fmt.pf ppf "%a\n\n%a" pp_condition_name ~&def pp_field_definition ~&field
   | Table_index { table; _ } ->
       pp_table_definition' ppf table
+
+(* Size and offset of an item. They cannot be read in the source. *)
+
+let named_record { record_name; record_item; _ } =
+  match Cobol_data.Item.qualname ~&record_item with
+  | None -> None
+  | Some _ -> Some record_name
+
+(* [prefix] is printed only when there is something to print, so that callers
+   never get a line break on its own. *)
+let pp_memory_info ?(prefix = "") ppf def =
+  let open Cobol_data.Item in
+  if not (def_has_issues def) then
+    let pp_size = match def with
+      | Table_index _ -> pp_total_size     (* an index spans every occurrence *)
+      | _ -> pp_size
+    and record =
+      enclosing_record ~record_name:(named_record (def_record def))
+        (def_qualname def)
+    in
+    Fmt.pf ppf "%s%a  \n%a" prefix
+      (pp_offset_in record) (def_offset def) pp_size (def_size def)
