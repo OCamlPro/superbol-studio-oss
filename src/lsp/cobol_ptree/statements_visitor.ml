@@ -62,7 +62,9 @@ class virtual ['a] folder = object
   method fold_replacing_range_spec: (replacing_range_spec    , 'a) fold = default
   method fold_returning           : (returning               , 'a) fold = default
   method fold_selection_object    : (selection_object        , 'a) fold = default
+  method fold_selection_object'   : (selection_object with_loc, 'a) fold = default
   method fold_selection_subject   : (selection_subject       , 'a) fold = default
+  method fold_selection_subject'  : (selection_subject with_loc, 'a) fold = default
   method fold_send_operands       : (send_operands           , 'a) fold = default
   method fold_set_condition_spec  : (set_condition_spec      , 'a) fold = default
   method fold_set_switch_spec     : (set_switch_spec         , 'a) fold = default
@@ -157,7 +159,7 @@ let fold_varying_phrase (v: _ #folder) =
       >> fold_ident v varying_ident
       >> fold_scalar v varying_from
       >> fold_option ~fold:fold_scalar v varying_by
-      >> fold_condition v varying_until
+      >> fold_condition' v varying_until
     end
 
 let fold_varying_phrase' (v: _ #folder) =
@@ -171,7 +173,7 @@ let fold_perform_mode (v: _ #folder) =
           >> fold_ident_or_intlit v i
       | PerformUntil { with_test; until } -> x
           >> fold_option ~fold:fold_stage v with_test
-          >> fold_option ~fold:fold_condition v until
+          >> fold_option ~fold:fold_condition' v until
       | PerformVarying { with_test; varying; after } -> x
           >> fold_option ~fold:fold_stage v with_test
           >> fold_varying_phrase' v varying
@@ -707,30 +709,28 @@ let fold_selection_subject (v: _ #folder) =
       | Subject c -> fold_condition v c
       | SubjectConst b -> fold_bool v b
     end
-
+    
+let fold_selection_subject' (v: _ #folder) =
+  handle' v#fold_selection_subject' ~fold:fold_selection_subject v
+  
 let fold_selection_object (v: _ #folder) =
   handle v#fold_selection_object
     ~continue:begin fun selection_object x ->
       match selection_object with
       | SelCond c -> x
-          >> fold_abbrev_relation_operand' v c
+          >> fold_condition v c
       | SelRange { negated; start; stop; alphabet} -> x
           >> fold_bool v negated
           >> fold_expression v start
           >> fold_expression v stop
           >> fold_option ~fold:fold_name' v alphabet
-      | SelClassCond { negated; class_specifier } -> x
-          >> fold_bool v negated
-          >> fold_class v class_specifier
-      | SelSignCond { negated; sign_specifier } -> x
-          >> fold_bool v negated
-          >> fold_signz v sign_specifier
-      | SelOmitted { negated } -> x
-          >> fold_bool v negated
       | SelConst b -> x
           >> fold_bool v b
       | SelAny -> x
     end
+    
+let fold_selection_object' (v: _ #folder) =
+  handle' v#fold_selection_object' ~fold:fold_selection_object v
 
 let fold_validate' (v: _ #folder) =
   handle' v#fold_validate' v ~fold:(fold_list ~fold:fold_ident)
@@ -1019,7 +1019,7 @@ and fold_entry' (v: _ #folder) : entry_stmt with_loc -> 'a -> 'a =
 and fold_evaluate' (v: _ #folder) : evaluate_stmt with_loc -> 'a -> 'a =
   handle' v#fold_evaluate' v
     ~fold:begin fun v { eval_subjects; eval_branches; eval_otherwise } x -> x
-      >> fold_list ~fold:fold_selection_subject v eval_subjects
+      >> fold_list ~fold:fold_selection_subject' v eval_subjects
       >> fold_list ~fold:fold_evaluate_branch v eval_branches
       >> fold_statements v eval_otherwise
     end
@@ -1028,14 +1028,14 @@ and fold_evaluate_branch (v: _#folder) =
   handle v#fold_evaluate_branch
     ~continue:begin fun { eval_selection; eval_actions } x -> x
       >> fold_list v eval_selection
-        ~fold:(fold_list ~fold:fold_selection_object)
+        ~fold:(fold_list ~fold:fold_selection_object')
       >> fold_statements v eval_actions
     end
 
 and fold_if' (v: _ #folder) : if_stmt with_loc -> 'a -> 'a =
   handle' v#fold_if' v
     ~fold:begin fun v { condition; then_branch; else_branch } x -> x
-      >> fold_condition v condition
+      >> fold_condition' v condition
       >> fold_statements v then_branch
       >> fold_statements v else_branch
     end
@@ -1116,7 +1116,7 @@ and fold_rewrite' (v: _ #folder) =
 and fold_search_when_clause' (v: _#folder) =
   handle' v#fold_search_when_clause' v
     ~fold:begin fun v { search_when_cond; search_when_stmts } x -> x
-      >> fold_condition v search_when_cond
+      >> fold_condition' v search_when_cond
       >> fold_statements v search_when_stmts
     end
 

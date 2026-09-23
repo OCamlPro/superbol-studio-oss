@@ -40,11 +40,11 @@ type evaluate_body =
   }
 
 val evaluate_body_when_other: srcloc -> statements -> evaluate_body
-val evaluate_body_last_branch: selection_object list with_loc -> statements ->
+val evaluate_body_last_branch: selection_object with_loc list with_loc -> statements ->
   evaluate_body
-val evaluate_body_prepend_when: selection_object list with_loc -> statements ->
+val evaluate_body_prepend_when: selection_object with_loc list with_loc -> statements ->
   evaluate_body -> evaluate_body
-val evaluate_stmt: selection_subject list -> evaluate_body -> evaluate_stmt
+val evaluate_stmt: selection_subject with_loc list -> evaluate_body -> evaluate_stmt
 
 val build_simple_program:
   Cobol_ptree.options_paragraph with_loc option ->
