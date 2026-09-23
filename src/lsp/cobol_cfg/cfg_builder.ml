@@ -8,12 +8,12 @@
 (*                                                                            *)
 (******************************************************************************)
 
-open Cobol_unit
-open Cobol_common.Srcloc.INFIX
 open Cobol_common.Srcloc.TYPES
 open Cobol_unit.Types
-open Cfg_jumps
 open Cfg_types
+
+open Cobol_common.Srcloc.INFIX
+
 module NEL = Cobol_common.Basics.NEL
 
 (* TYPES AND HELPERS *)
@@ -22,7 +22,7 @@ type display_name_type =
   | Full
   | Short
 
-let qn_to_strings : qualname -> string * string = function
+let qn_to_strings : Cobol_ptree.qualname -> string * string = function
   | Name { payload; _ } -> payload, ""
   | Qual({ payload = para; _ }, Name { payload = sec; _ }) -> para, sec
   | _ -> raise @@ Invalid_argument
@@ -77,13 +77,16 @@ let build_node
     ?(is_section=false)
     ?(display_name_type=Full)
     ~enclosing_section ~cu paragraph =
-  let { jumps; will_fallthru; terminal; skip_remaining = _ }
-    : JumpsCollector.acc = Visitor.fold_procedure_paragraph'
-      (JumpsCollector.folder ~enclosing_section ~cu) paragraph JumpsCollector.init in
+  let { jumps; will_fallthru; terminal;
+        skip_remaining = _ } : Cfg_jumps.JumpsCollector.acc =
+    let v = Cfg_jumps.JumpsCollector.folder ~enclosing_section ~cu in
+    Cobol_unit.Visitor.fold_procedure_paragraph' v paragraph
+      Cfg_jumps.JumpsCollector.init
+  in
   let typ, loc, section_name = match ~&paragraph.paragraph_name with
     | None -> Entry `Paragraph, ~@paragraph, ""
     | Some qn ->
-      let fullqn = full_qn' ~enclosing_section ~cu qn in
+      let fullqn = Cfg_jumps.full_qn' ~enclosing_section ~cu qn in
       let full_name = qn_to_fullname fullqn in
       let short_name, section_name =
         let name, qualifier = qn_to_strings fullqn in
@@ -104,23 +107,23 @@ let build_node
   }
 
 let new_node ~typ =
-  let loc_of ~(qn: qualname) = match qn with
-    | Cobol_ptree.Name name
+  let loc_of ~(qn: Cobol_ptree.qualname) = match qn with
+    | Name name
     | Qual (name, _) -> ~@name in
   let typ, loc, section_name = match typ with
     | `External qn ->
-      let _para, section = qn_to_strings qn in
-      External (qn_to_fullname qn), Some (loc_of ~qn), section
+        let _para, section = qn_to_strings qn in
+        External (qn_to_fullname qn), Some (loc_of ~qn), section
     | `EntryPoint -> Entry `Point, None, ""
     | `EntryStmt ({ payload; loc }, id) ->
-      Entry (`Statement payload), Some loc, id
+        Entry (`Statement payload), Some loc, id
     | `Call s ->
-      External s, None, call_stmt_section_name
+        External s, None, call_stmt_section_name
   in {
     id = next_node_idx ();
     section_name;
     loc;
-    jumps = Jumps.empty;
+    jumps = Cfg_jumps.Jumps.empty;
     will_fallthru = true;
     terminal = false;
     typ;
@@ -142,27 +145,27 @@ let build_edges nodes =
   let rec edge_builder_aux ~vertexes g nodes =
     let g, vertexes = match nodes with
       | ({ jumps; _ } as current)::_ ->
-        Jumps.fold begin fun uncond (g, vertexes) ->
+        Cfg_jumps.Jumps.fold begin fun uncond (g, vertexes) ->
           match uncond with
           | GoDepending qn
           | Go qn ->
             let vertexes, next = find_or_add vertexes ~typ:(`External qn) in
-            Cfg.add_edge_e g (current, Go, next),
+            CFG.add_edge_e g (current, Go, next),
             vertexes
           | Perform qn ->
             let vertexes, next = find_or_add vertexes ~typ:(`External qn) in
-            Cfg.add_edge_e g (current, Perform, next),
+            CFG.add_edge_e g (current, Perform, next),
             vertexes
           | Call prefix ->
             let vertexes, next =
               find_or_add vertexes ~typ:(`Call (prefix_to_string prefix)) in
-            Cfg.add_edge_e g (current, Perform, next),
+            CFG.add_edge_e g (current, Perform, next),
             vertexes
           | Entry entry_stmt ->
             let name, loc = entry_stmt_to_string_loc entry_stmt in
             let vertexes, next =
               find_or_add vertexes ~typ:(`EntryStmt (name &@ loc, current.section_name)) in
-            Cfg.add_edge_e g (next, FallThrough, current),
+            CFG.add_edge_e g (next, FallThrough, current),
             vertexes
         end jumps (g, vertexes)
       | [] -> g, vertexes
@@ -170,16 +173,16 @@ let build_edges nodes =
     match nodes with
     | ({ will_fallthru; _ } as current)::next::tl
       when will_fallthru ->
-      edge_builder_aux ~vertexes (Cfg.add_edge g current next) (next::tl)
+      edge_builder_aux ~vertexes (CFG.add_edge g current next) (next::tl)
     | _::tl -> edge_builder_aux ~vertexes g tl
     | [] -> g
   in
   let g, vertexes = List.fold_left begin fun (g, vertexes) node ->
-      Cfg.add_vertex g node,
+      CFG.add_vertex g node,
       match node.typ with
       | Normal (full_name, _) -> StringMap.add full_name node vertexes
       | _ ->  vertexes
-    end (Cfg.empty, StringMap.empty) nodes
+    end (CFG.empty, StringMap.empty) nodes
   in
   edge_builder_aux ~vertexes g nodes
 
@@ -237,13 +240,11 @@ let graph_material_of_doc ({ group; _ }: Cobol_typeck.Outputs.t) =
 
 let cfg_of_doc ~name checked_doc =
   graph_material_of_doc checked_doc
-  |> List.find_opt
-    begin fun (corr_name, _) -> String.equal name corr_name end
+  |> List.assoc_opt name
   |> function
-  | None -> raise @@
-    Pretty.invalid_arg "%s is invalid for requested document" name
-  | Some (_, `Cu cu) -> cfg_of ~cu
-  | Some (_, `Section (cu, sec)) -> cfg_of_section ~cu sec
+  | None -> Pretty.invalid_arg "%s is invalid for requested document" name
+  | Some `Cu cu -> cfg_of ~cu
+  | Some `Section (cu, sec) -> cfg_of_section ~cu sec
 
 let possible_cfgs_of_doc checked_doc =
   graph_material_of_doc checked_doc
@@ -259,42 +260,42 @@ let do_collapse_fallthru g =
     | Normal (_, name) -> Some (NEL.One name)
     | Entry _ | External _ | Split _ -> None in
   let collapse_node ~cfg ~id_map ~node ~pred n_names pred_names =
-    let cfg = Cfg.fold_succ_e begin fun (_, e, next) cfg ->
+    let cfg = CFG.fold_succ_e begin fun (_, e, next) cfg ->
         match next.typ with
         | Split next_name
           (* when the same split node already exist, remove the duplicate one *)
           when
-            Cfg.fold_succ_e begin fun pred_edge acc ->
+            CFG.fold_succ_e begin fun pred_edge acc ->
               acc || match pred_edge with
               | (_, pred_e, { typ = Split name; _ }) ->
                 Stdlib.(=) pred_e e &&
                 String.equal name next_name
               | _ -> false
             end cfg pred false
-          -> Cfg.remove_vertex cfg next
-        | _ -> Cfg.add_edge_e cfg (pred, e, next)
+          -> CFG.remove_vertex cfg next
+        | _ -> CFG.add_edge_e cfg (pred, e, next)
       end cfg node cfg in
     let id_map = IdMap.update pred.id
         begin function
           | None -> Some (NEL.append n_names pred_names)
           | Some names -> Some (NEL.append n_names names)
         end id_map in
-    Cfg.remove_vertex cfg node, id_map
+    CFG.remove_vertex cfg node, id_map
   in
   let id_map = IdMap.empty in
   let cfg, id_map =
-    Cfg.fold_vertex begin fun node (cfg, id_map) ->
+    CFG.fold_vertex begin fun node (cfg, id_map) ->
       match get_names_if_collapsable node with
       | None -> (cfg, id_map)
       | Some n_names ->
-        match Cfg.pred_e cfg node with
+        match CFG.pred_e cfg node with
         | [(({ typ = Normal (_, pred_name); _ } as pred), FallThrough, _)] ->
           collapse_node ~cfg ~id_map ~node ~pred n_names (NEL.One pred_name)
         | [(({ typ = Collapsed pred_names ; _ } as pred), FallThrough, _)] ->
           collapse_node ~cfg ~id_map ~node ~pred n_names pred_names
         | _ -> cfg, id_map
     end g (g, id_map) in
-  Cfg.map_vertex begin fun node ->
+  CFG.map_vertex begin fun node ->
     match IdMap.find_opt node.id id_map with
     | None -> node
     | Some names -> { node with typ = Collapsed (NEL.rev names) }
@@ -303,9 +304,9 @@ let do_collapse_fallthru g =
 let do_hide_unreachable g =
   let rec aux cfg =
     let did_remove, cfg =
-      Cfg.fold_vertex begin fun n (did_remove, cfg) ->
-        if Cfg.in_degree cfg n <= 0 && not (is_entry n)
-        then true, Cfg.remove_vertex cfg n
+      CFG.fold_vertex begin fun n (did_remove, cfg) ->
+        if CFG.in_degree cfg n <= 0 && not (is_entry n)
+        then true, CFG.remove_vertex cfg n
         else did_remove, cfg
       end cfg (false, cfg)
     in
@@ -324,28 +325,28 @@ let do_split_nodes ~ids ~limit g =
   in
   let is_above_limit n =
     match limit with
-    | Some limit -> Cfg.in_degree g n >= limit
+    | Some limit -> CFG.in_degree g n >= limit
     | None -> false
   in
-  Cfg.fold_vertex begin fun n cfg ->
+  CFG.fold_vertex begin fun n cfg ->
     match split_typ n with
     | Some (typ, remove_original)
       when is_above_limit n || List.mem n.id ids ->
-      let cfg = Cfg.fold_pred_e begin fun edge cfg ->
-          let cfg = Cfg.remove_edge_e cfg edge in
+      let cfg = CFG.fold_pred_e begin fun edge cfg ->
+          let cfg = CFG.remove_edge_e cfg edge in
           let n_clone = { (clone_node n) with typ } in
           let (pred, edge, _) = edge in
-          let cfg = Cfg.add_edge_e cfg (pred, edge, n_clone) in
+          let cfg = CFG.add_edge_e cfg (pred, edge, n_clone) in
           cfg
         end cfg n cfg in
       if remove_original
-      then Cfg.remove_vertex cfg n
+      then CFG.remove_vertex cfg n
       else cfg
     | _ -> cfg
   end g g
 
 let find_node_with ~id cfg =
-  Cfg.fold_vertex begin fun node -> function
+  CFG.fold_vertex begin fun node -> function
     | None when node.id == id -> Some node
     | acc -> acc
   end cfg None
@@ -356,14 +357,14 @@ let restrict_to_descendents id cfg =
   | None -> cfg
   | Some node ->
     let ids = Ids.singleton node.id in
-    let module Dfs = Graph.Traverse.Dfs(Cfg) in
+    let module Dfs = Graph.Traverse.Dfs (CFG) in
     let ids = Dfs.fold_component begin fun node ids ->
         Ids.add node.id ids
       end ids cfg node in
-    Cfg.fold_vertex begin fun node cfg ->
+    CFG.fold_vertex begin fun node cfg ->
       if Ids.mem node.id ids
       then cfg
-      else Cfg.remove_vertex cfg node
+      else CFG.remove_vertex cfg node
     end cfg cfg
 
 
@@ -379,7 +380,7 @@ let restrict_to_neighborhood id cfg =
       then explored_nodes
       else
         let next_depth_nodes = Nodes.fold begin fun node new_nodes ->
-            Cfg.fold_succ begin fun succ new_nodes ->
+            CFG.fold_succ begin fun succ new_nodes ->
               if Nodes.mem succ explored_nodes
               then new_nodes
               else Nodes.add succ new_nodes
@@ -389,20 +390,20 @@ let restrict_to_neighborhood id cfg =
         explore next_depth_nodes explored_nodes (depth+1)
     in
     let reachables = explore nodes nodes 0 in
-    let all_nodes = Cfg.fold_pred begin fun pred reachables ->
+    let all_nodes = CFG.fold_pred begin fun pred reachables ->
         Nodes.add pred reachables
       end cfg node reachables in
-    Cfg.fold_vertex begin fun node cfg ->
+    CFG.fold_vertex begin fun node cfg ->
       if Nodes.mem node all_nodes
       then cfg
-      else Cfg.remove_vertex cfg node
+      else CFG.remove_vertex cfg node
     end cfg cfg
 
 let remove_nodes ids cfg =
   List.fold_left begin fun cfg id ->
     match find_node_with ~id cfg with
     | None -> cfg
-    | Some node -> Cfg.remove_vertex cfg node
+    | Some node -> CFG.remove_vertex cfg node
   end cfg ids
 
 let handle_cfg_options ~(options: Cfg_options.t) cfg =
