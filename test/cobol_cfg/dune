@@ -1,5 +1,12 @@
 ; See README.md for instructions to add new tests for `cobol_cfg`
 
+(rule
+ (alias runtest)
+ (enabled_if (not %{bin-available:graph-easy}))
+ (action
+   (progn ;(run realpath -s --relative-to %{workspace_root} .)
+          (echo "Note (test/cobol_cfg): graph-easy is not available, so ASCII tests will not run.\n"))))
+
 (library
  (name test_cobol_cfg_dot)
  (modules dot_basic)
