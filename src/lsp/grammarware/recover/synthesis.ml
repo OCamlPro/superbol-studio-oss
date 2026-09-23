@@ -129,13 +129,11 @@ struct
             ) [] (Lr1.transitions st)
         in
         let cost = List.fold_left
-            (fun acc (_, prods) ->
-               List.fold_left (fun acc prod ->
-                   if Production.rhs prod = [||] && Production.lhs prod = n then
-                     min_float (cost_of_prod prod) acc
-                   else acc
-                 ) acc prods
-            ) infinity (Lr1.reductions st)
+            (fun acc (_, prod) ->
+               if Production.rhs prod = [||] && Production.lhs prod = n then
+                 min_float (cost_of_prod prod) acc
+               else acc
+            ) infinity (Lr1.get_reductions st)
         in
         if cost < infinity || acc <> [] then
           (fun v -> List.fold_left (fun cost f -> min_float cost (f v)) cost acc)
@@ -210,13 +208,11 @@ struct
             ) acc (Lr1.transitions st)
         in
         let acc = List.fold_left
-            (fun acc (_, prods) ->
-               List.fold_left (fun acc prod ->
-                   if Production.rhs prod = [||] && Production.lhs prod = n then
-                     select (Reduce prod) acc
-                   else acc
-                 ) acc prods
-            ) acc (Lr1.reductions st)
+            (fun acc (_, prod) ->
+               if Production.rhs prod = [||] && Production.lhs prod = n then
+                 select (Reduce prod) acc
+               else acc
+            ) acc (Lr1.get_reductions st)
         in
         [acc]
 
