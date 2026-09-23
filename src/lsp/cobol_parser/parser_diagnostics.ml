@@ -108,6 +108,8 @@ type customizable_diagnostic =
   | Implementation_pending of string
   | Missing_tokens of Pretty.delayed     (* TODO: avoid this functional value *)
   | Invalid_syntax
+  | Fallthrough_to_when_other
+  | No_when_branch_before_when_other
   | Exec_block_diagnostic of Cobol_common.Exec_block.diagnostic
 
 let pp_customizable_diagnostic ppf = function
@@ -118,6 +120,11 @@ let pp_customizable_diagnostic ppf = function
       Pretty.print ppf "Missing@ %t" pp_assumed
   | Invalid_syntax ->
       Pretty.print ppf "Invalid@ syntax"
+  | Fallthrough_to_when_other ->
+      Pretty.print ppf "Fall-through@ to@ WHEN@ OTHER:@ this@ WHEN@ phrase@ \
+                        has@ no@ imperative@ statement@ and@ is@ ignored"
+  | No_when_branch_before_when_other ->
+      Pretty.print ppf "No@ WHEN@ branch@ before@ WHEN@ OTHER"
   | Exec_block_diagnostic d ->
       Cobol_common.Exec_block.pp_diagnostic ppf d
 

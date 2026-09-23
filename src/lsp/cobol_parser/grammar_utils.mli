@@ -30,6 +30,22 @@ type data_division_sentence =
 val build_data_division: data_division_sentence list with_loc ->
   data_division with_loc option
 
+(** Parser-only representation of the body of an EVALUATE 
+    remembering locations of ignored clauses to display warnings. *)
+type evaluate_body =
+  {
+    eb_branches: evaluate_branch list;
+    eb_when_other: (srcloc list * srcloc * statements) option; (** 
+      (loc of ignored WHEN clauses, loc of WHEN OTHER, statements) *)
+  }
+
+val evaluate_body_when_other: srcloc -> statements -> evaluate_body
+val evaluate_body_last_branch: selection_object list with_loc -> statements ->
+  evaluate_body
+val evaluate_body_prepend_when: selection_object list with_loc -> statements ->
+  evaluate_body -> evaluate_body
+val evaluate_stmt: selection_subject list -> evaluate_body -> evaluate_stmt
+
 val build_simple_program:
   Cobol_ptree.options_paragraph with_loc option ->
   environment_division with_loc option ->

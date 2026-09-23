@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Accept relaxed MF syntaxes for EVALUATE statements [#667](https://github.com/OCamlPro/superbol-studio-oss/pull/667)
 - Display of the size and offset of data items on hover [#665](https://github.com/OCamlPro/superbol-studio-oss/pull/665)
 - Support tabs in source file [#591](https://github.com/OCamlPro/superbol-studio-oss/pull/591)
 - Unified internal representation of binary data items [#656](https://github.com/OCamlPro/superbol-studio-oss/pull/656) [#672](https://github.com/OCamlPro/superbol-studio-oss/pull/672)

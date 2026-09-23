@@ -72,6 +72,7 @@ let dual_handler_none =
 %[@post.tag procedure_division Cobol_ptree.procedure_division]
 %[@post.tag method_definitions Cobol_ptree.method_definitions]
 %[@post.tag data_descr_entry Cobol_ptree.data_item]
+%[@post.tag evaluate_body Grammar_utils.evaluate_body]
 
 %[@post.tag pending string]
 
@@ -3468,11 +3469,8 @@ Partial exp = ident/zero is ambiguous, could be
 
 %public let unconditional_action := ~ = evaluate_statement; < >
 let evaluate_statement :=
- | EVALUATE; ssl = selection_subjects; wl = nell(when_phrase);
-   isl = when_other; oterm_(END_EVALUATE);
-   { Evaluate { eval_subjects = ssl;
-                eval_branches = wl;
-                eval_otherwise = isl; } }
+ | EVALUATE; ssl = selection_subjects; b = evaluate_body; oterm_(END_EVALUATE);
+   { Evaluate (Grammar_utils.evaluate_stmt ssl b) }
 
 let selection_subjects :=
  | ss = selection_subject;                                 { [ss] }
@@ -3512,16 +3510,24 @@ let partial_expression :=
  | io(IS); n = bo(NOT); OMITTED;
    { SelOmitted { negated = n } }                   (* omitted *) (* exp = ident *)
 
-let when_phrase :=
- | wl = rnel(when_selection_objects); isl = imp_stmts;
-   { {eval_selection = wl; eval_actions = isl} }
+let evaluate_body [@post.evaluate_body] :=
+ | ~ = when_phrases; < >
 
-let when_selection_objects := WHEN; ~ = selection_objects; < >
+(* MF extension: we need to support WHEN falling through into WHEN OTHER
+   and empty statement lists here, as well as EVALUATE body with only a
+   WHEN OTHER branch. *)
+let when_phrases :=
+ | wl = when_selection_objects; isl = imp_stmts_opt; %prec lowest
+   { Grammar_utils.evaluate_body_last_branch wl isl }
+ | wl = when_selection_objects; isl = imp_stmts_opt; b = when_phrases;
+   { Grammar_utils.evaluate_body_prepend_when wl isl b }
+ | (wo, other_stmts) = when_other_phrase;
+   { Grammar_utils.evaluate_body_when_other wo other_stmts }
 
-let when_other [@default []] :=
- | %prec lowest { [] }
- | WHEN; OTHER; ~ = imp_stmts; < >
+let when_selection_objects := ~ = loc(pf(WHEN, selection_objects)); < >
 
+let when_other_phrase :=
+ | wo = loc(WHEN; OTHER); isl = imp_stmts_opt; { ~@wo, isl }
 
 
 (* EXIT STATEMENT *)
