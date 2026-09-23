@@ -290,67 +290,52 @@ let pp_divide_operands ppf = function
 
 (* EVALUATE *)
 type selection_subject =
-  | Subject of condition with_loc
+  | Subject of condition
   | SubjectConst of bool
 [@@deriving ord]
 
 let pp_selection_subject ppf = function
-  | Subject c -> pp_condition' ppf c
+  | Subject c -> pp_condition ppf c
   | SubjectConst b -> Fmt.pf ppf (if b then "TRUE" else "FALSE")
 
+let pp_selection_subject' = pp_with_loc pp_selection_subject
+
+type selection_range =
+  {
+    negated: bool;
+    start: expr with_loc;
+    stop: expr with_loc;
+    alphabet: name with_loc option;
+  }
+[@@deriving ord]
+
+let pp_selection_range ppf { negated; start; stop; alphabet } =
+  if negated then Fmt.pf ppf "NOT@ ";
+  Fmt.pf ppf "%a@ THROUGH@ %a%a"
+    pp_expr' start
+    pp_expr' stop
+    Fmt.(option (sp ++ const string "IN" ++ sp ++ pp_with_loc pp_name)) alphabet
+
 type selection_object =
-  | SelCond of abbrev_relation_operand with_loc (** Condition with a potentially omitted subject
+  | SelCond of condition (** Condition with a potentially omitted subject
       interpreted as an abbreviated condition prepended by the corresponding subject in EVALUATE.
-      May start with AbbrevSubject to denote an independant condition.
+      May start with CondSubject to denote an independant condition.
       Typically used for clauses such as:
       - WHEN > 5 (matching subject should be an integer)
       - WHEN A > 3 (matching subject should be either TRUE or FALSE)
       - WHEN <= 3 OR A > 3 (matching subject should be an integer) *)
-  | SelRange of
-      {
-        negated: bool;
-        start: expr with_loc;
-        stop: expr with_loc;
-        alphabet: name with_loc option;
-      }
-  | SelClassCond of
-      {
-        negated: bool;
-        class_specifier: class_;
-      }
-  | SelSignCond of
-      {
-        negated: bool;
-        sign_specifier: signz;
-      }
-  | SelOmitted of
-      {
-        negated: bool;
-      }
+  | SelRange of selection_range
   | SelConst of bool
   | SelAny
 [@@deriving ord]
 
 let pp_selection_object ppf = function
-  | SelCond c -> pp_with_loc pp_abbrev_relation_operand ppf c
-  | SelRange { negated; start; stop; alphabet } ->
-    if negated then Fmt.pf ppf "NOT@ ";
-    Fmt.pf ppf "%a@ THROUGH@ %a%a"
-      pp_expr' start
-      pp_expr' stop
-      Fmt.(option (sp ++ const string "IN" ++ sp ++ pp_with_loc pp_name)) alphabet
-  | SelClassCond { negated; class_specifier = cs } ->
-    if negated then Fmt.pf ppf "NOT@ ";
-    pp_class_ ppf cs
-  | SelSignCond { negated; sign_specifier } ->
-    if negated then Fmt.pf ppf "NOT@ ";
-    pp_signz ppf sign_specifier
-  | SelOmitted { negated } ->
-    if negated then Fmt.pf ppf "NOT@ ";
-    Fmt.pf ppf "OMITTED"
+  | SelCond c -> pp_condition ppf c
+  | SelRange r -> pp_selection_range ppf r
   | SelConst b -> Fmt.pf ppf (if b then "TRUE" else "FALSE")
   | SelAny -> Fmt.pf ppf "ANY"
 
+let pp_selection_object' = pp_with_loc pp_selection_object
 
 (* MULTIPLY *)
 type multiply_operands =

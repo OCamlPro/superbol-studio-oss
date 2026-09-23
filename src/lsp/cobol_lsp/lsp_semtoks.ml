@@ -436,7 +436,7 @@ let semtoks_from_ptree ~filename ?range ptree =
       |> add_ident varying_ident VarModif
       |> fold_scalar self varying_from
       |> fold_option ~fold:fold_scalar self varying_by
-      |> fold_condition self varying_until
+      |> fold_condition' self varying_until
       |> Visitor.skip_children
 
     method! fold_raise' {payload = raise_stmt; _} acc =

@@ -13,6 +13,7 @@
 
 open Unit_types
 
+open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 
 let pp_resolved_name pp_resolved : _ resolved_name Fmt.t =
@@ -42,6 +43,54 @@ let pp_procedure_arg =
     Fmt.(field "passing-style" (fun x -> x.arg_passing_style)
            pp_arg_passing_style);
   ]
+  
+let rec pp_expanded_cond: expanded_cond Pretty.printer = 
+  fun ppf xc -> 
+    let open Cobol_ptree in
+    let open Fmt in
+    match xc with
+    | Expr e ->
+        pp_expr' ppf e
+    | Relation (a, o, b) ->
+        fmt "%a@ %a@ %a" ppf pp_expr' a pp_relop o pp_expr' b
+    | ClassCond (e, c) ->
+        fmt "%a@ %a" ppf pp_expr' e pp_class_ c
+    | SignCond (e, s) ->
+        fmt "%a@ %a" ppf pp_expr' e pp_signz s
+    | Omitted e ->
+        fmt "%a@ OMITTED" ppf pp_expr' e
+    | Not c ->
+        fmt "NOT@ @[<1>(%a)@]" ppf pp_expanded_cond' c
+    | Combined (a, o, b) ->
+        fmt "@[<1>(%a)@]@ %a@ @[<1>(%a)@]" ppf
+          pp_expanded_cond' a pp_logop o pp_expanded_cond' b
+
+and pp_expanded_cond': expanded_cond with_loc Pretty.printer = fun ppf ->
+  pp_with_loc pp_expanded_cond ppf
+
+let pp_expanded_selection_subject: expanded_selection_subject Pretty.printer =
+  fun ppf -> function
+    | SubjectValue e -> Cobol_ptree.pp_expr' ppf e
+    | SubjectCond c -> pp_expanded_cond ppf c
+    | SubjectConst b -> Fmt.string ppf (if b then "TRUE" else "FALSE")
+
+let pp_expanded_selection_subject'
+  : expanded_selection_subject with_loc Pretty.printer = fun ppf ->
+  pp_with_loc pp_expanded_selection_subject ppf
+
+let pp_expanded_selection_object: expanded_selection_object Pretty.printer =
+  fun ppf -> function
+    | SelCond c -> pp_expanded_cond ppf c
+    | SelValue { negated; value } ->
+        Pretty.print ppf "%s%a"
+          (if negated then "NOT " else "") Cobol_ptree.pp_expr' value
+    | SelRange r -> Cobol_ptree.pp_selection_range ppf r
+    | SelConst b -> Fmt.string ppf (if b then "TRUE" else "FALSE")
+    | SelAny -> Fmt.string ppf "ANY"
+
+let pp_expanded_selection_object'
+  : expanded_selection_object with_loc Pretty.printer = fun ppf ->
+  pp_with_loc pp_expanded_selection_object ppf
 
 let pp_cobol_unit ?(show_items = false) =
   Pretty.record_with_conditional_fields [

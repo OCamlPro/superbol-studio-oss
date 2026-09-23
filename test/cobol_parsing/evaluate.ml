@@ -39,14 +39,14 @@ let show_evaluates contents =
           inherit [unit] Cobol_ptree.Visitor.folder
           method! fold_evaluate' { payload = ev; _ } acc =
             Pretty.out "@[<v>EVALUATE %a@,"
-              Fmt.(list ~sep:(any " ALSO ") Cobol_ptree.pp_selection_subject)
+              Fmt.(list ~sep:(any " ALSO ") Cobol_ptree.pp_selection_subject')
               ev.eval_subjects;
             List.iter begin fun { Cobol_ptree.eval_selection; eval_actions } ->
               Pretty.out "  branch: %d clause(s) [%a], %d statement(s)@,"
                 (List.length eval_selection)
                 Fmt.(list ~sep:(any " | ")
                        (list ~sep:(any " ALSO ")
-                          Cobol_ptree.pp_selection_object))
+                          Cobol_ptree.pp_selection_object'))
                 eval_selection
                 (List.length eval_actions)
             end ev.eval_branches;

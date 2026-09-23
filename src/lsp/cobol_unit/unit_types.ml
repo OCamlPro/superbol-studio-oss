@@ -109,6 +109,31 @@ type procedure =
     procedure_using: procedure_using with_loc option; (* PROCEDURE DIVISION USING ... *)
     procedure_blocks: procedure_block named_n_ordered;
   }
+  
+type expanded_cond =
+  | Expr of Cobol_ptree.expr with_loc (** expression used as a condition *)
+  | Relation of Cobol_ptree.expr with_loc * Cobol_ptree.relop * Cobol_ptree.expr with_loc  (** {v e <relop> e' v} *)
+  | ClassCond of Cobol_ptree.expr with_loc * Cobol_ptree.class_ (** class condition *)
+  | SignCond of Cobol_ptree.expr with_loc * Cobol_ptree.signz (** {v e POSITIVE/NEGATIVE/ZERO v} *)
+  | Omitted of Cobol_ptree.expr with_loc (** {v c OMITTED v} *)
+  | Not of expanded_cond with_loc (** {v NOT c v} *)
+  | Combined of expanded_cond with_loc * Cobol_ptree.logop * expanded_cond with_loc (** {v c <AND/OR> c' v} *)
+
+type expanded_selection_subject =
+  | SubjectValue of Cobol_ptree.expr with_loc
+  | SubjectCond of expanded_cond
+  | SubjectConst of bool
+
+type expanded_selection_object = 
+  | SelCond of expanded_cond
+  | SelValue of
+    {
+      negated: bool;
+      value: Cobol_ptree.expr with_loc;
+    }
+  | SelRange of Cobol_ptree.selection_range
+  | SelConst of bool
+  | SelAny
 
 (* main *)
 

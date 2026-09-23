@@ -512,7 +512,7 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
         |> Numeric @>@ fold_ident v vp.varying_ident
         |> Numeric @>@ fold_scalar v vp.varying_from
         |> Numeric @>@ fold_option ~fold:fold_scalar v vp.varying_by
-        |> fold_condition v vp.varying_until
+        |> fold_condition' v vp.varying_until
         |> skip
 
       method! fold_raise' { payload = r; _ } acc =
