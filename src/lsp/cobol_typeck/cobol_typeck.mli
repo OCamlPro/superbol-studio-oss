@@ -19,3 +19,4 @@ module Results = Typeck_results
 include module type of Typeck_engine
 
 module References = Typeck_references
+module Condition = Typeck_condition

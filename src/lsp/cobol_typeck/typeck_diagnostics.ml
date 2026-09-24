@@ -22,6 +22,8 @@ type diagnostic =
   | Data_error of Typeck_data_diagnostics.error
   | Data_warning of Typeck_data_diagnostics.warning
   | Proc_error of Typeck_procedure_diagnostics.error
+  | Condition_error of Typeck_condition_diagnostics.error
+  | Condition_warning of Typeck_condition_diagnostics.warning
   | Dialect_feature_used of
       {
         feature: unit Cobol_config.feature;
@@ -36,9 +38,11 @@ let union d1 d2 = LIST.append ~loc:__LOC__ d2 d1
 let diagnostic_severity = function
   | Config_error _
   | Data_error _
-  | Proc_error _ ->
+  | Proc_error _ 
+  | Condition_error _ ->
       `Print DIAGS.Error
-  | Data_warning _ ->
+  | Data_warning _ 
+  | Condition_warning _ ->
       `Print DIAGS.Warn
   | Dialect_feature_used { feature = _; _ } ->
       (* TODO: explicitly add a feature -> support mapping in [config] *)
@@ -53,6 +57,10 @@ let diagnostic_loc = function
       Typeck_data_diagnostics.warning_loc w
   | Proc_error e ->
       Typeck_procedure_diagnostics.error_loc e
+  | Condition_error e ->
+      Typeck_condition_diagnostics.error_loc e
+  | Condition_warning w ->
+      Typeck_condition_diagnostics.warning_loc w
   | Dialect_feature_used { usage_loc = loc; _ } ->
       Some loc
 
@@ -65,6 +73,10 @@ let pp_diagnostic ppf = function
       Typeck_data_diagnostics.pp_warning ppf w
   | Proc_error e ->
       Typeck_procedure_diagnostics.pp_error ppf e
+  | Condition_error e ->
+      Typeck_condition_diagnostics.pp_error ppf e
+  | Condition_warning w ->
+      Typeck_condition_diagnostics.pp_warning ppf w
   | Dialect_feature_used { feature; _ } ->
       Pretty.print ppf "%(%)@ used" feature#short
 

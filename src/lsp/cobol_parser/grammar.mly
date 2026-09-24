@@ -14,7 +14,6 @@
 
 open Grammar_utils
 open Cobol_ptree
-open Cobol_ptree.Terms_helpers
 open Cobol_common.Srcloc.INFIX
 
 open struct
@@ -34,6 +33,9 @@ let with_loc token location_limits =
 let dual_handler_none =
   { dual_handler_pos = []; dual_handler_neg = [] }
 
+let neg_condition ~neg (c: condition with_loc): condition =
+  if not neg then ~&c else CondNot c
+  
 %}
 
 (* Tokens are listed in `grammar_tokens.mly' *)
@@ -2804,9 +2806,15 @@ let condition :=
  | ~ = loc(cond); <>
 
 let cond [@symbol "<condition>"] [@recovery_with_pos dummy_cond] :=
- | ~ = nonrel_condition;                     < >
- | ~ = relation_condition;      %prec lowest < >
- | l = condition; op = logop; r = condition; { Logop (l, op, r) }
+ | ~ = loc(relop); ~ = loc(cond_object_atom);      <CondRelOp>
+ | ~ = class_or_sign_condition;                    <>
+ | n = ibo(NOT); c = loc(cond_after_optional_not); { neg_condition ~neg:n c }
+ | x = condition; r = logop; y = condition;        { CondCombined (x, r, y) }
+
+let cond_after_optional_not :=
+ | ~ = expression; ~ = loc(cond_relop_atom); <CondSubject>
+ | ~ = expression;              %prec lowest <CondObjectOrExpr>
+ | any_lpar; ~ = condition; RPAR;            <CondParen>
 
 let logop ==
  | AND;           { LAnd }
@@ -2816,46 +2824,23 @@ let any_lpar ==
  | LPAR;              {}
  | LPAR_BEFORE_RELOP; {}
 
-let relation_condition ==
- | neg = ibo(NOT); e = expression; pred = loc(abbrev_relop_operand);
-    { Relation (neg, e, pred) }
+cond_relop_atom:
+ | c = class_or_sign_condition_after_subject                       { c }
+ | r = loc(relop) e = loc(cond_object_atom)                        { CondRelOp (r, e) }
+ | io(IS) n = ibo(NOT) LPAR_BEFORE_RELOP c = loc(cond_relop_operand) RPAR 
+    { neg_condition ~neg:n (CondParen c &@<- c) }
 
-nonrel_condition:
- | n = ibo(NOT)     e = expression %prec lowest { neg_condition ~neg:n (Expr e &@<- e) }
- | n = ibo(NOT)     c = loc(extended_condition) { neg_condition ~neg:n (cast_no_rel_cond ~&c &@<- c) }
- | n = ibo(NOT) "(" c  = condition ")"          { neg_condition ~neg:n c }
+cond_relop_operand:
+ | cond_relop_atom { $1 }
+ | loc(cond_relop_operand) logop condition { CondCombined ($1, $2, $3) }
 
-abbrev_relop_atom:
- | r = relop e = loc(abbrev_object_atom)                             { AbbrevRelOp (r, e) }
- | n = ibo(NOT) LPAR_BEFORE_RELOP c = loc(abbrev_relop_operand) RPAR { AbbrevParen (n, c) }
+cond_object_atom:
+ | n = ibo(NOT)     e = expression        %prec lowest { neg_condition ~neg:n (CondObjectOrExpr e &@<- e) }
+ | n = ibo(NOT) "(" c = loc(cond_object_operand) ")"   { neg_condition ~neg:n (CondParen c &@<- c) }
 
-abbrev_relop_operand:
- | abbrev_relop_atom { $1 }
- | loc(abbrev_relop_operand) logop loc(abbrev_relation_operand)    { AbbrevLogop ($1, $2, $3) }
-
-abbrev_object_atom:
- | n = ibo(NOT)     e = expression          %prec lowest { AbbrevObject (n, e) }
- | n = ibo(NOT) "(" c = loc(abbrev_object_operand) ")"   { AbbrevParen (n, c) }
-
-abbrev_object_operand:
- | abbrev_object_atom { $1 }
- | loc(abbrev_object_operand) logop loc(abbrev_relation_operand)   { AbbrevLogop ($1, $2, $3) }
-
-abbrev_relation_operand:
- | r = relop    e = loc(abbrev_object_atom)                        { AbbrevRelOp (r, e) }
- | n = ibo(NOT) e = expression                        %prec lowest { AbbrevObject (n, e) }
- | n = ibo(NOT) e = expression a = loc(abbrev_relop_atom)          { AbbrevSubject (n, e, a) }
- | n = ibo(NOT) c = loc(extended_condition)                        { AbbrevOther (neg_condition ~neg:n c) }
- | n = ibo(NOT) any_lpar c = loc(abbrev_relation_operand) RPAR     { AbbrevParen (n, c) }
- | loc(abbrev_relation_operand) logop loc(abbrev_relation_operand) { AbbrevLogop ($1, $2, $3) }
-
-extended_condition:
- | e = expression io(IS) n = bo(NOT) c = class_condition
-    { neg_condition ~neg:n (with_loc (ClassCond (e, c)) $sloc) }
- | e = expression io(IS) n = bo(NOT) s = sign_condition
-    { neg_condition ~neg:n (with_loc (SignCond (e, s)) $sloc) }
- | e = expression io(IS) n = bo(NOT) OMITTED
-    { neg_condition ~neg:n (with_loc (Omitted e) $sloc) }
+cond_object_operand:
+ | cond_object_atom { $1 }
+ | loc(cond_object_operand) logop condition { CondCombined ($1, $2, $3) }
 
 relop [@recovery Eq] [@symbol "<relational arithmetic operator>"]:
  | io(IS) n = ibo(NOT) GREATER THAN?
@@ -2896,7 +2881,17 @@ sign_condition_no_zero [@recovery SgnPositive]:
  | POSITIVE { SgnPositive }
  | NEGATIVE { SgnNegative : signz }
 
+let class_or_sign_condition :=
+ | IS; n = bo(NOT); c = loc(class_condition);      { neg_condition ~neg:n (CondClass ~&c &@<- c) }
+ | n = bo(NOT); c = loc(class_condition_no_ident); { neg_condition ~neg:n (CondClass ~&c &@<- c) }
+ | IS; n = bo(NOT); s = loc(sign_condition);       { neg_condition ~neg:n (CondSign ~&s &@<- s) }
+ | n = bo(NOT); s = loc(sign_condition_no_zero);   { neg_condition ~neg:n (CondSign ~&s &@<- s) }
+ | io(IS); n = bo(NOT); o = loc(OMITTED);          { neg_condition ~neg:n (CondOmitted &@<- o) }
 
+let class_or_sign_condition_after_subject :=
+ | io(IS); n = bo(NOT); c = loc(class_condition);  { neg_condition ~neg:n (CondClass ~&c &@<- c) }
+ | io(IS); n = bo(NOT); s = loc(sign_condition);   { neg_condition ~neg:n (CondSign ~&s &@<- s) }
+ | io(IS); n = bo(NOT); o = loc(OMITTED);          { neg_condition ~neg:n (CondOmitted &@<- o) }
 
 (* ---------- Rules common to several statements ---------- *)
 
@@ -3454,17 +3449,8 @@ selection subject:
 
 selection object:
 
-partial_exp = sequence of cobol words starting with
-  a relational operator,
-  a class condition without identifier,
-  a sign condition without identifier,
-  a sign condition without the arithmetic expression
-
-selection_subject followed by partial_exp = conditional exp
-
-Partial exp = ident/zero is ambiguous, could be
- NOT? class_condition / sign_condition (partial exp)
- NOT? expression (ident/zero)
+ same ambiguity as in abbreviated conditions:
+ object vs. boolean expression is ambiguous
 *)
 
 %public let unconditional_action := ~ = evaluate_statement; < >
@@ -3473,22 +3459,21 @@ let evaluate_statement :=
    { Evaluate (Grammar_utils.evaluate_stmt ssl b) }
 
 let selection_subjects :=
- | ss = selection_subject;                                 { [ss] }
- | ss = selection_subject; ALSO; ssl = selection_subjects; { ss :: ssl }
+ | ss = loc(selection_subject);                                 { [ss] }
+ | ss = loc(selection_subject); ALSO; ssl = selection_subjects; { ss :: ssl }
 
 let selection_subject :=
- | c = condition;  {Subject c}                        (* also arith/bool expr *)
+ | c = cond;       {Subject c}                        (* also arith/bool expr *)
  | TRUE;           {SubjectConst true}
  | FALSE;          {SubjectConst false}
 
 let selection_objects :=
- | so = selection_object;                                { [so] }
- | so = selection_object; ALSO; sol = selection_objects; { so :: sol }
+ | so = loc(selection_object);                                { [so] }
+ | so = loc(selection_object); ALSO; sol = selection_objects; { so :: sol }
 
 let selection_object :=
- | c = loc(abbrev_relation_operand); {SelCond c}                 (* also arith/bool exp*)
+ | ~ = cond;                         <SelCond>                 (* also arith/bool exp*)
  | ~ = range_expression;             < >
- | ~ = partial_expression;           < >                                   (* +COB2002 *)
  | TRUE;                             {SelConst true}
  | FALSE;                            {SelConst false}
  | ANY;                              {SelAny}
@@ -3498,17 +3483,6 @@ let range_expression :=
    i2 = expression; i = ro(pf(IN,name));
    { SelRange { negated = b; start = i1; stop = i2; alphabet = i } }
 
-let partial_expression :=
- | IS; n = bo(NOT); c = class_condition;
-   { SelClassCond { negated = n; class_specifier = c } } (* class *) (* exp = ident *)
- | n = bo(NOT); c = class_condition_no_ident;
-   { SelClassCond { negated = n; class_specifier = c } } (* class *) (* exp = ident *)
- | IS; n = bo(NOT); s = sign_condition;
-   { SelSignCond { negated = n; sign_specifier = s } } (* sign *) (* exp = arith exp *)
- | n = bo(NOT); s = sign_condition_no_zero;
-   { SelSignCond { negated = n; sign_specifier = s } } (* sign *) (* exp = arith exp *)
- | io(IS); n = bo(NOT); OMITTED;
-   { SelOmitted { negated = n } }                   (* omitted *) (* exp = ident *)
 
 let evaluate_body [@post.evaluate_body] :=
  | ~ = when_phrases; < >

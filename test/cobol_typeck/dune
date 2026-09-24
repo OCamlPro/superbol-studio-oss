@@ -9,6 +9,9 @@
     ok_renames    ko_renames
     ok_redefines  ko_redefines
     ok_conditions ko_conditions
+    ok_expanded_conditions ko_expanded_conditions
+    ok_expanded_evaluate   ko_expanded_evaluate
+    warn_unused_abbreviation
                   ko_proc_names
                   ko_syntax
     ok_fd

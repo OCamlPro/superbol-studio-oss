@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Add typechecking errors for abbreviated conditions without a valid expansion [#673](https://github.com/OCamlPro/superbol-studio-oss/pull/673)
 - Accept relaxed MF syntaxes for EVALUATE statements [#667](https://github.com/OCamlPro/superbol-studio-oss/pull/667)
 - Display of the size and offset of data items on hover [#665](https://github.com/OCamlPro/superbol-studio-oss/pull/665)
 - Display of `REDEFINES` relations on hover, with the size of the redefinition and the size of the item it redefines [#669](https://github.com/OCamlPro/superbol-studio-oss/pull/669)
@@ -18,6 +19,7 @@
 - Support for 78-level data items [#634](https://github.com/OCamlPro/superbol-studio-oss/pull/634)
 
 ### Fixed
+- Fix parsing and expansion of complex conditions [#673](https://github.com/OCamlPro/superbol-studio-oss/pull/673)
 - Performances of the LSP server when many documents are opened and closed in a single session [#659](https://github.com/OCamlPro/superbol-studio-oss/pull/659)
 - Internal type of `CALL` arguments [#655](https://github.com/OCamlPro/superbol-studio-oss/pull/655)
 - Amount of references reported in codelens, that wrongly included declarations [#640](https://github.com/OCamlPro/superbol-studio-oss/pull/640)

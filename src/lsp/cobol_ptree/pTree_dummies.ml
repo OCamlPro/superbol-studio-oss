@@ -56,8 +56,15 @@ let dummy_alphanum =
 let dummy_expr =
   Atom (Fig Zero)
 
+(* The recovered condition needs to be self-contained: a bare
+   [CondObjectOrExpr] would take part in the surrounding abbreviation, and
+   report a spurious missing subject or relational operator on top of the
+   syntax error that triggered the recovery. *)
 let dummy_cond ~pos =
-  Expr (dummy_expr &@ Cobol_common.Srcloc.raw (pos, pos))
+  let loc = Cobol_common.Srcloc.raw (pos, pos) in
+  CondSubject (dummy_expr &@ loc,
+               CondRelOp (Eq &@ loc,
+                          CondObjectOrExpr (dummy_expr &@ loc) &@ loc) &@ loc)
 
 let dummy_picture ~pos =
   {

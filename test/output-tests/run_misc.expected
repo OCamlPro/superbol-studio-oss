@@ -1009,26 +1009,6 @@ run_misc.at-6988-callee.cob:57.15-57.21:
   59                 (int                         NOT = "D") OR
 >> Error: Invalid syntax
 
-run_misc.at-6988-callee.cob:57.46:
-  54                                    while
-  55                                    .
-  56              IF (const                       NOT = "A") OR
-  57 >               (double                      NOT = "B") OR
-----                                                 ^
-  58                 (float                       NOT = "C") OR
-  59                 (int                         NOT = "D") OR
->> Hint: Missing <expression>
-
-run_misc.at-6988-callee.cob:57.47-57.48:
-  54                                    while
-  55                                    .
-  56              IF (const                       NOT = "A") OR
-  57 >               (double                      NOT = "B") OR
-----                                                  ^
-  58                 (float                       NOT = "C") OR
-  59                 (int                         NOT = "D") OR
->> Error: Invalid syntax
-
 run_misc.at-6988-callee.cob:58.15-58.20:
   55                                    .
   56              IF (const                       NOT = "A") OR
@@ -1039,52 +1019,12 @@ run_misc.at-6988-callee.cob:58.15-58.20:
   60                 (short                       NOT = "E") OR
 >> Error: Invalid syntax
 
-run_misc.at-6988-callee.cob:58.46:
-  55                                    .
-  56              IF (const                       NOT = "A") OR
-  57                 (double                      NOT = "B") OR
-  58 >               (float                       NOT = "C") OR
-----                                                 ^
-  59                 (int                         NOT = "D") OR
-  60                 (short                       NOT = "E") OR
->> Hint: Missing <expression>
-
-run_misc.at-6988-callee.cob:58.47-58.48:
-  55                                    .
-  56              IF (const                       NOT = "A") OR
-  57                 (double                      NOT = "B") OR
-  58 >               (float                       NOT = "C") OR
-----                                                  ^
-  59                 (int                         NOT = "D") OR
-  60                 (short                       NOT = "E") OR
->> Error: Invalid syntax
-
 run_misc.at-6988-callee.cob:71.15-71.23:
   68                 (goto                        NOT = "M") OR
   69                 (register                    NOT = "N") OR
   70                 (sizeof                      NOT = "O") OR
   71 >               (volatile                    NOT = "P") OR
 ----                  ^^^^^^^^
-  72                 (char                        NOT = "Q") OR
-  73                 (do                          NOT = "R") OR
->> Error: Invalid syntax
-
-run_misc.at-6988-callee.cob:71.46:
-  68                 (goto                        NOT = "M") OR
-  69                 (register                    NOT = "N") OR
-  70                 (sizeof                      NOT = "O") OR
-  71 >               (volatile                    NOT = "P") OR
-----                                                 ^
-  72                 (char                        NOT = "Q") OR
-  73                 (do                          NOT = "R") OR
->> Hint: Missing <expression>
-
-run_misc.at-6988-callee.cob:71.47-71.48:
-  68                 (goto                        NOT = "M") OR
-  69                 (register                    NOT = "N") OR
-  70                 (sizeof                      NOT = "O") OR
-  71 >               (volatile                    NOT = "P") OR
-----                                                  ^
   72                 (char                        NOT = "Q") OR
   73                 (do                          NOT = "R") OR
 >> Error: Invalid syntax
@@ -1160,52 +1100,12 @@ run_misc.at-6989-callee2.cob:88.15-88.18:
   90                 (typeid                      NOT = "f") OR
 >> Error: Invalid syntax
 
-run_misc.at-6989-callee2.cob:88.46:
-  85                 (try                         NOT = "a") OR
-  86                 (bool                        NOT = "b") OR
-  87                 (explicit                    NOT = "c") OR
-  88 >               (new                         NOT = "d") OR
-----                                                 ^
-  89                 (static_cast                 NOT = "e") OR
-  90                 (typeid                      NOT = "f") OR
->> Hint: Missing <expression>
-
-run_misc.at-6989-callee2.cob:88.47-88.48:
-  85                 (try                         NOT = "a") OR
-  86                 (bool                        NOT = "b") OR
-  87                 (explicit                    NOT = "c") OR
-  88 >               (new                         NOT = "d") OR
-----                                                  ^
-  89                 (static_cast                 NOT = "e") OR
-  90                 (typeid                      NOT = "f") OR
->> Error: Invalid syntax
-
 run_misc.at-6989-callee2.cob:113.15-113.18:
  110                 (xor_eq                      NOT = "z") OR
  111                 (and_eq                      NOT = "0") OR
  112                 (bitor                       NOT = "1") OR
  113 >               (xor                         NOT = "2")
 ----                  ^^^
- 114                 DISPLAY "At least one var has wrong content!".
- 115              MOVE x'FF' TO         asm
->> Error: Invalid syntax
-
-run_misc.at-6989-callee2.cob:113.46:
- 110                 (xor_eq                      NOT = "z") OR
- 111                 (and_eq                      NOT = "0") OR
- 112                 (bitor                       NOT = "1") OR
- 113 >               (xor                         NOT = "2")
-----                                                 ^
- 114                 DISPLAY "At least one var has wrong content!".
- 115              MOVE x'FF' TO         asm
->> Hint: Missing <expression>
-
-run_misc.at-6989-callee2.cob:113.47-113.48:
- 110                 (xor_eq                      NOT = "z") OR
- 111                 (and_eq                      NOT = "0") OR
- 112                 (bitor                       NOT = "1") OR
- 113 >               (xor                         NOT = "2")
-----                                                  ^
  114                 DISPLAY "At least one var has wrong content!".
  115              MOVE x'FF' TO         asm
 >> Error: Invalid syntax
