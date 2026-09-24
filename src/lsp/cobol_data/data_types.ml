@@ -213,8 +213,8 @@ and item_definitions = item_definition with_loc nel
 and item_redefinitions = item_definition with_loc list
 
 and item_definition =
-  | Field of field_definition (** for data items without OCCURS clause *)
-  | Table of table_definition (** for data items with an OCCURS clause *)
+  | Field of field_definition        (** for data items without OCCURS clause *)
+  | Table of table_definition        (** for data items with an OCCURS clause *)
 
 and field_definition =
   {
@@ -224,12 +224,14 @@ and field_definition =
     field_size: Data_memory.size;
     field_layout: field_layout;
     field_length_variability: length_variability;
-    field_conditions: condition_names; (** Named conditions on the value of this field. *)
-    field_redefines: Cobol_ptree.qualname with_loc option; (**
-      Set iff this field is a redefinition.
-      In that case this field appears inside item_redefinitions of the item it redefines.
-      Later, we may create instead a item_redefinition type. *)
-    field_redefinitions: item_redefinitions; (** List of alternative definitions for this field *)
+    field_conditions: condition_names; (** Named conditions on the value of this
+                                           field. *)
+    field_redefines: Cobol_ptree.qualname with_loc option;
+    (** Set iff this field is a redefinition.  In that case this field appears
+        inside item_redefinitions of the item it redefines.  Later, we may
+        create instead a item_redefinition type. *)
+    field_redefinitions: item_redefinitions; (** List of alternative definitions
+                                                 for this field *)
     field_has_definition_issues: bool;
   }
 
@@ -252,9 +254,9 @@ and table_definition =
     table_range: table_range;
     table_init_values: Cobol_ptree.literal with_loc list;     (* list for now *)
     table_redefines: Cobol_ptree.qualname with_loc option; (* same as [field_redefines] but for tables *)
-    table_redefinitions: item_redefinitions; (**
-      List of alternative definitions for the full table.
-      Note that by default the typechecker generates a warning on table redefinition. *)
+    table_redefinitions: item_redefinitions;
+    (** List of alternative definitions for the full table.  Note that by
+        default the typechecker generates a warning on table redefinition. *)
     table_has_definition_issues: bool;
   }
 and table_range =
@@ -332,13 +334,22 @@ and renamed_item_layout =
 (*     const_layout: const_layout; *)
 (*   } *)
 
-(** [data_definition] provides a direct access to the pair of each item and associated record items.
-    It is used for instance to retrieve data item information from its name. *)
+(** [data_definition] provides a direct access to the pair of each item and
+    associated record items.  It is used for instance to retrieve data item
+    information from its name. *)
 type data_definition =
   | Data_field of
       {
         record: record;
         def: field_definition with_loc;
+        main_def: item_definition with_loc option;
+        (** Main item definition, if distinct from [Field def]. This gives the
+            full definition (including [def] itself) of any item with a
+            REDEFINES clause. *)
+        table_def: table_definition with_loc option;
+        (** When [def] is a field with an OCCURS clause (i.e, its
+            [field_leading_ranges] field is not empty), this gives the
+            definition for the whole table.  Otherwise it is [None]. *)
       }
   | Data_renaming of                                              (* not sure *)
       {
