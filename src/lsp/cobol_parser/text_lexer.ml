@@ -76,19 +76,20 @@ module IntrinsicHandles =
 let token_of_punct = Hashtbl.create 15
 let punct_of_token = Hashtbl.create 15
 let word_of_token = Hashtbl.create 257
-let __token_of_word = Hashtbl.create 257        (* copied in `Make` below *)
+let __token_of_word = Hashtbl.create 257       (* copied in `create` below *)
 let __token_of_intrinsic = Hashtbl.create 116  (* all intrinsic function name *)
 
+let string_of_word_token t =
+  Hashtbl.find word_of_token t
 
-(** Raises {!Not_found} if the token is neither a keyword nor a
-    punctuation. *)
+(** Raises {!Not_found} if the token is neither a keyword nor a punctuation. *)
 let string_of_token t =
   try Hashtbl.find word_of_token t
   with Not_found -> Hashtbl.find punct_of_token t
 
 let token_of_handle h = h.token
 
-(** Never raises {!Not_found}. *)
+(** Never raises {!Not_found} (by construction of keyword handles). *)
 let string_of_keyword_handle h =
   string_of_token @@ token_of_handle h
 
@@ -345,19 +346,19 @@ let ebcdic_char i =
 
 let decode_symbolic_ebcdics' ~quotation w =
   let open Text_categorizer in
-  let module ACC = Parser_diagnostics.Accumulator in
-  let acc_error e (acc, diags) = acc, Parser_diagnostics.add_error e diags in
+  let open Parser_diagnostics_types in
+  let acc_error e (acc, diags) = acc, e :: diags in
   let symbolic_ebcdic ~loc:_ = symbolic_ebcdic
   and alphanum_string ~loc:_ = alphanum_string in
   let str, diags =
-    Cobol_common.Tokenizing.fold_tokens w ("", Parser_diagnostics.none)
+    Cobol_common.Tokenizing.fold_tokens w ("", [])
       ~tokenizer:alphanum_string
       ~until:(function AEnd _ -> true | _ -> false)
       ~next_tokenizer:(function
           | AEBCDIC _
           | AStr (_, EBCDIC) | AUnexpected (_, EBCDIC) -> symbolic_ebcdic
           | AStr (_, STR) | AUnexpected (_, STR) | AEnd _ -> alphanum_string)
-      ~f:begin fun t -> match ~&t with    (* TODO: (fixed/configurable tables) *)
+      ~f:begin fun t -> match ~&t with      (* TODO: (fixed/configurable tables) *)
         | AStr (s, _) ->
             fun (acc, diags) -> acc ^ s, diags
         | AEBCDIC i when i < 1 || i > 256 ->
@@ -374,11 +375,9 @@ let decode_symbolic_ebcdics' ~quotation w =
                                       stuff = Character_in_symbolic_EBCDIC c }
       end
   in
-  ACC.result ~diags
-    (Grammar_tokens.ALPHANUM { quotation; hexadecimal = false;
-                               str;          (* CHECKME: not the given string *)
-                               runtime_repr = Native_bytes } &@<- w)
-
-(* include Make (Text_keywords) *)
+  Grammar_tokens.ALPHANUM { quotation; hexadecimal = false;
+                            str;             (* CHECKME: not the given string *)
+                            runtime_repr = Native_bytes } &@<- w,
+  diags
 
 (* --- *)

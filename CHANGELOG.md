@@ -18,6 +18,7 @@
 - Support for 78-level data items [#634](https://github.com/OCamlPro/superbol-studio-oss/pull/634)
 
 ### Fixed
+- Keywords shown in some diagnostic messages [#676](https://github.com/OCamlPro/superbol-studio-oss/pull/676)
 - Wrong edges in CFG visualization that occured in cases of homonym paragraphs [#599](https://github.com/OCamlPro/superbol-studio-oss/pull/599)
 - Performances of the LSP server when many documents are opened and closed in a single session [#659](https://github.com/OCamlPro/superbol-studio-oss/pull/659)
 - Internal type of `CALL` arguments [#655](https://github.com/OCamlPro/superbol-studio-oss/pull/655)

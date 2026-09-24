@@ -327,7 +327,7 @@ run_misc.at-2641-prog.cob:9.33:
 ----                                    ^
   10              IF INDVAL NOT = 3
   11                 DISPLAY INDVAL
->> Hint: Missing END_PERFORM
+>> Hint: Missing END-PERFORM
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:2666:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:2686:0
@@ -2473,7 +2473,7 @@ run_misc.at-13739-prog.cob:22.47:
 ----                                                  ^
   23                         end-display
   24                         display 'SIZE ERROR, last value = ' doubleValue
->> Hint: Missing END_PERFORM .
+>> Hint: Missing END-PERFORM .
 
 run_misc.at-13739-prog.cob:22.48-22.52:
   19                 compute doubleValue = doubleValue * 2

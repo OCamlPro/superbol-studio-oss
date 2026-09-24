@@ -37,53 +37,17 @@
 
 (* Note that's heavily inspired from merlin's own code for recovery *)
 
+open Recovery_types
+
 module LIST = Cobol_common.Basics.LIST
 
 module Make
     (Parser: MenhirLib.IncrementalEngine.EVERYTHING)
-    (Recovery: sig
-       val default_value: pos:Lexing.position -> 'a Parser.symbol -> 'a
-       val token_of_terminal: 'a Parser.terminal -> 'a -> Parser.token
-       val depth: int array
-
-       type action =
-         | Abort
-         | R of int
-         | S: 'a Parser.symbol -> action
-         | Sub of action list
-       and decision =
-         | Nothing
-         | One of action list
-         | Select of (int -> action list)
-
-       val recover: int -> decision
-
-       val print_symbol: Parser.xsymbol -> string
-       val print_token: Parser.token -> string
-       val benign_assumption: Parser.token -> bool
-     end) =
+    (Recovery: PARAMS with module Parser := Parser)
+  : (DRIVER with module Parser := Parser) =
 struct
 
-  type 'a candidate =
-    {
-      env: 'a Parser.env;
-      visited: 'a operation list;
-      assumed: assumption list;
-    }
-  and 'a operation =
-    | Shift of 'a Parser.env * 'a Parser.env
-    | Reduce of Parser.production * 'a Parser.env option
-  and assumption =
-    {
-      show: Pretty.delayed option;
-      pos: Lexing.position;
-      benign: bool;
-    }
-  type 'a candidates =
-    {
-      final: ('a * assumption list) option;
-      candidates: 'a candidate list;
-    }
+  include Driver_types (Parser)
 
   let feed_token token visited env =
     let rec aux visited = function
@@ -144,7 +108,7 @@ struct
 
   let generate (type a) (env: a Parser.env) =
     let module E = struct
-      exception Result of (a * assumption list)
+      exception Result of (a * a assumption list)
     end in
     let eval ~endp path : Recovery.action -> a Parser.env * _ * _ =
       let rec aux ((env, visited, assumed) as path) = function
@@ -159,17 +123,12 @@ struct
         | S (N _ as sym) ->
             let env' =
               Parser.feed sym endp (Recovery.default_value ~pos:endp sym) endp env
-            and show = match Recovery.print_symbol @@ X sym with
-              | "" -> None
-              | sym_str -> Some (Pretty.delayed "%s" sym_str)
             in
             (* Here, we assume that a symbol that shows as an empty string
                denotes a non-terminal that may be empty and is therefore a
                benign assumption. *)
-            let benign = show = None in
-            env',
-            Shift (env, env') :: visited,
-            { show; pos = endp; benign } :: assumed
+            env', Shift (env, env') :: visited,
+            { insertion = Symbol (Parser.X sym); pos = endp } :: assumed
         | S (T t as sym) ->
             let v = Recovery.default_value ~pos:endp sym in
             let token = Recovery.token_of_terminal t v in
@@ -179,11 +138,8 @@ struct
             | `Accept v ->
                 raise (E.Result (v, assumed))
             | `Recovered (_, env, visited) ->
-                let show = match Recovery.print_token token with
-                  | "" -> None
-                  | sym_str -> Some (Pretty.delayed "%s" sym_str)
-                and benign = Recovery.benign_assumption token in
-                env, visited, { show; pos = endp; benign } :: assumed
+                env, visited,
+                { insertion = Token token; pos = endp } :: assumed
       in
       aux path
     in

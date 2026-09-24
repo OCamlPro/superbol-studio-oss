@@ -10,8 +10,16 @@
 (**************************************************************************)
 %}
 
-(* Note: `grammar.mly` opens `Cobol_ptree.Dummies`, so it's be openned in
-   [@recovery] attributes below. *)
+(* Notes:
+
+   `grammar.mly` opens `Cobol_ptree.Dummies`, so it's open in [@recovery]
+   attributes below.
+
+   In addition, keyword strings given as payloads to [@keyword] replace the
+   string that is automatically derived from the token name.  When multiple
+   strings are given for a keyword token, every form maps to the same reservable
+   keyword, and the first string is used when the keyword appears in parser
+   diagnostics. *)
 
 %token EOF
 
@@ -209,20 +217,20 @@
 %token COMMIT                       [@keyword]
 %token COMMON                       [@keyword]
 %token COMMUNICATION                [@keyword]
-%token COMP                         [@keyword  "COMPUTATIONAL",   "COMP"]
+%token COMP                         [@keyword  "COMP",   "COMPUTATIONAL"]
 %token COMPUTE                      [@keyword]
-%token COMP_0                       [@keyword  "COMPUTATIONAL-0", "COMP-0"]
-%token COMP_1                       [@keyword  "COMPUTATIONAL-1", "COMP-1"]
+%token COMP_0                       [@keyword  "COMP-0", "COMPUTATIONAL-0"]
+%token COMP_1                       [@keyword  "COMP-1", "COMPUTATIONAL-1"]
 %token COMP_10                      [@keyword]
 %token COMP_15                      [@keyword]
-%token COMP_2                       [@keyword  "COMPUTATIONAL-2", "COMP-2"]
-%token COMP_3                       [@keyword  "COMPUTATIONAL-3", "COMP-3"]
-%token COMP_4                       [@keyword  "COMPUTATIONAL-4", "COMP-4"]
-%token COMP_5                       [@keyword  "COMPUTATIONAL-5", "COMP-5"]
-%token COMP_6                       [@keyword  "COMPUTATIONAL-6", "COMP-6"]
+%token COMP_2                       [@keyword  "COMP-2", "COMPUTATIONAL-2"]
+%token COMP_3                       [@keyword  "COMP-3", "COMPUTATIONAL-3"]
+%token COMP_4                       [@keyword  "COMP-4", "COMPUTATIONAL-4"]
+%token COMP_5                       [@keyword  "COMP-5", "COMPUTATIONAL-5"]
+%token COMP_6                       [@keyword  "COMP-6", "COMPUTATIONAL-6"]
 %token COMP_9                       [@keyword]
-%token COMP_N                       [@keyword  "COMPUTATIONAL-N", "COMP-N"]
-%token COMP_X                       [@keyword  "COMPUTATIONAL-X", "COMP-X"]
+%token COMP_N                       [@keyword  "COMP-N", "COMPUTATIONAL-N"]
+%token COMP_X                       [@keyword  "COMP-X", "COMPUTATIONAL-X"]
 %token CONDITION                    [@keyword]
 %token CONFIGURATION                [@keyword]
 %token CONSTANT                     [@keyword]
@@ -236,7 +244,7 @@
 %token COPY                         [@keyword]
 %token COPY_SELECTION               [@keyword]                [@contexts ]
 %token CORE_INDEX                   [@keyword]                [@contexts ]
-%token CORRESPONDING                [@keyword  "CORR", "CORRESPONDING"]
+%token CORRESPONDING                [@keyword  "CORRESPONDING", "CORR"]
 %token COUNT                        [@keyword]
 %token CRT                          [@keyword]
 %token CRT_UNDER                    [@keyword]
@@ -281,7 +289,7 @@
 %token DESCENDING                   [@keyword]
 %token DESTINATION                  [@keyword]
 %token DESTROY                      [@keyword]
-%token DETAIL                       [@keyword  "DE", "DETAIL"]
+%token DETAIL                       [@keyword  "DETAIL", "DE"]
 %token DISABLE                      [@keyword]
 %token DISC                         [@keyword]                [@contexts ]
 %token DISK                         [@keyword]                [@contexts ]
@@ -517,7 +525,7 @@
 %token I_O                          [@keyword]
 %token I_O_CONTROL                  [@keyword]
 %token JSON                         [@keyword]
-%token JUSTIFIED                    [@keyword  "JUST", "JUSTIFIED"]
+%token JUSTIFIED                    [@keyword  "JUSTIFIED", "JUST"]
 %token KEPT                         [@keyword]
 %token KEY                          [@keyword]
 %token KEYBOARD                     [@keyword]                [@contexts ]
@@ -687,7 +695,7 @@
 %token PF                           [@keyword]
 %token PH                           [@keyword]
 %token PHYSICAL                     [@keyword]
-%token PICTURE                      [@keyword  "PIC", "PICTURE"]
+%token PICTURE                      [@keyword  "PICTURE", "PIC"]
 %token PIXEL                        [@keyword]                [@contexts ]
 %token PLACEMENT                    [@keyword]                [@contexts ]
 %token PLUS                         [@keyword]
@@ -890,7 +898,7 @@
 %token SWITCH                       [@keyword]
 %token SYMBOL                       [@keyword]                [@contexts currency_clause]
 %token SYMBOLIC                     [@keyword]
-%token SYNCHRONIZED                 [@keyword  "SYNC", "SYNCHRONIZED"]
+%token SYNCHRONIZED                 [@keyword  "SYNCHRONIZED", "SYNC"]
 %token SYSTEM_DEFAULT               [@keyword]
 %token SYSTEM_INFO                  [@keyword]                [@contexts ]
 %token SYSTEM_OFFSET                [@keyword]

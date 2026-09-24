@@ -11,39 +11,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Parser_diagnostics_types
+
 open Cobol_common.Srcloc.TYPES
+
 open Cobol_common.Srcloc.INFIX
 
 module LIST = Cobol_common.Basics.LIST
-
-type error =
-  | Caught_exception of { msg: string }
-  | Malformed of { loc: srcloc; stuff: malformed_stuff }
-  | Missing of { loc: srcloc; stuff: missing_stuff }
-  | Unexpected of { loc: srcloc; stuff: unexpected_stuff }
-  | Unsupported of { loc: srcloc; stuff: unsupported_stuff }
-  | Unterminated of { loc: srcloc; stuff: unterminated_stuff }
-
-and malformed_stuff =
-  | Alphanumeric_literal
-  | Data_item_at_level_78
-
-and missing_stuff =
-  | Continuation_of of string
-  | Value_for_78_level_item of Cobol_ptree.data_name with_loc
-
-and unexpected_stuff =
-  | Pseudotext
-  | Character_in_symbolic_EBCDIC of char
-  | Clause_for_78_level_item of Cobol_ptree.data_clause with_loc
-  | Multiple_values_for_78_level_item of Cobol_ptree.data_name with_loc
-  | Symbolic_EBCDIC_orginal of int
-
-and unsupported_stuff =
-  | Global_clause_for_78_level_item
-
-and unterminated_stuff =
-  | Comment_entry
 
 let pp_malformed_stuff ppf = function
   | Alphanumeric_literal ->
@@ -106,7 +80,9 @@ let pp_error ppf = function
 
 type customizable_diagnostic =
   | Implementation_pending of string
-  | Missing_tokens of Pretty.delayed     (* TODO: avoid this functional value *)
+  | Missing_tokens of
+      (Grammar.MenhirInterpreter.xsymbol, Grammar.token)
+        Recovery_types.generic_insertion list
   | Invalid_syntax
   | Fallthrough_to_when_other
   | No_when_branch_before_when_other
@@ -116,8 +92,12 @@ let pp_customizable_diagnostic ppf = function
   | Implementation_pending descr ->
       Pretty.print ppf "Ignored@ %a@ (implementation@ pending)"
         Pretty.text descr
-  | Missing_tokens pp_assumed ->
-      Pretty.print ppf "Missing@ %t" pp_assumed
+  | Missing_tokens replacements ->
+      Pretty.print ppf "Missing@ %a"
+        Fmt.(list ~sep:sp
+               (Recovery_printer.pp_generic_insertion
+                  (using Grammar_printer.print_symbol string)
+                  (using Text_lexer.string_of_token string))) replacements
   | Invalid_syntax ->
       Pretty.print ppf "Invalid@ syntax"
   | Fallthrough_to_when_other ->
