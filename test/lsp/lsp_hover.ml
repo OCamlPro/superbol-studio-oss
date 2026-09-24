@@ -1224,6 +1224,7 @@ let%expect_test "hover-datadef-redefines" =
     *e.g,* [`0`] (0), [`1`] (1)
     Offset: 0 bytes in S
     Size: 1 byte
+    Redefined by U
     ---
     References: 2
     (line 10, character 13):
@@ -1264,6 +1265,7 @@ let%expect_test "hover-datadef-redefines" =
     *e.g,* [`0`] (0), [`1`] (1)
     Offset: 0 bytes in X
     Size: 1 byte
+    Redefined by Z
     ---
     References: 2
     (line 12, character 20):
@@ -1410,7 +1412,7 @@ let%expect_test "hover-datadef-table-and-index" =
     ```
     ALPHANUMERIC(1)
     Offset: 0 bytes
-    Size: 1 byte
+    Size: 10 bytes (1 byte per occurrence)
     ---
     References: 2
     (line 7, character 52):
@@ -1602,7 +1604,7 @@ let%expect_test "hover-datadef-table-and-index" =
     ```
     ALPHANUMERIC(1)
     Offset: 0 bytes in VARTAB1
-    Size: 1 byte
+    Size: *variable* (1 byte per occurrence)
     ---
     References: 2
     (line 24, character 46):
@@ -2536,6 +2538,7 @@ let%expect_test "hover-offset-size" =
     ALPHANUMERIC(10)
     Offset: 4 bytes in WS-CUSTOMER
     Size: 10 bytes
+    Redefined by WS-NAME-R
     ---
     References: 4
     (line 8, character 13):
@@ -2661,7 +2664,7 @@ let%expect_test "hover-offset-size" =
     ```
     ALPHANUMERIC(5)
     Offset: 0 bytes in WS-TABLE
-    Size: 5 bytes
+    Size: *variable* (5 bytes per occurrence)
     ---
     References: 1
     (line 15, character 11):
@@ -2684,3 +2687,188 @@ let%expect_test "hover-offset-size" =
     Size: 1 byte
     ---
     References: 1 |}]
+
+let%expect_test "hover-redefines-sizes" =
+  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  print_hovered server ~projdir @@ extract_position_markers {cobol|
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. prog.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 S.
+          05 _|_A PIC X(4).
+          05 _|_B REDEFINES A PIC X(2).
+          05 _|_C REDEFINES A PIC X(6).
+          05 _|_D REDEFINES A PIC X(4).
+          05 _|_E PIC X(3).
+          05 _|_TAB OCCURS 3 PIC X(2).
+          05 _|_ALT REDEFINES TAB PIC X(8).
+        PROCEDURE DIVISION.
+            STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[{"message":"Redefinition of item with OCCURS clause TAB IN S","range":{"end":{"character":40,"line":12},"start":{"character":10,"line":12}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    (line 6, character 13):
+    __rootdir__/prog.cob:7.13-7.14:
+       4           DATA DIVISION.
+       5           WORKING-STORAGE SECTION.
+       6           01 S.
+       7 >           05 A PIC X(4).
+    ----                ^
+       8             05 B REDEFINES A PIC X(2).
+       9             05 C REDEFINES A PIC X(6).
+    ```cobol
+    A IN S
+    ```
+    ```cobol
+    PIC X(4) USAGE DISPLAY
+    ```
+    ALPHANUMERIC(4)
+    Offset: 0 bytes in S
+    Size: 4 bytes
+    Redefined by B: 2 bytes of 4 bytes
+    Redefined by C: 6 bytes of 4 bytes ⚠️
+    Redefined by D
+    ---
+    References: 4
+    (line 7, character 13):
+    __rootdir__/prog.cob:8.13-8.14:
+       5           WORKING-STORAGE SECTION.
+       6           01 S.
+       7             05 A PIC X(4).
+       8 >           05 B REDEFINES A PIC X(2).
+    ----                ^
+       9             05 C REDEFINES A PIC X(6).
+      10             05 D REDEFINES A PIC X(4).
+    ```cobol
+    B IN S
+    ```
+    ```cobol
+    PIC XX USAGE DISPLAY
+    ```
+    ALPHANUMERIC(2)
+    Redefines:
+    ```cobol
+    A IN S
+    ```
+    Offset: 0 bytes in S
+    Size: 2 bytes
+    Redefinition: 2 bytes of 4 bytes
+    ---
+    References: 1
+    (line 8, character 13):
+    __rootdir__/prog.cob:9.13-9.14:
+       6           01 S.
+       7             05 A PIC X(4).
+       8             05 B REDEFINES A PIC X(2).
+       9 >           05 C REDEFINES A PIC X(6).
+    ----                ^
+      10             05 D REDEFINES A PIC X(4).
+      11             05 E PIC X(3).
+    ```cobol
+    C IN S
+    ```
+    ```cobol
+    PIC X(6) USAGE DISPLAY
+    ```
+    ALPHANUMERIC(6)
+    Redefines:
+    ```cobol
+    A IN S
+    ```
+    Offset: 0 bytes in S
+    Size: 6 bytes
+    Redefinition: 6 bytes of 4 bytes ⚠️
+    ---
+    References: 1
+    (line 9, character 13):
+    __rootdir__/prog.cob:10.13-10.14:
+       7             05 A PIC X(4).
+       8             05 B REDEFINES A PIC X(2).
+       9             05 C REDEFINES A PIC X(6).
+      10 >           05 D REDEFINES A PIC X(4).
+    ----                ^
+      11             05 E PIC X(3).
+      12             05 TAB OCCURS 3 PIC X(2).
+    ```cobol
+    D IN S
+    ```
+    ```cobol
+    PIC X(4) USAGE DISPLAY
+    ```
+    ALPHANUMERIC(4)
+    Redefines:
+    ```cobol
+    A IN S
+    ```
+    Offset: 0 bytes in S
+    Size: 4 bytes
+    ---
+    References: 1
+    (line 10, character 13):
+    __rootdir__/prog.cob:11.13-11.14:
+       8             05 B REDEFINES A PIC X(2).
+       9             05 C REDEFINES A PIC X(6).
+      10             05 D REDEFINES A PIC X(4).
+      11 >           05 E PIC X(3).
+    ----                ^
+      12             05 TAB OCCURS 3 PIC X(2).
+      13             05 ALT REDEFINES TAB PIC X(8).
+    ```cobol
+    E IN S
+    ```
+    ```cobol
+    PIC XXX USAGE DISPLAY
+    ```
+    ALPHANUMERIC(3)
+    Offset: 4 bytes in S
+    Size: 3 bytes
+    ---
+    References: 1
+    (line 11, character 13):
+    __rootdir__/prog.cob:12.13-12.16:
+       9             05 C REDEFINES A PIC X(6).
+      10             05 D REDEFINES A PIC X(4).
+      11             05 E PIC X(3).
+      12 >           05 TAB OCCURS 3 PIC X(2).
+    ----                ^^^
+      13             05 ALT REDEFINES TAB PIC X(8).
+      14           PROCEDURE DIVISION.
+    ```cobol
+    TAB IN S
+    ```
+    ```cobol
+    PIC XX USAGE DISPLAY
+    ```
+    ALPHANUMERIC(2)
+    Offset: 7 bytes in S
+    Size: 6 bytes (2 bytes per occurrence)
+    Redefined by ALT: 8 bytes of 6 bytes ⚠️
+    ---
+    References: 2
+    (line 12, character 13):
+    __rootdir__/prog.cob:13.13-13.16:
+      10             05 D REDEFINES A PIC X(4).
+      11             05 E PIC X(3).
+      12             05 TAB OCCURS 3 PIC X(2).
+      13 >           05 ALT REDEFINES TAB PIC X(8).
+    ----                ^^^
+      14           PROCEDURE DIVISION.
+      15               STOP RUN.
+    ```cobol
+    ALT IN S
+    ```
+    ```cobol
+    PIC X(8) USAGE DISPLAY
+    ```
+    ALPHANUMERIC(8)
+    Redefines:
+    ```cobol
+    TAB IN S
+    ```
+    Offset: 7 bytes in S
+    Size: 8 bytes
+    Redefinition: 8 bytes of 6 bytes ⚠️
+    ---
+    References: 1 |}];;
