@@ -203,32 +203,71 @@ let record_name: acc -> Cobol_ptree.qualname with_loc option -> acc * string =
 (* --- *)
 
 
+let add_named_def qn def { named; list } =
+  { named = Resolver_map.add ~&qn def named;
+    list = def :: list }
+
+let add_anonymous_def def { named; list } =
+  { named;
+    list = def :: list }
+
+
+let collect_data_definitions ~record record_item data_defs =
+  Cobol_data.Item.fold_definitions record_item (data_defs, None, None)
+    ~fold_redefinitions:true
+    ~field:begin fun def (acc, prev_main_def, prev_table_def) -> (* regular field *)
+      let field_def =
+        let table_def =
+          if ~&def.field_leading_ranges <> []
+          then prev_table_def
+          else None
+        and main_def =
+          match Option.map (~&) prev_main_def with
+          | Some Field def' when ~&def != def' ->
+              prev_main_def
+          | Some Table def' when ~&def != ~&(def'.table_field) ->
+              prev_main_def
+          | _ ->
+              None
+        in
+        Data_field { record; def; main_def; table_def }
+      in
+      match ~&def.field_qualname with
+      | Some qn ->
+          add_named_def qn field_def acc, prev_main_def, prev_table_def
+      | None ->
+          add_anonymous_def field_def acc, prev_main_def, prev_table_def
+    end
+    ~table:begin fun table (acc, prev_main_def, prev_table_def) ->
+      LIST.fold_left begin fun acc qualname ->       (* register table indexes *)
+        let index_def = Table_index { record; table; qualname } in
+        add_named_def qualname index_def acc
+      end acc ~&table.table_range.range_indexes, prev_main_def, prev_table_def
+    end
+    ~visit_item:begin fun item_def (acc, prev_main_def, prev_table_def) ->
+      let main_def =
+        match ~&item_def with
+        | Field def when def.field_redefinitions <> [] -> Some item_def
+        | Table def when def.table_redefinitions <> [] -> Some item_def
+        | _ -> prev_main_def
+      and table_def =
+        match ~&item_def with
+        | Table def -> Some (def &@<- item_def)
+        | _ -> prev_table_def
+      in
+      Cobol_common.Visitor.do_children_and_then (acc, main_def, table_def)
+        (fun (acc, _, _) -> acc, prev_main_def, prev_table_def)
+    end |>
+  fun (data_defs, _, _) -> data_defs
+
+
 let commit_record acc ~renamings (record_item: item_definition with_loc) =
   let record_item_name = Cobol_data.Item.qualname ~&record_item in
   let acc, record_name = record_name acc record_item_name in
   let record = { record_name; record_storage = acc.current_storage;
                  record_item; record_renamings = renamings } in
-  let add_named_def qn def { named; list } =
-    { named = Resolver_map.add ~&qn def named;
-      list = def :: list }
-  and add_anonymous_def def { named; list } =
-    { named;
-      list = def :: list }
-  in
   let data_items =
-    Cobol_data.Item.fold_definitions ~fold_redefinitions:true record_item
-      acc.definitions.data_items
-      ~field:begin fun def -> match ~&def.field_qualname with  (* regular fields *)
-        | Some qn ->
-            add_named_def qn (Data_field { record; def })
-        | None ->
-            add_anonymous_def (Data_field { record; def })
-      end
-      ~table:begin fun table acc ->                             (* table indexes *)
-        LIST.fold_left begin fun acc qualname ->
-          add_named_def qualname (Table_index { record; table; qualname }) acc
-        end acc ~&table.table_range.range_indexes
-      end
+    collect_data_definitions ~record record_item acc.definitions.data_items
   in
   let data_items =                                      (* add renaming items *)
     LIST.fold_left begin fun data_items def ->

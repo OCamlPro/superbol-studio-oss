@@ -393,11 +393,16 @@ let pp_record: record Pretty.printer =
   ]
 
 let pp_data_definition ppf = function
-  | Data_field { def; record = { record_name; _ } } ->
-      Pretty.record [
-        Fmt.(styled `Yellow @@ any "data field");
-        Fmt.field "record" (fun () -> record_name) Fmt.string;
-        Pretty.vfield "def" (fun () -> def) pp_field_definition';
+  | Data_field { def; record = { record_name; _ }; main_def; table_def } ->
+      Pretty.record_with_conditional_fields [
+        T Fmt.(styled `Yellow @@ any "data field");
+        T (Fmt.field "record" (fun () -> record_name) Fmt.string);
+        T (Pretty.vfield "def" (fun () -> def) pp_field_definition');
+        T (Pretty.vfield "main-def" (fun () -> main_def) (* Note reprints [def] *)
+             Fmt.(option ~none:(any "(same as def)") pp_item_definition'));
+        C'(table_def <> None,
+           Pretty.vfield "table-def" (fun () -> table_def) (* Note reprints [def] *)
+             Fmt.(option pp_table_definition'));
       ] ppf ()
   | Data_renaming { def; record = { record_name; _ } } ->
       Pretty.record [

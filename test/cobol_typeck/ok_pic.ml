@@ -131,7 +131,7 @@ let%expect_test "signed-numeric-sizes" =
         usage: {
           display
           category: NUMERIC(digits = 5, scale = 0, signed = true)
-          sign-position: leading nonseparate
+          sign-position: trailing nonseparate
         }
       }
     }

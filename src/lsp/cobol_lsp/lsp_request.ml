@@ -668,8 +668,14 @@ let pp_data_definition_info ppf = function
   | Preproc def ->
       Lsp_data_info_printer.pp_compilation_var_definition ppf def
 
+let pp_data_memory_info ?prefix ppf = function
+  | Regular def ->
+      Lsp_data_info_printer.pp_memory_info ?prefix ppf def
+  | Preproc _ ->
+      ()                         (* those variables use no memory at run time *)
+
 let describe_data_definition_for_element_at_pos
-    ?(show_hover_text_on_definitions = false)
+    ?(show_data_description_on_definitions = false)
     ~(doc: Lsp_document.t) ~(checked_doc: Cobol_typeck.Outputs.t) position
   =
   let Cobol_typeck.Outputs.{ group; _ } = checked_doc in
@@ -693,13 +699,19 @@ let describe_data_definition_for_element_at_pos
           if doc_comments <> ""
           then Pretty.print ppf "\n---\n%s" doc_comments
         in
+        (* The description mostly repeats the hovered line, so it can be
+           hidden on definitions. Size and offset are always shown. *)
         let text =
-          if show_hover_text_on_definitions ||
+          if show_data_description_on_definitions ||
              not (Lsp_position.is_in_src ~filename position data_def_src)
-          then Some (Pretty.to_string "%a%t"
+          then Some (Pretty.to_string "%a%a%t"
                        pp_data_definition_info data_def
+                       (pp_data_memory_info ~prefix:"  \n") data_def
                        pp_documentation)
-          else None
+          else match Pretty.to_string "%a" (pp_data_memory_info ?prefix:None)
+                       data_def with
+            | "" -> None
+            | memory_info -> Some memory_info
         in
         Some (text, hover_loc)
       with Not_found ->
@@ -757,7 +769,7 @@ let preproc_info_on_hover ~filename position pplog =
   | None ->
       None
 
-let handle_hover ?show_hover_text_on_definitions
+let handle_hover ?show_data_description_on_definitions
     registry HoverParams.{ textDocument; position; _ } =
   let filename = Lsp.Uri.to_path textDocument.uri in
   try_with_checked_doc registry textDocument
@@ -765,7 +777,7 @@ let handle_hover ?show_hover_text_on_definitions
       let ref_count () = data_references position ~doc checked_doc in
       match
         describe_data_definition_for_element_at_pos position ~doc ~checked_doc
-          ?show_hover_text_on_definitions,
+          ?show_data_description_on_definitions,
         preproc_info_on_hover ~filename position doc.artifacts.pplog
       with
       | None, None ->

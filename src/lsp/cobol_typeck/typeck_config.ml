@@ -25,10 +25,11 @@ type acc =
     diags: Typeck_diagnostics.t;
   }
 
-(** Default sign configuration for DISPLAY items: leading, non-separate. *)
+(** Default sign configuration for DISPLAY items, which at least in GnuCOBOL is
+    trailing non-separate. *)
 let default_display_sign_config: Cobol_data.Types.display_sign_config =
   Cobol_data.Types.{
-    sign_position = Leading;
+    sign_position = Trailing;
     sign_separate = false;
   }
 

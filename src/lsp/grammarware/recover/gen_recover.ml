@@ -52,12 +52,11 @@ let () =
               (st' :> int)
           ) (Lr1.transitions st);
         fprintf ppf "Reductions:\n";
-        List.iter (fun (t,ps) ->
-            let p : production = List.hd ps in
+        List.iter (fun ((t,p) : terminal * production) ->
             fprintf ppf " - on %a, reduce %d:\n  %a\n"
               Print.terminal t
               (p :> int) Print.production p
-          ) (Lr1.reductions st);
+          ) (Lr1.get_reductions st);
       );
     Production.iter (fun (p : production) ->
         fprintf ppf "\n# Production p%d\n%a"

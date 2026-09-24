@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let show_diagnostics ?(show_data = false)
+let show_diagnostics ?(show_data = false) ?(show_whole_definitions = false)
     ?parser_options ?source_format ?filename contents =
   Prog_typeck.typeck ?parser_options ?source_format ?filename contents |>
   Cobol_common.Diagnostics.show_n_forget ~set_status:false ~ppf:Fmt.stdout
@@ -40,7 +40,21 @@ let show_diagnostics ?(show_data = false)
                 Cobol_data.Printer.pp_data_storage s;
           | _ ->
               ()
+        method! fold_data_definitions d () =
+          if show_whole_definitions then
+            Cobol_common.Visitor.skip_children @@
+            Pretty.out "@[<v>Whole data defintions:@;%a@]@."
+              Fmt.(list ~sep:cut @@ begin fun ppf d ->
+                  Pretty.print ppf "%a@[<v>Definition: %a@]"
+                    (Cobol_common.Srcloc.pp_srcloc ~platform:Prog_common.platform)
+                    (Cobol_data.Item.def_loc d)
+                    Cobol_data.Printer.pp_data_definition d
+                end)
+              d.data_items.list
+          else
+            Cobol_common.Visitor.do_children ()
       end group ()
   end
 
-let show_data = show_diagnostics ~show_data:true
+let show_data ?show_whole_definitions
+  = show_diagnostics ~show_data:true ?show_whole_definitions
