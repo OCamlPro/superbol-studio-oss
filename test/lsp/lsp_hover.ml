@@ -1203,7 +1203,6 @@ let%expect_test "hover-datadef-redefines" =
     ```
     Offset: 0 bytes in S
     Size: 1 byte
-    Redefinition of size 1/1 byte
     ---
     References: 2
     (line 7, character 31):
@@ -1225,7 +1224,7 @@ let%expect_test "hover-datadef-redefines" =
     *e.g,* [`0`] (0), [`1`] (1)
     Offset: 0 bytes in S
     Size: 1 byte
-    Redefined by U of size 1/1 byte
+    Redefined by U
     ---
     References: 2
     (line 10, character 13):
@@ -1266,7 +1265,7 @@ let%expect_test "hover-datadef-redefines" =
     *e.g,* [`0`] (0), [`1`] (1)
     Offset: 0 bytes in X
     Size: 1 byte
-    Redefined by Z of size 1/1 byte
+    Redefined by Z
     ---
     References: 2
     (line 12, character 20):
@@ -1308,7 +1307,6 @@ let%expect_test "hover-datadef-redefines" =
     ```
     Offset: 0 bytes in S
     Size: 1 byte
-    Redefinition of size 1/1 byte
     ---
     References: 2
     (line 12, character 24):
@@ -1414,7 +1412,7 @@ let%expect_test "hover-datadef-table-and-index" =
     ```
     ALPHANUMERIC(1)
     Offset: 0 bytes
-    Size: 1 byte
+    Size: 10 bytes (1 byte per occurrence)
     ---
     References: 2
     (line 7, character 52):
@@ -1606,7 +1604,7 @@ let%expect_test "hover-datadef-table-and-index" =
     ```
     ALPHANUMERIC(1)
     Offset: 0 bytes in VARTAB1
-    Size: 1 byte
+    Size: *variable* (1 byte per occurrence)
     ---
     References: 2
     (line 24, character 46):
@@ -2540,7 +2538,7 @@ let%expect_test "hover-offset-size" =
     ALPHANUMERIC(10)
     Offset: 4 bytes in WS-CUSTOMER
     Size: 10 bytes
-    Redefined by WS-NAME-R of size 10/10 bytes
+    Redefined by WS-NAME-R
     ---
     References: 4
     (line 8, character 13):
@@ -2566,7 +2564,6 @@ let%expect_test "hover-offset-size" =
     ```
     Offset: 4 bytes in WS-CUSTOMER
     Size: 10 bytes
-    Redefinition of size 10/10 bytes
     ---
     References: 1
     (line 9, character 13):
@@ -2667,7 +2664,7 @@ let%expect_test "hover-offset-size" =
     ```
     ALPHANUMERIC(5)
     Offset: 0 bytes in WS-TABLE
-    Size: 5 bytes
+    Size: *variable* (5 bytes per occurrence)
     ---
     References: 1
     (line 15, character 11):
@@ -2730,9 +2727,9 @@ let%expect_test "hover-redefines-sizes" =
     ALPHANUMERIC(4)
     Offset: 0 bytes in S
     Size: 4 bytes
-    Redefined by B of size **2/4 bytes**
-    ⚠️ Redefined by C of size **6/4 bytes**
-    Redefined by D of size 4/4 bytes
+    Redefined by B: 2 bytes of 4 bytes
+    Redefined by C: 6 bytes of 4 bytes ⚠️
+    Redefined by D
     ---
     References: 4
     (line 7, character 13):
@@ -2757,7 +2754,7 @@ let%expect_test "hover-redefines-sizes" =
     ```
     Offset: 0 bytes in S
     Size: 2 bytes
-    Redefinition of size **2/4 bytes**
+    Redefinition: 2 bytes of 4 bytes
     ---
     References: 1
     (line 8, character 13):
@@ -2782,7 +2779,7 @@ let%expect_test "hover-redefines-sizes" =
     ```
     Offset: 0 bytes in S
     Size: 6 bytes
-    ⚠️ Redefinition of size **6/4 bytes**
+    Redefinition: 6 bytes of 4 bytes ⚠️
     ---
     References: 1
     (line 9, character 13):
@@ -2807,7 +2804,6 @@ let%expect_test "hover-redefines-sizes" =
     ```
     Offset: 0 bytes in S
     Size: 4 bytes
-    Redefinition of size 4/4 bytes
     ---
     References: 1
     (line 10, character 13):
@@ -2847,8 +2843,8 @@ let%expect_test "hover-redefines-sizes" =
     ```
     ALPHANUMERIC(2)
     Offset: 7 bytes in S
-    Size: 2 bytes
-    ⚠️ Redefined by ALT of size **8/6 bytes**
+    Size: 6 bytes (2 bytes per occurrence)
+    Redefined by ALT: 8 bytes of 6 bytes ⚠️
     ---
     References: 2
     (line 12, character 13):
@@ -2873,6 +2869,6 @@ let%expect_test "hover-redefines-sizes" =
     ```
     Offset: 7 bytes in S
     Size: 8 bytes
-    ⚠️ Redefinition of size **8/6 bytes**
+    Redefinition: 8 bytes of 6 bytes ⚠️
     ---
     References: 1 |}];;

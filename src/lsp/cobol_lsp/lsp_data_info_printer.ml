@@ -20,17 +20,15 @@ let size_in_bits size =
   try Some (Cobol_data.Memory.as_bits size)
   with Cobol_data.Memory.NOT_SCALAR _ -> None
 
-let pp_bits ppf bits =
-  if Int.rem bits 8 = 0 then
-    let bytes = bits / 8 in
-    Fmt.pf ppf "%u byte%s" bytes (if bytes <> 1 then "s" else "")
-  else
-    Fmt.pf ppf "%u bit%s" bits (if bits <> 1 then "s" else "")
-
 let pp_readable_size ppf size =
   match size_in_bits size with
-  | Some bits -> pp_bits ppf bits
-  | None -> Fmt.pf ppf "*variable*"
+  | Some bits when Int.rem bits 8 = 0 ->
+      let bytes = bits / 8 in
+      Fmt.pf ppf "%u byte%s" bytes (if bytes <> 1 then "s" else "")
+  | Some bits ->
+      Fmt.pf ppf "%u bit%s" bits (if bits <> 1 then "s" else "")
+  | None ->
+      Fmt.pf ppf "*variable*"
 
 let pp_size =
   Fmt.(any "Size: " ++ pp_readable_size)
@@ -332,28 +330,26 @@ let named_record { record_name; record_item; _ } =
 
 (* REDEFINES. The size of the other item cannot be read in the source. *)
 
-(* Size of the redefinition over the size of the item it redefines. Both are
-   given in the same unit when we can. *)
-let pp_sizes ppf (redef, redefined) =
-  match size_in_bits redef, size_in_bits redefined with
-  | Some a, Some b when Int.rem a 8 = 0 && Int.rem b 8 = 0 ->
-      Fmt.pf ppf "%u/%a" (a / 8) pp_bits b
-  | _ ->
-      Fmt.pf ppf "%a/%a" pp_readable_size redef pp_readable_size redefined
-
-let pp_redefinition ppf (kind, redef, redefined) =
+(* Size of the redefinition, then size of the item it redefines. We give them
+   only on a mismatch, as the card already shows them when they are equal.
+   [keep_when_equal] still names the redefinition in that case. *)
+let pp_redefinition ~keep_when_equal ppf (kind, redef, redefined) =
   let does_not_fit, mismatch =
     match size_in_bits redef, size_in_bits redefined with
     | Some a, Some b -> a > b, a <> b
     | _ -> false, false                    (* one of the sizes is variable *)
   in
-  let bold = if mismatch then "**" else "" in
-  Fmt.pf ppf "  \n%s%s of size %s%a%s"
-    (if does_not_fit then "⚠️ " else "") kind
-    bold pp_sizes (redef, redefined) bold
+  if mismatch then
+    Fmt.pf ppf "  \n%s: %a of %a%s"
+      kind pp_readable_size redef pp_readable_size redefined
+      (if does_not_fit then " ⚠️" else "")
+  else if keep_when_equal then
+    Fmt.pf ppf "  \n%s" kind
 
 (* The description already names the redefined item, so we do not repeat it.
-   Redefinitions are in the same record, so their name is not qualified. *)
+   Redefinitions are in the same record, so their name is not qualified. A
+   redefinition of the same size adds nothing to its own description, but on the
+   item it redefines the note is the only sign that a redefinition exists. *)
 let pp_redefinition_info ppf def =
   let open Cobol_data.Item in
   match def_item def with
@@ -361,14 +357,16 @@ let pp_redefinition_info ppf def =
   | Some item ->
       let own = size item in
       Option.iter begin fun redefined ->
-        pp_redefinition ppf ("Redefinition", own, size redefined)
+        pp_redefinition ~keep_when_equal:false ppf
+          ("Redefinition", own, size redefined)
       end (def_redefined def);
       List.iter begin fun redef ->
         let name = match item_qualname ~&redef with
           | Some qn -> Cobol_unit.Qual.name_of ~&qn
           | None -> "FILLER"
         in
-        pp_redefinition ppf ("Redefined by " ^ name, size ~&redef, own)
+        pp_redefinition ~keep_when_equal:true ppf
+          ("Redefined by " ^ name, size ~&redef, own)
       end (redefinitions item)
 
 (* [prefix] is printed only when there is something to print, so that callers
@@ -376,13 +374,19 @@ let pp_redefinition_info ppf def =
 let pp_memory_info ?(prefix = "") ppf def =
   let open Cobol_data.Item in
   if not (def_has_issues def) then
-    let pp_size = match def with
-      | Table_index _ -> pp_total_size     (* an index spans every occurrence *)
-      | _ -> pp_size
+    let pp_item_size ppf = function
+      | Table_index _ as def ->
+          pp_total_size ppf (def_size def) (* an index spans every occurrence *)
+      | Data_field { def; table_def = Some table; _ } ->
+          (* The whole table is what the offsets and the notes below use. *)
+          Fmt.pf ppf "%a (%a per occurrence)"
+            pp_size ~&table.table_size pp_readable_size ~&def.field_size
+      | def ->
+          pp_size ppf (def_size def)
     and record =
       enclosing_record ~record_name:(named_record (def_record def))
         (def_qualname def)
     in
     Fmt.pf ppf "%s%a  \n%a%a" prefix
-      (pp_offset_in record) (def_offset def) pp_size (def_size def)
+      (pp_offset_in record) (def_offset def) pp_item_size def
       pp_redefinition_info def
