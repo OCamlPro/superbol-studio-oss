@@ -9,7 +9,6 @@
 (******************************************************************************)
 
 open Cobol_common.Srcloc.TYPES
-open Cfg_jumps
 module NEL = Cobol_common.Basics.NEL
 
 type node_type =
@@ -24,7 +23,7 @@ type node = {
   section_name: string;
   loc: srcloc option;
   typ: node_type;
-  jumps: Jumps.t;
+  jumps: Cfg_jumps.Jumps.t;
   will_fallthru: bool;
   terminal: bool; (* unused atm *)
 }
@@ -47,4 +46,4 @@ module Edge = struct
   let default = FallThrough
 end
 
-module Cfg = Graph.Persistent.Digraph.ConcreteLabeled(Node)(Edge)
+module CFG = Graph.Persistent.Digraph.ConcreteLabeled (Node) (Edge)

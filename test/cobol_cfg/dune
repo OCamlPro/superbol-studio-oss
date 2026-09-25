@@ -1,0 +1,38 @@
+; See README.md for instructions to add new tests for `cobol_cfg`
+
+(rule
+ (alias runtest)
+ (enabled_if (not %{bin-available:graph-easy}))
+ (action
+   (progn ;(run realpath -s --relative-to %{workspace_root} .)
+          (echo "Note (test/cobol_cfg): graph-easy is not available, so ASCII tests will not run.\n"))))
+
+(library
+ (name test_cobol_cfg_dot)
+ (modules dot_basic)
+ (preprocess (pps ppx_expect))
+ (inline_tests (modes best)) ; add js for testing with nodejs
+ (libraries cobol_cfg cfg_testing cfg_tests)
+ )
+
+(library
+ (name test_cobol_cfg_ascii)
+ (modules ascii_basic)
+ (preprocess (pps ppx_expect))
+ (inline_tests (modes best)) ; add js for testing with nodejs
+ (libraries cobol_cfg cfg_testing cfg_tests)
+ (enabled_if %{bin-available:graph-easy})
+ )
+
+(library
+ (name cfg_testing)
+ (modules Cfg_testing)
+ (libraries typeck_testing parser_testing cobol_typeck cobol_cfg ez_file)
+ )
+
+(library
+ (name cfg_tests)
+ (modules cfg_basic)
+ (wrapped false)
+ (libraries testing_utils)
+ )

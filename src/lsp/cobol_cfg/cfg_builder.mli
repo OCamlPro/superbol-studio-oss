@@ -14,7 +14,7 @@ val make
   : options:Cfg_options.t
   -> name:string
   -> Cobol_typeck.Outputs.t
-  -> Cfg.t * Cfg.t
+  -> CFG.t * CFG.t
 
 val possible_cfgs_of_doc
   : Cobol_typeck.Outputs.t

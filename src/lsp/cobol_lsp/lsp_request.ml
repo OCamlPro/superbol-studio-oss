@@ -261,9 +261,9 @@ let find_cu_data_definition Lsp_position.{ location_of; location_of_srcloc }
 let find_cu_proc_definition
     Lsp_position.{ location_of; _ }
     ?(allow_notifications = true)
-    ?(in_section: Cobol_unit.Types.procedure_section option)
+    ?(enclosing_section: Cobol_unit.Types.procedure_section option)
     (qn: Cobol_ptree.qualname) (cu: Cobol_unit.Types.cobol_unit) =
-  match Cobol_unit.Procedure.find ?in_section qn cu.unit_procedure with
+  match Cobol_unit.Procedure.find ?enclosing_section qn cu.unit_procedure with
   | Paragraph { payload = { paragraph_name = Some qn; _ }; _ }
     when focus_on_name_in_defintions ->
       [location_of qn]
@@ -300,9 +300,10 @@ let find_definitions ?allow_notifications loc_translator
       find_cu_data_definition loc_translator ?allow_notifications qn
   | Data_item { full_qn = None; item_loc } ->
       [loc_translator.location_of_srcloc item_loc]
-  | Proc_name { qn; in_section } ->
+  | Proc_name { qn; enclosing_section } ->
       with_cu @@
-      find_cu_proc_definition loc_translator ?allow_notifications ?in_section qn
+      find_cu_proc_definition loc_translator ?allow_notifications qn
+        ?enclosing_section
   | Preproc_or_compilation_variable_ref
       { def = Compilation_var { src = Source_location loc; _ }
             |     Preproc_var { src = Source_location loc; _ }; _ } ->
@@ -348,10 +349,10 @@ let find_full_qn ~kind qn qmap =
   lookup_qn ~kind qn
     ~lookup:(fun qn -> (Cobol_unit.Resolver_map.find_binding qn qmap).full_qn)
 
-let find_proc_qn ~kind qn ?in_section cu =
+let find_proc_qn ~kind qn ?enclosing_section cu =
   lookup_qn ~kind qn
     ~lookup:begin fun qn ->
-      Cobol_unit.Procedure.full_qn ?in_section qn
+      Cobol_unit.Procedure.full_qn ?enclosing_section qn
         cu.Cobol_unit.Types.unit_procedure
     end
 
@@ -430,12 +431,12 @@ let lookup_references_in_doc position ~with_declaration ~(doc: Lsp_document.t)
             with_cu_n_refs @@ fun (cu, cu_refs) ->
             Option.fold ~none:[] ~some:(data_refs cu_refs) @@
             find_full_qn qn ~&cu.unit_data.data_items.named ~kind:"data-name"
-        | Proc_name { qn; in_section } ->
+        | Proc_name { qn; enclosing_section } ->
             Lsp_debug.message "Lsp_request.lookup_references_in_doc: \
                                Proc_name...";
             with_cu_n_refs @@ fun (cu, cu_refs) ->
             Option.fold ~none:[] ~some:(proc_refs cu_refs) @@
-            find_proc_qn qn ?in_section ~&cu ~kind:"procedure-name"
+            find_proc_qn qn ?enclosing_section ~&cu ~kind:"procedure-name"
         | Preproc_or_compilation_variable_ref { def; _ } ->
             ppenv_var_reference_locs ~doc loc_translator def
       in

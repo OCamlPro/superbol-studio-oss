@@ -647,6 +647,7 @@ let%expect_test "definition-requests-goto-qualified-section/paragraphs" =
        7              STOP RUN.
        8 |}];;
 
+
 let%expect_test "definition-ambiguous-section/paragraphs" =
   let { end_with_postproc; projdir }, server = make_lsp_project () in
   print_definitions ~projdir server @@ extract_position_markers {cobol|
@@ -664,6 +665,80 @@ let%expect_test "definition-ambiguous-section/paragraphs" =
   end_with_postproc [%expect.output];
   [%expect {| {"params":{"diagnostics":[{"message":"Ambiguous procedure-name 'SUB-1'; known matching names are 'sub-1 IN main-2', 'sub-1 IN main-1'","range":{"end":{"character":23,"line":4},"start":{"character":18,"line":4}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"} |}];;
 
+
+let%expect_test "definition-paragraph-in-anonymous-section" =
+  let { end_with_postproc; projdir }, server = make_lsp_project () in
+  print_definitions ~projdir server @@ extract_position_markers {cobol|
+       PROGRAM-ID. prog.
+       PROCEDURE DIVISION.
+          GO TO _|1-a-from-anonymous-1st-section|_A.
+          GO TO _|2-b-from-anonymous-1st-section|_B.
+          GOBACK.
+       B. GO TO _|3-a-from-anonymous-1st-section|_A.
+          GOBACK.
+       A SECTION.
+          GO TO _|4-a-from-b-section|_A. *> This cannot refer to `A IN A`.
+          GO TO _|5-a-from-b-section|_B.
+       B. GO TO _|6-a-from-b-in-b|_A.
+      *A. GOBACK.                        *> Forbidden redefinition of `A`
+  |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    1-a-from-anonymous-1st-section (line 3, character 16):
+    __rootdir__/prog.cob:9.7-9.8:
+       6             GOBACK.
+       7          B. GO TO A.
+       8             GOBACK.
+       9 >        A SECTION.
+    ----          ^
+      10             GO TO A. *> This cannot refer to `A IN A`.
+      11             GO TO B.
+    2-b-from-anonymous-1st-section (line 4, character 16):
+    __rootdir__/prog.cob:7.7-7.8:
+       4             GO TO A.
+       5             GO TO B.
+       6             GOBACK.
+       7 >        B. GO TO A.
+    ----          ^
+       8             GOBACK.
+       9          A SECTION.
+    3-a-from-anonymous-1st-section (line 6, character 16):
+    __rootdir__/prog.cob:9.7-9.8:
+       6             GOBACK.
+       7          B. GO TO A.
+       8             GOBACK.
+       9 >        A SECTION.
+    ----          ^
+      10             GO TO A. *> This cannot refer to `A IN A`.
+      11             GO TO B.
+    4-a-from-b-section (line 9, character 16):
+    __rootdir__/prog.cob:9.7-9.8:
+       6             GOBACK.
+       7          B. GO TO A.
+       8             GOBACK.
+       9 >        A SECTION.
+    ----          ^
+      10             GO TO A. *> This cannot refer to `A IN A`.
+      11             GO TO B.
+    5-a-from-b-section (line 10, character 16):
+    __rootdir__/prog.cob:12.7-12.8:
+       9          A SECTION.
+      10             GO TO A. *> This cannot refer to `A IN A`.
+      11             GO TO B.
+      12 >        B. GO TO A.
+    ----          ^
+      13         *A. GOBACK.                        *> Forbidden redefinition of `A`
+      14
+    6-a-from-b-in-b (line 11, character 16):
+    __rootdir__/prog.cob:9.7-9.8:
+       6             GOBACK.
+       7          B. GO TO A.
+       8             GOBACK.
+       9 >        A SECTION.
+    ----          ^
+      10             GO TO A. *> This cannot refer to `A IN A`.
+      11             GO TO B. |}];;
 
 
 let%expect_test "definition-malformed-qualifiers" =

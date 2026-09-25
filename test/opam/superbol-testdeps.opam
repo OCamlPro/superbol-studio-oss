@@ -51,4 +51,6 @@ depends: [
   "ppx_expect" {>= "v0.16" with-test}
   "odoc" {with-doc}
 ]
-# Content of `opam-trailer` field:
+depopts: [
+  "conf-graph-easy" {with-test}
+]

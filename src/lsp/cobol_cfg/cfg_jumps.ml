@@ -8,17 +8,14 @@
 (*                                                                            *)
 (******************************************************************************)
 
-open Cobol_unit
 open Cobol_unit.Types
-open Cobol_common.Visitor
+
 open Cobol_common.Srcloc.INFIX
 
-type qualname = Cobol_ptree.qualname
-
 type jumps =
-  | Go of qualname
-  | GoDepending of qualname
-  | Perform of qualname
+  | Go of Cobol_ptree.qualname
+  | GoDepending of Cobol_ptree.qualname
+  | Perform of Cobol_ptree.qualname
   | Call of Cobol_ptree.call_target
   | Entry of Cobol_ptree.entry_stmt
 
@@ -41,10 +38,11 @@ module Jumps = Set.Make(struct
       | _ -> to_int j2 - to_int j1
   end)
 
-let full_qn ~cu qn =
-  (Resolver_map.find_binding qn cu.unit_procedure.procedure_blocks.named).full_qn
+let full_qn ~enclosing_section ~cu qn =
+  Cobol_unit.Procedure.full_qn ?enclosing_section qn cu.unit_procedure
 
-let full_qn' ~cu qn = full_qn ~cu ~&qn
+let full_qn' ~enclosing_section ~cu qn =
+  full_qn ~enclosing_section ~cu ~&qn
 
 
 module JumpsCollector = struct
@@ -61,21 +59,23 @@ module JumpsCollector = struct
                skip_remaining = false;
              }
 
-  let folder ~cu = object (v)
-    inherit [acc] Visitor.folder
+  let folder ~enclosing_section ~cu = object (v)
+    inherit [acc] Cobol_unit.Visitor.folder
 
     method! fold_goback' _ acc =
-      skip @@ { acc with terminal = true;
-                         will_fallthru = false;
-                         skip_remaining = true }
+      Cobol_common.Visitor.skip
+        { acc with terminal = true;
+                   will_fallthru = false;
+                   skip_remaining = true }
 
     method! fold_stop' _ acc =
-      skip @@ { acc with terminal = true;
-                         will_fallthru = false;
-                         skip_remaining = true }
+      Cobol_common.Visitor.skip
+        { acc with terminal = true;
+                   will_fallthru = false;
+                   skip_remaining = true }
 
     method! fold_exit' { payload = exit_stmt; _ } acc =
-      skip @@
+      Cobol_common.Visitor.skip @@
       match exit_stmt with
       | ExitSimple
       | ExitPerform _ -> acc
@@ -102,7 +102,7 @@ module JumpsCollector = struct
         end eval_branches |> acc_list_split in
       let other =
         Cobol_ptree.Visitor.fold_statements v eval_otherwise init in
-      skip {
+      Cobol_common.Visitor.skip {
         jumps = List.fold_left Jumps.union acc.jumps (other.jumps::jumps);
         will_fallthru = List.fold_left (||) other.will_fallthru unreachables;
         terminal = List.fold_left (||) other.terminal terminals;
@@ -111,8 +111,8 @@ module JumpsCollector = struct
 
     method! fold_statement' _ ({ skip_remaining; _ } as acc) =
       if skip_remaining
-      then skip acc
-      else do_children acc
+      then Cobol_common.Visitor.skip acc
+      else Cobol_common.Visitor.do_children acc
 
     method! fold_if' { payload = { then_branch; else_branch; _ }; _ } acc =
       let {  jumps; terminal; will_fallthru; skip_remaining } =
@@ -122,7 +122,7 @@ module JumpsCollector = struct
             will_fallthru = else_fallthru;
             skip_remaining = else_skip } =
         Cobol_ptree.Visitor.fold_statements v else_branch init in
-      skip {
+      Cobol_common.Visitor.skip {
         jumps = Jumps.union jumps else_jumps;
         will_fallthru = will_fallthru || else_fallthru;
         terminal = terminal || else_terminal;
@@ -130,33 +130,38 @@ module JumpsCollector = struct
       }
 
     method! fold_goto' { payload; _ } acc =
-      skip @@
+      Cobol_common.Visitor.skip @@
       match payload with
       | GoToEntry _ -> acc (* TODO couldn't find doc *)
       | GoToSimple { target } ->
         {
           acc with
-          jumps = Jumps.add (Go (full_qn' ~cu target)) acc.jumps;
+          jumps = Jumps.add (Go (full_qn' ~enclosing_section ~cu target)) acc.jumps;
           will_fallthru = false;
           skip_remaining = true;
         }
       | GoToDepending { targets; _ } ->
         Cobol_common.Basics.NEL.(
           targets
-          |> map ~f:(full_qn' ~cu)
+          |> map ~f:(full_qn' ~enclosing_section ~cu)
           |> fold_left ~f:begin fun acc target ->
             Jumps.add (GoDepending target) acc
           end acc.jumps)
         |> begin fun jumps -> { acc with jumps } end
 
     method! fold_perform_target' { payload; _ } acc =
-      let start = full_qn' ~cu payload.perform_target.procedure_start in
-      skip { acc with jumps = Jumps.add (Perform start) acc.jumps }
+      let start =
+        full_qn' ~enclosing_section ~cu payload.perform_target.procedure_start
+      in
+      Cobol_common.Visitor.skip
+        { acc with jumps = Jumps.add (Perform start) acc.jumps }
 
     method! fold_call' { payload = { call_target; _ }; _ } acc =
-      skip { acc with jumps = Jumps.add (Call call_target) acc.jumps }
+      Cobol_common.Visitor.skip
+        { acc with jumps = Jumps.add (Call call_target) acc.jumps }
 
     method! fold_entry' { payload; _ } acc =
-      skip { acc with jumps = Jumps.add (Entry payload) acc.jumps }
+      Cobol_common.Visitor.skip
+        { acc with jumps = Jumps.add (Entry payload) acc.jumps }
   end
 end

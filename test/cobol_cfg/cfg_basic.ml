@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
-(*  Copyright (c) 2022-2023 OCamlPro SAS                                  *)
+(*  Copyright (c) 2022-2026 OCamlPro SAS                                  *)
 (*                                                                        *)
 (* All rights reserved.                                                   *)
 (* This source code is licensed under the GNU Affero General Public       *)
@@ -11,16 +11,36 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Utilities to deal with sections/paragraphs of PROCEDURE DIVISIONs *)
+open Prog_printer
 
-val find
-  : ?enclosing_section: Unit_types.procedure_section
-  -> Cobol_ptree.qualname
-  -> Unit_types.procedure
-  -> Unit_types.procedure_block
+let performs =
+  prog "performs"
+    ~procedure:{|
+       A SECTION.
+          PERFORM B.
+          GOBACK.
+       B. PERFORM C.
+          GOBACK.
+       C. PERFORM D.
+          GOBACK.
+       D SECTION.
+          PERFORM A.
+          GOBACK.
+    |}
 
-val full_qn
-  : ?enclosing_section: Unit_types.procedure_section
-  -> Cobol_ptree.qualname
-  -> Unit_types.procedure
-  -> Cobol_ptree.qualname
+let ambiguous_n_anonymous =
+  prog "ambiguous-n-anonymous"
+    ~procedure:{|
+          PERFORM A.
+          PERFORM B.
+          GOBACK.
+       B. PERFORM A.
+          GOBACK.
+       A SECTION.
+          PERFORM A.
+          PERFORM B.
+          GOBACK.
+       B. PERFORM A.
+          GOBACK.
+      *A. GOBACK.  *> forbidden redefinition of A
+    |}
