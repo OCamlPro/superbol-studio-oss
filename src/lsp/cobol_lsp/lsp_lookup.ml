@@ -467,7 +467,7 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
         acc
         |> ObjectRef (* 4byte *) @>@ fold_ident v i.invoke_target
         |> Alphanum @>@ fold_ident_or_strlit v i.invoke_method
-        |> fold_list ~fold:fold_call_using_clause' v i.invoke_using
+        |> fold_list ~fold:fold_call_using_clause v i.invoke_using
         |> fold_ident'_opt v i.invoke_returning
         |> skip
 

@@ -2969,9 +2969,9 @@ COB85:
   (BY REFERENCE)? identifier...
   BY CONTENT identifier...
 COB2002:
-  (BY REFERENCE)? identifier/OMITTED
-  (BY CONTENT)? identifier/literal/expression
-  (BY VALUE)? identifier/literal/expression
+  (BY REFERENCE)? identifier/OMITTED...
+  (BY CONTENT)? identifier/literal/expression...
+  (BY VALUE)? identifier/literal/expression...
 *)
 
 let x :=                                                 (* `x` as in GnuCOBOL *)
@@ -2985,19 +2985,23 @@ let x :=                                                 (* `x` as in GnuCOBOL *
  | n = NATLIT;               { National n }
  | l = length_of_expr;       { l }
 
-let using_by :=
- | b = call_using_by?; e = loc(x);
-   { { call_using_by = b;                       (* COB85: ident, COB2002: exp *)
-       call_using_expr = Some e &@<- e } }
- | b = call_using_by?; omitted = loc(OMITTED);
-   { { call_using_by = b;
-       call_using_expr = None &@<- omitted } }                    (* +COB2002 *)
+let _using_args :=
+  | (* Nothing *)          { [] }
+  | USING; ~ = using_args; <    >
 
-let call_using_by [@recovery CallUsingByReference] :=
- | BY?; REFERENCE; {CallUsingByReference}
- | BY?; CONTENT;   {CallUsingByContent}
- | BY?; VALUE;     {CallUsingByValue}                             (* +COB2002 *)
+let using_args :=
+  | head_args = nel_(loc(using_reference_arg));
+    tail_args = rl(using_by_n_args); { CallUsingDefault head_args :: tail_args }
+  | rl(using_by_n_args)
 
+let using_by_n_args :=
+  | BY?; REFERENCE; ~ = nel_(loc(using_reference_arg)); <CallUsingByReference>
+  | BY?; CONTENT;   ~ = nel_(loc(x));                   <CallUsingByContent>
+  | BY?; VALUE;     ~ = nel_(loc(x));                   <CallUsingByValue>
+
+let using_reference_arg [@recovery ArgOmitted] :=
+ | ~ = loc(x); < ArgGiven >                     (* COB85: ident, COB2002: exp *)
+ | OMITTED;    { ArgOmitted }                   (* +COB2002 *)
 
 
 (* DELETE, OPEN, READ, REWRITE, WRITE *)
@@ -3246,7 +3250,7 @@ let alter_statement :=
 %public let unconditional_action := ~ = call_statement; < >
 let call_statement [@context call_stmt] :=
   | CALL; so = bo(STATIC); cp = call_target;
-    ul = lo(pf(USING,rnel(loc(using_by))));
+    ul = _using_args;
     ro = ro(returning_or_giving); oeho = io(overflow_or_exception_handler);
     oterm_(END_CALL);
     { Call { call_static = so; (* STATIC is GnuCOBOL extension *)
@@ -3740,7 +3744,7 @@ let ident_by_after_before :=
 %public let unconditional_action := ~ = invoke_statement; < >
 let invoke_statement :=
  | INVOKE; i = ident; is = ident_or_string;
-   ul = lo(pf(USING,rnel(loc(using_by)))); ro = ro(returning_ident);
+   ul = _using_args; ro = ro(returning_ident);
    { Invoke { invoke_target = i;
               invoke_method = is;
               invoke_using = ul;

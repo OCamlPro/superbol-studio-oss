@@ -85,27 +85,33 @@ let pp_position ppf = function
 (* CALL, INVOKE *)
 
 type call_using_clause =
-  {
-    call_using_by: call_using_by option;
-    call_using_expr: scalar with_loc option with_loc;   (** OMITTED if [None] *)
-  }
+  | CallUsingDefault of using_reference_arg with_loc nel
+  | CallUsingByReference of using_reference_arg with_loc nel
+  | CallUsingByContent of scalar with_loc nel
+  | CallUsingByValue of scalar with_loc nel
+
+and using_reference_arg =
+  | ArgOmitted
+  | ArgGiven of scalar with_loc
 [@@deriving ord]
 
-and call_using_by =
-  | CallUsingByReference
-  | CallUsingByContent
-  | CallUsingByValue
-[@@deriving ord]
+let pp_using_reference_arg ppf = function
+  | ArgOmitted -> Fmt.string ppf "OMITTED"
+  | ArgGiven arg -> pp_with_loc pp_scalar ppf arg
 
-let pp_call_using_by ppf = function
-  | CallUsingByReference -> Fmt.pf ppf "BY REFERENCE"
-  | CallUsingByContent -> Fmt.pf ppf "BY CONTENT"
-  | CallUsingByValue -> Fmt.pf ppf "BY VALUE"
-
-let pp_call_using_clause ppf { call_using_by = cub; call_using_expr = cue } =
-  Fmt.(option (pp_call_using_by ++ sp)) ppf cub;
-  Fmt.(pp_with_loc @@ option ~none:(any "OMITTED") @@
-       pp_with_loc pp_scalar) ppf cue
+let pp_call_using_clause ppf = function
+  | CallUsingDefault args ->
+      NEL.pp ~fopen:"@[" ~fsep:"@ " ~fclose:"@]"
+        (pp_with_loc pp_using_reference_arg) ppf args
+  | CallUsingByReference args ->
+      NEL.pp ~fopen:"@[BY@ REFERENCE@ " ~fsep:"@ " ~fclose:"@]"
+        (pp_with_loc pp_using_reference_arg) ppf args
+  | CallUsingByContent args ->
+      NEL.pp ~fopen:"@[BY@ CONTENT@ " ~fsep:"@ " ~fclose:"@]"
+        (pp_with_loc pp_scalar) ppf args
+  | CallUsingByValue args ->
+      NEL.pp ~fopen:"@[BY@ VALUE@ " ~fsep:"@ " ~fclose:"@]"
+        (pp_with_loc pp_scalar) ppf args
 
 
 (* DELETE, OPEN, REWRITE, WRITE, READ (through on_lock_or_retry) *)

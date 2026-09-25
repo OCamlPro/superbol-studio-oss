@@ -428,7 +428,7 @@ and call_stmt =
   {
     call_static: bool;                                            (* GnuCOBOL *)
     call_target: call_target;
-    call_using: call_using_clause with_loc list;
+    call_using: call_using_clause list;
     call_returning: ident with_loc option;
     call_error_handler: call_error_handler option;
   }
@@ -871,8 +871,7 @@ and pp_call_stmt ppf
     (if cs then "STATIC " else "");
   pp_call_target ppf ct;
   if cu != [] then
-    Fmt.pf ppf "@ USING@ %a"
-      Fmt.(list ~sep:sp (pp_with_loc pp_call_using_clause)) cu;
+    Fmt.pf ppf "@ USING@ %a" Fmt.(list ~sep:sp pp_call_using_clause) cu;
   Option.iter (Fmt.pf ppf "@ RETURNING@ %a" (pp_with_loc pp_ident)) returning;
   pp_dual_handler pp_statement
     ?on ~close:Fmt.(any "END-CALL") ppf dh;
