@@ -428,7 +428,7 @@ and call_stmt =
   {
     call_static: bool;                                            (* GnuCOBOL *)
     call_target: call_target;
-    call_using: call_using_clause with_loc list;
+    call_using: call_using_clause list;
     call_returning: ident with_loc option;
     call_error_handler: call_error_handler option;
   }
@@ -495,8 +495,8 @@ and statement =
   | Evaluate of evaluate_stmt
   | ExecBlock of Cobol_common.Exec_block.t
   | Exit of exit_stmt
-  | Free of name with_loc list
-  | Generate of name with_loc
+  | Free of qualname list
+  | Generate of qualname
   | GoTo of goto_stmt
   | GoBack of goback_stmt
   | If of if_stmt
@@ -871,8 +871,7 @@ and pp_call_stmt ppf
     (if cs then "STATIC " else "");
   pp_call_target ppf ct;
   if cu != [] then
-    Fmt.pf ppf "@ USING@ %a"
-      Fmt.(list ~sep:sp (pp_with_loc pp_call_using_clause)) cu;
+    Fmt.pf ppf "@ USING@ %a" Fmt.(list ~sep:sp pp_call_using_clause) cu;
   Option.iter (Fmt.pf ppf "@ RETURNING@ %a" (pp_with_loc pp_ident)) returning;
   pp_dual_handler pp_statement
     ?on ~close:Fmt.(any "END-CALL") ppf dh;
@@ -1064,10 +1063,10 @@ and pp_statement ppf = function
   | Evaluate s -> pp_evaluate_stmt ppf s
   | ExecBlock b -> Cobol_common.Exec_block.pp ppf b
   | Exit s -> pp_exit_stmt ppf s
-  | Free names ->
-      Fmt.pf ppf "FREE@ @[%a@]" Fmt.(list ~sep:sp (pp_with_loc pp_name)) names
-  | Generate name ->
-      Fmt.pf ppf "GENERATE@ %a" (pp_with_loc pp_name) name
+  | Free qualnames ->
+      Fmt.pf ppf "FREE@ @[%a@]" Fmt.(list ~sep:sp pp_qualname) qualnames
+  | Generate qn ->
+      Fmt.pf ppf "GENERATE@ %a" pp_qualname qn
   | GoTo s -> pp_goto_stmt ppf s
   | GoBack s ->
     Fmt.pf ppf "GOBACK%a"

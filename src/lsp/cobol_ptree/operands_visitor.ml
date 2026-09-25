@@ -15,50 +15,52 @@ open Operands
 
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Visitor
-open Cobol_common.Visitor.INFIX                         (* for `>>` (== `|>`) *)
 open Terms_visitor
+
+open Cobol_common.Srcloc.INFIX
+open Cobol_common.Visitor.INFIX                         (* for `>>` (== `|>`) *)
 
 (* --- *)
 
 class ['a] folder = object
   inherit ['a] Terms_visitor.folder
-  method fold_alphabet_specification   : (alphabet_specification    , 'a) fold = default
+  method fold_alphabet_specification   : (alphabet_specification      , 'a) fold = default
   (* method fold_rounded                  : 'x. ('x rounded              , 'a) fold = default *)
-  method fold_rounded_ident            : (rounded_ident             , 'a) fold = default
-  method fold_basic_arithmetic_operands: (basic_arithmetic_operands , 'a) fold = default
-  method fold_call_using_clause        : (call_using_clause         , 'a) fold = default
-  method fold_call_using_clause'       : (call_using_clause with_loc, 'a) fold = default
-  method fold_call_using_by            : (call_using_by             , 'a) fold = default
-  method fold_date_time                : (date_time                 , 'a) fold = default
-  method fold_divide_operands          : (divide_operands           , 'a) fold = default
-  method fold_file_option              : (file_option               , 'a) fold = default
-  method fold_multiply_operands        : (multiply_operands         , 'a) fold = default
-  method fold_mcs_awaiting_item        : (mcs_awaiting_item         , 'a) fold = default
-  method fold_mcs_kind                 : (mcs_kind                  , 'a) fold = default
-  method fold_mcs_command_operands     : (mcs_command_operands      , 'a) fold = default
-  method fold_open_mode                : (open_mode                 , 'a) fold = default
-  method fold_position                 : (position                  , 'a) fold = default
-  method fold_raising                  : (raising                   , 'a) fold = default
-  method fold_read_direction           : (read_direction            , 'a) fold = default
-  method fold_read_lock_behavior       : (read_lock_behavior        , 'a) fold = default
-  method fold_retry_clause             : (retry_clause              , 'a) fold = default
-  method fold_search_condition         : (search_condition          , 'a) fold = default
-  method fold_sharing_mode             : (sharing_mode              , 'a) fold = default
-  method fold_stage                    : (stage                     , 'a) fold = default
-  method fold_advancing_phrase         : (advancing_phrase          , 'a) fold = default
-  method fold_write_target             : (write_target              , 'a) fold = default
-  method fold_procedure_range          : 'x. ('x procedure_range      , 'a) fold = default
+  method fold_rounded_ident            : (rounded_ident               , 'a) fold = default
+  method fold_basic_arithmetic_operands: (basic_arithmetic_operands   , 'a) fold = default
+  method fold_using_arg_default'       : (using_arg_default with_loc  , 'a) fold = default
+  method fold_using_reference_arg'     : (using_reference_arg with_loc, 'a) fold = default
+  method fold_call_using_clause        : (call_using_clause           , 'a) fold = default
+  method fold_date_time                : (date_time                   , 'a) fold = default
+  method fold_divide_operands          : (divide_operands             , 'a) fold = default
+  method fold_file_option              : (file_option                 , 'a) fold = default
+  method fold_multiply_operands        : (multiply_operands           , 'a) fold = default
+  method fold_mcs_awaiting_item        : (mcs_awaiting_item           , 'a) fold = default
+  method fold_mcs_kind                 : (mcs_kind                    , 'a) fold = default
+  method fold_mcs_command_operands     : (mcs_command_operands        , 'a) fold = default
+  method fold_open_mode                : (open_mode                   , 'a) fold = default
+  method fold_position                 : (position                    , 'a) fold = default
+  method fold_raising                  : (raising                     , 'a) fold = default
+  method fold_read_direction           : (read_direction              , 'a) fold = default
+  method fold_read_lock_behavior       : (read_lock_behavior          , 'a) fold = default
+  method fold_retry_clause             : (retry_clause                , 'a) fold = default
+  method fold_search_condition         : (search_condition            , 'a) fold = default
+  method fold_sharing_mode             : (sharing_mode                , 'a) fold = default
+  method fold_stage                    : (stage                       , 'a) fold = default
+  method fold_advancing_phrase         : (advancing_phrase            , 'a) fold = default
+  method fold_write_target             : (write_target                , 'a) fold = default
+  method fold_procedure_range          : 'x. ('x procedure_range        , 'a) fold = default
   (* SET *)
-  method fold_set_attribute_switch     : (set_attribute_switch      , 'a) fold = default
-  method fold_screen_attribute         : (screen_attribute          , 'a) fold = default
-  method fold_set_ambiguous_method     : (set_ambiguous_method      , 'a) fold = default
-  method fold_on_off                   : (on_off                    , 'a) fold = default
-  method fold_locale_category          : (locale_category           , 'a) fold = default
-  method fold_set_save_locale          : (set_save_locale           , 'a) fold = default
-  method fold_set_locale_target        : (set_locale_target         , 'a) fold = default
-  method fold_set_locale_source        : (set_locale_source         , 'a) fold = default
-  method fold_start_position           : (start_position            , 'a) fold = default
-  method fold_float_content            : (float_content             , 'a) fold = default
+  method fold_set_attribute_switch     : (set_attribute_switch        , 'a) fold = default
+  method fold_screen_attribute         : (screen_attribute            , 'a) fold = default
+  method fold_set_ambiguous_method     : (set_ambiguous_method        , 'a) fold = default
+  method fold_on_off                   : (on_off                      , 'a) fold = default
+  method fold_locale_category          : (locale_category             , 'a) fold = default
+  method fold_set_save_locale          : (set_save_locale             , 'a) fold = default
+  method fold_set_locale_target        : (set_locale_target           , 'a) fold = default
+  method fold_set_locale_source        : (set_locale_source           , 'a) fold = default
+  method fold_start_position           : (start_position              , 'a) fold = default
+  method fold_float_content            : (float_content               , 'a) fold = default
 
 end
 
@@ -88,30 +90,43 @@ let fold_rounded_idents (v: _ #folder) =
 let fold_basic_arithmetic_operands (v: _ #folder) =
   handle v#fold_basic_arithmetic_operands
     ~continue:begin fun o x -> match o with
-      | ArithSimple { sources; targets } -> x
-          >> fold_list ~fold:fold_scalar v sources
+      | ArithSimple { operands; targets } -> x
+          >> fold_list ~fold:fold_scalar v operands
           >> fold_rounded_idents v targets
-      | ArithGiving { sources; to_or_from_item; targets } -> x
-          >> fold_list ~fold:fold_scalar v sources
-          >> fold_scalar v to_or_from_item
+      | ArithGiving { leading_operands; last_operand; targets } -> x
+          >> fold_list ~fold:fold_scalar v leading_operands
+          >> fold_scalar v last_operand
           >> fold_rounded_idents v targets
       | ArithCorresponding { source; target } -> x
           >> fold_qualname v source
           >> fold_rounded_ident v target
     end
 
-let fold_call_using_by (v: _ #folder) =
-  leaf v#fold_call_using_by
+let fold_using_arg_default' (v: _ #folder) =
+  handle v#fold_using_arg_default'
+    ~continue:begin fun a -> match ~&a with
+      | ArgDefaultOmitted -> Fun.id
+      | ArgDefault e -> fold_expr' v e
+    end
+
+let fold_using_reference_arg' (v: _ #folder) =
+  handle v#fold_using_reference_arg'
+    ~continue:begin fun a -> match ~&a with
+      | ArgRefOmitted -> Fun.id
+      | ArgRef a -> fold_scalar' v a
+    end
 
 let fold_call_using_clause (v: _ #folder) =
   handle v#fold_call_using_clause
-    ~continue:begin fun { call_using_by; call_using_expr } x -> x
-      >> fold_option ~fold:fold_call_using_by v call_using_by
-      >> fold' ~fold:(fold_option ~fold:fold_scalar') v call_using_expr
+    ~continue:begin function
+      | CallUsingDefault args ->
+          fold_nel ~fold:fold_using_arg_default' v args
+      | CallUsingByReference args ->
+          fold_nel ~fold:fold_using_reference_arg' v args
+      | CallUsingByContent args
+      | CallUsingByValue args ->
+          fold_nel ~fold:fold_expr' v args
     end
-
-let fold_call_using_clause' (v: _ #folder) =
-  handle' v#fold_call_using_clause' v ~fold:fold_call_using_clause
 
 let fold_date_time (v: _ #folder) =
   leaf v#fold_date_time       (* NB: only `bool` children: consider as a leaf *)

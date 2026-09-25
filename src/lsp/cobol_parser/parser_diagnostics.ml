@@ -158,6 +158,15 @@ let has_errors diags =
   diags.errors <> [] ||
   List.exists (fun { severity; _ } -> severity = Error) diags.customs
 
+let count_errors diags =
+  List.fold_left (fun n { severity; _ } -> n + if severity = Error then 1 else 0)
+    (List.length diags.errors)
+    diags.customs
+
+let count_warnings diags =
+  List.fold_left (fun n { severity; _ } -> n + if severity = Warn then 1 else 0)
+    0 diags.customs
+
 let add_diag ~severity ?loc diag diags =
   { diags with customs = { severity; loc; diag } :: diags.customs }
 
@@ -225,4 +234,10 @@ module ALL = struct                 (* combines preproc & parsing diagnostics *)
   let has_errors { preproc_diags; parser_diags } =
     Cobol_preproc.Diagnostics.has_errors preproc_diags ||
     has_errors parser_diags
+  let count_errors { preproc_diags; parser_diags } =
+    Cobol_preproc.Diagnostics.count_errors preproc_diags +
+    count_errors parser_diags
+  let count_warnings { preproc_diags; parser_diags } =
+    Cobol_preproc.Diagnostics.count_warnings preproc_diags +
+    count_warnings parser_diags
 end

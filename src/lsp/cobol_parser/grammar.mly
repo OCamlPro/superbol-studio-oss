@@ -2335,7 +2335,7 @@ let subscript_first [@recovery SubSAll] [@symbol "<subscript>"] [@cost 0] :=
 
 let subscript_following [@recovery SubSAll] [@symbol "<subscript>"] [@cost 0] :=
  | ALL;                                  {SubSAll}
- | e = expression_par_unop;              {SubSExpr e}
+ | e = loc(expr_no_leftmost_all);        {SubSExpr e}
  | i = name; s = sign; offset = integer; {SubSIdx (i, s, offset): subscript}
 
 let subscripts [@recovery []] [@symbol "<subscripts>"] [@cost 0] :=
@@ -2701,7 +2701,7 @@ let expr_no_all ==
       expr_(term(atomic_no_all),
             term(atomic_no_all))
 
-let expr_par_unop ==
+let expr_no_leftmost_all ==
       expr_(term_(factor_(atomic_no_all),
                   factor(atomic,atomic)),
             term(atomic))
@@ -2713,7 +2713,6 @@ let expr_no_leftmost_length :=
 
 let expression == loc(expr)
 let expression_no_all == loc(expr_no_all)
-let expression_par_unop == loc(expr_par_unop)
 let expression_no_leftmost_length == loc(expr_no_leftmost_length)
 
 (* --- *)
@@ -2969,9 +2968,9 @@ COB85:
   (BY REFERENCE)? identifier...
   BY CONTENT identifier...
 COB2002:
-  (BY REFERENCE)? identifier/OMITTED
-  (BY CONTENT)? identifier/literal/expression
-  (BY VALUE)? identifier/literal/expression
+  (BY REFERENCE)? identifier/OMITTED...
+  (BY CONTENT)? identifier/literal/expression...
+  (BY VALUE)? identifier/literal/expression...
 *)
 
 let x :=                                                 (* `x` as in GnuCOBOL *)
@@ -2985,18 +2984,27 @@ let x :=                                                 (* `x` as in GnuCOBOL *
  | n = NATLIT;               { National n }
  | l = length_of_expr;       { l }
 
-let using_by :=
- | b = call_using_by?; e = loc(x);
-   { { call_using_by = b;                       (* COB85: ident, COB2002: exp *)
-       call_using_expr = Some e &@<- e } }
- | b = call_using_by?; omitted = loc(OMITTED);
-   { { call_using_by = b;
-       call_using_expr = None &@<- omitted } }                    (* +COB2002 *)
+let _using_args :=
+  | (* Nothing *)          { [] }
+  | USING; ~ = using_args; <    >
 
-let call_using_by [@recovery CallUsingByReference] :=
- | BY?; REFERENCE; {CallUsingByReference}
- | BY?; CONTENT;   {CallUsingByContent}
- | BY?; VALUE;     {CallUsingByValue}                             (* +COB2002 *)
+let using_args :=
+  | head_args = nel_(loc(using_arg_default));
+    tail_args = rl(using_by_n_args); { CallUsingDefault head_args :: tail_args }
+  | rl(using_by_n_args)
+
+let using_by_n_args :=
+  | BY?; REFERENCE; ~ = nel_(loc(using_reference_arg));  <CallUsingByReference>
+  | BY?; CONTENT;   ~ = nel_(loc(expr_no_leftmost_all)); <CallUsingByContent>
+  | BY?; VALUE;     ~ = nel_(loc(expr_no_leftmost_all)); <CallUsingByValue>
+
+let using_reference_arg [@recovery ArgRefOmitted] :=
+ | ~ = loc(x); < ArgRef >                   (* COB85: ident, COB2002: exp *)
+ | OMITTED;    { ArgRefOmitted }            (* +COB2002 *)
+
+let using_arg_default ==
+ | ~ = loc(expr_no_leftmost_all); < ArgDefault >
+ | OMITTED;                       { ArgDefaultOmitted }
 
 
 
@@ -3188,14 +3196,14 @@ add_statement:
  | ADD inl = rnel(scalar) TO irl = rounded_idents
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR) end_add
    { Add { basic_arith_operands =
-             ArithSimple { sources = inl; targets = irl };
+             ArithSimple { operands = inl; targets = irl };
            basic_arith_on_size_error = h } }
  | ADD inl = rnel(scalar) TO in_ = scalar
    GIVING irl = rounded_idents
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR) end_add
    { Add { basic_arith_operands =
-             ArithGiving { sources = inl;
-                           to_or_from_item = in_;
+             ArithGiving { leading_operands = inl;
+                           last_operand = in_;
                            targets = irl };
            basic_arith_on_size_error = h } }
  | ADD inl = rnel(scalar) (* Same as above without 'TO' *)
@@ -3203,8 +3211,8 @@ add_statement:
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR) end_add
    { let in_, inl = split_last inl in
      Add { basic_arith_operands =
-             ArithGiving { sources = inl;
-                           to_or_from_item = in_;
+             ArithGiving { leading_operands = inl;
+                           last_operand = in_;
                            targets = irl };
            basic_arith_on_size_error = h } }
  | ADD CORRESPONDING i = qualname TO ir = rounded_ident
@@ -3246,7 +3254,7 @@ let alter_statement :=
 %public let unconditional_action := ~ = call_statement; < >
 let call_statement [@context call_stmt] :=
   | CALL; so = bo(STATIC); cp = call_target;
-    ul = lo(pf(USING,rnel(loc(using_by))));
+    ul = _using_args;
     ro = ro(returning_or_giving); oeho = io(overflow_or_exception_handler);
     oterm_(END_CALL);
     { Call { call_static = so; (* STATIC is GnuCOBOL extension *)
@@ -3566,14 +3574,14 @@ let exit_spec [@recovery ExitSimple] :=
 
 %public let unconditional_action := ~ = free_statement; < >
 let free_statement :=
- | FREE; ~ = names; <Free>
+ | FREE; ~ = qualnames; <Free>
 
 
 (* GENERATE STATEMENT (+COB85, -COB2002) *)
 
 %public let unconditional_action := ~ = generate_statement; < >
 let generate_statement :=
- | GENERATE; ~ = name; <Generate>
+ | GENERATE; ~ = qualname; <Generate>
 
 
 
@@ -3740,7 +3748,7 @@ let ident_by_after_before :=
 %public let unconditional_action := ~ = invoke_statement; < >
 let invoke_statement :=
  | INVOKE; i = ident; is = ident_or_string;
-   ul = lo(pf(USING,rnel(loc(using_by)))); ro = ro(returning_ident);
+   ul = _using_args; ro = ro(returning_ident);
    { Invoke { invoke_target = i;
               invoke_method = is;
               invoke_using = ul;
@@ -4289,14 +4297,14 @@ let subtract_statement :=
  | SUBTRACT; inl = rnel(scalar); FROM; irl = rounded_idents;
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); end_subtract;
    { Subtract { basic_arith_operands =
-                  ArithSimple { sources = inl; targets = irl };
+                  ArithSimple { operands = inl; targets = irl };
                 basic_arith_on_size_error = h } }
  | SUBTRACT; inl = rnel(scalar); FROM; in_ = scalar;
    GIVING; irl = rounded_idents;
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); end_subtract;
    { Subtract { basic_arith_operands =
-                  ArithGiving { sources = inl;
-                                to_or_from_item = in_;
+                  ArithGiving { leading_operands = inl;
+                                last_operand = in_;
                                 targets = irl };
                 basic_arith_on_size_error = h } }
  | SUBTRACT; CORRESPONDING; i = qualname; FROM; ir = rounded_ident;

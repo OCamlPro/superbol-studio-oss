@@ -110,8 +110,8 @@ class virtual ['a] folder = object
   method fold_evaluate'      : (evaluate_stmt with_loc        , 'a) fold = default
   method fold_exec_block'    : (exec_block with_loc           , 'a) fold = default
   method fold_exit'          : (exit_stmt with_loc            , 'a) fold = default
-  method fold_free'          : (name with_loc list with_loc   , 'a) fold = default
-  method fold_generate'      : (name with_loc with_loc        , 'a) fold = default
+  method fold_free'          : (qualname list with_loc        , 'a) fold = default
+  method fold_generate'      : (qualname with_loc             , 'a) fold = default
   method fold_goback'        : (goback_stmt    with_loc       , 'a) fold = default
   method fold_goto'          : (goto_stmt with_loc            , 'a) fold = default
   method fold_if'            : (if_stmt with_loc              , 'a) fold = default
@@ -486,10 +486,10 @@ let fold_exit' (v: _ #folder) =
     end
 
 let fold_free' (v: _ #folder) =
-  handle' v#fold_free' v ~fold:(fold_list ~fold:fold_name')
+  handle' v#fold_free' v ~fold:(fold_list ~fold:fold_qualname)
 
 let fold_generate' (v: _ #folder) =
-  handle' v#fold_generate' v ~fold:fold_name'
+  handle' v#fold_generate' v ~fold:fold_qualname
 
 let fold_goback' (v: _ #folder) =
   handle' v#fold_goback' v
@@ -538,7 +538,7 @@ let fold_invoke' (v: _ #folder) =
                         invoke_using; invoke_returning} x -> x
       >> fold_ident v invoke_target
       >> fold_ident_or_strlit v invoke_method
-      >> fold_list ~fold:fold_call_using_clause' v invoke_using
+      >> fold_list ~fold:fold_call_using_clause v invoke_using
       >> fold_ident'_opt v invoke_returning
     end
 
@@ -901,7 +901,7 @@ and fold_call' (v: _ #folder) : call_stmt with_loc -> 'a -> 'a =
                         call_returning; call_error_handler } x -> x
       >> fold_bool v call_static
       >> fold_call_target v call_target
-      >> fold_list ~fold:fold_call_using_clause' v call_using
+      >> fold_list ~fold:fold_call_using_clause v call_using
       >> fold_ident'_opt v call_returning
       >> fold_option ~fold:fold_call_error_handler v call_error_handler
     end
