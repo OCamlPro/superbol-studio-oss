@@ -293,7 +293,7 @@ type invoke_stmt =
   {
     invoke_target: ident;
     invoke_method: ident_or_strlit;
-    invoke_using: call_using_clause with_loc list;
+    invoke_using: call_using_clause list;
     invoke_returning: ident with_loc option;
     (* error_htypeler: error_htypeler;  (* seen on IBM Cobol *)  *)
   }
@@ -304,8 +304,7 @@ let pp_invoke_stmt ppf
 =
   Fmt.pf ppf "INVOKE@ %a@ %a" pp_ident t pp_ident_or_strlit m;
   if u != [] then
-    Fmt.pf ppf "@ USING@ %a"
-      Fmt.(list ~sep:sp (pp_with_loc pp_call_using_clause)) u;
+    Fmt.pf ppf "@ USING@ %a" Fmt.(list ~sep:sp pp_call_using_clause) u;
   Fmt.(option (sp ++ pp_with_loc pp_ident)) ppf r
 
 

@@ -538,7 +538,7 @@ let fold_invoke' (v: _ #folder) =
                         invoke_using; invoke_returning} x -> x
       >> fold_ident v invoke_target
       >> fold_ident_or_strlit v invoke_method
-      >> fold_list ~fold:fold_call_using_clause' v invoke_using
+      >> fold_list ~fold:fold_call_using_clause v invoke_using
       >> fold_ident'_opt v invoke_returning
     end
 
@@ -901,7 +901,7 @@ and fold_call' (v: _ #folder) : call_stmt with_loc -> 'a -> 'a =
                         call_returning; call_error_handler } x -> x
       >> fold_bool v call_static
       >> fold_call_target v call_target
-      >> fold_list ~fold:fold_call_using_clause' v call_using
+      >> fold_list ~fold:fold_call_using_clause v call_using
       >> fold_ident'_opt v call_returning
       >> fold_option ~fold:fold_call_error_handler v call_error_handler
     end

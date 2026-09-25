@@ -340,7 +340,7 @@ let semtoks_from_ptree ~filename ?range ptree =
                                     call_error_handler }; _} acc = acc
       |> fold_bool self call_static
       |> fold_call_target self call_target
-      |> fold_list ~fold:fold_call_using_clause' self call_using
+      |> fold_list ~fold:fold_call_using_clause self call_using
       |> add_option add_ident' call_returning VarModif
       |> fold_option ~fold:fold_call_error_handler self call_error_handler
       |> Visitor.skip_children
