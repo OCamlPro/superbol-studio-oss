@@ -85,33 +85,41 @@ let pp_position ppf = function
 (* CALL, INVOKE *)
 
 type call_using_clause =
-  | CallUsingDefault of using_reference_arg with_loc nel
+  | CallUsingDefault of using_arg_default with_loc nel
   | CallUsingByReference of using_reference_arg with_loc nel
-  | CallUsingByContent of scalar with_loc nel
-  | CallUsingByValue of scalar with_loc nel
+  | CallUsingByContent of expr with_loc nel
+  | CallUsingByValue of expr with_loc nel
+
+and using_arg_default =
+  | ArgDefaultOmitted
+  | ArgDefault of expr with_loc
 
 and using_reference_arg =
-  | ArgOmitted
-  | ArgGiven of scalar with_loc
+  | ArgRefOmitted
+  | ArgRef of scalar with_loc (* idents in standards, yet GC accepts literals  *)
 [@@deriving ord]
 
+let pp_using_arg_default ppf = function
+  | ArgDefaultOmitted -> Fmt.string ppf "OMITTED"
+  | ArgDefault arg -> pp_with_loc pp_expr ppf arg
+
 let pp_using_reference_arg ppf = function
-  | ArgOmitted -> Fmt.string ppf "OMITTED"
-  | ArgGiven arg -> pp_with_loc pp_scalar ppf arg
+  | ArgRefOmitted -> Fmt.string ppf "OMITTED"
+  | ArgRef arg -> pp_with_loc pp_scalar ppf arg
 
 let pp_call_using_clause ppf = function
   | CallUsingDefault args ->
       NEL.pp ~fopen:"@[" ~fsep:"@ " ~fclose:"@]"
-        (pp_with_loc pp_using_reference_arg) ppf args
+        (pp_with_loc pp_using_arg_default) ppf args
   | CallUsingByReference args ->
       NEL.pp ~fopen:"@[BY@ REFERENCE@ " ~fsep:"@ " ~fclose:"@]"
         (pp_with_loc pp_using_reference_arg) ppf args
   | CallUsingByContent args ->
       NEL.pp ~fopen:"@[BY@ CONTENT@ " ~fsep:"@ " ~fclose:"@]"
-        (pp_with_loc pp_scalar) ppf args
+        (pp_with_loc pp_expr) ppf args
   | CallUsingByValue args ->
       NEL.pp ~fopen:"@[BY@ VALUE@ " ~fsep:"@ " ~fclose:"@]"
-        (pp_with_loc pp_scalar) ppf args
+        (pp_with_loc pp_expr) ppf args
 
 
 (* DELETE, OPEN, REWRITE, WRITE, READ (through on_lock_or_retry) *)
