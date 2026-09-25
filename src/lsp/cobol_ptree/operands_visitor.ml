@@ -28,6 +28,7 @@ class ['a] folder = object
   (* method fold_rounded                  : 'x. ('x rounded              , 'a) fold = default *)
   method fold_rounded_ident            : (rounded_ident               , 'a) fold = default
   method fold_basic_arithmetic_operands: (basic_arithmetic_operands   , 'a) fold = default
+  method fold_using_arg_default'       : (using_arg_default with_loc  , 'a) fold = default
   method fold_using_reference_arg'     : (using_reference_arg with_loc, 'a) fold = default
   method fold_call_using_clause        : (call_using_clause           , 'a) fold = default
   method fold_date_time                : (date_time                   , 'a) fold = default
@@ -101,22 +102,30 @@ let fold_basic_arithmetic_operands (v: _ #folder) =
           >> fold_rounded_ident v target
     end
 
+let fold_using_arg_default' (v: _ #folder) =
+  handle v#fold_using_arg_default'
+    ~continue:begin fun a -> match ~&a with
+      | ArgDefaultOmitted -> Fun.id
+      | ArgDefault e -> fold_expr' v e
+    end
+
 let fold_using_reference_arg' (v: _ #folder) =
   handle v#fold_using_reference_arg'
     ~continue:begin fun a -> match ~&a with
-      | ArgOmitted -> Fun.id
-      | ArgGiven a -> fold_scalar' v a
+      | ArgRefOmitted -> Fun.id
+      | ArgRef a -> fold_scalar' v a
     end
 
 let fold_call_using_clause (v: _ #folder) =
   handle v#fold_call_using_clause
     ~continue:begin function
-      | CallUsingDefault args
+      | CallUsingDefault args ->
+          fold_nel ~fold:fold_using_arg_default' v args
       | CallUsingByReference args ->
           fold_nel ~fold:fold_using_reference_arg' v args
       | CallUsingByContent args
       | CallUsingByValue args ->
-          fold_nel ~fold:fold_scalar' v args
+          fold_nel ~fold:fold_expr' v args
     end
 
 let fold_date_time (v: _ #folder) =

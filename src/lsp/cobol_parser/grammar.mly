@@ -2335,7 +2335,7 @@ let subscript_first [@recovery SubSAll] [@symbol "<subscript>"] [@cost 0] :=
 
 let subscript_following [@recovery SubSAll] [@symbol "<subscript>"] [@cost 0] :=
  | ALL;                                  {SubSAll}
- | e = expression_par_unop;              {SubSExpr e}
+ | e = loc(expr_no_leftmost_all);        {SubSExpr e}
  | i = name; s = sign; offset = integer; {SubSIdx (i, s, offset): subscript}
 
 let subscripts [@recovery []] [@symbol "<subscripts>"] [@cost 0] :=
@@ -2701,7 +2701,7 @@ let expr_no_all ==
       expr_(term(atomic_no_all),
             term(atomic_no_all))
 
-let expr_par_unop ==
+let expr_no_leftmost_all ==
       expr_(term_(factor_(atomic_no_all),
                   factor(atomic,atomic)),
             term(atomic))
@@ -2713,7 +2713,6 @@ let expr_no_leftmost_length :=
 
 let expression == loc(expr)
 let expression_no_all == loc(expr_no_all)
-let expression_par_unop == loc(expr_par_unop)
 let expression_no_leftmost_length == loc(expr_no_leftmost_length)
 
 (* --- *)
@@ -2990,18 +2989,23 @@ let _using_args :=
   | USING; ~ = using_args; <    >
 
 let using_args :=
-  | head_args = nel_(loc(using_reference_arg));
+  | head_args = nel_(loc(using_arg_default));
     tail_args = rl(using_by_n_args); { CallUsingDefault head_args :: tail_args }
   | rl(using_by_n_args)
 
 let using_by_n_args :=
-  | BY?; REFERENCE; ~ = nel_(loc(using_reference_arg)); <CallUsingByReference>
-  | BY?; CONTENT;   ~ = nel_(loc(x));                   <CallUsingByContent>
-  | BY?; VALUE;     ~ = nel_(loc(x));                   <CallUsingByValue>
+  | BY?; REFERENCE; ~ = nel_(loc(using_reference_arg));  <CallUsingByReference>
+  | BY?; CONTENT;   ~ = nel_(loc(expr_no_leftmost_all)); <CallUsingByContent>
+  | BY?; VALUE;     ~ = nel_(loc(expr_no_leftmost_all)); <CallUsingByValue>
 
-let using_reference_arg [@recovery ArgOmitted] :=
- | ~ = loc(x); < ArgGiven >                     (* COB85: ident, COB2002: exp *)
- | OMITTED;    { ArgOmitted }                   (* +COB2002 *)
+let using_reference_arg [@recovery ArgRefOmitted] :=
+ | ~ = loc(x); < ArgRef >                   (* COB85: ident, COB2002: exp *)
+ | OMITTED;    { ArgRefOmitted }            (* +COB2002 *)
+
+let using_arg_default ==
+ | ~ = loc(expr_no_leftmost_all); < ArgDefault >
+ | OMITTED;                       { ArgDefaultOmitted }
+
 
 
 (* DELETE, OPEN, READ, REWRITE, WRITE *)
