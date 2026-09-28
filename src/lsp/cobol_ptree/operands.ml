@@ -85,27 +85,41 @@ let pp_position ppf = function
 (* CALL, INVOKE *)
 
 type call_using_clause =
-  {
-    call_using_by: call_using_by option;
-    call_using_expr: scalar with_loc option with_loc;   (** OMITTED if [None] *)
-  }
+  | CallUsingDefault of using_arg_default with_loc nel
+  | CallUsingByReference of using_reference_arg with_loc nel
+  | CallUsingByContent of expr with_loc nel
+  | CallUsingByValue of expr with_loc nel
+
+and using_arg_default =
+  | ArgDefaultOmitted
+  | ArgDefault of expr with_loc
+
+and using_reference_arg =
+  | ArgRefOmitted
+  | ArgRef of scalar with_loc (* idents in standards, yet GC accepts literals  *)
 [@@deriving ord]
 
-and call_using_by =
-  | CallUsingByReference
-  | CallUsingByContent
-  | CallUsingByValue
-[@@deriving ord]
+let pp_using_arg_default ppf = function
+  | ArgDefaultOmitted -> Fmt.string ppf "OMITTED"
+  | ArgDefault arg -> pp_with_loc pp_expr ppf arg
 
-let pp_call_using_by ppf = function
-  | CallUsingByReference -> Fmt.pf ppf "BY REFERENCE"
-  | CallUsingByContent -> Fmt.pf ppf "BY CONTENT"
-  | CallUsingByValue -> Fmt.pf ppf "BY VALUE"
+let pp_using_reference_arg ppf = function
+  | ArgRefOmitted -> Fmt.string ppf "OMITTED"
+  | ArgRef arg -> pp_with_loc pp_scalar ppf arg
 
-let pp_call_using_clause ppf { call_using_by = cub; call_using_expr = cue } =
-  Fmt.(option (pp_call_using_by ++ sp)) ppf cub;
-  Fmt.(pp_with_loc @@ option ~none:(any "OMITTED") @@
-       pp_with_loc pp_scalar) ppf cue
+let pp_call_using_clause ppf = function
+  | CallUsingDefault args ->
+      NEL.pp ~fopen:"@[" ~fsep:"@ " ~fclose:"@]"
+        (pp_with_loc pp_using_arg_default) ppf args
+  | CallUsingByReference args ->
+      NEL.pp ~fopen:"@[BY@ REFERENCE@ " ~fsep:"@ " ~fclose:"@]"
+        (pp_with_loc pp_using_reference_arg) ppf args
+  | CallUsingByContent args ->
+      NEL.pp ~fopen:"@[BY@ CONTENT@ " ~fsep:"@ " ~fclose:"@]"
+        (pp_with_loc pp_expr) ppf args
+  | CallUsingByValue args ->
+      NEL.pp ~fopen:"@[BY@ VALUE@ " ~fsep:"@ " ~fclose:"@]"
+        (pp_with_loc pp_expr) ppf args
 
 
 (* DELETE, OPEN, REWRITE, WRITE, READ (through on_lock_or_retry) *)
@@ -199,50 +213,52 @@ let pp_date_time ppf = function
   | Time -> Fmt.pf ppf "TIME"
 
 
-
 (* ADD, SUBTRACT *)
 type basic_arithmetic_operands =
-  | ArithSimple of
+  | ArithSimple of               (* ADD/SUBTRACT <operands> TO/FROM <targets> *)
       {
-        sources: scalar list;
+        operands: scalar list;          (* (non-empty) *)
         targets: rounded_idents;
       }
-  | ArithGiving of
+  | ArithGiving of   (* ADD/SUBTRACT <leading_operands> (TO)/FROM <base_operand>
+                        GIVING <targets> *)
       {
-        sources: scalar list;
-        to_or_from_item: scalar;
+        leading_operands: scalar list;                           (* non-empty *)
+        base_operand: scalar;
         targets: rounded_idents;
       }
-  | ArithCorresponding of
+  | ArithCorresponding of (* ADD/SUBTRACT CORRESPONDING <source> TO/FROM
+                             <target> *)
       {
         source: qualname;
         target: rounded_ident;
       }
 [@@deriving ord]
 
-let pp_arithmetic_operands ?modifier ~sep pp_lhs pp_rhs ppf (args, body) =
+let pp_arithmetic_operands ?modifier ?(sep = "TO/FROM") pp_lhs pp_rhs ppf
+    (args, body) =
   let pp_lhs = Fmt.box pp_lhs and pp_rhs = Fmt.box pp_rhs in
   Fmt.pf ppf "%a@;<1 2>%a"
-    Fmt.(option (any " " ++ string)) modifier
+    Fmt.(option (sp ++ string)) modifier
     Fmt.(box (pair ~sep:Fmt.(sp ++ const string sep ++ sp) pp_lhs pp_rhs)) args;
-  Fmt.(list ~sep:nop (any "@ " ++ box ~indent:2 (fun ppf pf -> pf ppf ()))) ppf body
+  Fmt.(list ~sep:nop (sp ++ box ~indent:2 (fun ppf pf -> pf ppf ()))) ppf body
 
 let pp_giving targets =
   [ Fmt.(any "GIVING@ " ++ const (box pp_rounded_idents) targets) ]
 
-let pp_basic_arithmetic_operands ?(sep = "TO") ppf bao =
+let pp_basic_arithmetic_operands ?sep ppf bao =
   let pp_sources = Fmt.(list ~sep:sp pp_scalar) in
   match bao with
-  | ArithSimple { sources; targets } ->
-    pp_arithmetic_operands ~sep pp_sources pp_rounded_idents
-      ppf ((sources, targets), [])
-  | ArithGiving { sources; to_or_from_item; targets } ->
-    pp_arithmetic_operands ~sep pp_sources pp_scalar
-      ppf ((sources, to_or_from_item), pp_giving targets)
+  | ArithSimple { operands; targets } ->
+      pp_arithmetic_operands ?sep pp_sources pp_rounded_idents
+        ppf ((operands, targets), [])
+  | ArithGiving { leading_operands; base_operand; targets } ->
+      pp_arithmetic_operands ?sep pp_sources pp_scalar
+        ppf ((leading_operands, base_operand), pp_giving targets)
   | ArithCorresponding { source; target } ->
-    pp_arithmetic_operands ~modifier:"CORRESPONDING" ~sep
-      pp_qualname pp_rounded_ident
-      ppf ((source, target), [])
+      pp_arithmetic_operands ~modifier:"CORRESPONDING" ?sep
+        pp_qualname pp_rounded_ident
+        ppf ((source, target), [])
 
 
 (*

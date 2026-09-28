@@ -283,6 +283,8 @@ let union d1 d2 =
     warnings = LIST.append ~loc:__LOC__ d1.warnings d2.warnings }
 let add_error e diags = { diags with errors = e :: diags.errors }
 let add_warning w diags = { diags with warnings = w :: diags.warnings }
+let count_errors diags = List.length diags.errors
+let count_warnings diags = List.length diags.warnings
 let has_errors diags = diags.errors <> []
 
 let add_src_diagnostics Src_diagnostics.{ errors; warnings } diags =

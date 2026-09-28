@@ -1324,7 +1324,7 @@ module UPCAST = struct
     | Name _ as v -> v
   external name_or_literal: name_ term -> name_or_literal = "%identity"
 
-  let base_ident_with_refmod: base_ident_ term -> ident = function
+  let base_ident_as_ident: base_ident_ term -> ident = function
     | QualIdent _ as v -> v
     | InlineCall _ as v -> v
     | InlineInvoke _ as v -> v
@@ -1333,7 +1333,8 @@ module UPCAST = struct
     | Address _ as v -> v
     | Counter _ as v -> v
     | ScalarRefMod _ as v -> v
-  external base_ident_with_refmod: base_ident_ term -> ident = "%identity"
+  external base_ident_as_ident: base_ident_ term -> ident = "%identity"
+  let base_ident_with_refmod = base_ident_as_ident
 
   let scalar_ident_as_scalar: scalar_ident_ term -> scalar = function
     | QualIdent _ as v -> v
@@ -1344,6 +1345,16 @@ module UPCAST = struct
     | Counter _ as v -> v
     | ScalarRefMod _ as v -> v
   external scalar_ident_as_scalar: scalar_ident_ term -> scalar = "%identity"
+
+  let scalar_ident_as_ident: scalar_ident_ term -> ident = function
+    | QualIdent _ as v -> v
+    | InlineCall _ as v -> v
+    | InlineInvoke _ as v -> v
+    | ObjectRef _ as v -> v
+    | Address _ as v -> v
+    | Counter _ as v -> v
+    | ScalarRefMod _ as v -> v
+  external scalar_ident_as_ident: scalar_ident_ term -> ident = "%identity"
 
   let numeric_as_scalar: numlit -> scalar = function
     | Integer _ as v -> v

@@ -178,6 +178,8 @@ let semtoks_from_ptree ~filename ?range ptree =
     | Qual (name, qn) ->
         add_name' name toktyp acc |>
         add_qualname qn toktyp
+  and add_qualname' qn' toktyp acc =
+    add_qualname ~&qn' toktyp acc
   in
   let add_ident (id: Cobol_ptree.ident) toktyp acc =
     match id with
@@ -340,7 +342,7 @@ let semtoks_from_ptree ~filename ?range ptree =
                                     call_error_handler }; _} acc = acc
       |> fold_bool self call_static
       |> fold_call_target self call_target
-      |> fold_list ~fold:fold_call_using_clause' self call_using
+      |> fold_list ~fold:fold_call_using_clause self call_using
       |> add_option add_ident' call_returning VarModif
       |> fold_option ~fold:fold_call_error_handler self call_error_handler
       |> Visitor.skip_children
@@ -376,12 +378,12 @@ let semtoks_from_ptree ~filename ?range ptree =
 *)
     (*TODO: Exit *)
 
-    method! fold_free' names acc = acc
-      |> add_list add_name' ~&names VarModif
+    method! fold_free' f acc = acc
+      |> add_list add_qualname' ~&f VarModif
       |> Visitor.skip_children
 
-    method! fold_generate' name acc = acc
-      |> add_name' ~&name VarModif
+    method! fold_generate' g acc = acc
+      |> add_qualname' ~&g VarModif
       |> Visitor.skip_children
 
     method! fold_procedure_name name acc = acc
