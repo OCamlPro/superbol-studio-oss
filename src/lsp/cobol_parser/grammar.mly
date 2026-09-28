@@ -3574,14 +3574,14 @@ let exit_spec [@recovery ExitSimple] :=
 
 %public let unconditional_action := ~ = free_statement; < >
 let free_statement :=
- | FREE; ~ = qualnames; <Free>
+ | FREE; ~ = rnel(loc(qualname)); <Free>
 
 
 (* GENERATE STATEMENT (+COB85, -COB2002) *)
 
 %public let unconditional_action := ~ = generate_statement; < >
 let generate_statement :=
- | GENERATE; ~ = qualname; <Generate>
+ | GENERATE; ~ = loc(qualname); <Generate>
 
 
 

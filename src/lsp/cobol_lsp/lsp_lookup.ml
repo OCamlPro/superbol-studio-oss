@@ -438,7 +438,7 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
 
       method! fold_free' { payload = f; _ } acc =
         acc
-        |> Pointer @>@ fold_list ~fold:fold_qualname v f
+        |> Pointer @>@ fold_list ~fold:fold_qualname' v f
         |> skip
 
       method! fold_goto' { payload = g; _ } acc =
