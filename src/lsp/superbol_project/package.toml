@@ -54,12 +54,14 @@ skip = ["index.mld", "main.ml"]
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
 cobol_common = "version"
-cobol_preproc = "version"
 cobol_config = "version"
-ocplib_stuff = "0.4.0"
+cobol_preproc = "version"
 ez_file = "0.3.0"
 ezr_toml = "version"
+ocplib_stuff = "0.4.0"
 pretty = "version"
+superbol_cache = "version"
+superbol_platform = "version"
 
 # package tools dependencies
 [tools]

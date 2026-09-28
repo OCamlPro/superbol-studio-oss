@@ -22,17 +22,13 @@ include module type of TYPES
 
 val default_extensions: extensions
 
-val config
-  : project_layout: Superbol_project.layout
-  -> ?enable_caching: bool
-  -> ?enable_client_configs: bool
-  -> ?force_syntax_diagnostics: bool
-  -> ?fallback_storage_directory: string
-  -> unit
-  -> Lsp_types.config
+(** [run ~platform ~cache_store_for ~config ~extensions] runs the server.
 
+    [cache_store_for] is how a cache directory is opened.  An application with
+    no file-system at hand passes {!Superbol_cache.Store.unavailable}, which
+    disables caching: every lookup misses and nothing is stored. *)
 val run
   : platform: Cobol_common.Platform.TYPES.platform
-  -> config: Lsp_types.config
+  -> config: Lsp_types.lsp_config
   -> extensions: extensions
   -> Lsp_server.exit_status

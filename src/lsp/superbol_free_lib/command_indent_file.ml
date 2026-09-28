@@ -25,7 +25,7 @@ let action ~numeric ~intext ~inplace ?suffix ?range
   let module Config = (val config) in
 
   let f ?contents filename =
-    let project = Project.for_ ~filename in
+    let project = Project.for_ ~filename () in
 
     let output =
       match suffix with

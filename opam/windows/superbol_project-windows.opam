@@ -51,6 +51,8 @@ install: [
 depends: [
   "ocaml" {>= "4.14.2"}
   "dune" {>= "3.17.0"}
+  "superbol_platform-windows" {= version}
+  "superbol_cache-windows" {= version}
   "pretty-windows" {= version}
   "ocplib_stuff-windows" {>= "0.4.0" & < "1.0.0"}
   "ezr_toml-windows" {= version}

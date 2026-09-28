@@ -30,6 +30,10 @@ let reply (cp: ClientCapabilities.t) =
     TextDocumentSyncOptions.create ()
       ~openClose:true
       ~change:Incremental
+      (* Saving is when the file and what we parsed are known to agree, which is
+         the one moment a document is worth caching.  The contents are of no use
+         to us -- we already hold them -- so they are not asked for. *)
+      ~save:(`Bool true)
   and semtoks =
     let legend =
       SemanticTokensLegend.create

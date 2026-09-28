@@ -49,6 +49,8 @@ install: [
 depends: [
   "ocaml" {>= "4.14.2"}
   "dune" {>= "3.17.0"}
+  "superbol_platform" {= version}
+  "superbol_cache" {= version}
   "pretty" {= version}
   "ocplib_stuff" {>= "0.4.0" & < "1.0.0"}
   "ezr_toml" {= version}

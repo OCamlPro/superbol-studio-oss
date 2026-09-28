@@ -70,3 +70,16 @@ let single_switch ?descr (kind: single_switch) ~name ~default =
 let switch ?descr = function
   | #dual_switch as kind -> dual_switch ?descr kind
   | #single_switch as kind -> single_switch ?descr kind
+
+(** Accepts a plain number of bytes, or one with the usual suffix: [500M],
+    [2G], [64k].  Powers of 1024, as the sizes this reports are. *)
+let size_of_string s =
+  let scale, digits = match s.[String.length s - 1] with
+    | 'k' | 'K' -> 1024L, String.length s - 1
+    | 'M' | 'm' -> 1048576L, String.length s - 1
+    | 'G' | 'g' -> 1073741824L, String.length s - 1
+    | _ -> 1L, String.length s
+  in
+  match Int64.of_string_opt (String.sub s 0 digits) with
+  | Some n when n >= 0L -> Ok (Int64.mul n scale)
+  | Some _ | None -> Error ()

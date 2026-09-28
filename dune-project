@@ -259,6 +259,7 @@
    (vscode-json (= :version))
    (superbol_preprocs (= :version))
    (superbol_platform (= :version))
+   (superbol_cache (= :version))
    (sql_preproc (= :version))
    (lwt (and ( >= 5 )( < 5.9 )))
    (ez_toml (= :version))
@@ -310,12 +311,32 @@
 
  (depends
    (ocaml (>= 4.14.2))
+   (superbol_platform (= :version))
+   (superbol_cache (= :version))
    (pretty (= :version))
    (ocplib_stuff (and (>= 0.4.0) (< 1.0.0)))
    (ezr_toml (= :version))
    (ez_file (and (>= 0.3.0) (< 1.0.0)))
    (cobol_preproc (= :version))
    (cobol_config (= :version))
+   (cobol_common (= :version))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name superbol_cache)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "Hierarchical cache for SuperBOL\n")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.2))
+   (ez_file ( >= 0.5 ))
    (cobol_common (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
@@ -333,6 +354,7 @@
 
  (depends
    (ocaml (>= 4.14.2))
+   (superbol_cache (= :version))
    (pretty (= :version))
    (ez_file ( >= 0.5 ))
    (cobol_preproc (= :version))
@@ -432,6 +454,7 @@
    (toml (and (>= 7.1.0) (< 8.0.0)))
    (superbol_project (= :version))
    (superbol_preprocs (= :version))
+   (superbol_cache (= :version))
    (pretty (= :version))
    (lsp (and ( >= 1.18 )( < 1.19 )))
    (jsonrpc ( >= 1.15 ))

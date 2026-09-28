@@ -51,6 +51,8 @@ install: [
 depends: [
   "ocaml" {>= "4.14.2"}
   "dune" {>= "3.17.0"}
+  "superbol_platform-osx" {= version}
+  "superbol_cache-osx" {= version}
   "pretty-osx" {= version}
   "ocplib_stuff-osx" {>= "0.4.0" & < "1.0.0"}
   "ezr_toml-osx" {= version}

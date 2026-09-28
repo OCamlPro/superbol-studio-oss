@@ -47,6 +47,7 @@ module TYPES = struct
     mutable error :  'a. ('a, Format.formatter, unit) format -> 'a ;
     mutable getcwd: unit -> string;
     mutable read_text_file : string -> string ;
+    mutable list_dir : string -> string list ;
     mutable with_stdin: 'a. f:(in_channel -> 'a) -> 'a;
     mutable peek_channel_prefix: in_channel -> len:int -> string;
     mutable getenv_opt : string -> string option ;
@@ -80,6 +81,9 @@ let innocuous = {
     Pretty.string_to (fun msg -> raise (Sys_error msg))
       "%s: Filesystem operations are unavailable" file
   end;
+  (* Listing a directory that cannot be reached is not an error: a caller that
+     records what a lookup path held simply records that it held nothing. *)
+  list_dir = (fun _dir -> []);
   with_stdin = begin fun ~f:_ ->
     Pretty.string_to (fun msg -> raise (Sys_error msg))
       "with_stdin: Filesystem operations are unavailable"
@@ -105,7 +109,7 @@ let innocuous = {
 }
 
 let copy ~dst ~src:{ verbosity; eprintf; error; getcwd; with_stdin;
-                     read_text_file;
+                     read_text_file; list_dir;
                      peek_channel_prefix;
                      mk_temp_dir; remove_dir;
                      autodetect_format; find_lib; getenv_opt }  =
@@ -114,6 +118,7 @@ let copy ~dst ~src:{ verbosity; eprintf; error; getcwd; with_stdin;
   dst.error <- error;
   dst.getcwd <- getcwd;
   dst.read_text_file <- read_text_file;
+  dst.list_dir <- list_dir;
   dst.with_stdin <- with_stdin;
   dst.peek_channel_prefix <- peek_channel_prefix;
   dst.mk_temp_dir <- mk_temp_dir;

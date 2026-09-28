@@ -13,7 +13,6 @@
 
 open EzCompat                                                    (* StringMap *)
 open Lsp_project.TYPES
-open Ez_file.V1
 open Lsp_types
 
 module DIAGS = Cobol_common.Diagnostics
@@ -28,6 +27,16 @@ module TYPES = struct
       artifacts: Cobol_parser.Outputs.artifacts;
       checked: checked_doc option;
       rewinder: rewinder option;
+      (* Records what preprocessing observed of the outside world -- copybooks
+         read, directories searched, environment variables consulted -- so that
+         caching this document can be made conditional on all of it, and not
+         merely on the document's own contents.  [None] on a document that was
+         restored from cache rather than parsed, which is what [witnesses] is
+         for: those have to survive being cached again, or the entry would be
+         written back depending on nothing at all and would then match whatever
+         its copybooks had become. *)
+      recorder: Superbol_cache.Recorder.t option;
+      witnesses: Superbol_cache.Types.witness list;
       (* Used for caching, when loading a cache file as the file is not
          reparsed, then diagnostics are not sent. *)
       parsing_diags: Cobol_parser.Diagnostics.ALL.t;
@@ -50,7 +59,11 @@ module TYPES = struct
   type cached =
     {
       doc_cache_filename: string;   (* relative to project rootdir *)
-      doc_cache_checksum: Digest.t; (* checked against file on disk on reload *)
+      (* No checksum of the document itself: its contents take part in the key
+         this record is stored under, so a change to them yields a different
+         entry rather than one that has to be rejected.  What is left here is
+         everything else the parse depended upon. *)
+      doc_cache_witnesses: Superbol_cache.Types.witness list;
       doc_cache_langid: string;
       doc_cache_version: int;
       doc_cache_pplog: Cobol_preproc.Trace.log;
@@ -78,7 +91,7 @@ let source_format_for ~doc =
       Superbol_project.Config.source_format_for
         ~filename:(Lsp.Uri.to_path (uri doc)) doc.project.config
 
-let rewindable_parse ({ project; textdoc; _ } as doc) =
+let rewindable_parse ~platform ({ project; textdoc; _ } as doc) =
   Cobol_parser.rewindable_parse_with_artifacts
     ~options:Cobol_parser.Options.{
         (default ~exec_scanners: Superbol_preprocs.exec_scanners) with
@@ -87,7 +100,7 @@ let rewindable_parse ({ project; textdoc; _ } as doc) =
       } @@
   Cobol_preproc.preprocessor
     ~options:Cobol_preproc.Options.{
-        (default ~platform:Lsp_platform.record) with
+        (default ~platform) with
         copybook_lookup_config =
           Lsp_project.copybook_lookup_config_for ~uri:(uri doc) project;
         config = project.config.cobol_config;
@@ -130,16 +143,27 @@ let check doc ptree =
 
 let parse_and_analyze ({ copybook; _ } as doc) =
   if copybook then                                                    (* skip *)
-    { doc with artifacts = no_artifacts; rewinder = None; checked = None }
+    { doc with artifacts = no_artifacts; rewinder = None; checked = None;
+               recorder = None; witnesses = [] }
   else
-    check doc @@ rewindable_parse doc
+    (* The recorder outlives this parse: a later incremental reparse runs on the
+       preprocessor state captured in the rewinder, and so keeps reporting to
+       this same recorder.  Witnesses only ever accumulate, which costs a
+       needless miss at worst and never a wrong hit. *)
+    let recorder = Superbol_cache.Recorder.create ~platform:Lsp_platform.record in
+    let doc =
+      check doc @@
+      rewindable_parse ~platform:(Superbol_cache.Recorder.platform recorder) doc
+    in
+    { doc with recorder = Some recorder }
 
 let reparse_and_analyze ?position ({ copybook; rewinder; textdoc; _ } as doc) =
   match position, rewinder with
   | None, _ | _, None ->
       parse_and_analyze doc
   | _, Some _ when copybook ->                                         (* skip *)
-      { doc with artifacts = no_artifacts; rewinder = None; checked = None }
+      { doc with artifacts = no_artifacts; rewinder = None; checked = None;
+                 recorder = None; witnesses = [] }
   | Some position, Some rewinder ->
       check doc @@
       Cobol_parser.rewind_and_parse rewinder ~position @@ fun ~last_pp:_ ->
@@ -194,6 +218,8 @@ let blank ~project textdoc =
     parsing_diags = Cobol_parser.Diagnostics.ALL.none;
     typecking_diags = Cobol_typeck.Diagnostics.none;
     checked = None;
+    recorder = None;
+    witnesses = [];
     copybook;
   }
 
@@ -250,11 +276,18 @@ let diagnostics { parsing_diags; typecking_diags; _ } =
 (** Caching utilities *)
 
 let to_cache ({ project; textdoc; checked; parsing_diags; typecking_diags;
+                recorder;
                 artifacts = { pplog; tokens;
                               rev_comments; rev_ignored; _ }; _ } as doc) =
   {
     doc_cache_filename = Lsp_project.relative_path_for ~uri:(uri doc) project;
-    doc_cache_checksum = Digest.string (Lsp.Text_document.text textdoc);
+    (* The recorder is asked rather than [witnesses] whenever there is one: an
+       incremental reparse keeps reporting to it, so it holds strictly more than
+       what was known when the parse first finished. *)
+    doc_cache_witnesses =
+      (match recorder with
+       | Some recorder -> Superbol_cache.Recorder.witnesses recorder
+       | None -> doc.witnesses);
     doc_cache_langid = Lsp.Text_document.languageId textdoc;
     doc_cache_version = Lsp.Text_document.version textdoc;
     doc_cache_pplog = pplog;
@@ -266,12 +299,17 @@ let to_cache ({ project; textdoc; checked; parsing_diags; typecking_diags;
     doc_cache_typecking_diags = typecking_diags;
   }
 
-(* NB: Note this checks against the actual file on disk, which may be different
-   from what a client sends upon opening. *)
-(** Raises [Failure] in case of bad checksum. *)
-let of_cache ~project ~params
+(** [of_cache ~project ~params ~contents cached] rebuilds a document from its
+    cached form.
+
+    [contents] is what the file holds now, and the caller has already
+    established that it is what the entry was recorded against: the contents
+    take part in the key the entry is stored under.  Everything {e else} the
+    parse depended upon is checked by the cache, against
+    {!Lsp_document.TYPES.doc_cache_witnesses}. *)
+let of_cache ~project ~params ~contents
     { doc_cache_filename = filename;
-      doc_cache_checksum = checksum;
+      doc_cache_witnesses = witnesses;
       doc_cache_langid = languageId;
       doc_cache_version = version;
       doc_cache_pplog = pplog;
@@ -282,23 +320,20 @@ let of_cache ~project ~params
       doc_cache_parsing_diags = parsing_diags;
       doc_cache_typecking_diags = typecking_diags } =
   let absolute_filename = Lsp_project.absolute_path_for ~filename project in
-  if checksum <> Digest.file absolute_filename then
-    failwith "Bad checksum"
-  else
-    let uri = Lsp.Uri.of_path absolute_filename
-    and text = EzFile.read_file absolute_filename in
-    let doc = Lsp.Types.DidOpenTextDocumentParams.create
-        ~textDocument:(Lsp.Types.TextDocumentItem.create
-                         ~languageId ~text ~uri ~version) in
-    let doc =
-      blank ~project @@
-      Lsp.Text_document.make doc ~position_encoding:params.position_encoding
-    in
-    { doc with artifacts = { pplog; tokens = lazy tokens;
-                             rev_comments; rev_ignored };
-               parsing_diags;
-               typecking_diags;
-               checked }
+  let uri = Lsp.Uri.of_path absolute_filename in
+  let doc = Lsp.Types.DidOpenTextDocumentParams.create
+      ~textDocument:(Lsp.Types.TextDocumentItem.create
+                       ~languageId ~text:contents ~uri ~version) in
+  let doc =
+    blank ~project @@
+    Lsp.Text_document.make doc ~position_encoding:params.position_encoding
+  in
+  { doc with artifacts = { pplog; tokens = lazy tokens;
+                           rev_comments; rev_ignored };
+             parsing_diags;
+             typecking_diags;
+             witnesses;
+             checked }
 
 (* --- *)
 

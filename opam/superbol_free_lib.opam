@@ -52,6 +52,7 @@ depends: [
   "vscode-json" {= version}
   "superbol_preprocs" {= version}
   "superbol_platform" {= version}
+  "superbol_cache" {= version}
   "sql_preproc" {= version}
   "lwt" {>= "5" & < "5.9"}
   "ez_toml" {= version}

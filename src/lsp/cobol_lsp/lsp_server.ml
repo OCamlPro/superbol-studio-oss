@@ -57,9 +57,9 @@ module TYPES = struct
   }
 
   type state =
-    | NotInitialized of config   (* At startup and until "initialize" request *)
-    | Initialized of params      (* After "initialize" and before "initialized"
-                                    notif *)
+    | NotInitialized of lsp_config (* At startup and until "initialize" request *)
+    | Initialized of params       (* After "initialize" and before "initialized"
+                                     notif *)
     | Running of registry        (* After "initialized" and before "shutdown" *)
     | ShuttingDown               (* From "shuntdown" until "exit" notif *)
     | Exit of exit_status        (* After "exit" notif *)
@@ -342,24 +342,22 @@ let save_project_caches { params; docs; _ } =
 
 
 let load_project_cache ~rootdir
-    ({ params = { config = { project_layout = layout; _ }; _ } as params;
-       docs = old_docs; _ } as registry) =
-  let new_docs = Lsp_project_cache.load ~params ~layout ~rootdir in
-  let registry =
-    { registry with
-      docs = URIMap.union (fun _ _old new_ -> Some new_) old_docs new_docs }
-  in
-  match URIMap.choose_opt new_docs with
-  | Some (_, Lsp_document.{ project; _ }) -> add_project project registry
-  | None -> registry
+    ({ params = { config = { lsp_project_layout = layout; _ }; _ } as params;
+       docs = _old_docs; _ } as registry) =
+  match Lsp_project_cache.load ~params ~layout ~rootdir with
+  | None ->
+      registry
+  | Some project ->
+      add_project project registry
 
 
 (** {2 Documents} *)
 
 
-let add_or_replace_doc doc r =
-  let docs = URIMap.add (Lsp_document.uri doc) doc r.docs in
-  if docs == r.docs then r else { r with docs }
+(** Note: also saves the document in cache. *)
+let add_or_replace_doc doc registry =
+  let docs = URIMap.add (Lsp_document.uri doc) doc registry.docs in
+  if docs == registry.docs then registry else { registry with docs }
 
 
 (** {3 Error reporting} *)
@@ -511,7 +509,7 @@ let retrieve_project_for ~uri registry =
        [uri].  Not sure it is desirable to support nested projects, though. *)
     registry
   with Not_found ->
-    let layout = registry.params.config.project_layout in
+    let layout = registry.params.config.lsp_project_layout in
     let rootdir = Lsp_project.rootdir_for ~uri ~layout in
     if Lsp_project.SET.mem_rootdir ~rootdir registry.projects
     then registry
@@ -522,7 +520,7 @@ let create_or_retrieve_project_promise ~rootdir registry =    (* from rootdir *)
   try
     now (Lsp_project.SET.for_rootdir ~rootdir registry.projects) registry
   with Not_found ->                                (* load or init new project *)
-    let layout = registry.params.config.project_layout in
+    let layout = registry.params.config.lsp_project_layout in
     let project = Lsp_project.for_ ~rootdir ~layout in
     add_project project registry |>
     if registry.params.config.enable_client_configs
@@ -537,7 +535,7 @@ let create_or_retrieve_doc_project_promise ~uri registry =    (* from doc uri *)
   try
     now (Lsp_project.SET.for_ ~uri registry.projects) registry
   with Not_found ->
-    let layout = registry.params.config.project_layout in
+    let layout = registry.params.config.lsp_project_layout in
     let rootdir = Lsp_project.rootdir_for ~uri ~layout in
     create_or_retrieve_project_promise ~rootdir registry
 
@@ -586,7 +584,7 @@ let get_project_config_command uri registry =
 
 
 let load_project_in ~dir registry =
-  let layout = registry.params.config.project_layout in
+  let layout = registry.params.config.lsp_project_layout in
   let project = Lsp_project.in_existing_dir dir ~layout in
   let registry =
     add_project project @@
@@ -653,10 +651,20 @@ let on_change_workspace_folders
 let add ~doc:(DidOpenTextDocumentParams.{ textDocument = { uri; _ }; _ } as doc)
     registry =
   let add_in_project project registry =
+    let filename = Lsp.Uri.to_path uri in
     try
-      let doc = Lsp_document.load ~project ~params:registry.params doc in
-      let registry = dispatch_diagnostics doc registry in
-      add_or_replace_doc doc registry
+      match
+        Lsp_project_cache.load_document ~project ~params:registry.params
+          ~filename ~contents:doc.textDocument.text
+      with
+      | None ->
+          let doc = Lsp_document.load ~project ~params:registry.params doc in
+          Lsp_project_cache.save_document ~params:registry.params doc;
+          let registry = dispatch_diagnostics doc registry in
+          add_or_replace_doc doc registry
+      | Some doc ->
+          let registry = dispatch_diagnostics doc registry in
+          add_or_replace_doc doc registry
     with Lsp_document.Internal_error (doc, e, backtrace) ->
       document_error_while_"opening" doc e backtrace registry
   in
@@ -664,8 +672,8 @@ let add ~doc:(DidOpenTextDocumentParams.{ textDocument = { uri; _ }; _ } as doc)
     ~after:(create_or_retrieve_doc_project_promise ~uri registry)
 
 
-let did_open (DidOpenTextDocumentParams.{ textDocument = { uri; text; _ };
-                                          _ } as doc) registry =
+let did_open (doc: DidOpenTextDocumentParams.t) registry =
+  let uri = doc.textDocument.uri and text = doc.textDocument.text in
   (* Try first with a lookup for the project in a cache, and then by
      creating/loading the project. *)
   let rec aux ~try_cache registry =
@@ -698,6 +706,16 @@ let did_change DidChangeTextDocumentParams.{ textDocument = { uri; _ };
     add_or_replace_doc doc registry
   with Lsp_document.Internal_error (doc, e, backtrace) ->
     document_error_while_"updating" doc e backtrace registry
+
+
+(** Persists the document's cache.  The editor having just written the file, it
+    now holds exactly what was parsed --- which is the condition under which a
+    cached document can be restored at all --- so this is the moment to keep it,
+    rather than waiting for the session to end. *)
+let did_save DidSaveTextDocumentParams.{ textDocument = { uri }; _ } registry =
+  Option.iter (Lsp_project_cache.save_document ~params:registry.params) @@
+  URIMap.find_opt uri registry.docs;
+  registry
 
 
 let did_close DidCloseTextDocumentParams.{ textDocument = { uri } } registry =

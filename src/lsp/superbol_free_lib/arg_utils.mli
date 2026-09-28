@@ -23,3 +23,7 @@ val switch
   -> name: string
   -> default: bool
   -> bool ref * Ezcmd.V2.EZCMD.TYPES.arg_list
+
+(** Accepts a plain number of bytes, or one with the usual suffix: [500M],
+    [2G], [64k].  Powers of 1024, as the sizes this reports are. *)
+val size_of_string: string -> (int64, unit) result
