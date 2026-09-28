@@ -20,6 +20,7 @@ type output =
   }
 
 val of_compilation_unit
-  : Cobol_unit.Types.unit_config
+  : options: Typeck_config.options
+  -> Cobol_unit.Types.unit_env
   -> Cobol_ptree.compilation_unit with_loc
   -> output * Typeck_diagnostics.t

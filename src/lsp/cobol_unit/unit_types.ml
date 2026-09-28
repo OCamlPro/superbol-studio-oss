@@ -57,8 +57,11 @@ type unit_config =
     unit_display_sign_config: Cobol_data.Types.display_sign_config;
   }
 
-(* TODO: add a dedicated type to hold info from the INPUT-OUTPUT SECTION. Maybe
-   building up a more global `unit_env` type in that process. *)
+type unit_env =
+  {
+    env_config: unit_config;         (* CONFIGURATION SECTION *)
+    (* TODO: INPUT-OUTPUT SECTION (at least) *)
+  }
 
 (* data items *)
 
@@ -117,7 +120,7 @@ type cobol_unit =
   {
     unit_name: string with_loc;
     unit_parent_name: string with_loc option;
-    unit_config: unit_config;
+    unit_env: unit_env;
     unit_data: data_definitions;
     unit_procedure: procedure;
   }

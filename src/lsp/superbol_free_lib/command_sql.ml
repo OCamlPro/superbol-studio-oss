@@ -15,13 +15,15 @@ open EZCMD.TYPES
 open Common_args
 
 let typeck_file { preproc_options; parser_options; _ } filename =
+  let module Config = (val parser_options.config) in
   Cobol_preproc.Input.from ~filename
     ~f: begin fun input ->
       input
       |> Cobol_preproc.preprocessor ~options:preproc_options
       |> Cobol_parser.parse_simple ~options:parser_options
       |> Cobol_parser.Outputs.result_only
-      |> Cobol_typeck.compilation_group ~config:parser_options.config
+      |> Cobol_typeck.compilation_group
+        ~options:{ binary_size = Config.binary_size#value }
         ~fold_exec_block':Superbol_preprocs.Esql.fold_exec_block'
       |> Cobol_typeck.Results.result_only
       |> fun checked_group ->

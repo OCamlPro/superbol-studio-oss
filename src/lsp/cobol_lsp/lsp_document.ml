@@ -105,14 +105,16 @@ let no_artifacts =
                          rev_ignored = [] }
 
 let check doc ptree =
-  let config = doc.project.config.cobol_config in
+  let module Config = (val doc.project.config.cobol_config) in
   let Cobol_parser.Outputs.{ result = ptree, rewinder;
                              diags = parsing_diags } = ptree in
   let Cobol_typeck.Results.{ result = checked;
-                             diags = typecking_diags }
-    = Cobol_typeck.compilation_group ~config
+                             diags = typecking_diags } =
+    Cobol_typeck.compilation_group
       ~fold_exec_block':Superbol_preprocs.Esql.fold_exec_block'
-      ptree in
+      ~options:{ binary_size = Config.binary_size#value }
+      ptree
+  in
   let artifacts = Cobol_parser.artifacts ptree in
   let typecking_diags =
     (* Do not report typeck diagnostics in case of syntax or pre-processing
