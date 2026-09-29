@@ -15,6 +15,8 @@ open Cobol_common                                          (* Srcloc, Visitor *)
 open Cobol_common.Srcloc.INFIX
 open Cobol_parser.Tokens
 
+module LIST = Cobol_common.Basics.LIST
+
 module TOKTYP = struct
   type t = { index: int; name: string }
   let all: t list ref = ref []
@@ -665,17 +667,6 @@ let relative_semtoks semtoks =
   end (0, 0, 0) semtoks;
   data
 
-let merge_lists compare l1 l2 =
-  let rec aux acc l1 l2 = match l1, l2 with
-    | [], l | l, [] ->
-        List.rev_append acc l
-    | h1 :: t1, h2 :: t2 ->
-        if compare h1 h2 <= 0
-        then aux (h1 :: acc) t1 l2
-        else aux (h2 :: acc) l1 t2
-  in
-  aux [] l1 l2
-
 let ensure_sorted name ~filename cmp l =
   let rec unsorted_pair = function
     | [] | [_] -> None
@@ -715,7 +706,7 @@ let data ~filename ~range ~tokens ~pplog
   and semtoks4 = ensure_sorted "ignored"      ~filename compare_semtoks semtoks4
   and semtoks5 = ensure_sorted "preproc"      ~filename compare_semtoks semtoks5 in
   relative_semtoks
-    (merge_lists compare_semtoks semtoks1 @@
-     merge_lists compare_semtoks semtoks2 @@
-     merge_lists compare_semtoks semtoks3 @@
-     merge_lists compare_semtoks semtoks4 @@ semtoks5)
+    (LIST.tail_merge compare_semtoks semtoks1 @@
+     LIST.tail_merge compare_semtoks semtoks2 @@
+     LIST.tail_merge compare_semtoks semtoks3 @@
+     LIST.tail_merge compare_semtoks semtoks4 @@ semtoks5)
