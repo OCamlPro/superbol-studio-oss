@@ -15,6 +15,7 @@
 
 module Memory = Data_memory
 module Types = Data_types
+module Record = Data_record
 module Item = Data_item
 module Usage = Data_usage
 module Picture = Data_picture

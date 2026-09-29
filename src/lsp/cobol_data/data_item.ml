@@ -57,9 +57,6 @@ let qualname = function
   | Field { field_qualname; _ } -> field_qualname
   | Table _ -> None
 
-let record_size: record -> Data_memory.size = fun r ->
-  size ~&(r.record_item)
-
 (* Same as [qualname], but a table takes the name of the field it contains. *)
 let item_qualname: item_definition -> Cobol_ptree.qualname with_loc option =
   function

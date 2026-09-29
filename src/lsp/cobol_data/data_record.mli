@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
-(*  Copyright (c) 2026 OCamlPro SAS                                       *)
+(*  Copyright (c) 2022-2026 OCamlPro SAS                                  *)
 (*                                                                        *)
 (* All rights reserved.                                                   *)
 (* This source code is licensed under the GNU Affero General Public       *)
@@ -11,19 +11,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Ezlibcob.V1
-open Types
+(** Utilities for accessing record info and managing collections of records *)
 
-let create record_definition : cob_record_handle =
-  let record_data_size =
-    Cobol_data.Memory.as_bytes (Cobol_data.Record.size record_definition)
-      ~memory_config:Cobol_data.Memory.amd64_memory_config
-  in
-  let record_data_ptr =
-    CPtr.cast UInt8 @@ CArray.to_ptr @@ CArray.create Char ~default:' '
-      record_data_size
-  in
-  {
-    record_memory = { record_data_ptr; record_data_size };
-    record_definition;
-  }
+open Data_types
+
+val size: record -> Data_memory.size
+val storage: record -> data_storage
+
+module SET: sig
+  include Stdlib.Set.S with type elt = record
+  val pp: t Pretty.printer
+end
+
+module MAP: sig
+  include Stdlib.Map.S with type key = record
+  val pp: ?fbind: ('x, _, 'x) format -> 'a Pretty.printer -> 'a t Pretty.printer
+end

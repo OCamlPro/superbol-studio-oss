@@ -204,7 +204,7 @@ type length_variability =
 
 type record =
   {
-    record_name: string;
+    record_name: string;                      (* unique (as per cobol_typeck) *)
     record_storage: data_storage;
     record_item: item_definition with_loc;
     record_renamings: record_renamings;
