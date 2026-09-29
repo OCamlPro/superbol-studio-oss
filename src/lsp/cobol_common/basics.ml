@@ -97,6 +97,18 @@ module LIST = struct
   let tail_map ?loc f l =
     check_10 "tail_map" ~loc l;
     EzList.tail_map f l
+
+  (** Tail-recursive version of [List.merge]. *)
+  let tail_merge ?loc compare l1 l2 =
+    let rec aux acc l1 l2 = match l1, l2 with
+      | [], l | l, [] ->
+          rev_append ?loc acc l
+      | h1 :: t1, h2 :: t2 ->
+          if compare h1 h2 <= 0
+          then aux (h1 :: acc) t1 l2
+          else aux (h2 :: acc) l1 t2
+    in
+    aux [] l1 l2
 end
 
 (** Representation for non-empty lists *)
