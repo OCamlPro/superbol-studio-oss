@@ -12,13 +12,16 @@
 (**************************************************************************)
 
 open EzCompat
-module TEXT = Cobol_preproc.Text
 
-open Cobol_common.Srcloc.INFIX
 open Cobol_common.Srcloc.TYPES
 open Cobol_preproc.Text.TYPES
+open Parser_diagnostics_types
 open Grammar_tokens                              (* import token constructors *)
-open Parser_diagnostics
+
+open Cobol_common.Srcloc.INFIX
+
+module TEXT = Cobol_preproc.Text
+module LIST = Cobol_common.Basics.LIST
 
 (* --- *)
 
@@ -54,7 +57,7 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
     | t ->
         (* Try de-tokenizing to accept, e.g, PROGRAM-ID. nested. (as NESTED is a
            keyword). *)
-        try INFO_WORD (Hashtbl.find Text_lexer.word_of_token t)
+        try INFO_WORD (Text_lexer.string_of_word_token t)
         with Not_found -> t
   and function_name = function
     | t when not intrinsics_enabled ->
@@ -63,7 +66,7 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
         (try Text_lexer.token_of_intrinsic w with Not_found -> t)
     | t ->
         (try (Text_lexer.token_of_intrinsic @@
-              Hashtbl.find Text_lexer.word_of_token t)
+              Text_lexer.string_of_word_token t)
          with Not_found -> t)
   and comment_entry revtoks =
     COMMENT_ENTRY (LIST.rev_map string_of_token revtoks)
@@ -506,7 +509,7 @@ let tokenize_text ~source_format ({ leftover_tokens; _ } as state) text =
       Error (`ReachedEOF tokens),
       let error = Unterminated { loc; stuff = unterminated_item } in
       let diags = Parser_diagnostics.union diags state.diags in
-      { state with diags = add_error error diags }
+      { state with diags = Parser_diagnostics.add_error error diags }
 
 let emit_token (type m) (s: m state) tok : m state =
   match s.memory with
@@ -591,7 +594,6 @@ let reword_intrinsics s tokens =
   (* Some intrinsics NOT preceded with FUNCTION may now be words; assumes
      [Disabled_intrinsics] does not occur on a `FUNCTION` keyword (but that's
      unlikely). *)
-  let keyword_of_token token = Hashtbl.find Text_lexer.word_of_token token in
   let is_intrinsic_token = function
     | INTRINSIC_FUNC _ -> true
     | t when Text_keywords.is_known_intrinsic_token t -> true
@@ -604,7 +606,7 @@ let reword_intrinsics s tokens =
       ({ payload = k2_token; _ } as k2) :: tl
       when k1_token <> FUNCTION && is_intrinsic_token k2_token ->
         aux (LIST.tail_map ~loc:__LOC__ distinguish_words @@
-             retokenize s (keyword_of_token k2_token &@<- k2) @
+             retokenize s (Text_lexer.string_of_word_token k2_token &@<- k2) @
              k1 :: rev_prefix) tl
     | k1 :: tl ->
         aux (k1 :: rev_prefix) tl
@@ -633,10 +635,10 @@ let retokenize_after: lexer_update -> _ state -> token list -> token list =
             [token]
       end
   | Disabled_keywords stream ->
-      let keyword_of_token = Hashtbl.find Text_lexer.word_of_token in
       EzList.tail_map begin fun token ->
         if Text_lexer.TokenHandles.mem_text_token ~&token stream
-        then match token_in_area_a token, keyword_of_token ~&token with
+        then match token_in_area_a token,
+                   Text_lexer.string_of_word_token ~&token with
           | true, w -> WORD_IN_AREA_A w &@<- token
           | false, w -> WORD w &@<- token
         else token

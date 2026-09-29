@@ -29,12 +29,9 @@ module IntrinsicHandles: Set.S with type elt = intrinsic_handle
 (* --- *)
 
 val string_of_token: Grammar_tokens.token -> string
+val string_of_word_token: Grammar_tokens.token -> string
 val string_of_keyword_handle: keyword_handle -> string
 val pp_tokens_via_handles: TokenHandles.t Pretty.printer
-
-(** Only for debugging *)
-val word_of_token : (Grammar_tokens.token, string) Hashtbl.t
-val punct_of_token : (Grammar_tokens.token, string) Hashtbl.t
 
 (* --- *)
 
@@ -80,6 +77,5 @@ val read_tokens
 val decode_symbolic_ebcdics'
   : quotation: Cobol_ptree.alphanum_quote
   -> string Cobol_common.Srcloc.with_loc
-  -> Grammar_tokens.token
-    Cobol_common.Srcloc.with_loc
-    Parser_diagnostics.Accumulator.with_diags
+  -> Grammar_tokens.token Cobol_common.Srcloc.with_loc *
+     Parser_diagnostics_types.error list

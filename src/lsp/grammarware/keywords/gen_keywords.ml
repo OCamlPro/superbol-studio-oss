@@ -91,6 +91,10 @@ let combined_name name =
 let uncobolize name =
   String.map (function '-' -> '_' | c -> c) String.(sub name 1 @@ length name - 2)
 
+(* Note: in lists emitted below, the declaration order for a given word is
+   reversed so first entries remain in reverse-lookup tables constructed via
+   list traversals with `Map.add`/`Hashtbl.add`. *)
+
 let emit_entry attribute_payload ?(with_spaces = false) ?(comment_token = false) ppf t =
   let start_token ppf = if comment_token then Fmt.string ppf "(*"
   and end_token   ppf = if comment_token then Fmt.string ppf "*)" in
@@ -110,8 +114,8 @@ let emit_entry attribute_payload ?(with_spaces = false) ?(comment_token = false)
       | Some payload ->
           List.iter
             (fun kwd -> Fmt.pf ppf "@\n%s%t, %a%t;" (String.trim kwd)
-                start_token pp_terminal t end_token)
-            (String.split_on_char ',' payload)
+                start_token pp_terminal t end_token) @@
+            List.rev (String.split_on_char ',' payload)
 
 let emit_generic_intrinsics ppf t =
   match Terminal.kind t with
@@ -125,6 +129,7 @@ let emit_generic_intrinsics ppf t =
           List.iter
             (fun kwd -> Fmt.pf ppf "@\n%s, %s %s;" kwd
                 (Terminal.name t) (uncobolize kwd)) @@
+          List.rev @@
           List.filter_map
             (fun s -> match String.trim s with "" -> None | s -> Some s)
             (String.split_on_char ',' payload)
@@ -149,7 +154,7 @@ let emit_custom_intrinsics ppf t =
           | kwds ->
               List.iter
                 (fun kwd -> Fmt.pf ppf "@\n%s, %a;" kwd pp_terminal t)
-                kwds
+                (List.rev kwds)
 
 let emit_keywords_list ppf =
   Fmt.pf ppf "@[<2>let keywords = %s.[" tokens_module;

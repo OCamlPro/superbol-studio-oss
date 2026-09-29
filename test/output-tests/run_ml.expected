@@ -27,7 +27,7 @@ run_ml.at-122-prog.cob:21.16:
 ----                   ^
   22              05 name          PIC X(10) value "Someone".
   23              05 dept          PIC X(10) value "Marketing".
->> Hint: Missing DIVISION . PROGRAM_ID <word> . END PROGRAM
+>> Hint: Missing DIVISION . PROGRAM-ID <word> . END PROGRAM
 
 run_ml.at-122-prog.cob:21.28-21.31:
   18          01  0SpecialTAGName  PIC X(3) VALUE "abc".
@@ -105,7 +105,7 @@ run_ml.at-122-prog.cob:96.12:
   95              END-IF
   96 >            .
 ----               ^
->> Hint: Missing PROGRAM_ID <word> .
+>> Hint: Missing PROGRAM-ID <word> .
 
 run_ml.at-122-prog.cob:97.0:
   94                  DISPLAY 'Test 10 failed: ' FUNCTION TRIM (out)

@@ -15,6 +15,7 @@ open Cobol_common.Types
 open Cobol_common.Srcloc.INFIX
 open Parser_options                               (* import types for options *)
 open Parser_outputs                               (* import types for outputs *)
+open Parser_diagnostics_types
 
 module LIST = Cobol_common.Basics.LIST
 module OUT = Parser_outputs
@@ -28,10 +29,15 @@ module Grammar_recovery =
   Recovery.Make (Grammar_interpr) (struct
     include Grammar_recover
     include Grammar_printer
-    let benign_assumption: TOK.token -> bool = function
-      | PERIOD -> true
-      | _ -> false
   end)
+
+let empty_insertion: Grammar_recovery.insertion -> bool = function
+  | Symbol s -> Grammar_printer.print_symbol s = ""
+  | Token _ -> false
+
+let benign_insertion: Grammar_recovery.insertion -> bool = function
+  | Token PERIOD -> true
+  | r -> empty_insertion r
 
 (* Main type definitions *)
 
@@ -162,6 +168,10 @@ let error ({ preproc = ({ diags; _ } as pp); _ } as ps) e =
   let diags = Parser_diagnostics.add_error e diags in
   { ps with preproc = { pp with diags } }
 
+let malformed ps ~loc stuff = error ps @@ Malformed { loc; stuff }
+let unexpected ps ~loc stuff = error ps @@ Unexpected { loc; stuff }
+let missing ps ~loc stuff = error ps @@ Missing { loc; stuff }
+
 let add_diag ({ preproc = ({ diags; _ } as pp); _ } as ps) severity ?loc diag =
   let diags = Parser_diagnostics.add_diag ~severity ?loc diag diags in
   { ps with preproc = { pp with diags } }
@@ -271,40 +281,43 @@ let put_token_back ({ preproc; _ } as ps) token tokens =
 (** Use recovery trace (assumptions on missing tokens) to generate syntax hints
     and report on an invalid syntax error. *)
 let report_syntax_hints_n_error ps
-    (assumed: Grammar_recovery.assumption list)
+    (assumed: _ Grammar_recovery.assumption list)
     ~(report_invalid_syntax:
         Cobol_common.Diagnostics.severity -> (_ state as 's) -> 's)
     ~recovery_options
   =
   (* Gather one hint per source position of recovery assumptions, and determine
-     global benignness *)
+     global safety *)
   let hints, globally_benign =
-    let concat_reports r1 r2 = match r1, r2 with
-      | Some r, Some s -> Some (Pretty.delayed "%t@ %t" r s)
-      | r, None | None, r -> r
-    in
     List.fold_left begin fun (reports, benign') assumption ->
-      let Grammar_recovery.{ show; pos; benign } = assumption in
-      let show, prev_reports = match reports with
+      let Grammar_recovery.{ insertion; pos } = assumption in
+      let empty = empty_insertion insertion in
+      let insertions, prev_reports =
+        match reports with
         | (report, prev_pos) :: tl when prev_pos == pos ->      (* same position *)
-            concat_reports report show, tl
-        | tl ->
-            show, tl                                          (* new position *)
+            if empty
+            then report, tl
+            else report @ [insertion], tl
+        | tl ->                                                (* new position *)
+            if empty
+            then [], tl
+            else [insertion], tl
       in
       (* Note: Consider not benign if nothing is to be reported (show =
          None). *)
-      (show, pos) :: prev_reports, benign && benign' && show <> None
-    end ([], assumed <> []) assumed                 (* initially benign unless no
-                                                      assumption was involved *)
+      (insertions, pos) :: prev_reports,
+      benign' && insertions <> [] && benign_insertion insertion
+    end ([], assumed <> []) assumed               (* initially benign unless no
+                                                     assumption was involved *)
   in
   (* Accumulate hints about missing tokens *)
   let ps =
     List.fold_left begin fun ps -> function
-      | None, _ ->                               (* nothing relevant to report *)
+      | [], _ ->                                 (* nothing relevant to report *)
           ps
-      | Some pp_assumed, raw_pos ->
+      | insertions, raw_pos ->
           let loc = Overlay_manager.join_limits (raw_pos, raw_pos) in
-          add_diag ps Hint ~loc (Missing_tokens pp_assumed)
+          add_diag ps Hint ~loc (Missing_tokens insertions)
     end ps (List.rev hints)
   in
   (* Generate a global error or warning if necessary *)
@@ -423,8 +436,7 @@ let isolate_value_clause ps data_clauses
         (*                           stuff = Global_clause_for_78_level_item }, *)
         ps, value_clause
     | clause ->
-        error ps @@ Unexpected { loc = ~@clause;
-                                 stuff = Clause_for_78_level_item clause },
+        unexpected ps ~loc:~@clause @@ Clause_for_78_level_item clause,
         value_clause
   end (ps, None) data_clauses
 
@@ -437,7 +449,7 @@ let on_data_descr_entry (e: Cobol_ptree.data_item) ps token tokens =
       in
       match e.data_name with              (* CHECKME: is `78 FILLER` allowed? *)
       | Some { payload = DataFiller; _ } | None ->
-          error ps @@ Malformed { loc; stuff = Data_item_at_level_78 }
+          malformed ps ~loc (Data_item_at_level_78)
       | Some ({ payload = DataName name; _ } as dn) ->
           let ps, value = isolate_value_clause ps e.data_clauses in
           match value with
@@ -445,11 +457,9 @@ let on_data_descr_entry (e: Cobol_ptree.data_item) ps token tokens =
               update_pp ps @@
               Cobol_preproc.bind_78_constant ps.preproc.pp ~loc name literal
           | Some { payload = ValueTable _; loc } ->
-              let stuff = DIAGS.Multiple_values_for_78_level_item dn in
-              error ps @@ Unexpected { loc; stuff }
+              unexpected ps ~loc (Multiple_values_for_78_level_item dn)
           | None ->
-              let stuff = DIAGS.Value_for_78_level_item dn in
-              error ps @@ Missing { loc; stuff }
+              missing ps ~loc (Value_for_78_level_item dn)
     else ps
   in
   ps, token, tokens
