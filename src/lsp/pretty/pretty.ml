@@ -168,6 +168,16 @@ let path =
   list string ~fopen:"" ~fclose:"" ~fempty:""
     ~fsep:(Simple.char Ez_file.V1.FileOS.path_separator)
 
+let with_oxford_comma ?(comb = "and") pp ppf lst =
+  let rec aux ?(deep = false) = function
+    | [] -> ()
+    | [x] -> pp ppf x
+    | [x;y] when not deep -> Fmt.fmt "%a@ %s@ %a" ppf pp x comb pp y
+    | [x;y] when   deep -> Fmt.fmt "%a,@ %s@ %a" ppf pp x comb pp y
+    | x :: tl -> Fmt.fmt "%a,@ " ppf pp x; aux ~deep:true tl
+  in
+  aux lst
+
 (** {3 Pretty-printing records} *)
 
 (** Field with a vertical layout *)
