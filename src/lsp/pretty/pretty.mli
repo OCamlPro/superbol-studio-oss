@@ -49,6 +49,22 @@ val list
 val stack: 'a printer -> 'a list printer
 val path: string list printer
 
+(** [with_oxford_comma ~comb pp ppf lst] pretty-prints [lst] using [ppf] by
+    enumerating its items and inserting Oxford-style comma.  In particular, this
+    function:
+
+    - does nothing on an empty list;
+
+    - acts like [pp ppf e] if [lst = [e]];
+
+    - prints "[a] [comb] [b]" (without comma) in case [lst = [a;b]];
+
+    - otherwise prints every element followed by a comma, except for the last
+      that is preceded with "[comb]", as for instance in "a, b, c, and d".
+
+    [comb] is "and" by default; other sensible use is "or". *)
+val with_oxford_comma: ?comb:string -> 'a printer -> 'a list printer
+
 val record
   : ?opening:'a printer
   -> ?closing:'a printer
