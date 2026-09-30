@@ -2538,32 +2538,12 @@ syn_misc.at-7454-prog.cob:46.16-46.19:
   48      *>or zero for any one that failed the format (PICTURE) test.
 >> Error: Invalid syntax
 
-syn_misc.at-7454-prog.cob:46.27:
-  43               05  IN-WEEK       PIC 99  OCCURS 5
-  44                   VARYING IN-WEEK-NO FROM 1, IN-NEXT-WEEK-NO FROM 2
-  45                   INVALID WHEN IN-WEEK-NO < 5
-  46 >                 AND IN-WEEK (IN-WEEK-NO) > IN-WEEK (IN-NEXT-WEEK-NO)
-----                              ^
-  47      *>OUT-WEEK (1) to (5) will hold the values of IN-WEEK (1) to (5),
-  48      *>or zero for any one that failed the format (PICTURE) test.
->> Hint: Missing RENAMES
-
 syn_misc.at-7454-prog.cob:46.28-46.29:
   43               05  IN-WEEK       PIC 99  OCCURS 5
   44                   VARYING IN-WEEK-NO FROM 1, IN-NEXT-WEEK-NO FROM 2
   45                   INVALID WHEN IN-WEEK-NO < 5
   46 >                 AND IN-WEEK (IN-WEEK-NO) > IN-WEEK (IN-NEXT-WEEK-NO)
 ----                               ^
-  47      *>OUT-WEEK (1) to (5) will hold the values of IN-WEEK (1) to (5),
-  48      *>or zero for any one that failed the format (PICTURE) test.
->> Error: Invalid syntax
-
-syn_misc.at-7454-prog.cob:46.39-46.40:
-  43               05  IN-WEEK       PIC 99  OCCURS 5
-  44                   VARYING IN-WEEK-NO FROM 1, IN-NEXT-WEEK-NO FROM 2
-  45                   INVALID WHEN IN-WEEK-NO < 5
-  46 >                 AND IN-WEEK (IN-WEEK-NO) > IN-WEEK (IN-NEXT-WEEK-NO)
-----                                          ^
   47      *>OUT-WEEK (1) to (5) will hold the values of IN-WEEK (1) to (5),
   48      *>or zero for any one that failed the format (PICTURE) test.
 >> Error: Invalid syntax
