@@ -68,6 +68,33 @@ let pp_diagnostic ppf = function
   | Dialect_feature_used { feature; _ } ->
       Pretty.print ppf "%(%)@ used" feature#short
 
+let has_errors: diagnostics -> bool =
+  List.exists begin function
+    | Config_error _
+    | Data_error _
+    | Proc_error _ -> true
+    | Data_warning _
+    | Dialect_feature_used _ -> false
+  end
+
+let count_errors: diagnostics -> int =
+  List.fold_left begin fun acc -> function
+    | Config_error _
+    | Data_error _
+    | Proc_error _ -> succ acc
+    | Data_warning _
+    | Dialect_feature_used _ -> acc
+  end 0
+
+let count_warnings: diagnostics -> int =
+  List.fold_left begin fun acc -> function
+    | Config_error _
+    | Data_error _
+    | Proc_error _ -> acc
+    | Data_warning _
+    | Dialect_feature_used _ -> succ acc
+  end 0
+
 let translate diagnostics =
   (* Temporary hack: reverse errors list so order of generated diagnostics
      corresponds to order of emission in the code below. *)
