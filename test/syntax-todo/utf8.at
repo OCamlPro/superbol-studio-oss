@@ -18,8 +18,7 @@ AT_DATA([prog.cob], [
     10    STOP RUN.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=true prog.cob], [0], [Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=true prog.cob], [0], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 prog.cob:8.43:
    5        4 WORKING-STORAGE SECTION.

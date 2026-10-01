@@ -24,8 +24,14 @@ type t = {
   platform: Cobol_common.Platform.TYPES.platform;
   preproc_options: preproc_options;
   parser_options: parser_options;
-  pretty_verbose: 'a. 'a Pretty.proc;
+  pretty_progress: 'a. 'a Pretty.proc;
 }
+
+type progress_display = 
+  | Hide
+  | Show
+  | Log
+  | Log_stderr
 
 let showable =
   [
@@ -52,7 +58,7 @@ let iter_comma_separated_spec ~showable ~option_name ~f spec =
                 (list ~fopen:"" ~fsep:",@ " ~fclose:"" string)
                 (StringSet.elements unknowns))
 
-let get ?(verbose_on = `Stdout) () =
+let get () =
   let conf = ref "" in
   let dialect = ref None in
   let format = ref Cobol_config.Auto in
@@ -76,6 +82,7 @@ let get ?(verbose_on = `Stdout) () =
     iter_comma_separated_spec ~showable ~option_name:"--silence" spec
       ~f:(fun tag -> show := List.filter ((<>) tag) !show)
   in
+  let progress_display_opt = ref None  in
 
   let args = [
 
@@ -128,6 +135,18 @@ let get ?(verbose_on = `Stdout) () =
       "Add EXT as a filename extension for copybook resolution (default: %a)"
       Fmt.(list ~sep:sp @@ fmt "`%s`")
       Cobol_common.Copybook.copybook_extensions;
+      
+    ["progress"], Arg.Symbol (["hide"; "force"; "log"; "log-err"], function
+      | "hide" -> progress_display_opt := Some Hide
+      | "force" -> progress_display_opt := Some Show
+      | "log" -> progress_display_opt := Some Log
+      | "log-err" -> progress_display_opt := Some Log_stderr
+      | _ -> assert false),
+    EZCMD.info ~docv:"MODE"
+      "Set how to display progress of the command.\n\
+      MODE can be hide, force, log or log-err. 
+      By default progress is displayed when stderr is a TTY.";
+    
   ] in
 
   let get () =
@@ -179,6 +198,11 @@ let get ?(verbose_on = `Stdout) () =
     let platform =
       { Superbol_platform.record with verbosity = !Globals.verbosity }
     in
+    let progress_display = match !progress_display_opt with
+      | None -> if Unix.isatty Unix.stderr then Show else Hide
+      | Some p -> p
+    in
+    let last_progress_msg_len = ref 0 in
     (* Pretty.error "@[Preprocessor environment:@;<1 2>@[%a@]@]@." *)
     (*   Cobol_preproc.Env.pp env; *)
     { platform ;
@@ -190,10 +214,16 @@ let get ?(verbose_on = `Stdout) () =
                           env };
       parser_options = { config; recovery; verbose; show = !show;
                          exec_scanners = Superbol_preprocs.exec_scanners };
-      pretty_verbose = match verbose_on with
-        | `Stdout -> Pretty.out
-        | `Stderr -> Pretty.error
-        | `Stdnul -> Pretty.sink }
-
+      pretty_progress = match progress_display with
+        | Hide -> Pretty.sink
+        | Show -> fun fmt ->
+            Format.kasprintf (fun s ->
+                let len = String.length s in
+                let pad = String.make (max 0 (!last_progress_msg_len - len)) ' ' in
+                last_progress_msg_len := len;
+                Pretty.error "%s%s\r%!" s pad)
+              ("@[" ^^ fmt ^^ "@]")
+        | Log -> fun fmt -> Pretty.out ("@[" ^^ fmt ^^ "@]@.") 
+        | Log_stderr -> fun fmt -> Pretty.error ("@[" ^^ fmt ^^ "@]@.") }
   in
   get, args

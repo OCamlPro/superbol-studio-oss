@@ -16,8 +16,7 @@ AT_DATA([prog.cob], [
 ])
 
 AT_CHECK([$SUPERBOL check --recovery=false --std=mf --source-format=xcard prog.cob], [1],
-[Checking `prog.cob'
-],
+[],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 prog.cob:5.35-5.41:
    2          PROGRAM-ID      prog.
@@ -46,8 +45,7 @@ AT_DATA([prog.cob], [
 ])
 
 AT_CHECK([$SUPERBOL check --recovery=false --std=mf --source-format=xcard prog.cob], [1],
-[Checking `prog.cob'
-],
+[],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 prog.cob:5.51-5.59:
    2          PROGRAM-ID      prog.
@@ -63,8 +61,9 @@ AT_CLEANUP
 
 
 AT_SETUP([ASSIGN TO EXTERNAL])
+
 # promoted on 2026-02-09T17:53
-AT_DATA([prog.cob],[
+AT_DATA([prog.cob], [
        program-id BookLegacy.
        environment division.
        input-output section.
@@ -78,9 +77,12 @@ AT_DATA([prog.cob],[
                alternate record key is b-author with duplicates
 	       .
 	       ])
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf --source-format=xcard prog.cob], [0], [Checking `prog.cob'
-], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
+
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf --source-format=xcard prog.cob], [0],
+[],
+[SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
+
 AT_CLEANUP
 
 AT_SETUP([MF NO PROGRAM-ID])
@@ -90,9 +92,7 @@ AT_DATA([prog.cob], [
        display "Hello, COBOL World!"
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 prog.cob:2.7-2.14:
    1   @&t@
@@ -114,9 +114,7 @@ AT_DATA([prog.cob], [
        display "Hello, COBOL World!"
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 prog.cob:2.7-2.14:
    1   @&t@
@@ -143,9 +141,7 @@ AT_DATA([prog.cob], [
        procedure division.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 prog.cob:5.15-5.16:
    2          program-id. toto.
@@ -174,9 +170,7 @@ AT_DATA([prog.cob], [
            .
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 prog.cob:5.19-5.28:
    2          program-id. toto.
@@ -207,9 +201,7 @@ AT_DATA([prog.cob], [
            move 12.0 to my-bird::length-field::min.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 prog.cob:9.33-9.45:
    6                  10  length-field.
@@ -239,9 +231,7 @@ AT_DATA([prog.cob], [
            add 1 to value-parameter giving return-parameter.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 prog.cob:5.51-5.60:
    2          program-id. toto.
@@ -273,9 +263,7 @@ AT_DATA([prog.cob], [
            move 5 to return-parameter.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 prog.cob:5.33-5.42:
    2          program-id. toto.
@@ -307,9 +295,7 @@ AT_DATA([prog.cob], [
            add 1 to value-parameter giving return-parameter.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 prog.cob:5.38-5.39:
    2          program-id. toto.
@@ -340,9 +326,7 @@ AT_DATA([prog.cob], [
            add 1 to value-parameter.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 prog.cob:5.50-5.51:
    2          program-id. toto.
@@ -373,9 +357,7 @@ AT_DATA([prog.cob], [
            add 1 to ref-parameter.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 prog.cob:5.45-5.46:
    2          program-id. toto.
@@ -406,9 +388,7 @@ AT_DATA([prog.cob], [
                10  cell    x-cell-name.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 prog.cob:7.27-7.38:
    4          78  GRID-SIZE           value 8.
@@ -436,9 +416,7 @@ AT_DATA([prog.cob], [
                                             "e", "f", "g", "h".
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 prog.cob:6.62-6.63:
    3          working-storage section.
@@ -472,9 +450,7 @@ AT_DATA([prog.cob], [
        end program.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 prog.cob:6.25-6.26:
    3          procedure division.
@@ -731,9 +707,7 @@ AT_DATA([prog.cob], [
        end class.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 prog.cob:6.16-6.33:
    3         * Implements a calendar editor column for use in the data grid
@@ -760,9 +734,7 @@ AT_DATA([prog.cob], [
        PROGRAM-ID. customer.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 prog.cob:2.11-2.16:
    1   @&t@
@@ -796,9 +768,7 @@ AT_DATA([prog.cob], [
        PROCEDURE DIVISION.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
@@ -820,9 +790,7 @@ AT_DATA([prog.cob], [
        end program.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 prog.cob:8.7-8.10:
    5                   when < 300
@@ -840,7 +808,6 @@ AT_CLEANUP
 
 
 AT_SETUP([MF WHEN COND AND COND])
-
 AT_DATA([prog.cob], [
        program-id. GetFlyerLevel.
        procedure division.
@@ -851,9 +818,7 @@ AT_DATA([prog.cob], [
        end program.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
@@ -875,9 +840,7 @@ program-id.             acas-get-params.
               MOVE LENGTH(Buffer) TO Buffer-Length
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --free prog.cob], [1],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --free prog.cob], [1], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 prog.cob:5.25-5.26:
    2   identification division.
@@ -903,9 +866,7 @@ AT_SETUP([MF ...])
 AT_DATA([prog.cob], [
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
@@ -919,9 +880,7 @@ AT_SETUP([MF ...])
 AT_DATA([prog.cob], [
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
@@ -935,9 +894,7 @@ AT_SETUP([MF ...])
 AT_DATA([prog.cob], [
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
@@ -957,9 +914,7 @@ procedure division.
     cancel a as universal.
 ])
 
-AT_CHECK([$SUPERBOL check syntax --recovery=false --std=default prog.cob], [0],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check syntax --recovery=false --std=default prog.cob], [0], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
@@ -989,8 +944,7 @@ AT_DATA([prog.cob], [
 ])
 
 AT_CHECK([$SUPERBOL check --recovery=false --std=mf --source-format=xcard prog.cob], [0],
-[Checking `prog.cob'
-],
+[],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
@@ -1006,9 +960,7 @@ program-id.             acas-get-params.
      accept   menu-reply at 0644 with foreground-color 6 auto.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --free --std=mf prog.cob], [0],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --free --std=mf prog.cob], [0], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
@@ -1024,9 +976,7 @@ program-id.             acas-get-params.
      display "Waiting < sec " at line ws-lines col 1 blink.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --free --std=mf prog.cob], [0],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --free --std=mf prog.cob], [0], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
@@ -1042,9 +992,7 @@ AT_DATA([prog.cob], [
        end program.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
@@ -1060,9 +1008,7 @@ program-id.             acas-get-params.
      accept   Arg-Vals from command-line.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --free --std=mf prog.cob], [0],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --free --std=mf prog.cob], [0], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
@@ -1080,9 +1026,7 @@ AT_DATA([prog.cob], [
        end program.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
@@ -1103,9 +1047,7 @@ AT_DATA([prog.cob], [
                   FILE STATUS  IS WS-BNKACC-NDX-STATUS.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
@@ -1122,9 +1064,7 @@ AT_DATA([prog.cob], [
        Entry "Initialise" Using Dsc-Control-Block Data-Block.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
@@ -1148,9 +1088,7 @@ file-control.
  01  ACAS-Params-Record  pic x(80).
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --free --std=mf prog.cob], [0],
-[Checking `prog.cob'
-],
+AT_CHECK([$SUPERBOL check --recovery=false --free --std=mf prog.cob], [0], [],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
@@ -1160,8 +1098,7 @@ AT_CLEANUP
 
 
 AT_SETUP([TRIM TRAILING])
-
-AT_DATA([prog.cob],[
+AT_DATA([prog.cob], [
        IDENTIFICATION   DIVISION.
        PROGRAM-ID.      prog.
        PROCEDURE        DIVISION.
@@ -1169,8 +1106,11 @@ AT_DATA([prog.cob],[
                DISPLAY "OK"
            END-IF.
 ])
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf --source-format=xcard prog.cob], [0], [Checking `prog.cob'
-], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
+
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf --source-format=xcard prog.cob], [0],
+[],
+[SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
+
 AT_CLEANUP
 
