@@ -5,8 +5,8 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sub-commands and Arguments &mdash; superbol-studio-oss master
- (a185498
-) (2026/09/30 14:44) documentation</title>
+ (59f3e70
+) (2026/10/01 17:11) documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d8449d71" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=86f27845" />
       <link rel="stylesheet" type="text/css" href="_static/css/fixes.css" />
@@ -15,7 +15,7 @@
   
         <script src="_static/jquery.js?v=8dae8fb0"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=c309081e"></script>
+        <script src="_static/documentation_options.js?v=4090bba3"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -39,7 +39,7 @@
           </a>
               <div class="version">
                 master
- (a185498
+ (59f3e70
 )
               </div>
 <div role="search">
@@ -223,6 +223,13 @@
 <li><p><code class="code docutils literal notranslate"><span class="pre">--dialect</span> <span class="pre">DIALECT</span></code> or <code class="code docutils literal notranslate"><span class="pre">--std</span> <span class="pre">DIALECT</span></code>   Set the dialect to bu used (overriden by <cite>–conf</cite> if used)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--ext</span> <span class="pre">EXT</span></code>   Add EXT as a filename extension for copybook resolution (default: <cite>cpy</cite> <cite>cbl</cite> <cite>cob</cite>)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--free</span></code>   Shorthand for <cite>–source-format FREE</cite></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--progress</span> <span class="pre">MODE</span></code>   Set how to display progress of the command.</p></li>
+</ul>
+<dl class="simple">
+<dt>MODE can be hide, force, log or log-err.</dt><dd><p>By default progress is displayed when stderr is a TTY.</p>
+</dd>
+</dl>
+<ul class="simple">
 <li><p><code class="code docutils literal notranslate"><span class="pre">--recovery</span> <span class="pre">BOOL</span></code>   Enable/disable parser recovery after syntax errors (default: true)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--silence</span> <span class="pre">STRING</span></code>   Silence specific messages</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--source-format</span> <span class="pre">SOURCE_FORMAT</span></code>   Set the format of source code; allowed values are: { FIXED (the default), FREE}</p></li>
@@ -334,6 +341,13 @@ Set the current default switch</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--intext</span></code>   For numeric, indentation size is relative to area A</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--lines</span> <span class="pre">LINE-LINE</span></code>   Indent only lines between these lines</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--numeric</span></code>   Output indentation size at the beginning of each line</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--progress</span> <span class="pre">MODE</span></code>   Set how to display progress of the command.</p></li>
+</ul>
+<dl class="simple">
+<dt>MODE can be hide, force, log or log-err.</dt><dd><p>By default progress is displayed when stderr is a TTY.</p>
+</dd>
+</dl>
+<ul class="simple">
 <li><p><code class="code docutils literal notranslate"><span class="pre">--recovery</span> <span class="pre">BOOL</span></code>   Enable/disable parser recovery after syntax errors (default: true)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--silence</span> <span class="pre">STRING</span></code>   Silence specific messages</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--source-format</span> <span class="pre">SOURCE_FORMAT</span></code>   Set the format of source code; allowed values are: { FIXED (the default), FREE}</p></li>
@@ -401,6 +415,13 @@ Set the current default switch</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--free</span></code>   Shorthand for <cite>–source-format FREE</cite></p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--output</span> <span class="pre">FILE</span></code> or <code class="code docutils literal notranslate"><span class="pre">-o</span> <span class="pre">FILE</span></code>   Output File (use ‘-’ for stdout)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--parse</span></code>   If true, parse the generated cobol before printing</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--progress</span> <span class="pre">MODE</span></code>   Set how to display progress of the command.</p></li>
+</ul>
+<dl class="simple">
+<dt>MODE can be hide, force, log or log-err.</dt><dd><p>By default progress is displayed when stderr is a TTY.</p>
+</dd>
+</dl>
+<ul class="simple">
 <li><p><code class="code docutils literal notranslate"><span class="pre">--recovery</span> <span class="pre">BOOL</span></code>   Enable/disable parser recovery after syntax errors (default: true)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--silence</span> <span class="pre">STRING</span></code>   Silence specific messages</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--source-format</span> <span class="pre">SOURCE_FORMAT</span></code>   Set the format of source code; allowed values are: { FIXED (the default), FREE}</p></li>
@@ -530,6 +551,13 @@ Set the current default switch</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--dialect</span> <span class="pre">DIALECT</span></code> or <code class="code docutils literal notranslate"><span class="pre">--std</span> <span class="pre">DIALECT</span></code>   Set the dialect to bu used (overriden by <cite>–conf</cite> if used)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--ext</span> <span class="pre">EXT</span></code>   Add EXT as a filename extension for copybook resolution (default: <cite>cpy</cite> <cite>cbl</cite> <cite>cob</cite>)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--free</span></code>   Shorthand for <cite>–source-format FREE</cite></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--progress</span> <span class="pre">MODE</span></code>   Set how to display progress of the command.</p></li>
+</ul>
+<dl class="simple">
+<dt>MODE can be hide, force, log or log-err.</dt><dd><p>By default progress is displayed when stderr is a TTY.</p>
+</dd>
+</dl>
+<ul class="simple">
 <li><p><code class="code docutils literal notranslate"><span class="pre">--recovery</span> <span class="pre">BOOL</span></code>   Enable/disable parser recovery after syntax errors (default: true)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--silence</span> <span class="pre">STRING</span></code>   Silence specific messages</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--source-format</span> <span class="pre">SOURCE_FORMAT</span></code>   Set the format of source code; allowed values are: { FIXED (the default), FREE}</p></li>

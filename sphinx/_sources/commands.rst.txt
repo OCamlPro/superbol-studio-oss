@@ -113,6 +113,10 @@ Where options are:
 
 * :code:`--free`   Shorthand for `--source-format FREE`
 
+* :code:`--progress MODE`   Set how to display progress of the command.
+MODE can be hide, force, log or log-err. 
+      By default progress is displayed when stderr is a TTY.
+
 * :code:`--recovery BOOL`   Enable/disable parser recovery after syntax errors (default: true)
 
 * :code:`--silence STRING`   Silence specific messages
@@ -274,6 +278,10 @@ Where options are:
 
 * :code:`--numeric`   Output indentation size at the beginning of each line
 
+* :code:`--progress MODE`   Set how to display progress of the command.
+MODE can be hide, force, log or log-err. 
+      By default progress is displayed when stderr is a TTY.
+
 * :code:`--recovery BOOL`   Enable/disable parser recovery after syntax errors (default: true)
 
 * :code:`--silence STRING`   Silence specific messages
@@ -391,6 +399,10 @@ Where options are:
 * :code:`--output FILE` or :code:`-o FILE`   Output File (use '-' for stdout)
 
 * :code:`--parse`   If true, parse the generated cobol before printing
+
+* :code:`--progress MODE`   Set how to display progress of the command.
+MODE can be hide, force, log or log-err. 
+      By default progress is displayed when stderr is a TTY.
 
 * :code:`--recovery BOOL`   Enable/disable parser recovery after syntax errors (default: true)
 
@@ -574,6 +586,10 @@ Where options are:
 * :code:`--ext EXT`   Add EXT as a filename extension for copybook resolution (default: `cpy` `cbl` `cob`)
 
 * :code:`--free`   Shorthand for `--source-format FREE`
+
+* :code:`--progress MODE`   Set how to display progress of the command.
+MODE can be hide, force, log or log-err. 
+      By default progress is displayed when stderr is a TTY.
 
 * :code:`--recovery BOOL`   Enable/disable parser recovery after syntax errors (default: true)
 
