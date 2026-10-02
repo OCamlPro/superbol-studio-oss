@@ -84,7 +84,7 @@ let name_of = Cobol_unit.Qual.name_of
 (* let qual_of = Cobol_unit.Qual.qual_of *)
 let requal = Cobol_unit.Qual.requal
 
-let init (config: unit_config) =
+let init ~options ({ env_config = config }: unit_env) =
   {
     current_storage = Local_storage;                         (* dummy default *)
     current_qualification = None;
@@ -106,6 +106,7 @@ let init (config: unit_config) =
           currency_signs = config.unit_currency_signs;
         };
       display_sign_config = config.unit_display_sign_config;
+      typeck_options = options;
     };
     diags = [];
   }
@@ -971,8 +972,8 @@ let data_definitions_folder = object
   (* TODO: fold_report_group_item' *)
 end
 
-let of_compilation_unit config cu' =
-  init config |>
+let of_compilation_unit ~options env cu' =
+  init ~options env |>
   Cobol_ptree.Visitor.fold_compilation_unit' data_definitions_folder cu' |>
   flush_item_stack |>
   result

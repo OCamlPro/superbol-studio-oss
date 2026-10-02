@@ -55,6 +55,7 @@ depends: [
   "cobol_ptree-windows" {= version}
   "cobol_parser-windows" {= version}
   "cobol_data-windows" {= version}
+  "cobol_config-windows" {= version}
   "cobol_common-windows" {= version}
   "ppx_deriving" {>= "5.2.1"}
   "odoc" {with-doc}

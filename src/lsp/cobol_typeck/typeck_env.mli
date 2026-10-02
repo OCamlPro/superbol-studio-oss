@@ -13,12 +13,11 @@
 
 open Cobol_common.Srcloc.TYPES
 
-type output = Cobol_unit.Types.unit_config
-
 val of_compilation_unit
-  : ?parent_config:Cobol_unit.Types.unit_config
+  : options:Typeck_config.options
+  -> ?parent_env:Cobol_unit.Types.unit_env
   -> Cobol_ptree.compilation_unit with_loc
-  -> output * Typeck_diagnostics.t
+  -> Cobol_unit.Types.unit_env * Typeck_diagnostics.t
 
 (* Additional, temporary... *)
 

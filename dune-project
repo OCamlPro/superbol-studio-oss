@@ -600,6 +600,7 @@
    (cobol_ptree (= :version))
    (cobol_parser (= :version))
    (cobol_data (= :version))
+   (cobol_config (= :version))
    (cobol_common (= :version))
    (ppx_deriving ( >= 5.2.1 ))
    odoc

@@ -17,13 +17,15 @@ open EZCMD.TYPES
 open Superbol_free_lib.Common_args
 
 let parse_n_typeck { preproc_options; parser_options; platform; _ } filename =
+  let module Config = (val parser_options.config) in
   let filename = Option.value ~default:"" filename in
   Cobol_preproc.Input.from ~filename ~platform ~f:begin fun input ->
     Cobol_preproc.preprocessor ~options:preproc_options input |>
     Cobol_parser.parse_simple ~options:parser_options |>
     Cobol_parser.Outputs.translate_diags |>
     Cobol_common.Diagnostics.more_result ~f:begin fun ptree ->
-      Cobol_typeck.compilation_group ~config:parser_options.config ptree
+      Cobol_typeck.compilation_group ptree
+        ~options:{ binary_size = Config.binary_size#value }
         ~fold_exec_block':Superbol_preprocs.Esql.fold_exec_block' |>
       Cobol_typeck.Results.translate_diags
     end |>

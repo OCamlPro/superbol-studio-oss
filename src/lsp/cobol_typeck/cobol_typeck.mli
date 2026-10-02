@@ -13,6 +13,7 @@
 
 (** Type-checking and validation of COBOL compilation groups *)
 
+module Config = Typeck_config
 module Outputs = Typeck_outputs
 module Diagnostics = Typeck_diagnostics
 module Results = Typeck_results

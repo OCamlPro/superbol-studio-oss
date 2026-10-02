@@ -24,6 +24,7 @@ type data_config =
   {
     picture_config: Cobol_data.Types.picture_config;
     display_sign_config: Cobol_data.Types.display_sign_config;
+    typeck_options: Typeck_config.options;
   }
 
 type data_clauses =
@@ -201,7 +202,7 @@ let display_usage_from_literal: Cobol_ptree.literal -> usage =
   (* TODO: `Display|`National *)
   let detect_sign i =
     if EzString.starts_with ~prefix:"-" i
-    then Display_signed Typeck_config.default_display_sign_config,
+    then Display_signed Typeck_env.default_display_sign_config,
          String.length i - 1
     else Display_unsigned,
          String.length i
@@ -306,17 +307,52 @@ let ensure_picture diags
       in
       diags, guess_picture ~usage pic_len
 
+let byte_size_of_int = function
+  | 1 -> Byte_size
+  | 2 -> Short_size
+  | 4 -> Long_size
+  | 8 -> Double_size
+  | 16 -> Long_double_size
+  | n -> Custom_size n
 
-let binary_from_numeric_info ?(min_size_is_short = false) ?(native_truncation = true)
+let binary_from_numeric_info ~data_config ?(native_truncation = true)
     diags ?picture PIC.TYPES.{ digits; scale = scaling; signed } =
   let byte_size =
-    if not min_size_is_short && digits < 3 then Byte_size       (* 1-2 = 1 byte *)
-    else if digits < 5 then Short_size                       (* 3-4 = 2 bytes *)
-    else if digits < 10 then Long_size                       (* 5-9 = 4 bytes *)
-    else if digits < 19 &&     (* 10-19 if unsigned, 10-18 if signed = 8 bytes *)
-            signed then Double_size
-    else if digits < 20 then Double_size
-    else Long_double_size                                         (* 16 bytes *)
+    byte_size_of_int @@
+    match data_config.typeck_options.binary_size with
+    | B_2_4_8 ->
+        if digits < 5 then 2                          (* 1-4 *)
+        else if digits < 10 then 4                    (* 5-9 *)
+        else if digits < 19 then 8                    (* 10-18 *)
+        else 16                                       (* CHECKME: error case? *)
+    | B_1_2_4_8 ->
+        if digits < 3 then 1                             (* 1-2 *)
+        else if digits < 5 then 2                        (* 3-4 *)
+        else if digits < 10 then 4                       (* 5-9 *)
+        else if digits < 19 && signed then 8              (* 10-18 if signed *)
+        else if digits < 20 then 8                       (* 10-19 if unsigned *)
+        else 16
+    | B_1__8 when signed && digits < 19 ->
+        [|1; 1; 1;                                              (* (0,) 1, 2 *)
+          2; 2;                                                 (* 3, 4 *)
+          3; 3;                                                 (* 5, 6 *)
+          4; 4; 4;                                              (* 7, 8, 9 *)
+          5; 5;                                                 (* 10, 11 *)
+          6; 6; 6;                                              (* 12, 13, 14 *)
+          7; 7;                                                 (* 15, 16 *)
+          8; 8|]                                                (* 17; 18 *)
+        .(digits)
+    | B_1__8 when not signed && digits < 19 ->
+        [|1; 1; 1;                                              (* (0,) 1, 2 *)
+          2; 2;                                                 (* 3, 4 *)
+          3; 3; 3;                                              (* 5, 6, 7 *)
+          4; 4;                                                 (* 8, 9 *)
+          5; 5; 5;                                              (* 10, 11, 12 *)
+          6; 6;                                                 (* 13, 14 *)
+          7; 7;                                                 (* 15, 16 *)
+          8; 8|]                                                (* 17; 18 *)
+        .(digits)
+    | B_1__8 -> 16                                     (* CHECKME: error case? *)
   and truncation =
     if native_truncation
     then Truncate_to_native_size
@@ -363,7 +399,8 @@ let auto_usage diags ~item_loc ?(usage: Cobol_ptree.usage_clause = Display)
       let diags, picture
         = ensure_picture diags ~only:`Numeric_category ~item_loc ~usage
           picture in
-      binary_from_numeric_info diags ~picture ~native_truncation:false
+      binary_from_numeric_info ~data_config diags ~picture
+        ~native_truncation:false
         (Result.value ~default:{ digits = 1; scale = 0; signed = false } @@
          PIC.numeric_info picture)
   | Bit ->
@@ -401,7 +438,7 @@ let display_usage ~item_loc ~data_config ?value_literal ?picture diags =
 
 
 (** Items with USAGE COMP-5 *)
-let range_extended_usage diags ~item_loc given_picture usage =
+let range_extended_usage ~data_config diags ~item_loc given_picture usage =
   let diags, picture =
     ensure_picture diags ~only:`Numeric_or_alphanum_category
       ~item_loc ~required:true ~usage given_picture
@@ -410,8 +447,8 @@ let range_extended_usage diags ~item_loc given_picture usage =
     match PIC.numeric_info picture with                 (* TODO: check scale? *)
     | Ok ({ digits; _ } as numeric_info)
       when digits >= 1 && digits <= 18 ->
-        binary_from_numeric_info diags ~picture ~min_size_is_short:true
-          ~native_truncation:true numeric_info
+        binary_from_numeric_info ~data_config diags ~picture numeric_info
+          ~native_truncation:true
     | Ok { digits; scale = scaling; signed } ->
         let picture = Result.get_ok @@ Option.get given_picture in
         let feature = Digits { given = digits ; min = 1; max = 18 } in
@@ -599,7 +636,7 @@ let to_usage_n_value ~item_name ~item_loc ~data_config item_clauses =
         packed_decimal_usage diags ~item_loc ~picture comp
 
     | UsagePending `Comp5 as usage ->
-        range_extended_usage diags ~item_loc picture usage
+        range_extended_usage ~data_config diags ~item_loc picture usage
 
     | Type _
     | UsagePending (`Comp10|`CompN|`Comp0|`Comp15|`CompX|`Comp9) ->
