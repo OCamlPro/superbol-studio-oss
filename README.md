@@ -285,9 +285,9 @@ task* with appropriate debug options.  Once this is done, you can
 
 After having opened the program to debug, select `Terminal >
 Run Build Task…`  (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>), and
-then `SuperBOL: build (debug)`.
+then `SuperBOL: build module (debug)`.
 
-![Select `SuperBOL: build (debug)`](./assets/superbol-configure-build-tasks.png)
+![Select `SuperBOL: build module (debug)`](./assets/superbol-configure-build-tasks.png)
 
 ### Launching the Compiled Program for Debugging
 
@@ -312,9 +312,11 @@ program.
 ### Customizing Build Tasks
 
 To customize a build task, you can select `Terminal > Configure
-Default Build Task…`, and then `SuperBOL: build` or
-`SuperBOL: build (debug)` (the latter being the task that is run
-whenever you start a debugging session, *e.g* with <kbd>F5</kbd>).
+Default Build Task…`, and then one of `SuperBOL: build module`,
+`SuperBOL: build module (debug)`, `SuperBOL: build executable`, or
+`SuperBOL: build executable (debug)`.  By default, starting a debugging session (*e.g* with
+<kbd>F5</kbd>) runs `SuperBOL: build module (debug)`, and running without debugging
+(<kbd>Ctrl</kbd>+<kbd>F5</kbd>) runs `SuperBOL: build module`.
 
 Save the `tasks.json` as shown.  Definitions for this task notably
 include a `forDebug` flag, that instructs the compiler to insert debug
@@ -328,8 +330,8 @@ be edited to pass additional arguments to `cobc`.
 
 GnuCOBOL can instrument your programs so they can generate coverage
 information at runtime.  To enable this feature, you can set the
-`forCoverage` setting to `true` in the `Superbol: build (debug)` task
-in your `tasks.json` file (see [Customizing Build
+`forCoverage` setting to `true` in any SuperBOL build task in your
+`tasks.json` file (see [Customizing Build
 Tasks](#customizing-build-tasks)).  This flag instructs the extension
 to pass the `--coverage` flag to the `cobc` compiler.
 

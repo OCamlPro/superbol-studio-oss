@@ -209,9 +209,10 @@ let provide_tasks instance ~token:_ =
       = define_cobc_build_task ~config ~spec:module_spec
     in
     Promise.Option.return [
-      define_exec_build_task "build"          ~debug:false;
-      define_exec_build_task "build (debug)"  ~debug:true;
-      define_modl_build_task "build (module)" ~debug:false;
+      define_modl_build_task "build module"             ~debug:false;
+      define_modl_build_task "build module (debug)"     ~debug:true;
+      define_exec_build_task "build executable"         ~debug:false;
+      define_exec_build_task "build executable (debug)" ~debug:true;
     ]
   end
 
