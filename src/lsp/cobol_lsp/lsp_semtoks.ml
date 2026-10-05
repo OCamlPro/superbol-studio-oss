@@ -113,9 +113,12 @@ let compare_semtoks first second =
   then first.start - second.start
   else first.line - second.line
 
+let compare_rev_semtoks a b =
+  - compare_semtoks a b
+
 let acc_semtok ?(merge = false) s acc = match s with
   | None -> acc
-  | Some s when merge -> List.merge (fun a b -> - compare_semtoks a b) [s] acc
+  | Some s when merge -> LIST.tail_merge compare_rev_semtoks [s] acc
   | Some s -> s :: acc
 
 let single_line_lexlocs_in ~filename =
@@ -362,6 +365,12 @@ let semtoks_from_ptree ~filename ?range ptree =
       |> add_ident rounded VarModif
       |> fold_rounding self rounded_rounding
       |> Visitor.skip_children
+
+    (* The parse-tree does not allow us to distinguish between DIVIDE … INTO …
+       and DIVITE … BY … forms, for which the order of operands is reversed. So
+       we sort the semantic tokens manually aftwerwards: *)
+    method! fold_divide_operands _ acc =
+      Visitor.do_children_and_then acc (List.sort compare_rev_semtoks)
 
     method! fold_delete' {payload = { delete_targets; delete_retry;
                                       delete_on_invalid_key }; _} acc = acc
