@@ -273,7 +273,8 @@ let debuggers =
                                         "name": "${2:SuperBOL: debug (launch)}",
                                         "type": "superbol-gdb",
                                         "request": "launch",
-                                        "preLaunchTask": "SuperBOL: build (debug)",
+                                        "preLaunchTask": "SuperBOL: build module (debug)",
+                                        "useCobcrun": true,
                                         "target": "$${_:{file}}",
                                         "arguments": "",
                                         "cwd": "$${_:{workspaceFolder}}",
@@ -490,7 +491,7 @@ let taskDefinitions =
 
         Manifest.PROPERTY.bool "executable"
           ~description:"Build an executable program instead of a module"
-          ~default:true;
+          ~default:false;
 
         Manifest.PROPERTY.null_string "cobcPath"
           ~title:"GnuCOBOL Compiler Executable"

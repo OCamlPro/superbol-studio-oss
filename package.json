@@ -380,7 +380,8 @@
               "name": "${2:SuperBOL: debug (launch)}",
               "type": "superbol-gdb",
               "request": "launch",
-              "preLaunchTask": "SuperBOL: build (debug)",
+              "preLaunchTask": "SuperBOL: build module (debug)",
+              "useCobcrun": true,
               "target": "$${_:{file}}",
               "arguments": "",
               "cwd": "$${_:{workspaceFolder}}",
@@ -569,7 +570,7 @@
           },
           "executable": {
             "type": "boolean",
-            "default": true,
+            "default": false,
             "description": "Build an executable program instead of a module"
           },
           "cobcPath": {
