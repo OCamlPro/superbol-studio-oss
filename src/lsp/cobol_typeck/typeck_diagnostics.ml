@@ -54,7 +54,7 @@ let diagnostic_loc = function
   | Proc_error e ->
       Typeck_procedure_diagnostics.error_loc e
   | Dialect_feature_used { usage_loc = loc; _ } ->
-      Some loc
+      loc
 
 let pp_diagnostic ppf = function
   | Config_error e ->
@@ -103,6 +103,6 @@ let translate diagnostics =
     | `Ignore ->
         diags
     | `Print s ->
-        DIAGS.Acc.diag s diags ?loc:(diagnostic_loc d) "%a" pp_diagnostic d
+        DIAGS.Acc.diag s diags ~loc:(diagnostic_loc d) "%a" pp_diagnostic d
     (* | `Feature f -> *)
   end DIAGS.Set.none (List.rev diagnostics)
