@@ -67,7 +67,7 @@ module type MANAGER = sig
   val with_temporary_copy: f: ('a -> 'b) -> 'a -> 'b
 end
 
-(** Nanager module instantiation *)
+(** Manager module instantiation *)
 module New_manager: functor (Id: sig val name: string end) () -> MANAGER
 
 val debug_oc : out_channel option ref

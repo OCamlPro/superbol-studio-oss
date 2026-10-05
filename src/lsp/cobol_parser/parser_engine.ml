@@ -39,42 +39,7 @@ let benign_insertion: Grammar_recovery.insertion -> bool = function
   | Token PERIOD -> true
   | r -> empty_insertion r
 
-(* Main type definitions *)
-
-type 'x rewinder =
-  {
-    rewind_n_parse:
-      ?stop_before_eof:bool -> preprocessor_rewind -> position: position ->
-      ('x * ('x rewinder)) with_diags;
-    last_env_stage: inspectable_parser_state;
-    forget: unit -> unit; (* Don't use a rewinder after forget has been
-                            called. *)
-  }
-and preprocessor_rewind
-  = last_pp: (Cobol_preproc.preprocessor as 'r)
-  -> ?new_position: Lexing.position
-  -> 'r -> 'r
-and position =
-  | Lexing of Lexing.position
-  | Indexed of { line: int; char: int }                  (* all starting at 0 *)
-and inspectable_parser_state =
-  | Env:
-      'a Grammar_interpr.env                 (* always valid input_needed env. *)
-      -> inspectable_parser_state
-  | Sink
-
-type 'm simple_parsing
-  = options: parser_options
-  -> Cobol_preproc.preprocessor
-  -> (Cobol_ptree.compilation_group option, 'm) output with_diags
-
-type 'm rewindable_parsing
-  = options: parser_options
-  -> Cobol_preproc.preprocessor
-  -> (((Cobol_ptree.compilation_group option, 'm) output as 'x) *
-      'x rewinder) with_diags
-
-(* --- *)
+(** {1 Main type definitions} *)
 
 (** State of the parser.
 
@@ -114,6 +79,8 @@ and 'm persist =
     verbose: bool;
     show: [`Pending] list;
   }
+
+(* --- *)
 
 (** Initializes a parser state, given a preprocessor. *)
 let make_parser
@@ -550,6 +517,14 @@ and ('a, 'm) final_stage =
   'a option *
   inspectable_parser_state                                   (* last env seen *)
 
+and inspectable_parser_state =
+  | Env:
+      'a Grammar_interpr.env                 (* always valid input_needed env. *)
+      -> inspectable_parser_state
+  | Sink
+
+(* --- *)
+
 let rec normal ps tokens = function
   | Grammar_interpr.InputNeeded env ->
       Trans (ps, tokens, env)
@@ -642,11 +617,19 @@ let on_exn ps e =
 
 (* --- *)
 
+type _ grammar_entry =
+  | Compilation_group: Cobol_ptree.compilation_group grammar_entry
+
+let checkpoint (type a)
+  : a grammar_entry -> Lexing.position -> a Grammar_interpr.checkpoint = function
+  | Compilation_group ->
+      Grammar.Incremental.compilation_group
+
 (** [first_stage ps ~make_checkpoint] is the first stage for parsing a ['a] out
     of a parser in state [ps]. *)
-let first_stage (ps: 'm state) ~make_checkpoint : ('a, 'm) stage =
+let first_stage (ps: 'm state) ~grammar_entry : ('a, 'm) stage =
   let ps, tokens = produce_tokens ps in
-  normal ps tokens (make_checkpoint ps.preproc.persist.leftmost_limit)
+  normal ps tokens (checkpoint grammar_entry ps.preproc.persist.leftmost_limit)
 
 (** [full_parse stage] completes parsing from the given stage [stage]. *)
 let rec full_parse: ('a, 'm) stage -> 'a option * 'm state = function
@@ -672,19 +655,19 @@ let aggregate_output (type m) (ps: m state) res
       WithArtifacts (res, artifacts)
 
 (** Simple parsing *)
-let parse_once ~options (type m) ~(memory: m memory) ~make_checkpoint pp
+let parse_once ~options (type m) ~(memory: m memory) ~grammar_entry pp
   : (('a option, m) output) with_diags =
   let ps = make_parser options ~tokenizer_memory:memory pp in
-  let res, ps = full_parse @@ first_stage ~make_checkpoint ps in
+  let res, ps = full_parse @@ first_stage ~grammar_entry ps in
   Overlay_manager.forget ~file_of:ps.preproc.persist.leftmost_limit;
   OUT.with_diags (aggregate_output ps res) (all_diags ps)
 
 (* --- *)
 
-(* Rewindable parsing *)
+(** {2 Rewindable parsing} *)
 
 (** The state of a rewindable parser combines a current stage [stage], and a
-    store [store] that represent a rewindable history.  The initial state is
+    store [store] that represents a rewindable history.  The initial state is
     kept in case parsing needs to restart at the very beginning of the input. *)
 type ('a, 'm) rewindable_parsing_state =
   {
@@ -707,10 +690,28 @@ and ('a, 'm) rewindable_history_event =
 and ('a, 'm) interim_stage_without_tokens =
   'm state * 'a Grammar_interpr.env           (* Always valid input_needed env. *)
 
-let init_rewindable_parse ps ~make_checkpoint =
+(** The type of rewinders themselves. In addition to a rewindable parsing state,
+    they also need to retain the entrypoint to the grammar for cases of complete
+    rewind before the first recorded intermediate state. *)
+type ('a, 'm) rewinder =
+  {
+    rwps: ('a, 'm) rewindable_parsing_state;
+    grammar_entry: 'a grammar_entry;
+  }
+
+and preprocessor_rewind
+  = last_pp: (Cobol_preproc.preprocessor as 'r)
+  -> ?new_position: Lexing.position
+  -> 'r -> 'r
+
+and position =
+  | Lexing of Lexing.position
+  | Indexed of { line: int; char: int }                  (* all starting at 0 *)
+
+let init_rewindable_parse ps ~grammar_entry =
   {
     init = ps;
-    stage = first_stage ps ~make_checkpoint;
+    stage = first_stage ps ~grammar_entry;
     store = [];
   }
 
@@ -785,15 +786,11 @@ let find_history_event_preceding ~position ({ store; _ } as rwps) =
 
 (* --- *)
 
-let forget rwps () =
-  Overlay_manager.forget
-    ~file_of:rwps.init.preproc.persist.leftmost_limit
-
-let rec rewind_n_parse
-  : type m. ('a, m) rewindable_parsing_state -> make_checkpoint:_
-    -> ?stop_before_eof:bool -> preprocessor_rewind -> position: position
-    -> ((('a option, m) output as 'x) * 'x rewinder) with_diags =
-  fun rwps ~make_checkpoint ?stop_before_eof pp_rewind ~position ->
+let rewind_n_parse
+  : (('a, 'm) rewinder as 'rewinder)
+    -> ?stop_before_eof:bool -> preprocessor_rewind -> position:position
+    -> (('a option, 'm) output * 'rewinder) with_diags =
+  fun ({ rwps; grammar_entry }) ?stop_before_eof pp_rewind ~position ->
   let rwps =
     let last_pp = (rewindable_parser_state rwps).preproc.pp in
     try
@@ -809,79 +806,72 @@ let rec rewind_n_parse
       let pp = pp_rewind ~last_pp rwps.init.preproc.pp in
       let ps = { rwps.init with preproc = { rwps.init.preproc with pp } } in
       Overlay_manager.restart ~at:ps.prev_limit ();
-      init_rewindable_parse ~make_checkpoint ps
+      init_rewindable_parse ~grammar_entry ps
   in
   let res, rwps = parse_with_history ?stop_before_eof rwps in
   let ps = rewindable_parser_state rwps in
   let output = aggregate_output ps res in
-  let rewind_n_parse = rewind_n_parse rwps ~make_checkpoint
-  and last_env_stage = last_env_stage rwps
-  and forget = forget rwps in
-  OUT.with_diags (output, { rewind_n_parse; last_env_stage; forget })
-    (all_diags ps)
+  OUT.with_diags (output, { rwps; grammar_entry }) (all_diags ps)
 
 let rewindable_parse
-  : options:_ -> memory:'m memory -> make_checkpoint:_
+  : options: parser_options -> memory:'m memory -> grammar_entry:'a grammar_entry
     -> Cobol_preproc.preprocessor
-    -> ((('a option, 'm) output as 'x) * 'x rewinder) with_diags =
-  fun ~options ~memory ~make_checkpoint pp ->
+    -> (('a option, 'm) output * ('a, 'm) rewinder) with_diags =
+  fun ~options ~memory ~grammar_entry pp ->
   let res, rwps =
     make_parser options ~tokenizer_memory:memory pp |>
-    init_rewindable_parse ~make_checkpoint |>
+    init_rewindable_parse ~grammar_entry |>
     parse_with_history
   in
   let ps = rewindable_parser_state rwps in
   let output = aggregate_output ps res in
-  let rewind_n_parse = rewind_n_parse rwps ~make_checkpoint
-  and last_env_stage = last_env_stage rwps
-  and forget = forget rwps in
-  OUT.with_diags (output, { rewind_n_parse; last_env_stage; forget })
-    (all_diags ps)
+  OUT.with_diags (output, { rwps; grammar_entry }) (all_diags ps)
 
 (* --- *)
 
 (* Main exported functions *)
 
-let parse
-    (type m)
-    ~(memory: m memory)
-    ~(options: parser_options)
-  : Cobol_preproc.preprocessor ->
-    (Cobol_ptree.compilation_group option, m) output with_diags =
-  parse_once ~options ~memory
-    ~make_checkpoint:Grammar.Incremental.compilation_group
+(** General types for the interface *)
+
+type ('a, 'm) simple_parsing
+  = options: parser_options
+  -> Cobol_preproc.preprocessor
+  -> ('a option, 'm) output with_diags
+
+type ('a, 'm) rewindable_parsing
+  = options: parser_options
+  -> Cobol_preproc.preprocessor
+  -> (('a option, 'm) output * ('a, 'm) rewinder) with_diags
+
+let parse (type m) ~(memory: m memory)
+  : (Cobol_ptree.compilation_group, m) simple_parsing =
+  parse_once ~memory ~grammar_entry:Compilation_group
 
 let parse_simple = parse ~memory:Amnesic
 let parse_with_artifacts = parse ~memory:Eidetic
 
-let rewindable_parse
-    (type m)
-    ~(memory: m memory)
-    ~(options: parser_options)
-  : Cobol_preproc.preprocessor ->
-    (((Cobol_ptree.compilation_group option, m) output as 'x) * 'x rewinder)
-      with_diags =
-  rewindable_parse ~options ~memory
-    ~make_checkpoint:Grammar.Incremental.compilation_group
+let rewindable_parse (type m) ~(memory: m memory)
+  : (Cobol_ptree.compilation_group, m) rewindable_parsing =
+  rewindable_parse ~memory ~grammar_entry:Compilation_group
 
 let rewindable_parse_simple = rewindable_parse ~memory:Amnesic
 let rewindable_parse_with_artifacts = rewindable_parse ~memory:Eidetic
 
-let rewind_and_parse { rewind_n_parse; _ } rewind_preproc ~position =
-  rewind_n_parse rewind_preproc ~position
+let rewind_and_parse rewinder =
+  rewind_n_parse ~stop_before_eof:false rewinder
 
-let forget { forget; _ } =
-  forget ()
+let forget rewinder =
+  Overlay_manager.forget
+    ~file_of:rewinder.rwps.init.preproc.persist.leftmost_limit
 
 (* Rewinding for inspection *)
 
-let rewind_for_inspection { rewind_n_parse; _ } rewind_preproc
-    ~position ~inspect =
+let rewind_for_inspection rewinder rewind_preproc ~position ~inspect =
   Overlay_manager.with_temporary_copy ~f:begin fun () ->
-    let { result = _, { last_env_stage; _ }; _ } =
-      rewind_n_parse ~stop_before_eof:true rewind_preproc ~position
+    let { result = _, rewinder; _ } =
+      rewind_n_parse rewinder ~stop_before_eof:true rewind_preproc ~position
     in
-    inspect last_env_stage
+    inspect (last_env_stage rewinder.rwps)
   end ()
 
 (* Extracting artifacts *)

@@ -24,10 +24,50 @@ let message fmt =
           Printf.fprintf oc "OVERLAY: %s\n%!" s) fmt
 *)
 
-module TYPES = struct
-  type limit = Lexing.position
+(** Overlay limits (internal) *)
+module Limit = struct
+
+  type state = int
+  type manager = state ref
+
+  type t = Lexing.position
+
+  let new_manager () =
+    ref (-1)             (* Actually start at -2 (-1 is used in Lexing.dummy) *)
+
+  (** [make_virtual manager filename] makes a new vitrual limit that is unique
+      to the combination of [manager] and [filename]. In the result, [pos_lnum]
+      holds the pre-computed hash for the limit. *)
+  let make_virtual: manager -> string -> t = fun id pos_fname ->
+    decr id;
+    { Lexing.dummy_pos with pos_fname;
+                            pos_cnum = !id;
+                            pos_lnum = Hashtbl.hash !id }
+
+  let is_virtual (l: t) : bool =
+    l.pos_cnum < (-1)
+
+  let equal (l1: t) (l2: t) =
+    l1 == l2 ||
+    l1.pos_cnum == l2.pos_cnum &&
+    l1.pos_fname = l2.pos_fname
+
+  let hash (l: t) =
+    l.pos_lnum
+
+  (* l1 = l2, or l1 was emitted before l2 *)
+  let surely_predates (l1: t) (l2: t) =                          (* or equals *)
+    if l1.pos_cnum < (-1)
+    then l2.pos_cnum <= l1.pos_cnum
+    else l1.pos_cnum > 0 && l1.pos_cnum <= l2.pos_cnum &&
+         l1.pos_fname = l2.pos_fname
+
 end
-include TYPES
+type limit = Limit.t
+
+(** Weak hashtable where keys are overlay limits (internal) *)
+module WLnks = Ephemeron.K1.Make (Limit)
+module HLnks = Hashtbl.Make (Limit)
 
 module type MANAGER = sig
   type limit := limit
@@ -40,40 +80,6 @@ module type MANAGER = sig
   val with_temporary_copy: f: ('a -> 'b) -> 'a -> 'b
 end
 
-(** Overlay limits (internal) *)
-module Limit = struct
-
-  type t = limit
-
-  let make_virtual: unit -> t =
-    let id = ref (-1) in (* Actually start at -2 (-1 is used in Lexing.dummy) *)
-    fun () ->
-      decr id;
-      Lexing.{ dummy_pos with pos_cnum = !id }
-
-  let is_virtual (l: t) : bool =
-    l.pos_cnum < (-1)
-
-  let equal (l1: t) (l2: t) =
-    l1 == l2 ||
-    l1.pos_cnum == l2.pos_cnum  &&
-    l1.pos_fname = l2.pos_fname
-
-  let hash (l: limit) = l.pos_cnum
-
-  (* l1 = l2, or l1 was emitted before l2 *)
-  let surely_predates (l1: limit) (l2: limit) =                  (* or equals *)
-    if l1.pos_cnum < (-1)
-    then l2.pos_cnum <= l1.pos_cnum
-    else l1.pos_cnum > 0 && l1.pos_cnum <= l2.pos_cnum &&
-         l1.pos_fname = l2.pos_fname
-
-end
-
-(** Weak hashtable where keys are overlay limits (internal) *)
-module WLnks = Ephemeron.K1.Make (Limit)
-module HLnks = Hashtbl.Make (Limit)
-
 (** Managers for sequences of overlay token limits *)
 type manager =
   {
@@ -84,6 +90,7 @@ type manager =
                                         the left limit of the next *)
     cache: (srcloc * limit) WLnks.t;
     id: string;                (** manager identifier (for logging/debugging) *)
+    limit_manager: Limit.manager;
   }
 
 (** Manager initialization *)
@@ -96,6 +103,7 @@ let new_manager: string -> manager =
       over_right_gap = HLnks.create 42;
       cache = WLnks.create 42;
       id = Pretty.to_string "%s-%u" manager_name !id;
+      limit_manager = Limit.new_manager ();
     }
 
 (** Returns left and right (potentially fresh) limits for the given source
@@ -112,8 +120,9 @@ let limits: manager -> srcloc -> limit * limit = fun ctx loc ->
       WLnks.remove ctx.cache right;            (* same for `right` *)
       left, right
   | _ ->
-      let left = Limit.make_virtual () in
-      let right = Limit.make_virtual () in
+      let refloc = Cobol_common.Srcloc.start_pos loc in
+      let left = Limit.make_virtual ctx.limit_manager refloc.pos_fname in
+      let right = Limit.make_virtual ctx.limit_manager refloc.pos_fname in
       HLnks.add ctx.right_of left (loc, right);
       left, right
 
@@ -184,8 +193,8 @@ let join_limits: manager -> limit * limit -> srcloc = fun ctx (s, e) ->
   with Not_found ->
     join_failure (s, e)
 
-(* Recursively traverse and empty `right_of` and `over_right_gap` from the
-   given right limit, if given; empties the full context otherwise. *)
+(* Recursively traverse and empty `right_of` and `over_right_gap` from the given
+   left or right limit. *)
 let rec clear_right_of ctx left =
   match HLnks.find_opt ctx.right_of left with
   | Some (_, right) ->
@@ -205,8 +214,8 @@ let restart ?at ctx =
   | Some right ->
       clear_right_of ctx @@ HLnks.find ctx.over_right_gap right
   | None ->
-      HLnks.clear  ctx.right_of;
-      HLnks.clear  ctx.over_right_gap
+      HLnks.clear ctx.right_of;
+      HLnks.clear ctx.over_right_gap
 
 let forget ~file_of ctx =
   let filename = file_of.Lexing.pos_fname in

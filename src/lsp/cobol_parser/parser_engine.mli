@@ -35,21 +35,23 @@ open Parser_outputs
 (** {1 Basic (one-shot) parsing} *)
 
 (** Simple parsing functions traverse the inputs once to produce a result. *)
-type 'm simple_parsing
+type ('a, 'm) simple_parsing
   = options: parser_options
   -> Cobol_preproc.preprocessor
-  -> (Cobol_ptree.compilation_group option, 'm) output with_diags
+  -> ('a option, 'm) output with_diags
 
 (* val parse *)
 (*   : memory: 'm memory -> 'm simple_parsing *)
 
 (** Simple parsing function that does not return any artifact. *)
 val parse_simple
-  : Cobol_common.Behaviors.amnesic simple_parsing
+  : (Cobol_ptree.compilation_group,
+     Cobol_common.Behaviors.amnesic) simple_parsing
 
 (** Simple parsing function does return some artifacts. *)
 val parse_with_artifacts
-  : Cobol_common.Behaviors.eidetic simple_parsing
+  : (Cobol_ptree.compilation_group,
+     Cobol_common.Behaviors.eidetic) simple_parsing
 
 (** {1 Rewindable parsing} *)
 
@@ -57,14 +59,14 @@ val parse_with_artifacts
     functions, with the ability to {i rewind} the parser (and pre-processor)
     before a given lexing position.  To this end, their results include a
     {!rewinder} that may then be given to {!rewind_and_parse}. *)
-type 'm rewindable_parsing
+type ('a, 'm) rewindable_parsing
   = options: parser_options
   -> Cobol_preproc.preprocessor
-  -> (((Cobol_ptree.compilation_group option, 'm) output as 'x) * 'x rewinder)
-    with_diags
+  -> (('a option, 'm) output * ('a, 'm) rewinder) with_diags
 
-(** Rewinder for parsing functions that produce results of type ['x] *)
-and 'x rewinder
+(** Type of rewinders for parsing functions that produce results of type ['a],
+    with artifact memorization behavior ['m]. *)
+and ('a, 'm) rewinder
 
 (** Functions for rewinding the pre-processor.  Such a function should return a
     preprocessor in the {e exact same state} as the one given in (unlabelled)
@@ -79,21 +81,20 @@ and 'x rewinder
 
     If [new_position] is not given, the text should be read from the very
     beginning of the input. *)
-and preprocessor_rewind
+type preprocessor_rewind
   = last_pp: (Cobol_preproc.preprocessor as 'r)
   -> ?new_position:Lexing.position
   -> 'r -> 'r
 
-(* val rewindable_parse *)
-(*   : memory:'m memory -> 'm rewindable_parsing *)
-
 (** Rewindable parsing function that does not return any artifact. *)
 val rewindable_parse_simple
-  : Cobol_common.Behaviors.amnesic rewindable_parsing
+  : (Cobol_ptree.compilation_group,
+     Cobol_common.Behaviors.amnesic) rewindable_parsing
 
 (** Rewindable parsing function that does return some artifacts. *)
 val rewindable_parse_with_artifacts
-  : Cobol_common.Behaviors.eidetic rewindable_parsing
+  : (Cobol_ptree.compilation_group,
+     Cobol_common.Behaviors.eidetic) rewindable_parsing
 
 (** Specification of positions to rewind to. *)
 type position =
@@ -111,16 +112,15 @@ type position =
     [position], as the parser typically needs to rewind earlier than
     [position]. *)
 val rewind_and_parse
-  : 'x rewinder
+  : (Cobol_ptree.compilation_group as 'a, 'm) rewinder
   -> preprocessor_rewind
   -> position: position
-  -> (((Cobol_ptree.compilation_group option, 'm) output as 'x) * 'x rewinder)
-    with_diags
+  -> (('a option, 'm) output * ('a, 'm) rewinder) with_diags
 
 (** [forget rewinder] unloads internal structures that are necessary for the
     given rewinder.  Feeding [rewinder] to {!rewind_and_parse} or
     {!rewind_for_inspection} aftwerward is an unforgivable error. *)
-val forget: 'x rewinder -> unit
+val forget: _ rewinder -> unit
 
 (** {1 Rewinding for inspection} *)
 
@@ -132,7 +132,7 @@ type inspectable_parser_state =
 
 (** Note: given parser state should not escapre [inspect]. *)
 val rewind_for_inspection
-  : 'x rewinder
+  : _ rewinder
   -> preprocessor_rewind
   -> position: position
   -> inspect: (inspectable_parser_state -> 'a) -> 'a
