@@ -224,9 +224,9 @@ let error_loc = function
   | Unexpected_redefinition_level { redef_level = { loc; _ }; _ }
   | Unexpected_redefinition_name { redef_redefines = { loc; _ }; _ }
   | Unexpected_table_value_clause { value_loc = loc; _ } ->
-      Some loc
+      loc
   | Data_literal_error e ->
-      Some (Cobol_data.Error.loc e)
+      Cobol_data.Error.loc e
 
 let warning_loc = function
   | Duplicate_clause { second_loc = loc; _ }
@@ -235,7 +235,7 @@ let warning_loc = function
   | Mismatching_usage_in_group { item_usage = { loc; _ }; _ }
   | Redefinition_of_table_item { redef_loc = loc; _ }
   | Unsupported_usage { usage = { loc; _ } } ->
-      Some loc
+      loc
 
 let pp_data_name'_opt
   : Cobol_ptree.data_name with_loc option Pretty.printer

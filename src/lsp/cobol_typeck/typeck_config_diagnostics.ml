@@ -19,7 +19,7 @@ type error =
 
 let error_loc = function
   | Invalid_picture_symbol { loc; _ } ->
-      Some loc
+      loc
 
 let pp_error ppf = function
   | Invalid_picture_symbol s ->

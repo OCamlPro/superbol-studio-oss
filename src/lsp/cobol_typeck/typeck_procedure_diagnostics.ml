@@ -45,7 +45,7 @@ let error_loc = function
   | Ambiguous_proc_name { given_qualname = { loc; _ }; _ }
   | Invalid_proc_arg_storage { arg_name = { loc; _ }; _ }
   | Procedure_arg_record_not_found { arg_name = { loc; _ } } ->
-      Some loc
+      loc
 
 let pp_qualname_ambiguity ~kind ppf { given_qualname; matching_qualnames } =
   Pretty.print ppf "Ambiguous@ %s@ '%a';@ known@ matching@ names@ are@ %a"
