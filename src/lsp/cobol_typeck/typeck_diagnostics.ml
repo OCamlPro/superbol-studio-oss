@@ -18,7 +18,7 @@ module LIST = Cobol_common.Basics.LIST
 
 (** more general diagnostics *)
 type diagnostic =
-  | Config_error of Typeck_config_diagnostics.error
+  | Env_error of Typeck_env_diagnostics.error
   | Data_error of Typeck_data_diagnostics.error
   | Data_warning of Typeck_data_diagnostics.warning
   | Proc_error of Typeck_procedure_diagnostics.error
@@ -34,7 +34,7 @@ let none: diagnostics = []
 let union d1 d2 = LIST.append ~loc:__LOC__ d2 d1
 
 let diagnostic_severity = function
-  | Config_error _
+  | Env_error _
   | Data_error _
   | Proc_error _ ->
       `Print DIAGS.Error
@@ -45,8 +45,8 @@ let diagnostic_severity = function
       `Ignore
 
 let diagnostic_loc = function
-  | Config_error e ->
-      Typeck_config_diagnostics.error_loc e
+  | Env_error e ->
+      Typeck_env_diagnostics.error_loc e
   | Data_error e ->
       Typeck_data_diagnostics.error_loc e
   | Data_warning w ->
@@ -57,8 +57,8 @@ let diagnostic_loc = function
       loc
 
 let pp_diagnostic ppf = function
-  | Config_error e ->
-      Typeck_config_diagnostics.pp_error ppf e
+  | Env_error e ->
+      Typeck_env_diagnostics.pp_error ppf e
   | Data_error e ->
       Typeck_data_diagnostics.pp_error ppf e
   | Data_warning w ->
@@ -70,7 +70,7 @@ let pp_diagnostic ppf = function
 
 let has_errors: diagnostics -> bool =
   List.exists begin function
-    | Config_error _
+    | Env_error _
     | Data_error _
     | Proc_error _ -> true
     | Data_warning _
@@ -79,7 +79,7 @@ let has_errors: diagnostics -> bool =
 
 let count_errors: diagnostics -> int =
   List.fold_left begin fun acc -> function
-    | Config_error _
+    | Env_error _
     | Data_error _
     | Proc_error _ -> succ acc
     | Data_warning _
@@ -88,7 +88,7 @@ let count_errors: diagnostics -> int =
 
 let count_warnings: diagnostics -> int =
   List.fold_left begin fun acc -> function
-    | Config_error _
+    | Env_error _
     | Data_error _
     | Proc_error _ -> acc
     | Data_warning _

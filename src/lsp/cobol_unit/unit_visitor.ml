@@ -26,6 +26,7 @@ class ['a] folder = object
   method fold_cobol_unit: (cobol_unit, 'a) fold = default
   method fold_cobol_unit': (cobol_unit with_loc, 'a) fold = default
   method fold_unit_config: (unit_config, 'a) fold = default
+  method fold_unit_env: (unit_env, 'a) fold = default
   method fold_data_definitions: (data_definitions, 'a) fold = default
   method fold_procedure_section: (procedure_section, 'a) fold = default
   method fold_procedure_section': (procedure_section with_loc, 'a) fold = default
@@ -107,13 +108,19 @@ let fold_procedure (v: _ #folder) =
       >> fold_list v ~fold:fold_procedure_block procedure_blocks.list
     end
 
+let fold_unit_env (v: _ #folder) =
+  handle v#fold_unit_env
+    ~continue:begin fun { env_config } x ->
+      fold_unit_config v env_config x
+    end
+
 let fold_cobol_unit (v: _ #folder) =
   handle v#fold_cobol_unit
-    ~continue:begin fun { unit_name; unit_parent_name; unit_config;
+    ~continue:begin fun { unit_name; unit_parent_name; unit_env;
                           unit_data; unit_procedure } x -> x
       >> fold_string' v unit_name
       >> fold_string'_opt v unit_parent_name
-      >> fold_unit_config v unit_config
+      >> fold_unit_env v unit_env
       >> fold_data_definitions v unit_data
       >> fold_procedure v unit_procedure
     end

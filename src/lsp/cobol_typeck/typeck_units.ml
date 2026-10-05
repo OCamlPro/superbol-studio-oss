@@ -22,7 +22,7 @@ module CUMap = Cobol_unit.Collections.MAP
 type acc =
   {
     parent_name: string with_loc option;
-    parent_config: unit_config option;
+    parent_env: unit_env option;
     cus: CUs.t;                                                    (* = group *)
     artifacts: Typeck_outputs.artifacts;
     diags: Typeck_diagnostics.diagnostics;
@@ -31,15 +31,10 @@ type acc =
 let init =
   {
     parent_name = None;
-    parent_config = None;
+    parent_env = None;
     cus = CUs.empty;
     artifacts = Typeck_outputs.no_artifacts;
     diags = Typeck_diagnostics.none;
-    (* unit_config = *)
-    (*   { *)
-    (*     unit_currency_signs = Cobol_common.Basics.CharSet.singleton '$'; *)
-    (*     unit_decimal_point = ','; *)
-    (*   } *)
   }
 
 let result ptree acc =
@@ -51,16 +46,16 @@ let result ptree acc =
     }
     acc.diags
 
-let build_units ~fold_exec_block' _config = object
+let build_units ~fold_exec_block' ~(options: Typeck_config.options) = object
   inherit [acc] Cobol_ptree.Visitor.folder
 
-  method! fold_compilation_unit' cu ({ parent_name; parent_config; _ } as acc) =
+  method! fold_compilation_unit' cu ({ parent_name; parent_env; _ } as acc) =
 
-    let unit_config, unit_config_diags
-      = Typeck_config.of_compilation_unit ?parent_config cu in
+    let unit_env, unit_env_diags
+      = Typeck_env.of_compilation_unit ~options ?parent_env cu in
 
     let unit_data, unit_data_diags
-      = Typeck_data_items.of_compilation_unit unit_config cu in
+      = Typeck_data_items.of_compilation_unit ~options unit_env cu in
 
     let unit_procedure, unit_procedure_diags
       = Typeck_procedure.of_compilation_unit cu
@@ -72,7 +67,7 @@ let build_units ~fold_exec_block' _config = object
       {
         unit_name = Cobol_ptree.name_of_compilation_unit ~&cu;
         unit_parent_name = parent_name;
-        unit_config;
+        unit_env;
         unit_data = unit_data.definitions;
         unit_procedure = unit_procedure.procedure;
       } &@<- cu
@@ -89,11 +84,11 @@ let build_units ~fold_exec_block' _config = object
     let acc =
       {
         parent_name = Some ~&unit.unit_name;
-        parent_config = Some unit_config;
+        parent_env = Some unit_env;
         cus = CUs.add unit acc.cus;
         artifacts = { references };
         diags =
-          Typeck_diagnostics.(union unit_config_diags @@
+          Typeck_diagnostics.(union unit_env_diags @@
                               union unit_data_diags   @@ unit_procedure_diags);
       }
     in
@@ -101,7 +96,7 @@ let build_units ~fold_exec_block' _config = object
     (* Proceed with nested progs, if any, and then restore parent's name and
        config: *)
     Visitor.do_children_and_then acc
-      (fun acc -> { acc with parent_name; parent_config })
+      (fun acc -> { acc with parent_name; parent_env })
 
   (* skip some divisions/sections/paragraphs *)
   method! fold_informational_paragraphs _ = Visitor.skip
@@ -115,11 +110,11 @@ end
 (** This function builds the internal representation of full compilation
     groups. *)
 let of_compilation_group
-  : Cobol_config.t ->
+  : options:Typeck_config.options ->
     fold_exec_block':Typeck_outputs.exec_block_folder ->
     Cobol_ptree.compilation_group ->
     Typeck_outputs.t Typeck_results.with_diags =
-  fun config ~fold_exec_block' compilation_group_ptree ->
+  fun ~options ~fold_exec_block' compilation_group_ptree ->
   Cobol_ptree.Visitor.fold_compilation_group
-    (build_units ~fold_exec_block' config) compilation_group_ptree init |>
+    (build_units ~fold_exec_block' ~options) compilation_group_ptree init |>
   result compilation_group_ptree

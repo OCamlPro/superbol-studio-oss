@@ -11,6 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Config = Typeck_config
 module Outputs = Typeck_outputs
 module Diagnostics = Typeck_diagnostics
 module Results = Typeck_results

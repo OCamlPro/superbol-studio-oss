@@ -13,12 +13,14 @@
 
 (** Type-checking and validation of COBOL compilation groups *)
 
-let compilation_group (type m) : ?config: _
-  -> fold_exec_block': Typeck_outputs.exec_block_folder
-  -> m Cobol_parser.Outputs.parsed_compilation_group
-  -> _ = fun ?(config = Cobol_config.default) ~fold_exec_block' ->
+let compilation_group (type m)
+  : options:Typeck_config.options
+    -> fold_exec_block': Typeck_outputs.exec_block_folder
+    -> m Cobol_parser.Outputs.parsed_compilation_group
+    -> Typeck_outputs.t Typeck_results.with_diags =
+  fun ~options ~fold_exec_block' ->
   function
   | Only None | WithArtifacts (None, _) ->
       Typeck_results.simple_result Typeck_outputs.none
   | Only Some cg | WithArtifacts (Some cg, _) ->
-      Typeck_units.of_compilation_group config ~fold_exec_block' cg
+      Typeck_units.of_compilation_group ~options ~fold_exec_block' cg
