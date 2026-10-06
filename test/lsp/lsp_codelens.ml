@@ -275,3 +275,53 @@ let%expect_test "codelens-78-level-in-copybook-with-replacement" =
        8          PROCEDURE DIVISION.
        9             DISPLAY C
     1 reference |}];;
+
+let%expect_test "codelens-preproc-directives" =
+  let end_with_postproc = codelens {cobol|
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       >>DEFINE X AS 1
+       >>DEFINE B AS b'10'
+       >>IF B
+       77 WS VALUE "OK".
+       >>ELSE
+       77 WS VALUE "KO".
+       >>END-IF
+       >>IF X = 1
+       >>END-IF
+       PROCEDURE DIVISION.
+          DISPLAY WS
+          STOP RUN.
+    |cobol} in
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    __rootdir__/prog.cob:6.16:
+       3          PROGRAM-ID. prog.
+       4          DATA DIVISION.
+       5          WORKING-STORAGE SECTION.
+       6 >        >>DEFINE X AS 1
+    ----                   ^
+       7          >>DEFINE B AS b'10'
+       8          >>IF B
+    1 reference
+    __rootdir__/prog.cob:7.16:
+       4          DATA DIVISION.
+       5          WORKING-STORAGE SECTION.
+       6          >>DEFINE X AS 1
+       7 >        >>DEFINE B AS b'10'
+    ----                   ^
+       8          >>IF B
+       9          77 WS VALUE "OK".
+    1 reference
+    __rootdir__/prog.cob:9.10:
+       6          >>DEFINE X AS 1
+       7          >>DEFINE B AS b'10'
+       8          >>IF B
+       9 >        77 WS VALUE "OK".
+    ----             ^
+      10          >>ELSE
+      11          77 WS VALUE "KO".
+    1 reference |}];;
