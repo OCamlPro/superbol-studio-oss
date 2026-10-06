@@ -113,9 +113,12 @@ let compare_semtoks first second =
   then first.start - second.start
   else first.line - second.line
 
+let compare_rev_semtoks a b =
+  - compare_semtoks a b
+
 let acc_semtok ?(merge = false) s acc = match s with
   | None -> acc
-  | Some s when merge -> List.merge (fun a b -> - compare_semtoks a b) [s] acc
+  | Some s when merge -> LIST.tail_merge compare_rev_semtoks [s] acc
   | Some s -> s :: acc
 
 let single_line_lexlocs_in ~filename =
@@ -128,12 +131,10 @@ let acc_semtoks ?merge ~filename ?range ?tokmods toktyp loc acc =
   end acc @@ single_line_lexlocs_in ~filename loc
 
 type token_category =
-  | ProgramName
   | ParagraphName
   | ProcName
   | Parameter
   | DataDecl
-  | DataLevel
   | Var
   | VarModif
   | ReportName
@@ -155,12 +156,10 @@ let semtoks_from_ptree ~filename ?range ptree =
 
   let acc_semtoks category loc acc =
     let toktyp, tokmods = match category with
-      | ProgramName -> TOKTYP.string, TOKMOD.(union [definition; readonly])
       | ParagraphName -> TOKTYP.function_, TOKMOD.(one definition)
       | ProcName -> TOKTYP.function_, TOKMOD.none
       | Parameter -> TOKTYP.parameter, TOKMOD.none
       | DataDecl -> TOKTYP.variable, TOKMOD.(one declaration)
-      | DataLevel -> TOKTYP.decorator, TOKMOD.none
       | Var -> TOKTYP.variable, TOKMOD.none
       | VarModif -> TOKTYP.variable, TOKMOD.(one modification)
       | ReportName
@@ -202,20 +201,8 @@ let semtoks_from_ptree ~filename ?range ptree =
     inherit [semtok List.t] Cobol_ptree.Visitor.folder
 
     (* program-name *)
-    method! fold_program_unit {program_name; _} acc = acc
-      |> add_name' program_name ProgramName
-      |> Visitor.do_children
-    (* we call do_children, so we must ensure that
-       the fold_name' does nothing,
-       otherwise, there will be token overlap.
-
-       Or we can override this method fold_program_unit to explicitly
-       fold its every child and return Visitor.skip_children x.
-       But by doing that for every method(which we need to override),
-       we have to write a great amount of code... like rewriting
-       the code of Cobol_ast.
-
-    *)
+    method! fold_program_name' _ acc =
+      Visitor.skip_children acc                 (* left to textmate grammar *)
 
     (*TODO: File/Report section*)
 
@@ -262,10 +249,8 @@ let semtoks_from_ptree ~filename ?range ptree =
     (*       Visitor.skip_children acc (\*Not implmented*\) *)
 
     (* data-level *)
-    (* TODO: condition_name ??*)
-    method! fold_data_level' dl acc = acc
-      |> add_name' dl DataLevel
-      |> Visitor.skip_children
+    method! fold_data_level' _dl acc =
+        Visitor.skip_children acc                 (* left to textmate grammar *)
 
     (* paragraph name *)
     method! fold_paragraph { paragraph_name; paragraph_is_section;
@@ -282,7 +267,6 @@ let semtoks_from_ptree ~filename ?range ptree =
                                               by_reference_arg_optional } acc =
       acc
       |> add_name' by_reference_arg_name Parameter
-      (*|> Visitor.do_children*)
       |> fold_bool self by_reference_arg_optional
       |> Visitor.skip_children
 
@@ -293,8 +277,7 @@ let semtoks_from_ptree ~filename ?range ptree =
 
     (* inline call of function *)
     method! fold_inline_call c x = match c with
-      | CallFunc { func; args } -> x
-          |> add_name' func ProcName
+      | CallFunc { args; _ } -> x
           |> fold_list ~fold:fold_effective_arg self args
           |> Visitor.skip_children
       | CallTrim { arg; tip } -> x
@@ -363,6 +346,12 @@ let semtoks_from_ptree ~filename ?range ptree =
       |> fold_rounding self rounded_rounding
       |> Visitor.skip_children
 
+    (* The parse-tree does not allow us to distinguish between DIVIDE … INTO …
+       and DIVITE … BY … forms, for which the order of operands is reversed. So
+       we sort the semantic tokens manually aftwerwards: *)
+    method! fold_divide_operands _ acc =
+      Visitor.do_children_and_then acc (List.sort compare_rev_semtoks)
+
     method! fold_delete' {payload = { delete_targets; delete_retry;
                                       delete_on_invalid_key }; _} acc = acc
       |> add_name' delete_targets FileName
@@ -388,6 +377,7 @@ let semtoks_from_ptree ~filename ?range ptree =
       |> add_qualname' ~&g VarModif
       |> Visitor.skip_children
 
+    (* procedure-name: section/paragraph name *)
     method! fold_procedure_name name acc = acc
       |> add_qualname name ProcName
       |> Visitor.skip_children

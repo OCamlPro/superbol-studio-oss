@@ -21,7 +21,7 @@ open Proc_division
 
 type program_unit =
   {
-    program_name: name_or_literal with_loc;
+    program_name: program_name with_loc;
     program_as: strlit option;
     program_level: program_level;
     program_options: options_paragraph with_loc option;
@@ -30,6 +30,8 @@ type program_unit =
     program_proc: procedure_division with_loc option;
     program_end_name: name_or_literal with_loc option
   }
+
+and program_name = name_or_literal
 
 and program_level =
   | ProgramDefinition of
@@ -62,6 +64,8 @@ let pp_program_kind ppf = function
       Fmt.pf ppf "INITIAL"
   | Recursive ->
       Fmt.pf ppf "RECURSIVE"
+
+let pp_program_name = pp_name_or_literal
 
 let pp_program_mode ppf { prog_is_common;
                           prog_kind } =
@@ -96,7 +100,7 @@ let rec pp_program_unit ppf { program_name;
   if has_identification_division_header then
     Fmt.pf ppf "@[IDENTIFICATION@ DIVISION@].@\n";
   Fmt.(option pp_informational_paragraphs) ppf preliminary_info;
-  Fmt.pf ppf "@[PROGRAM-ID.@ %a" (pp_with_loc pp_name_or_literal) program_name;
+  Fmt.pf ppf "@[PROGRAM-ID.@ %a" (pp_with_loc pp_program_name) program_name;
   Fmt.(option (any "@ AS " ++ pp_strlit)) ppf program_as;
   Fmt.(option (option (sp ++ pp_program_mode))
          ~none:(any "@ PROTOTYPE")) ppf mode;
