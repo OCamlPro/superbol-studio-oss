@@ -1,8 +1,8 @@
 Considering: import/gnucobol/tests/testsuite.src/data_display.at:64:0
-Considering: import/gnucobol/tests/testsuite.src/data_display.at:121:0
-Considering: import/gnucobol/tests/testsuite.src/data_display.at:167:0
-Considering: import/gnucobol/tests/testsuite.src/data_display.at:205:0
-data_display.at-205-prog.cob:11.24-11.38:
+Considering: import/gnucobol/tests/testsuite.src/data_display.at:122:0
+Considering: import/gnucobol/tests/testsuite.src/data_display.at:168:0
+Considering: import/gnucobol/tests/testsuite.src/data_display.at:207:0
+data_display.at-207-prog.cob:11.24-11.38:
    8          01 X-BIU         BINARY-INT    UNSIGNED.
    9          01 X-BLU         BINARY-LONG   UNSIGNED.
   10          01 X-BDU         BINARY-DOUBLE UNSIGNED.
@@ -12,7 +12,7 @@ data_display.at-205-prog.cob:11.24-11.38:
   13          PROCEDURE        DIVISION.
 >> Error: Invalid syntax
 
-data_display.at-205-prog.cob:12.24-12.36:
+data_display.at-207-prog.cob:12.24-12.36:
    9          01 X-BLU         BINARY-LONG   UNSIGNED.
   10          01 X-BDU         BINARY-DOUBLE UNSIGNED.
   11          01 X-US          UNSIGNED-SHORT.
@@ -22,10 +22,10 @@ data_display.at-205-prog.cob:12.24-12.36:
   14              MOVE 127 TO X-BCU.               DISPLAY X-BCU END-DISPLAY.
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/data_display.at:402:0
-Considering: import/gnucobol/tests/testsuite.src/data_display.at:462:0
-Considering: import/gnucobol/tests/testsuite.src/data_display.at:527:0
-Considering: import/gnucobol/tests/testsuite.src/data_display.at:8730:0
-Considering: import/gnucobol/tests/testsuite.src/data_display.at:16934:0
-Considering: import/gnucobol/tests/testsuite.src/data_display.at:22976:0
-Considering: import/gnucobol/tests/testsuite.src/data_display.at:29024:0
+Considering: import/gnucobol/tests/testsuite.src/data_display.at:404:0
+Considering: import/gnucobol/tests/testsuite.src/data_display.at:464:0
+Considering: import/gnucobol/tests/testsuite.src/data_display.at:529:0
+Considering: import/gnucobol/tests/testsuite.src/data_display.at:8732:0
+Considering: import/gnucobol/tests/testsuite.src/data_display.at:16936:0
+Considering: import/gnucobol/tests/testsuite.src/data_display.at:22978:0
+Considering: import/gnucobol/tests/testsuite.src/data_display.at:29026:0

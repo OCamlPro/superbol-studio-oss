@@ -1,9 +1,9 @@
-Considering: import/gnucobol/tests/testsuite.src/listings.at:75:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:98:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:127:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:169:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:232:0
-listings.at-232-prog.cob:13.34-13.40:
+Considering: import/gnucobol/tests/testsuite.src/listings.at:78:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:100:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:129:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:171:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:234:0
+listings.at-234-prog.cob:13.34-13.40:
   10            3 ZZ           PIC X(2) VALUE "ZZ".
   11            3 Y            PIC X(1) VALUE "Y".
   12          PROCEDURE        DIVISION.
@@ -13,8 +13,8 @@ listings.at-232-prog.cob:13.34-13.40:
   15                      LEADING "Y" BY "X".
 >> Error: Malformed REPLACE statement
 
-Considering: import/gnucobol/tests/testsuite.src/listings.at:289:0
-listings.at-289-prog.cob:7.7-8.70:
+Considering: import/gnucobol/tests/testsuite.src/listings.at:291:0
+listings.at-291-prog.cob:7.7-8.70:
    4          DATA             DIVISION.
    5          WORKING-STORAGE  SECTION.
    6          01 GET-VALUE.
@@ -28,8 +28,8 @@ listings.at-289-prog.cob:7.7-8.70:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-Considering: import/gnucobol/tests/testsuite.src/listings.at:349:0
-listings.at-349-prog.cob:7.7-12.48:
+Considering: import/gnucobol/tests/testsuite.src/listings.at:351:0
+listings.at-351-prog.cob:7.7-12.48:
    4          DATA             DIVISION.
    5          WORKING-STORAGE  SECTION.
    6          01 GET-VALUE.
@@ -51,8 +51,8 @@ listings.at-349-prog.cob:7.7-12.48:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-Considering: import/gnucobol/tests/testsuite.src/listings.at:413:0
-listings.at-413-prog2.cob:7.7-12.55:
+Considering: import/gnucobol/tests/testsuite.src/listings.at:415:0
+listings.at-415-prog2.cob:7.7-12.55:
    4          DATA DIVISION.
    5          WORKING-STORAGE SECTION.
    6          01 GET-VALUE.
@@ -74,8 +74,8 @@ listings.at-413-prog2.cob:7.7-12.55:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-Considering: import/gnucobol/tests/testsuite.src/listings.at:477:0
-listings.at-477-prog3.cob:7.7-12.55:
+Considering: import/gnucobol/tests/testsuite.src/listings.at:479:0
+listings.at-479-prog3.cob:7.7-12.55:
    4          DATA DIVISION.
    5          WORKING-STORAGE SECTION.
    6          01 GET-VALUE.
@@ -97,8 +97,8 @@ listings.at-477-prog3.cob:7.7-12.55:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-Considering: import/gnucobol/tests/testsuite.src/listings.at:538:0
-listings.at-538-prog.cob:6.7-8.53:
+Considering: import/gnucobol/tests/testsuite.src/listings.at:540:0
+listings.at-540-prog.cob:6.7-8.53:
    3          PROGRAM-ID.      prog.
    4          DATA             DIVISION.
    5          WORKING-STORAGE  SECTION.
@@ -114,8 +114,8 @@ listings.at-538-prog.cob:6.7-8.53:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-Considering: import/gnucobol/tests/testsuite.src/listings.at:631:0
-listings.at-631-prog.cob:6.7-10.55:
+Considering: import/gnucobol/tests/testsuite.src/listings.at:633:0
+listings.at-633-prog.cob:6.7-10.55:
    3          PROGRAM-ID.      prog.                                            PROG002
    4          DATA             DIVISION.                                        PROG003
    5          WORKING-STORAGE  SECTION.                                         PROG004
@@ -135,8 +135,8 @@ listings.at-631-prog.cob:6.7-10.55:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-Considering: import/gnucobol/tests/testsuite.src/listings.at:691:0
-listings.at-691-prog.cob:6.7-8.44:
+Considering: import/gnucobol/tests/testsuite.src/listings.at:693:0
+listings.at-693-prog.cob:6.7-8.44:
    3          PROGRAM-ID.      prog.
    4          DATA             DIVISION.
    5          WORKING-STORAGE  SECTION.
@@ -152,8 +152,8 @@ listings.at-691-prog.cob:6.7-8.44:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-Considering: import/gnucobol/tests/testsuite.src/listings.at:774:0
-listings.at-774-prog1.cob:11.10-13.52:
+Considering: import/gnucobol/tests/testsuite.src/listings.at:776:0
+listings.at-776-prog1.cob:11.10-13.52:
    8   
    9          01 xx                   pic x(02).
   10   
@@ -169,7 +169,7 @@ listings.at-774-prog1.cob:11.10-13.52:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-listings.at-774-prog1.cob:15.10-17.52:
+listings.at-776-prog1.cob:15.10-17.52:
   12                                        'yy1-' by a11-
   13                                        'yy2-' by a12-.
   14   
@@ -185,7 +185,7 @@ listings.at-774-prog1.cob:15.10-17.52:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-listings.at-774-prog1.cob:19.10-21.52:
+listings.at-776-prog1.cob:19.10-21.52:
   16                                        'yy1-' by a21-
   17                                        'yy2-' by a22-.
   18   
@@ -201,8 +201,8 @@ listings.at-774-prog1.cob:19.10-21.52:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-Considering: import/gnucobol/tests/testsuite.src/listings.at:893:0
-listings.at-893-prog.cob:6.7-8.53:
+Considering: import/gnucobol/tests/testsuite.src/listings.at:895:0
+listings.at-895-prog.cob:6.7-8.53:
    3          PROGRAM-ID.      prog.
    4          DATA             DIVISION.
    5          WORKING-STORAGE  SECTION.
@@ -218,8 +218,8 @@ listings.at-893-prog.cob:6.7-8.53:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-Considering: import/gnucobol/tests/testsuite.src/listings.at:957:0
-listings.at-957-prog.cob:6.7-8.54:
+Considering: import/gnucobol/tests/testsuite.src/listings.at:959:0
+listings.at-959-prog.cob:6.7-8.54:
    3          PROGRAM-ID.      prog.
    4          DATA             DIVISION.
    5          WORKING-STORAGE  SECTION.
@@ -235,8 +235,8 @@ listings.at-957-prog.cob:6.7-8.54:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-Considering: import/gnucobol/tests/testsuite.src/listings.at:1020:0
-listings.at-1020-prog.cob:6.7-7.50:
+Considering: import/gnucobol/tests/testsuite.src/listings.at:1022:0
+listings.at-1022-prog.cob:6.7-7.50:
    3          PROGRAM-ID.      prog.
    4          DATA             DIVISION.
    5          WORKING-STORAGE  SECTION.
@@ -250,8 +250,8 @@ listings.at-1020-prog.cob:6.7-7.50:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-Considering: import/gnucobol/tests/testsuite.src/listings.at:1146:0
-listings.at-1146-tstcpybk.cob:13.11-13.32:
+Considering: import/gnucobol/tests/testsuite.src/listings.at:1148:0
+listings.at-1148-tstcpybk.cob:13.11-13.32:
   10   
   11          INPUT-OUTPUT SECTION.
   12          FILE-CONTROL.
@@ -263,7 +263,7 @@ listings.at-1146-tstcpybk.cob:13.11-13.32:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-listings.at-1146-tstcpybk.cob:14.11-14.32:
+listings.at-1148-tstcpybk.cob:14.11-14.32:
   11          INPUT-OUTPUT SECTION.
   12          FILE-CONTROL.
   13              COPY "copy-sl-1.inc".
@@ -275,7 +275,7 @@ listings.at-1146-tstcpybk.cob:14.11-14.32:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-listings.at-1146-tstcpybk.cob:18.11-18.32:
+listings.at-1148-tstcpybk.cob:18.11-18.32:
   15   
   16          DATA DIVISION.
   17          FILE SECTION.
@@ -287,7 +287,7 @@ listings.at-1146-tstcpybk.cob:18.11-18.32:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-listings.at-1146-tstcpybk.cob:19.11-19.32:
+listings.at-1148-tstcpybk.cob:19.11-19.32:
   16          DATA DIVISION.
   17          FILE SECTION.
   18              COPY "copy-fd-1.inc".
@@ -299,7 +299,7 @@ listings.at-1146-tstcpybk.cob:19.11-19.32:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-listings.at-1146-tstcpybk.cob:30.11-30.32:
+listings.at-1148-tstcpybk.cob:30.11-30.32:
   27         *
   28          77  GLOB              PIC 99         GLOBAL.
   29         *
@@ -311,7 +311,7 @@ listings.at-1146-tstcpybk.cob:30.11-30.32:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-listings.at-1146-tstcpybk.cob:31.11-31.32:
+listings.at-1148-tstcpybk.cob:31.11-31.32:
   28          77  GLOB              PIC 99         GLOBAL.
   29         *
   30              COPY "copy-ws-1.inc".
@@ -323,8 +323,8 @@ listings.at-1146-tstcpybk.cob:31.11-31.32:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-Considering: import/gnucobol/tests/testsuite.src/listings.at:1394:0
-listings.at-1394-prog.cob:4.7-4.23:
+Considering: import/gnucobol/tests/testsuite.src/listings.at:1396:0
+listings.at-1396-prog.cob:4.7-4.23:
    1   
    2          IDENTIFICATION   DIVISION.
    3          PROGRAM-ID.      prog.
@@ -336,14 +336,14 @@ listings.at-1394-prog.cob:4.7-4.23:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-Considering: import/gnucobol/tests/testsuite.src/listings.at:1613:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:1613:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:1711:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:1778:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:2029:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:2029:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:2055:0
-listings.at-2055-prog.cob:9.11-9.14:
+Considering: import/gnucobol/tests/testsuite.src/listings.at:1698:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:1698:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:1796:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:1863:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:2114:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:2114:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:2140:0
+listings.at-2140-prog.cob:9.11-9.14:
    6          01 PAR-IN        PIC 9.
    7          01 PAR-OUT       PIC 9.
    8          PROCEDURE DIVISION USING PAR-IN RETURNING PAR-OUT.
@@ -353,7 +353,7 @@ listings.at-2055-prog.cob:9.11-9.14:
   11          END FUNCTION WITHPAR.
 >> Error: Invalid syntax
 
-listings.at-2055-prog.cob:9.16:
+listings.at-2140-prog.cob:9.16:
    6          01 PAR-IN        PIC 9.
    7          01 PAR-OUT       PIC 9.
    8          PROCEDURE DIVISION USING PAR-IN RETURNING PAR-OUT.
@@ -363,7 +363,7 @@ listings.at-2055-prog.cob:9.16:
   11          END FUNCTION WITHPAR.
 >> Hint: Missing .
 
-listings.at-2055-prog.cob:9.17-9.19:
+listings.at-2140-prog.cob:9.17-9.19:
    6          01 PAR-IN        PIC 9.
    7          01 PAR-OUT       PIC 9.
    8          PROCEDURE DIVISION USING PAR-IN RETURNING PAR-OUT.
@@ -373,7 +373,7 @@ listings.at-2055-prog.cob:9.17-9.19:
   11          END FUNCTION WITHPAR.
 >> Warning: Invalid syntax
 
-listings.at-2055-prog.cob:9.26:
+listings.at-2140-prog.cob:9.26:
    6          01 PAR-IN        PIC 9.
    7          01 PAR-OUT       PIC 9.
    8          PROCEDURE DIVISION USING PAR-IN RETURNING PAR-OUT.
@@ -383,7 +383,7 @@ listings.at-2055-prog.cob:9.26:
   11          END FUNCTION WITHPAR.
 >> Hint: Missing .
 
-listings.at-2055-prog.cob:9.27-9.33:
+listings.at-2140-prog.cob:9.27-9.33:
    6          01 PAR-IN        PIC 9.
    7          01 PAR-OUT       PIC 9.
    8          PROCEDURE DIVISION USING PAR-IN RETURNING PAR-OUT.
@@ -393,7 +393,7 @@ listings.at-2055-prog.cob:9.27-9.33:
   11          END FUNCTION WITHPAR.
 >> Warning: Invalid syntax
 
-listings.at-2055-prog.cob:9.42-9.49:
+listings.at-2140-prog.cob:9.42-9.49:
    6          01 PAR-IN        PIC 9.
    7          01 PAR-OUT       PIC 9.
    8          PROCEDURE DIVISION USING PAR-IN RETURNING PAR-OUT.
@@ -403,9 +403,12 @@ listings.at-2055-prog.cob:9.42-9.49:
   11          END FUNCTION WITHPAR.
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/listings.at:2115:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:2150:0
-listings.at-2150-prog2.cob:6.2-6.30:
+Considering: import/gnucobol/tests/testsuite.src/listings.at:2232:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:2232:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:2270:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:2301:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:2336:0
+listings.at-2336-prog2.cob:6.2-6.30:
    3     PROGRAM-ID.      prog2.
    4     DATA             DIVISION.
    5     WORKING-STORAGE  SECTION.
@@ -415,12 +418,12 @@ listings.at-2150-prog2.cob:6.2-6.30:
    8    DISPLAY
 >> Error: Invalid >>PAGE compiler directive
 
-Considering: import/gnucobol/tests/testsuite.src/listings.at:2199:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:2252:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:2284:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:2372:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:2643:0
-listings.at-2643-prog.cob:9.11-9.14:
+Considering: import/gnucobol/tests/testsuite.src/listings.at:2385:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:2438:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:2470:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:2558:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:2829:0
+listings.at-2829-prog.cob:9.11-9.14:
    6          01 PAR-IN        PIC 9.
    7          01 PAR-OUT       PIC 9.
    8          PROCEDURE DIVISION USING PAR-IN RETURNING PAR-OUT.
@@ -430,7 +433,7 @@ listings.at-2643-prog.cob:9.11-9.14:
   11          END FUNCTION WITHPAR.
 >> Error: Invalid syntax
 
-listings.at-2643-prog.cob:9.16:
+listings.at-2829-prog.cob:9.16:
    6          01 PAR-IN        PIC 9.
    7          01 PAR-OUT       PIC 9.
    8          PROCEDURE DIVISION USING PAR-IN RETURNING PAR-OUT.
@@ -440,7 +443,7 @@ listings.at-2643-prog.cob:9.16:
   11          END FUNCTION WITHPAR.
 >> Hint: Missing .
 
-listings.at-2643-prog.cob:9.17-9.19:
+listings.at-2829-prog.cob:9.17-9.19:
    6          01 PAR-IN        PIC 9.
    7          01 PAR-OUT       PIC 9.
    8          PROCEDURE DIVISION USING PAR-IN RETURNING PAR-OUT.
@@ -450,7 +453,7 @@ listings.at-2643-prog.cob:9.17-9.19:
   11          END FUNCTION WITHPAR.
 >> Warning: Invalid syntax
 
-listings.at-2643-prog.cob:9.26:
+listings.at-2829-prog.cob:9.26:
    6          01 PAR-IN        PIC 9.
    7          01 PAR-OUT       PIC 9.
    8          PROCEDURE DIVISION USING PAR-IN RETURNING PAR-OUT.
@@ -460,7 +463,7 @@ listings.at-2643-prog.cob:9.26:
   11          END FUNCTION WITHPAR.
 >> Hint: Missing .
 
-listings.at-2643-prog.cob:9.27-9.33:
+listings.at-2829-prog.cob:9.27-9.33:
    6          01 PAR-IN        PIC 9.
    7          01 PAR-OUT       PIC 9.
    8          PROCEDURE DIVISION USING PAR-IN RETURNING PAR-OUT.
@@ -470,7 +473,7 @@ listings.at-2643-prog.cob:9.27-9.33:
   11          END FUNCTION WITHPAR.
 >> Warning: Invalid syntax
 
-listings.at-2643-prog.cob:9.42-9.49:
+listings.at-2829-prog.cob:9.42-9.49:
    6          01 PAR-IN        PIC 9.
    7          01 PAR-OUT       PIC 9.
    8          PROCEDURE DIVISION USING PAR-IN RETURNING PAR-OUT.
@@ -480,7 +483,7 @@ listings.at-2643-prog.cob:9.42-9.49:
   11          END FUNCTION WITHPAR.
 >> Error: Invalid syntax
 
-listings.at-2643-prog.cob:19.11-19.15:
+listings.at-2829-prog.cob:19.11-19.15:
   16          LINKAGE          SECTION.
   17          01 PAR           PIC 9.
   18          PROCEDURE DIVISION RETURNING PAR.
@@ -490,7 +493,7 @@ listings.at-2643-prog.cob:19.11-19.15:
   21          END FUNCTION WITHOUTPAR.
 >> Error: Invalid syntax
 
-listings.at-2643-prog.cob:19.17:
+listings.at-2829-prog.cob:19.17:
   16          LINKAGE          SECTION.
   17          01 PAR           PIC 9.
   18          PROCEDURE DIVISION RETURNING PAR.
@@ -500,7 +503,7 @@ listings.at-2643-prog.cob:19.17:
   21          END FUNCTION WITHOUTPAR.
 >> Hint: Missing .
 
-listings.at-2643-prog.cob:19.18-19.20:
+listings.at-2829-prog.cob:19.18-19.20:
   16          LINKAGE          SECTION.
   17          01 PAR           PIC 9.
   18          PROCEDURE DIVISION RETURNING PAR.
@@ -510,8 +513,8 @@ listings.at-2643-prog.cob:19.18-19.20:
   21          END FUNCTION WITHOUTPAR.
 >> Warning: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/listings.at:2762:0
-listings.at-2762-prog.cob:31.27:
+Considering: import/gnucobol/tests/testsuite.src/listings.at:2948:0
+listings.at-2948-prog.cob:31.27:
   28              05  FLD3      PIC X(3).
   29              05  FLD4      PIC X(4).
   30          LINKAGE          SECTION.
@@ -521,7 +524,7 @@ listings.at-2762-prog.cob:31.27:
   33              05  O-START   PIC X(42).
 >> Hint: Missing <integer literal>
 
-listings.at-2762-prog.cob:31.28-31.37:
+listings.at-2948-prog.cob:31.28-31.37:
   28              05  FLD3      PIC X(3).
   29              05  FLD4      PIC X(4).
   30          LINKAGE          SECTION.
@@ -531,7 +534,7 @@ listings.at-2762-prog.cob:31.28-31.37:
   33              05  O-START   PIC X(42).
 >> Error: Invalid syntax
 
-listings.at-2762-prog.cob:34.31:
+listings.at-2948-prog.cob:34.31:
   31          01  O1  PIC X OCCURS UNBOUNDED DEPENDING ON FL4.
   32          01  O2.
   33              05  O-START   PIC X(42).
@@ -541,7 +544,7 @@ listings.at-2762-prog.cob:34.31:
   36                  10  O-E1  PIC 9(24).
 >> Hint: Missing <integer literal>
 
-listings.at-2762-prog.cob:34.32-34.41:
+listings.at-2948-prog.cob:34.32-34.41:
   31          01  O1  PIC X OCCURS UNBOUNDED DEPENDING ON FL4.
   32          01  O2.
   33              05  O-START   PIC X(42).
@@ -551,12 +554,12 @@ listings.at-2762-prog.cob:34.32-34.41:
   36                  10  O-E1  PIC 9(24).
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/listings.at:2848:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:2876:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:3688:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:3725:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:3810:0
-listings.at-3810-prog.cob:6.7-6.23:
+Considering: import/gnucobol/tests/testsuite.src/listings.at:3034:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:3062:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:3874:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:3911:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:3996:0
+listings.at-3996-prog.cob:6.7-6.23:
    3          PROGRAM-ID.      prog.
    4          DATA             DIVISION.
    5          WORKING-STORAGE  SECTION.
@@ -568,7 +571,7 @@ listings.at-3810-prog.cob:6.7-6.23:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-listings.at-3810-prog.cob:7.7-7.24:
+listings.at-3996-prog.cob:7.7-7.24:
    4          DATA             DIVISION.
    5          WORKING-STORAGE  SECTION.
    6          COPY "copy.inc".
@@ -580,7 +583,7 @@ listings.at-3810-prog.cob:7.7-7.24:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-listings.at-3810-prog.cob:9.7-9.20:
+listings.at-3996-prog.cob:9.7-9.20:
    6          COPY "copy.inc".
    7          COPY "copy2.inc".
    8          PROCEDURE        DIVISION.
@@ -590,7 +593,7 @@ listings.at-3810-prog.cob:9.7-9.20:
   11              END-DISPLAY.
 >> Error: Invalid >>LISTING compiler directive
 
-listings.at-3810-prog.cob:12.7-12.20:
+listings.at-3996-prog.cob:12.7-12.20:
    9          >>LISTING OFF
   10              DISPLAY TEST1-VAR NO ADVANCING
   11              END-DISPLAY.
@@ -599,8 +602,8 @@ listings.at-3810-prog.cob:12.7-12.20:
   13              STOP RUN.
 >> Error: Invalid >>LISTING compiler directive
 
-Considering: import/gnucobol/tests/testsuite.src/listings.at:3906:0
-listings.at-3906-prog.cob:6.7-6.23:
+Considering: import/gnucobol/tests/testsuite.src/listings.at:4092:0
+listings.at-4092-prog.cob:6.7-6.23:
    3          PROGRAM-ID.      prog.
    4          DATA             DIVISION.
    5          WORKING-STORAGE  SECTION.
@@ -612,7 +615,7 @@ listings.at-3906-prog.cob:6.7-6.23:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-listings.at-3906-prog.cob:7.7-7.24:
+listings.at-4092-prog.cob:7.7-7.24:
    4          DATA             DIVISION.
    5          WORKING-STORAGE  SECTION.
    6          COPY "copy.inc".
@@ -624,7 +627,7 @@ listings.at-3906-prog.cob:7.7-7.24:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-listings.at-3906-prog.cob:9.0-9.13:
+listings.at-4092-prog.cob:9.0-9.13:
    6          COPY "copy.inc".
    7          COPY "copy2.inc".
    8          PROCEDURE        DIVISION.
@@ -634,7 +637,7 @@ listings.at-3906-prog.cob:9.0-9.13:
   11              END-DISPLAY.
 >> Error: Invalid >>LISTING compiler directive
 
-listings.at-3906-prog.cob:12.0-12.13:
+listings.at-4092-prog.cob:12.0-12.13:
    9   >>LISTING OFF
   10              DISPLAY TEST1-VAR NO ADVANCING
   11              END-DISPLAY.
@@ -643,15 +646,15 @@ listings.at-3906-prog.cob:12.0-12.13:
   13              STOP RUN.
 >> Error: Invalid >>LISTING compiler directive
 
-Considering: import/gnucobol/tests/testsuite.src/listings.at:3986:0
-listings.at-3986-prog.cob:1.11-1.16:
+Considering: import/gnucobol/tests/testsuite.src/listings.at:4172:0
+listings.at-4172-prog.cob:1.11-1.16:
    1 >            TITLE "GnuCOBOL lists IBM"
 ----              ^^^^^
    2          IDENTIFICATION   DIVISION.
    3              SKIP1
 >> Error: Invalid syntax
 
-listings.at-3986-prog.cob:3.11-3.16:
+listings.at-4172-prog.cob:3.11-3.16:
    1              TITLE "GnuCOBOL lists IBM"
    2          IDENTIFICATION   DIVISION.
    3 >            SKIP1
@@ -660,7 +663,7 @@ listings.at-3986-prog.cob:3.11-3.16:
    5              SKIP2
 >> Error: Invalid syntax
 
-listings.at-3986-prog.cob:5.11-5.16:
+listings.at-4172-prog.cob:5.11-5.16:
    2          IDENTIFICATION   DIVISION.
    3              SKIP1
    4          PROGRAM-ID.      prog.
@@ -670,7 +673,7 @@ listings.at-3986-prog.cob:5.11-5.16:
    7              SKIP3
 >> Error: Invalid syntax
 
-listings.at-3986-prog.cob:7.11-7.16:
+listings.at-4172-prog.cob:7.11-7.16:
    4          PROGRAM-ID.      prog.
    5              SKIP2
    6          DATA             DIVISION.
@@ -680,7 +683,7 @@ listings.at-3986-prog.cob:7.11-7.16:
    9          01  TITLE-01          PIC X(2).
 >> Error: Invalid syntax
 
-listings.at-3986-prog.cob:11.11-11.16:
+listings.at-4172-prog.cob:11.11-11.16:
    8          WORKING-STORAGE  SECTION.
    9          01  TITLE-01          PIC X(2).
   10          01  TITLE-02          PIC X(2).
@@ -690,7 +693,7 @@ listings.at-3986-prog.cob:11.11-11.16:
   13          EJECT
 >> Error: Invalid syntax
 
-listings.at-3986-prog.cob:13.12:
+listings.at-4172-prog.cob:13.12:
   10          01  TITLE-02          PIC X(2).
   11              TITLE "here goes the code"
   12          PROCEDURE        DIVISION.
@@ -700,7 +703,7 @@ listings.at-3986-prog.cob:13.12:
   15                            TITLE-02.
 >> Hint: Missing .
 
-listings.at-3986-prog.cob:14.11-14.15:
+listings.at-4172-prog.cob:14.11-14.15:
   11              TITLE "here goes the code"
   12          PROCEDURE        DIVISION.
   13          EJECT
@@ -710,9 +713,9 @@ listings.at-3986-prog.cob:14.11-14.15:
   16              STOP RUN.
 >> Warning: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/listings.at:4042:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:4076:0
-listings.at-4076-prog2.cob:6.0-6.6:
+Considering: import/gnucobol/tests/testsuite.src/listings.at:4228:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:4262:0
+listings.at-4262-prog2.cob:6.0-6.6:
    3     PROGRAM-ID.      prog2.
    4     DATA             DIVISION.
    5     WORKING-STORAGE  SECTION.
@@ -722,7 +725,7 @@ listings.at-4076-prog2.cob:6.0-6.6:
    8     STOP RUN.
 >> Error: Invalid >>PAGE compiler directive
 
-Considering: import/gnucobol/tests/testsuite.src/listings.at:4124:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:5812:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:6128:0
-Considering: import/gnucobol/tests/testsuite.src/listings.at:6940:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:4310:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:5998:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:6314:0
+Considering: import/gnucobol/tests/testsuite.src/listings.at:7128:0

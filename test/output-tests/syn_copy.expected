@@ -465,8 +465,8 @@ syn_copy.at-1072-prog.cob:12.7-14.49:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:1110:0
-syn_copy.at-1110-prog.cob:2.7-2.12:
+Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:1111:0
+syn_copy.at-1111-prog.cob:2.7-2.12:
    1   
    2 >        BEGIN PROGRAM    prog.
 ----          ^^^^^
@@ -474,7 +474,7 @@ syn_copy.at-1110-prog.cob:2.7-2.12:
    4              DISPLAY output
 >> Error: Invalid syntax
 
-syn_copy.at-1110-prog.cob:4.18:
+syn_copy.at-1111-prog.cob:4.18:
    1   
    2          BEGIN PROGRAM    prog.
    3          PROCEDURE        DIVISION.
@@ -483,7 +483,7 @@ syn_copy.at-1110-prog.cob:4.18:
    5              STOP RUN.
 >> Hint: Missing <identifier or literal>
 
-syn_copy.at-1110-prog.cob:4.19-4.25:
+syn_copy.at-1111-prog.cob:4.19-4.25:
    1   
    2          BEGIN PROGRAM    prog.
    3          PROCEDURE        DIVISION.
@@ -492,8 +492,8 @@ syn_copy.at-1110-prog.cob:4.19-4.25:
    5              STOP RUN.
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:1155:0
-syn_copy.at-1155-prog.cob:6.7-8.54:
+Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:1156:0
+syn_copy.at-1156-prog.cob:6.7-8.54:
    3          PROGRAM-ID.      prog.
    4          DATA             DIVISION.
    5          WORKING-STORAGE  SECTION.
@@ -509,7 +509,7 @@ syn_copy.at-1155-prog.cob:6.7-8.54:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-syn_copy.at-1155-prog.cob:20.7-22.54:
+syn_copy.at-1156-prog.cob:20.7-22.54:
   17              END-DISPLAY.
   18              STOP RUN.
   19   	   ==.
