@@ -297,9 +297,9 @@ run_accept.at-260-prog.cob:113.11-113.22:
 >> Warning: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_accept.at:316:0
-Considering: import/gnucobol/tests/testsuite.src/run_accept.at:355:0
-Considering: import/gnucobol/tests/testsuite.src/run_accept.at:389:0
-run_accept.at-389-prog.cob:11.17:
+Considering: import/gnucobol/tests/testsuite.src/run_accept.at:357:0
+Considering: import/gnucobol/tests/testsuite.src/run_accept.at:391:0
+run_accept.at-391-prog.cob:11.17:
    8              03  VALUE "Hello!" LINE 3 COL 3.
    9   
   10          PROCEDURE      DIVISION.
@@ -308,7 +308,7 @@ run_accept.at-389-prog.cob:11.17:
   12              END-ACCEPT.
 >> Hint: Missing <identifier>
 
-run_accept.at-389-prog.cob:11.18-11.25:
+run_accept.at-391-prog.cob:11.18-11.25:
    8              03  VALUE "Hello!" LINE 3 COL 3.
    9   
   10          PROCEDURE      DIVISION.

@@ -125,7 +125,7 @@ syn_definition.at-847-prog.cob:10.7-10.10:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:950:0
-Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:975:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:977:0
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1101:0
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1118:0
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1180:0
@@ -429,3 +429,46 @@ syn_definition.at-2627-prog.cob:22.22-22.26:
   24          PROCEDURE DIVISION.
 >> Error: Invalid syntax
 
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:2898:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:2917:0
+syn_definition.at-2917-prog.cob:6.41:
+   3          PROGRAM-ID. prog.
+   4          DATA DIVISION.
+   5          WORKING-STORAGE SECTION.
+   6 >        01 fun-ptr1 USAGE FUNCTION-POINTER FUNCTION random.
+----                                            ^
+   7          01 fun-ptr2 USAGE FUNCTION-POINTER TO FUNCTION random.
+   8          PROCEDURE DIVISION.
+>> Hint: Missing <word>
+
+syn_definition.at-2917-prog.cob:6.42-6.50:
+   3          PROGRAM-ID. prog.
+   4          DATA DIVISION.
+   5          WORKING-STORAGE SECTION.
+   6 >        01 fun-ptr1 USAGE FUNCTION-POINTER FUNCTION random.
+----                                             ^^^^^^^^
+   7          01 fun-ptr2 USAGE FUNCTION-POINTER TO FUNCTION random.
+   8          PROCEDURE DIVISION.
+>> Error: Invalid syntax
+
+syn_definition.at-2917-prog.cob:7.44:
+   4          DATA DIVISION.
+   5          WORKING-STORAGE SECTION.
+   6          01 fun-ptr1 USAGE FUNCTION-POINTER FUNCTION random.
+   7 >        01 fun-ptr2 USAGE FUNCTION-POINTER TO FUNCTION random.
+----                                               ^
+   8          PROCEDURE DIVISION.
+   9              STOP RUN.
+>> Hint: Missing <word>
+
+syn_definition.at-2917-prog.cob:7.45-7.53:
+   4          DATA DIVISION.
+   5          WORKING-STORAGE SECTION.
+   6          01 fun-ptr1 USAGE FUNCTION-POINTER FUNCTION random.
+   7 >        01 fun-ptr2 USAGE FUNCTION-POINTER TO FUNCTION random.
+----                                                ^^^^^^^^
+   8          PROCEDURE DIVISION.
+   9              STOP RUN.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:2948:0

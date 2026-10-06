@@ -1,5 +1,5 @@
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:69:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:202:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:206:0
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:259:0
 used_binaries.at-259-prog.cob:10.8-10.18:
    7           PROCEDURE DIVISION.
@@ -25,30 +25,30 @@ used_binaries.at-259-prog.cob:12.8-12.28:
           - search path: ./sub
           - filename extensions: "cpy" "cbl" "cob"
 
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:324:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:352:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:399:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:430:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:450:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:519:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:613:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:614:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:682:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:683:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:690:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:734:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:735:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:786:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:787:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:823:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:823:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:906:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:924:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:946:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:962:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:991:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1024:0
-used_binaries.at-1024-progprep.cob:5.36-5.37:
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:300:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:328:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:374:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:405:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:425:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:494:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:588:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:589:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:657:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:658:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:665:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:709:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:710:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:761:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:762:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:798:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:798:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:914:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:932:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:954:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:977:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1003:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1039:0
+used_binaries.at-1039-progprep.cob:5.36-5.37:
    2          IDENTIFICATION   DIVISION.
    3          PROGRAM-ID.      prog.
    4          DATA             DIVISION.
@@ -58,21 +58,31 @@ used_binaries.at-1024-progprep.cob:5.36-5.37:
    7          COPY 'CRUD.CPY'.
 >> Error: Invalid syntax
 
-used_binaries.at-1024-progprep.cob:7.7-7.23:
+used_binaries.at-1039-progprep.cob:7.7-7.23:
    4          DATA             DIVISION.
    5          WORKING-STORAGE  SECTION.	  	#
    6          01 TEST-VAR PIC 9(2) VALUE 'A'.
    7 >        COPY 'CRUD.CPY'.
 ----          ^^^^^^^^^^^^^^^^
    8          PROCEDURE        DIVISION.
-   9              DISPLAY TEST-VAR NO ADVANCING
+   9              DISPLAY TEST-VAR NO ADVANCING ON EXCEPTION
 >> Error: Library `CRUD.CPY' not found
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1112:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1144:0
-used_binaries.at-1144-prog2.cob:8.57:
+used_binaries.at-1039-progprep.cob:11.28-11.30:
+   8          PROCEDURE        DIVISION.
+   9              DISPLAY TEST-VAR NO ADVANCING ON EXCEPTION
+  10                 MOVE 12 TO TEST-VAR.
+  11 >            DISPLAY TEST-VAR NO                                       ADVANCING
+----                               ^^
+  12              END-DISPLAY                                                   *> long line
+  13              STOP RUN...
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1155:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1187:0
+used_binaries.at-1187-prog2.cob:8.57:
    5          WORKING-STORAGE SECTION.
    6          01 long USAGE BINARY-C-LONG.
    7          PROCEDURE        DIVISION.
@@ -80,11 +90,135 @@ used_binaries.at-1144-prog2.cob:8.57:
 ----                                                            ^
 >> Hint: Missing <identifier>
 
-used_binaries.at-1144-prog2.cob:8.58-8.65:
+used_binaries.at-1187-prog2.cob:8.58-8.65:
    5          WORKING-STORAGE SECTION.
    6          01 long USAGE BINARY-C-LONG.
    7          PROCEDURE        DIVISION.
    8 >            CALL "f" USING "Hello" BY VALUE long RETURNING NOTHING.
 ----                                                             ^^^^^^^
 >> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1230:0
+used_binaries.at-1230-prog3.cob:2.7-2.31:
+   1   
+   2 >        >> IMP INCLUDE "filec.h"
+----          ^^^^^^^^^^^^^^^^^^^^^^^^
+   3          IDENTIFICATION   DIVISION.
+   4          PROGRAM-ID.      prog.
+>> Error: Invalid >>IMP compiler directive
+
+used_binaries.at-1230-prog3.cob:9.57:
+   6          WORKING-STORAGE SECTION.
+   7          01 long USAGE BINARY-C-LONG.
+   8          PROCEDURE        DIVISION.
+   9 >            CALL "f" USING "Hello" BY VALUE long RETURNING NOTHING.
+----                                                            ^
+>> Hint: Missing <identifier>
+
+used_binaries.at-1230-prog3.cob:9.58-9.65:
+   6          WORKING-STORAGE SECTION.
+   7          01 long USAGE BINARY-C-LONG.
+   8          PROCEDURE        DIVISION.
+   9 >            CALL "f" USING "Hello" BY VALUE long RETURNING NOTHING.
+----                                                             ^^^^^^^
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1277:0
+used_binaries.at-1277-prog.cob:6.7-6.18:
+   3          PROGRAM-ID. prog.
+   4          DATA DIVISION.
+   5          WORKING-STORAGE SECTION.
+   6 >        COPY COPY1.
+----          ^^^^^^^^^^^
+   7          PROCEDURE DIVISION.
+   8          MAIN-PROC SECTION.
+>> Error: Library `COPY1' not found
+          - search path: <empty>
+          - filename extensions: "cpy" "cbl" "cob"
+
+used_binaries.at-1277-prog.cob:10.7-10.18:
+   7          PROCEDURE DIVISION.
+   8          MAIN-PROC SECTION.
+   9          00.
+  10 >        COPY COPY3.
+----          ^^^^^^^^^^^
+  11          COPY COPY3.CPY.
+  12          END-PROC  SECTION.
+>> Error: Library `COPY3' not found
+          - search path: <empty>
+          - filename extensions: "cpy" "cbl" "cob"
+
+used_binaries.at-1277-prog.cob:11.7-11.22:
+   8          MAIN-PROC SECTION.
+   9          00.
+  10          COPY COPY3.
+  11 >        COPY COPY3.CPY.
+----          ^^^^^^^^^^^^^^^
+  12          END-PROC  SECTION.
+  13          COPY COPY4 in "sub".
+>> Error: Library `COPY3.CPY' not found
+          - search path: <empty>
+          - filename extensions: "cpy" "cbl" "cob"
+
+used_binaries.at-1277-prog.cob:13.7-13.27:
+  10          COPY COPY3.
+  11          COPY COPY3.CPY.
+  12          END-PROC  SECTION.
+  13 >        COPY COPY4 in "sub".
+----          ^^^^^^^^^^^^^^^^^^^^
+  14          EX.
+  15              STOP RUN.
+>> Error: Library `COPY4' not found
+          - search path: ./sub
+          - filename extensions: "cpy" "cbl" "cob"
+
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1279:0
+used_binaries.at-1279-prog2.cob:5.7-5.18:
+   2          IDENTIFICATION DIVISION.
+   3          PROGRAM-ID. prog2.
+   4          PROCEDURE DIVISION.
+   5 >        COPY COPY3.
+----          ^^^^^^^^^^^
+   6              STOP RUN.
+>> Error: Library `COPY3' not found
+          - search path: <empty>
+          - filename extensions: "cpy" "cbl" "cob"
+
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1465:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1499:0
+used_binaries.at-1499-prog.cob:14.24:
+  11          PROCEDURE DIVISION.
+  12          00. PERFORM DO-WAIT.
+  13          EX. GOBACK.
+  14 >        DO-WAIT. CONTINUE AFTER 10 SECONDS.
+----                           ^
+  15          END PROGRAM 'wait'.
+>> Hint: Missing .
+
+used_binaries.at-1499-prog.cob:14.25-14.30:
+  11          PROCEDURE DIVISION.
+  12          00. PERFORM DO-WAIT.
+  13          EX. GOBACK.
+  14 >        DO-WAIT. CONTINUE AFTER 10 SECONDS.
+----                            ^^^^^
+  15          END PROGRAM 'wait'.
+>> Warning: Invalid syntax
+
+used_binaries.at-1499-prog.cob:14.33:
+  11          PROCEDURE DIVISION.
+  12          00. PERFORM DO-WAIT.
+  13          EX. GOBACK.
+  14 >        DO-WAIT. CONTINUE AFTER 10 SECONDS.
+----                                    ^
+  15          END PROGRAM 'wait'.
+>> Hint: Missing .
+
+used_binaries.at-1499-prog.cob:14.34-14.41:
+  11          PROCEDURE DIVISION.
+  12          00. PERFORM DO-WAIT.
+  13          EX. GOBACK.
+  14 >        DO-WAIT. CONTINUE AFTER 10 SECONDS.
+----                                     ^^^^^^^
+  15          END PROGRAM 'wait'.
+>> Warning: Invalid syntax
 

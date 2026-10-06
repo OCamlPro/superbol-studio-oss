@@ -3,9 +3,9 @@ Considering: import/gnucobol/tests/testsuite.src/configuration.at:56:0
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:167:0
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:234:0
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:254:0
-Considering: import/gnucobol/tests/testsuite.src/configuration.at:280:0
+Considering: import/gnucobol/tests/testsuite.src/configuration.at:284:0
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:316:0
-Considering: import/gnucobol/tests/testsuite.src/configuration.at:399:0
+Considering: import/gnucobol/tests/testsuite.src/configuration.at:396:0
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:851:0
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:880:0
 configuration.at-880-wide.cob:9.18:
@@ -38,8 +38,8 @@ configuration.at-880-wide.cob:9.19-9.72:
   11         -            '        80'
 >> Error: Missing continuation of `     20        30        40         50       60     '
 
-Considering: import/gnucobol/tests/testsuite.src/configuration.at:903:0
-configuration.at-903-prog.cob:7.13-7.20:
+Considering: import/gnucobol/tests/testsuite.src/configuration.at:904:0
+configuration.at-904-prog.cob:7.13-7.20:
    4          ENVIRONMENT DIVISION.
    5          CONFIGURATION SECTION.
    6              OBJECT-COMPUTER.
@@ -49,7 +49,7 @@ configuration.at-903-prog.cob:7.13-7.20:
    9              ALPHABET an-ebcdic IS EBCDIC.
 >> Error: Invalid syntax
 
-configuration.at-903-prog.cob:9.33-9.39:
+configuration.at-904-prog.cob:9.33-9.39:
    6              OBJECT-COMPUTER.
    7                PROGRAM COLLATING SEQUENCE IS an-ebcdic.
    8          SPECIAL-NAMES.
@@ -59,7 +59,7 @@ configuration.at-903-prog.cob:9.33-9.39:
   11              STOP RUN.
 >> Error: Invalid syntax
 
-configuration.at-903-prog.cob:9.39-9.40:
+configuration.at-904-prog.cob:9.39-9.40:
    6              OBJECT-COMPUTER.
    7                PROGRAM COLLATING SEQUENCE IS an-ebcdic.
    8          SPECIAL-NAMES.
@@ -69,7 +69,7 @@ configuration.at-903-prog.cob:9.39-9.40:
   11              STOP RUN.
 >> Error: Invalid syntax
 
-configuration.at-903-prog.cob:9.39:
+configuration.at-904-prog.cob:9.39:
    6              OBJECT-COMPUTER.
    7                PROGRAM COLLATING SEQUENCE IS an-ebcdic.
    8          SPECIAL-NAMES.
@@ -78,4 +78,15 @@ configuration.at-903-prog.cob:9.39:
   10          PROCEDURE        DIVISION.
   11              STOP RUN.
 >> Hint: Missing IS <word>
+
+Considering: import/gnucobol/tests/testsuite.src/configuration.at:1035:0
+configuration.at-1035-prog.cob:6.3-6.4:
+   3   03		PROGRAM-ID.      prog.
+   4   04		PROCEDURE        DIVISION.
+   5   05    * In the next line, the star is an indicator after a tab of size 6
+   6 > 06	*PROCEDURE        DIVISION.
+----      ^
+   7   07    * After 2 tabs, the line is at the beginning of Area A
+   8   08		DISPLAY "hello".
+>> Error: Invalid syntax
 
