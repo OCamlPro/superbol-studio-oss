@@ -33,6 +33,7 @@ let%expect_test "occurs-fixed-1" =
       table
       offset: 0
       size: 40
+      size-max: 40
       range: {
         span: fixed-length: 5
       }
@@ -41,6 +42,7 @@ let%expect_test "occurs-fixed-1" =
         leading ranges: 1
         offset: 0
         size: 8
+        size-max: 8
         layout: {
           elementary
           usage: {
@@ -72,6 +74,7 @@ let%expect_test "occurs-fixed-2" =
       table
       offset: 0
       size: 40
+      size-max: 40
       range: {
         span: fixed-length: 5
       }
@@ -80,6 +83,7 @@ let%expect_test "occurs-fixed-2" =
         leading ranges: 1
         offset: 0
         size: 8
+        size-max: 8
         layout: {
           structure
           fields: {
@@ -87,6 +91,7 @@ let%expect_test "occurs-fixed-2" =
             leading ranges: 1
             offset: 0
             size: 8
+            size-max: 8
             layout: {
               elementary
               usage: {
@@ -123,6 +128,7 @@ let%expect_test "occurs-fixed-3" =
       table
       offset: 0
       size: 1344
+      size-max: 1344
       range: {
         span: fixed-length: 42
       }
@@ -131,6 +137,7 @@ let%expect_test "occurs-fixed-3" =
         leading ranges: 1
         offset: 0
         size: 32
+        size-max: 32
         layout: {
           structure
           fields: {
@@ -138,6 +145,7 @@ let%expect_test "occurs-fixed-3" =
             leading ranges: 1
             offset: 0
             size: 16
+            size-max: 16
             layout: {
               elementary
               usage: {
@@ -150,6 +158,7 @@ let%expect_test "occurs-fixed-3" =
             leading ranges: 1
             offset: 16
             size: 16
+            size-max: 16
             layout: {
               elementary
               usage: {
@@ -195,6 +204,7 @@ let%expect_test "occurs-fixed-nested" =
       table
       offset: 0
       size: 528
+      size-max: 528
       range: {
         span: fixed-length: 1
       }
@@ -203,12 +213,14 @@ let%expect_test "occurs-fixed-nested" =
         leading ranges: 1
         offset: 0
         size: 528
+        size-max: 528
         layout: {
           structure
           fields: {
             table
             offset: 0
             size: 528
+            size-max: 528
             range: {
               span: fixed-length: 2
             }
@@ -217,12 +229,14 @@ let%expect_test "occurs-fixed-nested" =
               leading ranges: 2
               offset: 0
               size: 264
+              size-max: 264
               layout: {
                 structure
                 fields: {
                   table
                   offset: 0
                   size: 216
+                  size-max: 216
                   range: {
                     span: fixed-length: 3
                   }
@@ -231,12 +245,14 @@ let%expect_test "occurs-fixed-nested" =
                     leading ranges: 3
                     offset: 0
                     size: 72
+                    size-max: 72
                     layout: {
                       structure
                       fields: {
                         table
                         offset: 0
                         size: 32
+                        size-max: 32
                         range: {
                           span: fixed-length: 4
                         }
@@ -245,6 +261,7 @@ let%expect_test "occurs-fixed-nested" =
                           leading ranges: 4
                           offset: 0
                           size: 8
+                          size-max: 8
                           layout: {
                             elementary
                             usage: {
@@ -257,6 +274,7 @@ let%expect_test "occurs-fixed-nested" =
                         table
                         offset: 32
                         size: 40
+                        size-max: 40
                         range: {
                           span: fixed-length: 5
                         }
@@ -265,6 +283,7 @@ let%expect_test "occurs-fixed-nested" =
                           leading ranges: 4
                           offset: 32
                           size: 8
+                          size-max: 8
                           layout: {
                             elementary
                             usage: {
@@ -281,6 +300,7 @@ let%expect_test "occurs-fixed-nested" =
                   table
                   offset: 216
                   size: 48
+                  size-max: 48
                   range: {
                     span: fixed-length: 6
                   }
@@ -289,6 +309,7 @@ let%expect_test "occurs-fixed-nested" =
                     leading ranges: 3
                     offset: 216
                     size: 8
+                    size-max: 8
                     layout: {
                       elementary
                       usage: {
@@ -324,6 +345,7 @@ let%expect_test "occurs-depending-1" =
       qualname: B-LEN
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         elementary
         usage: {
@@ -344,6 +366,7 @@ let%expect_test "occurs-depending-1" =
       table
       offset: 0
       size: (* 8 (valof B-LEN))
+      size-max: 40
       range: {
         span: {
           depending-span
@@ -357,6 +380,7 @@ let%expect_test "occurs-depending-1" =
         leading ranges: 1
         offset: 0
         size: 8
+        size-max: 8
         layout: {
           elementary
           usage: {
@@ -386,6 +410,7 @@ let%expect_test "occurs-depending-2" =
       table
       offset: 0
       size: (* 8 (valof B-LEN))
+      size-max: 40
       range: {
         span: {
           depending-span
@@ -399,6 +424,7 @@ let%expect_test "occurs-depending-2" =
         leading ranges: 1
         offset: 0
         size: 8
+        size-max: 8
         layout: {
           elementary
           usage: {
@@ -420,6 +446,7 @@ let%expect_test "occurs-depending-2" =
       qualname: B-LEN
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         elementary
         usage: {
@@ -450,6 +477,7 @@ let%expect_test "occurs-with-index" =
       table
       offset: 0
       size: 40
+      size-max: 40
       range: {
         span: fixed-length: 5
         indexes: I IN V-TAB, J IN V-TAB
@@ -459,6 +487,7 @@ let%expect_test "occurs-with-index" =
         leading ranges: 1
         offset: 0
         size: 8
+        size-max: 8
         layout: {
           elementary
           usage: {
@@ -482,12 +511,14 @@ let%expect_test "occurs-with-index" =
       qualname: W
       offset: 0
       size: 336
+      size-max: 336
       layout: {
         structure
         fields: {
           table
           offset: 0
           size: 336
+          size-max: 336
           range: {
             span: fixed-length: 42
             indexes: K IN W-TAB IN W, L IN W-TAB IN W
@@ -497,6 +528,7 @@ let%expect_test "occurs-with-index" =
             leading ranges: 1
             offset: 0
             size: 8
+            size-max: 8
             layout: {
               elementary
               usage: {

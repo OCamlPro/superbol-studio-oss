@@ -222,6 +222,7 @@ and field_definition =
     field_leading_ranges: table_range list;
     field_offset: Data_memory.offset;         (** offset w.r.t record address *)
     field_size: Data_memory.size;
+    field_size_max: Data_memory.size; (** always scalar, modulo DYNAMIC table *)
     field_layout: field_layout;
     field_length_variability: length_variability;
     field_conditions: condition_names; (** Named conditions on the value of this
@@ -251,6 +252,7 @@ and table_definition =
     table_field: field_definition with_loc;
     table_offset: Data_memory.offset;
     table_size: Data_memory.size;
+    table_size_max: Data_memory.size; (** always scalar, modulo DYNAMIC table *)
     table_range: table_range;
     table_init_values: Cobol_ptree.literal with_loc list;     (* list for now *)
     table_redefines: Cobol_ptree.qualname with_loc option; (* same as [field_redefines] but for tables *)

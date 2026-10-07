@@ -284,6 +284,7 @@ and pp_field_definition: field_definition Pretty.printer = fun ppf x ->
          (fun x -> List.length x.field_leading_ranges) Fmt.int);
     T (Fmt.field "offset" (fun x -> x.field_offset) pp_offset);
     T (Fmt.field "size" (fun x -> x.field_size) pp_size);
+    T (Fmt.field "size-max" (fun x -> x.field_size_max) pp_size);
     T (Pretty.vfield "layout" (fun x -> x.field_layout) pp_field_layout);
     C ((fun x -> x.field_conditions <> []),
        Pretty.vfield "conditions" (fun x -> x.field_conditions) pp_condition_names);
@@ -324,6 +325,7 @@ and pp_table_definition: table_definition Pretty.printer = fun ppf x ->
        Fmt.field "redefines" (fun x -> x.table_redefines) pp_qualname'_opt);
     T (Fmt.field "offset" (fun x -> x.table_offset) pp_offset);
     T (Fmt.field "size" (fun x -> x.table_size) pp_size);
+    T (Fmt.field "size-max" (fun x -> x.table_size_max) pp_size);
     T (Pretty.vfield "range" (fun x -> x.table_range) pp_table_range);
     C ((fun x -> x.table_init_values <> []),
        Fmt.field "init-values" (fun _ -> "...") Fmt.string);

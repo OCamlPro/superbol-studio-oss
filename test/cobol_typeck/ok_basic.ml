@@ -36,6 +36,7 @@ let%expect_test "basics" =
       qualname: X
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         elementary
         usage: {
@@ -56,6 +57,7 @@ let%expect_test "basics" =
       qualname: Y
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         elementary
         usage: {

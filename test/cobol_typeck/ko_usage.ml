@@ -58,6 +58,7 @@ let%expect_test "mismatching-subordinate-usage" =
       /!\ with_errors /!\
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         structure
         fields: {
@@ -65,6 +66,7 @@ let%expect_test "mismatching-subordinate-usage" =
           /!\ with_errors /!\
           offset: 0
           size: 8
+          size-max: 8
           layout: {
             elementary
             usage: {
@@ -118,6 +120,7 @@ let%expect_test "pic-on-wrong-usage" =
       /!\ with_errors /!\
       offset: 0
       size: size-of-index
+      size-max: size-of-index
       layout: {
         elementary
         usage: index
@@ -138,6 +141,7 @@ let%expect_test "pic-on-wrong-usage" =
       /!\ with_errors /!\
       offset: 0
       size: size-of-index
+      size-max: size-of-index
       layout: {
         structure
         fields: {
@@ -145,6 +149,7 @@ let%expect_test "pic-on-wrong-usage" =
           /!\ with_errors /!\
           offset: 0
           size: size-of-index
+          size-max: size-of-index
           layout: {
             elementary
             usage: index
@@ -220,6 +225,7 @@ let%expect_test "unsupported-usage" =
       /!\ with_errors /!\
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         elementary
         usage: {
@@ -243,6 +249,7 @@ let%expect_test "unsupported-usage" =
       /!\ with_errors /!\
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         structure
         fields: {
@@ -250,6 +257,7 @@ let%expect_test "unsupported-usage" =
           /!\ with_errors /!\
           offset: 0
           size: 8
+          size-max: 8
           layout: {
             elementary
             usage: {
@@ -274,6 +282,7 @@ let%expect_test "unsupported-usage" =
       qualname: C
       offset: 0
       size: 80
+      size-max: 80
       layout: {
         structure
         fields: {
@@ -281,6 +290,7 @@ let%expect_test "unsupported-usage" =
           /!\ with_errors /!\
           offset: 0
           size: 80
+          size-max: 80
           range: {
             span: fixed-length: 10
           }
@@ -290,6 +300,7 @@ let%expect_test "unsupported-usage" =
             leading ranges: 1
             offset: 0
             size: 8
+            size-max: 8
             layout: {
               elementary
               usage: {
@@ -315,6 +326,7 @@ let%expect_test "unsupported-usage" =
       qualname: E
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         elementary
         usage: {
@@ -328,6 +340,7 @@ let%expect_test "unsupported-usage" =
         redefines: E
         offset: 0
         size: 8
+        size-max: 8
         layout: {
           elementary
           usage: {
@@ -394,6 +407,7 @@ let%expect_test "bad-pic-comps" =
       /!\ with_errors /!\
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         elementary
         usage: {
@@ -413,6 +427,7 @@ let%expect_test "bad-pic-comps" =
       qualname: B
       offset: 0
       size: 24
+      size-max: 24
       layout: {
         elementary
         usage: {
@@ -433,6 +448,7 @@ let%expect_test "bad-pic-comps" =
       /!\ with_errors /!\
       offset: 0
       size: 64
+      size-max: 64
       layout: {
         elementary
         usage: {
@@ -454,6 +470,7 @@ let%expect_test "bad-pic-comps" =
       /!\ with_errors /!\
       offset: 0
       size: 64
+      size-max: 64
       layout: {
         elementary
         usage: {

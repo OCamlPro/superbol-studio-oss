@@ -35,6 +35,7 @@ let%expect_test "numeric-pic-for-bin-usage" =
       qualname: A
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         elementary
         usage: {
@@ -55,6 +56,7 @@ let%expect_test "numeric-pic-for-bin-usage" =
       qualname: B
       offset: 0
       size: 32
+      size-max: 32
       layout: {
         elementary
         usage: {
@@ -75,6 +77,7 @@ let%expect_test "numeric-pic-for-bin-usage" =
       qualname: C
       offset: 0
       size: 32
+      size-max: 32
       layout: {
         elementary
         usage: {
@@ -106,6 +109,7 @@ let%expect_test "signed-numeric-sizes" =
       qualname: A
       offset: 0
       size: 40
+      size-max: 40
       layout: {
         elementary
         usage: {
@@ -126,6 +130,7 @@ let%expect_test "signed-numeric-sizes" =
       qualname: B
       offset: 0
       size: 40
+      size-max: 40
       layout: {
         elementary
         usage: {
@@ -147,6 +152,7 @@ let%expect_test "signed-numeric-sizes" =
       qualname: C
       offset: 0
       size: 40
+      size-max: 40
       layout: {
         elementary
         usage: {
@@ -168,6 +174,7 @@ let%expect_test "signed-numeric-sizes" =
       qualname: D
       offset: 0
       size: 48
+      size-max: 48
       layout: {
         elementary
         usage: {
@@ -189,6 +196,7 @@ let%expect_test "signed-numeric-sizes" =
       qualname: E
       offset: 0
       size: 48
+      size-max: 48
       layout: {
         elementary
         usage: {

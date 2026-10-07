@@ -33,6 +33,7 @@ let%expect_test "one-77" =
       qualname: A
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         elementary
         usage: {
@@ -61,6 +62,7 @@ let%expect_test "77-occurs-fixed" =
       table
       offset: 0
       size: 40
+      size-max: 40
       range: {
         span: fixed-length: 5
       }
@@ -69,6 +71,7 @@ let%expect_test "77-occurs-fixed" =
         leading ranges: 1
         offset: 0
         size: 8
+        size-max: 8
         layout: {
           elementary
           usage: {
@@ -105,6 +108,7 @@ let%expect_test "redefines-77" =
       qualname: A
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         elementary
         usage: {
@@ -118,6 +122,7 @@ let%expect_test "redefines-77" =
         redefines: A
         offset: 0
         size: 8
+        size-max: 8
         layout: {
           elementary
           usage: {
@@ -141,6 +146,7 @@ let%expect_test "redefines-77" =
       qualname: T-LEN
       offset: 0
       size: 16
+      size-max: 16
       layout: {
         elementary
         usage: {
@@ -154,6 +160,7 @@ let%expect_test "redefines-77" =
         redefines: T-LEN
         offset: 0
         size: 16
+        size-max: 16
         layout: {
           elementary
           usage: {

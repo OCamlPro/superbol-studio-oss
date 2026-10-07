@@ -58,6 +58,7 @@ and item_under_construction =               (* item currently being assembled *)
     item_redefines: Cobol_ptree.qualname with_loc option;     (* if REDEFINES *)
     item_offset: Cobol_data.Memory.offset;
     item_size: Cobol_data.Memory.size;
+    item_size_max: Cobol_data.Memory.size;
     item_clauses: Typeck_clauses.data_clauses;
     item_range: table_range option;
     item_rev_leading_ranges: table_range list;       (* ~> leading subscripts *)
@@ -295,12 +296,14 @@ let commit_item_definition ~renamings def acc =
   match acc.item_stack with
   | [] ->
       commit_record acc ~renamings def
-  | { item_loc; item_size; _ } as top_item :: item_stack ->
-      let field_size = Cobol_data.Item.size ~&def in
+  | { item_loc; item_size; item_size_max; _ } as top_item :: item_stack ->
+      let size     = Cobol_data.Item.size     ~&def
+      and size_max = Cobol_data.Item.size_max ~&def in
       let top_item =
         { top_item with
           item_loc = Cobol_common.Srcloc.concat item_loc ~@def;
-          item_size = Cobol_data.Memory.add item_size field_size;
+          item_size = Cobol_data.Memory.add item_size size;
+          item_size_max = Cobol_data.Memory.add item_size_max size_max;
           item_rev_fields = def :: top_item.item_rev_fields } in
       { acc with item_stack = top_item :: item_stack }
 
@@ -391,21 +394,22 @@ let error_if_picture ~item_name ~item_loc ~reason = function
                                                  item_name; item_loc }]
 
 
-let field_layout_n_size ~usage ~init_value { item_name;
-                                             item_loc;
-                                             item_size;
-                                             item_clauses;
-                                             item_rev_fields; _ } =
+let field_layout_n_sizes ~usage ~init_value { item_name;
+                                              item_loc;
+                                              item_size;
+                                              item_size_max;
+                                              item_clauses;
+                                              item_rev_fields; _ } =
   match item_rev_fields, usage with
   | [], Ok usage ->
-      [],
-      Elementary_field { usage; init_value },
-      Cobol_data.Usage.size usage
+      let size = Cobol_data.Usage.size usage in
+      [], Elementary_field { usage; init_value }, size, size
   | [], Error Some diag ->                                    (* missing usage *)
       let picture = PIC.alphanumeric ~size:1 in
       [data_warning diag],
       Elementary_field { usage = Alphanumeric { picture; size = 1 };
                          init_value = None },
+      Cobol_data.Memory.byte_size,
       Cobol_data.Memory.byte_size
   | [], Error None ->        (* missing usage (reported as missing pic string) *)
       let picture = PIC.alphanumeric ~size:1 in
@@ -413,12 +417,14 @@ let field_layout_n_size ~usage ~init_value { item_name;
        Missing_picture_clause_for_elementary_item { item_name; item_loc }],
       Elementary_field { usage = Alphanumeric { picture; size = 1 };
                          init_value = None },
+      Cobol_data.Memory.byte_size,
       Cobol_data.Memory.byte_size
   | flds, _ ->
       error_if_picture ~item_name ~item_loc ~reason:`Group_item
         item_clauses.picture,
       Struct_field { subfields = NEL.of_rev_list flds },
-      item_size                (* accumulated during commits of subfields *)
+      item_size,                   (* accumulated during commits of subfields *)
+      item_size_max
 
 
 let subitem_fields_have_issues { item_rev_fields; _ } =
@@ -442,8 +448,8 @@ let item_definition acc ({ item_name;
     Typeck_clauses.to_usage_n_value item_clauses ~item_name ~item_loc
       ~data_config:acc.data_config
   in
-  let diags', field_layout, field_size =
-    field_layout_n_size item ~usage ~init_value
+  let diags', field_layout, field_size, field_size_max =
+    field_layout_n_sizes item ~usage ~init_value
   in
   let item_diagnostics =
     LIST.append ~loc:__LOC__ diags @@
@@ -458,6 +464,7 @@ let item_definition acc ({ item_name;
       field_layout;
       field_offset = item_offset;
       field_size;
+      field_size_max;
       field_length_variability = Fixed_length;
       field_conditions = LIST.rev item_rev_conditions;
       field_redefinitions = [];
@@ -478,19 +485,25 @@ let item_definition acc ({ item_name;
       Table { table_field = field;
               table_offset = ~&field.field_offset;
               table_size;
+              table_size_max = table_size;
               table_range = range;
               table_init_values = [];
               table_redefines = item_redefines;
               table_redefinitions = [];
               table_has_definition_issues = definition_issues } &@<- field
-  | Some ({ range_span = Depending_span { occurs_depending; _ }; _ } as range) ->
+  | Some ({ range_span = Depending_span { occurs_depending;
+                                          occurs_depending_max; _ };
+            _ } as range) ->
       let dep_size = Cobol_data.Memory.valof ~&occurs_depending in
       let table_size
-        = Cobol_data.Memory.repeat ~&field.field_size ~by:dep_size in
+        = Cobol_data.Memory.repeat ~&field.field_size ~by:dep_size
+      and table_size_max
+        = Cobol_data.Memory.mult_int ~&field.field_size ~&occurs_depending_max in
       register_field_def acc field,
       Table { table_field = field;
               table_offset = ~&field.field_offset;
               table_size;
+              table_size_max;
               table_range = range;
               table_init_values = [];
               table_redefines = item_redefines;
@@ -501,6 +514,7 @@ let item_definition acc ({ item_name;
       Table { table_field = field;
               table_offset = ~&field.field_offset;
               table_size = Cobol_data.Memory.size_of_dynamic_table;
+              table_size_max = Cobol_data.Memory.size_of_dynamic_table;  (* CHECKME *)
               table_range = range;
               table_init_values = [];
               table_redefines = item_redefines;
@@ -682,6 +696,7 @@ let on_redefinition_item acc item_clauses
                        item_redefines;
                        item_offset = current_item_offset base_stack;
                        item_size = Cobol_data.Memory.point_size;
+                       item_size_max = Cobol_data.Memory.point_size;
                        item_clauses;
                        item_range;
                        item_rev_leading_ranges;
@@ -732,6 +747,7 @@ let on_item acc ~at_level
                        item_redefines = None;
                        item_offset = current_item_offset acc.item_stack;
                        item_size = Cobol_data.Memory.point_size;
+                       item_size_max = Cobol_data.Memory.point_size;
                        item_clauses;
                        item_range;
                        item_rev_leading_ranges;

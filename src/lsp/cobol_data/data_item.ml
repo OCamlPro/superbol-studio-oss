@@ -53,6 +53,10 @@ let size: item_definition -> Data_memory.size = function
   | Field f -> f.field_size
   | Table t -> t.table_size
 
+let size_max: item_definition -> Data_memory.size = function
+  | Field f -> f.field_size_max
+  | Table t -> t.table_size_max
+
 let qualname = function
   | Field { field_qualname; _ } -> field_qualname
   | Table _ -> None
@@ -125,6 +129,12 @@ let def_size: data_definition -> Data_memory.size = function
   | Data_renaming { def; _} -> ~&def.renaming_size
   | Data_condition { field; _} -> ~&field.field_size
   | Table_index { table; _ } -> ~&table.table_size
+
+let def_size_max: data_definition -> Data_memory.size = function
+  | Data_field { def; _} -> ~&def.field_size_max
+  | Data_renaming { def; _} -> ~&def.renaming_size
+  | Data_condition { field; _} -> ~&field.field_size_max
+  | Table_index { table; _ } -> ~&table.table_size_max
 
 let def_offset: data_definition -> Data_memory.offset = function
   | Data_field { def; _} -> ~&def.field_offset

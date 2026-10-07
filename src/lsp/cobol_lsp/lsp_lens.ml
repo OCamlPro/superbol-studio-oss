@@ -56,11 +56,13 @@ let positions ~uri group artifacts =
       take_when_in Data_division renaming_name
     method! fold_field_definition { field_qualname; field_redefines;
                                     field_leading_ranges;
-                                    field_offset; field_size; field_layout;
+                                    field_offset; field_size; field_size_max;
+                                    field_layout;
                                     field_conditions; field_redefinitions;
                                     field_length_variability = _;
                                     field_has_definition_issues = _ } acc =
-      ignore(field_redefines, field_leading_ranges, field_offset, field_size);
+      ignore(field_redefines, field_leading_ranges, field_offset, field_size,
+             field_size_max);
       Cobol_common.Visitor.skip @@ begin
         acc
         |> Cobol_ptree.Visitor.fold_qualname'_opt v field_qualname
@@ -69,11 +71,12 @@ let positions ~uri group artifacts =
         |> Cobol_data.Visitor.fold_item_redefinitions v field_redefinitions
       end
     method! fold_table_definition { table_field; table_offset; table_size;
-                                    table_range; table_init_values;
-                                    table_redefines; table_redefinitions;
+                                    table_size_max; table_range;
+                                    table_init_values; table_redefines;
+                                    table_redefinitions;
                                     table_has_definition_issues } acc =
-      ignore(table_offset, table_size, table_init_values, table_redefines,
-             table_has_definition_issues);
+      ignore(table_offset, table_size, table_size_max, table_init_values,
+             table_redefines, table_has_definition_issues);
       Cobol_common.Visitor.skip @@ begin
         acc
         |> Cobol_data.Visitor.fold_field_definition' v table_field

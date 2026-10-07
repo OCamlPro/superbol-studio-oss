@@ -51,6 +51,7 @@ let%expect_test "fd" =
       qualname: X
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         elementary
         usage: {
@@ -96,12 +97,14 @@ let%expect_test "fd" =
       filler
       offset: 0
       size: (+ 16 (* 8 (valof C)))
+      size-max: 336
       layout: {
         structure
         fields: {
           qualname: C
           offset: 0
           size: 16
+          size-max: 16
           layout: {
             elementary
             usage: {
@@ -114,6 +117,7 @@ let%expect_test "fd" =
           table
           offset: 16
           size: (* 8 (valof C))
+          size-max: 320
           range: {
             span: {
               depending-span
@@ -127,6 +131,7 @@ let%expect_test "fd" =
             leading ranges: 1
             offset: 16
             size: 8
+            size-max: 8
             layout: {
               elementary
               usage: {
