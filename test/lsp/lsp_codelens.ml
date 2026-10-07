@@ -325,3 +325,67 @@ let%expect_test "codelens-preproc-directives" =
       10          >>ELSE
       11          77 WS VALUE "KO".
     1 reference |}];;
+
+let%expect_test "codelens-preproc-directives-numeric" =
+  Unix.putenv "ONE_HALF" "0.5"; (* Warning: left in environment after the test *)
+  Unix.putenv "ONE_OVER_2" "1/2"; (* Warning: left in environment after the test *)
+  let end_with_postproc = codelens {cobol|
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       >>DEFINE ONE_HALF AS PARAMETER
+       >>IF ONE_HALF = 0000.5
+       77 WS VALUE "OK".
+       >>ELSE
+       77 WS VALUE "KO".
+       >>END-IF
+       >>DEFINE ONE_OVER_2 AS PARAMETER
+       >>IF ONE_HALF <> ONE_OVER_2
+       77 WX VALUE "KO".
+       >>ELSE
+       77 WX VALUE "OK".
+       >>END-IF
+       PROCEDURE DIVISION.
+         DISPLAY WS WX
+         GOBACK.
+    |cobol} in
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    __rootdir__/prog.cob:6.16:
+       3          PROGRAM-ID. prog.
+       4          DATA DIVISION.
+       5          WORKING-STORAGE SECTION.
+       6 >        >>DEFINE ONE_HALF AS PARAMETER
+    ----                   ^
+       7          >>IF ONE_HALF = 0000.5
+       8          77 WS VALUE "OK".
+    2 references
+    __rootdir__/prog.cob:8.10:
+       5          WORKING-STORAGE SECTION.
+       6          >>DEFINE ONE_HALF AS PARAMETER
+       7          >>IF ONE_HALF = 0000.5
+       8 >        77 WS VALUE "OK".
+    ----             ^
+       9          >>ELSE
+      10          77 WS VALUE "KO".
+    1 reference
+    __rootdir__/prog.cob:12.16:
+       9          >>ELSE
+      10          77 WS VALUE "KO".
+      11          >>END-IF
+      12 >        >>DEFINE ONE_OVER_2 AS PARAMETER
+    ----                   ^
+      13          >>IF ONE_HALF <> ONE_OVER_2
+      14          77 WX VALUE "KO".
+    1 reference
+    __rootdir__/prog.cob:16.10:
+      13          >>IF ONE_HALF <> ONE_OVER_2
+      14          77 WX VALUE "KO".
+      15          >>ELSE
+      16 >        77 WX VALUE "OK".
+    ----             ^
+      17          >>END-IF
+      18          PROCEDURE DIVISION.
+    1 reference |}];;
