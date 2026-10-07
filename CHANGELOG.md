@@ -5,7 +5,7 @@
 ### Added
 - Built-in `SuperBOL: build module (debug)` task; built-in build tasks are renamed to `SuperBOL: build module`, `SuperBOL: build module (debug)`, `SuperBOL: build executable`, and `SuperBOL: build executable (debug)` [#683](https://github.com/OCamlPro/superbol-studio-oss/pull/683) (fix for [issue #539](https://github.com/OCamlPro/superbol-studio-oss/issues/539))
 - Accept relaxed MF syntaxes for EVALUATE statements [#667](https://github.com/OCamlPro/superbol-studio-oss/pull/667)
-- Display of the size and offset of data items on hover [#665](https://github.com/OCamlPro/superbol-studio-oss/pull/665)
+- Display of the size and offset of data items on hover [#665](https://github.com/OCamlPro/superbol-studio-oss/pull/665) [#690](https://github.com/OCamlPro/superbol-studio-oss/pull/690)
 - Display of `REDEFINES` relations on hover, with the size of the redefinition and the size of the item it redefines [#669](https://github.com/OCamlPro/superbol-studio-oss/pull/669)
 - Support tabs in source file [#591](https://github.com/OCamlPro/superbol-studio-oss/pull/591)
 - Unified internal representation of binary data items [#656](https://github.com/OCamlPro/superbol-studio-oss/pull/656) [#672](https://github.com/OCamlPro/superbol-studio-oss/pull/672) [#680](https://github.com/OCamlPro/superbol-studio-oss/pull/680)
