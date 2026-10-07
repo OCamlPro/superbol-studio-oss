@@ -40,6 +40,7 @@ let%expect_test "redefines-occurs" =
         qualname: A
         offset: 0
         size: 40
+        size-max: 40
         layout: {
           elementary
           usage: {
@@ -52,6 +53,7 @@ let%expect_test "redefines-occurs" =
           redefines: A
           offset: 0
           size: 40
+          size-max: 40
           range: {
             span: fixed-length: 5
           }
@@ -60,6 +62,7 @@ let%expect_test "redefines-occurs" =
             leading ranges: 1
             offset: 0
             size: 8
+            size-max: 8
             layout: {
               elementary
               usage: {
@@ -88,6 +91,7 @@ let%expect_test "redefines-occurs" =
         leading ranges: 1
         offset: 0
         size: 8
+        size-max: 8
         layout: {
           elementary
           usage: {
@@ -100,6 +104,7 @@ let%expect_test "redefines-occurs" =
         qualname: A
         offset: 0
         size: 40
+        size-max: 40
         layout: {
           elementary
           usage: {
@@ -112,6 +117,7 @@ let%expect_test "redefines-occurs" =
           redefines: A
           offset: 0
           size: 40
+          size-max: 40
           range: {
             span: fixed-length: 5
           }
@@ -120,6 +126,7 @@ let%expect_test "redefines-occurs" =
             leading ranges: 1
             offset: 0
             size: 8
+            size-max: 8
             layout: {
               elementary
               usage: {
@@ -135,6 +142,7 @@ let%expect_test "redefines-occurs" =
         redefines: A
         offset: 0
         size: 40
+        size-max: 40
         range: {
           span: fixed-length: 5
         }
@@ -143,6 +151,7 @@ let%expect_test "redefines-occurs" =
           leading ranges: 1
           offset: 0
           size: 8
+          size-max: 8
           layout: {
             elementary
             usage: {
@@ -182,12 +191,14 @@ let%expect_test "qualified-redefines-occurs" =
         qualname: X
         offset: 0
         size: 40
+        size-max: 40
         layout: {
           structure
           fields: {
             qualname: a IN X
             offset: 0
             size: 40
+            size-max: 40
             layout: {
               elementary
               usage: {
@@ -200,6 +211,7 @@ let%expect_test "qualified-redefines-occurs" =
               redefines: A IN X
               offset: 0
               size: 40
+              size-max: 40
               range: {
                 span: fixed-length: 5
               }
@@ -208,6 +220,7 @@ let%expect_test "qualified-redefines-occurs" =
                 leading ranges: 1
                 offset: 0
                 size: 8
+                size-max: 8
                 layout: {
                   elementary
                   usage: {
@@ -239,6 +252,7 @@ let%expect_test "qualified-redefines-occurs" =
         qualname: a IN X
         offset: 0
         size: 40
+        size-max: 40
         layout: {
           elementary
           usage: {
@@ -251,6 +265,7 @@ let%expect_test "qualified-redefines-occurs" =
           redefines: A IN X
           offset: 0
           size: 40
+          size-max: 40
           range: {
             span: fixed-length: 5
           }
@@ -259,6 +274,7 @@ let%expect_test "qualified-redefines-occurs" =
             leading ranges: 1
             offset: 0
             size: 8
+            size-max: 8
             layout: {
               elementary
               usage: {
@@ -287,6 +303,7 @@ let%expect_test "qualified-redefines-occurs" =
         leading ranges: 1
         offset: 0
         size: 8
+        size-max: 8
         layout: {
           elementary
           usage: {
@@ -299,6 +316,7 @@ let%expect_test "qualified-redefines-occurs" =
         qualname: a IN X
         offset: 0
         size: 40
+        size-max: 40
         layout: {
           elementary
           usage: {
@@ -311,6 +329,7 @@ let%expect_test "qualified-redefines-occurs" =
           redefines: A IN X
           offset: 0
           size: 40
+          size-max: 40
           range: {
             span: fixed-length: 5
           }
@@ -319,6 +338,7 @@ let%expect_test "qualified-redefines-occurs" =
             leading ranges: 1
             offset: 0
             size: 8
+            size-max: 8
             layout: {
               elementary
               usage: {
@@ -334,6 +354,7 @@ let%expect_test "qualified-redefines-occurs" =
         redefines: A IN X
         offset: 0
         size: 40
+        size-max: 40
         range: {
           span: fixed-length: 5
         }
@@ -342,6 +363,7 @@ let%expect_test "qualified-redefines-occurs" =
           leading ranges: 1
           offset: 0
           size: 8
+          size-max: 8
           layout: {
             elementary
             usage: {
@@ -401,6 +423,7 @@ let%expect_test "redefines-with-value" =
         qualname: X
         offset: 0
         size: 48
+        size-max: 48
         layout: {
           elementary
           usage: {
@@ -413,6 +436,7 @@ let%expect_test "redefines-with-value" =
           redefines: X
           offset: 0
           size: 48
+          size-max: 48
           range: {
             span: fixed-length: 6
           }
@@ -421,6 +445,7 @@ let%expect_test "redefines-with-value" =
             leading ranges: 1
             offset: 0
             size: 8
+            size-max: 8
             layout: {
               elementary
               usage: {
@@ -434,6 +459,7 @@ let%expect_test "redefines-with-value" =
           redefines: X
           offset: 0
           size: 48
+          size-max: 48
           range: {
             span: fixed-length: 3
           }
@@ -442,6 +468,7 @@ let%expect_test "redefines-with-value" =
             leading ranges: 1
             offset: 0
             size: 16
+            size-max: 16
             layout: {
               elementary
               usage: {
@@ -470,6 +497,7 @@ let%expect_test "redefines-with-value" =
         leading ranges: 1
         offset: 0
         size: 8
+        size-max: 8
         layout: {
           elementary
           usage: {
@@ -482,6 +510,7 @@ let%expect_test "redefines-with-value" =
         qualname: X
         offset: 0
         size: 48
+        size-max: 48
         layout: {
           elementary
           usage: {
@@ -494,6 +523,7 @@ let%expect_test "redefines-with-value" =
           redefines: X
           offset: 0
           size: 48
+          size-max: 48
           range: {
             span: fixed-length: 6
           }
@@ -502,6 +532,7 @@ let%expect_test "redefines-with-value" =
             leading ranges: 1
             offset: 0
             size: 8
+            size-max: 8
             layout: {
               elementary
               usage: {
@@ -515,6 +546,7 @@ let%expect_test "redefines-with-value" =
           redefines: X
           offset: 0
           size: 48
+          size-max: 48
           range: {
             span: fixed-length: 3
           }
@@ -523,6 +555,7 @@ let%expect_test "redefines-with-value" =
             leading ranges: 1
             offset: 0
             size: 16
+            size-max: 16
             layout: {
               elementary
               usage: {
@@ -538,6 +571,7 @@ let%expect_test "redefines-with-value" =
         redefines: X
         offset: 0
         size: 48
+        size-max: 48
         range: {
           span: fixed-length: 6
         }
@@ -546,6 +580,7 @@ let%expect_test "redefines-with-value" =
           leading ranges: 1
           offset: 0
           size: 8
+          size-max: 8
           layout: {
             elementary
             usage: {
@@ -572,6 +607,7 @@ let%expect_test "redefines-with-value" =
         leading ranges: 1
         offset: 0
         size: 16
+        size-max: 16
         layout: {
           elementary
           usage: {
@@ -584,6 +620,7 @@ let%expect_test "redefines-with-value" =
         qualname: X
         offset: 0
         size: 48
+        size-max: 48
         layout: {
           elementary
           usage: {
@@ -596,6 +633,7 @@ let%expect_test "redefines-with-value" =
           redefines: X
           offset: 0
           size: 48
+          size-max: 48
           range: {
             span: fixed-length: 6
           }
@@ -604,6 +642,7 @@ let%expect_test "redefines-with-value" =
             leading ranges: 1
             offset: 0
             size: 8
+            size-max: 8
             layout: {
               elementary
               usage: {
@@ -617,6 +656,7 @@ let%expect_test "redefines-with-value" =
           redefines: X
           offset: 0
           size: 48
+          size-max: 48
           range: {
             span: fixed-length: 3
           }
@@ -625,6 +665,7 @@ let%expect_test "redefines-with-value" =
             leading ranges: 1
             offset: 0
             size: 16
+            size-max: 16
             layout: {
               elementary
               usage: {
@@ -640,6 +681,7 @@ let%expect_test "redefines-with-value" =
         redefines: X
         offset: 0
         size: 48
+        size-max: 48
         range: {
           span: fixed-length: 3
         }
@@ -648,6 +690,7 @@ let%expect_test "redefines-with-value" =
           leading ranges: 1
           offset: 0
           size: 16
+          size-max: 16
           layout: {
             elementary
             usage: {
@@ -704,12 +747,14 @@ let%expect_test "occurs-n-redefines-1" =
         qualname: W
         offset: 0
         size: 48
+        size-max: 48
         layout: {
           structure
           fields: {
             table
             offset: 0
             size: 40
+            size-max: 40
             range: {
               span: fixed-length: 5
             }
@@ -718,6 +763,7 @@ let%expect_test "occurs-n-redefines-1" =
               leading ranges: 1
               offset: 0
               size: 8
+              size-max: 8
               layout: {
                 elementary
                 usage: {
@@ -732,6 +778,7 @@ let%expect_test "occurs-n-redefines-1" =
               redefines: a IN W
               offset: 0
               size: 40
+              size-max: 40
               layout: {
                 elementary
                 usage: {
@@ -744,6 +791,7 @@ let%expect_test "occurs-n-redefines-1" =
             qualname: C IN W
             offset: 40
             size: 8
+            size-max: 8
             layout: {
               elementary
               usage: {
@@ -772,6 +820,7 @@ let%expect_test "occurs-n-redefines-1" =
         leading ranges: 1
         offset: 0
         size: 8
+        size-max: 8
         layout: {
           elementary
           usage: {
@@ -786,6 +835,7 @@ let%expect_test "occurs-n-redefines-1" =
         table
         offset: 0
         size: 40
+        size-max: 40
         range: {
           span: fixed-length: 5
         }
@@ -794,6 +844,7 @@ let%expect_test "occurs-n-redefines-1" =
           leading ranges: 1
           offset: 0
           size: 8
+          size-max: 8
           layout: {
             elementary
             usage: {
@@ -808,6 +859,7 @@ let%expect_test "occurs-n-redefines-1" =
           redefines: a IN W
           offset: 0
           size: 40
+          size-max: 40
           layout: {
             elementary
             usage: {
@@ -834,6 +886,7 @@ let%expect_test "occurs-n-redefines-1" =
         redefines: a IN W
         offset: 0
         size: 40
+        size-max: 40
         layout: {
           elementary
           usage: {
@@ -846,6 +899,7 @@ let%expect_test "occurs-n-redefines-1" =
         table
         offset: 0
         size: 40
+        size-max: 40
         range: {
           span: fixed-length: 5
         }
@@ -854,6 +908,7 @@ let%expect_test "occurs-n-redefines-1" =
           leading ranges: 1
           offset: 0
           size: 8
+          size-max: 8
           layout: {
             elementary
             usage: {
@@ -868,6 +923,7 @@ let%expect_test "occurs-n-redefines-1" =
           redefines: a IN W
           offset: 0
           size: 40
+          size-max: 40
           layout: {
             elementary
             usage: {
@@ -893,6 +949,7 @@ let%expect_test "occurs-n-redefines-1" =
         qualname: C IN W
         offset: 40
         size: 8
+        size-max: 8
         layout: {
           elementary
           usage: {
@@ -938,12 +995,14 @@ let%expect_test "occurs-n-redefines-2" =
         qualname: W
         offset: 0
         size: 16
+        size-max: 16
         layout: {
           structure
           fields: {
             table
             offset: 0
             size: 16
+            size-max: 16
             range: {
               span: fixed-length: 2
             }
@@ -952,6 +1011,7 @@ let%expect_test "occurs-n-redefines-2" =
               leading ranges: 1
               offset: 0
               size: 8
+              size-max: 8
               layout: {
                 elementary
                 usage: {
@@ -967,12 +1027,14 @@ let%expect_test "occurs-n-redefines-2" =
           redefines: W
           offset: 0
           size: 16
+          size-max: 16
           layout: {
             structure
             fields: {
               qualname: B IN X
               offset: 0
               size: 8
+              size-max: 8
               layout: {
                 elementary
                 usage: {
@@ -984,6 +1046,7 @@ let%expect_test "occurs-n-redefines-2" =
               qualname: C IN X
               offset: 8
               size: 8
+              size-max: 8
               layout: {
                 elementary
                 usage: {
@@ -1013,6 +1076,7 @@ let%expect_test "occurs-n-redefines-2" =
         leading ranges: 1
         offset: 0
         size: 8
+        size-max: 8
         layout: {
           elementary
           usage: {
@@ -1025,12 +1089,14 @@ let%expect_test "occurs-n-redefines-2" =
         qualname: W
         offset: 0
         size: 16
+        size-max: 16
         layout: {
           structure
           fields: {
             table
             offset: 0
             size: 16
+            size-max: 16
             range: {
               span: fixed-length: 2
             }
@@ -1039,6 +1105,7 @@ let%expect_test "occurs-n-redefines-2" =
               leading ranges: 1
               offset: 0
               size: 8
+              size-max: 8
               layout: {
                 elementary
                 usage: {
@@ -1054,12 +1121,14 @@ let%expect_test "occurs-n-redefines-2" =
           redefines: W
           offset: 0
           size: 16
+          size-max: 16
           layout: {
             structure
             fields: {
               qualname: B IN X
               offset: 0
               size: 8
+              size-max: 8
               layout: {
                 elementary
                 usage: {
@@ -1071,6 +1140,7 @@ let%expect_test "occurs-n-redefines-2" =
               qualname: C IN X
               offset: 8
               size: 8
+              size-max: 8
               layout: {
                 elementary
                 usage: {
@@ -1086,6 +1156,7 @@ let%expect_test "occurs-n-redefines-2" =
         table
         offset: 0
         size: 16
+        size-max: 16
         range: {
           span: fixed-length: 2
         }
@@ -1094,6 +1165,7 @@ let%expect_test "occurs-n-redefines-2" =
           leading ranges: 1
           offset: 0
           size: 8
+          size-max: 8
           layout: {
             elementary
             usage: {
@@ -1124,12 +1196,14 @@ let%expect_test "occurs-n-redefines-2" =
         redefines: W
         offset: 0
         size: 16
+        size-max: 16
         layout: {
           structure
           fields: {
             qualname: B IN X
             offset: 0
             size: 8
+            size-max: 8
             layout: {
               elementary
               usage: {
@@ -1141,6 +1215,7 @@ let%expect_test "occurs-n-redefines-2" =
             qualname: C IN X
             offset: 8
             size: 8
+            size-max: 8
             layout: {
               elementary
               usage: {
@@ -1155,12 +1230,14 @@ let%expect_test "occurs-n-redefines-2" =
         qualname: W
         offset: 0
         size: 16
+        size-max: 16
         layout: {
           structure
           fields: {
             table
             offset: 0
             size: 16
+            size-max: 16
             range: {
               span: fixed-length: 2
             }
@@ -1169,6 +1246,7 @@ let%expect_test "occurs-n-redefines-2" =
               leading ranges: 1
               offset: 0
               size: 8
+              size-max: 8
               layout: {
                 elementary
                 usage: {
@@ -1184,12 +1262,14 @@ let%expect_test "occurs-n-redefines-2" =
           redefines: W
           offset: 0
           size: 16
+          size-max: 16
           layout: {
             structure
             fields: {
               qualname: B IN X
               offset: 0
               size: 8
+              size-max: 8
               layout: {
                 elementary
                 usage: {
@@ -1201,6 +1281,7 @@ let%expect_test "occurs-n-redefines-2" =
               qualname: C IN X
               offset: 8
               size: 8
+              size-max: 8
               layout: {
                 elementary
                 usage: {
@@ -1228,6 +1309,7 @@ let%expect_test "occurs-n-redefines-2" =
         qualname: B IN X
         offset: 0
         size: 8
+        size-max: 8
         layout: {
           elementary
           usage: {
@@ -1240,12 +1322,14 @@ let%expect_test "occurs-n-redefines-2" =
         qualname: W
         offset: 0
         size: 16
+        size-max: 16
         layout: {
           structure
           fields: {
             table
             offset: 0
             size: 16
+            size-max: 16
             range: {
               span: fixed-length: 2
             }
@@ -1254,6 +1338,7 @@ let%expect_test "occurs-n-redefines-2" =
               leading ranges: 1
               offset: 0
               size: 8
+              size-max: 8
               layout: {
                 elementary
                 usage: {
@@ -1269,12 +1354,14 @@ let%expect_test "occurs-n-redefines-2" =
           redefines: W
           offset: 0
           size: 16
+          size-max: 16
           layout: {
             structure
             fields: {
               qualname: B IN X
               offset: 0
               size: 8
+              size-max: 8
               layout: {
                 elementary
                 usage: {
@@ -1286,6 +1373,7 @@ let%expect_test "occurs-n-redefines-2" =
               qualname: C IN X
               offset: 8
               size: 8
+              size-max: 8
               layout: {
                 elementary
                 usage: {
@@ -1313,6 +1401,7 @@ let%expect_test "occurs-n-redefines-2" =
         qualname: C IN X
         offset: 8
         size: 8
+        size-max: 8
         layout: {
           elementary
           usage: {
@@ -1325,12 +1414,14 @@ let%expect_test "occurs-n-redefines-2" =
         qualname: W
         offset: 0
         size: 16
+        size-max: 16
         layout: {
           structure
           fields: {
             table
             offset: 0
             size: 16
+            size-max: 16
             range: {
               span: fixed-length: 2
             }
@@ -1339,6 +1430,7 @@ let%expect_test "occurs-n-redefines-2" =
               leading ranges: 1
               offset: 0
               size: 8
+              size-max: 8
               layout: {
                 elementary
                 usage: {
@@ -1354,12 +1446,14 @@ let%expect_test "occurs-n-redefines-2" =
           redefines: W
           offset: 0
           size: 16
+          size-max: 16
           layout: {
             structure
             fields: {
               qualname: B IN X
               offset: 0
               size: 8
+              size-max: 8
               layout: {
                 elementary
                 usage: {
@@ -1371,6 +1465,7 @@ let%expect_test "occurs-n-redefines-2" =
               qualname: C IN X
               offset: 8
               size: 8
+              size-max: 8
               layout: {
                 elementary
                 usage: {
@@ -1422,12 +1517,14 @@ let%expect_test "redefines-index" =
         qualname: xx
         offset: 0
         size: size-of-index
+        size-max: size-of-index
         layout: {
           structure
           fields: {
             qualname: x IN xx
             offset: 0
             size: size-of-index
+            size-max: size-of-index
             layout: {
               elementary
               usage: index
@@ -1437,6 +1534,7 @@ let%expect_test "redefines-index" =
               redefines: x IN xx
               offset: 0
               size: size-of-index
+              size-max: size-of-index
               layout: {
                 elementary
                 usage: index
@@ -1449,6 +1547,7 @@ let%expect_test "redefines-index" =
           redefines: xx
           offset: 0
           size: 32
+          size-max: 32
           layout: {
             elementary
             usage: {
@@ -1477,6 +1576,7 @@ let%expect_test "redefines-index" =
         qualname: x IN xx
         offset: 0
         size: size-of-index
+        size-max: size-of-index
         layout: {
           elementary
           usage: index
@@ -1486,6 +1586,7 @@ let%expect_test "redefines-index" =
           redefines: x IN xx
           offset: 0
           size: size-of-index
+          size-max: size-of-index
           layout: {
             elementary
             usage: index
@@ -1510,6 +1611,7 @@ let%expect_test "redefines-index" =
         redefines: x IN xx
         offset: 0
         size: size-of-index
+        size-max: size-of-index
         layout: {
           elementary
           usage: index
@@ -1519,6 +1621,7 @@ let%expect_test "redefines-index" =
         qualname: x IN xx
         offset: 0
         size: size-of-index
+        size-max: size-of-index
         layout: {
           elementary
           usage: index
@@ -1528,6 +1631,7 @@ let%expect_test "redefines-index" =
           redefines: x IN xx
           offset: 0
           size: size-of-index
+          size-max: size-of-index
           layout: {
             elementary
             usage: index
@@ -1551,6 +1655,7 @@ let%expect_test "redefines-index" =
         redefines: xx
         offset: 0
         size: 32
+        size-max: 32
         layout: {
           elementary
           usage: {
@@ -1563,12 +1668,14 @@ let%expect_test "redefines-index" =
         qualname: xx
         offset: 0
         size: size-of-index
+        size-max: size-of-index
         layout: {
           structure
           fields: {
             qualname: x IN xx
             offset: 0
             size: size-of-index
+            size-max: size-of-index
             layout: {
               elementary
               usage: index
@@ -1578,6 +1685,7 @@ let%expect_test "redefines-index" =
               redefines: x IN xx
               offset: 0
               size: size-of-index
+              size-max: size-of-index
               layout: {
                 elementary
                 usage: index
@@ -1590,6 +1698,7 @@ let%expect_test "redefines-index" =
           redefines: xx
           offset: 0
           size: 32
+          size-max: 32
           layout: {
             elementary
             usage: {

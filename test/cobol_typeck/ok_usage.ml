@@ -53,6 +53,7 @@ let%expect_test "usage-binary" =
       qualname: A1
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         elementary
         usage: {
@@ -74,6 +75,7 @@ let%expect_test "usage-binary" =
       /!\ with_errors /!\
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         elementary
         usage: {
@@ -111,6 +113,7 @@ let%expect_test "usage-binary-mf" =
       qualname: A1
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         elementary
         usage: {
@@ -132,6 +135,7 @@ let%expect_test "usage-binary-mf" =
       /!\ with_errors /!\
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         elementary
         usage: {
@@ -161,6 +165,7 @@ let%expect_test "usage-index" =
       qualname: A
       offset: 0
       size: size-of-index
+      size-max: size-of-index
       layout: {
         elementary
         usage: index
@@ -182,12 +187,14 @@ let%expect_test "usage-index" =
       filler
       offset: 0
       size: (* 2 size-of-index)
+      size-max: (* 2 size-of-index)
       layout: {
         structure
         fields: {
           qualname: C
           offset: 0
           size: size-of-index
+          size-max: size-of-index
           layout: {
             elementary
             usage: index
@@ -196,6 +203,7 @@ let%expect_test "usage-index" =
           qualname: D
           offset: size-of-index
           size: size-of-index
+          size-max: size-of-index
           layout: {
             elementary
             usage: index
@@ -226,6 +234,7 @@ let%expect_test "usage-index-mf" =
       qualname: A
       offset: 0
       size: size-of-index
+      size-max: size-of-index
       layout: {
         elementary
         usage: index
@@ -247,12 +256,14 @@ let%expect_test "usage-index-mf" =
       filler
       offset: 0
       size: (* 2 size-of-index)
+      size-max: (* 2 size-of-index)
       layout: {
         structure
         fields: {
           qualname: C
           offset: 0
           size: size-of-index
+          size-max: size-of-index
           layout: {
             elementary
             usage: index
@@ -261,6 +272,7 @@ let%expect_test "usage-index-mf" =
           qualname: D
           offset: size-of-index
           size: size-of-index
+          size-max: size-of-index
           layout: {
             elementary
             usage: index
@@ -301,6 +313,7 @@ let%expect_test "usage-comps" =
       qualname: A1
       offset: 0
       size: size-of-C-float
+      size-max: size-of-C-float
       layout: {
         elementary
         usage: float-short (float)
@@ -318,6 +331,7 @@ let%expect_test "usage-comps" =
       qualname: A2
       offset: 0
       size: size-of-C-double
+      size-max: size-of-C-double
       layout: {
         elementary
         usage: float-long (double)
@@ -335,6 +349,7 @@ let%expect_test "usage-comps" =
       qualname: A5
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         elementary
         usage: {
@@ -355,6 +370,7 @@ let%expect_test "usage-comps" =
       qualname: B5
       offset: 0
       size: 16
+      size-max: 16
       layout: {
         elementary
         usage: {
@@ -375,6 +391,7 @@ let%expect_test "usage-comps" =
       qualname: C5
       offset: 0
       size: 32
+      size-max: 32
       layout: {
         elementary
         usage: {
@@ -395,6 +412,7 @@ let%expect_test "usage-comps" =
       qualname: D5
       offset: 0
       size: 64
+      size-max: 64
       layout: {
         elementary
         usage: {
@@ -415,6 +433,7 @@ let%expect_test "usage-comps" =
       qualname: SA5
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         elementary
         usage: {
@@ -435,6 +454,7 @@ let%expect_test "usage-comps" =
       qualname: SB5
       offset: 0
       size: 16
+      size-max: 16
       layout: {
         elementary
         usage: {
@@ -455,6 +475,7 @@ let%expect_test "usage-comps" =
       qualname: SC5
       offset: 0
       size: 32
+      size-max: 32
       layout: {
         elementary
         usage: {
@@ -475,6 +496,7 @@ let%expect_test "usage-comps" =
       qualname: SD5
       offset: 0
       size: 64
+      size-max: 64
       layout: {
         elementary
         usage: {
@@ -495,6 +517,7 @@ let%expect_test "usage-comps" =
       qualname: SVB5
       offset: 0
       size: 16
+      size-max: 16
       layout: {
         elementary
         usage: {
@@ -515,6 +538,7 @@ let%expect_test "usage-comps" =
       qualname: SVC5
       offset: 0
       size: 32
+      size-max: 32
       layout: {
         elementary
         usage: {
@@ -535,6 +559,7 @@ let%expect_test "usage-comps" =
       qualname: SVD5
       offset: 0
       size: 64
+      size-max: 64
       layout: {
         elementary
         usage: {
@@ -555,6 +580,7 @@ let%expect_test "usage-comps" =
       qualname: SVD5
       offset: 0
       size: 64
+      size-max: 64
       layout: {
         elementary
         usage: {
@@ -595,6 +621,7 @@ let%expect_test "usage-comps-mf" =
       qualname: A1
       offset: 0
       size: size-of-C-float
+      size-max: size-of-C-float
       layout: {
         elementary
         usage: float-short (float)
@@ -612,6 +639,7 @@ let%expect_test "usage-comps-mf" =
       qualname: A2
       offset: 0
       size: size-of-C-double
+      size-max: size-of-C-double
       layout: {
         elementary
         usage: float-long (double)
@@ -629,6 +657,7 @@ let%expect_test "usage-comps-mf" =
       qualname: A5
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         elementary
         usage: {
@@ -649,6 +678,7 @@ let%expect_test "usage-comps-mf" =
       qualname: B5
       offset: 0
       size: 16
+      size-max: 16
       layout: {
         elementary
         usage: {
@@ -669,6 +699,7 @@ let%expect_test "usage-comps-mf" =
       qualname: C5
       offset: 0
       size: 32
+      size-max: 32
       layout: {
         elementary
         usage: {
@@ -689,6 +720,7 @@ let%expect_test "usage-comps-mf" =
       qualname: D5
       offset: 0
       size: 64
+      size-max: 64
       layout: {
         elementary
         usage: {
@@ -709,6 +741,7 @@ let%expect_test "usage-comps-mf" =
       qualname: SA5
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         elementary
         usage: {
@@ -729,6 +762,7 @@ let%expect_test "usage-comps-mf" =
       qualname: SB5
       offset: 0
       size: 16
+      size-max: 16
       layout: {
         elementary
         usage: {
@@ -749,6 +783,7 @@ let%expect_test "usage-comps-mf" =
       qualname: SC5
       offset: 0
       size: 32
+      size-max: 32
       layout: {
         elementary
         usage: {
@@ -769,6 +804,7 @@ let%expect_test "usage-comps-mf" =
       qualname: SD5
       offset: 0
       size: 64
+      size-max: 64
       layout: {
         elementary
         usage: {
@@ -789,6 +825,7 @@ let%expect_test "usage-comps-mf" =
       qualname: SVB5
       offset: 0
       size: 16
+      size-max: 16
       layout: {
         elementary
         usage: {
@@ -809,6 +846,7 @@ let%expect_test "usage-comps-mf" =
       qualname: SVC5
       offset: 0
       size: 32
+      size-max: 32
       layout: {
         elementary
         usage: {
@@ -829,6 +867,7 @@ let%expect_test "usage-comps-mf" =
       qualname: SVD5
       offset: 0
       size: 64
+      size-max: 64
       layout: {
         elementary
         usage: {
@@ -849,6 +888,7 @@ let%expect_test "usage-comps-mf" =
       qualname: SVD5
       offset: 0
       size: 64
+      size-max: 64
       layout: {
         elementary
         usage: {

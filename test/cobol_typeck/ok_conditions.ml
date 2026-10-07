@@ -34,6 +34,7 @@ let%expect_test "simple-conditions" =
       qualname: X
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         elementary
         usage: {
@@ -78,12 +79,14 @@ let%expect_test "qualified-conditions" =
       qualname: W
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         structure
         fields: {
           qualname: X IN W
           offset: 0
           size: 8
+          size-max: 8
           layout: {
             elementary
             usage: {
@@ -139,12 +142,14 @@ let%expect_test "group-conditions" =
       qualname: X
       offset: 0
       size: 24
+      size-max: 24
       layout: {
         structure
         fields: {
           filler
           offset: 0
           size: 24
+          size-max: 24
           layout: {
             elementary
             usage: {
@@ -178,12 +183,14 @@ let%expect_test "group-conditions" =
       qualname: W
       offset: 0
       size: 24
+      size-max: 24
       layout: {
         structure
         fields: {
           table
           offset: 0
           size: 24
+          size-max: 24
           range: {
             span: fixed-length: 3
           }
@@ -192,6 +199,7 @@ let%expect_test "group-conditions" =
             leading ranges: 1
             offset: 0
             size: 8
+            size-max: 8
             layout: {
               structure
               fields: {
@@ -199,6 +207,7 @@ let%expect_test "group-conditions" =
                 leading ranges: 1
                 offset: 0
                 size: 8
+                size-max: 8
                 layout: {
                   elementary
                   usage: {

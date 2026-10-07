@@ -54,12 +54,14 @@ let%expect_test "renames-with-redefines" =
       qualname: A
       offset: 0
       size: 32
+      size-max: 32
       layout: {
         structure
         fields: {
           qualname: A-1 IN A
           offset: 0
           size: 8
+          size-max: 8
           layout: {
             elementary
             usage: {
@@ -71,6 +73,7 @@ let%expect_test "renames-with-redefines" =
           qualname: A-A IN A
           offset: 8
           size: 8
+          size-max: 8
           layout: {
             elementary
             usage: {
@@ -82,6 +85,7 @@ let%expect_test "renames-with-redefines" =
           qualname: A-B IN A
           offset: 16
           size: 8
+          size-max: 8
           layout: {
             elementary
             usage: {
@@ -93,6 +97,7 @@ let%expect_test "renames-with-redefines" =
           qualname: A-2 IN A
           offset: 24
           size: 8
+          size-max: 8
           layout: {
             elementary
             usage: {
@@ -106,6 +111,7 @@ let%expect_test "renames-with-redefines" =
             redefines: A-2 IN A
             offset: 24
             size: 8
+            size-max: 8
             layout: {
               elementary
               usage: {
@@ -118,6 +124,7 @@ let%expect_test "renames-with-redefines" =
             redefines: A-2 IN A
             offset: 24
             size: 8
+            size-max: 8
             layout: {
               elementary
               usage: {
@@ -184,6 +191,7 @@ let%expect_test "renames-with-redefines" =
       table
       offset: 0
       size: 40
+      size-max: 40
       range: {
         span: fixed-length: 5
       }
@@ -192,6 +200,7 @@ let%expect_test "renames-with-redefines" =
         leading ranges: 1
         offset: 0
         size: 8
+        size-max: 8
         layout: {
           elementary
           usage: {
@@ -246,12 +255,14 @@ let%expect_test "renames-qualif" =
       qualname: A
       offset: 0
       size: 72
+      size-max: 72
       layout: {
         structure
         fields: {
           qualname: A-T-LEN IN A
           offset: 0
           size: 16
+          size-max: 16
           layout: {
             elementary
             usage: {
@@ -263,6 +274,7 @@ let%expect_test "renames-qualif" =
           qualname: A-1 IN A
           offset: 16
           size: 8
+          size-max: 8
           layout: {
             elementary
             usage: {
@@ -274,6 +286,7 @@ let%expect_test "renames-qualif" =
           table
           offset: 24
           size: 40
+          size-max: 40
           range: {
             span: fixed-length: 5
           }
@@ -282,6 +295,7 @@ let%expect_test "renames-qualif" =
             leading ranges: 1
             offset: 24
             size: 8
+            size-max: 8
             layout: {
               elementary
               usage: {
@@ -294,6 +308,7 @@ let%expect_test "renames-qualif" =
           qualname: A-2 IN A
           offset: 64
           size: 8
+          size-max: 8
           layout: {
             elementary
             usage: {
@@ -307,6 +322,7 @@ let%expect_test "renames-qualif" =
             redefines: A-2 IN A
             offset: 64
             size: 8
+            size-max: 8
             layout: {
               elementary
               usage: {
@@ -387,6 +403,7 @@ let%expect_test "renames-qualif" =
       qualname: YYY
       offset: 0
       size: 24
+      size-max: 24
       layout: {
         elementary
         usage: {
@@ -399,30 +416,35 @@ let%expect_test "renames-qualif" =
         redefines: YYY
         offset: 0
         size: 24
+        size-max: 24
         layout: {
           structure
           fields: {
             filler
             offset: 0
             size: 24
+            size-max: 24
             layout: {
               structure
               fields: {
                 qualname: ZZZ IN XXX
                 offset: 0
                 size: 24
+                size-max: 24
                 layout: {
                   structure
                   fields: {
                     filler
                     offset: 0
                     size: 24
+                    size-max: 24
                     layout: {
                       structure
                       fields: {
                         qualname: DDD IN ZZZ IN XXX
                         offset: 0
                         size: 8
+                        size-max: 8
                         layout: {
                           elementary
                           usage: {
@@ -435,6 +457,7 @@ let%expect_test "renames-qualif" =
                         qualname: FFF IN ZZZ IN XXX
                         offset: 8
                         size: 8
+                        size-max: 8
                         layout: {
                           elementary
                           usage: {
@@ -447,6 +470,7 @@ let%expect_test "renames-qualif" =
                         qualname: EEE IN ZZZ IN XXX
                         offset: 16
                         size: 8
+                        size-max: 8
                         layout: {
                           elementary
                           usage: {

@@ -34,6 +34,7 @@ let%expect_test "one-77" =
       qualname: A
       offset: 0
       size: 8
+      size-max: 8
       layout: {
         elementary
         usage: {
@@ -65,6 +66,7 @@ let%expect_test "boolean-value" =
       qualname: X
       offset: 0
       size: 32
+      size-max: 32
       layout: {
         elementary
         usage: {
@@ -86,6 +88,7 @@ let%expect_test "boolean-value" =
       qualname: Y
       offset: 0
       size: 0
+      size-max: 0
       layout: {
         elementary
         usage: {
@@ -117,6 +120,7 @@ let%expect_test "hexadecimal-value" =
       qualname: X
       offset: 0
       size: 88
+      size-max: 88
       layout: {
         elementary
         usage: {
@@ -138,6 +142,7 @@ let%expect_test "hexadecimal-value" =
       qualname: Y
       offset: 0
       size: 96
+      size-max: 96
       layout: {
         elementary
         usage: {

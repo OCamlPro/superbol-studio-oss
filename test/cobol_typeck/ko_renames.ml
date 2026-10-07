@@ -96,12 +96,14 @@ let%expect_test "renames-errors-1" =
       qualname: B
       offset: 0
       size: 96
+      size-max: 96
       layout: {
         structure
         fields: {
           table
           offset: 0
           size: 40
+          size-max: 40
           range: {
             span: fixed-length: 5
           }
@@ -110,6 +112,7 @@ let%expect_test "renames-errors-1" =
             leading ranges: 1
             offset: 0
             size: 8
+            size-max: 8
             layout: {
               elementary
               usage: {
@@ -122,6 +125,7 @@ let%expect_test "renames-errors-1" =
           qualname: B-2 IN B
           offset: 40
           size: 8
+          size-max: 8
           layout: {
             elementary
             usage: {
@@ -133,6 +137,7 @@ let%expect_test "renames-errors-1" =
           qualname: B-3 IN B
           offset: 48
           size: 8
+          size-max: 8
           layout: {
             elementary
             usage: {
@@ -144,6 +149,7 @@ let%expect_test "renames-errors-1" =
           table
           offset: 56
           size: 40
+          size-max: 40
           range: {
             span: fixed-length: 5
           }
@@ -152,6 +158,7 @@ let%expect_test "renames-errors-1" =
             leading ranges: 1
             offset: 56
             size: 8
+            size-max: 8
             layout: {
               structure
               fields: {
@@ -159,6 +166,7 @@ let%expect_test "renames-errors-1" =
                 leading ranges: 1
                 offset: 56
                 size: 8
+                size-max: 8
                 layout: {
                   elementary
                   usage: {
@@ -306,6 +314,7 @@ let%expect_test "renames-missing-target" =
       table
       offset: 0
       size: 40
+      size-max: 40
       range: {
         span: fixed-length: 5
       }
@@ -314,6 +323,7 @@ let%expect_test "renames-missing-target" =
         leading ranges: 1
         offset: 0
         size: 8
+        size-max: 8
         layout: {
           elementary
           usage: {
@@ -339,12 +349,14 @@ let%expect_test "renames-missing-target" =
       qualname: B
       offset: 0
       size: 16
+      size-max: 16
       layout: {
         structure
         fields: {
           qualname: B1 IN B
           offset: 0
           size: 8
+          size-max: 8
           layout: {
             elementary
             usage: {
@@ -356,6 +368,7 @@ let%expect_test "renames-missing-target" =
           qualname: B2 IN B
           offset: 8
           size: 8
+          size-max: 8
           layout: {
             elementary
             usage: {
@@ -425,12 +438,14 @@ let%expect_test "renames-errors-invalid-sizes" =
       filler
       offset: 0
       size: 9
+      size-max: 9
       layout: {
         structure
         fields: {
           qualname: A
           offset: 0
           size: 8
+          size-max: 8
           layout: {
             elementary
             usage: {
@@ -442,6 +457,7 @@ let%expect_test "renames-errors-invalid-sizes" =
           qualname: B
           offset: 8
           size: 1
+          size-max: 1
           layout: {
             elementary
             usage: {
