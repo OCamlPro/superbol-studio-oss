@@ -21,14 +21,14 @@ let size_in_bits size =
   with Cobol_data.Memory.NOT_SCALAR _ -> None
 
 (* Number and unit: bytes when [bits] is a whole number of bytes. *)
-let in_unit bits =
+let bit_n_unit bits =
   if Int.rem bits 8 = 0 then bits / 8, "byte" else bits, "bit"
 
 let pp_unit ppf (n, unit) =
   Fmt.pf ppf "%s%s" unit (if n <> 1 then "s" else "")
 
 let pp_bits ppf bits =
-  let n, unit = in_unit bits in
+  let n, unit = bit_n_unit bits in
   Fmt.pf ppf "%u %a" n pp_unit (n, unit)
 
 let pp_readable_size ppf size =
@@ -40,7 +40,7 @@ let pp_readable_size ppf size =
    the product when one of its factors is 1. *)
 let pp_table_size ppf (span, occurrence_size, total_size) =
   let pp_count prefix n bits =
-    let m, unit = in_unit bits in
+    let m, unit = bit_n_unit bits in
     let p = n * m in
     if n = 1 || m = 1 then
       Fmt.pf ppf "%s%u %a" prefix p pp_unit (p, unit)
