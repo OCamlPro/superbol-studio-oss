@@ -717,11 +717,6 @@ let describe_data_definition_for_element_at_pos
       with Not_found ->
         None
 
-let data_references position ~(doc: Lsp_document.t) checked_doc =
-  Option.map List.length @@
-  lookup_references_in_doc position ~doc checked_doc
-    ~with_declaration:true
-
 let hover_markdown ~filename ~loc value =
   let content = MarkupContent.create ~kind:MarkupKind.Markdown ~value in
   let range = Lsp_position.range_of_srcloc_in ~filename loc in
@@ -774,32 +769,22 @@ let handle_hover ?show_data_description_on_definitions
   let filename = Lsp.Uri.to_path textDocument.uri in
   try_with_checked_doc registry textDocument
     ~f:begin fun ~doc checked_doc ->
-      let ref_count () = data_references position ~doc checked_doc in
       match
         describe_data_definition_for_element_at_pos position ~doc ~checked_doc
           ?show_data_description_on_definitions,
         preproc_info_on_hover ~filename position doc.artifacts.pplog
       with
-      | None, None ->
+      | None, None
+      | Some (None, _), None ->
           None
-      | Some (None, loc), None ->
-          Option.bind (ref_count ()) @@ fun n ->
-          hover_markdown ~filename ~loc @@ Printf.sprintf "References: %d" n
       | None, Some (text, loc) ->
           hover_markdown ~filename ~loc text
       | Some (Some text, loc), None ->
-          let ref_text =
-            Option.fold ~none:"" ~some:(Printf.sprintf "\n\n---\nReferences: %d")
-              (ref_count ()) in
-          hover_markdown ~filename ~loc @@ text ^ ref_text
+          hover_markdown ~filename ~loc text
       | Some (def_text, loc), Some (pp_text, _) ->
-          let ref_text =
-            Option.fold ~none:"" ~some:(Printf.sprintf "\n\n---\nReferences: %d")
-              (ref_count ()) in
           hover_markdown ~filename ~loc @@
-          Pretty.to_string "%s%s\n---\nAdditional pre-processing:\n%s"
+          Pretty.to_string "%s\n---\nAdditional pre-processing:\n%s"
             (Option.value ~default:"" def_text)
-            ref_text
             pp_text
     end
 

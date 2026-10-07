@@ -81,8 +81,6 @@ let%expect_test "hover-copy" =
     Offset: 0 bytes
     Size: 1 byte
     ---
-    References: 2
-    ---
     Additional pre-processing:
     ```cobol
            01 FIELD PIC X.
@@ -105,8 +103,6 @@ let%expect_test "hover-copy" =
     ALPHANUMERIC(1)
     Offset: 0 bytes
     Size: 1 byte
-    ---
-    References: 2
     ---
     Additional pre-processing:
     ```cobol
@@ -131,8 +127,6 @@ let%expect_test "hover-copy" =
     Offset: 0 bytes
     Size: 1 byte
     ---
-    References: 2
-    ---
     Additional pre-processing:
     ```cobol
            01 FIELD PIC X.
@@ -155,8 +149,6 @@ let%expect_test "hover-copy" =
     ALPHANUMERIC(1)
     Offset: 0 bytes
     Size: 1 byte
-    ---
-    References: 2
     ---
     Additional pre-processing:
     ```cobol
@@ -200,9 +192,7 @@ let%expect_test "hover-typedef-from-copy" =
     ```
     ALPHANUMERIC(1)
     Offset: 0 bytes
-    Size: 1 byte
-    ---
-    References: 2 |}];;
+    Size: 1 byte |}];;
 
 (* Hover replaced *)
 
@@ -273,8 +263,6 @@ let%expect_test "hover-datadef-vars" =
     ALPHANUMERIC(1)
     Offset: 0 bytes
     Size: 1 byte
-    ---
-    References: 2
     (line 5, character 23):
     __rootdir__/prog.cob:6.8-6.27:
        3           PROGRAM-ID. prog.
@@ -293,8 +281,6 @@ let%expect_test "hover-datadef-vars" =
     ALPHANUMERIC(1)
     Offset: 0 bytes
     Size: 1 byte
-    ---
-    References: 2
     (line 6, character 14):
     __rootdir__/prog.cob:7.11-7.17:
        4           DATA DIVISION.
@@ -310,8 +296,6 @@ let%expect_test "hover-datadef-vars" =
     Group of 3 subfields
     Offset: 0 bytes
     Size: 10 bytes
-    ---
-    References: 2
     (line 7, character 31):
     __rootdir__/prog.cob:8.10-8.44:
        5           WORKING-STORAGE SECTION.
@@ -332,8 +316,6 @@ let%expect_test "hover-datadef-vars" =
     VALUE 123
     Offset: 0 bytes in STRUCT
     Size: 3 bytes
-    ---
-    References: 2
     (line 8, character 16):
     __rootdir__/prog.cob:9.13-9.21:
        6           01 DATA-NAME PIC X.
@@ -353,8 +335,6 @@ let%expect_test "hover-datadef-vars" =
     VALUE QUOTE
     Offset: 3 bytes in STRUCT
     Size: 1 byte
-    ---
-    References: 2
     (line 9, character 38):
     __rootdir__/prog.cob:10.10-10.50:
        7           01 STRUCT.
@@ -374,8 +354,6 @@ let%expect_test "hover-datadef-vars" =
     VALUE "ABC456"
     Offset: 4 bytes in STRUCT
     Size: 6 bytes
-    ---
-    References: 2
     (line 10, character 14):
     __rootdir__/prog.cob:11.11-11.14:
        8             02 STRUCT-1 PICTURE 999 VALUE 123.
@@ -395,8 +373,6 @@ let%expect_test "hover-datadef-vars" =
     VALUE "************************************"
     Offset: 0 bytes
     Size: 38 bytes
-    ---
-    References: 1
     (line 11, character 17):
     __rootdir__/prog.cob:12.11-12.24:
        9             02 STRUCT-2 PICTURE X VALUE QUOTE.
@@ -416,8 +392,6 @@ let%expect_test "hover-datadef-vars" =
     *e.g,* [`+000000000.000000000`] (0), [`+123456789.123000000`] (123456789.123)
     Offset: 0 bytes
     Size: 8 bytes
-    ---
-    References: 1
     (line 13, character 18):
     __rootdir__/prog.cob:14.18-14.27:
       11           01 BIG PIC X(38) VALUE "************************************".
@@ -436,8 +410,6 @@ let%expect_test "hover-datadef-vars" =
     ALPHANUMERIC(1)
     Offset: 0 bytes
     Size: 1 byte
-    ---
-    References: 2
     (line 13, character 33):
     __rootdir__/prog.cob:14.28-14.34:
       11           01 BIG PIC X(38) VALUE "************************************".
@@ -453,8 +425,6 @@ let%expect_test "hover-datadef-vars" =
     Group of 3 subfields
     Offset: 0 bytes
     Size: 10 bytes
-    ---
-    References: 2
     (line 13, character 36):
     __rootdir__/prog.cob:14.35-14.43:
       11           01 BIG PIC X(38) VALUE "************************************".
@@ -475,8 +445,6 @@ let%expect_test "hover-datadef-vars" =
     VALUE 123
     Offset: 0 bytes in STRUCT
     Size: 3 bytes
-    ---
-    References: 2
     (line 13, character 47):
     __rootdir__/prog.cob:14.44-14.52:
       11           01 BIG PIC X(38) VALUE "************************************".
@@ -496,8 +464,6 @@ let%expect_test "hover-datadef-vars" =
     VALUE QUOTE
     Offset: 3 bytes in STRUCT
     Size: 1 byte
-    ---
-    References: 2
     (line 13, character 56):
     __rootdir__/prog.cob:14.53-14.61:
       11           01 BIG PIC X(38) VALUE "************************************".
@@ -516,9 +482,7 @@ let%expect_test "hover-datadef-vars" =
     ALPHANUMERIC(6)
     VALUE "ABC456"
     Offset: 4 bytes in STRUCT
-    Size: 6 bytes
-    ---
-    References: 2 |}];;
+    Size: 6 bytes |}];;
 
 let%expect_test "hover-datadef-value-with-tab" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -553,9 +517,7 @@ let%expect_test "hover-datadef-value-with-tab" =
     ALPHANUMERIC(10)
     VALUE "ABC\tDEF"
     Offset: 0 bytes
-    Size: 10 bytes
-    ---
-    References: 2 |}]
+    Size: 10 bytes |}]
 
 let%expect_test "hover-datadef-vars-usage" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -600,8 +562,6 @@ let%expect_test "hover-datadef-vars-usage" =
     *e.g,* [`        0.00`] (0), [`  123,456.78`] (123456.78)
     Offset: 0 bytes
     Size: 8 bytes
-    ---
-    References: 1
     (line 6, character 11):
     __rootdir__/prog.cob:7.11-7.15:
        4           DATA DIVISION.
@@ -621,8 +581,6 @@ let%expect_test "hover-datadef-vars-usage" =
     *e.g,* [`0`] (0), [`1`] (1)
     Offset: 0 bytes
     Size: 1 byte
-    ---
-    References: 1
     (line 7, character 11):
     __rootdir__/prog.cob:8.11-8.15:
        5           WORKING-STORAGE SECTION.
@@ -640,8 +598,6 @@ let%expect_test "hover-datadef-vars-usage" =
     ```
     Offset: 0 bytes
     Size: 2 bytes
-    ---
-    References: 1
     (line 8, character 11):
     __rootdir__/prog.cob:9.11-9.15:
        6           01 VAR PIC -BZZZ,ZZ9.99.
@@ -659,8 +615,6 @@ let%expect_test "hover-datadef-vars-usage" =
     ```
     Offset: 0 bytes
     Size: *variable*
-    ---
-    References: 1
     (line 9, character 11):
     __rootdir__/prog.cob:10.11-10.15:
        7           01 VAR1 PIC 9 USAGE BINARY.
@@ -679,8 +633,6 @@ let%expect_test "hover-datadef-vars-usage" =
     BOOLEAN(3)
     Offset: 0 bytes
     Size: 3 bits
-    ---
-    References: 1
     (line 10, character 11):
     __rootdir__/prog.cob:11.11-11.15:
        8           01 VAR4 USAGE BINARY-SHORT.
@@ -696,8 +648,6 @@ let%expect_test "hover-datadef-vars-usage" =
     Pointer
     Offset: 0 bytes
     Size: *variable*
-    ---
-    References: 1
     (line 11, character 11):
     __rootdir__/prog.cob:12.11-12.15:
        9           01 VAR3 USAGE BINARY-C-LONG.
@@ -717,8 +667,6 @@ let%expect_test "hover-datadef-vars-usage" =
     *e.g,* [`0`] (0), [`1`] (1)
     Offset: 0 bytes
     Size: 1 byte
-    ---
-    References: 1
     (line 12, character 11):
     __rootdir__/prog.cob:13.11-13.15:
       10           01 VAR6 PIC 111 USAGE BIT.
@@ -738,8 +686,6 @@ let%expect_test "hover-datadef-vars-usage" =
     *e.g,* [`         `] (0), [`$+1/2.3 4`] (12.34)
     Offset: 0 bytes
     Size: 4 bytes
-    ---
-    References: 1
     (line 13, character 11):
     __rootdir__/prog.cob:14.11-14.15:
       11           01 VAR7 USAGE POINTER.
@@ -758,8 +704,6 @@ let%expect_test "hover-datadef-vars-usage" =
     ALPHANUMERIC(2)
     Offset: 0 bytes
     Size: 2 bytes
-    ---
-    References: 1
     (line 14, character 11):
     __rootdir__/prog.cob:15.11-15.16:
       12           01 VAR8 PIC 9 USAGE PACKED-DECIMAL.
@@ -773,8 +717,6 @@ let%expect_test "hover-datadef-vars-usage" =
     VAR10
     ```
     *(layout omitted due to issues in item definition)*
-    ---
-    References: 1
     (line 15, character 11):
     __rootdir__/prog.cob:16.11-16.16:
       13           01 VAR9 PIC $++/+.+B+.
@@ -787,9 +729,7 @@ let%expect_test "hover-datadef-vars-usage" =
     ```cobol
     VAR11
     ```
-    *(layout omitted due to issues in item definition)*
-    ---
-    References: 1 |}];;
+    *(layout omitted due to issues in item definition)* |}];;
 
 let%expect_test "hover-datadef-filler-vars" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -829,8 +769,6 @@ let%expect_test "hover-datadef-filler-vars" =
     Group of 2 subfields
     Offset: 0 bytes
     Size: 4 bytes
-    ---
-    References: 1
     (line 9, character 29):
     Hovering nothing worthy |}];;
 
@@ -872,8 +810,6 @@ let%expect_test "hover-datadef-simple-condition" =
     ALPHANUMERIC(1)
     Offset: 0 bytes
     Size: 1 byte
-    ---
-    References: 1
     (line 6, character 14):
     Hovering nothing worthy
     (line 7, character 15):
@@ -899,8 +835,6 @@ let%expect_test "hover-datadef-simple-condition" =
     ALPHANUMERIC(1)
     Offset: 0 bytes in VAL
     Size: 1 byte
-    ---
-    References: 2
     (line 10, character 22):
     __rootdir__/prog.cob:11.14-11.22:
        8             88 CONDTHRU VALUE "a" THRU "z".
@@ -921,9 +855,7 @@ let%expect_test "hover-datadef-simple-condition" =
     ```
     ALPHANUMERIC(1)
     Offset: 0 bytes in VAL
-    Size: 1 byte
-    ---
-    References: 2 |}];;
+    Size: 1 byte |}];;
 
 let%expect_test "hover-datadef-group-condition" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -966,8 +898,6 @@ let%expect_test "hover-datadef-group-condition" =
     Group of 2 subfields
     Offset: 0 bytes
     Size: 2 bytes
-    ---
-    References: 1
     (line 9, character 17):
     Hovering nothing worthy
     (line 11, character 14):
@@ -991,8 +921,6 @@ let%expect_test "hover-datadef-group-condition" =
     ALPHANUMERIC(1)
     Offset: 0 bytes in STRUCT
     Size: 1 byte
-    ---
-    References: 2
     (line 12, character 14):
     __rootdir__/prog.cob:13.14-13.20:
       10               88 COND-2 VALUE "a".
@@ -1013,9 +941,7 @@ let%expect_test "hover-datadef-group-condition" =
     ```
     ALPHANUMERIC(1)
     Offset: 1 byte in STRUCT
-    Size: 1 byte
-    ---
-    References: 2 |}];;
+    Size: 1 byte |}];;
 
 let%expect_test "hover-datadef-renames" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -1057,8 +983,6 @@ let%expect_test "hover-datadef-renames" =
     *e.g,* [`0`] (0), [`1`] (1)
     Offset: 0 bytes in X
     Size: 1 byte
-    ---
-    References: 2
     (line 8, character 16):
     __rootdir__/prog.cob:9.10-9.25:
        6           01 X.
@@ -1079,8 +1003,6 @@ let%expect_test "hover-datadef-renames" =
     *e.g,* [`0`] (0), [`1`] (1)
     Offset: 0 bytes in X
     Size: 1 byte
-    ---
-    References: 2
     (line 8, character 23):
     __rootdir__/prog.cob:9.23-9.24:
        6           01 X.
@@ -1100,8 +1022,6 @@ let%expect_test "hover-datadef-renames" =
     *e.g,* [`0`] (0), [`1`] (1)
     Offset: 0 bytes in X
     Size: 1 byte
-    ---
-    References: 4
     (line 9, character 22):
     __rootdir__/prog.cob:10.13-10.22:
        7             05 Y PIC 9.
@@ -1122,8 +1042,6 @@ let%expect_test "hover-datadef-renames" =
     ALPHANUMERIC(3)
     Offset: 0 bytes in X
     Size: 3 bytes
-    ---
-    References: 1
     (line 10, character 20):
     __rootdir__/prog.cob:11.13-11.27:
        8             05 YY PIC XX.
@@ -1136,8 +1054,6 @@ let%expect_test "hover-datadef-renames" =
     ```cobol
     Y-THRU-MISSING IN X
     ```
-    ---
-    References: 1
     (line 12, character 20):
     __rootdir__/prog.cob:13.20-13.21:
       10             66 Y-THRU-YY RENAMES Y THRU YY.
@@ -1157,9 +1073,7 @@ let%expect_test "hover-datadef-renames" =
     NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
     Offset: 0 bytes in X
-    Size: 1 byte
-    ---
-    References: 2 |}];;
+    Size: 1 byte |}];;
 
 let%expect_test "hover-datadef-redefines" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -1203,8 +1117,6 @@ let%expect_test "hover-datadef-redefines" =
     ```
     Offset: 0 bytes in S
     Size: 1 byte
-    ---
-    References: 2
     (line 7, character 31):
     __rootdir__/prog.cob:8.31-8.32:
        5           WORKING-STORAGE SECTION.
@@ -1225,8 +1137,6 @@ let%expect_test "hover-datadef-redefines" =
     Offset: 0 bytes in S
     Size: 1 byte
     Redefined by U
-    ---
-    References: 2
     (line 10, character 13):
     __rootdir__/prog.cob:11.13-11.14:
        8             05 U PIC X REDEFINES T.
@@ -1244,8 +1154,6 @@ let%expect_test "hover-datadef-redefines" =
     ```cobol
     Y IN X
     ```
-    ---
-    References: 2
     (line 10, character 26):
     __rootdir__/prog.cob:11.25-11.26:
        8             05 U PIC X REDEFINES T.
@@ -1266,8 +1174,6 @@ let%expect_test "hover-datadef-redefines" =
     Offset: 0 bytes in X
     Size: 1 byte
     Redefined by Z
-    ---
-    References: 2
     (line 12, character 20):
     __rootdir__/prog.cob:13.20-13.21:
       10             05 Y PIC 9.
@@ -1283,8 +1189,6 @@ let%expect_test "hover-datadef-redefines" =
     Group of 1 subfield
     Offset: 0 bytes
     Size: 1 byte
-    ---
-    References: 2
     (line 12, character 22):
     __rootdir__/prog.cob:13.22-13.23:
       10             05 Y PIC 9.
@@ -1307,8 +1211,6 @@ let%expect_test "hover-datadef-redefines" =
     ```
     Offset: 0 bytes in S
     Size: 1 byte
-    ---
-    References: 2
     (line 12, character 24):
     __rootdir__/prog.cob:13.24-13.25:
       10             05 Y PIC 9.
@@ -1326,8 +1228,6 @@ let%expect_test "hover-datadef-redefines" =
     ```cobol
     Y IN X
     ```
-    ---
-    References: 2
     (line 12, character 26):
     __rootdir__/prog.cob:13.26-13.27:
       10             05 Y PIC 9.
@@ -1342,9 +1242,7 @@ let%expect_test "hover-datadef-redefines" =
     ```
     Group of 1 subfield
     Offset: 0 bytes
-    Size: 1 byte
-    ---
-    References: 2 |}];;
+    Size: 1 byte |}];;
 
 let%expect_test "hover-datadef-table-and-index" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -1393,8 +1291,6 @@ let%expect_test "hover-datadef-table-and-index" =
     Index
     Offset: 0 bytes
     Size: *variable*
-    ---
-    References: 2
     (line 7, character 13):
     __rootdir__/prog.cob:8.11-8.13:
        5           WORKING-STORAGE SECTION.
@@ -1413,8 +1309,6 @@ let%expect_test "hover-datadef-table-and-index" =
     ALPHANUMERIC(1)
     Offset: 0 bytes
     Size: 10 bytes (1 byte per occurrence)
-    ---
-    References: 2
     (line 7, character 52):
     __rootdir__/prog.cob:8.47-8.53:
        5           WORKING-STORAGE SECTION.
@@ -1439,8 +1333,6 @@ let%expect_test "hover-datadef-table-and-index" =
     ALPHANUMERIC(1)
     Offset: 0 bytes
     Total size: 10 bytes
-    ---
-    References: 3
     (line 8, character 44):
     __rootdir__/prog.cob:9.41-9.47:
        6           77 IDX USAGE IS INDEX.
@@ -1462,8 +1354,6 @@ let%expect_test "hover-datadef-table-and-index" =
     Group of 1 subfield
     Offset: 0 bytes
     Total size: 10 bytes
-    ---
-    References: 1
     (line 8, character 49):
     __rootdir__/prog.cob:9.48-9.50:
        6           77 IDX USAGE IS INDEX.
@@ -1485,8 +1375,6 @@ let%expect_test "hover-datadef-table-and-index" =
     Group of 1 subfield
     Offset: 0 bytes
     Total size: 10 bytes
-    ---
-    References: 1
     (line 10, character 13):
     __rootdir__/prog.cob:11.11-11.13:
        8           01 T1 PIC X OCCURS 10 TIMES INDEXED BY INDEX1.
@@ -1502,8 +1390,6 @@ let%expect_test "hover-datadef-table-and-index" =
     Group of 1 subfield
     Offset: 0 bytes
     Size: 2 bytes
-    ---
-    References: 1
     (line 12, character 13):
     __rootdir__/prog.cob:13.11-13.13:
       10             02 SUB-FIELD pic x.
@@ -1519,8 +1405,6 @@ let%expect_test "hover-datadef-table-and-index" =
     Group of 1 subfield
     ---
      (no size shown yet, on purpose as COMP-0 is unsupported)
-    ---
-    References: 1
     (line 14, character 66):
     __rootdir__/prog.cob:15.65-15.67:
       12             02 FILLER PIC 99 USAGE DISPLAY.
@@ -1542,8 +1426,6 @@ let%expect_test "hover-datadef-table-and-index" =
     Group of 1 subfield
     Offset: 0 bytes
     Total size: *variable*
-    ---
-    References: 1
     (line 23, character 24):
     __rootdir__/prog.cob:24.21-24.27:
       21             02 X PIC X OCCURS 1 TO 99 DEPENDING ON VARTAB-SIZE.
@@ -1568,8 +1450,6 @@ let%expect_test "hover-datadef-table-and-index" =
     ALPHANUMERIC(1)
     Offset: 0 bytes
     Total size: 10 bytes
-    ---
-    References: 3
     (line 24, character 24):
     __rootdir__/prog.cob:25.20-25.27:
       22           PROCEDURE DIVISION.
@@ -1585,8 +1465,6 @@ let%expect_test "hover-datadef-table-and-index" =
     Group of 1 subfield
     Offset: 0 bytes
     Size: *variable*
-    ---
-    References: 2
     (line 24, character 32):
     __rootdir__/prog.cob:25.28-25.39:
       22           PROCEDURE DIVISION.
@@ -1605,8 +1483,6 @@ let%expect_test "hover-datadef-table-and-index" =
     ALPHANUMERIC(1)
     Offset: 0 bytes in VARTAB1
     Size: *variable* (1 byte per occurrence)
-    ---
-    References: 2
     (line 24, character 46):
     __rootdir__/prog.cob:25.40-25.47:
       22           PROCEDURE DIVISION.
@@ -1621,9 +1497,7 @@ let%expect_test "hover-datadef-table-and-index" =
     ```
     Group of 2 subfields
     Offset: 0 bytes
-    Size: *variable*
-    ---
-    References: 2 |}];;
+    Size: *variable* |}];;
 
 let%expect_test "hover-preproc-directives" =
   Unix.putenv "ABCD" "ABCD-VALUE"; (* Warning: left in environment after the test *)
@@ -1659,25 +1533,9 @@ let%expect_test "hover-preproc-directives" =
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     (line 5, character 16):
-    __rootdir__/prog.cob:6.16-6.17:
-       3          PROGRAM-ID. prog.
-       4          DATA DIVISION.
-       5          WORKING-STORAGE SECTION.
-       6 >        >>DEFINE X AS 1
-    ----                   ^
-       7          >>DEFINE B AS b'10'
-       8          >>IF B
-    References: 1
+    Hovering nothing worthy
     (line 6, character 16):
-    __rootdir__/prog.cob:7.16-7.17:
-       4          DATA DIVISION.
-       5          WORKING-STORAGE SECTION.
-       6          >>DEFINE X AS 1
-       7 >        >>DEFINE B AS b'10'
-    ----                   ^
-       8          >>IF B
-       9          77 WS VALUE "OK".
-    References: 2
+    Hovering nothing worthy
     (line 7, character 13):
     __rootdir__/prog.cob:8.12-8.13:
        5          WORKING-STORAGE SECTION.
@@ -1688,18 +1546,8 @@ let%expect_test "hover-preproc-directives" =
        9          77 WS VALUE "OK".
       10          >>ELSE
     Compilation variable with value b"10"
-    ---
-    References: 2
     (line 12, character 16):
-    __rootdir__/prog.cob:13.16-13.20:
-      10          >>ELSE
-      11          77 WS VALUE "KO".
-      12          >>END-IF
-      13 >        >>DEFINE ABCD AS PARAMETER
-    ----                   ^^^^
-      14          >>IF ABCD IS DEFINED
-      15          >>END-IF
-    References: 2
+    Hovering nothing worthy
     (line 13, character 12):
     __rootdir__/prog.cob:14.12-14.16:
       11          77 WS VALUE "KO".
@@ -1710,17 +1558,8 @@ let%expect_test "hover-preproc-directives" =
       15          >>END-IF
       16         * Some documentation for bis
     Compilation variable with value "ABCD-VALUE" (defined in process environment)
-    ---
-    References: 2
     (line 18, character 16):
-    __rootdir__/prog.cob:19.16-19.19:
-      16         * Some documentation for bis
-      17         * ...
-      18         * on several lines.
-      19 >        >>DEFINE BIS AS 42.24
-    ----                   ^^^
-      20
-    References: 1
+    Hovering nothing worthy
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     Now with hover text on defintions
     (line 5, character 16):
@@ -1733,8 +1572,6 @@ let%expect_test "hover-preproc-directives" =
        7          >>DEFINE B AS b'10'
        8          >>IF B
     Compilation variable with value 1.0
-    ---
-    References: 1
     (line 6, character 16):
     __rootdir__/prog.cob:7.16-7.17:
        4          DATA DIVISION.
@@ -1745,8 +1582,6 @@ let%expect_test "hover-preproc-directives" =
        8          >>IF B
        9          77 WS VALUE "OK".
     Compilation variable with value b"10"
-    ---
-    References: 2
     (line 7, character 13):
     __rootdir__/prog.cob:8.12-8.13:
        5          WORKING-STORAGE SECTION.
@@ -1757,8 +1592,6 @@ let%expect_test "hover-preproc-directives" =
        9          77 WS VALUE "OK".
       10          >>ELSE
     Compilation variable with value b"10"
-    ---
-    References: 2
     (line 12, character 16):
     __rootdir__/prog.cob:13.16-13.20:
       10          >>ELSE
@@ -1769,8 +1602,6 @@ let%expect_test "hover-preproc-directives" =
       14          >>IF ABCD IS DEFINED
       15          >>END-IF
     Compilation variable with value "ABCD-VALUE" (defined in process environment)
-    ---
-    References: 2
     (line 13, character 12):
     __rootdir__/prog.cob:14.12-14.16:
       11          77 WS VALUE "KO".
@@ -1781,8 +1612,6 @@ let%expect_test "hover-preproc-directives" =
       15          >>END-IF
       16         * Some documentation for bis
     Compilation variable with value "ABCD-VALUE" (defined in process environment)
-    ---
-    References: 2
     (line 18, character 16):
     __rootdir__/prog.cob:19.16-19.19:
       16         * Some documentation for bis
@@ -1796,8 +1625,6 @@ let%expect_test "hover-preproc-directives" =
      Some documentation for bis
      ...
      on several lines.
-    ---
-    References: 1
   |}];;
 
 let%expect_test "hover-preproc-directives-numeric" =
@@ -1836,15 +1663,7 @@ let%expect_test "hover-preproc-directives-numeric" =
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     (line 5, character 16):
-    __rootdir__/prog.cob:6.16-6.24:
-       3          PROGRAM-ID. prog.
-       4          DATA DIVISION.
-       5          WORKING-STORAGE SECTION.
-       6 >        >>DEFINE ONE_HALF AS PARAMETER
-    ----                   ^^^^^^^^
-       7          >>IF ONE_HALF = 0000.5
-       8          77 WS VALUE "OK".
-    References: 3
+    Hovering nothing worthy
     (line 6, character 20):
     __rootdir__/prog.cob:7.12-7.20:
        4          DATA DIVISION.
@@ -1855,18 +1674,8 @@ let%expect_test "hover-preproc-directives-numeric" =
        8          77 WS VALUE "OK".
        9          >>ELSE
     Compilation variable with value 0.5 (defined in process environment)
-    ---
-    References: 3
     (line 11, character 16):
-    __rootdir__/prog.cob:12.16-12.26:
-       9          >>ELSE
-      10          77 WS VALUE "KO".
-      11          >>END-IF
-      12 >        >>DEFINE ONE_OVER_2 AS PARAMETER
-    ----                   ^^^^^^^^^^
-      13          >>IF ONE_HALF <> ONE_OVER_2
-      14          77 WX VALUE "KO".
-    References: 2
+    Hovering nothing worthy
     (line 12, character 34):
     __rootdir__/prog.cob:13.24-13.34:
       10          77 WS VALUE "KO".
@@ -1877,8 +1686,6 @@ let%expect_test "hover-preproc-directives-numeric" =
       14          77 WX VALUE "KO".
       15          >>ELSE
     Compilation variable with value 0.5 (defined in process environment)
-    ---
-    References: 2
     (line 18, character 18):
     __rootdir__/prog.cob:19.17-19.19:
       16          77 WX VALUE "OK".
@@ -1898,8 +1705,6 @@ let%expect_test "hover-preproc-directives-numeric" =
     VALUE "OK"
     Offset: 0 bytes
     Size: 2 bytes
-    ---
-    References: 2
     (line 18, character 21):
     __rootdir__/prog.cob:19.20-19.22:
       16          77 WX VALUE "OK".
@@ -1919,8 +1724,6 @@ let%expect_test "hover-preproc-directives-numeric" =
     VALUE "OK"
     Offset: 0 bytes
     Size: 2 bytes
-    ---
-    References: 2
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     Now with hover text on defintions
     (line 5, character 16):
@@ -1933,8 +1736,6 @@ let%expect_test "hover-preproc-directives-numeric" =
        7          >>IF ONE_HALF = 0000.5
        8          77 WS VALUE "OK".
     Compilation variable with value 0.5 (defined in process environment)
-    ---
-    References: 3
     (line 6, character 20):
     __rootdir__/prog.cob:7.12-7.20:
        4          DATA DIVISION.
@@ -1945,8 +1746,6 @@ let%expect_test "hover-preproc-directives-numeric" =
        8          77 WS VALUE "OK".
        9          >>ELSE
     Compilation variable with value 0.5 (defined in process environment)
-    ---
-    References: 3
     (line 11, character 16):
     __rootdir__/prog.cob:12.16-12.26:
        9          >>ELSE
@@ -1957,8 +1756,6 @@ let%expect_test "hover-preproc-directives-numeric" =
       13          >>IF ONE_HALF <> ONE_OVER_2
       14          77 WX VALUE "KO".
     Compilation variable with value 0.5 (defined in process environment)
-    ---
-    References: 2
     (line 12, character 34):
     __rootdir__/prog.cob:13.24-13.34:
       10          77 WS VALUE "KO".
@@ -1969,8 +1766,6 @@ let%expect_test "hover-preproc-directives-numeric" =
       14          77 WX VALUE "KO".
       15          >>ELSE
     Compilation variable with value 0.5 (defined in process environment)
-    ---
-    References: 2
     (line 18, character 18):
     __rootdir__/prog.cob:19.17-19.19:
       16          77 WX VALUE "OK".
@@ -1990,8 +1785,6 @@ let%expect_test "hover-preproc-directives-numeric" =
     VALUE "OK"
     Offset: 0 bytes
     Size: 2 bytes
-    ---
-    References: 2
     (line 18, character 21):
     __rootdir__/prog.cob:19.20-19.22:
       16          77 WX VALUE "OK".
@@ -2011,8 +1804,6 @@ let%expect_test "hover-preproc-directives-numeric" =
     VALUE "OK"
     Offset: 0 bytes
     Size: 2 bytes
-    ---
-    References: 2
   |}];;
 
 let%expect_test "hover-datadef-78" =
@@ -2042,8 +1833,6 @@ let%expect_test "hover-datadef-78" =
        7         *Note: currently handled as hovering over `01 VAR ... CONST.`
        8          77 VAR VALUE CONST.
     Compilation variable with value "ABCD"
-    ---
-    References: 3
     (line 7, character 23):
     __rootdir__/prog.cob:8.7-8.26:
        5          WORKING-STORAGE SECTION.
@@ -2065,8 +1854,6 @@ let%expect_test "hover-datadef-78" =
     Size: 4 bytes
     ---
     Note: currently handled as hovering over `01 VAR ... CONST.`
-    ---
-    References: 2
     (line 9, character 27):
     __rootdir__/prog.cob:10.27-10.30:
        7         *Note: currently handled as hovering over `01 VAR ... CONST.`
@@ -2088,8 +1875,6 @@ let%expect_test "hover-datadef-78" =
     Size: 4 bytes
     ---
     Note: currently handled as hovering over `01 VAR ... CONST.`
-    ---
-    References: 2
     (line 9, character 46):
     __rootdir__/prog.cob:10.43-10.48:
        7         *Note: currently handled as hovering over `01 VAR ... CONST.`
@@ -2100,8 +1885,6 @@ let%expect_test "hover-datadef-78" =
       11              STOP RUN.
       12
     Compilation variable with value "ABCD"
-    ---
-    References: 3
   |}];;
 
 let%expect_test "hover-datadef-communication-section" =
@@ -2172,8 +1955,6 @@ let%expect_test "hover-comment" =
     Size: 4 bytes
     ---
      inline comment
-    ---
-    References: 2
     (line 18, character 25):
     __rootdir__/prog.cob:19.24-19.29:
       16         * comments and...
@@ -2194,8 +1975,6 @@ let%expect_test "hover-comment" =
     Size: 1 byte
     ---
      val1 only inline comment
-    ---
-    References: 2
     (line 18, character 31):
     __rootdir__/prog.cob:19.30-19.35:
       16         * comments and...
@@ -2216,8 +1995,6 @@ let%expect_test "hover-comment" =
     Size: 1 byte
     ---
      val2 only line comment
-    ---
-    References: 2
     (line 18, character 37):
     __rootdir__/prog.cob:19.36-19.41:
       16         * comments and...
@@ -2239,8 +2016,6 @@ let%expect_test "hover-comment" =
     ---
      val3 several line
      comments
-    ---
-    References: 2
     (line 18, character 43):
     __rootdir__/prog.cob:19.42-19.47:
       16         * comments and...
@@ -2260,9 +2035,7 @@ let%expect_test "hover-comment" =
     Offset: 3 bytes in STRUCT
     Size: 1 byte
     ---
-     an inline comment.
-    ---
-    References: 2 |}];;
+     an inline comment. |}];;
 
 
 let%expect_test "hover-comment-copy" =
@@ -2307,9 +2080,7 @@ let%expect_test "hover-comment-copy" =
     Offset: 0 bytes
     Size: 1 byte
     ---
-     copy inline comment
-    ---
-    References: 2 |}]
+     copy inline comment |}]
 
 let%expect_test "hover-data-division-memory-info-only" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -2338,9 +2109,7 @@ let%expect_test "hover-data-division-memory-info-only" =
        7          PROCEDURE DIVISION.
        8             DISPLAY VAR.
     Offset: 0 bytes
-    Size: 1 byte
-    ---
-    References: 3 |}]
+    Size: 1 byte |}]
 
 let%expect_test "hover-procedure-using" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -2374,9 +2143,7 @@ let%expect_test "hover-procedure-using" =
     ```
     ALPHANUMERIC(1)
     Offset: 0 bytes
-    Size: 1 byte
-    ---
-    References: 3 |}]
+    Size: 1 byte |}]
 
 
 let%expect_test "78-level-in-copybook" =
@@ -2409,9 +2176,7 @@ let%expect_test "78-level-in-copybook" =
     ----                     ^
        9             STOP RUN.
       10
-    Compilation variable with value "ABC"
-    ---
-    References: 2 |}]
+    Compilation variable with value "ABC" |}]
 
 let%expect_test "78-level-in-copybook-with-replacement" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -2453,9 +2218,7 @@ let%expect_test "78-level-in-copybook-with-replacement" =
     *e.g,* [`0`] (0), [`1`] (1)
     VALUE "A"
     Offset: 0 bytes
-    Size: 1 byte
-    ---
-    References: 2 |}]
+    Size: 1 byte |}]
 
 let%expect_test "hover-offset-size" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -2497,8 +2260,6 @@ let%expect_test "hover-offset-size" =
     Group of 3 subfields
     Offset: 0 bytes
     Size: 19 bytes
-    ---
-    References: 1
     (line 6, character 13):
     __rootdir__/prog.cob:7.13-7.18:
        4           DATA DIVISION.
@@ -2518,8 +2279,6 @@ let%expect_test "hover-offset-size" =
     *e.g,* [`0000`] (0), [`1234`] (1234)
     Offset: 0 bytes in WS-CUSTOMER
     Size: 4 bytes
-    ---
-    References: 2
     (line 7, character 13):
     __rootdir__/prog.cob:8.13-8.20:
        5           WORKING-STORAGE SECTION.
@@ -2539,8 +2298,6 @@ let%expect_test "hover-offset-size" =
     Offset: 4 bytes in WS-CUSTOMER
     Size: 10 bytes
     Redefined by WS-NAME-R
-    ---
-    References: 4
     (line 8, character 13):
     __rootdir__/prog.cob:9.13-9.22:
        6           01 WS-CUSTOMER.
@@ -2564,8 +2321,6 @@ let%expect_test "hover-offset-size" =
     ```
     Offset: 4 bytes in WS-CUSTOMER
     Size: 10 bytes
-    ---
-    References: 1
     (line 9, character 13):
     __rootdir__/prog.cob:10.13-10.22:
        7             05 WS-ID       PIC 9(4).
@@ -2585,8 +2340,6 @@ let%expect_test "hover-offset-size" =
     *e.g,* [`+000000000`] (0), [`+123456789`] (123456789)
     Offset: 14 bytes in WS-CUSTOMER
     Size: 5 bytes
-    ---
-    References: 1
     (line 10, character 13):
     __rootdir__/prog.cob:11.13-11.19:
        8             05 WS-NAME     PIC X(10).
@@ -2607,8 +2360,6 @@ let%expect_test "hover-offset-size" =
     ALPHANUMERIC(14)
     Offset: 0 bytes in WS-CUSTOMER
     Size: 14 bytes
-    ---
-    References: 1
     (line 11, character 11):
     __rootdir__/prog.cob:12.11-12.19:
        9             05 WS-NAME-R REDEFINES WS-NAME PIC 9(10).
@@ -2628,8 +2379,6 @@ let%expect_test "hover-offset-size" =
     *e.g,* [`000`] (0), [`123`] (123)
     Offset: 0 bytes
     Size: 3 bytes
-    ---
-    References: 1
     (line 12, character 11):
     __rootdir__/prog.cob:13.11-13.19:
       10             05 WS-AMOUNT   PIC S9(9) COMP-3.
@@ -2645,8 +2394,6 @@ let%expect_test "hover-offset-size" =
     Group of 1 subfield
     Offset: 0 bytes
     Size: *variable*
-    ---
-    References: 1
     (line 13, character 13):
     __rootdir__/prog.cob:14.13-14.20:
       11             66 WS-KEY RENAMES WS-ID THRU WS-NAME.
@@ -2665,8 +2412,6 @@ let%expect_test "hover-offset-size" =
     ALPHANUMERIC(5)
     Offset: 0 bytes in WS-TABLE
     Size: *variable* (5 bytes per occurrence)
-    ---
-    References: 1
     (line 15, character 11):
     __rootdir__/prog.cob:16.11-16.18:
       13           01 WS-TABLE.
@@ -2684,9 +2429,7 @@ let%expect_test "hover-offset-size" =
     ```
     ALPHANUMERIC(1)
     Offset: 0 bytes
-    Size: 1 byte
-    ---
-    References: 1 |}]
+    Size: 1 byte |}]
 
 let%expect_test "hover-redefines-sizes" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -2730,8 +2473,6 @@ let%expect_test "hover-redefines-sizes" =
     Redefined by B: 2 bytes of 4 bytes
     Redefined by C: 6 bytes of 4 bytes ⚠️
     Redefined by D
-    ---
-    References: 4
     (line 7, character 13):
     __rootdir__/prog.cob:8.13-8.14:
        5           WORKING-STORAGE SECTION.
@@ -2755,8 +2496,6 @@ let%expect_test "hover-redefines-sizes" =
     Offset: 0 bytes in S
     Size: 2 bytes
     Redefinition: 2 bytes of 4 bytes
-    ---
-    References: 1
     (line 8, character 13):
     __rootdir__/prog.cob:9.13-9.14:
        6           01 S.
@@ -2780,8 +2519,6 @@ let%expect_test "hover-redefines-sizes" =
     Offset: 0 bytes in S
     Size: 6 bytes
     Redefinition: 6 bytes of 4 bytes ⚠️
-    ---
-    References: 1
     (line 9, character 13):
     __rootdir__/prog.cob:10.13-10.14:
        7             05 A PIC X(4).
@@ -2804,8 +2541,6 @@ let%expect_test "hover-redefines-sizes" =
     ```
     Offset: 0 bytes in S
     Size: 4 bytes
-    ---
-    References: 1
     (line 10, character 13):
     __rootdir__/prog.cob:11.13-11.14:
        8             05 B REDEFINES A PIC X(2).
@@ -2824,8 +2559,6 @@ let%expect_test "hover-redefines-sizes" =
     ALPHANUMERIC(3)
     Offset: 4 bytes in S
     Size: 3 bytes
-    ---
-    References: 1
     (line 11, character 13):
     __rootdir__/prog.cob:12.13-12.16:
        9             05 C REDEFINES A PIC X(6).
@@ -2845,8 +2578,6 @@ let%expect_test "hover-redefines-sizes" =
     Offset: 7 bytes in S
     Size: 6 bytes (2 bytes per occurrence)
     Redefined by ALT: 8 bytes of 6 bytes ⚠️
-    ---
-    References: 2
     (line 12, character 13):
     __rootdir__/prog.cob:13.13-13.16:
       10             05 D REDEFINES A PIC X(4).
@@ -2869,6 +2600,4 @@ let%expect_test "hover-redefines-sizes" =
     ```
     Offset: 7 bytes in S
     Size: 8 bytes
-    Redefinition: 8 bytes of 6 bytes ⚠️
-    ---
-    References: 1 |}];;
+    Redefinition: 8 bytes of 6 bytes ⚠️ |}];;
