@@ -20,21 +20,40 @@ let size_in_bits size =
   try Some (Cobol_data.Memory.as_bits size)
   with Cobol_data.Memory.NOT_SCALAR _ -> None
 
+(* Number and unit: bytes when [bits] is a whole number of bytes. *)
+let bit_n_unit bits =
+  if Int.rem bits 8 = 0 then bits / 8, "byte" else bits, "bit"
+
+let pp_unit ppf (n, unit) =
+  Fmt.pf ppf "%s%s" unit (if n <> 1 then "s" else "")
+
+let pp_bits ppf bits =
+  let n, unit = bit_n_unit bits in
+  Fmt.pf ppf "%u %a" n pp_unit (n, unit)
+
 let pp_readable_size ppf size =
   match size_in_bits size with
-  | Some bits when Int.rem bits 8 = 0 ->
-      let bytes = bits / 8 in
-      Fmt.pf ppf "%u byte%s" bytes (if bytes <> 1 then "s" else "")
-  | Some bits ->
-      Fmt.pf ppf "%u bit%s" bits (if bits <> 1 then "s" else "")
-  | None ->
-      Fmt.pf ppf "*variable*"
+  | Some bits -> pp_bits ppf bits
+  | None -> Fmt.pf ppf "*variable size*"
 
-let pp_size =
-  Fmt.(any "Size: " ++ pp_readable_size)
-
-let pp_total_size =
-  Fmt.(any "Total size: " ++ pp_readable_size)
+(* Size of a table: occurrences × size of one occurrence (= total). We drop
+   the product when one of its factors is 1. *)
+let pp_table_size ppf (span, occurrence_size, total_size) =
+  let pp_count prefix n bits =
+    let m, unit = bit_n_unit bits in
+    let p = n * m in
+    if n = 1 || m = 1 then
+      Fmt.pf ppf "%s%u %a" prefix p pp_unit (p, unit)
+    else
+      Fmt.pf ppf "%s%u×%u (=%u) %a" prefix n m p pp_unit (p, unit)
+  in
+  match span, size_in_bits occurrence_size with
+  | Fixed_span { occurs_times; _ }, Some bits ->
+      pp_count "" ~&occurs_times bits
+  | Depending_span { occurs_depending_max; _ }, Some bits ->
+      pp_count "up to " ~&occurs_depending_max bits
+  | _ ->
+      pp_readable_size ppf total_size
 
 (* Show the record name only for items that are inside a record. On a record
    itself it would just repeat the item name. *)
@@ -44,9 +63,19 @@ let enclosing_record ~record_name
   | Some (Name _) -> None
   | None -> record_name                        (* FILLER: show the record name *)
 
-let pp_offset_in record ppf offset =
-  Fmt.pf ppf "Offset: %a%a" pp_readable_size offset
-    Fmt.(option (any " in " ++ string)) record
+(* Positions start at 1, as in reference modification: [X(4:1)] is the byte at
+   position 4. We give no position for an item that is not in a record. *)
+let pp_position_in record ppf offset =
+  match record with
+  | None -> ()
+  | Some record ->
+      match size_in_bits offset with
+      | Some bits when Int.rem bits 8 = 0 ->
+          Fmt.pf ppf " at position %u in %s" (bits / 8 + 1) record
+      | Some bits ->
+          Fmt.pf ppf " at bit position %u in %s" (bits + 1) record
+      | None ->
+          Fmt.pf ppf " at a variable position in %s" record
 
 let pp_int' = Cobol_ptree.pp_with_loc Fmt.int
 
@@ -356,9 +385,17 @@ let pp_redefinition_info ppf def =
   | None -> ()
   | Some item ->
       let own = size item in
+      (* The line above already gives the size of [item], so we only give the
+         difference with the redefined item. *)
       Option.iter begin fun redefined ->
-        pp_redefinition ~keep_when_equal:false ppf
-          ("Redefinition", own, size redefined)
+        match size_in_bits own, size_in_bits (size redefined) with
+        | Some a, Some b when a > b ->
+            Fmt.pf ppf "  \n%a larger than the redefined item ⚠️"
+              pp_bits (a - b)
+        | Some a, Some b when a < b ->
+            Fmt.pf ppf "  \n%a smaller than the redefined item"
+              pp_bits (b - a)
+        | _ -> ()
       end (def_redefined def);
       List.iter begin fun redef ->
         let name = match item_qualname ~&redef with
@@ -375,18 +412,20 @@ let pp_memory_info ?(prefix = "") ppf def =
   let open Cobol_data.Item in
   if not (def_has_issues def) then
     let pp_item_size ppf = function
-      | Table_index _ as def ->
-          pp_total_size ppf (def_size def) (* an index spans every occurrence *)
+      | Table_index { table; _ } ->      (* an index spans every occurrence *)
+          pp_table_size ppf (~&table.table_range.range_span,
+                             ~&(~&table.table_field).field_size,
+                             ~&table.table_size)
       | Data_field { def; table_def = Some table; _ } ->
           (* The whole table is what the offsets and the notes below use. *)
-          Fmt.pf ppf "%a (%a per occurrence)"
-            pp_size ~&table.table_size pp_readable_size ~&def.field_size
+          pp_table_size ppf (~&table.table_range.range_span,
+                             ~&def.field_size, ~&table.table_size)
       | def ->
-          pp_size ppf (def_size def)
+          pp_readable_size ppf (def_size def)
     and record =
       enclosing_record ~record_name:(named_record (def_record def))
         (def_qualname def)
     in
-    Fmt.pf ppf "%s%a  \n%a%a" prefix
-      (pp_offset_in record) (def_offset def) pp_item_size def
+    Fmt.pf ppf "%s%a%a%a" prefix
+      pp_item_size def (pp_position_in record) (def_offset def)
       pp_redefinition_info def
