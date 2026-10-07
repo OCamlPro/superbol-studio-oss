@@ -20,39 +20,38 @@ let size_in_bits size =
   try Some (Cobol_data.Memory.as_bits size)
   with Cobol_data.Memory.NOT_SCALAR _ -> None
 
+(* Number and unit: bytes when [bits] is a whole number of bytes. *)
+let in_unit bits =
+  if Int.rem bits 8 = 0 then bits / 8, "byte" else bits, "bit"
+
+let pp_unit ppf (n, unit) =
+  Fmt.pf ppf "%s%s" unit (if n <> 1 then "s" else "")
+
+let pp_bits ppf bits =
+  let n, unit = in_unit bits in
+  Fmt.pf ppf "%u %a" n pp_unit (n, unit)
+
 let pp_readable_size ppf size =
   match size_in_bits size with
-  | Some bits when Int.rem bits 8 = 0 ->
-      let bytes = bits / 8 in
-      Fmt.pf ppf "%u byte%s" bytes (if bytes <> 1 then "s" else "")
-  | Some bits ->
-      Fmt.pf ppf "%u bit%s" bits (if bits <> 1 then "s" else "")
-  | None ->
-      Fmt.pf ppf "*variable size*"
+  | Some bits -> pp_bits ppf bits
+  | None -> Fmt.pf ppf "*variable size*"
 
-(* Number only, in the unit [pp_readable_size] uses for [unit_size]. *)
-let pp_size_number ~unit_size ppf size =
-  match size_in_bits unit_size, size_in_bits size with
-  | Some u, Some bits when Int.rem u 8 = 0 && Int.rem bits 8 = 0 ->
-      Fmt.int ppf (bits / 8)
-  | Some _, Some bits ->
-      Fmt.int ppf bits
-  | _ ->
-      Fmt.pf ppf "*variable size*"
-
-(* Size of a table: occurrences × size of one occurrence, then the total. *)
+(* Size of a table: occurrences × size of one occurrence (= total). We drop
+   the product when one of its factors is 1. *)
 let pp_table_size ppf (span, occurrence_size, total_size) =
-  let pp_count prefix n =
-    Fmt.pf ppf "%s%u×%a" prefix n pp_readable_size occurrence_size;
-    if size_in_bits total_size <> None then
-      Fmt.pf ppf " (total %a)"
-        (pp_size_number ~unit_size:occurrence_size) total_size
+  let pp_count prefix n bits =
+    let m, unit = in_unit bits in
+    let p = n * m in
+    if n = 1 || m = 1 then
+      Fmt.pf ppf "%s%u %a" prefix p pp_unit (p, unit)
+    else
+      Fmt.pf ppf "%s%u×%u (=%u) %a" prefix n m p pp_unit (p, unit)
   in
   match span, size_in_bits occurrence_size with
-  | Fixed_span { occurs_times; _ }, Some _ ->
-      pp_count "" ~&occurs_times
-  | Depending_span { occurs_depending_max; _ }, Some _ ->
-      pp_count "up to " ~&occurs_depending_max
+  | Fixed_span { occurs_times; _ }, Some bits ->
+      pp_count "" ~&occurs_times bits
+  | Depending_span { occurs_depending_max; _ }, Some bits ->
+      pp_count "up to " ~&occurs_depending_max bits
   | _ ->
       pp_readable_size ppf total_size
 
@@ -386,9 +385,17 @@ let pp_redefinition_info ppf def =
   | None -> ()
   | Some item ->
       let own = size item in
+      (* The line above already gives the size of [item], so we only give the
+         difference with the redefined item. *)
       Option.iter begin fun redefined ->
-        pp_redefinition ~keep_when_equal:false ppf
-          ("Redefinition", own, size redefined)
+        match size_in_bits own, size_in_bits (size redefined) with
+        | Some a, Some b when a > b ->
+            Fmt.pf ppf "  \n%a larger than the redefined item ⚠️"
+              pp_bits (a - b)
+        | Some a, Some b when a < b ->
+            Fmt.pf ppf "  \n%a smaller than the redefined item"
+              pp_bits (b - a)
+        | _ -> ()
       end (def_redefined def);
       List.iter begin fun redef ->
         let name = match item_qualname ~&redef with

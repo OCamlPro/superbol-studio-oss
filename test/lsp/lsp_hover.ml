@@ -1260,7 +1260,7 @@ let%expect_test "hover-datadef-table-and-index" =
     PIC X USAGE DISPLAY
     ```
     ALPHANUMERIC(1)
-    10×1 byte (total 10)
+    10 bytes
     (line 7, character 52):
     __rootdir__/prog.cob:8.47-8.53:
        5           WORKING-STORAGE SECTION.
@@ -1283,7 +1283,7 @@ let%expect_test "hover-datadef-table-and-index" =
     PIC X USAGE DISPLAY
     ```
     ALPHANUMERIC(1)
-    10×1 byte (total 10)
+    10 bytes
     (line 8, character 44):
     __rootdir__/prog.cob:9.41-9.47:
        6           77 IDX USAGE IS INDEX.
@@ -1303,7 +1303,7 @@ let%expect_test "hover-datadef-table-and-index" =
     T2
     ```
     Group of 1 subfield
-    10×1 byte (total 10)
+    10 bytes
     (line 8, character 49):
     __rootdir__/prog.cob:9.48-9.50:
        6           77 IDX USAGE IS INDEX.
@@ -1323,7 +1323,7 @@ let%expect_test "hover-datadef-table-and-index" =
     T2
     ```
     Group of 1 subfield
-    10×1 byte (total 10)
+    10 bytes
     (line 10, character 13):
     __rootdir__/prog.cob:11.11-11.13:
        8           01 T1 PIC X OCCURS 10 TIMES INDEXED BY INDEX1.
@@ -1372,7 +1372,7 @@ let%expect_test "hover-datadef-table-and-index" =
     FILLER
     ```
     Group of 1 subfield
-    up to 20×1 byte
+    up to 20 bytes
     (line 23, character 24):
     __rootdir__/prog.cob:24.21-24.27:
       21             02 X PIC X OCCURS 1 TO 99 DEPENDING ON VARTAB-SIZE.
@@ -1395,7 +1395,7 @@ let%expect_test "hover-datadef-table-and-index" =
     PIC X USAGE DISPLAY
     ```
     ALPHANUMERIC(1)
-    10×1 byte (total 10)
+    10 bytes
     (line 24, character 24):
     __rootdir__/prog.cob:25.20-25.27:
       22           PROCEDURE DIVISION.
@@ -1426,7 +1426,7 @@ let%expect_test "hover-datadef-table-and-index" =
     PIC X USAGE DISPLAY
     ```
     ALPHANUMERIC(1)
-    up to 99×1 byte at position 1 in VARTAB1
+    up to 99 bytes at position 1 in VARTAB1
     (line 24, character 46):
     __rootdir__/prog.cob:25.40-25.47:
       22           PROCEDURE DIVISION.
@@ -2330,7 +2330,7 @@ let%expect_test "hover-offset-size" =
     PIC X(5) USAGE DISPLAY
     ```
     ALPHANUMERIC(5)
-    up to 10×5 bytes at position 1 in WS-TABLE
+    up to 10×5 (=50) bytes at position 1 in WS-TABLE
     (line 15, character 11):
     __rootdir__/prog.cob:16.11-16.18:
       13           01 WS-TABLE.
@@ -2411,7 +2411,7 @@ let%expect_test "hover-redefines-sizes" =
     A IN S
     ```
     2 bytes at position 1 in S
-    Redefinition: 2 bytes of 4 bytes
+    2 bytes smaller than the redefined item
     (line 8, character 13):
     __rootdir__/prog.cob:9.13-9.14:
        6           01 S.
@@ -2433,7 +2433,7 @@ let%expect_test "hover-redefines-sizes" =
     A IN S
     ```
     6 bytes at position 1 in S
-    Redefinition: 6 bytes of 4 bytes ⚠️
+    2 bytes larger than the redefined item ⚠️
     (line 9, character 13):
     __rootdir__/prog.cob:10.13-10.14:
        7             05 A PIC X(4).
@@ -2488,7 +2488,7 @@ let%expect_test "hover-redefines-sizes" =
     PIC XX USAGE DISPLAY
     ```
     ALPHANUMERIC(2)
-    3×2 bytes (total 6) at position 8 in S
+    3×2 (=6) bytes at position 8 in S
     Redefined by ALT: 8 bytes of 6 bytes ⚠️
     (line 12, character 13):
     __rootdir__/prog.cob:13.13-13.16:
@@ -2511,4 +2511,4 @@ let%expect_test "hover-redefines-sizes" =
     TAB IN S
     ```
     8 bytes at position 8 in S
-    Redefinition: 8 bytes of 6 bytes ⚠️ |}];;
+    2 bytes larger than the redefined item ⚠️ |}];;
