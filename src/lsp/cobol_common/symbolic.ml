@@ -37,6 +37,7 @@ module type LINEXPR = sig
   val add: linexpr -> linexpr -> linexpr
   val sub: linexpr -> linexpr -> linexpr
   val mult: linexpr -> by:factor -> linexpr
+  val is_scalar: linexpr -> bool
   val as_int: ?const_values:const_values -> linexpr -> int
   val subst_vars: linexpr -> int valuation -> linexpr
   val subst_consts: linexpr -> const_values -> linexpr
@@ -177,6 +178,16 @@ struct
       let symbolic = function Term_group.Unit, _ -> None | E d, _-> Some d in
       let symbols = Terms.bindings l |> List.filter_map symbolic in
       not_scalar_consts (NEL.of_rev_list @@ List.rev symbols)
+
+  let is_scalar: linexpr -> bool = fun l ->
+    Terms.is_empty l ||
+    Terms.cardinal l = 1 && match Terms.choose l with
+    | E _, _ -> false
+    | Unit, c ->
+        Factors.is_empty c ||
+        Factors.cardinal c = 1 && match Factors.choose c with
+        | S _, _ -> false
+        | N, _ -> true
 
   (* --- *)
 

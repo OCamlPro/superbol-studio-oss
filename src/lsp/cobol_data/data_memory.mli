@@ -73,6 +73,8 @@ val size_of_dynamic_table: size
 val size_of_index: size
 val size_of_pointer: size
 
+val is_scalar: size -> bool
+
 (** Raises {!NOT_SCALAR} in case of failure. *)
 val as_bits: ?memory_config:memory_config -> size -> int
 

@@ -77,8 +77,7 @@ let%expect_test "hover-copy" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    1 byte
+    - 1 byte
     ---
     Additional pre-processing:
     ```cobol
@@ -99,8 +98,7 @@ let%expect_test "hover-copy" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    1 byte
+    - 1 byte
     ---
     Additional pre-processing:
     ```cobol
@@ -121,8 +119,7 @@ let%expect_test "hover-copy" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    1 byte
+    - 1 byte
     ---
     Additional pre-processing:
     ```cobol
@@ -143,8 +140,7 @@ let%expect_test "hover-copy" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    1 byte
+    - 1 byte
     ---
     Additional pre-processing:
     ```cobol
@@ -186,8 +182,7 @@ let%expect_test "hover-typedef-from-copy" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    1 byte |}];;
+    - 1 byte |}];;
 
 (* Hover replaced *)
 
@@ -255,8 +250,7 @@ let%expect_test "hover-datadef-vars" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    1 byte
+    - 1 byte
     (line 5, character 23):
     __rootdir__/prog.cob:6.8-6.27:
        3           PROGRAM-ID. prog.
@@ -272,8 +266,7 @@ let%expect_test "hover-datadef-vars" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    1 byte
+    - 1 byte
     (line 6, character 14):
     __rootdir__/prog.cob:7.11-7.17:
        4           DATA DIVISION.
@@ -287,7 +280,7 @@ let%expect_test "hover-datadef-vars" =
     STRUCT
     ```
     Group of 3 subfields
-    10 bytes
+    - 10 bytes
     (line 7, character 31):
     __rootdir__/prog.cob:8.10-8.44:
        5           WORKING-STORAGE SECTION.
@@ -303,10 +296,8 @@ let%expect_test "hover-datadef-vars" =
     ```cobol
     PIC 999 USAGE DISPLAY
     ```
-    NUMERIC(digits = 3, scale = 0, signed = false)
     *e.g,* [`000`] (0), [`123`] (123)
-    VALUE 123
-    3 bytes at position 1 in STRUCT
+    - 3 bytes at position 1 in `STRUCT`
     (line 8, character 16):
     __rootdir__/prog.cob:9.13-9.21:
        6           01 DATA-NAME PIC X.
@@ -322,9 +313,7 @@ let%expect_test "hover-datadef-vars" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    VALUE QUOTE
-    1 byte at position 4 in STRUCT
+    - 1 byte at position 4 in `STRUCT`
     (line 9, character 38):
     __rootdir__/prog.cob:10.10-10.50:
        7           01 STRUCT.
@@ -340,9 +329,7 @@ let%expect_test "hover-datadef-vars" =
     ```cobol
     PIC X(6) USAGE DISPLAY
     ```
-    ALPHANUMERIC(6)
-    VALUE "ABC456"
-    6 bytes at position 5 in STRUCT
+    - 6 bytes at position 5 in `STRUCT`
     (line 10, character 14):
     __rootdir__/prog.cob:11.11-11.14:
        8             02 STRUCT-1 PICTURE 999 VALUE 123.
@@ -358,9 +345,7 @@ let%expect_test "hover-datadef-vars" =
     ```cobol
     PIC X(38) USAGE DISPLAY
     ```
-    ALPHANUMERIC(38)
-    VALUE "************************************"
-    38 bytes
+    - 38 bytes
     (line 11, character 17):
     __rootdir__/prog.cob:12.11-12.24:
        9             02 STRUCT-2 PICTURE X VALUE QUOTE.
@@ -376,9 +361,8 @@ let%expect_test "hover-datadef-vars" =
     ```cobol
     PIC S9(9)V9(9) USAGE BINARY-DOUBLE
     ```
-    NUMERIC(digits = 18, scale = 9, signed = true)
     *e.g,* [`+000000000.000000000`] (0), [`+123456789.123000000`] (123456789.123)
-    8 bytes
+    - 8 bytes
     (line 13, character 18):
     __rootdir__/prog.cob:14.18-14.27:
       11           01 BIG PIC X(38) VALUE "************************************".
@@ -394,8 +378,7 @@ let%expect_test "hover-datadef-vars" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    1 byte
+    - 1 byte
     (line 13, character 33):
     __rootdir__/prog.cob:14.28-14.34:
       11           01 BIG PIC X(38) VALUE "************************************".
@@ -409,7 +392,7 @@ let%expect_test "hover-datadef-vars" =
     STRUCT
     ```
     Group of 3 subfields
-    10 bytes
+    - 10 bytes
     (line 13, character 36):
     __rootdir__/prog.cob:14.35-14.43:
       11           01 BIG PIC X(38) VALUE "************************************".
@@ -425,10 +408,8 @@ let%expect_test "hover-datadef-vars" =
     ```cobol
     PIC 999 USAGE DISPLAY
     ```
-    NUMERIC(digits = 3, scale = 0, signed = false)
     *e.g,* [`000`] (0), [`123`] (123)
-    VALUE 123
-    3 bytes at position 1 in STRUCT
+    - 3 bytes at position 1 in `STRUCT`
     (line 13, character 47):
     __rootdir__/prog.cob:14.44-14.52:
       11           01 BIG PIC X(38) VALUE "************************************".
@@ -444,9 +425,7 @@ let%expect_test "hover-datadef-vars" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    VALUE QUOTE
-    1 byte at position 4 in STRUCT
+    - 1 byte at position 4 in `STRUCT`
     (line 13, character 56):
     __rootdir__/prog.cob:14.53-14.61:
       11           01 BIG PIC X(38) VALUE "************************************".
@@ -462,9 +441,7 @@ let%expect_test "hover-datadef-vars" =
     ```cobol
     PIC X(6) USAGE DISPLAY
     ```
-    ALPHANUMERIC(6)
-    VALUE "ABC456"
-    6 bytes at position 5 in STRUCT |}];;
+    - 6 bytes at position 5 in `STRUCT` |}];;
 
 let%expect_test "hover-datadef-value-with-tab" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -496,9 +473,7 @@ let%expect_test "hover-datadef-value-with-tab" =
     ```cobol
     PIC X(10) USAGE DISPLAY
     ```
-    ALPHANUMERIC(10)
-    VALUE "ABC\tDEF"
-    10 bytes |}]
+    - 10 bytes |}];;
 
 let%expect_test "hover-datadef-vars-usage" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -539,9 +514,8 @@ let%expect_test "hover-datadef-vars-usage" =
     ```cobol
     PIC -BZZZ,ZZ9.99 USAGE DISPLAY
     ```
-    NUMERIC(digits = 8, scale = 2, signed = false)
     *e.g,* [`        0.00`] (0), [`  123,456.78`] (123456.78)
-    8 bytes
+    - 8 bytes
     (line 6, character 11):
     __rootdir__/prog.cob:7.11-7.15:
        4           DATA DIVISION.
@@ -557,9 +531,8 @@ let%expect_test "hover-datadef-vars-usage" =
     ```cobol
     PIC 9 USAGE BINARY
     ```
-    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
-    1 byte
+    - 1 byte
     (line 7, character 11):
     __rootdir__/prog.cob:8.11-8.15:
        5           WORKING-STORAGE SECTION.
@@ -575,7 +548,7 @@ let%expect_test "hover-datadef-vars-usage" =
     ```cobol
     USAGE BINARY-SHORT SIGNED
     ```
-    2 bytes
+    - 2 bytes
     (line 8, character 11):
     __rootdir__/prog.cob:9.11-9.15:
        6           01 VAR PIC -BZZZ,ZZ9.99.
@@ -591,7 +564,7 @@ let%expect_test "hover-datadef-vars-usage" =
     ```cobol
     USAGE BINARY-C-LONG SIGNED
     ```
-    *variable size*
+    - *variable size*
     (line 9, character 11):
     __rootdir__/prog.cob:10.11-10.15:
        7           01 VAR1 PIC 9 USAGE BINARY.
@@ -607,8 +580,7 @@ let%expect_test "hover-datadef-vars-usage" =
     ```cobol
     PIC 111 USAGE BIT
     ```
-    BOOLEAN(3)
-    3 bits
+    - 3 bits
     (line 10, character 11):
     __rootdir__/prog.cob:11.11-11.15:
        8           01 VAR4 USAGE BINARY-SHORT.
@@ -622,7 +594,7 @@ let%expect_test "hover-datadef-vars-usage" =
     VAR7
     ```
     Pointer
-    *variable size*
+    - *variable size*
     (line 11, character 11):
     __rootdir__/prog.cob:12.11-12.15:
        9           01 VAR3 USAGE BINARY-C-LONG.
@@ -638,9 +610,8 @@ let%expect_test "hover-datadef-vars-usage" =
     ```cobol
     PIC 9 USAGE PACKED-DECIMAL
     ```
-    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
-    1 byte
+    - 1 byte
     (line 12, character 11):
     __rootdir__/prog.cob:13.11-13.15:
       10           01 VAR6 PIC 111 USAGE BIT.
@@ -656,9 +627,8 @@ let%expect_test "hover-datadef-vars-usage" =
     ```cobol
     PIC $++/+.+B+ USAGE DISPLAY
     ```
-    NUMERIC(digits = 4, scale = 2, signed = false)
     *e.g,* [`         `] (0), [`$+1/2.3 4`] (12.34)
-    4 bytes
+    - 4 bytes
     (line 13, character 11):
     __rootdir__/prog.cob:14.11-14.15:
       11           01 VAR7 USAGE POINTER.
@@ -674,8 +644,7 @@ let%expect_test "hover-datadef-vars-usage" =
     ```cobol
     PIC L9 USAGE DISPLAY
     ```
-    ALPHANUMERIC(2)
-    2 bytes
+    - 2 bytes
     (line 14, character 11):
     __rootdir__/prog.cob:15.11-15.16:
       12           01 VAR8 PIC 9 USAGE PACKED-DECIMAL.
@@ -739,7 +708,7 @@ let%expect_test "hover-datadef-filler-vars" =
     STRUCT
     ```
     Group of 2 subfields
-    4 bytes
+    - 4 bytes
     (line 9, character 29):
     Hovering nothing worthy |}];;
 
@@ -778,8 +747,7 @@ let%expect_test "hover-datadef-simple-condition" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    1 byte
+    - 1 byte
     (line 6, character 14):
     Hovering nothing worthy
     (line 7, character 15):
@@ -802,8 +770,7 @@ let%expect_test "hover-datadef-simple-condition" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    1 byte at position 1 in VAL
+    - 1 byte at position 1 in `VAL`
     (line 10, character 22):
     __rootdir__/prog.cob:11.14-11.22:
        8             88 CONDTHRU VALUE "a" THRU "z".
@@ -822,8 +789,7 @@ let%expect_test "hover-datadef-simple-condition" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    1 byte at position 1 in VAL |}];;
+    - 1 byte at position 1 in `VAL` |}];;
 
 let%expect_test "hover-datadef-group-condition" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -864,7 +830,7 @@ let%expect_test "hover-datadef-group-condition" =
     STRUCT
     ```
     Group of 2 subfields
-    2 bytes
+    - 2 bytes
     (line 9, character 17):
     Hovering nothing worthy
     (line 11, character 14):
@@ -885,8 +851,7 @@ let%expect_test "hover-datadef-group-condition" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    1 byte at position 1 in STRUCT
+    - 1 byte at position 1 in `STRUCT`
     (line 12, character 14):
     __rootdir__/prog.cob:13.14-13.20:
       10               88 COND-2 VALUE "a".
@@ -905,8 +870,7 @@ let%expect_test "hover-datadef-group-condition" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    1 byte at position 2 in STRUCT |}];;
+    - 1 byte at position 2 in `STRUCT` |}];;
 
 let%expect_test "hover-datadef-renames" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -944,9 +908,8 @@ let%expect_test "hover-datadef-renames" =
     ```cobol
     PIC 9 USAGE DISPLAY
     ```
-    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
-    1 byte at position 1 in X
+    - 1 byte at position 1 in `X`
     (line 8, character 16):
     __rootdir__/prog.cob:9.10-9.25:
        6           01 X.
@@ -963,9 +926,8 @@ let%expect_test "hover-datadef-renames" =
     ```cobol
     PIC 9 USAGE DISPLAY
     ```
-    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
-    1 byte at position 1 in X
+    - 1 byte at position 1 in `X`
     (line 8, character 23):
     __rootdir__/prog.cob:9.23-9.24:
        6           01 X.
@@ -981,9 +943,8 @@ let%expect_test "hover-datadef-renames" =
     ```cobol
     PIC 9 USAGE DISPLAY
     ```
-    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
-    1 byte at position 1 in X
+    - 1 byte at position 1 in `X`
     (line 9, character 22):
     __rootdir__/prog.cob:10.13-10.22:
        7             05 Y PIC 9.
@@ -1001,8 +962,7 @@ let%expect_test "hover-datadef-renames" =
     ```cobol
     PIC XXX USAGE DISPLAY
     ```
-    ALPHANUMERIC(3)
-    3 bytes at position 1 in X
+    - 3 bytes at position 1 in `X`
     (line 10, character 20):
     __rootdir__/prog.cob:11.13-11.27:
        8             05 YY PIC XX.
@@ -1031,9 +991,8 @@ let%expect_test "hover-datadef-renames" =
     ```cobol
     PIC 9 USAGE DISPLAY
     ```
-    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
-    1 byte at position 1 in X |}];;
+    - 1 byte at position 1 in `X` |}];;
 
 let%expect_test "hover-datadef-redefines" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -1070,12 +1029,8 @@ let%expect_test "hover-datadef-redefines" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    Redefines:
-    ```cobol
-    T IN S
-    ```
-    1 byte at position 1 in S
+    - Redefines: `T IN S`
+    - 1 byte at position 1 in `S`
     (line 7, character 31):
     __rootdir__/prog.cob:8.31-8.32:
        5           WORKING-STORAGE SECTION.
@@ -1091,10 +1046,9 @@ let%expect_test "hover-datadef-redefines" =
     ```cobol
     PIC 9 USAGE DISPLAY
     ```
-    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
-    1 byte at position 1 in S
-    Redefined by U
+    - 1 byte at position 1 in `S`
+    - Redefined by `U`
     (line 10, character 13):
     __rootdir__/prog.cob:11.13-11.14:
        8             05 U PIC X REDEFINES T.
@@ -1108,10 +1062,7 @@ let%expect_test "hover-datadef-redefines" =
     Z IN X
     ```
     *(layout omitted due to issues in item definition)*
-    Redefines:
-    ```cobol
-    Y IN X
-    ```
+    - Redefines: `Y IN X`
     (line 10, character 26):
     __rootdir__/prog.cob:11.25-11.26:
        8             05 U PIC X REDEFINES T.
@@ -1127,10 +1078,9 @@ let%expect_test "hover-datadef-redefines" =
     ```cobol
     PIC 9 USAGE DISPLAY
     ```
-    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
-    1 byte at position 1 in X
-    Redefined by Z
+    - 1 byte at position 1 in `X`
+    - Redefined by `Z`
     (line 12, character 20):
     __rootdir__/prog.cob:13.20-13.21:
       10             05 Y PIC 9.
@@ -1144,7 +1094,7 @@ let%expect_test "hover-datadef-redefines" =
     S
     ```
     Group of 1 subfield
-    1 byte
+    - 1 byte
     (line 12, character 22):
     __rootdir__/prog.cob:13.22-13.23:
       10             05 Y PIC 9.
@@ -1160,12 +1110,8 @@ let%expect_test "hover-datadef-redefines" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    Redefines:
-    ```cobol
-    T IN S
-    ```
-    1 byte at position 1 in S
+    - Redefines: `T IN S`
+    - 1 byte at position 1 in `S`
     (line 12, character 24):
     __rootdir__/prog.cob:13.24-13.25:
       10             05 Y PIC 9.
@@ -1179,10 +1125,7 @@ let%expect_test "hover-datadef-redefines" =
     Z IN X
     ```
     *(layout omitted due to issues in item definition)*
-    Redefines:
-    ```cobol
-    Y IN X
-    ```
+    - Redefines: `Y IN X`
     (line 12, character 26):
     __rootdir__/prog.cob:13.26-13.27:
       10             05 Y PIC 9.
@@ -1196,7 +1139,7 @@ let%expect_test "hover-datadef-redefines" =
     X
     ```
     Group of 1 subfield
-    1 byte |}];;
+    - 1 byte |}];;
 
 let%expect_test "hover-datadef-table-and-index" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -1243,7 +1186,7 @@ let%expect_test "hover-datadef-table-and-index" =
     IDX
     ```
     Index
-    *variable size*
+    - *variable size*
     (line 7, character 13):
     __rootdir__/prog.cob:8.11-8.13:
        5           WORKING-STORAGE SECTION.
@@ -1259,8 +1202,7 @@ let%expect_test "hover-datadef-table-and-index" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    10 bytes
+    - 1 byte per occurrence, in table of 10 bytes
     (line 7, character 52):
     __rootdir__/prog.cob:8.47-8.53:
        5           WORKING-STORAGE SECTION.
@@ -1272,8 +1214,7 @@ let%expect_test "hover-datadef-table-and-index" =
       10             02 SUB-FIELD pic x.
     Table
     ```cobol
-    OCCURS 10 TIMES
-    INDEXED BY INDEX1 IN T1
+    OCCURS 10 TIMES INDEXED BY INDEX1 IN T1
     ```
     Fields:
     ```cobol
@@ -1282,8 +1223,7 @@ let%expect_test "hover-datadef-table-and-index" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    10 bytes
+    - 10 bytes
     (line 8, character 44):
     __rootdir__/prog.cob:9.41-9.47:
        6           77 IDX USAGE IS INDEX.
@@ -1295,15 +1235,14 @@ let%expect_test "hover-datadef-table-and-index" =
       11           01 T3.
     Table
     ```cobol
-    OCCURS 10 TIMES
-    INDEXED BY INDEX2 IN T2, I3 IN T2
+    OCCURS 10 TIMES INDEXED BY INDEX2 IN T2, I3 IN T2
     ```
     Fields:
     ```cobol
     T2
     ```
     Group of 1 subfield
-    10 bytes
+    - 10 bytes
     (line 8, character 49):
     __rootdir__/prog.cob:9.48-9.50:
        6           77 IDX USAGE IS INDEX.
@@ -1315,15 +1254,14 @@ let%expect_test "hover-datadef-table-and-index" =
       11           01 T3.
     Table
     ```cobol
-    OCCURS 10 TIMES
-    INDEXED BY INDEX2 IN T2, I3 IN T2
+    OCCURS 10 TIMES INDEXED BY INDEX2 IN T2, I3 IN T2
     ```
     Fields:
     ```cobol
     T2
     ```
     Group of 1 subfield
-    10 bytes
+    - 10 bytes
     (line 10, character 13):
     __rootdir__/prog.cob:11.11-11.13:
        8           01 T1 PIC X OCCURS 10 TIMES INDEXED BY INDEX1.
@@ -1337,7 +1275,7 @@ let%expect_test "hover-datadef-table-and-index" =
     T3
     ```
     Group of 1 subfield
-    2 bytes
+    - 2 bytes
     (line 12, character 13):
     __rootdir__/prog.cob:13.11-13.13:
       10             02 SUB-FIELD pic x.
@@ -1352,7 +1290,9 @@ let%expect_test "hover-datadef-table-and-index" =
     ```
     Group of 1 subfield
     ---
+    ```text
      (no size shown yet, on purpose as COMP-0 is unsupported)
+    ```
     (line 14, character 66):
     __rootdir__/prog.cob:15.65-15.67:
       12             02 FILLER PIC 99 USAGE DISPLAY.
@@ -1364,15 +1304,14 @@ let%expect_test "hover-datadef-table-and-index" =
       17           01 VARTAB1.
     Table
     ```cobol
-    OCCURS 10 TO 20 TIMES DEPENDING ON CNT
-    INDEXED BY I4
+    OCCURS 10 TO 20 TIMES DEPENDING ON CNT INDEXED BY I4
     ```
     Fields:
     ```cobol
     FILLER
     ```
     Group of 1 subfield
-    up to 20 bytes
+    - up to 20 bytes
     (line 23, character 24):
     __rootdir__/prog.cob:24.21-24.27:
       21             02 X PIC X OCCURS 1 TO 99 DEPENDING ON VARTAB-SIZE.
@@ -1384,8 +1323,7 @@ let%expect_test "hover-datadef-table-and-index" =
       26               STOP RUN.
     Table
     ```cobol
-    OCCURS 10 TIMES
-    INDEXED BY INDEX1 IN T1
+    OCCURS 10 TIMES INDEXED BY INDEX1 IN T1
     ```
     Fields:
     ```cobol
@@ -1394,8 +1332,7 @@ let%expect_test "hover-datadef-table-and-index" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    10 bytes
+    - 10 bytes
     (line 24, character 24):
     __rootdir__/prog.cob:25.20-25.27:
       22           PROCEDURE DIVISION.
@@ -1409,7 +1346,7 @@ let%expect_test "hover-datadef-table-and-index" =
     VARTAB1
     ```
     Group of 1 subfield
-    *variable size*
+    - *variable size*
     (line 24, character 32):
     __rootdir__/prog.cob:25.28-25.39:
       22           PROCEDURE DIVISION.
@@ -1425,8 +1362,7 @@ let%expect_test "hover-datadef-table-and-index" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    up to 99 bytes at position 1 in VARTAB1
+    - 1 byte per occurrence, in table of up to 99 bytes at position 1 in `VARTAB1`
     (line 24, character 46):
     __rootdir__/prog.cob:25.40-25.47:
       22           PROCEDURE DIVISION.
@@ -1440,7 +1376,7 @@ let%expect_test "hover-datadef-table-and-index" =
     VARTAB2
     ```
     Group of 2 subfields
-    *variable size* |}];;
+    - *variable size* |}];;
 
 let%expect_test "hover-preproc-directives" =
   Unix.putenv "ABCD" "ABCD-VALUE"; (* Warning: left in environment after the test *)
@@ -1488,7 +1424,7 @@ let%expect_test "hover-preproc-directives" =
     ----               ^
        9          77 WS VALUE "OK".
       10          >>ELSE
-    Compilation variable with value b"10"
+    Compilation variable with value `b"10"`
     (line 12, character 16):
     Hovering nothing worthy
     (line 13, character 12):
@@ -1500,7 +1436,7 @@ let%expect_test "hover-preproc-directives" =
     ----               ^^^^
       15          >>END-IF
       16         * Some documentation for bis
-    Compilation variable with value "ABCD-VALUE" (defined in process environment)
+    Compilation variable with value `"ABCD-VALUE"` (defined in process environment)
     (line 18, character 16):
     Hovering nothing worthy
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
@@ -1514,7 +1450,7 @@ let%expect_test "hover-preproc-directives" =
     ----                   ^
        7          >>DEFINE B AS b'10'
        8          >>IF B
-    Compilation variable with value 1.0
+    Compilation variable with value `1.0`
     (line 6, character 16):
     __rootdir__/prog.cob:7.16-7.17:
        4          DATA DIVISION.
@@ -1524,7 +1460,7 @@ let%expect_test "hover-preproc-directives" =
     ----                   ^
        8          >>IF B
        9          77 WS VALUE "OK".
-    Compilation variable with value b"10"
+    Compilation variable with value `b"10"`
     (line 7, character 13):
     __rootdir__/prog.cob:8.12-8.13:
        5          WORKING-STORAGE SECTION.
@@ -1534,7 +1470,7 @@ let%expect_test "hover-preproc-directives" =
     ----               ^
        9          77 WS VALUE "OK".
       10          >>ELSE
-    Compilation variable with value b"10"
+    Compilation variable with value `b"10"`
     (line 12, character 16):
     __rootdir__/prog.cob:13.16-13.20:
       10          >>ELSE
@@ -1544,7 +1480,7 @@ let%expect_test "hover-preproc-directives" =
     ----                   ^^^^
       14          >>IF ABCD IS DEFINED
       15          >>END-IF
-    Compilation variable with value "ABCD-VALUE" (defined in process environment)
+    Compilation variable with value `"ABCD-VALUE"` (defined in process environment)
     (line 13, character 12):
     __rootdir__/prog.cob:14.12-14.16:
       11          77 WS VALUE "KO".
@@ -1554,7 +1490,7 @@ let%expect_test "hover-preproc-directives" =
     ----               ^^^^
       15          >>END-IF
       16         * Some documentation for bis
-    Compilation variable with value "ABCD-VALUE" (defined in process environment)
+    Compilation variable with value `"ABCD-VALUE"` (defined in process environment)
     (line 18, character 16):
     __rootdir__/prog.cob:19.16-19.19:
       16         * Some documentation for bis
@@ -1563,11 +1499,13 @@ let%expect_test "hover-preproc-directives" =
       19 >        >>DEFINE BIS AS 42.24
     ----                   ^^^
       20
-    Compilation variable with value 42.24
+    Compilation variable with value `42.24`
     ---
+    ```text
      Some documentation for bis
      ...
      on several lines.
+    ```
   |}];;
 
 let%expect_test "hover-preproc-directives-numeric" =
@@ -1616,7 +1554,7 @@ let%expect_test "hover-preproc-directives-numeric" =
     ----               ^^^^^^^^
        8          77 WS VALUE "OK".
        9          >>ELSE
-    Compilation variable with value 0.5 (defined in process environment)
+    Compilation variable with value `0.5` (defined in process environment)
     (line 11, character 16):
     Hovering nothing worthy
     (line 12, character 34):
@@ -1628,7 +1566,7 @@ let%expect_test "hover-preproc-directives-numeric" =
     ----                           ^^^^^^^^^^
       14          77 WX VALUE "KO".
       15          >>ELSE
-    Compilation variable with value 0.5 (defined in process environment)
+    Compilation variable with value `0.5` (defined in process environment)
     (line 18, character 18):
     __rootdir__/prog.cob:19.17-19.19:
       16          77 WX VALUE "OK".
@@ -1644,9 +1582,7 @@ let%expect_test "hover-preproc-directives-numeric" =
     ```cobol
     PIC XX USAGE DISPLAY
     ```
-    ALPHANUMERIC(2)
-    VALUE "OK"
-    2 bytes
+    - 2 bytes
     (line 18, character 21):
     __rootdir__/prog.cob:19.20-19.22:
       16          77 WX VALUE "OK".
@@ -1662,9 +1598,7 @@ let%expect_test "hover-preproc-directives-numeric" =
     ```cobol
     PIC XX USAGE DISPLAY
     ```
-    ALPHANUMERIC(2)
-    VALUE "OK"
-    2 bytes
+    - 2 bytes
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     Now with hover text on defintions
     (line 5, character 16):
@@ -1676,7 +1610,7 @@ let%expect_test "hover-preproc-directives-numeric" =
     ----                   ^^^^^^^^
        7          >>IF ONE_HALF = 0000.5
        8          77 WS VALUE "OK".
-    Compilation variable with value 0.5 (defined in process environment)
+    Compilation variable with value `0.5` (defined in process environment)
     (line 6, character 20):
     __rootdir__/prog.cob:7.12-7.20:
        4          DATA DIVISION.
@@ -1686,7 +1620,7 @@ let%expect_test "hover-preproc-directives-numeric" =
     ----               ^^^^^^^^
        8          77 WS VALUE "OK".
        9          >>ELSE
-    Compilation variable with value 0.5 (defined in process environment)
+    Compilation variable with value `0.5` (defined in process environment)
     (line 11, character 16):
     __rootdir__/prog.cob:12.16-12.26:
        9          >>ELSE
@@ -1696,7 +1630,7 @@ let%expect_test "hover-preproc-directives-numeric" =
     ----                   ^^^^^^^^^^
       13          >>IF ONE_HALF <> ONE_OVER_2
       14          77 WX VALUE "KO".
-    Compilation variable with value 0.5 (defined in process environment)
+    Compilation variable with value `0.5` (defined in process environment)
     (line 12, character 34):
     __rootdir__/prog.cob:13.24-13.34:
       10          77 WS VALUE "KO".
@@ -1706,7 +1640,7 @@ let%expect_test "hover-preproc-directives-numeric" =
     ----                           ^^^^^^^^^^
       14          77 WX VALUE "KO".
       15          >>ELSE
-    Compilation variable with value 0.5 (defined in process environment)
+    Compilation variable with value `0.5` (defined in process environment)
     (line 18, character 18):
     __rootdir__/prog.cob:19.17-19.19:
       16          77 WX VALUE "OK".
@@ -1722,9 +1656,7 @@ let%expect_test "hover-preproc-directives-numeric" =
     ```cobol
     PIC XX USAGE DISPLAY
     ```
-    ALPHANUMERIC(2)
-    VALUE "OK"
-    2 bytes
+    - 2 bytes
     (line 18, character 21):
     __rootdir__/prog.cob:19.20-19.22:
       16          77 WX VALUE "OK".
@@ -1740,9 +1672,7 @@ let%expect_test "hover-preproc-directives-numeric" =
     ```cobol
     PIC XX USAGE DISPLAY
     ```
-    ALPHANUMERIC(2)
-    VALUE "OK"
-    2 bytes
+    - 2 bytes
   |}];;
 
 let%expect_test "hover-datadef-78" =
@@ -1771,7 +1701,7 @@ let%expect_test "hover-datadef-78" =
     ----          ^^^^^^^^^^^^^^^^^^^^^
        7         *Note: currently handled as hovering over `01 VAR ... CONST.`
        8          77 VAR VALUE CONST.
-    Compilation variable with value "ABCD"
+    Compilation variable with value `"ABCD"`
     (line 7, character 23):
     __rootdir__/prog.cob:8.7-8.26:
        5          WORKING-STORAGE SECTION.
@@ -1787,11 +1717,11 @@ let%expect_test "hover-datadef-78" =
     ```cobol
     PIC X(4) USAGE DISPLAY
     ```
-    ALPHANUMERIC(4)
-    VALUE "ABCD"
-    4 bytes
+    - 4 bytes
     ---
+    ```text
     Note: currently handled as hovering over `01 VAR ... CONST.`
+    ```
     (line 9, character 27):
     __rootdir__/prog.cob:10.27-10.30:
        7         *Note: currently handled as hovering over `01 VAR ... CONST.`
@@ -1807,11 +1737,11 @@ let%expect_test "hover-datadef-78" =
     ```cobol
     PIC X(4) USAGE DISPLAY
     ```
-    ALPHANUMERIC(4)
-    VALUE "ABCD"
-    4 bytes
+    - 4 bytes
     ---
+    ```text
     Note: currently handled as hovering over `01 VAR ... CONST.`
+    ```
     (line 9, character 46):
     __rootdir__/prog.cob:10.43-10.48:
        7         *Note: currently handled as hovering over `01 VAR ... CONST.`
@@ -1821,7 +1751,7 @@ let%expect_test "hover-datadef-78" =
     ----                                              ^^^^^
       11              STOP RUN.
       12
-    Compilation variable with value "ABCD"
+    Compilation variable with value `"ABCD"`
   |}];;
 
 let%expect_test "hover-datadef-communication-section" =
@@ -1888,9 +1818,11 @@ let%expect_test "hover-comment" =
     STRUCT
     ```
     Group of 4 subfields
-    4 bytes
+    - 4 bytes
     ---
+    ```text
      inline comment
+    ```
     (line 18, character 25):
     __rootdir__/prog.cob:19.24-19.29:
       16         * comments and...
@@ -1906,10 +1838,11 @@ let%expect_test "hover-comment" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    1 byte at position 1 in STRUCT
+    - 1 byte at position 1 in `STRUCT`
     ---
+    ```text
      val1 only inline comment
+    ```
     (line 18, character 31):
     __rootdir__/prog.cob:19.30-19.35:
       16         * comments and...
@@ -1925,10 +1858,11 @@ let%expect_test "hover-comment" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    1 byte at position 2 in STRUCT
+    - 1 byte at position 2 in `STRUCT`
     ---
+    ```text
      val2 only line comment
+    ```
     (line 18, character 37):
     __rootdir__/prog.cob:19.36-19.41:
       16         * comments and...
@@ -1944,11 +1878,12 @@ let%expect_test "hover-comment" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    1 byte at position 3 in STRUCT
+    - 1 byte at position 3 in `STRUCT`
     ---
+    ```text
      val3 several line
      comments
+    ```
     (line 18, character 43):
     __rootdir__/prog.cob:19.42-19.47:
       16         * comments and...
@@ -1964,10 +1899,11 @@ let%expect_test "hover-comment" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    1 byte at position 4 in STRUCT
+    - 1 byte at position 4 in `STRUCT`
     ---
-     an inline comment. |}];;
+    ```text
+     an inline comment.
+    ``` |}];;
 
 
 let%expect_test "hover-comment-copy" =
@@ -2008,10 +1944,11 @@ let%expect_test "hover-comment-copy" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    1 byte
+    - 1 byte
     ---
-     copy inline comment |}]
+    ```text
+     copy inline comment
+    ``` |}]
 
 let%expect_test "hover-data-division-memory-info-only" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -2039,7 +1976,7 @@ let%expect_test "hover-data-division-memory-info-only" =
     ----             ^^^
        7          PROCEDURE DIVISION.
        8             DISPLAY VAR.
-    1 byte |}]
+    - 1 byte |}]
 
 let%expect_test "hover-procedure-using" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -2071,8 +2008,7 @@ let%expect_test "hover-procedure-using" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    1 byte |}]
+    - 1 byte |}];;
 
 
 let%expect_test "78-level-in-copybook" =
@@ -2105,7 +2041,7 @@ let%expect_test "78-level-in-copybook" =
     ----                     ^
        9             STOP RUN.
       10
-    Compilation variable with value "ABC" |}]
+    Compilation variable with value `"ABC"` |}]
 
 let%expect_test "78-level-in-copybook-with-replacement" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -2143,10 +2079,8 @@ let%expect_test "78-level-in-copybook-with-replacement" =
     ```cobol
     PIC 9 USAGE DISPLAY
     ```
-    NUMERIC(digits = 1, scale = 0, signed = false)
     *e.g,* [`0`] (0), [`1`] (1)
-    VALUE "A"
-    1 byte |}]
+    - 1 byte |}];;
 
 let%expect_test "hover-offset-size" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -2186,7 +2120,7 @@ let%expect_test "hover-offset-size" =
     WS-CUSTOMER
     ```
     Group of 3 subfields
-    19 bytes
+    - 19 bytes
     (line 6, character 13):
     __rootdir__/prog.cob:7.13-7.18:
        4           DATA DIVISION.
@@ -2202,9 +2136,8 @@ let%expect_test "hover-offset-size" =
     ```cobol
     PIC 9(4) USAGE DISPLAY
     ```
-    NUMERIC(digits = 4, scale = 0, signed = false)
     *e.g,* [`0000`] (0), [`1234`] (1234)
-    4 bytes at position 1 in WS-CUSTOMER
+    - 4 bytes at position 1 in `WS-CUSTOMER`
     (line 7, character 13):
     __rootdir__/prog.cob:8.13-8.20:
        5           WORKING-STORAGE SECTION.
@@ -2220,9 +2153,8 @@ let%expect_test "hover-offset-size" =
     ```cobol
     PIC X(10) USAGE DISPLAY
     ```
-    ALPHANUMERIC(10)
-    10 bytes at position 5 in WS-CUSTOMER
-    Redefined by WS-NAME-R
+    - 10 bytes at position 5 in `WS-CUSTOMER`
+    - Redefined by `WS-NAME-R`
     (line 8, character 13):
     __rootdir__/prog.cob:9.13-9.22:
        6           01 WS-CUSTOMER.
@@ -2238,13 +2170,9 @@ let%expect_test "hover-offset-size" =
     ```cobol
     PIC 9(10) USAGE DISPLAY
     ```
-    NUMERIC(digits = 10, scale = 0, signed = false)
     *e.g,* [`0000000000`] (0), [`1234567891`] (1234567891)
-    Redefines:
-    ```cobol
-    WS-NAME IN WS-CUSTOMER
-    ```
-    10 bytes at position 5 in WS-CUSTOMER
+    - Redefines: `WS-NAME IN WS-CUSTOMER`
+    - 10 bytes at position 5 in `WS-CUSTOMER`
     (line 9, character 13):
     __rootdir__/prog.cob:10.13-10.22:
        7             05 WS-ID       PIC 9(4).
@@ -2260,9 +2188,8 @@ let%expect_test "hover-offset-size" =
     ```cobol
     PIC S9(9) USAGE PACKED-DECIMAL
     ```
-    NUMERIC(digits = 9, scale = 0, signed = true)
     *e.g,* [`+000000000`] (0), [`+123456789`] (123456789)
-    5 bytes at position 15 in WS-CUSTOMER
+    - 5 bytes at position 15 in `WS-CUSTOMER`
     (line 10, character 13):
     __rootdir__/prog.cob:11.13-11.19:
        8             05 WS-NAME     PIC X(10).
@@ -2280,8 +2207,7 @@ let%expect_test "hover-offset-size" =
     ```cobol
     PIC X(14) USAGE DISPLAY
     ```
-    ALPHANUMERIC(14)
-    14 bytes at position 1 in WS-CUSTOMER
+    - 14 bytes at position 1 in `WS-CUSTOMER`
     (line 11, character 11):
     __rootdir__/prog.cob:12.11-12.19:
        9             05 WS-NAME-R REDEFINES WS-NAME PIC 9(10).
@@ -2297,9 +2223,8 @@ let%expect_test "hover-offset-size" =
     ```cobol
     PIC 999 USAGE DISPLAY
     ```
-    NUMERIC(digits = 3, scale = 0, signed = false)
     *e.g,* [`000`] (0), [`123`] (123)
-    3 bytes
+    - 3 bytes
     (line 12, character 11):
     __rootdir__/prog.cob:13.11-13.19:
       10             05 WS-AMOUNT   PIC S9(9) COMP-3.
@@ -2313,7 +2238,7 @@ let%expect_test "hover-offset-size" =
     WS-TABLE
     ```
     Group of 1 subfield
-    *variable size*
+    - *variable size*
     (line 13, character 13):
     __rootdir__/prog.cob:14.13-14.20:
       11             66 WS-KEY RENAMES WS-ID THRU WS-NAME.
@@ -2329,8 +2254,7 @@ let%expect_test "hover-offset-size" =
     ```cobol
     PIC X(5) USAGE DISPLAY
     ```
-    ALPHANUMERIC(5)
-    up to 10×5 (=50) bytes at position 1 in WS-TABLE
+    - 5 bytes per occurrence, in table of up to 10×5 (=50) bytes at position 1 in `WS-TABLE`
     (line 15, character 11):
     __rootdir__/prog.cob:16.11-16.18:
       13           01 WS-TABLE.
@@ -2346,8 +2270,7 @@ let%expect_test "hover-offset-size" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    1 byte |}]
+    - 1 byte |}];;
 
 let%expect_test "hover-redefines-sizes" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -2385,11 +2308,10 @@ let%expect_test "hover-redefines-sizes" =
     ```cobol
     PIC X(4) USAGE DISPLAY
     ```
-    ALPHANUMERIC(4)
-    4 bytes at position 1 in S
-    Redefined by B: 2 bytes of 4 bytes
-    Redefined by C: 6 bytes of 4 bytes ⚠️
-    Redefined by D
+    - 4 bytes at position 1 in `S`
+    - Redefined by `B`: 2 bytes of 4 bytes
+    - Redefined by `C`: 6 bytes of 4 bytes ⚠️
+    - Redefined by `D`
     (line 7, character 13):
     __rootdir__/prog.cob:8.13-8.14:
        5           WORKING-STORAGE SECTION.
@@ -2405,13 +2327,9 @@ let%expect_test "hover-redefines-sizes" =
     ```cobol
     PIC XX USAGE DISPLAY
     ```
-    ALPHANUMERIC(2)
-    Redefines:
-    ```cobol
-    A IN S
-    ```
-    2 bytes at position 1 in S
-    2 bytes smaller than the redefined item
+    - Redefines: `A IN S`
+    - 2 bytes at position 1 in `S`
+    - 2 bytes smaller than the redefined item
     (line 8, character 13):
     __rootdir__/prog.cob:9.13-9.14:
        6           01 S.
@@ -2427,13 +2345,9 @@ let%expect_test "hover-redefines-sizes" =
     ```cobol
     PIC X(6) USAGE DISPLAY
     ```
-    ALPHANUMERIC(6)
-    Redefines:
-    ```cobol
-    A IN S
-    ```
-    6 bytes at position 1 in S
-    2 bytes larger than the redefined item ⚠️
+    - Redefines: `A IN S`
+    - 6 bytes at position 1 in `S`
+    - 2 bytes larger than the redefined item ⚠️
     (line 9, character 13):
     __rootdir__/prog.cob:10.13-10.14:
        7             05 A PIC X(4).
@@ -2449,12 +2363,8 @@ let%expect_test "hover-redefines-sizes" =
     ```cobol
     PIC X(4) USAGE DISPLAY
     ```
-    ALPHANUMERIC(4)
-    Redefines:
-    ```cobol
-    A IN S
-    ```
-    4 bytes at position 1 in S
+    - Redefines: `A IN S`
+    - 4 bytes at position 1 in `S`
     (line 10, character 13):
     __rootdir__/prog.cob:11.13-11.14:
        8             05 B REDEFINES A PIC X(2).
@@ -2470,8 +2380,7 @@ let%expect_test "hover-redefines-sizes" =
     ```cobol
     PIC XXX USAGE DISPLAY
     ```
-    ALPHANUMERIC(3)
-    3 bytes at position 5 in S
+    - 3 bytes at position 5 in `S`
     (line 11, character 13):
     __rootdir__/prog.cob:12.13-12.16:
        9             05 C REDEFINES A PIC X(6).
@@ -2487,9 +2396,8 @@ let%expect_test "hover-redefines-sizes" =
     ```cobol
     PIC XX USAGE DISPLAY
     ```
-    ALPHANUMERIC(2)
-    3×2 (=6) bytes at position 8 in S
-    Redefined by ALT: 8 bytes of 6 bytes ⚠️
+    - 2 bytes per occurrence, in table of 3×2 (=6) bytes at position 8 in `S`
+    - Redefined by `ALT`: 8 bytes of 6 bytes ⚠️
     (line 12, character 13):
     __rootdir__/prog.cob:13.13-13.16:
       10             05 D REDEFINES A PIC X(4).
@@ -2505,10 +2413,6 @@ let%expect_test "hover-redefines-sizes" =
     ```cobol
     PIC X(8) USAGE DISPLAY
     ```
-    ALPHANUMERIC(8)
-    Redefines:
-    ```cobol
-    TAB IN S
-    ```
-    8 bytes at position 8 in S
-    2 bytes larger than the redefined item ⚠️ |}];;
+    - Redefines: `TAB IN S`
+    - 8 bytes at position 8 in `S`
+    - 2 bytes larger than the redefined item ⚠️ |}];;;;
