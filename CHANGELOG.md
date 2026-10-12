@@ -19,6 +19,7 @@
 - Support for 78-level data items [#634](https://github.com/OCamlPro/superbol-studio-oss/pull/634)
 
 ### Fixed
+- Add new silenced keywords to match those in GnuCOBOL config files [#694](https://github.com/OCamlPro/superbol-studio-oss/pull/694)
 - Remove redundant count of references in hover, already shown by codelens [#689](https://github.com/OCamlPro/superbol-studio-oss/pull/689)
 - Order and amount of semantic tokens emitted by the LSP server [#686](https://github.com/OCamlPro/superbol-studio-oss/pull/686)
 - Keywords shown in some diagnostic messages [#676](https://github.com/OCamlPro/superbol-studio-oss/pull/676)
