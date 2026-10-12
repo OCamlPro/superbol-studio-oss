@@ -3950,7 +3950,7 @@ let with_data := DATA | WITH_DATA
 
 %public let unconditional_action := ~ = release_statement; < >
 let release_statement :=
- | RELEASE; i = name; ilo = ro(pf(FROM,ident_or_literal));
+ | RELEASE; i = qualname; ilo = ro(pf(FROM,ident_or_literal));
    { Release { release_item = i; release_from = ilo } } (* Literal only in COB2002+ *)
 
 
