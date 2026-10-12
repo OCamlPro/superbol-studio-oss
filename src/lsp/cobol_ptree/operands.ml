@@ -318,19 +318,21 @@ let pp_selection_subject' = pp_with_loc pp_selection_subject
 
 type selection_range =
   {
-    negated: bool;
-    start: expr with_loc;
-    stop: expr with_loc;
-    alphabet: name with_loc option;
+    sel_range_negated: bool;
+    sel_range_start: expr with_loc;
+    sel_range_stop: expr with_loc;
+    sel_range_alphabet: name with_loc option;
   }
 [@@deriving ord]
 
-let pp_selection_range ppf { negated; start; stop; alphabet } =
-  if negated then Fmt.pf ppf "NOT@ ";
+let pp_selection_range ppf 
+    { sel_range_negated; sel_range_start; sel_range_stop; sel_range_alphabet } =
+  if sel_range_negated then Fmt.pf ppf "NOT@ ";
   Fmt.pf ppf "%a@ THROUGH@ %a%a"
-    pp_expr' start
-    pp_expr' stop
-    Fmt.(option (sp ++ const string "IN" ++ sp ++ pp_with_loc pp_name)) alphabet
+    pp_expr' sel_range_start
+    pp_expr' sel_range_stop
+    Fmt.(option (sp ++ const string "IN" ++ sp ++ pp_with_loc pp_name)) 
+    sel_range_alphabet
 
 type selection_object =
   | SelCond of condition (** Condition with a potentially omitted subject

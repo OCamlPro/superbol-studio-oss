@@ -3489,7 +3489,11 @@ let selection_object :=
 let range_expression :=
  | b = ibo(NOT); i1 = expression; THROUGH;
    i2 = expression; i = ro(pf(IN,name));
-   { SelRange { negated = b; start = i1; stop = i2; alphabet = i } }
+   { SelRange { 
+      sel_range_negated = b; 
+      sel_range_start = i1; 
+      sel_range_stop = i2; 
+      sel_range_alphabet = i } }
 
 
 let evaluate_body [@post.evaluate_body] :=

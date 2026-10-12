@@ -719,11 +719,11 @@ let fold_selection_object (v: _ #folder) =
       match selection_object with
       | SelCond c -> x
           >> fold_condition v c
-      | SelRange { negated; start; stop; alphabet} -> x
-          >> fold_bool v negated
-          >> fold_expression v start
-          >> fold_expression v stop
-          >> fold_option ~fold:fold_name' v alphabet
+      | SelRange { sel_range_negated; sel_range_start; sel_range_stop; sel_range_alphabet} -> x
+          >> fold_bool v sel_range_negated
+          >> fold_expression v sel_range_start
+          >> fold_expression v sel_range_stop
+          >> fold_option ~fold:fold_name' v sel_range_alphabet
       | SelConst b -> x
           >> fold_bool v b
       | SelAny -> x

@@ -113,6 +113,11 @@ type procedure =
     procedure_blocks: procedure_block named_n_ordered;
   }
   
+(* For now, expanded conditions and selections are not used in the representation 
+   of statements included in Cobol_unit. They can be queried on demand for any
+   condition / selection with functions in Typeck_condition.
+   This may change in the near future. *)
+
 type expanded_cond =
   | Expr of Cobol_ptree.expr with_loc (** expression used as a condition *)
   | Relation of Cobol_ptree.expr with_loc * Cobol_ptree.relop * Cobol_ptree.expr with_loc  (** {v e <relop> e' v} *)
