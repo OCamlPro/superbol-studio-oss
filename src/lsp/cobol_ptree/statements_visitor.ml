@@ -582,7 +582,7 @@ let fold_raise' (v: _ #folder) =
 let fold_release' (v: _ #folder) =
   handle' v#fold_release' v
     ~fold:begin fun v {release_item; release_from} x -> x
-      >> fold_name' v release_item
+      >> fold_qualname v release_item
       >> fold_option ~fold:fold_ident_or_literal v release_from
     end
 

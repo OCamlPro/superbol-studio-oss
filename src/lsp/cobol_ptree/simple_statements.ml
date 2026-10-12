@@ -581,14 +581,14 @@ let pp_open_stmt =
 (* RELEASE *)
 type release_stmt =
   {
-    release_item: name with_loc;
+    release_item: qualname;
     release_from: ident_or_literal option;
   }
 [@@deriving ord]
 
 let pp_release_stmt ppf { release_item = ri; release_from = rf } =
   Fmt.pf ppf "RELEASE@ %a%a"
-    (pp_with_loc pp_name) ri
+    pp_qualname ri
     Fmt.(option (sp ++ const string "FROM" ++ sp ++ pp_ident_or_literal)) rf
 
 
