@@ -608,30 +608,33 @@ let doc_of_datadef data_def (artifacts: Cobol_parser.Outputs.artifacts) =
     List.fold_left begin fun (rev_comments, consider_line)
       Cobol_preproc.Text.{ comment_loc; comment_kind; comment_contents = c } ->
       let comment_range = Lsp_position.range_of_lexloc comment_loc in
+      let append_line l =
+        if String.trim l = "" then "" :: rev_comments else l :: rev_comments
+      in
       match comment_kind with
       | `Floating ->
           if comment_range.start.line == consider_line
-          then String.sub c 2 (String.length c - 2) :: rev_comments, -1
+          then append_line @@ String.sub c 2 (String.length c - 2), -1
           else rev_comments, consider_line
       | `Line ->
           if comment_range.start.line + 1 == consider_line
-          then String.sub c 1 (String.length c - 1) :: rev_comments,
+          then append_line @@ String.sub c 1 (String.length c - 1),
                consider_line - 1
           else rev_comments, consider_line
-    end ([], def_range.start.line) rev_comments |> fst |> String.concat "\n"
+    end ([], def_range.start.line) rev_comments |> fst
   in
   match data_def with
   | Preproc Compilation_var { src = Process_parameter; _ }
   | Preproc Preproc_var     { src = Process_parameter; _ } ->
-      "Given as process parameter"
+      `Process_parameter
   | Preproc Compilation_var { src = Process_environment; _ }
   | Preproc Preproc_var     { src = Process_environment; _ } ->
-      "Defined in process environment"
+      `Process_environment
   | Preproc Compilation_var { src = Source_location loc; _ }
   | Preproc Preproc_var     { src = Source_location loc; _ } ->
-      definition_comment loc
+      `Comment (definition_comment loc)
   | Regular data_def ->
-      definition_comment @@ Cobol_data.Item.def_loc data_def
+      `Comment (definition_comment @@ Cobol_data.Item.def_loc data_def)
 
 let lookup_data_definition ?cu_name element_at_pos group =
   let lookup_qn qn =
@@ -668,9 +671,9 @@ let pp_data_definition_info ppf = function
   | Preproc def ->
       Lsp_data_info_printer.pp_compilation_var_definition ppf def
 
-let pp_data_memory_info ?prefix ppf = function
+let pp_data_memory_info ppf = function
   | Regular def ->
-      Lsp_data_info_printer.pp_memory_info ?prefix ppf def
+      Lsp_data_info_printer.pp_memory_info ppf def
   | Preproc _ ->
       ()                         (* those variables use no memory at run time *)
 
@@ -695,21 +698,27 @@ let describe_data_definition_for_element_at_pos
           | Preproc Compilation_var def -> def.src
         in
         let pp_documentation ppf =
-          let doc_comments = doc_of_datadef data_def artifacts in
-          if doc_comments <> ""
-          then Pretty.print ppf "\n---\n%s" doc_comments
+          match doc_of_datadef data_def artifacts with
+          | `Process_environment ->
+              Pretty.print ppf "@,---@,Defined in process environment"
+          | `Process_parameter ->
+              Pretty.print ppf "@,---@,Given as process parameter"
+          | `Comment lines ->
+              if List.exists ((<>) "") lines then
+                Pretty.print ppf "@,---@,```text@,%a@,```"
+                  Fmt.(list ~sep:cut string) lines
         in
         (* The description mostly repeats the hovered line, so it can be
            hidden on definitions. Size and offset are always shown. *)
         let text =
           if show_data_description_on_definitions ||
              not (Lsp_position.is_in_src ~filename position data_def_src)
-          then Some (Pretty.to_string "%a%a%t"
+          then Some (Pretty.to_string "@[<v>%a%a%t@]"
                        pp_data_definition_info data_def
-                       (pp_data_memory_info ~prefix:"  \n") data_def
+                       pp_data_memory_info data_def
                        pp_documentation)
-          else match Pretty.to_string "%a" (pp_data_memory_info ?prefix:None)
-                       data_def with
+          else match Pretty.to_string "@[<v>%a@]\
+                                      " pp_data_memory_info data_def with
             | "" -> None
             | memory_info -> Some memory_info
         in
@@ -723,7 +732,7 @@ let hover_markdown ~filename ~loc value =
   Some (Hover.create () ~contents:(`MarkupContent content) ~range)
 
 let cobol_code fmt =                                   (* TODO: ensure no ``` *)
-  Pretty.to_string ("```cobol\n" ^^ fmt ^^ "\n```")
+  Pretty.to_string ("@[<v>```cobol@,@[" ^^ fmt ^^ "@]@,```@]")
 
 let find_hovered_pplog_event ~filename position pplog =
   List.find_opt begin function
@@ -783,7 +792,7 @@ let handle_hover ?show_data_description_on_definitions
           hover_markdown ~filename ~loc text
       | Some (def_text, loc), Some (pp_text, _) ->
           hover_markdown ~filename ~loc @@
-          Pretty.to_string "%s\n---\nAdditional pre-processing:\n%s"
+          Pretty.to_string "%s@\n---@\nAdditional pre-processing:@\n%s"
             (Option.value ~default:"" def_text)
             pp_text
     end

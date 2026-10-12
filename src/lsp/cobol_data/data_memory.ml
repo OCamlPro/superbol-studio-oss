@@ -97,6 +97,8 @@ let const_size: int -> size = function
 let valof_size s = AE.factor @@ valof s
 let elementary_size: elementary_size -> size = AE.const
 
+let is_scalar = AE.is_scalar
+
 let as_bits ?memory_config s =
   AE.as_int ?const_values:memory_config s
 

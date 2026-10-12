@@ -71,16 +71,16 @@ let pp_position_in record ppf offset =
   | Some record ->
       match size_in_bits offset with
       | Some bits when Int.rem bits 8 = 0 ->
-          Fmt.pf ppf " at position %u in %s" (bits / 8 + 1) record
+          Fmt.pf ppf "at position %u in `%s`" (bits / 8 + 1) record
       | Some bits ->
-          Fmt.pf ppf " at bit position %u in %s" (bits + 1) record
+          Fmt.pf ppf "at bit position %u in `%s`" (bits + 1) record
       | None ->
-          Fmt.pf ppf " at a variable position in %s" record
+          Fmt.pf ppf "at a variable position in `%s`" record
 
 let pp_int' = Cobol_ptree.pp_with_loc Fmt.int
 
 let pp_cobol_block: _ Fmt.t -> _ Fmt.t = fun pp ->
-  Fmt.(any "```cobol\n" ++ pp ++ any "\n```")
+  Fmt.(any "@,@[<v>```cobol@,@[" ++ pp ++ any "@]@,```@]")
 
 (* usage *)
 
@@ -103,7 +103,7 @@ let pp_example_of ppf (picture: Cobol_data.Picture.t) =
         if Float.is_integer max
         then string_of_int (int_of_float max)
         else string_of_float max in
-      Fmt.pf ppf "\n\n*e.g,* [`%s`] (0), [`%s`] (%s)"
+      Fmt.pf ppf "@,*e.g,* [`%s`] (0), [`%s`] (%s)"
         (Lsp_picture_interp.example_of ~picture 0. |> nbsp_repl)
         (Lsp_picture_interp.example_of ~picture max |> nbsp_repl)
         max_str
@@ -113,13 +113,9 @@ let pp_example_of ppf (picture: Cobol_data.Picture.t) =
 
 let pp_usage: usage Pretty.printer =
   let pp_usage_with_picture ppf name (picture: Cobol_data.Picture.t) =
-    Fmt.pf ppf "%a\n\n%a%a"
-      (pp_cobol_block (fun ppf _ ->
-           Fmt.pf ppf ("PIC %a USAGE " ^^ name)
-             Cobol_data.Picture.pp_picture_symbols picture.pic
-         )) ()
-      Cobol_data.Picture.pp_category picture.category
-      pp_example_of picture
+    pp_cobol_block Fmt.(any "PIC " ++ Cobol_data.Picture.pp_picture_symbols ++ sp ++
+                        any "USAGE " ++ any name) ppf picture.pic;
+    pp_example_of ppf picture
   and pp_width_tag ppf tag =
     Fmt.int ppf @@
     match tag with `W16 -> 16 | `W32 -> 32 | `W34 -> 34 | `W64 -> 64 | `W128 -> 128
@@ -129,9 +125,9 @@ let pp_usage: usage Pretty.printer =
     | Some picture ->
         pp_usage_with_picture ppf name picture
     | None ->
-        pp_cobol_block Fmt.(any "USAGE " ++ any name ++
-                            any (if signed then " SIGNED" else " UNSIGNED"))
-          ppf ()
+        pp_cobol_block
+          Fmt.(any "USAGE " ++ any name ++
+               any (if signed then " SIGNED" else " UNSIGNED")) ppf ()
   in
   fun ppf -> function
     | Alphanumeric { picture; _ }
@@ -197,7 +193,9 @@ let pp_fixed_span: fixed_span Pretty.printer = fun ppf x ->
   Fmt.pf ppf "OCCURS %a TIMES" pp_int' x.occurs_times
 
 and pp_depending_span: depending_span Pretty.printer = fun ppf x ->
-  Fmt.pf ppf "OCCURS %a TO %a TIMES DEPENDING ON %a" pp_int' x.occurs_depending_min pp_int' x.occurs_depending_max Cobol_ptree.pp_qualname' x.occurs_depending
+  Fmt.pf ppf "OCCURS %a TO %a TIMES DEPENDING ON %a"
+    pp_int' x.occurs_depending_min pp_int' x.occurs_depending_max
+    Cobol_ptree.pp_qualname' x.occurs_depending
 
 and pp_dynamic_span: dynamic_span Pretty.printer =
   Fmt.any "OCCURS DYNAMIC"
@@ -209,7 +207,7 @@ let pp_span: span Pretty.printer = fun ppf -> function
 
 let pp_struct: item_definitions Pretty.printer = fun ppf subfields ->
   let n = List.length (NEL.to_list subfields) in
-    Fmt.pf ppf "Group of %d subfield%s" n (if n > 1 then "s" else "")
+  Fmt.pf ppf "@,Group of %d subfield%s" n (if n > 1 then "s" else "")
 
 (* items *)
 
@@ -231,15 +229,10 @@ and pp_item_redefinitions: item_redefinitions Pretty.printer = fun ppf ->
 
 and pp_field_layout: field_layout Pretty.printer = fun ppf x ->
   match x with
-  | Elementary_field { usage; init_value } ->
-      Fmt.(
-        const pp_usage usage
-      ++ any "\n\n"
-      ++ const (option ~none:nop @@ any "VALUE " ++
-                pp_with_loc Cobol_data.Printer.pp_value) init_value)
-      ppf x
+  | Elementary_field { usage; init_value = _ } ->
+      pp_usage ppf usage
   | Struct_field { subfields } ->
-      Fmt.const pp_struct subfields ppf x
+      pp_struct ppf subfields
 
 and pp_field_definition: field_definition Pretty.printer = fun ppf x ->
   let definition_has_issues = x.field_has_definition_issues in
@@ -247,18 +240,20 @@ and pp_field_definition: field_definition Pretty.printer = fun ppf x ->
     pp_cobol_block Fmt.(option ~none:(any "FILLER") Cobol_ptree.pp_qualname')
   in
   let pp_redefines ppf x =
-    Fmt.(option @@ any "Redefines:\n" ++ pp_cobol_block Cobol_ptree.pp_qualname')
+    Fmt.(option @@ any "@,- @[Redefines:@;`" ++ Cobol_ptree.pp_qualname' ++ any "`@]")
       ppf x.field_redefines
   in
   match x.field_layout with
   | Elementary_field _ when definition_has_issues ->
-      Fmt.(const pp_qualname_opt_in_block' x.field_qualname ++ any "\n\n" ++
-           any "*(layout omitted due to issues in item definition)*  \n" ++
+      Fmt.(const pp_qualname_opt_in_block' x.field_qualname ++
+           any "@,*(layout omitted due to issues in item definition)*" ++
            pp_redefines)
         ppf x
   | _ ->
-      Fmt.(const pp_qualname_opt_in_block' x.field_qualname ++ any "\n\n" ++
-           const pp_field_layout x.field_layout ++ any "  \n" ++
+      Fmt.(any "@," ++
+           const pp_qualname_opt_in_block' x.field_qualname ++
+           any "@," ++
+           const pp_field_layout x.field_layout ++
            pp_redefines)
         ppf x
 
@@ -268,15 +263,14 @@ and pp_field_definition': field_definition with_loc Pretty.printer = fun ppf ->
 (* fields *)
 
 and pp_table_definition: table_definition Pretty.printer = fun ppf x ->
-  Fmt.(
-    any "Table\n\n"
-    ++ pp_cobol_block (
-      const pp_span x.table_range.range_span
-      ++ any "\nINDEXED BY "
-      ++ const (list ~sep:(any ", ") Cobol_ptree.pp_qualname') x.table_range.range_indexes)
-    ++ any "\n\nFields:\n\n"
-    ++ const pp_field_definition' x.table_field)
-  ppf x
+  Fmt.(any "@,Table@," ++
+       pp_cobol_block (const pp_span x.table_range.range_span ++
+                       any "@;INDEXED BY " ++
+                       const (list ~sep:comma Cobol_ptree.pp_qualname')
+                         x.table_range.range_indexes) ++
+       any "@,Fields:@;" ++
+       const pp_field_definition' x.table_field)
+    ppf x
 
 and pp_table_definition': table_definition with_loc Pretty.printer = fun ppf ->
   Cobol_ptree.pp_with_loc pp_table_definition ppf
@@ -303,13 +297,13 @@ let pp_renamed_item_layout: renamed_item_layout Pretty.printer = fun ppf x ->
 let pp_record_renaming: record_renaming Pretty.printer = fun ppf r ->
   let open Fmt in begin
     pp_cobol_block begin
-      const Cobol_ptree.pp_qualname' r.renaming_name ++ any "\n" ++
+      const Cobol_ptree.pp_qualname' r.renaming_name ++ any "@\n" ++
       if r.renaming_has_definition_issues then nop else
         any "RENAMES " ++
         const Cobol_ptree.pp_qualname' r.renaming_from ++
-        const (option (any "\nTHRU " ++ Cobol_ptree.pp_qualname'))
+        const (option (any "@\nTHRU " ++ Cobol_ptree.pp_qualname'))
           r.renaming_thru
-    end ++ any "\n\n" ++
+    end ++ any "@\n@\n" ++
     if r.renaming_has_definition_issues then nop else
       const pp_renamed_item_layout r.renaming_layout
   end ppf r
@@ -330,7 +324,7 @@ let pp_record_renaming': record_renaming with_loc Pretty.printer = fun ppf ->
 (*   ] *)
 
 let pp_compilation_var_definition ppf (Preproc_var def | Compilation_var def) =
-  Fmt.pf ppf "Compilation@ variable@ with@ value@ %a%t"
+  Fmt.pf ppf "@,@[Compilation@ variable@ with@ value@ `%a`%t@]"
     Cobol_preproc.Env.pp_value def.src_payload.compvar_value.src_payload
     (fun ppf -> match def.src_payload.compvar_value.src with
        | Source_location _ ->
@@ -346,7 +340,8 @@ let pp_data_definition ppf = function
   | Data_renaming { def; _ } ->
       pp_record_renaming' ppf def
   | Data_condition { def; field; _ } ->
-      Fmt.pf ppf "%a\n\n%a" pp_condition_name ~&def pp_field_definition ~&field
+      pp_condition_name ppf ~&def;
+      pp_field_definition ppf ~&field
   | Table_index { table; _ } ->
       pp_table_definition' ppf table
 
@@ -360,20 +355,17 @@ let named_record { record_name; record_item; _ } =
 (* REDEFINES. The size of the other item cannot be read in the source. *)
 
 (* Size of the redefinition, then size of the item it redefines. We give them
-   only on a mismatch, as the card already shows them when they are equal.
-   [keep_when_equal] still names the redefinition in that case. *)
-let pp_redefinition ~keep_when_equal ppf (kind, redef, redefined) =
+   only on a mismatch, as the card already shows them when they are equal. *)
+let pp_redefinition ppf (name, redef, redefined) =
   let does_not_fit, mismatch =
     match size_in_bits redef, size_in_bits redefined with
     | Some a, Some b -> a > b, a <> b
     | _ -> false, false                    (* one of the sizes is variable *)
   in
+  Fmt.pf ppf "@,- Redefined by `%s`" name;                (* TODO: escape '`' *)
   if mismatch then
-    Fmt.pf ppf "  \n%s: %a of %a%s"
-      kind pp_readable_size redef pp_readable_size redefined
+    Fmt.pf ppf ": %a of %a%s" pp_readable_size redef pp_readable_size redefined
       (if does_not_fit then " ⚠️" else "")
-  else if keep_when_equal then
-    Fmt.pf ppf "  \n%s" kind
 
 (* The description already names the redefined item, so we do not repeat it.
    Redefinitions are in the same record, so their name is not qualified. A
@@ -390,10 +382,10 @@ let pp_redefinition_info ppf def =
       Option.iter begin fun redefined ->
         match size_in_bits own, size_in_bits (size redefined) with
         | Some a, Some b when a > b ->
-            Fmt.pf ppf "  \n%a larger than the redefined item ⚠️"
+            Fmt.pf ppf "@,- %a larger than the redefined item ⚠️"
               pp_bits (a - b)
         | Some a, Some b when a < b ->
-            Fmt.pf ppf "  \n%a smaller than the redefined item"
+            Fmt.pf ppf "@,- %a smaller than the redefined item"
               pp_bits (b - a)
         | _ -> ()
       end (def_redefined def);
@@ -402,13 +394,10 @@ let pp_redefinition_info ppf def =
           | Some qn -> Cobol_unit.Qual.name_of ~&qn
           | None -> "FILLER"
         in
-        pp_redefinition ~keep_when_equal:true ppf
-          ("Redefined by " ^ name, size ~&redef, own)
+        pp_redefinition ppf (name, size ~&redef, own)
       end (redefinitions item)
 
-(* [prefix] is printed only when there is something to print, so that callers
-   never get a line break on its own. *)
-let pp_memory_info ?(prefix = "") ppf def =
+let pp_memory_info ppf def =
   let open Cobol_data.Item in
   if not (def_has_issues def) then
     let pp_item_size ppf = function
@@ -418,14 +407,18 @@ let pp_memory_info ?(prefix = "") ppf def =
                              ~&table.table_size)
       | Data_field { def; table_def = Some table; _ } ->
           (* The whole table is what the offsets and the notes below use. *)
+          Fmt.pf ppf "%a per occurrence, in table of \
+                     " pp_readable_size ~&def.field_size;
           pp_table_size ppf (~&table.table_range.range_span,
-                             ~&def.field_size, ~&table.table_size)
+                             ~&def.field_size,
+                             if Cobol_data.Memory.is_scalar ~&table.table_size
+                             then ~&table.table_size
+                             else ~&table.table_size_max);
       | def ->
           pp_readable_size ppf (def_size def)
     and record =
       enclosing_record ~record_name:(named_record (def_record def))
         (def_qualname def)
     in
-    Fmt.pf ppf "%s%a%a%a" prefix
-      pp_item_size def (pp_position_in record) (def_offset def)
-      pp_redefinition_info def
+    Fmt.pf ppf "@,- %a %a" pp_item_size def (pp_position_in record) (def_offset def);
+    pp_redefinition_info ppf def
