@@ -39,10 +39,4 @@ module Make (Tags: TAGS) = struct
     let integer x = atom (Integer x)
   end
 
-  module Cond = struct
-    open Expr
-    let expr e : 'r cond with_loc = Expr e &@ Srcloc.dummy
-    let ident x = expr (ident x)
-  end
-
 end

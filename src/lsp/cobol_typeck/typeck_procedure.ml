@@ -307,4 +307,10 @@ let of_compilation_unit ~data_definitions ~fold_exec_block' cu' =
   let { refs = references; diags; _ } =
     collect_references ~data_definitions ~fold_exec_block' ~refs procedure
   in
+  (* LATER: It would be great to store those expanded conditions. 
+    But we do not recreate a full typed tree for now.*)
+  let diags =
+    Typeck_condition.check_procedure 
+      ~env:(data_definitions.data_items.named) ~diags procedure
+  in
   { procedure; references }, diags

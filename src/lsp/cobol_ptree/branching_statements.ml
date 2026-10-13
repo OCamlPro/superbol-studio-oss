@@ -87,14 +87,14 @@ and dual_handler =
 (* EVAL *)
 and evaluate_stmt =
   {
-    eval_subjects: selection_subject list;
+    eval_subjects: selection_subject with_loc list;
     eval_branches: evaluate_branch list;
     eval_otherwise: statements;
   }
 
 and evaluate_branch =
   {
-    eval_selection: selection_object list list;
+    eval_selection: selection_object with_loc list list;
     eval_actions: statements;
   }
 
@@ -621,7 +621,7 @@ let rec pp_handler ppf h = pp_statements ppf h
 
 and pp_evaluate_stmt ppf { eval_subjects; eval_branches; eval_otherwise } =
   Fmt.pf ppf "EVALUATE@ %a@ %a"
-    Fmt.(list ~sep:(any "@ ALSO@ ") pp_selection_subject) eval_subjects
+    Fmt.(list ~sep:(any "@ ALSO@ ") pp_selection_subject') eval_subjects
     Fmt.(list ~sep:sp pp_evaluate_branch) eval_branches;
   if eval_otherwise != [] then
     Fmt.pf ppf "@ WHEN@ OTHER@ %a" pp_statements eval_otherwise;
@@ -631,7 +631,7 @@ and pp_evaluate_branch ppf { eval_selection; eval_actions } =
   Fmt.pf ppf "WHEN@ %a@ %a"
     Fmt.(
       list ~sep:(any "@ WHEN@ ")
-        (list ~sep:(any "@ ALSO@ ") pp_selection_object)
+        (list ~sep:(any "@ ALSO@ ") pp_selection_object')
     ) eval_selection
     pp_statements eval_actions
 

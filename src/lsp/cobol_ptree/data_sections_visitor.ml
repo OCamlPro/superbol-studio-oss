@@ -341,7 +341,7 @@ let fold_report_group_clause (v: _ #folder) =
       | ReportValue l -> x
           >> fold_literal v l
       | ReportPresentWhen c -> x
-          >> fold_condition v c
+          >> fold_condition' v c
       | ReportOccurs { from; to_; depending; step } -> x
           >> fold_name v from
           >> fold_name_opt v to_
