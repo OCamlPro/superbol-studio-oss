@@ -3723,5 +3723,10 @@ module Tasks = struct
 end
 
 module Env = struct
-  include [%js: val shell : unit -> string [@@js.get "__SUPERBOL__.vscode.env.shell"]]
+  include
+    [%js:
+    val shell : unit -> string [@@js.get "__SUPERBOL__.vscode.env.shell"]
+
+    val asExternalUri : target:Uri.t -> Uri.t Promise.t
+      [@@js.global "__SUPERBOL__.vscode.env.asExternalUri"]]
 end

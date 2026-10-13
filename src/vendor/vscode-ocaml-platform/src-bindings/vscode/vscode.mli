@@ -2809,4 +2809,6 @@ end
 
 module Env : sig
   val shell : unit -> string
+
+  val asExternalUri : target:Uri.t -> Uri.t Promise.t
 end
