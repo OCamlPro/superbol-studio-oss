@@ -158,6 +158,11 @@ let floating (f: Cobol_ptree.floating) : (floating_value, error) result =
     ~fractional:f.float_significand.fixed_fractional
     ~exponent:f.float_exponent
 
+(** [string_of_floating f] returns [f] as a string of the form
+    [(num/den)**exp]. *)
+let string_of_floating f =
+  Pretty.to_string "(%a)**%d" Q.pp_print f.float_significand f.float_exponent
+
 let ptree_of_floating (f: floating_value) : Cobol_ptree.floating =
   {
     float_significand = ptree_of_fixed f.float_significand;
