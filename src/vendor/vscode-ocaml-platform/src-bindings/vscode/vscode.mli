@@ -2145,6 +2145,8 @@ module WebviewPortMapping : sig
   val extensionHostPort : t -> int
 
   val webviewPort : t -> int
+
+  val create : webviewPort:int -> extensionHostPort:int -> t
 end
 
 module WebviewOptions : sig

@@ -2803,7 +2803,9 @@ module WebviewPortMapping = struct
     [%js:
     val extensionHostPort : t -> int [@@js.get]
 
-    val webviewPort : t -> int [@@js.get]]
+    val webviewPort : t -> int [@@js.get]
+
+    val create : webviewPort:int -> extensionHostPort:int -> t [@@js.builder]]
 end
 
 module WebviewOptions = struct
