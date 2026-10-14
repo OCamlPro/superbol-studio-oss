@@ -104,3 +104,80 @@ let%expect_test "ambiguous-n-anonymous" =
     +-----------+  '
     |  B IN A   | -+
     +-----------+ |}];;
+
+let%expect_test "section-starts-with-paragraph" =
+  Cfg_testing.show_ascii_cfgs Cfg_basic.section_starts_with_paragraph;
+  [%expect {|
+           PROGRAM-ID. section-starts-with-paragraph.
+           DATA DIVISION.
+           PROCEDURE DIVISION.
+           PERFORM A.
+              GOBACK.
+           A SECTION.
+           B. PERFORM C.
+              GOBACK.
+           C. GOBACK.
+
+    ---
+
+    #===========#
+    H   Entry   H
+    H paragraph H
+    #===========#
+      '
+      '
+      v
+    +-----------+
+    |  B IN A   |
+    +-----------+
+      '
+      '
+      v
+    +-----------+
+    |  C IN A   |
+    +-----------+ |}];;
+
+let%expect_test "section-starts-with-paragraph-section-cfg" =
+  Cfg_testing.show_ascii_section_cfg Cfg_basic.section_starts_with_paragraph
+    ~name:"A (section-starts-with-paragraph)";
+  [%expect {|
+    #===#
+    H A H
+    #===#
+      :
+      :
+      v
+    +---+
+    | B |
+    +---+
+      '
+      '
+      v
+    +---+
+    | C |
+    +---+ |}];;
+
+let%expect_test "performs-section-cfg" =
+  Cfg_testing.show_ascii_section_cfg Cfg_basic.performs
+    ~name:"A (performs)";
+  [%expect {|
+    #===#
+    H A H
+    #===#
+      '
+      '
+      v
+    +---+
+    | B |
+    +---+
+      '
+      '
+      v
+    +---+
+    | C |
+    +---+
+      '
+      '
+      v
+
+      D |}];;

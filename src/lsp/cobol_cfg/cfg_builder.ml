@@ -74,7 +74,6 @@ let reset_global_counter () =
   node_idx := 0
 
 let build_node
-    ?(is_section=false)
     ?(display_name_type=Full)
     ~enclosing_section ~cu paragraph =
   let { jumps; will_fallthru; terminal;
@@ -83,20 +82,19 @@ let build_node
     Cobol_unit.Visitor.fold_procedure_paragraph' v paragraph
       Cfg_jumps.JumpsCollector.init
   in
-  let typ, loc, section_name = match ~&(~&paragraph.paragraph).paragraph_name with
-    | None -> Entry `Paragraph, ~@paragraph, ""
+  let section_name =
+    Option.fold ~none:"" ~some:(~&) enclosing_section.section_name in
+  let typ, loc = match ~&(~&paragraph.paragraph).paragraph_name with
+    | None -> Entry `Paragraph, ~@paragraph
     | Some n ->
       let qn = Cobol_ptree.Name n &@<- n in
       let fullqn = Cfg_jumps.full_qn' ~enclosing_section ~cu qn in
       let full_name = qn_to_fullname fullqn in
-      let short_name, section_name =
-        let name, qualifier = qn_to_strings fullqn in
-        name, if is_section then name else qualifier
-      in
+      let short_name, _ = qn_to_strings fullqn in
       let display_name = match display_name_type with
         | Full -> full_name
         | Short -> short_name
-      in Normal (full_name, display_name), ~@qn, section_name
+      in Normal (full_name, display_name), ~@qn
   in {
     id = next_node_idx ();
     section_name;
@@ -181,7 +179,13 @@ let build_edges nodes =
   let g, vertexes = List.fold_left begin fun (g, vertexes) node ->
       CFG.add_vertex g node,
       match node.typ with
-      | Normal (full_name, _) -> StringMap.add full_name node vertexes
+      | Normal (full_name, _) ->
+        (* Also register the first node of each section under the section name,
+           in case the section starts with a named paragraph *)
+        StringMap.add full_name node vertexes
+        |> StringMap.update node.section_name (function
+            | None when node.section_name <> "" -> Some node
+            | x -> x)
       | _ ->  vertexes
     end (CFG.empty, StringMap.empty) nodes
   in
@@ -189,14 +193,12 @@ let build_edges nodes =
 
 let cfg_of ~(cu: cobol_unit) =
   reset_global_counter ();
-  let nodes = List.fold_left (fun acc section ->
-      fst @@ List.fold_left (fun (acc, is_section) p ->
-          build_node ~is_section ~enclosing_section:~&section ~cu p :: acc,
-          false
-        ) (acc, true) ~&section.section_paragraphs.list
-    ) [] cu.unit_procedure.procedure_sections
+  let nodes = List.concat_map (fun section ->
+      List.map (fun p -> build_node ~enclosing_section:~&section ~cu p)
+        ~&section.section_paragraphs.list
+    ) cu.unit_procedure.procedure_sections
   in
-  List.rev nodes
+  nodes
   |> begin function (* adding entry point if not already present *)
     | ({ typ = Entry _; _ } as hd )::tl -> { hd with id=0 }::tl
     | l -> { (new_node ~typ:`EntryPoint) with id=0 } :: l
@@ -206,18 +208,19 @@ let cfg_of ~(cu: cobol_unit) =
 let cfg_of_section ~cu (section: procedure_section) =
   reset_global_counter ();
   let nodes =
-    List.fold_left (fun (acc, is_section) p ->
-        build_node ~is_section ~display_name_type:Short
-          ~enclosing_section:section ~cu p
-          :: acc,
-        false
-      ) ([], true) section.section_paragraphs.list
-    |> fst
-    |> List.rev in
+    List.map (fun p ->
+        build_node ~display_name_type:Short ~enclosing_section:section ~cu p
+      ) section.section_paragraphs.list
+  in
+  let section_name =
+    Option.fold ~none:"" ~some:(~&) section.section_name in
   begin match nodes with
-    | ({ typ = Normal (_, name); _ } as entry)::tl ->
+    | ({ typ = Normal (_, name); _ } as entry)::tl when name = section_name ->
       { entry with typ = Entry (`Section name) }::tl
-    | l -> l end
+    | l -> (* the section starts with a named paragraph *)
+      { (new_node ~typ:`EntryPoint) with
+        typ = Entry (`Section section_name); section_name } :: l
+  end
   |> build_edges
 
 let graph_material_of_doc ({ group; _ }: Cobol_typeck.Outputs.t) =

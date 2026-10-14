@@ -577,13 +577,19 @@ let proc_at_pos ~filename (pos: Lsp.Types.Position.t) group : procedure_at_posit
     method! fold_cobol_unit cu acc =
       do_children { acc with cu = Some cu }
 
-    method! fold_procedure_paragraph { paragraph_name; _ } { cu; _ } =
-      let proc_name = match cu, paragraph_name with
-        | Some cu, Some qn ->
+    method! fold_procedure_section { section_name; _ } acc =
+      let proc_name =
+        Option.map (fun sn -> Cobol_ptree.Name sn) section_name in
+      do_children { acc with proc_name }
+
+    method! fold_procedure_paragraph { paragraph_name; _ } ({ cu; _ } as acc) =
+      (* Anonymous paragraphs keep the name of their enclosing section *)
+      match cu, paragraph_name with
+      | Some cu, Some qn ->
+        let proc_name =
           Some (Cobol_unit.Resolver_map.find_binding
-                  ~&qn cu.unit_procedure.procedure_blocks).full_qn
-        | _ -> None
-      in
-      skip { cu; proc_name }
+                  ~&qn cu.unit_procedure.procedure_blocks).full_qn in
+        skip { acc with proc_name }
+      | _ -> skip acc
 
   end group { cu = None; proc_name = None }
