@@ -21,7 +21,7 @@ way.
 kind = "library"
 
 # authors if different from project authors
-authors = [ "Fabrice Le Fessant <fabrice.le_fessant@ocamlpro.com>" ]
+authors = ["Fabrice Le Fessant <fabrice.le_fessant@ocamlpro.com>"]
 
 # name of a file to generate with the current version
 gen-version = "version.ml"
@@ -29,6 +29,13 @@ gen-version = "version.ml"
 # supported file generators are "ocamllex", "ocamlyacc" and "menhir" 
 # default is [ "ocamllex", "ocamlyacc" ] 
 # generators = [ "ocamllex", "menhir" ]
+
+# menhir options for the package
+#Example:
+#version = "2.0"
+#parser = { modules = ["parser"]; tokens = "Tokens" }
+#tokens = { modules = ["tokens"]}
+# menhir = ...
 
 # whether all modules should be packed/wrapped (default is true)
 # pack-modules = false
@@ -69,7 +76,8 @@ toml = ">=7.0"
 #  no-opam-test = "yes" 
 #  no-opam-doc = "yes" 
 #  gen-opam = "some" | "all" 
-#  dune-stanzas = "(flags (:standard (:include linking.sexp)))" 
+#  dune-flags = "(:standard (:include linking.sexp))" 
+#  dune-stanzas = "(foreign_stubs (language c) (names mapfile_stubs))" 
 #  static-clibs = "unix" 
 [fields]
 # ...

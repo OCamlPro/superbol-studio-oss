@@ -42,10 +42,11 @@ gen-version = "version.ml"
 # pack = "Mylib"
 
 # preprocessing options
-#  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))"
+#  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
+# preprocess = "pps ppx_deriving_encoding"
 
 # files to skip while updating at package level
-skip = ["index.mld", "main.ml" ]
+skip = ["index.mld", "main.ml"]
 
 # package library dependencies
 #   [dependencies]
@@ -68,7 +69,8 @@ pretty = "version"
 #  no-opam-test = "yes" 
 #  no-opam-doc = "yes" 
 #  gen-opam = "some" | "all" 
-#  dune-stanzas = "(flags (:standard (:include linking.sexp)))" 
+#  dune-flags = "(:standard (:include linking.sexp))" 
+#  dune-stanzas = "(foreign_stubs (language c) (names mapfile_stubs))" 
 #  static-clibs = "unix" 
 [fields]
 # ...

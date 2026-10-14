@@ -1067,7 +1067,6 @@
    (ocaml (>= 4.14.2))
    (pretty (= :version))
    (ezlibcob (= :version))
-   (cobol_unit (= :version))
    (cobol_data (= :version))
    (cir_types (= :version))
    (cir_logic (= :version))
