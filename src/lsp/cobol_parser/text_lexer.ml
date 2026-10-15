@@ -45,9 +45,14 @@ module TYPES = struct
     }
 
   (** Functional state for the lexer *)
+  type pic_state =
+    | Pic_unexpected
+    | Pic_expected
+    | Pic_awaiting_digits
+
   type lexer_state =
     {
-      expect_picture_string: bool;
+      pic_state: pic_state;
       decimal_point_is_comma: bool;
     }
 
@@ -82,10 +87,16 @@ let __token_of_intrinsic = Hashtbl.create 116  (* all intrinsic function name *)
 let string_of_word_token t =
   Hashtbl.find word_of_token t
 
-(** Raises {!Not_found} if the token is neither a keyword nor a punctuation. *)
+(** Returns [None] if the token is neither a keyword nor a punctuation. *)
+let string_of_punct_or_keyword_token t =
+  match Hashtbl.find_opt word_of_token t with
+  | Some s -> Some s
+  | None -> Hashtbl.find_opt punct_of_token t
+
 let string_of_token t =
-  try Hashtbl.find word_of_token t
-  with Not_found -> Hashtbl.find punct_of_token t
+  match string_of_punct_or_keyword_token t with
+  | Some s -> s
+  | None -> Grammar_printer.print_token t                       (* last resort *)
 
 let token_of_handle h = h.token
 
@@ -239,16 +250,18 @@ let intrinsic_handles lexer : string list -> IntrinsicHandles.t = fun intrinsics
 
 let initial_state =
   {
-    expect_picture_string = false;
+    pic_state = Pic_unexpected;
     decimal_point_is_comma = false;
   }
 
-let expecting_picture_string state = state.expect_picture_string
+let expecting_picture_string = function
+  | { pic_state = Pic_expected | Pic_awaiting_digits; _ } -> true
+  | _ -> false
 
-let cancel_picture_string_expectation state =
-  if state.expect_picture_string = false
+let cancel_picture_string_expectation ({ pic_state; _ } as state) =
+  if pic_state = Pic_unexpected
   then state
-  else { state with expect_picture_string = false }
+  else { state with pic_state = Pic_unexpected }
 
 let decimal_point_is_comma state =
   { state with decimal_point_is_comma = true }
@@ -268,15 +281,15 @@ let read_tokens lexer state w =
     Cobol_common.Srcloc.trunc_prefix len loc
   in
   let lexbuf = Lexing.from_string ~&w in
-  let rec aux ~loc ~expect_picture_string acc =
+  let rec aux ~loc ~pic_state acc =
     let open Grammar_tokens in
     let start_pos = lexbuf.Lexing.lex_curr_pos in
-    let append ?(expect_picture_string = expect_picture_string) x =
-      let expect_picture_string = expect_picture_string || x = PICTURE in
+    let append ~pic_state x =
+      let pic_state = if x = PICTURE then Pic_expected else pic_state in
       let xloc, loc = split_loc loc @@ lexbuf.Lexing.lex_curr_pos - start_pos in
-      aux ~loc ~expect_picture_string ((x &@ xloc) :: acc)
+      aux ~loc ~pic_state ((x &@ xloc) :: acc)
     in
-    let decimal_sep w c d e =
+    let[@local] decimal_sep w c d e =
       let head, head_len, loc =
         if w = "" then [], 0, loc else
           let wlen = String.length w in
@@ -290,15 +303,15 @@ let read_tokens lexer state w =
       let sloc, loc = split_loc loc 1 in
       let tail_len = lexbuf.Lexing.lex_curr_pos - start_pos - 1 - head_len in
       let tail_loc, loc = split_loc loc tail_len in
-      aux ~loc (LIST.append ~loc:__LOC__
-                  [tail &@ tail_loc; INTERVENING_ c &@ sloc]
-                  (LIST.append ~loc:__LOC__ head acc))
-        ~expect_picture_string
+      aux ~loc ~pic_state @@
+      LIST.append ~loc:__LOC__ [tail &@ tail_loc; INTERVENING_ c &@ sloc] @@
+      LIST.append ~loc:__LOC__ head acc
     in
-    if not expect_picture_string
-    then match Text_categorizer.token lexbuf with
+    let[@local] nominal ~pic_state' =
+      let append = append ~pic_state:pic_state' in
+      match Text_categorizer.token lexbuf with
       | End ->
-          List.rev acc, cancel_picture_string_expectation state
+          List.rev acc, { state with pic_state }
       | Word s ->
           append (try token_of_word lexer s with Not_found -> WORD s)
       | Punctuation s ->
@@ -318,24 +331,35 @@ let read_tokens lexer state w =
       | Numeric (w, Some (c, d, e)) ->
           decimal_sep w c d e
       | Unexpected (',' | ';') ->
-          aux ~loc:(Cobol_common.Srcloc.trunc_prefix 1 loc) acc
-            ~expect_picture_string
+          aux ~loc:(Cobol_common.Srcloc.trunc_prefix 1 loc) acc ~pic_state
       | Unexpected c ->
           append (INTERVENING_ c)
-    else match Text_categorizer.pic_token lexbuf with
-      | PIC_end ->
-          List.rev acc, { state with expect_picture_string }
-      | PIC_is ->
-          append IS ~expect_picture_string:true
-      | PIC_string w ->
-          append (PICTURE_STRING w) ~expect_picture_string:false
-      | PIC_unexpected (',' | ';') ->
-          aux ~loc:(Cobol_common.Srcloc.trunc_prefix 1 loc) acc
-            ~expect_picture_string
-      | PIC_unexpected c ->
-          append (INTERVENING_ c)
+    in
+    match pic_state with
+    | Pic_unexpected ->
+        nominal ~pic_state':pic_state
+    | Pic_awaiting_digits ->
+        nominal ~pic_state':Pic_expected
+    | Pic_expected ->
+        match Text_categorizer.pic_token lexbuf with
+        | PIC_end ->
+            List.rev acc, { state with pic_state }
+        | PIC_is ->
+            append IS ~pic_state
+        | PIC_string w ->
+            append (PICTURE_STRING w) ~pic_state:Pic_unexpected
+        | PIC_suffix w ->
+            append (PICTURE_SUFFIX w) ~pic_state:Pic_unexpected
+        | PIC_prefix w ->
+            append (PICTURE_PREFIX w) ~pic_state:Pic_awaiting_digits
+        | PIC_interm w ->
+            append (PICTURE_INTERM w) ~pic_state:Pic_awaiting_digits
+        | PIC_unexpected (',' | ';') ->
+            aux ~loc:(Cobol_common.Srcloc.trunc_prefix 1 loc) acc ~pic_state
+        | PIC_unexpected c ->
+            append (INTERVENING_ c) ~pic_state
   in
-  aux ~loc:~@w [] ~expect_picture_string:state.expect_picture_string
+  aux ~loc:~@w [] ~pic_state:state.pic_state
 
 
 (* --- Symbolic EBCDICs --- *)

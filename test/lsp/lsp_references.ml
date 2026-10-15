@@ -737,3 +737,111 @@ let%expect_test "references-requests-78-n-preproc" =
       13 >            DISPLAY B R.
     ----                        ^
       14 |}]
+
+let%expect_test "references-requests-78-in-pic-string" =
+  let { end_with_postproc; projdir }, server = make_lsp_project () in
+  print_references ~projdir server @@ extract_position_markers {cobol|
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       78 _|1-b-def|_B VALUE 1.
+       77 X PIC X(_|2-b-use|_B).
+       PROCEDURE DIVISION.
+           GOBACK.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    1-b-def (line 4, character 10):
+    __rootdir__/prog.cob:5.7-5.19:
+       2          PROGRAM-ID. prog.
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5 >        78 B VALUE 1.
+    ----          ^^^^^^^^^^^^
+       6          77 X PIC X(B).
+       7          PROCEDURE DIVISION.
+    __rootdir__/prog.cob:6.18-6.19:
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5          78 B VALUE 1.
+       6 >        77 X PIC X(B).
+    ----                     ^
+       7          PROCEDURE DIVISION.
+       8              GOBACK.
+    2-b-use (line 5, character 18):
+    __rootdir__/prog.cob:5.7-5.19:
+       2          PROGRAM-ID. prog.
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5 >        78 B VALUE 1.
+    ----          ^^^^^^^^^^^^
+       6          77 X PIC X(B).
+       7          PROCEDURE DIVISION.
+    __rootdir__/prog.cob:6.18-6.19:
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5          78 B VALUE 1.
+       6 >        77 X PIC X(B).
+    ----                     ^
+       7          PROCEDURE DIVISION.
+       8              GOBACK. |}]
+
+let%expect_test "references-requests-78-spaces-in-pic-string" =
+  let { end_with_postproc; projdir }, server = make_lsp_project () in
+  print_references ~projdir server @@ extract_position_markers {cobol|
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       78 _|1-b-def|_B VALUE 1.
+       77 X PIC X( _|2-b-use|_B ).
+       77 Y PIC X( _|3-b-undef|_U ).
+       PROCEDURE DIVISION.
+           GOBACK.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":20,"line":6},"start":{"character":19,"line":6}},"severity":1},{"message":"Missing <digits>","range":{"end":{"character":18,"line":6},"start":{"character":18,"line":6}},"severity":4}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    1-b-def (line 4, character 10):
+    __rootdir__/prog.cob:5.7-5.19:
+       2          PROGRAM-ID. prog.
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5 >        78 B VALUE 1.
+    ----          ^^^^^^^^^^^^
+       6          77 X PIC X( B ).
+       7          77 Y PIC X( U ).
+    __rootdir__/prog.cob:6.19-6.20:
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5          78 B VALUE 1.
+       6 >        77 X PIC X( B ).
+    ----                      ^
+       7          77 Y PIC X( U ).
+       8          PROCEDURE DIVISION.
+    2-b-use (line 5, character 19):
+    __rootdir__/prog.cob:5.7-5.19:
+       2          PROGRAM-ID. prog.
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5 >        78 B VALUE 1.
+    ----          ^^^^^^^^^^^^
+       6          77 X PIC X( B ).
+       7          77 Y PIC X( U ).
+    __rootdir__/prog.cob:6.19-6.20:
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5          78 B VALUE 1.
+       6 >        77 X PIC X( B ).
+    ----                      ^
+       7          77 Y PIC X( U ).
+       8          PROCEDURE DIVISION.
+    3-b-undef (line 6, character 19):
+    __rootdir__/prog.cob:7.10-7.11:
+       4          WORKING-STORAGE SECTION.
+       5          78 B VALUE 1.
+       6          77 X PIC X( B ).
+       7 >        77 Y PIC X( U ).
+    ----             ^
+       8          PROCEDURE DIVISION.
+       9              GOBACK. |}]

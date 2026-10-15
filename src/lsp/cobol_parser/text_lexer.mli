@@ -28,6 +28,7 @@ module IntrinsicHandles: Set.S with type elt = intrinsic_handle
 
 (* --- *)
 
+val string_of_punct_or_keyword_token: Grammar_tokens.token -> string option
 val string_of_token: Grammar_tokens.token -> string
 val string_of_word_token: Grammar_tokens.token -> string
 val string_of_keyword_handle: keyword_handle -> string

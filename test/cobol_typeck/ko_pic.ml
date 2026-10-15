@@ -104,3 +104,39 @@ let%expect_test "pics-incompatible-with-usage" =
       12
     >> Error: PICTURE of category boolean is incompatible with USAGE
               BINARY; expected a PICTURE for numeric data item |}];;
+
+let%expect_test "pics-undefined-78-const" =
+  dotest @@ prog "pics-undefined-78-const"
+    ~working_storage:{|
+       77 A PIC X(B).
+    |};
+  [%expect {|
+    prog.cob:4.18-4.19:
+       1          PROGRAM-ID. pics-undefined-78-const.
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4 >        77 A PIC X(B).
+    ----                     ^
+       5          PROCEDURE DIVISION.
+       6
+    >> Error: Invalid syntax
+
+    prog.cob:4.18:
+       1          PROGRAM-ID. pics-undefined-78-const.
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4 >        77 A PIC X(B).
+    ----                     ^
+       5          PROCEDURE DIVISION.
+       6
+    >> Hint: Missing <digits>
+
+    prog.cob:4.16-4.20:
+       1          PROGRAM-ID. pics-undefined-78-const.
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4 >        77 A PIC X(B).
+    ----                   ^^^^
+       5          PROCEDURE DIVISION.
+       6
+    >> Error: PICTURE string describes an empty data item |}];;

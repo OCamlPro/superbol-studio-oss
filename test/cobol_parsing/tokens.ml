@@ -208,3 +208,55 @@ let%expect_test "tokens-with-tabs" =
       PICTURE_STRING[X], VALUE, DIGITS[8], ., PROCEDURE, DIVISION, .,
       WORD[MAIN-PROC], ., COMPUTE, WORD[WS-RES], =, WORD[WS-ORIG], *, DIGITS[12],
       ., STOP, RUN, ., EOF |}];;
+
+let%expect_test "pic-strings-with-spaces" =
+  Parser_testing.show_parsed_tokens ~source_format:Auto
+    ~parser_options:(Parser_testing.options ~verbose:true ())
+     "
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-RES PIC 9( 4 )V9( 1)9(2 ).
+";
+    [%expect {|
+      Tks: IDENTIFICATION, DIVISION, .
+      Tks: PROGRAM-ID, ., INFO_WORD[prog], .
+      Incoming: {RECURSIVE}
+      Tks': ., INFO_WORD[prog], .
+      Tks: DATA, DIVISION, .
+      Outgoing: {RECURSIVE}
+      Tks: WORKING-STORAGE, SECTION, .
+      Tks: DIGITS[01], WORD[WS-RES], PICTURE, PICTURE_PREFIX[9(], DIGITS[4],
+           PICTURE_INTERM[)V9(], DIGITS[1], PICTURE_INTERM[)9(], DIGITS[2],
+           PICTURE_SUFFIX[)], .
+      Tks: EOF
+      IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[prog], ., DATA,
+      DIVISION, ., WORKING-STORAGE, SECTION, ., DIGITS[01], WORD[WS-RES], PICTURE,
+      PICTURE_PREFIX[9(], DIGITS[4], PICTURE_INTERM[)V9(], DIGITS[1],
+      PICTURE_INTERM[)9(], DIGITS[2], PICTURE_SUFFIX[)], ., EOF |}];;
+
+let%expect_test "pic-strings-with-const" =
+  Parser_testing.show_parsed_tokens ~source_format:Auto
+    ~parser_options:(Parser_testing.options ~verbose:true ())
+     "
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-RES PIC X(FOO).
+";
+    [%expect {|
+      Tks: IDENTIFICATION, DIVISION, .
+      Tks: PROGRAM-ID, ., INFO_WORD[prog], .
+      Incoming: {RECURSIVE}
+      Tks': ., INFO_WORD[prog], .
+      Tks: DATA, DIVISION, .
+      Outgoing: {RECURSIVE}
+      Tks: WORKING-STORAGE, SECTION, .
+      Tks: DIGITS[01], WORD[WS-RES], PICTURE, PICTURE_PREFIX[X(], WORD[FOO],
+           PICTURE_SUFFIX[)], .
+      Tks: EOF
+      IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[prog], ., DATA,
+      DIVISION, ., WORKING-STORAGE, SECTION, ., DIGITS[01], WORD[WS-RES], PICTURE,
+      PICTURE_PREFIX[X(], WORD[FOO], PICTURE_SUFFIX[)], ., EOF |}];;

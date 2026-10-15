@@ -22,9 +22,13 @@ type output =
 
 type pic_output =
   | PIC_string of string
+  | PIC_prefix of string
+  | PIC_interm of string
+  | PIC_suffix of string
   | PIC_is
   | PIC_end
   | PIC_unexpected of char
+  (* first component is any chars accumulated before the unexpected char *)
 
 type alphanum_suffix = STR | EBCDIC
 type alphanum_content =
@@ -35,7 +39,7 @@ type alphanum_content =
 }
 
 let blank = [' ' '\009' '\r' ]
-let blanks = (blank+ | '\t')
+let blanks = (blank | '\t')+
 let digit = [ '0'-'9' ]
 let sign = [ '+' '-' ]
 let opers = sign | ['*' '/' '>' '<' '=' '&'] | "**" | "::" | ">=" | "<=" | "<>"
@@ -49,8 +53,11 @@ let firstidentchar = [ 'a'-'z' 'A'-'Z' '0'-'9' ]
 let lastidentchar = firstidentchar
 let ident = (firstidentchar (identchar* lastidentchar)?)
 
-let picchar   = _ # [' ' '\t' '\009' '\n' '\r' '\'' '"' ';']
-let picstring = (picchar # [',']) (picchar*)
+let picchar   = _ # [' ' '\t' '\009' '\n' '\r' '\'' '"' ';' '(' ')']
+let picitem0  = (picchar # [',']) (picchar*) ('(' digit+ ')')?
+let picitemi  = picchar+ ('(' digit+ ')')?
+let picstring = picitem0 picitemi*
+
 
 (* Text-word tokenizer (after text manipulation phase) *)
 rule token = parse
@@ -93,6 +100,15 @@ and pic_token = parse
 
   | (picstring as s)
       { PIC_string s }
+
+  | (picstring '(' as s)
+      { PIC_prefix s }
+
+  | (')' picstring? as s)
+      { PIC_suffix s }
+
+  | (')' picstring '(' as s)
+      { PIC_interm s }
 
   | eof
       { PIC_end }

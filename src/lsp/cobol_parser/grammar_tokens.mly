@@ -23,8 +23,8 @@
 
 %token EOF
 
-%token <string> WORD [@recovery alphanum__] (* [@symbol "<word>"] *)
-%token <string> WORD_IN_AREA_A [@recovery alphanum__] (* [@symbol "<word in area A>"] *)
+%token <string> WORD [@recovery alphanum__] [@symbol "<word>"]
+%token <string> WORD_IN_AREA_A [@recovery alphanum__] [@symbol "<word in area A>"]
 %token <string> INFO_WORD [@recovery alphanum__]
 %token <Cobol_ptree.comment_entry> COMMENT_ENTRY [@recovery [alphanum__]]
 %token <Cobol_ptree.alphanum> ALPHANUM
@@ -34,30 +34,32 @@
 %token <string> SINTLIT [@recovery integer_zero]
 %token <string * char * string> FIXEDLIT [@recovery "0", '.', "0"]
 %token <string * char * string * string> FLOATLIT [@recovery "0", '.', "0", "1"]
-%token <string> DIGITS [@recovery integer_zero]
-%token <string> PICTURE_STRING [@recovery "X"]
-                  [@symbol "<picture character string>"]
+%token <string> DIGITS [@recovery integer_zero] [@symbol "<digits>"]
+%token <string> PICTURE_STRING [@recovery "X"] [@symbol "<picture character string>"]
+%token <string> PICTURE_PREFIX [@recovery "X("] [@symbol "<picture character string>"]
+%token <string> PICTURE_INTERM [@recovery ")X("] [@symbol "<picture character string>"]
+%token <string> PICTURE_SUFFIX [@recovery ")"] [@symbol "<picture character string>"]
 %token <Cobol_common.Exec_block.t> EXEC_BLOCK [@cost 999]
 
 %token EIGHTY_EIGHT
 
-%token AMPERSAND       "&"  [@symbol  "&"]
-%token ASTERISK        "*"  [@symbol  "*"]
-%token COLON           ":"  [@symbol  ":"]
-%token DASH_SIGN       "-"  [@symbol  "-"]
-%token DOUBLE_ASTERISK "**" [@symbol "**"]
-%token DOUBLE_COLON    "::" [@symbol "::"]
-%token EQ              "="  [@symbol  "="]
-%token GE              ">=" [@symbol ">="]
-%token GT              ">"  [@symbol  ">"]
-%token LE              "<=" [@symbol "<="]
-%token LPAR            "("  [@symbol  "("]
-%token LT              "<"  [@symbol  "<"]
-%token NE              "<>" [@symbol "<>"]
-%token PERIOD          "."  [@symbol  "."] [@cost 0] [@completion]
-%token PLUS_SIGN       "+"  [@symbol  "+"]
-%token RPAR            ")"  [@symbol  ")"]
-%token SLASH           "/"  [@symbol  "/"]
+%token AMPERSAND       "&"  [@punct] [@symbol  "&"]
+%token ASTERISK        "*"  [@punct] [@symbol  "*"]
+%token COLON           ":"  [@punct] [@symbol  ":"]
+%token DASH_SIGN       "-"  [@punct] [@symbol  "-"]
+%token DOUBLE_ASTERISK "**" [@punct] [@symbol "**"]
+%token DOUBLE_COLON    "::" [@punct] [@symbol "::"]
+%token EQ              "="  [@punct] [@symbol  "="]
+%token GE              ">=" [@punct] [@symbol ">="]
+%token GT              ">"  [@punct] [@symbol  ">"]
+%token LE              "<=" [@punct] [@symbol "<="]
+%token LPAR            "("  [@punct] [@symbol  "("]
+%token LT              "<"  [@punct] [@symbol  "<"]
+%token NE              "<>" [@punct] [@symbol "<>"]
+%token PERIOD          "."  [@punct] [@symbol  "."] [@cost 0] [@completion]
+%token PLUS_SIGN       "+"  [@punct] [@symbol  "+"]
+%token RPAR            ")"  [@punct] [@symbol  ")"]
+%token SLASH           "/"  [@punct] [@symbol  "/"]
 
 (* Default reservable keywords *)
 

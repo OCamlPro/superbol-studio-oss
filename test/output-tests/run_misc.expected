@@ -1741,6 +1741,46 @@ Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11785:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11759:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11829:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11865:0
+run_misc.at-11865-prog.cob:8.29-8.36:
+   5          DATA            DIVISION.
+   6          WORKING-STORAGE SECTION.
+   7          01  foo-bar     CONSTANT 8.
+   8 >        01  x           PIC 9(foo-bar)9(foo-bar).
+----                                ^^^^^^^
+   9   
+  10          PROCEDURE DIVISION.
+>> Error: Invalid syntax
+
+run_misc.at-11865-prog.cob:8.29:
+   5          DATA            DIVISION.
+   6          WORKING-STORAGE SECTION.
+   7          01  foo-bar     CONSTANT 8.
+   8 >        01  x           PIC 9(foo-bar)9(foo-bar).
+----                                ^
+   9   
+  10          PROCEDURE DIVISION.
+>> Hint: Missing <digits>
+
+run_misc.at-11865-prog.cob:8.39-8.46:
+   5          DATA            DIVISION.
+   6          WORKING-STORAGE SECTION.
+   7          01  foo-bar     CONSTANT 8.
+   8 >        01  x           PIC 9(foo-bar)9(foo-bar).
+----                                          ^^^^^^^
+   9   
+  10          PROCEDURE DIVISION.
+>> Error: Invalid syntax
+
+run_misc.at-11865-prog.cob:8.39:
+   5          DATA            DIVISION.
+   6          WORKING-STORAGE SECTION.
+   7          01  foo-bar     CONSTANT 8.
+   8 >        01  x           PIC 9(foo-bar)9(foo-bar).
+----                                          ^
+   9   
+  10          PROCEDURE DIVISION.
+>> Hint: Missing <digits>
+
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11887:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11941:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12015:0

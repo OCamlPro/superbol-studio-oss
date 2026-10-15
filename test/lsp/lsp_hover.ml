@@ -1683,7 +1683,7 @@ let%expect_test "hover-datadef-78" =
        DATA DIVISION.
        WORKING-STORAGE SECTION.
        78 CO_|_NST VALUE "ABCD".
-      *Note: currently handled as hovering over `01 VAR ... CONST.`
+      *Note: now properly handled as hovering over `CONST.`
        77 VAR VALUE CON_|_ST.
        PROCEDURE DIVISION.
            DISPLAY "VAR: " _|_VAR ", CONST: " CON_|_ST
@@ -1699,32 +1699,22 @@ let%expect_test "hover-datadef-78" =
        5          WORKING-STORAGE SECTION.
        6 >        78 CONST VALUE "ABCD".
     ----          ^^^^^^^^^^^^^^^^^^^^^
-       7         *Note: currently handled as hovering over `01 VAR ... CONST.`
+       7         *Note: now properly handled as hovering over `CONST.`
        8          77 VAR VALUE CONST.
     Compilation variable with value `"ABCD"`
     (line 7, character 23):
-    __rootdir__/prog.cob:8.7-8.26:
+    __rootdir__/prog.cob:8.20-8.25:
        5          WORKING-STORAGE SECTION.
        6          78 CONST VALUE "ABCD".
-       7         *Note: currently handled as hovering over `01 VAR ... CONST.`
+       7         *Note: now properly handled as hovering over `CONST.`
        8 >        77 VAR VALUE CONST.
-    ----          ^^^^^^^^^^^^^^^^^^^
+    ----                       ^^^^^
        9          PROCEDURE DIVISION.
       10              DISPLAY "VAR: " VAR ", CONST: " CONST
-    ```cobol
-    VAR
-    ```
-    ```cobol
-    PIC X(4) USAGE DISPLAY
-    ```
-    - 4 bytes
-    ---
-    ```text
-    Note: currently handled as hovering over `01 VAR ... CONST.`
-    ```
+    Compilation variable with value `"ABCD"`
     (line 9, character 27):
     __rootdir__/prog.cob:10.27-10.30:
-       7         *Note: currently handled as hovering over `01 VAR ... CONST.`
+       7         *Note: now properly handled as hovering over `CONST.`
        8          77 VAR VALUE CONST.
        9          PROCEDURE DIVISION.
       10 >            DISPLAY "VAR: " VAR ", CONST: " CONST
@@ -1740,11 +1730,11 @@ let%expect_test "hover-datadef-78" =
     - 4 bytes
     ---
     ```text
-    Note: currently handled as hovering over `01 VAR ... CONST.`
+    Note: now properly handled as hovering over `CONST.`
     ```
     (line 9, character 46):
     __rootdir__/prog.cob:10.43-10.48:
-       7         *Note: currently handled as hovering over `01 VAR ... CONST.`
+       7         *Note: now properly handled as hovering over `CONST.`
        8          77 VAR VALUE CONST.
        9          PROCEDURE DIVISION.
       10 >            DISPLAY "VAR: " VAR ", CONST: " CONST
