@@ -74,11 +74,11 @@ module TYPES = struct
     | ObjectRef
     | Pointer
 
-    type procedure_at_position =
-      {
-        cu: Cobol_unit.Types.cobol_unit option;
-        proc_name: Cobol_ptree.qualname option;
-      }
+  type procedure_at_position =
+    {
+      cu: Cobol_unit.Types.cobol_unit option;
+      proc_name: Cobol_ptree.qualname option;
+    }
 end
 open TYPES
 
@@ -148,33 +148,23 @@ let preproc_element_at_position ~filename pos
         None
   end (Cobol_preproc.Trace.events artifacts.Cobol_parser.Outputs.pplog)
 
-(** [element_at_position ~filename pos group artifacts] seeks the compilation
-    unit name and relevant syntactic element at the given position [pos] in
-    [filename], in typed compilation group [group] with associated parsing
-    artifacts [artifacts]. *)
-let element_at_position ~filename pos (group: Cobol_unit.Types.group) artifacts
-  : element_at_position =
-  (* let filename = Lsp.Uri.to_path uri in *)
-  let open struct
+type acc =
+  {
+    elt: element_at_position;
+    context: context;
+  }
+and context =
+  | Data_decls
+  | Procedure of Cobol_unit.Types.procedure_section option
 
-    type acc =
-      {
-        elt: element_at_position;
-        context: context;
-      }
-    and context =
-      | Data_decls
-      | Procedure of Cobol_unit.Types.procedure_section option
+let init =
+  {
+    elt = { element_at_position = None;
+            enclosing_compilation_unit_name = None };
+    context = Data_decls;                           (* does not really matter *)
+  }
 
-    let init =
-      {
-        elt = { element_at_position = None;
-                enclosing_compilation_unit_name = None };
-        context = Data_decls;                       (* does not really matter *)
-      }
-
-  end in
-
+let ptree_element_at_position ~filename pos group =
   let enter_context context ({ context = prev_context; _ } as acc) =
     Visitor.do_children_and_then { acc with context }
       (fun acc -> { acc with context = prev_context })
@@ -265,11 +255,22 @@ let element_at_position ~filename pos (group: Cobol_unit.Types.group) artifacts
       | _ ->                        (* unknow/unimplemented kind of EXEC block *)
           acc
 
-  end group init |> function
-  | { elt = { element_at_position = None; _ } as elt; _ } ->
-      let element = preproc_element_at_position ~filename pos artifacts in
-      { elt with element_at_position = element }
-  | acc ->
+  end group init
+
+(** [element_at_position ~filename pos group artifacts] seeks the compilation
+    unit name and relevant syntactic element at the given position [pos] in
+    [filename], in typed compilation group [group] with associated parsing
+    artifacts [artifacts]. *)
+let element_at_position ~filename pos (group: Cobol_unit.Types.group) artifacts
+  : element_at_position =
+  (* Preprocessor-related elements take priority over the prase-tree.  Still, we
+     traverse the parse-tree anyways to grab the name of the enclosing
+     compilation unit. *)
+  let acc = ptree_element_at_position ~filename pos group in
+  match preproc_element_at_position ~filename pos artifacts with
+  | Some element ->
+      { acc.elt with element_at_position = Some element }
+  | None ->
       acc.elt
 
 (* --- *)

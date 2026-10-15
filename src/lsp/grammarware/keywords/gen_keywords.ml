@@ -50,9 +50,12 @@ let emit_prelude ppf =
   end Grammar.attributes
 
 let punct attrs =
-  (* Note: we reuse the symbol attribute used by the printer. *)
-  List.find_opt (Attribute.has_label "symbol") attrs |>
-  Option.map Attribute.payload
+  if List.exists (Attribute.has_label "punct") attrs then
+    (* Note: we reuse the symbol attribute used by the printer. *)
+    List.find_opt (Attribute.has_label "symbol") attrs |>
+    Option.map Attribute.payload
+  else
+    None
 
 let keyword attrs =
   List.find_opt (Attribute.has_label "keyword") attrs |>

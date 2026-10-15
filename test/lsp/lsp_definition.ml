@@ -486,40 +486,71 @@ let%expect_test "definition-requests-78" =
        DATA DIVISION.
        WORKING-STORAGE SECTION.
        78 CONST VALUE "CONST".
+       78 INT   VALUE 2.
        77 VAR PIC A(5) VALUE C_|1-const-in-data-div|_ONST.
+       77 BAR PIC 9(I_|4-int-in-pict-string|_NT).
+       77 CAR PIC 9( I_|5-int-in-pict-string|_NT).
+       77 DAR PIC 9( I_|6-int-in-pict-string|_NT ).
        PROCEDURE DIVISION.
-           DISPLAY CON_|1-const-in-proc-div|_ST V_|2-var|_AR.
+           DISPLAY CON_|2-const-in-proc-div|_ST V_|3-var|_AR.
   |cobol};
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-    1-const-in-data-div (line 5, character 30):
-    __rootdir__/prog.cob:6.10-6.13:
-       3          DATA DIVISION.
-       4          WORKING-STORAGE SECTION.
-       5          78 CONST VALUE "CONST".
-       6 >        77 VAR PIC A(5) VALUE CONST.
-    ----             ^^^
-       7          PROCEDURE DIVISION.
-       8              DISPLAY CONST VAR.
-    1-const-in-proc-div (line 7, character 22):
+    1-const-in-data-div (line 6, character 30):
     __rootdir__/prog.cob:5.7-5.29:
        2          PROGRAM-ID. prog.
        3          DATA DIVISION.
        4          WORKING-STORAGE SECTION.
        5 >        78 CONST VALUE "CONST".
     ----          ^^^^^^^^^^^^^^^^^^^^^^
-       6          77 VAR PIC A(5) VALUE CONST.
-       7          PROCEDURE DIVISION.
-    2-var (line 7, character 26):
-    __rootdir__/prog.cob:6.10-6.13:
+       6          78 INT   VALUE 2.
+       7          77 VAR PIC A(5) VALUE CONST.
+    2-const-in-proc-div (line 11, character 22):
+    __rootdir__/prog.cob:5.7-5.29:
+       2          PROGRAM-ID. prog.
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5 >        78 CONST VALUE "CONST".
+    ----          ^^^^^^^^^^^^^^^^^^^^^^
+       6          78 INT   VALUE 2.
+       7          77 VAR PIC A(5) VALUE CONST.
+    3-var (line 11, character 26):
+    __rootdir__/prog.cob:7.10-7.13:
+       4          WORKING-STORAGE SECTION.
+       5          78 CONST VALUE "CONST".
+       6          78 INT   VALUE 2.
+       7 >        77 VAR PIC A(5) VALUE CONST.
+    ----             ^^^
+       8          77 BAR PIC 9(INT).
+       9          77 CAR PIC 9( INT).
+    4-int-in-pict-string (line 7, character 21):
+    __rootdir__/prog.cob:6.7-6.23:
        3          DATA DIVISION.
        4          WORKING-STORAGE SECTION.
        5          78 CONST VALUE "CONST".
-       6 >        77 VAR PIC A(5) VALUE CONST.
-    ----             ^^^
-       7          PROCEDURE DIVISION.
-       8              DISPLAY CONST VAR.
+       6 >        78 INT   VALUE 2.
+    ----          ^^^^^^^^^^^^^^^^
+       7          77 VAR PIC A(5) VALUE CONST.
+       8          77 BAR PIC 9(INT).
+    5-int-in-pict-string (line 8, character 22):
+    __rootdir__/prog.cob:6.7-6.23:
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5          78 CONST VALUE "CONST".
+       6 >        78 INT   VALUE 2.
+    ----          ^^^^^^^^^^^^^^^^
+       7          77 VAR PIC A(5) VALUE CONST.
+       8          77 BAR PIC 9(INT).
+    6-int-in-pict-string (line 9, character 22):
+    __rootdir__/prog.cob:6.7-6.23:
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5          78 CONST VALUE "CONST".
+       6 >        78 INT   VALUE 2.
+    ----          ^^^^^^^^^^^^^^^^
+       7          77 VAR PIC A(5) VALUE CONST.
+       8          77 BAR PIC 9(INT).
  |}]
 
 let%expect_test "definition-requests-78-n-preproc" =

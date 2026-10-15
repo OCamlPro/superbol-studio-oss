@@ -35,7 +35,7 @@ let dual_handler_none =
 
 let neg_condition ~neg (c: condition with_loc): condition =
   if not neg then ~&c else CondNot c
-  
+
 %}
 
 (* Tokens are listed in `grammar_tokens.mly' *)
@@ -820,7 +820,7 @@ let crt_status_clause :=                                           (* +COB2002 *
 
 let currency_sign_clause [@context currency_clause] :=
   | CURRENCY; SIGN?; IS?; l = string_literal;  (* not fig const (hex allowed) *)
-    lo = ro(pf(WITH?; PICTURE; IS?; p = loc(PICTURE_STRING); SYMBOL;
+    lo = ro(pf(WITH?; PICTURE; IS?; p = loc(picture_string); SYMBOL;
                { p }, string_literal));                (* +COB2002 *)
     { CurrencySign { sign = l; picture_symbol = lo } } (* not fig const, not hex, 1
                                                      char *)
@@ -1614,10 +1614,24 @@ let justified_clause := JUSTIFIED; RIGHT?
 let picture_clause
       [@recovery_with_pos dummy_picture]
       [@symbol "<picture clause>"] :=
-  | PICTURE; IS?; picture_string = loc(PICTURE_STRING);
+  | PICTURE; IS?; picture_string = loc(picture_string);
     picture_locale = ro(picture_locale_phrase);
     picture_depending = ro(depending_phrase);
     { { picture_string; picture_locale; picture_depending } }
+
+let picture_string [@symbol "<picture string>"] :=
+  | PICTURE_STRING
+  | x = PICTURE_PREFIX; n = picture_digits; p = picture_string_after_digits;
+    { Printf.sprintf "%s%s%s" x n p }
+
+let picture_string_after_digits :=
+  | PICTURE_SUFFIX
+  | x = PICTURE_INTERM; n = picture_digits; p = picture_string_after_digits;
+    { Printf.sprintf "%s%s%s" x n p }
+
+let picture_digits ==
+  | DIGITS
+  | EIGHTY_EIGHT; { "88" }                                        (* unlikely *)
 
 let picture_locale_phrase
       [@recovery dummy_picture_locale]
@@ -2826,7 +2840,7 @@ let any_lpar ==
 cond_relop_atom:
  | c = class_or_sign_condition_after_subject                       { c }
  | r = loc(relop) e = loc(cond_object_atom)                        { CondRelOp (r, e) }
- | io(IS) n = ibo(NOT) LPAR_BEFORE_RELOP c = loc(cond_relop_operand) RPAR 
+ | io(IS) n = ibo(NOT) LPAR_BEFORE_RELOP c = loc(cond_relop_operand) RPAR
     { neg_condition ~neg:n (CondParen c &@<- c) }
 
 cond_relop_operand:
@@ -3489,10 +3503,10 @@ let selection_object :=
 let range_expression :=
  | b = ibo(NOT); i1 = expression; THROUGH;
    i2 = expression; i = ro(pf(IN,name));
-   { SelRange { 
-      sel_range_negated = b; 
-      sel_range_start = i1; 
-      sel_range_stop = i2; 
+   { SelRange {
+      sel_range_negated = b;
+      sel_range_start = i1;
+      sel_range_stop = i2;
       sel_range_alphabet = i } }
 
 

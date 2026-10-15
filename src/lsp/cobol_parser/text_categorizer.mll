@@ -22,17 +22,13 @@ type output =
 
 type pic_output =
   | PIC_string of string
-  | PIC_string_prefix of string
+  | PIC_prefix of string
+  | PIC_interm of string
+  | PIC_suffix of string
   | PIC_is
   | PIC_end
   | PIC_unexpected of char
   (* first component is any chars accumulated before the unexpected char *)
-
-type pic_string_prefix =
-  | PIC_string of string
-  | PIC_string_prefix of string
-  | PIC_end
-  | PIC_unexpected of char
 
 type alphanum_suffix = STR | EBCDIC
 type alphanum_content =
@@ -58,7 +54,9 @@ let lastidentchar = firstidentchar
 let ident = (firstidentchar (identchar* lastidentchar)?)
 
 let picchar   = _ # [' ' '\t' '\009' '\n' '\r' '\'' '"' ';' '(' ')']
-let picstring = (picchar # [',']) (picchar*)
+let picitem0  = (picchar # [',']) (picchar*) ('(' digit+ ')')?
+let picitemi  = picchar+ ('(' digit+ ')')?
+let picstring = picitem0 picitemi*
 
 
 (* Text-word tokenizer (after text manipulation phase) *)
@@ -100,40 +98,23 @@ and pic_token = parse
   | ['i' 'I'] ['s' 'S']
       { PIC_is }
 
-  | ((picstring '(') as s)
-      { PIC_string_prefix s }
-
   | (picstring as s)
       { PIC_string s }
+
+  | (picstring '(' as s)
+      { PIC_prefix s }
+
+  | (')' picstring? as s)
+      { PIC_suffix s }
+
+  | (')' picstring '(' as s)
+      { PIC_interm s }
 
   | eof
       { PIC_end }
 
   | (_ as c)
-      { PIC_unexpected (c) }
-
-and pic_string_aux in_paren = parse
-
-  | blanks
-      { if not in_paren then PIC_end
-        else pic_string_aux in_paren lexbuf }
-
-  | (picchar+) as s
-      { PIC_string s }
-
-  | ')'
-      { PIC_string ")" }
-
-  | '('
-      { if in_paren then PIC_unexpected ('(')
-        else PIC_string "(" }
-
-  | eof
-      { if in_paren then PIC_string_prefix ""
-        else PIC_end }
-
-  | (_ as c)
-      { (PIC_unexpected (c): pic_string_prefix) }
+      { PIC_unexpected c }
 
 (* TODO: distinguish lexing entry based on quotation *)
 and alphanum_string = parse

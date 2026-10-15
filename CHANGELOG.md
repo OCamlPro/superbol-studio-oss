@@ -8,7 +8,7 @@
 - Accept relaxed MF syntaxes for EVALUATE statements [#667](https://github.com/OCamlPro/superbol-studio-oss/pull/667)
 - Display of the size and offset of data items on hover [#665](https://github.com/OCamlPro/superbol-studio-oss/pull/665) [#690](https://github.com/OCamlPro/superbol-studio-oss/pull/690) [#693](https://github.com/OCamlPro/superbol-studio-oss/pull/693)
 - Display of `REDEFINES` relations on hover, with the size of the redefinition and the size of the item it redefines [#669](https://github.com/OCamlPro/superbol-studio-oss/pull/669)
-- Allow spaces inside parenthesis of PICTURE strings [#587](https://github.com/OCamlPro/superbol-studio-oss/pull/587)
+- Allow spaces and 78-level constants in PICTURE string symbol occurences [#587](https://github.com/OCamlPro/superbol-studio-oss/pull/587)
 - Support tabs in source file [#591](https://github.com/OCamlPro/superbol-studio-oss/pull/591)
 - Unified internal representation of binary data items [#656](https://github.com/OCamlPro/superbol-studio-oss/pull/656) [#672](https://github.com/OCamlPro/superbol-studio-oss/pull/672) [#680](https://github.com/OCamlPro/superbol-studio-oss/pull/680)
 - Command to retrieve the directories that contain copybooks into the workspace settings [#654](https://github.com/OCamlPro/superbol-studio-oss/pull/654)

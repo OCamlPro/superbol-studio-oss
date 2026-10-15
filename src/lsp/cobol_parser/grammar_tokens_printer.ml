@@ -43,6 +43,9 @@ let pp_token_string: token Pretty.printer = fun ppf ->
   | WORD w
   | WORD_IN_AREA_A w
   | PICTURE_STRING w
+  | PICTURE_PREFIX w
+  | PICTURE_SUFFIX w
+  | PICTURE_INTERM w
   | INFO_WORD w
   | DIGITS w
   | SINTLIT w -> string w
@@ -57,10 +60,12 @@ let pp_token_string: token Pretty.printer = fun ppf ->
   | EXEC_BLOCK b -> Cobol_common.Exec_block.pp ppf b
   | INTERVENING_ c -> print "%c" c
   | t -> string @@
-      try Text_lexer.string_of_token t
-      with Not_found ->
-      try Hashtbl.find combined_tokens t
-      with Not_found -> "<unknown/unexpected token>"
+      match Text_lexer.string_of_punct_or_keyword_token t with
+      | Some s ->
+          s
+      | None ->
+          Option.value (Hashtbl.find_opt combined_tokens t)
+            ~default:"<unknown/unexpected token>"
 
 let pp_token: token Pretty.printer = fun ppf ->
   let string s = Pretty.string ppf s
@@ -69,6 +74,9 @@ let pp_token: token Pretty.printer = fun ppf ->
     | WORD w -> print "WORD[%s]" w
     | WORD_IN_AREA_A w -> print "WORD_IN_AREA_A[%s]" w
     | PICTURE_STRING w -> print "PICTURE_STRING[%s]" w
+    | PICTURE_PREFIX w -> print "PICTURE_PREFIX[%s]" w
+    | PICTURE_SUFFIX w -> print "PICTURE_SUFFIX[%s]" w
+    | PICTURE_INTERM w -> print "PICTURE_INTERM[%s]" w
     | INFO_WORD s -> print "INFO_WORD[%s]" s
     | COMMENT_ENTRY _ as t -> print "COMMENT_ENTRY[%a]" pp_token_string t
     | EXEC_BLOCK _ as t -> print "EXEC_BLOCK[%a]" pp_token_string t
