@@ -1,6 +1,6 @@
 # Changelog
 
-## [_] Next release
+## [1.1.0] Second stable release (2026-10-16)
 
 ### Added
 - Built-in `SuperBOL: build module (debug)` task; built-in build tasks are renamed to `SuperBOL: build module`, `SuperBOL: build module (debug)`, `SuperBOL: build executable`, and `SuperBOL: build executable (debug)` [#683](https://github.com/OCamlPro/superbol-studio-oss/pull/683) (fix for [issue #539](https://github.com/OCamlPro/superbol-studio-oss/issues/539))
