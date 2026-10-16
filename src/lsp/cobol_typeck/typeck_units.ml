@@ -65,7 +65,7 @@ let build_units ~fold_exec_block' ~(options: Typeck_config.options) = object
 
     let unit =
       {
-        unit_name = Cobol_ptree.name_of_compilation_unit ~&cu;
+        unit_name = Typeck_name.of_compilation_unit ~&cu;
         unit_parent_name = parent_name;
         unit_env;
         unit_data = unit_data.definitions;

@@ -332,14 +332,6 @@ let pp_compilation_unit ppf = function
   | ClassDefinition cd -> pp_class_definition ppf cd
   | InterfaceDefinition id -> pp_interface_definition ppf id
 
-let name_of_compilation_unit: compilation_unit -> string with_loc = function
-  | Program { program_name = name; _ }
-  | Function { function_name = name; _ }
-  | ClassDefinition { class_name = name; _ }
-  | InterfaceDefinition { interface_name = name; _ } ->
-      let open Cobol_common.Srcloc.INFIX in
-      Pretty.to_string "%a" pp_name_or_literal ~&name &@<- name
-
 type control_division = unit                               (* nothing for now *)
 [@@deriving ord]
 
@@ -357,17 +349,3 @@ let pp_compilation_group ppf { control_division; compilation_units } =
     ppf compilation_units
 
 let show_compilation_group = Fmt.to_to_string pp_compilation_group
-
-(* TODO: this will work with references, but not for literals. We
-   should make it work also for them, though we should probably wait
-   to get an example from real life. This function should be moved
-   somewhere else. *)
-let program_name : name_or_literal -> string =
-  function name_or_literal ->
-  Pretty.to_string "%a" pp_name_or_literal name_or_literal
-
-let program_name' : name_or_literal with_loc -> string with_loc =
-  function name_or_literal ->
-  let loc = name_or_literal.loc in
-  let payload = program_name name_or_literal.payload in
-  { loc ; payload }
