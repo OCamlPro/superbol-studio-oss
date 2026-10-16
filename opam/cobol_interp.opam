@@ -2,7 +2,7 @@
 # Do not modify, or add to the `skip` field of `drom.toml`.
 opam-version: "2.0"
 name: "cobol_interp"
-version: "1.0.1"
+version: "1.1.0"
 license: "MIT"
 synopsis: "SuperBOL Studio OSS Project"
 description: "Interpreter for COBOL programs (core interpretation logic)"
