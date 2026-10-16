@@ -1,5 +1,8 @@
 # Changelog
 
+## [_] Next release
+
+
 ## [1.1.0] Second stable release (2026-10-16)
 
 ### Added

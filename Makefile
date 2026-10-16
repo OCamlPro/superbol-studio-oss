@@ -36,7 +36,7 @@ DUNE_DOT_EXE = $(if $(filter win32,$(BUILD_PLAT)),$(DOT_EXE))
 
 CP ?= cp -fl
 
-VERSION = 1.1.0
+VERSION = 1.1.1
 DEV_DEPS := merlin ocamlformat odoc
 
 
