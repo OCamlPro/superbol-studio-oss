@@ -116,6 +116,7 @@ let%expect_test "qualif-2" =
   show_item Term.(name "X") map;                                 (* not found *)
   show_item Term.(name "Z") map;                                 (* ok *)
   show_item Term.(qual "Z" @@ name "X") map;                     (* ok *)
+  show_item Term.(qual "Z" @@ name "Y") map;                     (* ok *)
   [%expect  {xxx|
     Map: {
       Z IN Y IN X => X/Y/Z
@@ -125,7 +126,8 @@ let%expect_test "qualif-2" =
     |}
     Find X: not found
     Find Z: X/Y/Z
-    Find Z IN X: X/Y/Z |xxx}];;
+    Find Z IN X: X/Y/Z
+    Find Z IN Y: X/Y/Z |xxx}];;
 
 let%expect_test "replacement-2" =
   let map = of_list Term.[qual "Y" @@ name "X", "X";
