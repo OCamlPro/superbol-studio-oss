@@ -112,6 +112,174 @@ let%expect_test "simple-references-requests" =
     No reference found |}]
 
 
+let%expect_test "nested-references-requests" =
+  let { end_with_postproc; projdir }, server = make_lsp_project () in
+  print_references ~projdir server @@ extract_position_markers {cobol|
+        PROGRAM-ID. prog.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 A.
+          02 B.
+            03 C.
+              04 D PIC X.
+        PROCEDURE DIVISION.
+          DISPLAY _|1-d|_D D OF C OF B OF A D OF A D OF C D OF B
+          DISPLAY _|2-c|_C OF A C OF B C OF A
+          DISPLAY _|2-b|_B B OF A
+          STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    1-d (line 9, character 18):
+    __rootdir__/prog.cob:8.17-8.18:
+       5           01 A.
+       6             02 B.
+       7               03 C.
+       8 >               04 D PIC X.
+    ----                    ^
+       9           PROCEDURE DIVISION.
+      10             DISPLAY D D OF C OF B OF A D OF A D OF C D OF B
+    __rootdir__/prog.cob:10.18-10.19:
+       7               03 C.
+       8                 04 D PIC X.
+       9           PROCEDURE DIVISION.
+      10 >           DISPLAY D D OF C OF B OF A D OF A D OF C D OF B
+    ----                     ^
+      11             DISPLAY C OF A C OF B C OF A
+      12             DISPLAY B B OF A
+    __rootdir__/prog.cob:10.20-10.21:
+       7               03 C.
+       8                 04 D PIC X.
+       9           PROCEDURE DIVISION.
+      10 >           DISPLAY D D OF C OF B OF A D OF A D OF C D OF B
+    ----                       ^
+      11             DISPLAY C OF A C OF B C OF A
+      12             DISPLAY B B OF A
+    __rootdir__/prog.cob:10.37-10.38:
+       7               03 C.
+       8                 04 D PIC X.
+       9           PROCEDURE DIVISION.
+      10 >           DISPLAY D D OF C OF B OF A D OF A D OF C D OF B
+    ----                                        ^
+      11             DISPLAY C OF A C OF B C OF A
+      12             DISPLAY B B OF A
+    __rootdir__/prog.cob:10.44-10.45:
+       7               03 C.
+       8                 04 D PIC X.
+       9           PROCEDURE DIVISION.
+      10 >           DISPLAY D D OF C OF B OF A D OF A D OF C D OF B
+    ----                                               ^
+      11             DISPLAY C OF A C OF B C OF A
+      12             DISPLAY B B OF A
+    __rootdir__/prog.cob:10.51-10.52:
+       7               03 C.
+       8                 04 D PIC X.
+       9           PROCEDURE DIVISION.
+      10 >           DISPLAY D D OF C OF B OF A D OF A D OF C D OF B
+    ----                                                      ^
+      11             DISPLAY C OF A C OF B C OF A
+      12             DISPLAY B B OF A
+    2-b (line 11, character 18):
+    __rootdir__/prog.cob:6.13-6.14:
+       3           DATA DIVISION.
+       4           WORKING-STORAGE SECTION.
+       5           01 A.
+       6 >           02 B.
+    ----                ^
+       7               03 C.
+       8                 04 D PIC X.
+    __rootdir__/prog.cob:10.30-10.31:
+       7               03 C.
+       8                 04 D PIC X.
+       9           PROCEDURE DIVISION.
+      10 >           DISPLAY D D OF C OF B OF A D OF A D OF C D OF B
+    ----                                 ^
+      11             DISPLAY C OF A C OF B C OF A
+      12             DISPLAY B B OF A
+    __rootdir__/prog.cob:10.56-10.57:
+       7               03 C.
+       8                 04 D PIC X.
+       9           PROCEDURE DIVISION.
+      10 >           DISPLAY D D OF C OF B OF A D OF A D OF C D OF B
+    ----                                                           ^
+      11             DISPLAY C OF A C OF B C OF A
+      12             DISPLAY B B OF A
+    __rootdir__/prog.cob:11.30-11.31:
+       8                 04 D PIC X.
+       9           PROCEDURE DIVISION.
+      10             DISPLAY D D OF C OF B OF A D OF A D OF C D OF B
+      11 >           DISPLAY C OF A C OF B C OF A
+    ----                                 ^
+      12             DISPLAY B B OF A
+      13             STOP RUN.
+    __rootdir__/prog.cob:12.18-12.19:
+       9           PROCEDURE DIVISION.
+      10             DISPLAY D D OF C OF B OF A D OF A D OF C D OF B
+      11             DISPLAY C OF A C OF B C OF A
+      12 >           DISPLAY B B OF A
+    ----                     ^
+      13             STOP RUN.
+      14
+    __rootdir__/prog.cob:12.20-12.21:
+       9           PROCEDURE DIVISION.
+      10             DISPLAY D D OF C OF B OF A D OF A D OF C D OF B
+      11             DISPLAY C OF A C OF B C OF A
+      12 >           DISPLAY B B OF A
+    ----                       ^
+      13             STOP RUN.
+      14
+    2-c (line 10, character 18):
+    __rootdir__/prog.cob:7.15-7.16:
+       4           WORKING-STORAGE SECTION.
+       5           01 A.
+       6             02 B.
+       7 >             03 C.
+    ----                  ^
+       8                 04 D PIC X.
+       9           PROCEDURE DIVISION.
+    __rootdir__/prog.cob:10.25-10.26:
+       7               03 C.
+       8                 04 D PIC X.
+       9           PROCEDURE DIVISION.
+      10 >           DISPLAY D D OF C OF B OF A D OF A D OF C D OF B
+    ----                            ^
+      11             DISPLAY C OF A C OF B C OF A
+      12             DISPLAY B B OF A
+    __rootdir__/prog.cob:10.49-10.50:
+       7               03 C.
+       8                 04 D PIC X.
+       9           PROCEDURE DIVISION.
+      10 >           DISPLAY D D OF C OF B OF A D OF A D OF C D OF B
+    ----                                                    ^
+      11             DISPLAY C OF A C OF B C OF A
+      12             DISPLAY B B OF A
+    __rootdir__/prog.cob:11.18-11.19:
+       8                 04 D PIC X.
+       9           PROCEDURE DIVISION.
+      10             DISPLAY D D OF C OF B OF A D OF A D OF C D OF B
+      11 >           DISPLAY C OF A C OF B C OF A
+    ----                     ^
+      12             DISPLAY B B OF A
+      13             STOP RUN.
+    __rootdir__/prog.cob:11.25-11.26:
+       8                 04 D PIC X.
+       9           PROCEDURE DIVISION.
+      10             DISPLAY D D OF C OF B OF A D OF A D OF C D OF B
+      11 >           DISPLAY C OF A C OF B C OF A
+    ----                            ^
+      12             DISPLAY B B OF A
+      13             STOP RUN.
+    __rootdir__/prog.cob:11.32-11.33:
+       8                 04 D PIC X.
+       9           PROCEDURE DIVISION.
+      10             DISPLAY D D OF C OF B OF A D OF A D OF C D OF B
+      11 >           DISPLAY C OF A C OF B C OF A
+    ----                                   ^
+      12             DISPLAY B B OF A
+      13             STOP RUN. |}]
+
+
 let doc =
   extract_position_markers {cobol|
         IDENTIFICATION DIVISION.

@@ -75,10 +75,8 @@ let rec matches (qn: Cobol_ptree.qualname) ~(full: Cobol_ptree.qualname) =
       name_of qn = name_of full
   | Qual _, Name _ ->
       false
-  | Qual (_, qn'), Qual (_, full')
-    when name_of qn = name_of full ->
-      matches qn' ~full:full'
   | qn, Qual (_, full') ->
+      name_of qn = name_of full ||
       matches qn ~full:full'
 
 (** {1 Collections} *)
