@@ -25,6 +25,7 @@
 
 ### Fixed
 - False precedence errors on PICTURE strings with repeated `Z` or `*` before the decimal point, such as `Z(9).99`
+- Spurious missing PICTURE error on group items with a `USAGE` clause
 - Bug in resolution of qualified names with partial suffix [#698](https://github.com/OCamlPro/superbol-studio-oss/pull/698)
 - Add new silenced keywords to match those in GnuCOBOL config files [#694](https://github.com/OCamlPro/superbol-studio-oss/pull/694)
 - Remove redundant count of references in hover, already shown by codelens [#689](https://github.com/OCamlPro/superbol-studio-oss/pull/689)

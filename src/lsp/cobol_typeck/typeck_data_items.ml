@@ -443,8 +443,14 @@ let item_definition acc ({ item_name;
                            item_range;
                            item_rev_leading_ranges;
                            item_rev_conditions;
+                           item_rev_fields;
                            item_diagnostics; _ } as item) =
   let diags, usage, init_value =
+    (* The USAGE of a group item only applies to its subordinate items *)
+    let item_clauses = match item_rev_fields with
+      | [] -> item_clauses
+      | _ -> { item_clauses with usage = None }
+    in
     Typeck_clauses.to_usage_n_value item_clauses ~item_name ~item_loc
       ~data_config:acc.data_config
   in

@@ -897,3 +897,44 @@ let%expect_test "usage-comps-mf" =
         }
       }
     } |}];;
+
+let%expect_test "usage-comp-3-group" =
+  dotest @@ prog "usage-comp-3-group"
+    ~working_storage:{|
+       01 G COMP-3.
+          05 A PIC S9(9)V99 VALUE 0.
+    |};
+  [%expect {|
+    prog.cob:4.7-5.36:
+       1          PROGRAM-ID. usage-comp-3-group.
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4 >        01 G COMP-3.
+    ----          ^^^^^^^^^^^^
+       5 >           05 A PIC S9(9)V99 VALUE 0.
+    ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+       6          PROCEDURE DIVISION.
+       7
+    Item definition: {
+      qualname: G
+      offset: 0
+      size: 48
+      size-max: 48
+      layout: {
+        structure
+        fields: {
+          qualname: A IN G
+          offset: 0
+          size: 48
+          size-max: 48
+          layout: {
+            elementary
+            usage: {
+              packed-decimal
+              category: NUMERIC(digits = 11, scale = 2, signed = true)
+            }
+            value: 0
+          }
+        }
+      }
+    } |}];;
