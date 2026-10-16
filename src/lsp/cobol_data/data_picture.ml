@@ -910,7 +910,7 @@ let of_string config str =
     match next_symbols pos acc with
     | None, acc ->
         category, pic, acc, idx - 1                               (* all done *)
-    | Some (symbols, (_, span as loc), pos'), acc ->
+    | Some (symbols, loc, pos'), acc ->
         let after_v = acc.v_idx <> None in
         let acc, ok = match check_occurences acc symbols loc with
           | Ok acc -> acc, true
@@ -949,9 +949,9 @@ let of_string config str =
             | _ ->
                 acc
           in
-          check acc ~loc category (symbols :: pic) (idx + span) pos'
+          check acc ~loc category (symbols :: pic) (idx + symbols.symbol_occurences) pos'
         else                                              (* skip symbol(s) *)
-          of_string_rec acc category pic (idx + span) pos'
+          of_string_rec acc category pic (idx + symbols.symbol_occurences) pos'
 
   and check_occurences acc symbols loc =
     match symbols.symbol with                           (* check occurences *)

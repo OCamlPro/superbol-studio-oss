@@ -613,5 +613,10 @@ let () =
       parse_ko "No data"                 "$";
       same_repr "9(3)"                   "999";
       same_repr "X(2)9(3)X(1)"           "XX999X";
+      same_repr "Z(9).99-"               "ZZZZZZZZZ.99-";
+      same_repr "Z(9).99"                "ZZZZZZZZZ.99";
+      same_repr "Z(9)V99"                "ZZZZZZZZZV99";
+      same_repr "*(6).99"                "******.99";
+      same_repr "+Z(5).99"               "+ZZZZZ.99";
     ]
   ])

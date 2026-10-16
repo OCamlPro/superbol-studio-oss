@@ -2,6 +2,10 @@
 
 ## [_] Next release
 
+### Fixed
+- Wrong "missing PICTURE" error on group items with a `USAGE` clause [#700](https://github.com/OCamlPro/superbol-studio-oss/pull/700)
+- Wrong error on PICTURE strings like `Z(9).99`, with repeated `Z` or `*` before the decimal point [#700](https://github.com/OCamlPro/superbol-studio-oss/pull/700)
+
 
 ## [1.1.0] Second stable release (2026-10-16)
 
