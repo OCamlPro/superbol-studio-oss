@@ -72,9 +72,12 @@ let disambiguate_object_vs_bool_expr data_items expr =
     function
     | QualIdent { ident_name; _ } ->
         begin match Cobol_unit.Resolver_map.find ~&ident_name data_items with
-          | Cobol_data.Types.Data_condition _ -> CondBoolExpr
-          | _ -> CondObject
-          | exception Not_found ->
+          | Cobol_data.Types.Data_condition _ ->
+              CondBoolExpr
+          | _ ->
+              CondObject
+          | exception Not_found
+          | exception Cobol_unit.Resolver_map.Ambiguous _ ->
               (* Typechecking of references will already flag this resolution failure:
                      We use the special CondUnknown return value to avoid generating more
                      errors related to this failure. *)
