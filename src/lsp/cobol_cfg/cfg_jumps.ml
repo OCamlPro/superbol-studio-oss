@@ -39,7 +39,7 @@ module Jumps = Set.Make(struct
   end)
 
 let full_qn ~enclosing_section ~cu qn =
-  Cobol_unit.Procedure.full_qn ?enclosing_section qn cu.unit_procedure
+  Cobol_unit.Procedure.full_qn ~enclosing_section qn cu.unit_procedure
 
 let full_qn' ~enclosing_section ~cu qn =
   full_qn ~enclosing_section ~cu ~&qn
