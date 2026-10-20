@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Fixed
+- Fatal error on ambiguous qualified names appearing in abbreviated relation conditions [#701](https://github.com/OCamlPro/superbol-studio-oss/pull/701)
 - Wrong "missing PICTURE" error on group items with a `USAGE` clause [#700](https://github.com/OCamlPro/superbol-studio-oss/pull/700)
 - Wrong error on PICTURE strings like `Z(9).99`, with repeated `Z` or `*` before the decimal point [#700](https://github.com/OCamlPro/superbol-studio-oss/pull/700)
 
