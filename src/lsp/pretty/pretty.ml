@@ -65,7 +65,7 @@ let pp_set_margin ppf margin =
 
 (** Sends right margin to virtual infinity *)
 let blast_margin ppf =   (* see https://github.com/ocaml/ocaml/issues/10592 *)
-  pp_set_margin ppf max_int
+  pp_set_margin ppf 999_999_999  (* capped: OCaml 5.2+ pp_infinity = 1_000_000_001 *)
 
 (** Version of {!Format.asprintf} with virtually no right margin *)
 let to_string: ('a, string) func = fun fmt ->
