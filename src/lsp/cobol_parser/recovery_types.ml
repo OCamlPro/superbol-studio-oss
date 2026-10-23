@@ -38,7 +38,7 @@
 module type PARAMS = sig
   module Parser: MenhirLib.IncrementalEngine.EVERYTHING
 
-  val default_value: pos:Lexing.position -> 'a Parser.symbol -> 'a
+  val default_value: loc:Cobol_common.Types.srcloc -> 'a Parser.symbol -> 'a
   val token_of_terminal: 'a Parser.terminal -> 'a -> Parser.token
   val depth: int array
 

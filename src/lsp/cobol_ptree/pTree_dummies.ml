@@ -21,26 +21,26 @@ let integer_zero = "0"
 and integer_one = "1"
 and alphanum__ = "_"
 
-let dummy_string ~pos = alphanum__ &@ Cobol_common.Srcloc.raw (pos, pos)
+let dummy_string ~loc = alphanum__ &@ loc
 
-let dummy_name ~pos = dummy_string ~pos
+let dummy_name ~loc = dummy_string ~loc
 
-let dummy_name_or_literal ~pos : name_or_literal = Name (dummy_string ~pos)
+let dummy_name_or_literal ~loc : name_or_literal = Name (dummy_string ~loc)
 
-let dummy_qualname ~pos : qualname =
-  Name (dummy_name ~pos)
+let dummy_qualname ~loc : qualname =
+  Name (dummy_name ~loc)
 
-let dummy_qualname' ~pos : qualname with_loc =
-  dummy_qualname ~pos &@ Cobol_common.Srcloc.raw (pos, pos)
+let dummy_qualname' ~loc : qualname with_loc =
+  dummy_qualname ~loc &@ loc
 
-let dummy_qualident ~pos =
+let dummy_qualident ~loc =
   {
-    ident_name = dummy_qualname' ~pos;
+    ident_name = dummy_qualname' ~loc;
     ident_subscripts = [];
   }
 
-let dummy_ident ~pos =
-  QualIdent (dummy_qualident ~pos)
+let dummy_ident ~loc =
+  QualIdent (dummy_qualident ~loc)
 
 let dummy_literal =
   Integer integer_zero
@@ -60,15 +60,14 @@ let dummy_expr =
    [CondObjectOrExpr] would take part in the surrounding abbreviation, and
    report a spurious missing subject or relational operator on top of the
    syntax error that triggered the recovery. *)
-let dummy_cond ~pos =
-  let loc = Cobol_common.Srcloc.raw (pos, pos) in
+let dummy_cond ~loc =
   CondSubject (dummy_expr &@ loc,
                CondRelOp (Eq &@ loc,
                           CondObjectOrExpr (dummy_expr &@ loc) &@ loc) &@ loc)
 
-let dummy_picture ~pos =
+let dummy_picture ~loc =
   {
-    picture_string = "X" &@ Cobol_common.Srcloc.raw (pos, pos);
+    picture_string = "X" &@ loc;
     picture_locale = None;
     picture_depending = None;
   }

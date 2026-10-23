@@ -75,6 +75,7 @@ module type MANAGER = sig
   val limits: srcloc -> limit * limit
   val link_limits: limit -> limit -> unit
   val join_limits: limit * limit -> srcloc
+  val pointwise: limit -> srcloc
   val restart: ?at: limit -> unit -> unit
   val forget: file_of: limit -> unit
   val with_temporary_copy: f: ('a -> 'b) -> 'a -> 'b
@@ -131,19 +132,42 @@ let link_limits ctx left right =
   (* Replace to deal with overriding of limits during recovery/rewind. *)
   HLnks.replace ctx.over_right_gap left right
 
-(** Returns a source location that spans between two given limits; returns a
-    valid pointwise location if the two given limits are physically equal. *)
-let join_limits: manager -> limit * limit -> srcloc = fun ctx (s, e) ->
-  let pointwise l =          (* pointwise: ensure this is not a virtual limit *)
+(** [pointwise ctx l] builds a source location that starts and ends at [l].
+
+    May return {!Cobol_common.Srcloc.dummy} in case the given limit is invalid
+    (i.e, [l] does not result from a call to [limits ctx loc], for some
+    [loc]). *)
+let pointwise ctx l =
+  try
     let pos =
       if Limit.is_virtual l then
-        let s = HLnks.find ctx.over_right_gap l in
-        let loc, _ = HLnks.find ctx.right_of s in
-        Cobol_common.Srcloc.start_pos loc
+        match HLnks.find_opt ctx.over_right_gap l with
+        | Some left ->
+            let loc, _ = HLnks.find ctx.right_of left in
+            Cobol_common.Srcloc.start_pos loc
+        | None ->
+            let loc, _ = HLnks.find ctx.right_of l in
+            Cobol_common.Srcloc.start_pos loc
       else l
     in
     Cobol_common.Srcloc.raw (pos, pos)
-  in
+  with Not_found ->
+    Pretty.error "@[<2>%a:@ Internal@ warning:@ unable@ to@ build@ a@ proper@ \
+                  pointwise@ location@ in@ `%s.pointwise`@ [ctx=%s]@]@."
+      Cobol_common.Srcloc.pp_lexpos l
+      __MODULE__ ctx.id;
+    (* Printexc.(print_raw_backtrace Stdlib.stderr @@ get_callstack 30); *)
+    Cobol_common.Srcloc.dummy
+
+(** [join_limits ctx (s, e)] returns a source location that spans between the
+    two given limits [s] and [e]; returns a valid pointwise location if [s] and
+    [e] are physically equal.
+
+    May print a warning on [stderr] and return {!Cobol_common.Srcloc.dummy} in
+    case [s] does not precede [e] (in the sense that there was no chain of
+    alternating calls to {!limits} and {!link_limits}) that start from [s] and
+    end in [e]) *)
+let join_limits: manager -> limit * limit -> srcloc = fun ctx (s, e) ->
   let try_limits (s, e: limit * limit) =
 
     let rec proceed_from ?loc s =         (* start search from left limit [s] *)
@@ -172,7 +196,7 @@ let join_limits: manager -> limit * limit -> srcloc = fun ctx (s, e) ->
     in
 
     if Limit.equal s e
-    then pointwise s
+    then pointwise ctx s
     else try_cache_from s
   in
   let join_failure (s, e) =
@@ -182,7 +206,7 @@ let join_limits: manager -> limit * limit -> srcloc = fun ctx (s, e) ->
       Cobol_common.Srcloc.pp_lexpos e
       __MODULE__ ctx.id;
     (* Printexc.(print_raw_backtrace Stdlib.stderr @@ get_callstack 30); *)
-    Cobol_common.Srcloc.raw (e, e)
+    Cobol_common.Srcloc.dummy
   in
   try   (* first attempt assumes proper token limits: `s` is a left and `e` is a
            right of tokens *)
@@ -253,6 +277,7 @@ module New_manager (Id: sig val name: string end) () : MANAGER = struct
   let limits = limits ctx
   let link_limits = link_limits ctx
   let join_limits = join_limits ctx
+  let pointwise = pointwise ctx
   let restart ?at () = restart ?at ctx
   let forget ~file_of = forget ~file_of ctx
   let with_temporary_copy = with_temporary_copy ctx

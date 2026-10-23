@@ -121,8 +121,9 @@ struct
             let env = Parser.force_reduction prod env in
             env, Reduce (prod, Some env) :: visited, assumed
         | S (N _ as sym) ->
+            let loc = Grammar_utils.Overlay_manager.pointwise endp in
             let env' =
-              Parser.feed sym endp (Recovery.default_value ~pos:endp sym) endp env
+              Parser.feed sym endp (Recovery.default_value ~loc sym) endp env
             in
             (* Here, we assume that a symbol that shows as an empty string
                denotes a non-terminal that may be empty and is therefore a
@@ -130,7 +131,8 @@ struct
             env', Shift (env, env') :: visited,
             { insertion = Symbol (Parser.X sym); pos = endp } :: assumed
         | S (T t as sym) ->
-            let v = Recovery.default_value ~pos:endp sym in
+            let loc = Grammar_utils.Overlay_manager.pointwise endp in
+            let v = Recovery.default_value ~loc sym in
             let token = Recovery.token_of_terminal t v in
             match feed_token (token, endp, endp) visited env with
             | `Fail ->

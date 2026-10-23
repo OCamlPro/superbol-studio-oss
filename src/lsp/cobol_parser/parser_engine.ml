@@ -283,7 +283,7 @@ let report_syntax_hints_n_error ps
       | [], _ ->                                 (* nothing relevant to report *)
           ps
       | insertions, raw_pos ->
-          let loc = Overlay_manager.join_limits (raw_pos, raw_pos) in
+          let loc = Overlay_manager.pointwise raw_pos in
           add_diag ps Hint ~loc (Missing_tokens insertions)
     end ps (List.rev hints)
   in

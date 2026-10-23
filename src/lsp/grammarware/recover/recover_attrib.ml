@@ -43,7 +43,7 @@ module Make (G : Cmly_api.GRAMMAR) : S with module G = G = struct
         List.exists
           (fun attr ->
              Attribute.(has_label "recovery" attr ||
-                        has_label "recovery_with_pos" attr)) (prj attrs)
+                        has_label "recovery_with_loc" attr)) (prj attrs)
         || has_default
       then cost_of_attributes prj attrs
       else infinity
@@ -83,8 +83,8 @@ module Make (G : Cmly_api.GRAMMAR) : S with module G = G = struct
     match List.find (Attribute.has_label "recovery") attrs with
     | attr -> Attribute.payload attr
     | exception Not_found ->
-      match List.find (Attribute.has_label "recovery_with_pos") attrs with
-      | attr -> Attribute.payload attr ^ " ~pos"
+      match List.find (Attribute.has_label "recovery_with_loc") attrs with
+      | attr -> Attribute.payload attr ^ " ~loc"
       | exception Not_found -> fallback
 
   let default_terminal t =

@@ -40,10 +40,21 @@ module type MANAGER = sig
       after [t]). *)
   val link_limits: limit -> limit -> unit
 
-  (** [join_limits (start_limit, end_limit)] returns a source location that
-      spans from [start_limit] to [end_limit].  [start_limit] must have been
-      built (via {!limits}) {i before} [end_limit]. *)
+  (** [join_limits (s, e)] returns a source location that spans between the two
+      given limits [s] and [e]; returns a valid pointwise location if [s] and
+      [e] are physically equal.
+
+      May print a warning on [stderr] and return {!Cobol_common.Srcloc.dummy} in
+      case [s] does not precede [e] (in the sense that there was no chain of
+      alternating calls to {!limits} and {!link_limits}) that start from [s] and
+      end in [e]) *)
   val join_limits: limit * limit -> Cobol_common.Srcloc.srcloc
+
+  (** [pointwise l] builds a source location that starts and ends at [l].
+
+      May return {!Cobol_common.Srcloc.dummy} in case the given limit is invalid
+      (i.e, [l] does not result from a call to [limits loc], for some [loc]). *)
+  val pointwise: limit -> Cobol_common.Srcloc.srcloc
 
   (** [restart ?at ()] instructs the manager that the limits that are {e
       strictly at the right of} [at] are now outdated and should not be relied

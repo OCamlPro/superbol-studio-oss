@@ -27,8 +27,11 @@ let split_last l =
 let srcloc location_limits =
   Grammar_utils.Overlay_manager.join_limits location_limits
 
+let pointwise pos =
+  Grammar_utils.Overlay_manager.pointwise pos
+
 let with_loc token location_limits =
-  token &@ Grammar_utils.Overlay_manager.join_limits location_limits
+  token &@ srcloc location_limits
 
 let dual_handler_none =
   { dual_handler_pos = []; dual_handler_neg = [] }
@@ -282,10 +285,12 @@ let simple_program :=
     edo = ro(loc(environment_division));
     ddo = ro(loc(non_empty_data_division));
     pd = loc(program_procedure_division);
-    { { control_division = None;
-        compilation_units =
-          [ with_loc (build_simple_program opo edo ddo pd ~pos:$symbolstartpos) $sloc ];
-      } }
+    {
+      let loc = pointwise $symbolstartpos in
+      let prog = build_simple_program opo edo ddo pd ~loc in
+      { control_division = None;
+        compilation_units = [ with_loc prog $sloc ] }
+    }
 
 (* --- CONTROL DIVISION --- *)
 
@@ -1612,7 +1617,7 @@ let blank_when_zero_clause := BLANK; WHEN?; ZERO
 let justified_clause := JUSTIFIED; RIGHT?
 
 let picture_clause
-      [@recovery_with_pos dummy_picture]
+      [@recovery_with_loc dummy_picture]
       [@symbol "<picture clause>"] :=
   | PICTURE; IS?; picture_string = loc(picture_string);
     picture_locale = ro(picture_locale_phrase);
@@ -2291,13 +2296,13 @@ let at_eop := EOP | AT_EOP | END_OF_PAGE
 
 
 
-let name [@recovery_with_pos dummy_name] [@symbol "<word>"] :=
+let name [@recovery_with_loc dummy_name] [@symbol "<word>"] :=
  | i = loc(WORD); < >
 let names := ~ = rnel(name); < >
 
 let in_of := IN | OF
 
-let qualname_ [@recovery_with_pos dummy_qualname] [@symbol "<qualified name>"]
+let qualname_ [@recovery_with_loc dummy_qualname] [@symbol "<qualified name>"]
               [@completion QualifiedRef] :=
  | n = name; %prec lowest            {Name n: qualname}
  | n = name; in_of; qdn = qualname_; {Qual (n, qdn)}
@@ -2320,7 +2325,7 @@ let procedure_name_decl :=
  | ~ = name;                < >
  | ~ = literal_int_ident;   < >
 
-let procedure_name [@recovery_with_pos dummy_qualname'] [@symbol "<procedure name>"]
+let procedure_name [@recovery_with_loc dummy_qualname'] [@symbol "<procedure name>"]
                    [@completion ProcedureRef] :=
  | loc(qualified_procedure_name)
 
@@ -2358,7 +2363,7 @@ let subscripts [@recovery []] [@symbol "<subscripts>"] [@cost 0] :=
  | "("; s = loc(subscript_first); sl = rnel(loc(subscript_following)); ")"; { s::sl }
  | "("; s = loc(subscript_first); ")";                                      { [s] }
 
-let function_name [@recovery_with_pos dummy_name] [@symbol "<function-name>"]
+let function_name [@recovery_with_loc dummy_name] [@symbol "<function-name>"]
                   [@completion FunctionName] :=
  | ~ = name;                         < >
 
@@ -2471,7 +2476,7 @@ let base_ident ==                 (* identifier without reference modification *
  | a = address;                  {Address a}
  | c = counter;                  {Counter c}
 
-let ident [@symbol "<identifier>"] [@recovery_with_pos dummy_ident] :=
+let ident [@symbol "<identifier>"] [@recovery_with_loc dummy_ident] :=
   | i = base_ident; %prec below_RPAR { UPCAST.base_ident_with_refmod i }
   | i = loc(base_ident); r = refmod; { RefMod (i, r) }
 
@@ -2486,7 +2491,7 @@ let scalar_ident_ ==        (* scalar identifier without reference modification 
  | a = address;                  {Address a}
  | c = counter;                  {Counter c}
 
-let scalar_ident [@symbol "<scalar identifier>"] [@recovery_with_pos dummy_ident] :=
+let scalar_ident [@symbol "<scalar identifier>"] [@recovery_with_loc dummy_ident] :=
   | i = scalar_ident_; %prec below_RPAR { i }
   | i = loc(scalar_ident_); r = refmod; { ScalarRefMod (i, r) }
 
@@ -2498,7 +2503,7 @@ let length_of_expr :=
 
 let ident_or_literal
       [@symbol "<identifier or literal>"] [@cost 0]
-      [@recovery_with_pos (fun ~pos -> Cobol_ptree.UPCAST.ident_with_literal @@ dummy_ident ~pos)] :=
+      [@recovery_with_loc (fun ~loc -> Cobol_ptree.UPCAST.ident_with_literal @@ dummy_ident ~loc)] :=
   | i = ident; %prec lowest { UPCAST.ident_with_literal i }
   | l = literal;            { UPCAST.literal_with_ident l }
 
@@ -2818,7 +2823,7 @@ let arithmetic_term_no_length :=
 let condition :=
  | ~ = loc(cond); <>
 
-let cond [@symbol "<condition>"] [@recovery_with_pos dummy_cond] :=
+let cond [@symbol "<condition>"] [@recovery_with_loc dummy_cond] :=
  | ~ = loc(relop); ~ = loc(cond_object_atom);      <CondRelOp>
  | ~ = class_or_sign_condition;                    <>
  | n = ibo(NOT); c = loc(cond_after_optional_not); { neg_condition ~neg:n c }
