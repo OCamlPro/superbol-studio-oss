@@ -18,7 +18,7 @@ module type S = sig
 
   module Make
       (CONFIG: Cobol_config.T)
-      (Overlay_manager: Src_overlay.MANAGER)
+      (Srcloc_overlay: Src_overlay.MANAGER)
     : sig
 
       (* The type of tokens. *)

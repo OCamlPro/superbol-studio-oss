@@ -19,7 +19,7 @@ open Cobol_common.Srcloc.INFIX
    long as we don't parse localized tokens using multiple instances of the
    parser and in parallel.  If that were to change, the manager would need to be
    passed as parameter to the grammar. *)
-module Overlay_manager =
+module Srcloc_overlay =
   Cobol_preproc.Src_overlay.New_manager (struct
     let name = __MODULE__
   end) ()
@@ -90,7 +90,7 @@ let build_data_division = function
 type evaluate_body =
   {
     eb_branches: evaluate_branch list;
-    eb_when_other: (srcloc list * srcloc * statements) option; 
+    eb_when_other: (srcloc list * srcloc * statements) option;
   }
 
 let evaluate_body_when_other when_other_loc stmts =
@@ -130,10 +130,10 @@ let evaluate_stmt subjects eval_body =
       | Some (_, _, when_other_stmts) -> when_other_stmts);
   }
 
-let build_simple_program opts_par env_div datat_div proc_div ~pos =
+let build_simple_program opts_par env_div datat_div proc_div ~loc =
   Program {
     program_name =
-      (Cobol_ptree.Dummies.dummy_name_or_literal ~pos) &@ Cobol_common.Srcloc.dummy;
+      (Cobol_ptree.Dummies.dummy_name_or_literal ~loc) &@ loc;
       (* TODO: Use filename *)
     program_as = None;
     program_level = ProgramDefinition {

@@ -144,8 +144,8 @@ end = struct
     fprintf ppf "module Default = struct\n";
     A.default_prelude ppf;
 
-    fprintf ppf "  let value (type a) : pos:Lexing.position -> a %s.symbol -> a =
-      fun ~pos -> function\n" menhir;
+    fprintf ppf "  let value (type a) : loc:Cobol_common.Types.srcloc -> a %s.symbol -> a =
+      fun ~loc -> function\n" menhir;
     Terminal.iter (fun t ->
         match A.default_terminal t with
         | None -> ()

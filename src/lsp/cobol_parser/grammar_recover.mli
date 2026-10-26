@@ -29,6 +29,6 @@ val can_pop : 'a Grammar.MenhirInterpreter.terminal -> bool
 val depth : int array
 val recover : int -> decision
 val default_value :
-  pos:Lexing.position
+  loc:Cobol_common.Types.srcloc
   -> 'a Grammar.MenhirInterpreter.symbol
   -> 'a
