@@ -1,7 +1,12 @@
-(tests
-  (names test_picture_parsing)
-  (modules test_picture_parsing)
-  (libraries alcotest cobol_parser cobol_data testing_utils))
+(library
+ (name test_picture_parsing)
+ (modules test_picture_parsing)
+ (preprocess
+  (pps ppx_expect))
+ (inline_tests
+  (modes best)) ; add js for testing with nodejs
+ (libraries cobol_data pretty)
+ )
 
 (library
  (name parser_testing)
