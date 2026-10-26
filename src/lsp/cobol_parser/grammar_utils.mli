@@ -13,7 +13,7 @@
 
 open Cobol_ptree
 
-module Overlay_manager: Cobol_preproc.Src_overlay.MANAGER
+module Srcloc_overlay: Cobol_preproc.Src_overlay.MANAGER
 
 type data_division_sentence =
   | S_DATA_DIVISION_HEADER of srcloc

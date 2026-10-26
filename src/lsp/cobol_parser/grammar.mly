@@ -25,10 +25,10 @@ let split_last l =
   List.(let rl = rev l in hd rl, rev (tl rl))
 
 let srcloc location_limits =
-  Grammar_utils.Overlay_manager.join_limits location_limits
+  Grammar_utils.Srcloc_overlay.join_limits location_limits
 
 let pointwise pos =
-  Grammar_utils.Overlay_manager.pointwise pos
+  Grammar_utils.Srcloc_overlay.pointwise pos
 
 let with_loc token location_limits =
   token &@ srcloc location_limits

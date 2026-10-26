@@ -23,7 +23,7 @@ module DIAGS = Parser_diagnostics
 module TOK = Grammar_tokens
 
 module Tokzr = Text_tokenizer
-module Overlay_manager = Grammar_utils.Overlay_manager
+module Srcloc_overlay = Grammar_utils.Srcloc_overlay
 module Grammar_interpr = Grammar.MenhirInterpreter
 module Grammar_recovery =
   Recovery.Make (Grammar_interpr) (struct
@@ -99,7 +99,7 @@ let make_parser
   in
   let first_pos = Cobol_preproc.position pp in
   let first_loc = Cobol_common.Srcloc.raw (first_pos, first_pos) in
-  let leftmost_limit, right = Overlay_manager.limits first_loc in
+  let leftmost_limit, right = Srcloc_overlay.limits first_loc in
   {
     prev_limit = right;
     prev_limit' = right;        (* [right], in case (unlikely to be relevant) *)
@@ -231,8 +231,8 @@ let rec next_token ({ preproc = { tokzr; _ }; _ } as ps) tokens =
       next_token ps tokens
 
 let token_n_srcloc_limits ~prev_limit token =
-  let s, e = Overlay_manager.limits ~@token in
-  Overlay_manager.link_limits prev_limit s;
+  let s, e = Srcloc_overlay.limits ~@token in
+  Srcloc_overlay.link_limits prev_limit s;
   ~&token, s, e
 
 let put_token_back ({ preproc; _ } as ps) token tokens =
@@ -283,7 +283,7 @@ let report_syntax_hints_n_error ps
       | [], _ ->                                 (* nothing relevant to report *)
           ps
       | insertions, raw_pos ->
-          let loc = Overlay_manager.pointwise raw_pos in
+          let loc = Srcloc_overlay.pointwise raw_pos in
           add_diag ps Hint ~loc (Missing_tokens insertions)
     end ps (List.rev hints)
   in
@@ -342,7 +342,7 @@ let on_reduction ps tokens prod =
 let env_loc env =
   match Grammar_interpr.top env with
   | None -> None
-  | Some (Element (_, _, s, e)) -> Some (Overlay_manager.join_limits (s, e))
+  | Some (Element (_, _, s, e)) -> Some (Srcloc_overlay.join_limits (s, e))
 
 let on_pending ?(severity = Cobol_common.Diagnostics.Warn) descr ps env =
   if List.mem `Pending ps.preproc.persist.show
@@ -578,7 +578,7 @@ and check ps token tokens env = function
 and error ps token tokens env =
   let report_invalid_syntax =
     let loc_limits = Grammar_interpr.positions env in
-    let loc = Overlay_manager.join_limits loc_limits in
+    let loc = Srcloc_overlay.join_limits loc_limits in
     fun severity ps -> add_diag ps severity ~loc Invalid_syntax
   in
   match ps.preproc.persist.recovery with
@@ -659,7 +659,7 @@ let parse_once ~options (type m) ~(memory: m memory) ~grammar_entry pp
   : (('a option, m) output) with_diags =
   let ps = make_parser options ~tokenizer_memory:memory pp in
   let res, ps = full_parse @@ first_stage ~grammar_entry ps in
-  Overlay_manager.forget ~file_of:ps.preproc.persist.leftmost_limit;
+  Srcloc_overlay.forget ~file_of:ps.preproc.persist.leftmost_limit;
   OUT.with_diags (aggregate_output ps res) (all_diags ps)
 
 (* --- *)
@@ -799,13 +799,13 @@ let rewind_n_parse
       let pp = ps.preproc.pp in
       let pp = pp_rewind ~last_pp ~new_position:event.preproc_position pp in
       let ps = { ps with preproc = { ps.preproc with pp } } in
-      Overlay_manager.restart ~at:ps.prev_limit ();
+      Srcloc_overlay.restart ~at:ps.prev_limit ();
       let ps, tokens = produce_tokens ps in
       { rwps with stage = Trans (ps, tokens, env); store }
     with Not_found ->                     (* rewinding before first checkpoint *)
       let pp = pp_rewind ~last_pp rwps.init.preproc.pp in
       let ps = { rwps.init with preproc = { rwps.init.preproc with pp } } in
-      Overlay_manager.restart ~at:ps.prev_limit ();
+      Srcloc_overlay.restart ~at:ps.prev_limit ();
       init_rewindable_parse ~grammar_entry ps
   in
   let res, rwps = parse_with_history ?stop_before_eof rwps in
@@ -861,13 +861,13 @@ let rewind_and_parse rewinder =
   rewind_n_parse ~stop_before_eof:false rewinder
 
 let forget rewinder =
-  Overlay_manager.forget
+  Srcloc_overlay.forget
     ~file_of:rewinder.rwps.init.preproc.persist.leftmost_limit
 
 (* Rewinding for inspection *)
 
 let rewind_for_inspection rewinder rewind_preproc ~position ~inspect =
-  Overlay_manager.with_temporary_copy ~f:begin fun () ->
+  Srcloc_overlay.with_temporary_copy ~f:begin fun () ->
     let { result = _, rewinder; _ } =
       rewind_n_parse rewinder ~stop_before_eof:true rewind_preproc ~position
     in

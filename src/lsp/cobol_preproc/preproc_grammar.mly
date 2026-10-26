@@ -11,7 +11,7 @@
 (**************************************************************************)
 
 %parameter <CONFIG: Cobol_config.T>
-%parameter <Overlay_manager: Src_overlay.MANAGER>
+%parameter <Srcloc_overlay: Src_overlay.MANAGER>
 %{
   open Cobol_common.Srcloc.INFIX
   module PP_UTILS = Preproc_utils.Make (CONFIG)
@@ -37,7 +37,7 @@
 (* --------------------- DEDICATED UTILITIES -------------------------------- *)
 
 let loc (X) ==
-  | x = X; { x &@ Overlay_manager.join_limits $sloc }
+  | x = X; { x &@ Srcloc_overlay.join_limits $sloc }
 
 (* --- COPY ----------------------------------------------------------------- *)
 

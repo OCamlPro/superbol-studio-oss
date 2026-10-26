@@ -19,7 +19,7 @@ open Cobol_common.Srcloc.INFIX
    long as we don't parse localized tokens using multiple instances of the
    parser and in parallel.  If that were to change, the manager would need to be
    passed as parameter to the grammar. *)
-module Overlay_manager =
+module Srcloc_overlay =
   Cobol_preproc.Src_overlay.New_manager (struct
     let name = __MODULE__
   end) ()
