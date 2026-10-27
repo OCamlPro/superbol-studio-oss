@@ -21,20 +21,18 @@ open Cobol_common.Srcloc.TYPES
 
 class ['a] folder = object
   inherit ['a] Cobol_data.Visitor.folder
-  inherit!['a] Cobol_ptree.Proc_division_visitor.folder
+  inherit! ['a] Cobol_procedure.Visitor.folder
   method fold_unit_group: (Unit_group.t, 'a) fold = default
   method fold_cobol_unit: (cobol_unit, 'a) fold = default
   method fold_cobol_unit': (cobol_unit with_loc, 'a) fold = default
   method fold_unit_config: (unit_config, 'a) fold = default
   method fold_unit_env: (unit_env, 'a) fold = default
   method fold_data_definitions: (data_definitions, 'a) fold = default
-  method fold_procedure_section: (procedure_section, 'a) fold = default
-  method fold_procedure_section': (procedure_section with_loc, 'a) fold = default
-  method fold_procedure_paragraph: (procedure_paragraph, 'a) fold = default
-  method fold_procedure_paragraph': (procedure_paragraph with_loc, 'a) fold = default
+  method fold_section: (section, 'a) fold = default
+  method fold_section': (section with_loc, 'a) fold = default
+  method fold_paragraph: (paragraph, 'a) fold = default
+  method fold_paragraph': (paragraph with_loc, 'a) fold = default
   method fold_procedure_block: (procedure_block, 'a) fold = default
-  method fold_resolved_name: 'x. ('x resolved_name, 'a) fold = default
-  (* method fold_resolved_qualname: 'x. ('x resolved_qualname, 'a) fold = default *)
   method fold_procedure_arg: (procedure_arg, 'a) fold = default
   method fold_procedure_using: (procedure_using, 'a) fold = default
   method fold_procedure_using': (procedure_using with_loc, 'a) fold = default
@@ -52,48 +50,44 @@ let fold_data_definitions (v: _ #folder) =
       >> fold_list ~fold:Cobol_data.Visitor.fold_record v data_records
     end
 
-let fold_procedure_paragraph (v: _ #folder) =
-  handle v#fold_procedure_paragraph
-    ~continue:begin fun { paragraph_name; paragraph } x -> x
+let fold_paragraph (v: _ #folder) =
+  handle v#fold_paragraph
+    ~continue:begin fun { paragraph_name; paragraph_sentences } x -> x
       >> Cobol_ptree.Terms_visitor.fold_procedure_name'_opt v paragraph_name
-      >> Cobol_ptree.Proc_division_visitor.fold_paragraph' v paragraph
+      >> fold_list ~fold:Cobol_procedure.Visitor.fold_statements' v paragraph_sentences
     end
 
-let fold_procedure_paragraph' (v: _ #folder) =
-  handle' v#fold_procedure_paragraph' ~fold:fold_procedure_paragraph v
+let fold_paragraph' (v: _ #folder) =
+  handle' v#fold_paragraph' ~fold:fold_paragraph v
 
-let fold_procedure_section (v: _ #folder) =
-  handle v#fold_procedure_section
-    ~continue:begin fun { section_name; section_paragraphs } x -> x
-      >> Cobol_ptree.Terms_visitor.fold_procedure_name'_opt v 
-          (Option.map (fun sn -> 
-            Cobol_ptree.{ payload = Name sn; loc = sn.loc }) section_name)
-      >> fold_list v section_paragraphs.list ~fold:fold_procedure_paragraph'
+let fold_section (v: _ #folder) =
+  handle v#fold_section
+    ~continue:begin fun { section_name; section_segment;
+                          section_paragraphs } x -> x
+      >> Cobol_ptree.Terms_visitor.fold_procedure_name'_opt v
+        (Option.map (fun sn ->
+             Cobol_ptree.{ payload = Name sn; loc = sn.loc }) section_name)
+      >> fold_option ~fold:Cobol_procedure.Visitor.fold_integer_value v
+        section_segment
+      >> fold_list v section_paragraphs.list ~fold:fold_paragraph'
     end
 
-let fold_procedure_section' (v: _ #folder) =
-  handle' v#fold_procedure_section' ~fold:fold_procedure_section v
+let fold_section' (v: _ #folder) =
+  handle' v#fold_section' ~fold:fold_section v
 
 let fold_procedure_block (v: _ #folder) =
   handle v#fold_procedure_block
     ~continue:begin function
-      | Paragraph p -> fold_procedure_paragraph' v p
-      | Section s -> fold_procedure_section' v s
-    end
-
-let fold_resolved_name ~fold (v: _ #folder) =
-  handle v#fold_resolved_name
-    ~continue:begin fun { resolved_name; resolved } x -> x
-      >> fold_string' v resolved_name
-      >> fold v resolved
+      | Paragraph p -> fold_paragraph' v p
+      | Section s -> fold_section' v s
     end
 
 let fold_procedure_arg (v: _ #folder) =
   handle v#fold_procedure_arg
-    ~continue:begin fun { arg_data_definition; arg_passing_style } x ->
+    ~continue:begin fun { arg_name_ref; arg_passing_style } x ->
       ignore arg_passing_style;
       x
-      >> fold_resolved_name v ~fold:(fun _ _ -> Fun.id) arg_data_definition
+      >> Cobol_procedure.Visitor.fold_resolved_name v arg_name_ref
     end
 
 let fold_procedure_using (v: _ #folder) =
@@ -107,7 +101,7 @@ let fold_procedure (v: _ #folder) =
   handle v#fold_procedure                                     (* skip `named` *)
     ~continue:begin fun { procedure_sections; procedure_using; _ } x -> x
       >> fold_option ~fold:fold_procedure_using' v procedure_using
-      >> fold_list v ~fold:fold_procedure_section' procedure_sections
+      >> fold_list v ~fold:fold_section' procedure_sections
     end
 
 let fold_unit_env (v: _ #folder) =

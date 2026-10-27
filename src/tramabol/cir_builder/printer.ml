@@ -73,6 +73,8 @@ let register_printers () =
   end;
 
   register_unsupported_stuff_printer begin fun ppf -> function
+    | Base_ident i ->
+        Pretty.print ppf "identifier@ %a" Cobol_procedure.Printer.pp_base_ident i
     | Condition _ ->
         Pretty.print ppf "condition"
     | Dynamic_table ->
@@ -81,12 +83,12 @@ let register_printers () =
         Pretty.print ppf "span@ of@ dynamic-capacity@ table"
     | Expression _ ->
         Pretty.print ppf "expression"
+    | Scalar s ->
+        Pretty.print ppf "operand@ %a" Cobol_procedure.Printer.pp_scalar s
     | Statement _ ->
         Pretty.print ppf "statement"
     | Subscript s ->
-        Pretty.print ppf "subscript@ %a" Cobol_ptree.pp_subscript ~&s
-    | Term t ->
-        Pretty.print ppf "term@ %a" Cobol_ptree.pp_term t
+        Pretty.print ppf "subscript@ %a" Cobol_procedure.Printer.pp_subscript ~&s
     | Variable_length_field ->
         Pretty.print ppf "variable-length field"
     | _ ->

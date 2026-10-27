@@ -75,10 +75,10 @@ let fold_alphabet_specification (v: _ #folder) =
 
 let fold_rounded ~fold (v: _ #folder) =
   (* handle v#fold_rounded *)
-  (*   ~continue: *) begin fun { rounded; rounded_rounding } x -> x
-      >> fold v rounded
-      >> fold_rounding v rounded_rounding
-    end
+  (*   ~continue: *)
+  (fun { rounded; rounded_rounding } x -> x
+    >> fold v rounded
+    >> fold_rounding v rounded_rounding)
 
 let fold_rounded_ident (v: _ #folder) =
   handle v#fold_rounded_ident
@@ -98,7 +98,7 @@ let fold_basic_arithmetic_operands (v: _ #folder) =
           >> fold_scalar v base_operand
           >> fold_rounded_idents v targets
       | ArithCorresponding { source; target } -> x
-          >> fold_qualname v source
+          >> fold_qualname' v source
           >> fold_rounded_ident v target
     end
 
@@ -252,14 +252,14 @@ let fold_start_position (v: _#folder) =
       | StartPositionLast -> x
       | StartPositionKey { operator; name; length } -> x
           >> fold_relop v operator
-          >> fold_qualname v name
+          >> fold_qualname' v name
           >> fold_option ~fold:fold_expression v length
     end
 
 let fold_write_target (v: _ #folder) =
   handle v#fold_write_target
     ~continue:begin function
-      | WriteTargetName qn -> fold_qualname v qn
+      | WriteTargetName qn -> fold_qualname' v qn
       | WriteTargetFile name' -> fold_name' v name'
     end
 

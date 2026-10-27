@@ -389,3 +389,7 @@ dir = "src/tramabol/cir_builder"
 dir = "src/tramabol/cir_logic"
 # edit 'src/tramabol/cir_logic/package.toml' for package-specific options
 
+[[package]]
+dir = "src/lsp/cobol_procedure"
+# edit 'src/lsp/cobol_procedure/package.toml' for package-specific options
+

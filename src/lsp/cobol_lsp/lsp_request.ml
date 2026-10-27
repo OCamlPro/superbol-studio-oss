@@ -216,7 +216,7 @@ let handle_find_procedure registry params =
         Lsp_lookup.proc_at_pos ~filename pos checked_doc.group in
       let proc = match proc_name, cu with
         | Some qn, _ -> Pretty.to_string "%a" Cobol_ptree.pp_qualname qn
-                        |> Str.global_replace (Str.regexp "\n") " "
+            |> Str.global_replace (Str.regexp "\n") " "
         | _ -> raise Not_found in
       Some (`String proc)
     end |>
@@ -261,7 +261,7 @@ let find_cu_data_definition Lsp_position.{ location_of; location_of_srcloc }
 let find_cu_proc_definition
     Lsp_position.{ location_of; _ }
     ?(allow_notifications = true)
-    ?(enclosing_section: Cobol_unit.Types.procedure_section option)
+    ?(enclosing_section: Cobol_unit.Types.section option)
     (qn: Cobol_ptree.qualname) (cu: Cobol_unit.Types.cobol_unit) =
   match Cobol_unit.Procedure.find ?enclosing_section qn cu.unit_procedure with
   | Paragraph { payload = { paragraph_name = Some qn; _ }; _ }
@@ -461,8 +461,8 @@ let to_textedits ( ops : Cobol_indent.Types.edit_space_operation list ) =
       :: ops
       when line1 = line2 && spaces1 < 0 && spaces2 < 0 &&
            char2 = char1 - spaces1 ->
-      let ops = { op with spaces = spaces1 + spaces2 } :: ops in
-      iter ops ~lnum ~delta rev
+        let ops = { op with spaces = spaces1 + spaces2 } :: ops in
+        iter ops ~lnum ~delta rev
 
     (* two consecutive insertions *)
     | { line = line1 ; char = char1 ; spaces = spaces1 } as op
@@ -470,29 +470,29 @@ let to_textedits ( ops : Cobol_indent.Types.edit_space_operation list ) =
       :: ops
       when line1 = line2 && spaces1 > 0 && spaces2 > 0 &&
            char2 = char1 + spaces1 ->
-      let ops = { op with spaces = spaces1 + spaces2 } :: ops in
-      iter ops ~lnum ~delta rev
+        let ops = { op with spaces = spaces1 + spaces2 } :: ops in
+        iter ops ~lnum ~delta rev
 
     | { line ; char ; spaces } :: ops ->
 
-      let line = line - 1 in
-      let delta = if line = lnum then delta else 0 in
-      let char = char + delta in
-      let start = Position.create ~line ~character:char in
-      if spaces > 0 then
-        (* add spaces *)
-        let range = Range.create ~start ~end_:start in
-        let edit = TextEdit.create ~newText:(String.make spaces ' ') ~range in
-        let delta = delta + spaces in
-        iter ops ~lnum ~delta ( edit :: rev )
-      else
-        (* delete spaces *)
-        let spaces = -spaces in
-        let end_ = Position.create ~line ~character:(char + spaces) in
-        let range = Range.create ~start ~end_ in
-        let edit = TextEdit.create ~newText:"" ~range in
-        let delta = delta - spaces in
-        iter ops ~lnum:line ~delta ( edit :: rev )
+        let line = line - 1 in
+        let delta = if line = lnum then delta else 0 in
+        let char = char + delta in
+        let start = Position.create ~line ~character:char in
+        if spaces > 0 then
+          (* add spaces *)
+          let range = Range.create ~start ~end_:start in
+          let edit = TextEdit.create ~newText:(String.make spaces ' ') ~range in
+          let delta = delta + spaces in
+          iter ops ~lnum ~delta ( edit :: rev )
+        else
+          (* delete spaces *)
+          let spaces = -spaces in
+          let end_ = Position.create ~line ~character:(char + spaces) in
+          let range = Range.create ~start ~end_ in
+          let edit = TextEdit.create ~newText:"" ~range in
+          let delta = delta - spaces in
+          iter ops ~lnum:line ~delta ( edit :: rev )
 
   in
   iter ops [] ~lnum:0 ~delta:0
@@ -719,8 +719,8 @@ let describe_data_definition_for_element_at_pos
                        pp_documentation)
           else match Pretty.to_string "@[<v>%a@]\
                                       " pp_data_memory_info data_def with
-            | "" -> None
-            | memory_info -> Some memory_info
+          | "" -> None
+          | memory_info -> Some memory_info
         in
         Some (text, hover_loc)
       with Not_found ->

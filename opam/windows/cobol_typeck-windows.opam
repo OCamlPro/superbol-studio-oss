@@ -53,6 +53,7 @@ depends: [
   "dune" {>= "3.17.0"}
   "cobol_unit-windows" {= version}
   "cobol_ptree-windows" {= version}
+  "cobol_procedure-windows" {= version}
   "cobol_parser-windows" {= version}
   "cobol_data-windows" {= version}
   "cobol_config-windows" {= version}

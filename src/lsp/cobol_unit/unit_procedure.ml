@@ -16,7 +16,7 @@
 open Unit_types
 
 let rec find
-    ?(enclosing_section: procedure_section option)
+    ?(enclosing_section: section option)
     (procedure_name: Cobol_ptree.procedure_name)
     (procedure: procedure)
   : procedure_block =
@@ -29,7 +29,7 @@ let rec find
       with Not_found -> find procedure_name procedure
 
 let rec full_qn
-    ?(enclosing_section: procedure_section option)
+    ?(enclosing_section: section option)
     (procedure_name: Cobol_ptree.procedure_name)
     (procedure: procedure)
   =

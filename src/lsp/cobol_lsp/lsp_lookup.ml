@@ -41,7 +41,7 @@ module TYPES = struct
     | Proc_name of
         {
           qn: Cobol_ptree.qualname;
-          enclosing_section: Cobol_unit.Types.procedure_section option;
+          enclosing_section: Cobol_unit.Types.section option;
         }
     | Preproc_or_compilation_variable_ref of
         {
@@ -155,7 +155,7 @@ type acc =
   }
 and context =
   | Data_decls
-  | Procedure of Cobol_unit.Types.procedure_section option
+  | Procedure of Cobol_unit.Types.section option
 
 let init =
   {
@@ -202,7 +202,7 @@ let ptree_element_at_position ~filename pos group =
 
     method! fold_data_definitions _ = enter_context Data_decls
     method! fold_procedure _ = enter_context (Procedure None)
-    method! fold_procedure_section s = enter_context (Procedure (Some s))
+    method! fold_section s = enter_context (Procedure (Some s))
 
     method! fold_field_definition' def acc =
       Visitor.do_children @@ match ~&def.field_qualname with
@@ -308,7 +308,9 @@ let copy_at_pos ~filename pos ptree =
               Visitor.do_children None
   end ptree None
 
-let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info list =
+(* Note: works on the parse tree, as it relies on the traversal following the
+   order of the source (unlike expanded conditions in the typed tree). *)
+let type_at_pos ~filename (pos: Lsp.Types.Position.t) ptree : approx_typing_info list =
   let open Cobol_common.Visitor in
   let open Cobol_ptree.Visitor in
   let open struct
@@ -331,14 +333,15 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
     let (@>@) ctx fold =
       [ctx] @>>@ fold
   end in
-  Cobol_unit.Visitor.fold_unit_group
+  Cobol_ptree.Visitor.fold_compilation_group
     object (v)
-      inherit [acc] Cobol_unit.Visitor.folder
+      inherit [acc] Cobol_ptree.Visitor.folder
 
-      method! fold_cobol_unit cu acc =
-        acc
-        |> Cobol_unit.Visitor.fold_procedure v cu.unit_procedure
-        |> skip
+      (* only look into PROCEDURE DIVISIONs *)
+      method! fold_informational_paragraphs _ = skip
+      method! fold_options_paragraph' _ = skip
+      method! fold_environment_division _ = skip
+      method! fold_data_division' _ = skip
 
       method! fold' { loc; _ } acc =
         if acc.after_pos
@@ -358,28 +361,28 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
       method! fold_basic_arithmetic_operands o acc =
         begin match o with
           | ArithSimple { operands; targets } ->
-            acc
-            |> Numeric @>@ fold_list ~fold:fold_scalar v operands
-            |> Numeric @>@ fold_rounded_idents v targets
+              acc
+              |> Numeric @>@ fold_list ~fold:fold_scalar v operands
+              |> Numeric @>@ fold_rounded_idents v targets
           | ArithGiving { leading_operands; base_operand; targets } ->
-            acc
-            |> Numeric @>@ fold_list ~fold:fold_scalar v leading_operands
-            |> Numeric @>@ fold_scalar v base_operand
-            |> [Numeric; NumericEdited] @>>@ fold_rounded_idents v targets
+              acc
+              |> Numeric @>@ fold_list ~fold:fold_scalar v leading_operands
+              |> Numeric @>@ fold_scalar v base_operand
+              |> [Numeric; NumericEdited] @>>@ fold_rounded_idents v targets
           | ArithCorresponding { source; target } ->
-            acc
-            |> Group   @>@ fold_qualname v source
-            |> Group   @>@ fold_rounded_ident v target
+              acc
+              |> Group   @>@ fold_qualname' v source
+              |> Group   @>@ fold_rounded_ident v target
         end
         |> skip
 
       method! fold_allocate_kind k acc =
         begin match k with
           | AllocateDataItem n ->
-            acc
-            |> Any (* linkage level 01 or 77 *) @>@ fold_name' v n
+              acc
+              |> Any (* linkage level 01 or 77 *) @>@ fold_name' v n
           | AllocateCharacters e ->
-            acc |> Any @>@ fold_expression v e
+              acc |> Any @>@ fold_expression v e
         end
         |> skip
 
@@ -392,12 +395,12 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
       method! fold_call_target p acc =
         begin match p with
           | CallGeneral i ->
-            acc
-            |> Alphanum (* +procedure_pointer *) @>@ fold_ident_or_strlit v i
+              acc
+              |> Alphanum (* +procedure_pointer *) @>@ fold_ident_or_strlit v i
           | CallProto { called; prototype } ->
-            acc
-            |> fold_option ~fold:fold_ident_or_strlit v called
-            |> fold_call_proto v prototype
+              acc
+              |> fold_option ~fold:fold_ident_or_strlit v called
+              |> fold_call_proto v prototype
         end
         |> skip
 
@@ -417,23 +420,23 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
       method! fold_divide_operands dop acc =
         begin match dop with
           | DivideInto i ->
-            acc
-            |> Numeric @>@ fold_scalar v i.divisor
-            |> Numeric @>@ fold_rounded_idents v i.dividends
+              acc
+              |> Numeric @>@ fold_scalar v i.divisor
+              |> Numeric @>@ fold_rounded_idents v i.dividends
           | DivideGiving g ->
-            acc
-            |> Numeric @>@ fold_scalar v g.divisor
-            |> Numeric @>@ fold_scalar v g.dividend
-            |> [Numeric; NumericEdited] @>>@ fold_rounded_idents v g.giving
-            |> [Numeric; NumericEdited] @>>@ fold_option ~fold:fold_ident v g.remainder
+              acc
+              |> Numeric @>@ fold_scalar v g.divisor
+              |> Numeric @>@ fold_scalar v g.dividend
+              |> [Numeric; NumericEdited] @>>@ fold_rounded_idents v g.giving
+              |> [Numeric; NumericEdited] @>>@ fold_option ~fold:fold_ident v g.remainder
         end |> skip
 
       method! fold_entry_by_clause clause acc =
         begin match clause with
           | EntryByReference l ->
-            acc |> Any (* linkage lvl 01 77*) @>@ fold_name'_list v l
+              acc |> Any (* linkage lvl 01 77*) @>@ fold_name'_list v l
           | EntryByValue l ->
-            acc |> fold_name'_list v l
+              acc |> fold_name'_list v l
         end
         |> skip
 
@@ -446,11 +449,11 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
         begin match g with
           | GoToSimple _ -> acc
           | GoToDepending { depending_on; _ } ->
-            acc
-            |> Numeric (* int *) @>@ fold_ident v depending_on
+              acc
+              |> Numeric (* int *) @>@ fold_ident v depending_on
           | GoToEntry { depending_on; _ } ->
-            acc
-            |> Numeric (* int *) @>@ fold_option ~fold:fold_ident v depending_on
+              acc
+              |> Numeric (* int *) @>@ fold_option ~fold:fold_ident v depending_on
         end
         |> skip
 
@@ -477,9 +480,9 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
       method! fold_move' { payload = m; _ } acc =
         begin match m with
           | MoveCorresponding { from; to_ } ->
-            acc
-            |> Group @>@ fold_ident v from
-            |> Group @>@ fold_list ~fold:fold_ident v to_
+              acc
+              |> Group @>@ fold_ident v from
+              |> Group @>@ fold_list ~fold:fold_ident v to_
           | _ -> acc
         end
         |> skip
@@ -487,25 +490,25 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
       method! fold_multiply_operands mo acc =
         begin match mo with
           | MultiplyBy b ->
-            acc
-            |> Numeric @>@ fold_scalar v b.multiplier
-            |> Numeric @>@ fold_rounded_idents v b.multiplicand
+              acc
+              |> Numeric @>@ fold_scalar v b.multiplier
+              |> Numeric @>@ fold_rounded_idents v b.multiplicand
           | MultiplyGiving g ->
-            acc
-            |> Numeric @>@ fold_scalar v g.multiplier
-            |> Numeric @>@ fold_scalar v g.multiplicand
-            |> [Numeric; NumericEdited] @>>@ fold_rounded_idents v g.targets
+              acc
+              |> Numeric @>@ fold_scalar v g.multiplier
+              |> Numeric @>@ fold_scalar v g.multiplicand
+              |> [Numeric; NumericEdited] @>>@ fold_rounded_idents v g.targets
         end
         |> skip
 
       method! fold_perform_mode pm acc =
         begin match pm with
           | PerformNTimes i ->
-            acc |> Numeric @>@ fold_ident_or_intlit v i
+              acc |> Numeric @>@ fold_ident_or_intlit v i
           | PerformVarying pv ->
-            acc
-            |> fold_varying_phrase' v pv.varying
-            |> fold_list ~fold:fold_varying_phrase' v pv.after
+              acc
+              |> fold_varying_phrase' v pv.varying
+              |> fold_list ~fold:fold_varying_phrase' v pv.after
           | _ -> acc
         end
         |> skip
@@ -527,7 +530,7 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
 
       method! fold_search' { payload = s; _ } acc =
         acc
-        |> fold_qualname v s.search_item
+        |> fold_qualname' v s.search_item
         |> fold_handler v s.search_at_end
         |> [Numeric; Index] @>>@ fold_option ~fold:fold_ident v s.search_varying
         |> fold_list ~fold:fold_search_when_clause' v s.search_when_clauses
@@ -566,7 +569,7 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
         |> Numeric  @>@ fold_option ~fold:fold_ident v t.unstring_target_count
         |> skip
 
-    end group init |> result
+    end ptree init |> result
 
 let proc_at_pos ~filename (pos: Lsp.Types.Position.t) group : procedure_at_position =
   let open Cobol_common.Visitor in
@@ -577,19 +580,19 @@ let proc_at_pos ~filename (pos: Lsp.Types.Position.t) group : procedure_at_posit
     method! fold_cobol_unit cu acc =
       do_children { acc with cu = Some cu }
 
-    method! fold_procedure_section { section_name; _ } acc =
+    method! fold_section { section_name; _ } acc =
       let proc_name =
         Option.map (fun sn -> Cobol_ptree.Name sn) section_name in
       do_children { acc with proc_name }
 
-    method! fold_procedure_paragraph { paragraph_name; _ } ({ cu; _ } as acc) =
+    method! fold_paragraph { paragraph_name; _ } ({ cu; _ } as acc) =
       (* Anonymous paragraphs keep the name of their enclosing section *)
       match cu, paragraph_name with
       | Some cu, Some qn ->
-        let proc_name =
-          Some (Cobol_unit.Resolver_map.find_binding
-                  ~&qn cu.unit_procedure.procedure_blocks).full_qn in
-        skip { acc with proc_name }
+          let proc_name =
+            Some (Cobol_unit.Resolver_map.find_binding
+                    ~&qn cu.unit_procedure.procedure_blocks).full_qn in
+          skip { acc with proc_name }
       | _ -> skip acc
 
   end group { cu = None; proc_name = None }

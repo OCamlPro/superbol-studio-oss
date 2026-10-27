@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-7a7e6c08f331ef49155dd2867d9e1a3b:.
+bfaf31ba7e158366e9747d4b77fbb5b8:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -20,7 +20,7 @@ version:0.9.0
 
 # begin context for Makefile
 # file Makefile
-c04a1707d6c567ecffee7d3a39fb9cbf:Makefile
+9ab710aa87ad830c612f9178ef2c030d:Makefile
 # end context for Makefile
 
 # begin context for docs/README.txt
@@ -45,7 +45,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for drom.toml
 # file drom.toml
-b5ed4eaf1e3636993571ff701ea3b882:drom.toml
+7af27ee6accc7e7a382cf4c0e9678762:drom.toml
 # end context for drom.toml
 
 # begin context for dune
@@ -58,6 +58,7 @@ b5ed4eaf1e3636993571ff701ea3b882:drom.toml
 e514bc831633f46c26f1ab0136eb34e5:dune-project
 bf6468ae827317c5792647723f46cd0f:dune-project
 8158b87c284de95b6b0736d8c75668fb:dune-project
+194a385ea6b7d262fd0f200d752d964d:dune-project
 # end context for dune-project
 
 # begin context for opam/autofonce.opam
@@ -103,6 +104,7 @@ d791c55ed1c9519832d7e3e34c8a60ea:opam/autofonce_share.opam
 # begin context for opam/cir_builder.opam
 # file opam/cir_builder.opam
 502bf3e8c4616ba7c81bf8635bb35a6a:opam/cir_builder.opam
+11a4bb7fe582f5abdafe4f0270131d74:opam/cir_builder.opam
 # end context for opam/cir_builder.opam
 
 # begin context for opam/cir_logic.opam
@@ -118,6 +120,8 @@ d791c55ed1c9519832d7e3e34c8a60ea:opam/autofonce_share.opam
 # begin context for opam/cobol_cfg.opam
 # file opam/cobol_cfg.opam
 39c373847396d1028ef61aba4a589ce7:opam/cobol_cfg.opam
+c8f0d727635b8e0577992df8a0d26d58:opam/cobol_cfg.opam
+1f254ca6911682bd49bc4f13785fa358:opam/cobol_cfg.opam
 # end context for opam/cobol_cfg.opam
 
 # begin context for opam/cobol_common.opam
@@ -156,6 +160,7 @@ f25e8ef6cc5ce5c0721da10685a46510:opam/cobol_interp.opam
 d710b102c9318bb30d7e4d94725873df:opam/cobol_lsp.opam
 a5e4ea6f43b871d3cf260ab19f68dd74:opam/cobol_lsp.opam
 a68a2748f7fd225e79a0e12fd2073f2b:opam/cobol_lsp.opam
+57b9aa62310d6e1f411627724e7dbe7d:opam/cobol_lsp.opam
 # end context for opam/cobol_lsp.opam
 
 # begin context for opam/cobol_parser.opam
@@ -168,6 +173,11 @@ a779620553ab4e69758385124e667945:opam/cobol_parser.opam
 712c61d5c0bccfc521519cc20c5bcc74:opam/cobol_preproc.opam
 # end context for opam/cobol_preproc.opam
 
+# begin context for opam/cobol_procedure.opam
+# file opam/cobol_procedure.opam
+946225cc0c370a6b56c97d1c05d16f18:opam/cobol_procedure.opam
+# end context for opam/cobol_procedure.opam
+
 # begin context for opam/cobol_ptree.opam
 # file opam/cobol_ptree.opam
 e078c611a887dd36948a903a0f14adc0:opam/cobol_ptree.opam
@@ -176,11 +186,15 @@ e078c611a887dd36948a903a0f14adc0:opam/cobol_ptree.opam
 # begin context for opam/cobol_typeck.opam
 # file opam/cobol_typeck.opam
 519b5a56488ace41dff5b3d5cd5bbe2f:opam/cobol_typeck.opam
+f2ef84bfbfc285202f5ca8868fd278b6:opam/cobol_typeck.opam
+e5a03b14d877115f35e102d43cab0e6e:opam/cobol_typeck.opam
 # end context for opam/cobol_typeck.opam
 
 # begin context for opam/cobol_unit.opam
 # file opam/cobol_unit.opam
 cd069edb4e830d96a8ebead5d8496a23:opam/cobol_unit.opam
+70768741f40c79726a5db8b001432b84:opam/cobol_unit.opam
+1fe1152637b7b77cbbce01e135ae6dab:opam/cobol_unit.opam
 # end context for opam/cobol_unit.opam
 
 # begin context for opam/ebcdic_lib.opam
@@ -594,12 +608,12 @@ a18438bf6e347bb93779045b0a7006d1:src/h2mlstubs/version.mlt
 
 # begin context for src/lsp/cobol_cfg/dune
 # file src/lsp/cobol_cfg/dune
-cfee3e13c13fa1890123d30809d7a1a3:src/lsp/cobol_cfg/dune
+ce6124d11b61557f203690f612209aaf:src/lsp/cobol_cfg/dune
 # end context for src/lsp/cobol_cfg/dune
 
 # begin context for src/lsp/cobol_cfg/package.toml
 # file src/lsp/cobol_cfg/package.toml
-28c54567764ba342be93440171ac859b:src/lsp/cobol_cfg/package.toml
+26c736be1b8f378223f0e7780c2086bc:src/lsp/cobol_cfg/package.toml
 # end context for src/lsp/cobol_cfg/package.toml
 
 # begin context for src/lsp/cobol_cfg/version.mlt
@@ -684,12 +698,12 @@ a18438bf6e347bb93779045b0a7006d1:src/lsp/cobol_indent_old/version.mlt
 
 # begin context for src/lsp/cobol_lsp/dune
 # file src/lsp/cobol_lsp/dune
-8646a5eb877e9240cc3c738be253b58f:src/lsp/cobol_lsp/dune
+4f1ddcc00a3397b52164d3cfb39f0390:src/lsp/cobol_lsp/dune
 # end context for src/lsp/cobol_lsp/dune
 
 # begin context for src/lsp/cobol_lsp/package.toml
 # file src/lsp/cobol_lsp/package.toml
-d249c168dbda7b9ded2bbe276b476701:src/lsp/cobol_lsp/package.toml
+63faa82393f1faa39a6a331fa0e44088:src/lsp/cobol_lsp/package.toml
 # end context for src/lsp/cobol_lsp/package.toml
 
 # begin context for src/lsp/cobol_lsp/version.mlt
@@ -727,6 +741,21 @@ a18438bf6e347bb93779045b0a7006d1:src/lsp/cobol_parser/version.mlt
 a18438bf6e347bb93779045b0a7006d1:src/lsp/cobol_preproc/version.mlt
 # end context for src/lsp/cobol_preproc/version.mlt
 
+# begin context for src/lsp/cobol_procedure/dune
+# file src/lsp/cobol_procedure/dune
+03a262900be65b2e0d7243296bc0c16c:src/lsp/cobol_procedure/dune
+# end context for src/lsp/cobol_procedure/dune
+
+# begin context for src/lsp/cobol_procedure/index.mld
+# file src/lsp/cobol_procedure/index.mld
+16e44838f0bc756bea695178d6390d7a:src/lsp/cobol_procedure/index.mld
+# end context for src/lsp/cobol_procedure/index.mld
+
+# begin context for src/lsp/cobol_procedure/version.mlt
+# file src/lsp/cobol_procedure/version.mlt
+a18438bf6e347bb93779045b0a7006d1:src/lsp/cobol_procedure/version.mlt
+# end context for src/lsp/cobol_procedure/version.mlt
+
 # begin context for src/lsp/cobol_ptree/dune
 # file src/lsp/cobol_ptree/dune
 8c16b85b8b250ca5809d8eac211149fc:src/lsp/cobol_ptree/dune
@@ -744,12 +773,12 @@ a18438bf6e347bb93779045b0a7006d1:src/lsp/cobol_ptree/version.mlt
 
 # begin context for src/lsp/cobol_typeck/dune
 # file src/lsp/cobol_typeck/dune
-8fbff8760a4afaa9265e7902778d9e2e:src/lsp/cobol_typeck/dune
+2fe9668cd34b35e11f6f975b83fcb93c:src/lsp/cobol_typeck/dune
 # end context for src/lsp/cobol_typeck/dune
 
 # begin context for src/lsp/cobol_typeck/package.toml
 # file src/lsp/cobol_typeck/package.toml
-a72ed41d02703292373c77acdf7e36cc:src/lsp/cobol_typeck/package.toml
+52c06a32edbf896f24827fc3eb048234:src/lsp/cobol_typeck/package.toml
 # end context for src/lsp/cobol_typeck/package.toml
 
 # begin context for src/lsp/cobol_typeck/version.mlt
@@ -759,12 +788,12 @@ a18438bf6e347bb93779045b0a7006d1:src/lsp/cobol_typeck/version.mlt
 
 # begin context for src/lsp/cobol_unit/dune
 # file src/lsp/cobol_unit/dune
-af41b915dad9926cd22ae734de26cb04:src/lsp/cobol_unit/dune
+f8c9d388cc1864aba63759f2658d3c8f:src/lsp/cobol_unit/dune
 # end context for src/lsp/cobol_unit/dune
 
 # begin context for src/lsp/cobol_unit/package.toml
 # file src/lsp/cobol_unit/package.toml
-174f4126cf53a9f9787f6266972047bf:src/lsp/cobol_unit/package.toml
+ce667a6ecddac486c55364d9b2493e0e:src/lsp/cobol_unit/package.toml
 # end context for src/lsp/cobol_unit/package.toml
 
 # begin context for src/lsp/cobol_unit/version.mlt
@@ -974,12 +1003,12 @@ af5e62e2c1d2739b4c874e8890a7783b:src/superbol-studio-oss/package.toml
 
 # begin context for src/tramabol/cir_builder/dune
 # file src/tramabol/cir_builder/dune
-fdac268b8c059b1047b60dc537055e9c:src/tramabol/cir_builder/dune
+7918c93a3be70adb9f410094bc1e8d15:src/tramabol/cir_builder/dune
 # end context for src/tramabol/cir_builder/dune
 
 # begin context for src/tramabol/cir_builder/package.toml
 # file src/tramabol/cir_builder/package.toml
-fbfecd09703eaa4240d2d37ad8b355ad:src/tramabol/cir_builder/package.toml
+40119cd78993e3999305b86280a84a24:src/tramabol/cir_builder/package.toml
 # end context for src/tramabol/cir_builder/package.toml
 
 # begin context for src/tramabol/cir_builder/version.mlt

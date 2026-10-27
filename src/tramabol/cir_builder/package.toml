@@ -56,6 +56,7 @@ skip = ["index.mld", "main.ml"]
 cir_types = "version"
 cobol_common = "version"
 cobol_data = "version"
+cobol_procedure = "version"
 cobol_unit = "version"
 pretty = "version"
 

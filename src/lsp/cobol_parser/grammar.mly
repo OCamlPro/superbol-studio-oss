@@ -2308,7 +2308,7 @@ let qualname_ [@recovery_with_loc dummy_qualname] [@symbol "<qualified name>"]
  | n = name; in_of; qdn = qualname_; {Qual (n, qdn)}
 let qualname ==
  | qn = qualname_; { Cobol_ptree.Dummies.strip_dummies_from_qualname qn }
-let qualnames := ~ = rnel(qualname); < >
+let qualnames := ~ = rnel(loc(qualname)); < >
 let reference == qualname
 
 let refmod ==
@@ -2484,7 +2484,7 @@ let idents [@symbol "<identifiers>"] [@recovery []] :=
   | ~ = rnel(ident); < >
 
 let scalar_ident_ ==        (* scalar identifier without reference modification *)
- | q = qualident;                {QualIdent q : scalar_ident_ term} (* Works for object property too *)
+ | q = qualident;                {QualIdent q : scalar_base_ident_ term} (* Works for object property too *)
  | f = function_ident;           {InlineCall f}
  | i = inline_invocation;        {InlineInvoke i}
  | r = object_ref;               {ObjectRef r} (* Includes predefined address (NULL) *)
@@ -2492,7 +2492,7 @@ let scalar_ident_ ==        (* scalar identifier without reference modification 
  | c = counter;                  {Counter c}
 
 let scalar_ident [@symbol "<scalar identifier>"] [@recovery_with_loc dummy_ident] :=
-  | i = scalar_ident_; %prec below_RPAR { i }
+  | i = scalar_ident_; %prec below_RPAR { UPCAST.scalar_base_ident_as_scalar_ident i }
   | i = loc(scalar_ident_); r = refmod; { ScalarRefMod (i, r) }
 
 (* let scalar_idents [@symbol "<scalar identifiers>"] [@recovery []] :=
@@ -3229,7 +3229,7 @@ add_statement:
                            base_operand = in_;
                            targets = irl };
            basic_arith_on_size_error = h } }
- | ADD CORRESPONDING i = qualname TO ir = rounded_ident
+ | ADD CORRESPONDING i = loc(qualname) TO ir = rounded_ident
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR) end_add
    { Add { basic_arith_operands =
              ArithCorresponding { source = i; target = ir };
@@ -3906,7 +3906,7 @@ let read_statement [@context read_stmt] :=
    io = ro(pf(INTO,ident));
    lro = ro(lock_or_retry);                                       (* +COB2002 *)
    wlo = with_lock;                                               (* +COB2002 *)
-   ko = ro(pf(KEY; IS?, qualname));
+   ko = ro(pf(KEY; IS?, loc(qualname)));
    ho = io(at_end_or_invalid_key_handler);
    oterm_(END_READ);
    { Read { read_file = i;
@@ -3947,7 +3947,7 @@ let with_data := DATA | WITH_DATA
 
 %public let unconditional_action := ~ = release_statement; < >
 let release_statement :=
- | RELEASE; i = qualname; ilo = ro(pf(FROM,ident_or_literal));
+ | RELEASE; i = loc(qualname); ilo = ro(pf(FROM,ident_or_literal));
    { Release { release_item = i; release_from = ilo } } (* Literal only in COB2002+ *)
 
 
@@ -3998,7 +3998,7 @@ let rewrite_statement :=
 
 %public let unconditional_action := ~ = search_statement; < >
 let search_statement :=
- | SEARCH; i = qualname;
+ | SEARCH; i = loc(qualname);
    io = ro(pf(VARYING,ident));
    ae = ilo(pf(at_end,imp_stmts));
    wcl = nell(loc(when_clause));
@@ -4007,7 +4007,7 @@ let search_statement :=
               search_varying = io;
               search_at_end = ae;
               search_when_clauses = wcl } }
- | SEARCH; ALL; i = qualname;
+ | SEARCH; ALL; i = loc(qualname);
    ae = ilo(pf(at_end,imp_stmts));
    WHEN; sc = search_condition; scl = ll(and_clause);
    isl = imp_stmts;
@@ -4229,7 +4229,7 @@ let start_statement :=
 let start_position ==
  | FIRST; { StartPositionFirst }
  | LAST;  { StartPositionLast }
- | KEY; ro = relop; i = qualname;
+ | KEY; ro = relop; i = loc(qualname);
    wlo = io(pf(WITH?; LENGTH,expression)); (* arith *)
    { StartPositionKey { operator = ro; name = i; length = wlo } }
 
@@ -4304,7 +4304,7 @@ let subtract_statement :=
                                 base_operand = in_;
                                 targets = irl };
                 basic_arith_on_size_error = h } }
- | SUBTRACT; CORRESPONDING; i = qualname; FROM; ir = rounded_ident;
+ | SUBTRACT; CORRESPONDING; i = loc(qualname); FROM; ir = rounded_ident;
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); end_subtract;
    { Subtract { basic_arith_operands =
                   ArithCorresponding { source = i; target = ir };
@@ -4464,7 +4464,7 @@ write_statement:
              write_error_handler = ho } }
 
 let write_target :=
- | n = qualname;   {WriteTargetName n}
+ | n = loc(qualname); {WriteTargetName n}
  | FILE; n = name; {WriteTargetFile n}
 
 

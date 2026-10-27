@@ -59,6 +59,7 @@ depends: [
   "lsp-windows" {>= "1.18" & < "1.19"}
   "jsonrpc-windows" {>= "1.15"}
   "cobol_typeck-windows" {= version}
+  "cobol_procedure-windows" {= version}
   "cobol_parser-windows" {= version}
   "cobol_indent-windows" {= version}
   "cobol_data-windows" {= version}

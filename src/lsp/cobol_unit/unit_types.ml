@@ -19,24 +19,12 @@ open Cobol_common.Srcloc.INFIX
 (* utils *)
 
 (** A type to manage sets of items in both named and ordered form.  Note that in
-    many cases anonymous elements of [list] many not belong to [named]. *)
+    many cases anonymous elements of [list] do not appear in [named]. *)
 type 'a named_n_ordered =
   {
     named: 'a Unit_resolver_map.t;
     list: 'a list;
   }
-
-type ('a, 'ref_name) resolved_reference =
-  {
-    resolved_name: 'ref_name;
-    resolved: 'a;                                  (* note: skipped in visitor *)
-  }
-
-type 'a resolved_name =
-  ('a, Cobol_ptree.name with_loc) resolved_reference
-
-type 'a resolved_qualname =
-  ('a, Cobol_ptree.qualname with_loc) resolved_reference
 
 (* config *)
 
@@ -67,53 +55,60 @@ type unit_env =
 (* data items *)
 
 (** [data_definitions] exposes two views on the items (fields and tables) in DATA DIVISION:
-   - [data_items] contains all the items with direct access by name.
-   - [data_records] is a list of record trees where each element represents
+    - [data_items] contains all the items with direct access by name.
+    - [data_records] is a list of record trees where each element represents
       a record definition (typically a level 01 or 77 data item) *)
 type data_definitions =
   {
-    data_items: Cobol_data.Types.data_definition named_n_ordered; (*
-      LATER: recheck if the list of ordered data_definition is useful here.
-      All the structure information should already be accessible trhough [data_records]. *)
+    data_items: Cobol_data.Types.data_definition named_n_ordered;
+    (* LATER: recheck if the list of ordered data_definition is useful here.
+       All the structure information should already be accessible trhough [data_records]. *)
+
     data_records: Cobol_data.Types.record list;
   }
 
 (* proc *)
 
-type procedure_paragraph =
+type paragraph =
   {
-    paragraph_name: Cobol_ptree.procedure_name with_loc option; (** 
-      [None] for the unnamed paragraph at the begining of a section.
-      [Some qn] where [qn] is fully qualified otherwise. 
-      Note that [paragraph_name] is different than [~&paragraph.paragraph_name].
-      For an unnamed paragraph at the begining of a section 
-      [~&paragraph.paragraph_name] contains the (optionnal) section name whereas
-      [paragraph_name] contains [None] to indicate that the paragraph is
-      anonymous. *)
-    paragraph: Cobol_ptree.paragraph with_loc;
+    paragraph_name: Cobol_ptree.procedure_name with_loc option;
+    (** [None] for the unnamed paragraph at the begining of a section.
+        [Some qn] where [qn] is fully qualified otherwise.
+        Note that [paragraph_name] is different than [paragraph_name] in
+        [Cobol_ptree.paragraph].
+        For an unnamed paragraph at the begining of a section
+        [Cobol_ptree.paragraph] contains the (optionnal) section name whereas
+        this [paragraph_name] contains [None] to indicate that the paragraph is
+        anonymous. *)
+
+    paragraph_sentences: Cobol_procedure.Types.statements with_loc list;
   }
 
-type procedure_section =
+type section =
   {
-    section_name: Cobol_ptree.name with_loc option; (**
-      [None] for the unnamed section at the begining of PROCEDURE DIVISION
-      For convenience when collecting references to all procedure names, 
-      [section_name] is visited as a [procedure_name with_loc option]. *)
-    section_paragraphs: procedure_paragraph with_loc named_n_ordered; (**
-      Includes an anonymous empty paragraph if the section is empty.
-      However, this list does not start with an unnamed paragraph, 
-      when the section immediatley starts with a paragraph name. *)
+    section_name: Cobol_ptree.name with_loc option;
+    (** [None] for the unnamed section at the begining of PROCEDURE DIVISION
+        For convenience when collecting references to all procedure names,
+        [section_name] is visited as a [procedure_name with_loc option]. *)
+
+    section_segment: Cobol_data.Types.integer_value option;
+    (** Optional segment priority number (obsolete in COBOL-85) *)
+
+    section_paragraphs: paragraph with_loc named_n_ordered;
+    (** Includes an anonymous empty paragraph if the section is empty.
+        However, this list does not start with an unnamed paragraph,
+        when the section immediately starts with a paragraph name. *)
   }
 
 type procedure_block =
-  | Paragraph of procedure_paragraph with_loc
-  | Section of procedure_section with_loc
+  | Paragraph of paragraph with_loc
+  | Section of section with_loc
 
 type procedure_using = procedure_arg with_loc list
 
 and procedure_arg =
   {
-    arg_data_definition: Cobol_data.Types.data_definition resolved_name;
+    arg_name_ref: Cobol_procedure.Types.data_name_ref;
     arg_passing_style: arg_passing_style;
   }
 
@@ -124,39 +119,12 @@ and arg_passing_style =
 type procedure =
   {
     procedure_using: procedure_using with_loc option; (** PROCEDURE DIVISION USING ... *)
-    procedure_sections: procedure_section with_loc list;
-    procedure_blocks: procedure_block Unit_resolver_map.t; 
+    procedure_sections: section with_loc list;
+
+    procedure_blocks: procedure_block Unit_resolver_map.t;
+    (* skipped by visitors:
+       procedure blocks are all visited in source order through [procedure_sections] *)
   }
-  
-(* For now, expanded conditions and selections are not used in the representation 
-   of statements included in Cobol_unit. They can be queried on demand for any
-   condition / selection with functions in Typeck_condition.
-   This may change in the near future. *)
-
-type expanded_cond =
-  | Expr of Cobol_ptree.expr with_loc (** expression used as a condition *)
-  | Relation of Cobol_ptree.expr with_loc * Cobol_ptree.relop * Cobol_ptree.expr with_loc  (** {v e <relop> e' v} *)
-  | ClassCond of Cobol_ptree.expr with_loc * Cobol_ptree.class_ (** class condition *)
-  | SignCond of Cobol_ptree.expr with_loc * Cobol_ptree.signz (** {v e POSITIVE/NEGATIVE/ZERO v} *)
-  | Omitted of Cobol_ptree.expr with_loc (** {v c OMITTED v} *)
-  | Not of expanded_cond with_loc (** {v NOT c v} *)
-  | Combined of expanded_cond with_loc * Cobol_ptree.logop * expanded_cond with_loc (** {v c <AND/OR> c' v} *)
-
-type expanded_selection_subject =
-  | SubjectValue of Cobol_ptree.expr with_loc
-  | SubjectCond of expanded_cond
-  | SubjectConst of bool
-
-type expanded_selection_object = 
-  | SelCond of expanded_cond
-  | SelValue of
-    {
-      negated: bool;
-      value: Cobol_ptree.expr with_loc;
-    }
-  | SelRange of Cobol_ptree.selection_range
-  | SelConst of bool
-  | SelAny
 
 (* main *)
 

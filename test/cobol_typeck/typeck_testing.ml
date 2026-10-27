@@ -61,61 +61,38 @@ let show_data ?show_whole_definitions
 
 (* --- *)
 
-open Cobol_common.Srcloc.INFIX
-
-let pp_opt pp = Fmt.(option ~none:(any "<none>") pp)
+let pp_with_loc = Cobol_common.Srcloc.pp_with_loc
 let pp_also pp = Fmt.(list ~sep:(any " ALSO ") pp)
 
-(** Shows every condition of the program along with its expansion. Mirrors
-    {!Cobol_typeck.Condition.check_procedure} so conditions are expanded exactly
-    the way the typechecker expands them. *)
+(** Shows every condition of the typed procedure tree, as expanded by the
+    typechecker. *)
 let show_expanded_conditions ?parser_options ?source_format ?filename contents =
-  Prog_typeck.typeck ?parser_options ?source_format ?filename contents |>
-  Cobol_common.Diagnostics.show_n_forget ~set_status:false ~ppf:Fmt.stdout
-    ~platform:Prog_common.platform |>
-  begin fun Cobol_typeck.Outputs.{ group; _ } ->
-    Cobol_unit.Collections.SET.iter begin fun cu ->
-      let env = ~&cu.Cobol_unit.Types.unit_data.data_items.named in
-      Cobol_unit.Visitor.fold_procedure object
-        inherit [unit] Cobol_unit.Visitor.folder
+  let Cobol_typeck.Outputs.{ group; _ } =
+    Prog_typeck.typeck ?parser_options ?source_format ?filename contents |>
+    Cobol_common.Diagnostics.show_n_forget ~set_status:false ~ppf:Fmt.stdout
+      ~platform:Prog_common.platform
+  in
+  Cobol_unit.Visitor.fold_unit_group (object
+    inherit [unit] Cobol_unit.Visitor.folder
 
-        method! fold_condition' c () =
-          Cobol_common.Visitor.skip_children @@
-          Pretty.out "@[<hv 2>%a@]@."
-            (pp_opt Cobol_unit.Printer.pp_expanded_cond')
-            (Cobol_typeck.Condition.expand_condition env c).result
+    method! fold_condition_or_error' c () =
+      Cobol_common.Visitor.skip_children @@
+      Pretty.out "@[<hv 2>%a@]@."
+        Cobol_procedure.Printer.pp_condition_or_error' c
 
-        method! fold_evaluate' eval_stmt () =
-          Cobol_common.Visitor.skip_children @@
-          let subjects =
-            List.map
-              (fun s -> (Cobol_typeck.Condition.expand_selection_subject env s).result)
-              ~&eval_stmt.eval_subjects
-          in
-          Pretty.out "@[<hv 2>SUBJECT %a@]@."
-            (pp_also (pp_opt Cobol_unit.Printer.pp_expanded_selection_subject'))
-            subjects;
-          let pp_object ppf = function
-            | None -> Fmt.string ppf "<invalid subject>"
-            | Some obj ->
-                pp_opt Cobol_unit.Printer.pp_expanded_selection_object' ppf obj
-          in
-          List.iter begin fun branch ->
-            List.iter begin fun obj_list ->
-              match
-                List.map2 begin fun subj obj ->
-                  Option.map
-                    (fun subj ->
-                      (Cobol_typeck.Condition.expand_selection_object env subj obj).result)
-                    subj
-                end subjects obj_list
-              with
-              | objects ->
-                  Pretty.out "@[<hv 2>WHEN %a@]@." (pp_also pp_object) objects
-              | exception Invalid_argument _ ->
-                  Pretty.out "WHEN <mismatching selection length>@."
-            end branch.Cobol_ptree.eval_selection
-          end ~&eval_stmt.eval_branches
-      end ~&cu.Cobol_unit.Types.unit_procedure ()
-    end group
-  end
+    method! fold_evaluate' { payload = eval_stmt; _ } () =
+      Cobol_common.Visitor.skip_children @@
+      let open Cobol_procedure.Printer in
+      Pretty.out "@[<hv 2>SUBJECT %a@]@."
+        (pp_also @@ pp_with_loc @@
+         pp_or_error ~err:"invalid subject" pp_selection_subject)
+        eval_stmt.eval_subjects;
+      List.iter (fun { Cobol_procedure.Types.eval_selection; _ } ->
+          List.iter (fun objects ->
+              Pretty.out "@[<hv 2>WHEN %a@]@."
+                (pp_also @@ pp_with_loc @@
+                 pp_or_error ~err:"invalid selection object" pp_selection_object)
+                objects
+            ) eval_selection
+        ) eval_stmt.eval_branches
+  end) group ()

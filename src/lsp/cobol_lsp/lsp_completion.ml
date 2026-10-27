@@ -53,7 +53,7 @@ let change ~(case: actual_case) = match case with
 let to_string = function
   | Cobol_ptree.Name name -> [~&name]
   | Qual (name,_) as qualname ->
-    [~&name; Pretty.to_string "%a" Cobol_ptree.pp_qualname qualname]
+      [~&name; Pretty.to_string "%a" Cobol_ptree.pp_qualname qualname]
   | _ -> []
 
 let approx_type_to_string: approx_typing_info -> string = function
@@ -143,44 +143,43 @@ type typed_qualname = {
   is_valid: bool;
 }
 
-let qualnames_proposal ~filename pos group : typed_qualname list =
-  let expected_approx_types = Lsp_lookup.type_at_pos ~filename pos group in
+let qualnames_proposal ~filename pos ~ptree group : typed_qualname list =
+  let expected_approx_types = Lsp_lookup.type_at_pos ~filename pos ptree in
   match Lsp_lookup.last_cobol_unit_before_pos ~filename pos group with
   | None -> []
   | Some cu ->
-    cu.unit_data.data_items.list
-    |> List.filter_map begin fun d ->
-      let (typ, is_group) = approx_type_of_datadef d in
-      let typ = if is_group then Group else typ in
-      Option.map (fun qn -> qn, typ, is_valid ~expected:expected_approx_types d)
-      @@ Cobol_data.Item.def_qualname d
-    end
-    |> List.rev_map begin fun (qn, typ, is_valid) ->
-      List.map (fun name -> { name; typ; is_valid; }) @@ to_string qn end
-    |> List.flatten
+      cu.unit_data.data_items.list
+      |> List.filter_map begin fun d ->
+        let (typ, is_group) = approx_type_of_datadef d in
+        let typ = if is_group then Group else typ in
+        Option.map (fun qn -> qn, typ, is_valid ~expected:expected_approx_types d)
+        @@ Cobol_data.Item.def_qualname d
+      end
+      |> List.rev_map begin fun (qn, typ, is_valid) ->
+        List.map (fun name -> { name; typ; is_valid; }) @@ to_string qn end
+      |> List.flatten
 
 let procedures_proposal ~filename pos group =
   let open Cobol_unit.Types in
   match Lsp_lookup.last_cobol_unit_before_pos ~filename pos group with
   | None -> []
   | Some cu ->
-    cu.unit_procedure.procedure_sections
-    |> List.rev_map (fun section ->
-        let paragraph_names = 
-          List.map (fun paragraph ->
-              match ~&paragraph with
-              | { paragraph_name = Some { payload = qn; _ }; 
-                  paragraph = { payload = { paragraph_is_section = false; _ }; _ } } ->
-                  List.map (fun s -> "Paragraph", s) @@ to_string qn
-              | _ -> [])
-            ~&section.section_paragraphs.list |>
+      cu.unit_procedure.procedure_sections
+      |> List.rev_map (fun section ->
+          let paragraph_names =
+            List.map (fun paragraph ->
+                match ~&paragraph with
+                | { paragraph_name = Some { payload = qn; _ }; _ } ->
+                    List.map (fun s -> "Paragraph", s) @@ to_string qn
+                | _ -> [])
+              ~&section.section_paragraphs.list |>
             List.flatten
-        in
-        match ~&section.section_name with
+          in
+          match ~&section.section_name with
           | Some sn -> ("Section", ~&sn) :: paragraph_names
           | None -> paragraph_names
-    )
-    |> List.flatten
+        )
+      |> List.flatten
 
 let all_intrinsic_function_name =
   List.map fst Cobol_parser.Keywords.intrinsic_functions
@@ -236,41 +235,41 @@ let string_of_K tokens =
     let rec inner ?(space_before=true) = function
       | [] -> ()
       | Cobol_parser.Tokens.PERIOD::tl ->
-        Fmt.string ppf ".\n"; inner tl
+          Fmt.string ppf ".\n"; inner tl
       | token::tl ->
-        if space_before then Fmt.sp ppf ();
-        Cobol_parser.Tokens.pp ppf token;
-        inner tl
+          if space_before then Fmt.sp ppf ();
+          Cobol_parser.Tokens.pp ppf token;
+          inner tl
     in
     inner ~space_before:false
   in
   Pretty.to_string "%a" pp (Basics.NEL.to_list tokens)
 
-let map_completion_items ~(range:Range.t) ~case ~group ~filename comp_entries =
+let map_completion_items ~(range:Range.t) ~case ~ptree ~group ~filename comp_entries =
   let pos = range.end_ in
   List.flatten @@ EzList.tail_map (function
       | Expect.Completion_entry.QualifiedRef ->
-        qualnames_proposal ~filename pos group
-        |> List.rev_map begin fun { name; typ; is_valid } ->
-          let typ = approx_type_to_string typ in
-          completion_item_create
-            ~priority_sort:(if is_valid then p_high else p_low)
-            ~detail:(if is_valid then typ else typ ^ " (unexpected here)")
-            ~kind:Variable ~range ~case name
-        end
+          qualnames_proposal ~filename pos ~ptree group
+          |> List.rev_map begin fun { name; typ; is_valid } ->
+            let typ = approx_type_to_string typ in
+            completion_item_create
+              ~priority_sort:(if is_valid then p_high else p_low)
+              ~detail:(if is_valid then typ else typ ^ " (unexpected here)")
+              ~kind:Variable ~range ~case name
+          end
       | ProcedureRef ->
-        procedures_proposal ~filename pos group
-        |> List.rev_map begin fun (typ, name) ->
-          completion_item_create
-            ~detail:typ
-            ~priority_sort:p_highest
-            ~kind:Function ~range ~case name
-        end
+          procedures_proposal ~filename pos group
+          |> List.rev_map begin fun (typ, name) ->
+            completion_item_create
+              ~detail:typ
+              ~priority_sort:p_highest
+              ~kind:Function ~range ~case name
+          end
       | FunctionName ->
-        all_intrinsic_function_name
-        |> List.rev_map (completion_item_create
-                           ~detail:"Intrinsic"
-                           ~kind:Function ~range ~case)
+          all_intrinsic_function_name
+          |> List.rev_map (completion_item_create
+                             ~detail:"Intrinsic"
+                             ~kind:Function ~range ~case)
       | K tokens -> begin
           try [ completion_item_create ~kind:Keyword ~range ~case @@
                 string_of_K tokens ]
@@ -314,7 +313,7 @@ let config ?(eager=true) ?(case=Auto) () =
     case;
   }
 
-let contextual ~config (doc: Lsp_document.t) Cobol_typeck.Outputs.{ group; _ }
+let contextual ~config (doc: Lsp_document.t) Cobol_typeck.Outputs.{ ptree; group; _ }
     (pos: Position.t)
   =
   let filename = Lsp.Uri.to_path (Lsp.Text_document.documentUri doc.textdoc) in
@@ -325,7 +324,7 @@ let contextual ~config (doc: Lsp_document.t) Cobol_typeck.Outputs.{ group; _ }
       ~f:begin function
         | Env env ->
             let items =
-              map_completion_items ~range ~case ~group ~filename @@
+              map_completion_items ~range ~case ~ptree ~group ~filename @@
               expected_tokens ~eager:config.eager env
             in
             items, range.start.character == range.end_.character

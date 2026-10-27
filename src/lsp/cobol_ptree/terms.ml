@@ -50,11 +50,12 @@ type inline_invoke_ = [ `InlineInvoke ]
 type length_of_ = [ `LengthOf ]
 type arith_value_ = length_of_                             (* may be expanded *)
 type refmod_scalar_ident_ = [ `RefmodScalarIdent ]
-type scalar_ident_ = [qualident_|address_|counter_|inline_call_|inline_invoke_|
-                      object_ref_|refmod_scalar_ident_]
-type base_ident_ = [scalar_ident_|object_view_]
+type scalar_base_ident_ = [qualident_|address_|counter_|inline_call_|
+                           inline_invoke_|object_ref_]
+type scalar_ident_ = [scalar_base_ident_|refmod_scalar_ident_]
+type base_ident_ = [scalar_base_ident_|object_view_]
 type refmod_ident_ = [ `RefmodIdent ]
-type ident_ = [base_ident_|refmod_ident_]
+type ident_ = [base_ident_|refmod_ident_|refmod_scalar_ident_]
 type qualname_ = [name_|qual_]
 type num_ = [int_|fixed_|float_]
 type nonnum_ = [alnum_|national_|bool_]
@@ -195,6 +196,43 @@ let show_intrinsic_name i =
 let pp_intrinsic_name ppf i =
   Pretty.string ppf (show_intrinsic_name i)
 
+type binop =
+  | BPlus
+  | BMinus
+  | BMul
+  | BDiv
+  | BPow
+  | BAnd
+  | BOr
+  | BXor
+[@@deriving ord]
+
+type unop =
+  | UPlus
+  | UMinus
+  | UNot
+[@@deriving ord]
+
+type logop =
+  | LAnd
+  | LOr
+[@@deriving ord]
+
+type relop =
+  | Gt
+  | Lt
+  | Eq
+  | Ne
+  | Ge
+  | Le
+[@@deriving ord]
+
+type counter_kind =
+  | LineageCounter
+  | PageCounter
+  | LineCounter
+[@@deriving ord]
+
 (** Now comes the type of all/most terms *)
 type _ term =
   | Alphanum: alphanum -> [>alnum_] term
@@ -219,7 +257,7 @@ type _ term =
   | ObjectRef: object_ref -> [>object_ref_] term (* Includes predefined address (NULL) *)
   | QualIdent: qualident -> [>qualident_] term  (* Includes subscripts *)
   | RefMod: base_ident_ term with_loc * refmod -> [>refmod_ident_] term (* Reference modification *)
-  | ScalarRefMod: scalar_ident_ term with_loc * refmod -> [>refmod_scalar_ident_] term
+  | ScalarRefMod: scalar_base_ident_ term with_loc * refmod -> [>refmod_scalar_ident_] term
 
   | StrConcat: strlit with_loc * strlit with_loc -> [>strlit_] term
   | Concat: nonnumlit with_loc * nonnumlit with_loc -> [>nonnum_] term
@@ -274,21 +312,6 @@ and strlit_or_intlit = [strlit_|int_] term
    corresponds to the `arith_x` rule, may make more sense.  *)
 and scalar = [scalar_ident_|refmod_ident_|lit_|arith_value_] term
 
-and binop =
-  | BPlus
-  | BMinus
-  | BMul
-  | BDiv
-  | BPow
-  | BAnd
-  | BOr
-  | BXor
-
-and unop =
-  | UPlus
-  | UMinus
-  | UNot
-
 and expr =
   | Atom of scalar
   | Unop of unop * expr with_loc
@@ -302,22 +325,10 @@ and condition =
   | CondParen of condition with_loc (** {v (c) v} *)
   | CondNot of condition with_loc
   | CondCombined (** {v c' <AND/OR> c'' v} *)
-      of condition with_loc * logop * condition with_loc
+    of condition with_loc * logop * condition with_loc
   | CondClass of class_ (** class condition *)
   | CondSign of signz (** {v POSITIVE/NEGATIVE/ZERO v} *)
   | CondOmitted (** {v OMITTED v} *)
-
-and logop =
-  | LAnd
-  | LOr
-
-and relop =
-  | Gt
-  | Lt
-  | Eq
-  | Ne
-  | Ge
-  | Le
 
 and class_ =
   | AlphabetOrClass of name with_loc
@@ -445,10 +456,6 @@ and counter =
     counter_kind: counter_kind;
     counter_name: name with_loc option;
   }
-and counter_kind =
-  | LineageCounter
-  | PageCounter
-  | LineCounter
 
 (* --- *)
 
@@ -471,7 +478,7 @@ module COMPARE = struct
           -1
       | Alphanum _, Fig _ -> 1
       | Boolean a, Boolean b ->
-          Stdlib.compare a b
+          compare_boolean a b
       | Integer a, Integer b ->
           String.compare a b
       | Integer _, Fig Zero
@@ -529,10 +536,10 @@ module COMPARE = struct
     | Atom a, Atom b ->
         compare_term a b
     | Unop(a, c), Unop(b, d) ->
-        compare_struct (Stdlib.compare a b) @@
+        compare_struct (compare_unop a b) @@
         lazy (compare_expr' c d)
     | Binop(a, c ,e), Binop(b, d, f) ->
-        compare_struct (Stdlib.compare c d) @@
+        compare_struct (compare_binop c d) @@
         lazy (compare_struct (compare_expr' a b) @@
               lazy (compare_expr' e f))
     (* take the arbitrari order Binop > Unop > Atom *)
@@ -549,49 +556,47 @@ module COMPARE = struct
 
   and compare_condition (a: condition) (b: condition): int =
     match a, b with
-      | CondSubject (x1, c1), CondSubject (x2, c2) ->
-          compare_struct (compare_expr' x1 x2) @@
-          lazy (compare_condition' c1 c2)
-      | CondSubject _, _ -> -1
-      | _, CondSubject _ -> 1
-      | CondRelOp (r1, c1), CondRelOp (r2, c2) ->
-          compare_struct (compare_relop' r1 r2) @@
-          lazy (compare_condition' c1 c2)
-      | CondRelOp _, _ -> -1
-      | _, CondRelOp _ -> 1
-      | CondObjectOrExpr x, CondObjectOrExpr y ->
-          compare_expr' x y
-      | CondObjectOrExpr _, _ -> -1
-      | _, CondObjectOrExpr _ -> 1
-      | CondParen c1, CondParen c2 ->
-          compare_condition' c1 c2
-      | CondParen _, _ -> -1
-      | _, CondParen _ -> 1
-      | CondNot c1, CondNot c2 ->
-          compare_condition' c1 c2
-      | CondNot _, _ -> -1
-      | _, CondNot _ -> 1
-      | CondCombined (x1, o1, y1), CondCombined (x2, o2, y2) ->
-          compare_struct (compare_logop o1 o2) @@
-          lazy (compare_struct (compare_condition' x1 x2) @@
-                lazy (compare_condition' y1 y2))
-      | CondCombined _, _ -> -1
-      | _, CondCombined _ -> 1
-      | CondClass c1, CondClass c2 ->
-          compare_class_ c1 c2
-      | CondClass _, _ -> -1
-      | _, CondClass _ -> 1
-      | CondSign s1, CondSign s2 ->
-          compare_signz s1 s2
-      | CondSign _, _ -> -1
-      | _, CondSign _ -> 1
-      | CondOmitted, CondOmitted -> 0
+    | CondSubject (x1, c1), CondSubject (x2, c2) ->
+        compare_struct (compare_expr' x1 x2) @@
+        lazy (compare_condition' c1 c2)
+    | CondSubject _, _ -> -1
+    | _, CondSubject _ -> 1
+    | CondRelOp (r1, c1), CondRelOp (r2, c2) ->
+        compare_struct (compare_relop' r1 r2) @@
+        lazy (compare_condition' c1 c2)
+    | CondRelOp _, _ -> -1
+    | _, CondRelOp _ -> 1
+    | CondObjectOrExpr x, CondObjectOrExpr y ->
+        compare_expr' x y
+    | CondObjectOrExpr _, _ -> -1
+    | _, CondObjectOrExpr _ -> 1
+    | CondParen c1, CondParen c2 ->
+        compare_condition' c1 c2
+    | CondParen _, _ -> -1
+    | _, CondParen _ -> 1
+    | CondNot c1, CondNot c2 ->
+        compare_condition' c1 c2
+    | CondNot _, _ -> -1
+    | _, CondNot _ -> 1
+    | CondCombined (x1, o1, y1), CondCombined (x2, o2, y2) ->
+        compare_struct (compare_logop o1 o2) @@
+        lazy (compare_struct (compare_condition' x1 x2) @@
+              lazy (compare_condition' y1 y2))
+    | CondCombined _, _ -> -1
+    | _, CondCombined _ -> 1
+    | CondClass c1, CondClass c2 ->
+        compare_class_ c1 c2
+    | CondClass _, _ -> -1
+    | _, CondClass _ -> 1
+    | CondSign s1, CondSign s2 ->
+        compare_signz s1 s2
+    | CondSign _, _ -> -1
+    | _, CondSign _ -> 1
+    | CondOmitted, CondOmitted -> 0
   and compare_condition' a b = compare_with_loc compare_condition a b
 
 
-  and compare_relop = Stdlib.compare
   and compare_relop' a b = compare_with_loc compare_relop a b
-  and compare_logop = Stdlib.compare
   and compare_class_ a b = match a, b with
     | AlphabetOrClass n1, AlphabetOrClass n2 ->
         compare_with_loc compare_name n1 n2
@@ -714,7 +719,7 @@ module COMPARE = struct
   and compare_counter
       { counter_kind = a; counter_name = c }
       { counter_kind = b; counter_name = d } =
-    compare_struct (Stdlib.compare a b) @@
+    compare_struct (compare_counter_kind a b) @@
     lazy (Option.compare (compare_with_loc compare_name) c d)
 
   and compare_ident: ident compare_fun = fun a b -> compare_term a b
@@ -920,10 +925,10 @@ module FMT = struct
   and pretty_expression = function
     | Atom a -> Unparse.Expression.atom pp_term a
     | Unop (o, e) ->
-      Unparse.Expression.unary (pretty_unop o) (pretty_expression ~&e)
+        Unparse.Expression.unary (pretty_unop o) (pretty_expression ~&e)
     | Binop (a, o, b) ->
-      Unparse.Expression.binary
-        (pretty_expression ~&a) (pretty_binop o) (pretty_expression ~&b)
+        Unparse.Expression.binary
+          (pretty_expression ~&a) (pretty_binop o) (pretty_expression ~&b)
 
   and pretty_unop = function
     | UPlus -> Unparse.Expression.prefix ~prec:4 (Fmt.const pp_unop UPlus)
@@ -1242,7 +1247,6 @@ module UPCAST = struct
     | ObjectRef _ as v -> v
     | Address _ as v -> v
     | Counter _ as v -> v
-    | ScalarRefMod _ as v -> v
   external base_ident_with_refmod: base_ident_ term -> ident = "%identity"
   external base_ident'_with_refmod': base_ident_ term with_loc -> ident with_loc = "%identity"
 
@@ -1254,8 +1258,17 @@ module UPCAST = struct
     | ObjectRef _ as v -> v
     | Address _ as v -> v
     | Counter _ as v -> v
-    | ScalarRefMod _ as v -> v
   external base_ident_as_term: base_ident_ term -> _ term = "%identity"
+
+  let scalar_base_ident_as_scalar_ident: scalar_base_ident_ term -> scalar_ident_ term = function
+    | QualIdent _ as v -> v
+    | InlineCall _ as v -> v
+    | InlineInvoke _ as v -> v
+    | ObjectRef _ as v -> v
+    | Address _ as v -> v
+    | Counter _ as v -> v
+  external scalar_base_ident_as_scalar_ident: scalar_base_ident_ term -> scalar_ident_ term = "%identity"
+  external scalar_base_ident'_as_scalar_ident': scalar_base_ident_ term with_loc -> scalar_ident_ term with_loc = "%identity"
 
   let scalar_ident_as_scalar: scalar_ident_ term -> scalar = function
     | QualIdent _ as v -> v

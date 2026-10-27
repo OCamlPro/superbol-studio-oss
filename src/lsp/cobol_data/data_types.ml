@@ -254,7 +254,7 @@ and table_definition =
     table_size: Data_memory.size;
     table_size_max: Data_memory.size; (** always scalar, modulo DYNAMIC table *)
     table_range: table_range;
-    table_init_values: Cobol_ptree.literal with_loc list;     (* list for now *)
+    table_init_values: literal_value with_loc list;           (* list for now *)
     table_redefines: Cobol_ptree.qualname with_loc option; (* same as [field_redefines] but for tables *)
     table_redefinitions: item_redefinitions;
     (** List of alternative definitions for the full table.  Note that by
