@@ -25,6 +25,7 @@ type t = {
   preproc_options: preproc_options;
   parser_options: parser_options;
   pretty_progress: 'a. 'a Pretty.proc;
+  analysis_overrides: Superbol_project.Analysis.overrides;
 }
 
 type progress_display = 
@@ -58,10 +59,44 @@ let iter_comma_separated_spec ~showable ~option_name ~f spec =
                 (list ~fopen:"" ~fsep:",@ " ~fclose:"" string)
                 (StringSet.elements unknowns))
 
+(** Departures from project configurations that are explicitly requested on the
+    command line, for commands that analyze documents within their projects. *)
+let analysis_overrides ~config ~conf ~dialect ~format ~libpath ~libexts ~env
+    ~recovery ~show : Superbol_project.Analysis.overrides =
+  let absolute dir =
+    if Ez_file.V1.EzFile.is_absolute dir then dir
+    else Ez_file.V1.EzFile.concat (Sys.getcwd ()) dir
+  in
+  (* Describes the configuration for cache keys.  The configuration file
+     itself is identified by its contents whenever it can be found as given;
+     files it includes are not accounted for, as with dialects. *)
+  let override_cobol_config =
+    match conf, dialect with
+    | "", None ->
+        None
+    | "", Some d ->
+        Some (config, "dialect:" ^ Cobol_config.DIALECT.to_string d)
+    | file, _ when Sys.file_exists file ->
+        Some (config, Pretty.to_string "conf:%s:%s" (absolute file)
+                (Digest.to_hex @@ Digest.file file))
+    | file, _ ->
+        Some (config, "conf:" ^ file)
+  in
+  {
+    override_cobol_config;
+    override_source_format = format;
+    override_libpath = List.map absolute libpath;
+    override_libexts = libexts;
+    override_env = env;
+    override_recovery = recovery;
+    override_show = show;
+  }
+
 let get () =
   let conf = ref "" in
   let dialect = ref None in
   let format = ref Cobol_config.Auto in
+  let explicit_format = ref false in
   let formats = ["free"; "Free"; "FREE";
                  "fixed"; "Fixed"; "FIXED";
                  "cobol85"; "COBOL85";
@@ -73,12 +108,17 @@ let get () =
                  "cobolx"; "Cobolx"; "CobolX"; "COBOLX";
                  "auto"; "AUTO"] in
   let libpath = ref ["."] in
+  let extra_libpath = ref [] in
   let search_path = ref [] in
   let libexts = ref Cobol_common.Copybook.copybook_extensions in
+  let extra_libexts = ref [] in
   let definitions = ref [] in
   let recovery = ref true in
+  let explicit_recovery = ref false in
   let show = ref [`Pending] in                                     (* default *)
+  let explicit_show = ref false in
   let silence spec =
+    explicit_show := true;
     iter_comma_separated_spec ~showable ~option_name:"--silence" spec
       ~f:(fun tag -> show := List.filter ((<>) tag) !show)
   in
@@ -97,6 +137,7 @@ let get () =
 
     ["source-format"],
     Arg.Symbol (formats, fun f ->
+        explicit_format := true;
         format := try Cobol_config.Options.format_of_string f with
           | Invalid_argument _ ->
               DIAGS.Now.warn Fmt.stderr
@@ -111,10 +152,13 @@ let get () =
     EZCMD.info ~docv:"VAR=VAL"
       "Define a pre-processor variable VAR, with value VAL";
 
-    ["free"], Arg.Unit (fun () -> format := SF SFFree),
+    ["free"], Arg.Unit (fun () -> explicit_format := true;
+                         format := SF SFFree),
     EZCMD.info "Shorthand for `--source-format FREE`";
 
-    ["recovery"], Arg.Set_bool recovery,
+    ["recovery"], Arg.Symbol (["true"; "false"], fun b ->
+        explicit_recovery := true;
+        recovery := bool_of_string b),
     EZCMD.info ~docv:"BOOL" @@
     Pretty.to_string "Enable/disable parser recovery after syntax errors \
                       (default: %b)" !recovery;
@@ -126,10 +170,12 @@ let get () =
         search_path := !search_path @ [s]),
     EZCMD.info ~docv:"DIR" "Add DIR to config search path";
 
-    ["I"], Arg.String (fun s -> libpath := !libpath @ [s]),
+    ["I"], Arg.String (fun s -> libpath := !libpath @ [s];
+                        extra_libpath := !extra_libpath @ [s]),
     EZCMD.info ~docv:"DIR" "Add DIR to library search path";
 
-    ["ext"], Arg.String (fun s -> libexts := !libexts @ [s]),
+    ["ext"], Arg.String (fun s -> libexts := !libexts @ [s];
+                          extra_libexts := !extra_libexts @ [s]),
     EZCMD.info ~docv:"EXT" @@
     Pretty.to_string
       "Add EXT as a filename extension for copybook resolution (default: %a)"
@@ -202,6 +248,13 @@ let get () =
       | None -> if Unix.isatty Unix.stderr then Show else Hide
       | Some p -> p
     in
+    let analysis_overrides =
+      analysis_overrides ~config ~conf:!conf ~dialect:!dialect
+        ~format:(if !explicit_format then Some !format else None)
+        ~libpath:!extra_libpath ~libexts:!extra_libexts ~env
+        ~recovery:(if !explicit_recovery then Some recovery else None)
+        ~show:(if !explicit_show then Some !show else None)
+    in
     let last_progress_msg_len = ref 0 in
     (* Pretty.error "@[Preprocessor environment:@;<1 2>@[%a@]@]@." *)
     (*   Cobol_preproc.Env.pp env; *)
@@ -212,6 +265,7 @@ let get () =
                             Cobol_common.Copybook.lookup_config !libpath
                               ~libexts:!libexts;
                           env };
+      analysis_overrides;
       parser_options = { config; recovery; verbose; show = !show;
                          exec_scanners = Superbol_preprocs.exec_scanners };
       pretty_progress = match progress_display with

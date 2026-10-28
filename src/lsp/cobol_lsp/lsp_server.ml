@@ -651,11 +651,9 @@ let on_change_workspace_folders
 let add ~doc:(DidOpenTextDocumentParams.{ textDocument = { uri; _ }; _ } as doc)
     registry =
   let add_in_project project registry =
-    let filename = Lsp.Uri.to_path uri in
     try
       match
-        Lsp_project_cache.load_document ~project ~params:registry.params
-          ~filename ~contents:doc.textDocument.text
+        Lsp_project_cache.load_document ~project ~params:registry.params ~doc
       with
       | None ->
           let doc = Lsp_document.load ~project ~params:registry.params doc in

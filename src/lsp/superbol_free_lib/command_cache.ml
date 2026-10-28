@@ -12,18 +12,13 @@
 (**************************************************************************)
 
 
-(** Inspecting and reclaiming the caches the LSP server writes. *)
+(** Inspecting, filling and reclaiming the caches the LSP server writes. *)
 
 open Ezcmd.V2
 open EZCMD.TYPES
 open Superbol_cache.Types
 
 module CACHE = Superbol_cache.Cache
-module CACHE_CONFIG = Superbol_cache.Config
-
-let cache_for rootdir =
-  Superbol_project.Cache.for_ ~rootdir
-    ~storage_location:Superbol_project.Cache.default_storage_location
 
 let size_n_unit bytes =
   let rec pick n = function
@@ -44,7 +39,7 @@ let pp_age ppf seconds =
 (* --- *)
 
 let status ~verbose dir =
-  match cache_for dir with
+  match Caching_commands.cache_for dir with
   | None -> ()
   | Some (root, cache) ->
       match CACHE.stats cache, CACHE.entries cache with
@@ -71,7 +66,7 @@ let status ~verbose dir =
           Pretty.error "Could not read the cache at %s@." root
 
 let trim ~older_than ~max_size dir =
-  match cache_for dir with
+  match Caching_commands.cache_for dir with
   | None -> ()
   | Some (root, cache) ->
       let policy =
@@ -132,3 +127,33 @@ let trim_cmd =
                          neither nothing is reclaimed but the leftovers of \
                          instances that died mid-write.  $(b,--older-than 0) \
                          empties the cache." ]]
+
+let analyze_cmd =
+  let files = ref [] and ppf = ref Fmt.stderr in
+  let common, common_args = Common_args.get () in
+  EZCMD.sub "cache analyze"
+    (fun () ->
+       Caching_commands.analyze_n_report (common ()) ~ppf:!ppf !files)
+    ~args:(common_args @
+           [ [], Arg.Anons (fun list -> files := list),
+             EZCMD.info ~docv:"FILE" "Cobol file to analyze";
+             ["stdout"], Arg.Unit (fun () -> ppf := Fmt.stdout),
+             EZCMD.info "Output errors/warnings to stdout" ])
+    ~doc:"Analyze files, reusing and filling the cache of their project"
+    ~man:[ `S "DESCRIPTION";
+           `Blocks [ `P "Preprocess, parse and typecheck each FILE as the LSP \
+                         server would, according to the configuration of the \
+                         project it belongs to, and report diagnostics.";
+                     `P "Analysis results are looked up in, or else stored into, \
+                         the cache of that project, which is shared with the LSP \
+                         server: a file analyzed by either is restored by the \
+                         other, for as long as neither the file nor anything it \
+                         depends upon (copybooks, project configuration) changes.";
+                     `P "Options such as $(b,--dialect), $(b,--conf), \
+                         $(b,--source-format), $(b,-I), $(b,--ext), $(b,-D), \
+                         $(b,--recovery) or $(b,--silence) override the project \
+                         configuration; analyses obtained with them are cached \
+                         separately, and are not shared with the LSP server.";
+                     `P "Files that appear to be copybooks are not analyzed. \
+                         With $(b,--progress log-err), tell whether each \
+                         analysis was found in the cache." ]]

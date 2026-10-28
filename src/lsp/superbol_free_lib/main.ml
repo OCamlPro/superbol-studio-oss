@@ -45,6 +45,7 @@ let public_subcommands = [
   Command_project.config_cmd;
 
   Command_cache.status_cmd;
+  Command_cache.analyze_cmd;
   Command_cache.trim_cmd;
 
   Command_util.util_detect_cycle_cmd;

@@ -17,3 +17,4 @@ module Config = Project_config
 module Layout = Project_layout
 module Diagnostics = Project_diagnostics
 module Cache = Project_cache
+module Analysis = Project_analysis

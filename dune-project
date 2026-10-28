@@ -311,13 +311,16 @@
 
  (depends
    (ocaml (>= 4.14.2))
+   (superbol_preprocs (= :version))
    (superbol_platform (= :version))
    (superbol_cache (= :version))
    (pretty (= :version))
    (ocplib_stuff (and (>= 0.4.0) (< 1.0.0)))
    (ezr_toml (= :version))
    (ez_file (and (>= 0.3.0) (< 1.0.0)))
+   (cobol_typeck (= :version))
    (cobol_preproc (= :version))
+   (cobol_parser (= :version))
    (cobol_config (= :version))
    (cobol_common (= :version))
    odoc

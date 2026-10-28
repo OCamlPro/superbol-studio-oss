@@ -15,6 +15,7 @@
 open Lsp_imports
 open Lsp_types
 
+module ANALYSIS = Superbol_project.Analysis
 module CACHE = Superbol_cache.Cache
 module CACHING = Superbol_cache.Caching
 module WITNESS = Superbol_cache.Witness
@@ -28,45 +29,29 @@ type project_index =
     project_data: Lsp_project.cached;
   }
 
-(* Code: *)
+(* --- *)
 
 let cache_for ~config ~rootdir : CACHE.t =
   config.lsp_cache_for ~rootdir:(Lsp_project.string_of_rootdir rootdir)
 
 (* --- Keys --- *)
 
-(* Everything about the project that bears on how a document is preprocessed and
-   parsed.  It takes part in every document key rather than being witnessed,
-   because settings pushed by the client never reach a file we could witness. *)
-let config_digest project =
-  let config = Lsp_project.config project in
-  match
-    Marshal.to_string
-      (Cobol_config.DIALECT.to_string @@
-       Cobol_config.dialect config.cobol_config,
-       config.source_format,
-       config.source_format_by_extension,
-       config.libpath,
-       config.libexts) []
-  with
-  | s -> Some (Digest.string s)
-  | exception Invalid_argument _ ->
-      None              (* nothing here should be functional, but if ever *)
-
 let project_key ~rootdir =
   CACHE.shallow_key ~label:"project"
     ~inputs:[Digest.string @@ Lsp_project.string_of_rootdir rootdir]
 
-(* The document's contents take part in the key, rather than being witnessed:
-   entries are published without ever replacing one another, so a document that
-   is edited has to land under a key of its own. *)
-let document_key ~project ~filename ~contents =
-  Option.map begin fun config_digest ->
-    CACHE.shallow_key ~label:"document"
-      ~inputs:[Digest.string @@ WITNESS.canonical_path filename;
-               Digest.string contents;
-               config_digest]
-  end (config_digest project)
+(* Each document has two entries: its analysis, shared with other front-ends,
+   and LSP-specific data.  Both are keyed on the same inputs, and the latter
+   depends on the former, so that any miss on the analysis entails a miss on the
+   LSP one. *)
+let document_keys ~project ~filename ~contents ~language_id =
+  let overrides = Lsp_document.analysis_overrides ~language_id in
+  match ANALYSIS.key ~overrides ~filename ~contents project,
+        ANALYSIS.inputs ~overrides ~filename ~contents project with
+  | Some analysis_key, Some inputs ->
+      Some (analysis_key, CACHE.shallow_key ~label:"lsp-document" ~inputs)
+  | _ ->
+      None
 
 (* --- Saving --- *)
 
@@ -75,16 +60,25 @@ let document_key ~project ~filename ~contents =
    from it.  Since a document is restored by reading the file, keying it on
    anything else would make it restorable in a state it was never parsed in. *)
 let store_document ~cache ~project doc =
-  let cached = Lsp_document.to_cache doc in
+  let analysis, witnesses, cached = Lsp_document.to_cache doc in
   let filename = cached.doc_cache_filename in
   let absolute = Lsp_project.absolute_path_for ~filename project in
   let contents = Lsp.Text_document.text doc.Lsp_document.textdoc in
-  match document_key ~project ~filename:absolute ~contents with
+  let language_id = Lsp_document.language_id doc in
+  match document_keys ~project ~filename:absolute ~contents ~language_id with
   | None -> None
-  | Some key ->
+  | Some (analysis_key, lsp_key) ->
+      let stored_analysis =
+        match witnesses with
+        | None -> Ok ()        (* restored from cache: not stored over again *)
+        | Some witnesses ->
+            ANALYSIS.store cache ~key:analysis_key ~label:filename ~witnesses
+              analysis
+      in
       match
-        CACHE.store cache ~key ~label:filename
-          ~witnesses:cached.doc_cache_witnesses
+        Result.bind stored_analysis @@ fun () ->
+        CACHE.store cache ~key:lsp_key ~label:filename
+          ~witnesses:[WITNESS.sub analysis_key]
           ~write_item:CACHING.write_item cached
       with
       | Ok () -> Some filename
@@ -158,25 +152,40 @@ let save ~params:{ config; _ } docs =
 
 (* --- Loading --- *)
 
-let load_document ~project ~params ~filename ~contents =
+(* The analysis entry may have been stored by another front-end, in which case
+   there is no LSP entry yet: the document is restored all the same, and the
+   LSP entry is written whenever the document is next stored. *)
+let load_document ~project ~params
+    ~doc:(Lsp.Types.DidOpenTextDocumentParams.{ textDocument; _ } as doc) =
   let Lsp_project.{ rootdir; _ } = project in
   let cache = cache_for ~config:params.config ~rootdir in
-  let absolute = Lsp_project.absolute_path_for ~filename project in
+  let filename = Lsp.Uri.to_path textDocument.uri in
   let resolve =
     Superbol_cache.Recorder.resolver ~platform:Lsp_platform.record ()
   in
-  match document_key ~project ~filename:absolute ~contents with
+  match
+    document_keys ~project ~filename ~contents:textDocument.text
+      ~language_id:textDocument.languageId
+  with
   | None ->
       None
-  | Some key ->
-      match CACHE.lookup cache ~key ~resolve ~read_item:CACHING.read_item with
-      | Ok Some cached ->
-          let doc = Lsp_document.of_cache ~project ~params ~contents cached in
+  | Some (analysis_key, lsp_key) ->
+      match ANALYSIS.lookup cache ~key:analysis_key ~resolve with
+      | Some analysis ->
+          let cached =
+            match
+              CACHE.lookup cache ~key:lsp_key ~resolve
+                ~read_item:CACHING.read_item
+            with
+            | Ok cached -> cached
+            | Error _ -> None
+          in
+          let doc = Lsp_document.of_cache ~project ~params ~doc analysis cached in
           if params.config.lsp_cache_verbose then
             Lsp_io.log_info "Successfully@ read@ document@ cache@ for@ %s"
               (Lsp.Uri.to_string @@ Lsp_document.uri doc);
           Some doc
-      | Ok None | Error _ ->
+      | None ->
           if params.config.lsp_cache_verbose then
             Lsp_io.log_info "Not@ reading@ document@ cache@ for@ %s" filename;
           None
