@@ -1922,6 +1922,67 @@ module ThemeIcon : sig
   val color : t -> ThemeColor.t option
 end
 
+module QuickInputButton : sig
+  include Js.T
+
+  val iconPath : t -> ThemeIcon.t
+
+  val tooltip : t -> string option
+
+  val create : iconPath:ThemeIcon.t -> ?tooltip:string -> unit -> t
+end
+
+module InputBox : sig
+  include Js.T
+
+  val title : t -> string option
+
+  val value : t -> string
+
+  val prompt : t -> string option
+
+  val placeholder : t -> string option
+
+  val password : t -> bool
+
+  val ignoreFocusOut : t -> bool
+
+  val validationMessage : t -> string option
+
+  val buttons : t -> QuickInputButton.t list
+
+  val set_title : t -> string -> unit
+
+  val set_value : t -> string -> unit
+
+  val set_prompt : t -> string -> unit
+
+  val set_placeholder : t -> string -> unit
+
+  val set_password : t -> bool -> unit
+
+  val set_ignoreFocusOut : t -> bool -> unit
+
+  (** [None] clears the message. *)
+  val set_validationMessage : t -> string option -> unit
+
+  val set_buttons : t -> QuickInputButton.t list -> unit
+
+  val onDidChangeValue : t -> string Event.t
+
+  val onDidAccept : t -> unit Event.t
+
+  val onDidHide : t -> unit Event.t
+
+  val onDidTriggerButton : t -> QuickInputButton.t Event.t
+
+  val show : t -> unit
+
+  val hide : t -> unit
+
+  val dispose : t -> unit
+end
+
 module TreeItem : sig
   include Js.T
 
@@ -2448,6 +2509,8 @@ module Window : sig
   val createStatusBarItem :
     ?alignment:StatusBarAlignment.t -> ?priority:int -> unit -> StatusBarItem.t
 
+  val createInputBox : unit -> InputBox.t
+
   val createTextEditorDecorationType :
      options:Ojs.t -> TextEditorDecorationType.t
 
@@ -2845,4 +2908,6 @@ module Env : sig
   val onDidChangeTelemetryEnabled : bool Event.t
 
   val asExternalUri : target:Uri.t -> Uri.t Promise.t
+
+  val openExternal : target:Uri.t -> bool Promise.t
 end
