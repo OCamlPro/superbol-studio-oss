@@ -2481,6 +2481,76 @@ module ThemeIcon = struct
     val color : t -> ThemeColor.t or_undefined [@@js.get]]
 end
 
+module QuickInputButton = struct
+  include Interface.Make ()
+
+  include
+    [%js:
+    val iconPath : t -> ThemeIcon.t [@@js.get]
+
+    val tooltip : t -> string or_undefined [@@js.get]
+
+    val create : iconPath:ThemeIcon.t -> ?tooltip:string -> unit -> t
+      [@@js.builder]]
+end
+
+module InputBox = struct
+  include Interface.Make ()
+
+  module OnDidChangeValue = Event.Make (Js.String)
+  module OnDidAccept = Event.Make (Js.Unit)
+  module OnDidHide = Event.Make (Js.Unit)
+  module OnDidTriggerButton = Event.Make (QuickInputButton)
+
+  include
+    [%js:
+    val title : t -> string or_undefined [@@js.get]
+
+    val value : t -> string [@@js.get]
+
+    val prompt : t -> string or_undefined [@@js.get]
+
+    val placeholder : t -> string or_undefined [@@js.get]
+
+    val password : t -> bool [@@js.get]
+
+    val ignoreFocusOut : t -> bool [@@js.get]
+
+    val validationMessage : t -> string or_undefined [@@js.get]
+
+    val buttons : t -> QuickInputButton.t list [@@js.get]
+
+    val set_title : t -> string -> unit [@@js.set]
+
+    val set_value : t -> string -> unit [@@js.set]
+
+    val set_prompt : t -> string -> unit [@@js.set]
+
+    val set_placeholder : t -> string -> unit [@@js.set]
+
+    val set_password : t -> bool -> unit [@@js.set]
+
+    val set_ignoreFocusOut : t -> bool -> unit [@@js.set]
+
+    val set_validationMessage : t -> string or_undefined -> unit [@@js.set]
+
+    val set_buttons : t -> QuickInputButton.t list -> unit [@@js.set]
+
+    val onDidChangeValue : t -> OnDidChangeValue.t [@@js.get]
+
+    val onDidAccept : t -> OnDidAccept.t [@@js.get]
+
+    val onDidHide : t -> OnDidHide.t [@@js.get]
+
+    val onDidTriggerButton : t -> OnDidTriggerButton.t [@@js.get]
+
+    val show : t -> unit [@@js.call]
+
+    val hide : t -> unit [@@js.call]
+
+    val dispose : t -> unit [@@js.call]]
+end
+
 module TreeItem = struct
   include Class.Make ()
 
@@ -3192,6 +3262,9 @@ module Window = struct
       -> StatusBarItem.t
       [@@js.global "__SUPERBOL__.vscode.window.createStatusBarItem"]
 
+    val createInputBox : unit -> InputBox.t
+      [@@js.global "__SUPERBOL__.vscode.window.createInputBox"]
+
     val createTextEditorDecorationType :
          options:Ojs.t
       -> TextEditorDecorationType.t
@@ -3772,5 +3845,8 @@ module Env = struct
       [@@js.global "__SUPERBOL__.vscode.env.onDidChangeTelemetryEnabled"]
 
     val asExternalUri : target:Uri.t -> Uri.t Promise.t
-      [@@js.global "__SUPERBOL__.vscode.env.asExternalUri"]]
+      [@@js.global "__SUPERBOL__.vscode.env.asExternalUri"]
+
+    val openExternal : target:Uri.t -> bool Promise.t
+      [@@js.global "__SUPERBOL__.vscode.env.openExternal"]]
 end
