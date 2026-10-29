@@ -37,6 +37,18 @@ val setTimeout : (unit -> unit) -> int -> Timeout.t
 
 val clearTimeout : Timeout.t -> unit
 
+val clearInterval : Timeout.t -> unit
+
+module Date : sig
+  include Js.T
+
+  val make : unit -> t
+
+  val now : unit -> float
+
+  val toISOString : t -> string
+end
+
 module Process : sig
   val cwd : unit -> string
 
@@ -71,6 +83,8 @@ module Buffer : sig
   val from : string -> t
 
   val concat : t list -> t
+
+  val byteLength : string -> int
 
   val append : t ref -> t -> unit
 
@@ -152,6 +166,8 @@ end
 
 module Os : sig
   val homedir : unit -> string
+
+  val release : unit -> string
 end
 
 module Fs : sig
@@ -200,6 +216,37 @@ module Net : sig
          ]
       -> unit
   end
+end
+
+module Https : sig
+  module IncomingMessage : sig
+    include Js.T
+
+    val resume : t -> unit
+
+    val on : t -> string -> (unit -> unit) -> unit
+  end
+
+  module ClientRequest : sig
+    include Js.T
+
+    val on : t -> string -> (unit -> unit) -> unit
+
+    val destroy : t -> unit
+
+    val end_ : t -> string -> unit
+  end
+
+  type request_options =
+    { host : string
+    ; path : string
+    ; method_ : string
+    ; headers : string Dict.t
+    ; timeout : int
+    }
+
+  val request :
+    request_options -> (IncomingMessage.t -> unit) -> ClientRequest.t
 end
 
 module ChildProcess : sig

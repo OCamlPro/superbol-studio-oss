@@ -3682,6 +3682,8 @@ module DebugConfigurationProviderTriggerKind = struct
 end
 
 module Debug = struct
+  module OnDidStartDebugSession = Event.Make (DebugSession)
+
   include
     [%js:
     val registerDebugConfigurationProvider:
@@ -3698,6 +3700,9 @@ module Debug = struct
       -> unit
       -> Disposable.t
          [@@js.global "__SUPERBOL__.vscode.debug.registerDebugAdapterDescriptorFactory"]
+
+    val onDidStartDebugSession : OnDidStartDebugSession.t
+      [@@js.global "__SUPERBOL__.vscode.debug.onDidStartDebugSession"]
     ]
 end
 
@@ -3724,10 +3729,41 @@ module Tasks = struct
       [@@js.global "__SUPERBOL__.vscode.tasks.fetchTasks"]]
 end
 
+module UIKind = struct
+  type t =
+    | Desktop [@js 1]
+    | Web [@js 2]
+  [@@js.enum] [@@js]
+end
+
 module Env = struct
+  module OnDidChangeTelemetryEnabled = Event.Make (Js.Bool)
+
   include
     [%js:
     val shell : unit -> string [@@js.get "__SUPERBOL__.vscode.env.shell"]
+
+    val appName : unit -> string [@@js.get "__SUPERBOL__.vscode.env.appName"]
+
+    val language : unit -> string
+      [@@js.get "__SUPERBOL__.vscode.env.language"]
+
+    val machineId : unit -> string
+      [@@js.get "__SUPERBOL__.vscode.env.machineId"]
+
+    val sessionId : unit -> string
+      [@@js.get "__SUPERBOL__.vscode.env.sessionId"]
+
+    val remoteName : unit -> string or_undefined
+      [@@js.get "__SUPERBOL__.vscode.env.remoteName"]
+
+    val uiKind : unit -> UIKind.t [@@js.get "__SUPERBOL__.vscode.env.uiKind"]
+
+    val isTelemetryEnabled : unit -> bool
+      [@@js.get "__SUPERBOL__.vscode.env.isTelemetryEnabled"]
+
+    val onDidChangeTelemetryEnabled : OnDidChangeTelemetryEnabled.t
+      [@@js.global "__SUPERBOL__.vscode.env.onDidChangeTelemetryEnabled"]
 
     val asExternalUri : target:Uri.t -> Uri.t Promise.t
       [@@js.global "__SUPERBOL__.vscode.env.asExternalUri"]]
