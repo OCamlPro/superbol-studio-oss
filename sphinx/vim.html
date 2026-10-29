@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
@@ -5,19 +7,18 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SuperBOL plugin for Vim/Neovim &mdash; superbol-studio-oss master
- (3e4b5f2
-) (2026/10/26 13:17) documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d8449d71" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=86f27845" />
+ (5807ccc
+) (2026/10/29 11:15) documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=beddf052" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=98b44b8a" />
       <link rel="stylesheet" type="text/css" href="_static/css/fixes.css" />
 
   
-  
-        <script src="_static/jquery.js?v=8dae8fb0"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=8c9e30c9"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=958b65b0"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=6380a34a"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -37,11 +38,6 @@
           <a href="index.html">
             
           </a>
-              <div class="version">
-                master
- (3e4b5f2
-)
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -179,30 +175,30 @@ your configuration:</p>
 <h2>Install for Neovim<a class="headerlink" href="#install-for-neovim" title="Link to this heading"></a></h2>
 <p>You must have <code class="code docutils literal notranslate"><span class="pre">neovim/nvim-lspconfig</span></code> installed.</p>
 <p>Add these lines to your neovim configuration:</p>
-<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;lspconfig.configs&quot;</span><span class="p">).</span><span class="n">cobol</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="n">default_config</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">cmd</span> <span class="o">=</span> <span class="p">{</span>
-      <span class="s2">&quot;opam&quot;</span><span class="p">,</span>
-      <span class="s2">&quot;exec&quot;</span><span class="p">,</span>
-      <span class="s2">&quot;--switch&quot;</span><span class="p">,</span>
-      <span class="s2">&quot;superbol-studio&quot;</span><span class="p">,</span>
-      <span class="s2">&quot;--&quot;</span><span class="p">,</span>
-      <span class="s2">&quot;superbol-free&quot;</span><span class="p">,</span>
-      <span class="s2">&quot;lsp&quot;</span><span class="p">,</span>
-      <span class="s2">&quot;--force-syntax-diagnostics&quot;</span><span class="p">,</span>
-    <span class="p">},</span>
-    <span class="n">filetypes</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;cobol&quot;</span> <span class="p">},</span>
-    <span class="n">root_dir</span> <span class="o">=</span> <span class="kr">function</span><span class="p">(</span><span class="n">startpath</span><span class="p">)</span>
-      <span class="kr">return</span> <span class="nb">require</span><span class="p">(</span><span class="s2">&quot;lspconfig&quot;</span><span class="p">).</span><span class="n">util</span><span class="p">.</span><span class="n">find_git_ancestor</span><span class="p">(</span><span class="n">startpath</span><span class="p">)</span>
-        <span class="ow">or</span> <span class="nb">require</span><span class="p">(</span><span class="s2">&quot;lspconfig&quot;</span><span class="p">).</span><span class="n">util</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">startpath</span><span class="p">)</span>
-    <span class="kr">end</span><span class="p">,</span>
-    <span class="n">settings</span> <span class="o">=</span> <span class="p">{},</span>
-  <span class="p">},</span>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;lspconfig.configs&quot;</span><span class="p">).</span><span class="nv">cobol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nv">default_config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nv">cmd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="s2">&quot;opam&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">&quot;exec&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">&quot;--switch&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">&quot;superbol-studio&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">&quot;--&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">&quot;superbol-free&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">&quot;lsp&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">&quot;--force-syntax-diagnostics&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nv">filetypes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">&quot;cobol&quot;</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="nv">root_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">startpath</span><span class="p">)</span>
+<span class="w">      </span><span class="kr">return</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;lspconfig&quot;</span><span class="p">).</span><span class="nv">util</span><span class="p">.</span><span class="nf">find_git_ancestor</span><span class="p">(</span><span class="nv">startpath</span><span class="p">)</span>
+<span class="w">        </span><span class="ow">or</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;lspconfig&quot;</span><span class="p">).</span><span class="nv">util</span><span class="p">.</span><span class="py">path</span><span class="p">.</span><span class="nf">dirname</span><span class="p">(</span><span class="nv">startpath</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">end</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">settings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">  </span><span class="p">},</span>
 <span class="p">}</span>
 
-<span class="nb">require</span><span class="p">(</span><span class="s2">&quot;lspconfig&quot;</span><span class="p">).</span><span class="n">cobol</span><span class="p">.</span><span class="n">setup</span><span class="p">({</span>
-  <span class="n">on_attach</span> <span class="o">=</span> <span class="n">my_attach_function</span><span class="p">,</span> <span class="c1">-- should be the same as your other lsp</span>
-  <span class="n">capabilities</span> <span class="o">=</span> <span class="n">my_capabilities</span><span class="p">,</span> <span class="c1">-- should be the same as other lsp</span>
+<span class="nb">require</span><span class="p">(</span><span class="s2">&quot;lspconfig&quot;</span><span class="p">).</span><span class="nv">cobol</span><span class="p">.</span><span class="nf">setup</span><span class="p">({</span>
+<span class="w">  </span><span class="nv">on_attach</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">my_attach_function</span><span class="p">,</span><span class="w"> </span><span class="c1">-- should be the same as your other lsp</span>
+<span class="w">  </span><span class="nv">capabilities</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">my_capabilities</span><span class="p">,</span><span class="w"> </span><span class="c1">-- should be the same as other lsp</span>
 <span class="p">})</span>
 </pre></div>
 </div>
