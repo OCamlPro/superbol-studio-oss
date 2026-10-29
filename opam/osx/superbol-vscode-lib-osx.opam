@@ -49,7 +49,7 @@ install: [
   ["sh" "-c" "./scripts/before.sh install '%{name}%'"]
 ]
 depends: [
-  "ocaml" {>= "4.14.0"}
+  "ocaml" {>= "4.14.2"}
   "dune" {>= "3.17.0"}
   "vscode-languageclient-js-stubs-osx" {= version}
   "vscode-js-stubs-osx" {= version}

@@ -10,7 +10,7 @@ CPPFLAGS="${CPPFLAGS:-}"
 cd "$1";
 case $(uname) in
     Linux)
-        ./build_aux/bootstrap
+        ./build_aux/bootstrap install
         mkdir -p _build
         cd _build
         ../configure --prefix="$2" \

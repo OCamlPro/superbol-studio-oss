@@ -47,7 +47,7 @@ install: [
   ["sh" "-c" "./scripts/before.sh install '%{name}%'"]
 ]
 depends: [
-  "ocaml" {>= "4.14.0"}
+  "ocaml" {>= "4.14.2"}
   "dune" {>= "3.17.0"}
   "tramabol_lib" {= version}
   "odoc" {with-doc}
