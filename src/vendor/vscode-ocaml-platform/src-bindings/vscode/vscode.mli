@@ -2500,6 +2500,12 @@ module Commands : sig
   val registerCommand :
     command:string -> callback:(args:Js.Any.t list -> unit) -> Disposable.t
 
+  (** Raw access to the [vscode.commands.registerCommand] function, e.g. for
+      instrumenting command registrations. *)
+  val registerCommandFunction : unit -> Js.Any.t
+
+  val setRegisterCommandFunction : Js.Any.t -> unit
+
   val registerTextEditorCommand :
        command:string
     -> callback:

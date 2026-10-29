@@ -3322,6 +3322,12 @@ module Commands = struct
       -> Disposable.t
       [@@js.global "__SUPERBOL__.vscode.commands.registerCommand"]
 
+    val registerCommandFunction : unit -> Js.Any.t
+      [@@js.get "__SUPERBOL__.vscode.commands.registerCommand"]
+
+    val setRegisterCommandFunction : Js.Any.t -> unit
+      [@@js.set "__SUPERBOL__.vscode.commands.registerCommand"]
+
     val registerTextEditorCommand :
          command:string
       -> callback:
