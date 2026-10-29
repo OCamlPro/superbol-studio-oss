@@ -25,40 +25,60 @@ open EzCompat                                                    (* StringMap *)
 
 (** {1 Results} *)
 
-(** Everything an analysis of a document yields, in a form that holds no
-    closure, and can therefore be cached.  On a copybook, nothing is analyzed:
-    every field but [copybook] is empty. *)
+(** What an analysis of a document yields, in a form that holds no closure,
+    and can therefore be cached.  This is enough for front-ends that report
+    diagnostics or work on typechecking outputs.  On a copybook, nothing is
+    analyzed: every field but [copybook] is empty. *)
 type t =
   {
     copybook: bool;
-    pplog: Cobol_preproc.Trace.log;
-    tokens: Cobol_parser.Outputs.tokens_with_locs;
-    comments: Cobol_preproc.Text.comments StringMap.t;
-    ignored: Cobol_common.Srcloc.lexloc list;
     checked: Cobol_typeck.Outputs.t option;
     parsing_diags: Cobol_parser.Diagnostics.ALL.t;
     typeck_diags: Cobol_typeck.Diagnostics.t;
   }
-
-(** [of_artifacts ~checked ~parsing_diags ~typeck_diags ~parsing_artifacts]
-    gathers the outputs of an analysis of a document that is not a copybook.
-    Forces the tokens (which are [lazy] in
-    {!Cobol_parser.Outputs.artifacts}). *)
-val of_artifacts
-  : checked: Cobol_typeck.Outputs.t option
-  -> parsing_diags: Cobol_parser.Diagnostics.ALL.t
-  -> typeck_diags: Cobol_typeck.Diagnostics.t
-  -> parsing_artifacts:Cobol_parser.Outputs.artifacts
-  -> t
-
-(** [artifacts t] rebuilds the parsing artifacts held in [t]. *)
-val artifacts: t -> Cobol_parser.Outputs.artifacts
 
 (** Result for a copybook. *)
 val copybook: t
 
 (** [diagnostics t] gathers all diagnostics held in [t]. *)
 val diagnostics: t -> Cobol_common.Diagnostics.Set.t
+
+(** {2 Results for the LSP} *)
+
+(** What an analysis yields, along with the parsing artifacts that are needed
+    to answer LSP requests (preprocessing log, tokens, comments, ignored
+    regions).  These are more costly to compute and to cache. *)
+type for_lsp =
+  {
+    lsp_copybook: bool;
+    lsp_pplog: Cobol_preproc.Trace.log;
+    lsp_tokens: Cobol_parser.Outputs.tokens_with_locs;
+    lsp_comments: Cobol_preproc.Text.comments StringMap.t;
+    lsp_ignored: Cobol_common.Srcloc.lexloc list;
+    lsp_checked: Cobol_typeck.Outputs.t option;
+    lsp_parsing_diags: Cobol_parser.Diagnostics.ALL.t;
+    lsp_typeck_diags: Cobol_typeck.Diagnostics.t;
+  }
+
+(** [of_artifacts_for_lsp ~checked ~parsing_diags ~typeck_diags
+    ~parsing_artifacts] gathers the outputs of an analysis of a document that
+    is not a copybook.  Forces the tokens (which are [lazy] in
+    {!Cobol_parser.Outputs.artifacts}). *)
+val of_artifacts_for_lsp
+  : checked: Cobol_typeck.Outputs.t option
+  -> parsing_diags: Cobol_parser.Diagnostics.ALL.t
+  -> typeck_diags: Cobol_typeck.Diagnostics.t
+  -> parsing_artifacts:Cobol_parser.Outputs.artifacts
+  -> for_lsp
+
+(** [artifacts a] rebuilds the parsing artifacts held in [a]. *)
+val artifacts: for_lsp -> Cobol_parser.Outputs.artifacts
+
+(** Result for the LSP for a copybook. *)
+val copybook_for_lsp: for_lsp
+
+(** [of_lsp_artifacts a] drops the artifacts of [a]. *)
+val of_lsp_artifacts: for_lsp -> t
 
 (** {1 Options} *)
 
@@ -142,6 +162,16 @@ val analyze
   -> Project.t
   -> t
 
+(** [analyze_for_lsp ~platform ?overrides ~filename ~contents project] is like
+    {!analyze}, except that parsing artifacts are collected as well. *)
+val analyze_for_lsp
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> ?overrides: overrides
+  -> filename: string
+  -> contents: string
+  -> Project.t
+  -> for_lsp
+
 (** {1 Caching} *)
 
 (** [inputs ?overrides ~filename ~contents project] are the inputs from which
@@ -169,28 +199,41 @@ val key
   -> Project.t
   -> Superbol_cache.Types.key option
 
-(** [store cache ~key ~label ~witnesses t] records [t] in [cache], for as long
-    as [witnesses] hold. *)
-val store
+(** [key_for_lsp ?overrides ~filename ~contents project] is the key under which
+    an analysis of [filename] for the LSP is cached; it is built from the same
+    {!inputs} as {!key}, but both kinds of results are stored on their own: a
+    hit on one does not require the other to be held. *)
+val key_for_lsp
+  : ?overrides: overrides
+  -> filename: string
+  -> contents: string
+  -> Project.t
+  -> Superbol_cache.Types.key option
+
+(** [store_for_lsp cache ~key ~label ~witnesses a] records [a] in [cache], for
+    as long as [witnesses] hold. *)
+val store_for_lsp
   : Superbol_cache.Cache.t
   -> key: Superbol_cache.Types.key
   -> label: string
   -> witnesses: Superbol_cache.Types.witness list
-  -> t
+  -> for_lsp
   -> (unit, Superbol_cache.Types.error) result
 
-(** [lookup cache ~key ~resolve] retrieves an analysis from [cache]; see
-    {!Superbol_cache.Cache.lookup}. *)
-val lookup
+(** [lookup_for_lsp cache ~key ~resolve] retrieves an analysis for the LSP from
+    [cache]; see {!Superbol_cache.Cache.lookup}. *)
+val lookup_for_lsp
   : Superbol_cache.Cache.t
   -> key: Superbol_cache.Types.key
   -> resolve: (Superbol_cache.Types.witness -> bool)
-  -> t option
+  -> for_lsp option
 
-(** [cached_analysis cache ~platform ?overrides ~filename ~contents project]
-    looks the analysis of [filename] up in [cache], answering witnesses from
-    [platform]; on a miss, analyzes the document, recording what [platform] is
-    asked, and stores the result.  The Boolean indicates a hit. *)
+(** [cached_analysis cache ~platform ?overrides ~filename ~contents project] is
+    the analysis of [filename]: it is obtained from the analysis for the LSP
+    held in [cache] if any, or else from a (normal) analysis, answering
+    witnesses from [platform].  On a miss on both, analyzes the document with
+    {!analyze}, recording what [platform] is asked, and stores the result (which
+    the LSP does not reuse).  The Boolean indicates a hit. *)
 val cached_analysis
   : Superbol_cache.Cache.t
   -> platform: Cobol_common.Platform.TYPES.platform
@@ -199,3 +242,17 @@ val cached_analysis
   -> contents: string
   -> Project.t
   -> t * bool
+
+(** [cached_analysis_for_lsp cache ~platform ?overrides ~filename ~contents
+    project] looks the analysis for the LSP of [filename] up in [cache],
+    answering witnesses from [platform]; on a miss, analyzes the document,
+    recording what [platform] is asked, and stores the result.  The Boolean
+    indicates a hit. *)
+val cached_analysis_for_lsp
+  : Superbol_cache.Cache.t
+  -> platform: Cobol_common.Platform.TYPES.platform
+  -> ?overrides: overrides
+  -> filename: string
+  -> contents: string
+  -> Project.t
+  -> for_lsp * bool

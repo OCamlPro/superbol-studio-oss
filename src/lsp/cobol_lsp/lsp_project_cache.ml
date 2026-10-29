@@ -40,13 +40,13 @@ let project_key ~rootdir =
   CACHE.shallow_key ~label:"project"
     ~inputs:[Digest.string @@ Lsp_project.string_of_rootdir rootdir]
 
-(* Each document has two entries: its analysis, shared with other front-ends,
-   and LSP-specific data.  Both are keyed on the same inputs, and the latter
+(* Each document has two entries: its analysis for the LSP, which other
+   front-ends may reuse, and LSP-specific data.  Both are keyed on the same inputs, and the latter
    depends on the former, so that any miss on the analysis entails a miss on the
    LSP one. *)
 let document_keys ~project ~filename ~contents ~language_id =
   let overrides = Lsp_document.analysis_overrides ~language_id in
-  match ANALYSIS.key ~overrides ~filename ~contents project,
+  match ANALYSIS.key_for_lsp ~overrides ~filename ~contents project,
         ANALYSIS.inputs ~overrides ~filename ~contents project with
   | Some analysis_key, Some inputs ->
       Some (analysis_key, CACHE.shallow_key ~label:"lsp-document" ~inputs)
@@ -72,7 +72,7 @@ let store_document ~cache ~project doc =
         match witnesses with
         | None -> Ok ()        (* restored from cache: not stored over again *)
         | Some witnesses ->
-            ANALYSIS.store cache ~key:analysis_key ~label:filename ~witnesses
+            ANALYSIS.store_for_lsp cache ~key:analysis_key ~label:filename ~witnesses
               analysis
       in
       match
@@ -170,7 +170,7 @@ let load_document ~project ~params
   | None ->
       None
   | Some (analysis_key, lsp_key) ->
-      match ANALYSIS.lookup cache ~key:analysis_key ~resolve with
+      match ANALYSIS.lookup_for_lsp cache ~key:analysis_key ~resolve with
       | Some analysis ->
           let cached =
             match

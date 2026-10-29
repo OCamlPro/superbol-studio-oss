@@ -24,42 +24,14 @@ module WITNESS = Superbol_cache.Witness
 type t =
   {
     copybook: bool;
-    pplog: Cobol_preproc.Trace.log;
-    tokens: Cobol_parser.Outputs.tokens_with_locs;
-    comments: Cobol_preproc.Text.comments StringMap.t;
-    ignored: Cobol_common.Srcloc.lexloc list;
     checked: Cobol_typeck.Outputs.t option;
     parsing_diags: Cobol_parser.Diagnostics.ALL.t;
     typeck_diags: Cobol_typeck.Diagnostics.t;
   }
 
-let of_artifacts ~checked ~parsing_diags ~typeck_diags
-    ~parsing_artifacts:Cobol_parser.Outputs.{ pplog; tokens;
-                                              rev_comments; rev_ignored } =
-  {
-    copybook = false;
-    pplog;
-    tokens = Lazy.force tokens;
-    comments = rev_comments;
-    ignored = rev_ignored;
-    checked;
-    parsing_diags;
-    typeck_diags;
-  }
-
-let artifacts { pplog; tokens; comments; ignored; _ } =
-  Cobol_parser.Outputs.{ pplog;
-                         tokens = lazy tokens;
-                         rev_comments = comments;
-                         rev_ignored = ignored }
-
 let copybook =
   {
     copybook = true;
-    pplog = Cobol_preproc.Trace.empty;
-    tokens = [];
-    comments = StringMap.empty;
-    ignored = [];
     checked = None;
     parsing_diags = Cobol_parser.Diagnostics.ALL.none;
     typeck_diags = Cobol_typeck.Diagnostics.none;
@@ -69,6 +41,61 @@ let diagnostics { parsing_diags; typeck_diags; _ } =
   DIAGS.Set.union
     (Cobol_parser.Diagnostics.ALL.translate parsing_diags)
     (Cobol_typeck.Diagnostics.translate typeck_diags)
+
+(* --- Results for the LSP --- *)
+
+type for_lsp =
+  {
+    lsp_copybook: bool;
+    lsp_pplog: Cobol_preproc.Trace.log;
+    lsp_tokens: Cobol_parser.Outputs.tokens_with_locs;
+    lsp_comments: Cobol_preproc.Text.comments StringMap.t;
+    lsp_ignored: Cobol_common.Srcloc.lexloc list;
+    lsp_checked: Cobol_typeck.Outputs.t option;
+    lsp_parsing_diags: Cobol_parser.Diagnostics.ALL.t;
+    lsp_typeck_diags: Cobol_typeck.Diagnostics.t;
+  }
+
+let of_artifacts_for_lsp ~checked ~parsing_diags ~typeck_diags
+    ~parsing_artifacts:Cobol_parser.Outputs.{ pplog; tokens;
+                                              rev_comments; rev_ignored } =
+  {
+    lsp_copybook = false;
+    lsp_pplog = pplog;
+    lsp_tokens = Lazy.force tokens;
+    lsp_comments = rev_comments;
+    lsp_ignored = rev_ignored;
+    lsp_checked = checked;
+    lsp_parsing_diags = parsing_diags;
+    lsp_typeck_diags = typeck_diags;
+  }
+
+let artifacts { lsp_pplog; lsp_tokens; lsp_comments; lsp_ignored; _ } =
+  Cobol_parser.Outputs.{ pplog = lsp_pplog;
+                         tokens = lazy lsp_tokens;
+                         rev_comments = lsp_comments;
+                         rev_ignored = lsp_ignored }
+
+let copybook_for_lsp =
+  {
+    lsp_copybook = true;
+    lsp_pplog = Cobol_preproc.Trace.empty;
+    lsp_tokens = [];
+    lsp_comments = StringMap.empty;
+    lsp_ignored = [];
+    lsp_checked = None;
+    lsp_parsing_diags = Cobol_parser.Diagnostics.ALL.none;
+    lsp_typeck_diags = Cobol_typeck.Diagnostics.none;
+  }
+
+let of_lsp_artifacts { lsp_copybook; lsp_checked;
+                 lsp_parsing_diags; lsp_typeck_diags; _ } =
+  {
+    copybook = lsp_copybook;
+    checked = lsp_checked;
+    parsing_diags = lsp_parsing_diags;
+    typeck_diags = lsp_typeck_diags;
+  }
 
 (* --- Options --- *)
 
@@ -159,8 +186,8 @@ let parser_options ?(overrides = no_overrides) project =
 let options_signature =
   "exec-scanners=superbol_preprocs;recovery=silence-benign"
 
-let parse ~platform ?overrides ~filename ~contents project =
-  Cobol_parser.parse_with_artifacts
+let parse parse_fun ~platform ?overrides ~filename ~contents project =
+  parse_fun
     ~options:(parser_options ?overrides project) @@
   Cobol_preproc.preprocessor
     ~options:(preproc_options ~platform ?overrides ~filename project) @@
@@ -188,12 +215,27 @@ let analyze ~platform ?overrides ~filename ~contents project =
   then copybook
   else
     let Cobol_parser.Outputs.{ result = parsed; diags = parsing_diags } =
-      parse ~platform ?overrides ~filename ~contents project
+      parse Cobol_parser.parse_simple
+        ~platform ?overrides ~filename ~contents project
     in
     let checked, typeck_diags =
       typecheck ?overrides ~parsing_diags project parsed
     in
-    of_artifacts ~checked:(Some checked) ~parsing_diags ~typeck_diags
+    { copybook = false; checked = Some checked; parsing_diags; typeck_diags }
+
+(* Same as [analyze], with a parse that collects artifacts. *)
+let analyze_for_lsp ~platform ?overrides ~filename ~contents project =
+  if detect_copybook ~platform ?overrides ~filename ~contents project
+  then copybook_for_lsp
+  else
+    let Cobol_parser.Outputs.{ result = parsed; diags = parsing_diags } =
+      parse Cobol_parser.parse_with_artifacts
+        ~platform ?overrides ~filename ~contents project
+    in
+    let checked, typeck_diags =
+      typecheck ?overrides ~parsing_diags project parsed
+    in
+    of_artifacts_for_lsp ~checked:(Some checked) ~parsing_diags ~typeck_diags
       ~parsing_artifacts:(Cobol_parser.artifacts parsed)
 
 (* --- Caching --- *)
@@ -233,34 +275,68 @@ let inputs ?overrides ~filename ~contents project =
      config_digest]
   end (config_digest ?overrides project)
 
+(* Both kinds of results are cached on their own, from the same inputs: neither
+   is derived from the other, which would make a hit on one require the other
+   to be held. *)
 let key ?overrides ~filename ~contents project =
   Option.map (fun inputs -> CACHE.shallow_key ~label:"analysis" ~inputs) @@
   inputs ?overrides ~filename ~contents project
 
-let store cache ~key ~label ~witnesses (t: t) =
-  CACHE.store cache ~key ~label ~witnesses ~write_item:CACHING.write_item t
+let key_for_lsp ?overrides ~filename ~contents project =
+  Option.map (fun inputs ->
+      CACHE.shallow_key ~label:"analysis-for-lsp" ~inputs) @@
+  inputs ?overrides ~filename ~contents project
 
-let lookup cache ~key ~resolve : t option =
+let store_any cache ~key ~label ~witnesses v =
+  CACHE.store cache ~key ~label ~witnesses ~write_item:CACHING.write_item v
+
+let lookup_any cache ~key ~resolve =
   match CACHE.lookup cache ~key ~resolve ~read_item:CACHING.read_item with
   | Ok result -> result
   | Error _ -> None
 
-let cached_analysis cache ~platform ?overrides ~filename ~contents project =
-  match key ?overrides ~filename ~contents project with
+let store_for_lsp cache ~key ~label ~witnesses (a: for_lsp) =
+  store_any cache ~key ~label ~witnesses a
+
+let lookup_for_lsp cache ~key ~resolve : for_lsp option =
+  lookup_any cache ~key ~resolve
+
+(* Looks [key] up, or else performs [analyze] while recording what [platform]
+   is asked, and stores the result under [key]. *)
+let lookup_or_analyze cache ~platform ~resolve ~key ~label ~analyze =
+  match lookup_any cache ~key ~resolve with
+  | Some v ->
+      v, true
   | None ->
-      analyze ~platform ?overrides ~filename ~contents project, false
-  | Some key ->
+      let recorder = RECORDER.create ~platform in
+      let v = analyze ~platform:(RECORDER.platform recorder) in
+      ignore @@
+      store_any cache ~key ~label ~witnesses:(RECORDER.witnesses recorder) v;
+      v, false
+
+let cached_analysis cache ~platform ?overrides ~filename ~contents project =
+  match key ?overrides ~filename ~contents project,
+        key_for_lsp ?overrides ~filename ~contents project with
+  | Some key, Some key_for_lsp ->
       let resolve = RECORDER.resolver ~platform () in
-      match lookup cache ~key ~resolve with
-      | Some t ->
-          t, true
-      | None ->
-          let recorder = RECORDER.create ~platform in
-          let t =
-            analyze ~platform:(RECORDER.platform recorder)
-              ?overrides ~filename ~contents project
-          in
-          let label = Project.relative_path_for ~filename project in
-          ignore @@
-          store cache ~key ~label ~witnesses:(RECORDER.witnesses recorder) t;
-          t, false
+      begin match lookup_for_lsp cache ~key:key_for_lsp ~resolve with
+        | Some a ->
+            of_lsp_artifacts a, true
+        | None ->
+            lookup_or_analyze cache ~platform ~resolve ~key
+              ~label:(Project.relative_path_for ~filename project)
+              ~analyze:(analyze ?overrides ~filename ~contents project)
+      end
+  | _ ->
+      analyze ~platform ?overrides ~filename ~contents project, false
+
+let cached_analysis_for_lsp cache ~platform ?overrides ~filename ~contents
+    project =
+  match key_for_lsp ?overrides ~filename ~contents project with
+  | None ->
+      analyze_for_lsp ~platform ?overrides ~filename ~contents project, false
+  | Some key ->
+      lookup_or_analyze cache ~platform ~key
+        ~resolve:(RECORDER.resolver ~platform ())
+        ~label:(Project.relative_path_for ~filename project)
+        ~analyze:(analyze_for_lsp ?overrides ~filename ~contents project)

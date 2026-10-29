@@ -56,7 +56,7 @@ module TYPES = struct
 
   (** Persistent representation of LSP-specific data (for caching).  The
       analysis results are cached separately, as a
-      {!Superbol_project.Analysis.t}, so that they can be shared with other
+      {!Superbol_project.Analysis.for_lsp}, so that they can be shared with other
       front-ends. *)
   type cached =
     {
@@ -262,8 +262,8 @@ let to_cache ({ project; copybook; checked; parsing_diags; typecking_diags;
                 recorder; artifacts; _ } as doc) =
   let analysis =
     if copybook
-    then ANALYSIS.copybook
-    else ANALYSIS.of_artifacts ~checked ~parsing_diags
+    then ANALYSIS.copybook_for_lsp
+    else ANALYSIS.of_artifacts_for_lsp ~checked ~parsing_diags
         ~typeck_diags:typecking_diags ~parsing_artifacts:artifacts
   in
   let witnesses =
@@ -287,7 +287,7 @@ let to_cache ({ project; copybook; checked; parsing_diags; typecking_diags;
     [analysis] was recorded against: the contents take part in the key the entry
     is stored under.  Everything {e else} the analysis depended upon is checked
     by the cache, against the witnesses it was stored with. *)
-let of_cache ~project ~params ~doc (analysis: ANALYSIS.t)
+let of_cache ~project ~params ~doc (analysis: ANALYSIS.for_lsp)
     (_: cached option) =                      (* nothing to restore from it yet *)
   let textdoc =
     Lsp.Text_document.make doc ~position_encoding:params.position_encoding
@@ -295,12 +295,12 @@ let of_cache ~project ~params ~doc (analysis: ANALYSIS.t)
   {
     project;
     textdoc;
-    copybook = analysis.copybook;
+    copybook = analysis.lsp_copybook;
     artifacts = ANALYSIS.artifacts analysis;
     rewinder = None;
-    parsing_diags = analysis.parsing_diags;
-    typecking_diags = analysis.typeck_diags;
-    checked = analysis.checked;
+    parsing_diags = analysis.lsp_parsing_diags;
+    typecking_diags = analysis.lsp_typeck_diags;
+    checked = analysis.lsp_checked;
     recorder = None;
   }
 

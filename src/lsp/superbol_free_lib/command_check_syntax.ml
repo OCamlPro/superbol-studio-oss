@@ -36,7 +36,8 @@ let cmd =
     "check syntax"          (* add the corresponding line in Main.subcommands *)
     begin fun () ->
       if !in_project
-      then Caching_commands.analyze_n_report (common ()) ~ppf:!ppf !files
+      then Caching_commands.analyze_n_report (common ()) ~for_lsp:false
+             ~ppf:!ppf !files
       else action (common ()) ~ppf:!ppf !files
     end
     ~args:(common_args @ [
@@ -62,7 +63,10 @@ let cmd =
             according to the configuration of the project it belongs to (which \
             options given on the command line override), with typechecking, and \
             leaving out files that appear to be copybooks. Results are looked up \
-            in, or else stored into, the cache of that project, shared with the \
-            LSP server and $(b,superbol cache analyze).";
+            in the cache of that project, which also holds those of the LSP \
+            server and $(b,superbol cache analyze).  On a miss, results are \
+            stored into the cache without the artifacts the LSP server needs, \
+            so they are not reused by the latter (use $(b,superbol cache \
+            analyze) to fill the cache for the LSP server).";
       ];
     ]

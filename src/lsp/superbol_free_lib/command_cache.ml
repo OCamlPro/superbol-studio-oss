@@ -133,7 +133,8 @@ let analyze_cmd =
   let common, common_args = Common_args.get () in
   EZCMD.sub "cache analyze"
     (fun () ->
-       Caching_commands.analyze_n_report (common ()) ~ppf:!ppf !files)
+       Caching_commands.analyze_n_report (common ()) ~for_lsp:true
+         ~ppf:!ppf !files)
     ~args:(common_args @
            [ [], Arg.Anons (fun list -> files := list),
              EZCMD.info ~docv:"FILE" "Cobol file to analyze";

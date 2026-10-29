@@ -245,18 +245,24 @@ let%expect_test "a size bound is honoured when the cache is written out" =
 
 (* --- Sharing analyses with the CLI --- *)
 
-(** Analyzes [prog.cob] the way the CLI does, and tells whether the analysis was
-    found in the cache. *)
-let cli_analyze ~projdir =
+(** Analyzes [prog.cob] the way the CLI does (for the LSP if [for_lsp] holds,
+    as `superbol cache analyze' does), and tells whether the analysis was found
+    in the cache. *)
+let cli_analyze ?(for_lsp = false) ~projdir () =
   let filename = projdir // "prog.cob" in
   let rootdir = Superbol_project.rootdir_for ~filename ~layout in
   let project = Cobol_common.Diagnostics.forget_diags @@
     Superbol_project.for_ ~rootdir ~layout in
-  let _, hit =
-    Superbol_project.Analysis.cached_analysis
-      (lsp_cache_for ~rootdir:(Superbol_project.string_of_rootdir rootdir))
-      ~platform:Superbol_platform.record
-      ~filename ~contents:(EzFile.read_file filename) project
+  let cache =
+    lsp_cache_for ~rootdir:(Superbol_project.string_of_rootdir rootdir) in
+  let contents = EzFile.read_file filename in
+  let platform = Superbol_platform.record in
+  let hit =
+    if for_lsp
+    then snd @@ Superbol_project.Analysis.cached_analysis_for_lsp cache
+        ~platform ~filename ~contents project
+    else snd @@ Superbol_project.Analysis.cached_analysis cache
+        ~platform ~filename ~contents project
   in
   print_endline (if hit then "found by the CLI" else "analyzed by the CLI")
 
@@ -266,20 +272,36 @@ let%expect_test "an analysis stored by the CLI is restored by the LSP" =
   (* The LSP has stored what it opened; editing the program makes sure what it
      restores next can only come from the CLI. *)
   ignore (write ~projdir "prog.cob" (program ^ "      *> edited\n"));
-  cli_analyze ~projdir;
-  cli_analyze ~projdir;
+  cli_analyze ~for_lsp:true ~projdir ();
+  cli_analyze ~for_lsp:true ~projdir ();
+  cli_analyze ~projdir ();
   [%expect {|
     analyzed by the CLI
+    found by the CLI
     found by the CLI |}];
   reopen ~projdir;
   report [%expect.output];
   cleanup projdir;
   [%expect {| restored from cache |}];;
 
+let%expect_test "an analysis not meant for the LSP is not restored by it" =
+  let projdir = setup ~copybook_dirs:[".", "       01 X PIC X.\n"] () in
+  ignore [%expect.output];
+  ignore (write ~projdir "prog.cob" (program ^ "      *> edited\n"));
+  cli_analyze ~projdir ();
+  cli_analyze ~projdir ();
+  [%expect {|
+    analyzed by the CLI
+    found by the CLI |}];
+  reopen ~projdir;
+  report [%expect.output];
+  cleanup projdir;
+  [%expect {| parsed afresh |}];;
+
 let%expect_test "an analysis stored by the LSP is found by the CLI" =
   let projdir = setup ~copybook_dirs:[".", "       01 X PIC X.\n"] () in
   ignore [%expect.output];
-  cli_analyze ~projdir;
+  cli_analyze ~projdir ();
   cleanup projdir;
   [%expect {| found by the CLI |}];;
 
@@ -291,6 +313,6 @@ let%expect_test "editing a copybook is a miss for both" =
   report [%expect.output];
   [%expect {| parsed afresh |}];
   ignore (write ~projdir "BOOK.cpy" "       01 X PIC 9(5).\n");
-  cli_analyze ~projdir;
+  cli_analyze ~projdir ();
   cleanup projdir;
   [%expect {| analyzed by the CLI |}];;
