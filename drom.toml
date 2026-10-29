@@ -8,9 +8,9 @@ authors = ["Nicolas Berthier <nicolas.berthier@ocamlpro.com>", "David Declerck <
 ci-systems = ["ubuntu-latest", "macos-latest"]
 copyright = "OCamlPro SAS"
 edition = "4.14.2"
+min-edition = "4.14.2"
 github-organization = "ocamlpro"
 license = "MIT"
-min-edition = "4.14.0"
 name = "superbol-studio-oss"
 skeleton = "program"
 synopsis = "SuperBOL Studio OSS Project"
@@ -99,7 +99,7 @@ github-workflow-before-opam = """
       - name: Build and install GnuCOBOL 4.x
         run: |
           if ${{ matrix.os == 'ubuntu-latest' }}; then
-            sudo apt-get install -y autoconf automake flex bison help2man texinfo wget libgmp-dev libdb-dev
+            sudo apt-get install -y autoconf automake autopoint flex bison help2man texinfo wget libgmp-dev libdb-dev
             bash scripts/install-gc4.sh import/gnucobol4 /opt/gnucobol-4.x
           elif ${{ matrix.os == 'macos-latest' }}; then
             brew update
@@ -139,7 +139,7 @@ github-workflow-before-build = """
         run: |
           opam pin --yes \"git+https://github.com/OCamlPro/drom.git#v0.9.3\"
           make check-project
-        if: ${{ matrix.skip_test }}
+        if: ${{ matrix.os == 'ubuntu-latest' }}
 """
 
 # NB: a `before-tests` field would make more sense here.

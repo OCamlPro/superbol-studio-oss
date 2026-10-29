@@ -18,7 +18,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (superbol-vscode-oss (= :version))
    (superbol-free (= :version))
    odoc
@@ -36,7 +36,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (vscode-languageclient-js-stubs (= :version))
    (vscode-js-stubs (= :version))
    (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
@@ -60,7 +60,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (superbol-vscode-lib (= :version))
    (js_of_ocaml-ppx ( >= 4 ))
    odoc
@@ -78,7 +78,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (js_of_ocaml ( >= 4 ))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
    (js_of_ocaml-ppx ( >= 4 ))
@@ -99,7 +99,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
    (js_of_ocaml ( >= 4 ))
    (interop-js-stubs (= :version))
@@ -122,7 +122,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (promise_jsoo (and ( >= 0.3.1 )( < 0.4 )))
    (jsonoo (and (>= 0.2.1) (< 1.0.0)))
    (js_of_ocaml ( >= 4 ))
@@ -146,7 +146,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (vscode-js-stubs (= :version))
    (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
    (node-js-stubs (= :version))
@@ -172,7 +172,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (ppx_deriving_encoding (and (>= 0.3.0) (< 1.0.0)))
    ezjsonm
    (ez_file (and (>= 0.3.0) (< 1.0.0)))
@@ -192,7 +192,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (vscode-debugprotocol (= :version))
    (node-js-stubs (= :version))
    (js_of_ocaml ( >= 4 ))
@@ -216,7 +216,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (js_of_ocaml ( >= 4 ))
    (interop-js-stubs (= :version))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
@@ -238,7 +238,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (superbol_free_lib (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
@@ -255,7 +255,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (vscode-json (= :version))
    (superbol_preprocs (= :version))
    (superbol_platform (= :version))
@@ -287,7 +287,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (sql_parser (= :version))
    (pretty (= :version))
    (cobol_typeck (= :version))
@@ -309,7 +309,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (pretty (= :version))
    (ocplib_stuff (and (>= 0.4.0) (< 1.0.0)))
    (ezr_toml (= :version))
@@ -332,7 +332,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (pretty (= :version))
    (ez_file ( >= 0.5 ))
    (cobol_preproc (= :version))
@@ -352,7 +352,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (pretty (= :version))
    (ppx_deriving ( >= 5.2.1 ))
    odoc
@@ -370,7 +370,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (menhirLib (and ( >= 20231231 )( < 20240715 )))
    (ez_file ( >= 0.3 ))
    (ebcdic_lib (= :version))
@@ -394,7 +394,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (cobol_common (= :version))
    (ppx_deriving ( >= 5.2.1 ))
    odoc
@@ -412,7 +412,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
@@ -428,7 +428,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (toml (and (>= 7.1.0) (< 8.0.0)))
    (superbol_project (= :version))
    (superbol_preprocs (= :version))
@@ -457,7 +457,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (ppxlib ( >= 0.15 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
@@ -474,7 +474,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (fmt ( >= 0.9 ))
    (ez_file ( >= 0.3 ))
    odoc
@@ -492,7 +492,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (pretty (= :version))
    (menhirLib (and ( >= 20231231 )( < 20240715 )))
    (cobol_common (= :version))
@@ -513,7 +513,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (fmt ( >= 0.9 ))
    (cobol_config (= :version))
    odoc
@@ -531,7 +531,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (fmt ( >= 0.9 ))
    (cobol_preproc (= :version))
    (cobol_common (= :version))
@@ -550,7 +550,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (ppx_import ( >= 1 ))
    (ppx_deriving ( >= 5.2.1 ))
    (menhirLib (and ( >= 20231231 )( < 20240715 )))
@@ -573,7 +573,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (zarith_stubs_js ( >= 0.17 ))
    (zarith ( >= 1 ))
    (cobol_ptree (= :version))
@@ -595,7 +595,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (cobol_unit (= :version))
    (cobol_ptree (= :version))
    (cobol_parser (= :version))
@@ -618,7 +618,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (cobol_ptree (= :version))
    (cobol_data (= :version))
    (cobol_config (= :version))
@@ -639,7 +639,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    ocplib_stuff
    (menhirLib ( > 2019 ))
    (ez_file ( >= 0.4 ))
@@ -660,7 +660,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (pretty (= :version))
    (ocplib_stuff (and (>= 0.4.0) (< 1.0.0)))
    (ez_toml (= :version))
@@ -680,7 +680,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (superbol_preprocs (= :version))
    (ppx_deriving ( >= 5.2.1 ))
    (ez_file ( >= 0.3 ))
@@ -703,7 +703,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (pretty (= :version))
    (ocplib_stuff (and (>= 0.4.0) (< 1.0.0)))
    (cobol_common (= :version))
@@ -723,7 +723,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (sql_ast (= :version))
    (menhirLib (and ( >= 20231231 )( < 20240715 )))
    (ez_file ( >= 0.3 ))
@@ -748,7 +748,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (ocamlgraph (and (>= 2.1.0) (< 3.0.0)))
    (cobol_typeck (= :version))
    odoc
@@ -766,7 +766,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (autofonce_lib (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
@@ -783,7 +783,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (ocplib_stuff ( >= 0.1 ))
    (ez_file ( >= 0.3 ))
    (autofonce_share (= :version))
@@ -805,7 +805,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (ocplib_stuff ( >= 0.1 ))
    (ez_file ( >= 0.5 ))
    (ez_cmdliner ( >= 0.4.3 ))
@@ -831,7 +831,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (ocplib_stuff ( >= 0.1 ))
    (ez_file ( >= 0.3 ))
    (autofonce_misc (= :version))
@@ -850,7 +850,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (crunch ( >= 3.2.0 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
@@ -867,7 +867,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (ocplib_stuff ( >= 0.1 ))
    (ez_file ( >= 0.5 ))
    (autofonce_misc (= :version))
@@ -886,7 +886,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (toml ( >= 7.0 ))
    (ocplib_stuff ( >= 0.1 ))
    (ez_file ( >= 0.5 ))
@@ -906,7 +906,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (ocplib_stuff ( >= 0.1 ))
    (ez_file ( >= 0.4 ))
    odoc
@@ -924,7 +924,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (ez_file ( >= 0.3 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
@@ -941,7 +941,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (ez_win32 ( >= 0.1 ))
    (ez_file ( >= 0.3 ))
    odoc
@@ -959,7 +959,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (pretty (= :version))
    (goblint-cil ( >= 2.0.0 ))
    (ez_file (and (>= 0.3.0) (< 1.0.0)))
@@ -979,7 +979,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (tramabol_lib (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
@@ -996,7 +996,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (superbol_platform (= :version))
    (superbol_free_lib (= :version))
    (pretty (= :version))
@@ -1021,7 +1021,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (h2mlstubs (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
@@ -1038,7 +1038,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (pretty (= :version))
    (ezlibcob (= :version))
    (cobol_unit (= :version))
@@ -1061,7 +1061,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (pretty (= :version))
    (cobol_unit (= :version))
    (cobol_data (= :version))
@@ -1080,7 +1080,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (pretty (= :version))
    (cobol_unit (= :version))
    (cobol_data (= :version))
@@ -1101,7 +1101,7 @@
   )
 
  (depends
-   (ocaml (>= 4.14.0))
+   (ocaml (>= 4.14.2))
    (pretty (= :version))
    (cir_types (= :version))
    odoc
