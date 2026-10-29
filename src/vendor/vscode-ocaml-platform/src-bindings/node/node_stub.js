@@ -26,4 +26,6 @@ globalThis.__SUPERBOL__.os = require("os");
 
 globalThis.__SUPERBOL__.net = require("net");
 
+globalThis.__SUPERBOL__.https = require("https");
+
 globalThis.__SUPERBOL__.events = require("events");

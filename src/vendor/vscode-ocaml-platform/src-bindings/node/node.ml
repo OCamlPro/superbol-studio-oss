@@ -41,7 +41,21 @@ include
 
   val setTimeout : (unit -> unit) -> int -> Timeout.t [@@js.global]
 
-  val clearTimeout : Timeout.t -> unit [@@js.global]]
+  val clearTimeout : Timeout.t -> unit [@@js.global]
+
+  val clearInterval : Timeout.t -> unit [@@js.global]]
+
+module Date = struct
+  include Class.Make ()
+
+  include
+    [%js:
+    val make : unit -> t [@@js.new "Date"]
+
+    val now : unit -> float [@@js.global "Date.now"]
+
+    val toISOString : t -> string [@@js.call]]
+end
 
 module Process = struct
   include
@@ -67,7 +81,11 @@ module Process = struct
   end
 end
 
-module Os = [%js: val homedir : unit -> string [@@js.global "__SUPERBOL__.os.homedir"]]
+module Os =
+  [%js:
+  val homedir : unit -> string [@@js.global "__SUPERBOL__.os.homedir"]
+
+  val release : unit -> string [@@js.global "__SUPERBOL__.os.release"]]
 
 module JsError = struct
   type t = Promise.error [@@js]
@@ -89,6 +107,8 @@ module Buffer = struct
     val from : string -> t [@@js.global "Buffer.from"]
 
     val concat : t list -> t [@@js.global "Buffer.concat"]
+
+    val byteLength : string -> int [@@js.global "Buffer.byteLength"]
 
     val write :
          t
@@ -239,6 +259,45 @@ module Net = struct
       | `Timeout f -> on t "timeout" @@ [%js.of: unit -> unit] f
       | `Error f -> on t "error" @@ [%js.of: err:JsError.t -> unit] f
   end
+end
+
+module Https = struct
+  module IncomingMessage = struct
+    include Class.Make ()
+
+    include
+      [%js:
+      val resume : t -> unit [@@js.call]
+
+      val on : t -> string -> (unit -> unit) -> unit [@@js.call]]
+  end
+
+  module ClientRequest = struct
+    include Class.Make ()
+
+    include
+      [%js:
+      val on : t -> string -> (unit -> unit) -> unit [@@js.call]
+
+      val destroy : t -> unit [@@js.call]
+
+      val end_ : t -> string -> unit [@@js.call "end"]]
+  end
+
+  type request_options =
+    { host : string
+    ; path : string
+    ; method_ : string [@js "method"]
+    ; headers : string Dict.t
+    ; timeout : int
+    }
+  [@@js]
+
+  include
+    [%js:
+    val request :
+      request_options -> (IncomingMessage.t -> unit) -> ClientRequest.t
+      [@@js.global "__SUPERBOL__.https.request"]]
 end
 
 module ChildProcess = struct

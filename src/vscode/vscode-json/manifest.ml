@@ -239,6 +239,7 @@ type property = {
   prop_minItems : int option ;
   prop_order: int option;
   prop_additionalProperties : any option ;
+  prop_tags : string list ; [@dft []]
 }
 [@@deriving json_encoding,show]
 
@@ -260,6 +261,7 @@ let property
     ?minItems: prop_minItems
     ?order: prop_order
     ?additionalProperties: prop_additionalProperties
+    ?tags: (prop_tags = [])
 
     name =
   name,
@@ -280,6 +282,7 @@ let property
     prop_minItems ;
     prop_order;
     prop_additionalProperties ;
+    prop_tags ;
   }
 
 module PROPERTY = struct

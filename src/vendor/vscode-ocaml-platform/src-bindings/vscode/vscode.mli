@@ -2789,6 +2789,8 @@ module Debug : sig
     -> factory: DebugAdapterDescriptorFactory.t
     -> unit
     -> Disposable.t
+
+  val onDidStartDebugSession : DebugSession.t Event.t
 end
 
 module TaskFilter : sig
@@ -2809,8 +2811,32 @@ module Tasks : sig
     ?filter:TaskFilter.t -> unit -> Task.t list Promise.t
 end
 
+module UIKind : sig
+  type t =
+    | Desktop
+    | Web
+
+  include Js.T with type t := t
+end
+
 module Env : sig
   val shell : unit -> string
+
+  val appName : unit -> string
+
+  val language : unit -> string
+
+  val machineId : unit -> string
+
+  val sessionId : unit -> string
+
+  val remoteName : unit -> string option
+
+  val uiKind : unit -> UIKind.t
+
+  val isTelemetryEnabled : unit -> bool
+
+  val onDidChangeTelemetryEnabled : bool Event.t
 
   val asExternalUri : target:Uri.t -> Uri.t Promise.t
 end
