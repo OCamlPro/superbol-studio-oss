@@ -825,7 +825,7 @@ module WorkspaceConfiguration = struct
     val get : t -> section:string -> Js.Any.t or_undefined [@@js.call]
 
     val get_default : t -> section:string -> defaultValue:Ojs.t -> Ojs.t
-      [@@js.call]
+      [@@js.call "get"]
 
     val has : t -> section:string -> bool [@@js.call]
 
@@ -1553,7 +1553,7 @@ module Memento = struct
     [%js:
     val get : t -> key:string -> Js.Any.t or_undefined [@@js.call]
 
-    val get_default : t -> key:string -> defaultValue:Ojs.t -> Ojs.t [@@js.call]
+    val get_default : t -> key:string -> defaultValue:Ojs.t -> Ojs.t [@@js.call "get"]
 
     val update : t -> key:string -> value:Js.Any.t -> Promise.void [@@js.call]]
 
