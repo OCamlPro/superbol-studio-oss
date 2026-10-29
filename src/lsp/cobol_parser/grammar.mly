@@ -3246,7 +3246,7 @@ let allocate_statement [@context allocate_stmt] :=
    { Allocate { allocate_kind = AllocateCharacters e;
                 allocate_initialized = ib;
                 allocate_returning = Some r } }
- | ALLOCATE; i = name; ib = bo(INITIALIZED); ro = ro(returning_ident);
+ | ALLOCATE; i = loc(qualname); ib = bo(INITIALIZED); ro = ro(returning_ident);
    { Allocate { allocate_kind = AllocateDataItem i;
                 allocate_initialized = ib;
                 allocate_returning = ro } }

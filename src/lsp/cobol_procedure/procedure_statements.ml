@@ -39,7 +39,7 @@ type sort_spec = {
 (* ALLOCATE *)
 type allocate_kind =
   | AllocateCharacters of expr with_loc
-  | AllocateDataItem of data_name_ref
+  | AllocateDataItem of data_ref
 [@@deriving ord]
 
 type allocate_stmt = {

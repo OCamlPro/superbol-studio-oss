@@ -303,7 +303,7 @@ let typeck_allocate_stmt (a : Cobol_ptree.allocate_stmt with_loc)
         let+ e = typeck_expr' e in
         AllocateCharacters e
     | AllocateDataItem n ->
-        let+ n = typeck_data_name_ref n in
+        let+ n = typeck_data_ref n in
         AllocateDataItem n
   and+ allocate_returning = map_option typeck_ident' allocate_returning in
   { allocate_kind; allocate_initialized; allocate_returning }

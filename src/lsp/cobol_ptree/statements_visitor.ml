@@ -184,7 +184,7 @@ let fold_allocate_kind (v: _ #folder) =
   handle v#fold_allocate_kind
     ~continue:begin function
       | AllocateCharacters e -> fold_expression v e
-      | AllocateDataItem n -> fold_name' v n
+      | AllocateDataItem n -> fold_qualname' v n
     end
 
 let fold_alter_operands' (v: _ #folder) =

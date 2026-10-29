@@ -35,14 +35,14 @@ type allocate_stmt =
 
 and allocate_kind =
   | AllocateCharacters of expr with_loc (*arith exp that evaluates to int (may be rounded)*)
-  | AllocateDataItem of name with_loc
+  | AllocateDataItem of qualname with_loc
 [@@deriving ord]
 
 let pp_allocate_kind ppf = function
   | AllocateCharacters e ->
       Fmt.pf ppf "%a@ CHARACTERS" pp_expr' e
   | AllocateDataItem n ->
-      pp_name ppf n.payload
+      pp_qualname ppf n.payload
 
 let pp_allocate_stmt ppf
     { allocate_kind = ak; allocate_initialized = ai; allocate_returning = ar } =

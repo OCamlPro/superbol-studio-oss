@@ -380,7 +380,7 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) ptree : approx_typing_info
         begin match k with
           | AllocateDataItem n ->
               acc
-              |> Any (* linkage level 01 or 77 *) @>@ fold_name' v n
+              |> Any @>@ fold_qualname' v n
           | AllocateCharacters e ->
               acc |> Any @>@ fold_expression v e
         end
