@@ -41,9 +41,9 @@ let project_key ~rootdir =
     ~inputs:[Digest.string @@ Lsp_project.string_of_rootdir rootdir]
 
 (* Each document has two entries: its analysis for the LSP, which other
-   front-ends may reuse, and LSP-specific data.  Both are keyed on the same inputs, and the latter
-   depends on the former, so that any miss on the analysis entails a miss on the
-   LSP one. *)
+   front-ends may reuse, and LSP-specific data.  Both are keyed on the same
+   inputs, and the latter depends on the former, so that any miss on the
+   analysis entails a miss on the LSP one. *)
 let document_keys ~project ~filename ~contents ~language_id =
   let overrides = Lsp_document.analysis_overrides ~language_id in
   Option.map begin fun keys ->

@@ -203,7 +203,7 @@ val document_keys
   -> keys
 
 (** [keys ?overrides ~filename ~contents project] combines {!config_inputs}
-    and {!document_keys}. *)
+    and {!document_keys}: [None] whenever the former is. *)
 val keys
   : ?overrides: overrides
   -> filename: string
@@ -242,8 +242,9 @@ val lookup_for_lsp
   -> resolve: (Superbol_cache.Types.witness -> bool)
   -> for_lsp option
 
-(** In the functions below, [keys] must be the {!keys} of [filename] and
-    [contents] in [project], with [overrides]. *)
+(** In the functions below, [keys] must be the keys of [filename] and
+    [contents] in [project] with [overrides], as given by [keys ?overrides
+    ~filename ~contents project]. *)
 
 (** [cached_analysis cache ~platform ?overrides ~keys ~filename ~contents
     project] is the analysis of [filename]: it is obtained from the analysis

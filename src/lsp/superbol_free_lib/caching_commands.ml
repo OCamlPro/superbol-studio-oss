@@ -46,7 +46,7 @@ type 'a analyzed_file =
 (* The project's cache, along with the inputs that keys of analyses of its
    documents with some overrides share.  Projects are loaded once per root
    directory ({!Superbol_project.for_}), and so is their cache: these are
-   computed again only for another project (e.g, if its configuration was
+   computed again only for another project (e.g. if its configuration was
    reloaded), or other overrides. *)
 let cached_configs = Hashtbl.create 1
 

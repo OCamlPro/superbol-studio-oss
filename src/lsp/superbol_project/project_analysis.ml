@@ -274,7 +274,7 @@ type keys =
     key_for_lsp: Superbol_cache.Types.key;
   }
 
-(* The document's contents take part in the key, rather than being witnessed:
+(* The document's contents take part in the keys, rather than being witnessed:
    entries are published without ever replacing one another, so a document that
    is edited has to land under a key of its own.
 
