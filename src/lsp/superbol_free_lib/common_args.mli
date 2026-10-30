@@ -13,6 +13,7 @@
 
 type t = {
   platform : Cobol_common.Platform.TYPES.platform;
+  project_root: string option;
   preproc_options: Cobol_preproc.Options.preproc_options;
   parser_options: Cobol_parser.Options.parser_options;
   pretty_progress: 'a. 'a Pretty.proc;

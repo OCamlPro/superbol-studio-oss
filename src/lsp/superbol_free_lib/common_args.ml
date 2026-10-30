@@ -22,13 +22,14 @@ open Cobol_parser.Options
 
 type t = {
   platform: Cobol_common.Platform.TYPES.platform;
+  project_root: string option;
   preproc_options: preproc_options;
   parser_options: parser_options;
   pretty_progress: 'a. 'a Pretty.proc;
   analysis_overrides: Superbol_project.Analysis.overrides;
 }
 
-type progress_display = 
+type progress_display =
   | Hide
   | Show
   | Log
@@ -93,6 +94,7 @@ let analysis_overrides ~config ~conf ~dialect ~format ~libpath ~libexts ~env
   }
 
 let get () =
+  let project_root = ref None in
   let conf = ref "" in
   let dialect = ref None in
   let format = ref Cobol_config.Auto in
@@ -125,6 +127,9 @@ let get () =
   let progress_display_opt = ref None  in
 
   let args = [
+    ["project-root"; "root"], Arg.File (fun f -> project_root := Some f),
+    EZCMD.info ~docv:"DIR" "Set the root of the project (autodetected on a \
+                            per-file basis otherwise)";
 
     ["conf"], Arg.Set_string conf,
     EZCMD.info ~docv:"CONF_FILE" "Set the configuration file to be used";
@@ -181,7 +186,7 @@ let get () =
       "Add EXT as a filename extension for copybook resolution (default: %a)"
       Fmt.(list ~sep:sp @@ fmt "`%s`")
       Cobol_common.Copybook.copybook_extensions;
-      
+
     ["progress"], Arg.Symbol (["hide"; "force"; "log"; "log-err"], function
       | "hide" -> progress_display_opt := Some Hide
       | "force" -> progress_display_opt := Some Show
@@ -190,9 +195,9 @@ let get () =
       | _ -> assert false),
     EZCMD.info ~docv:"MODE"
       "Set how to display progress of the command.\n\
-      MODE can be hide, force, log or log-err. 
+      MODE can be hide, force, log or log-err.
       By default progress is displayed when stderr is a TTY.";
-    
+
   ] in
 
   let get () =
@@ -258,7 +263,8 @@ let get () =
     let last_progress_msg_len = ref 0 in
     (* Pretty.error "@[Preprocessor environment:@;<1 2>@[%a@]@]@." *)
     (*   Cobol_preproc.Env.pp env; *)
-    { platform ;
+    { platform;
+      project_root = !project_root;
       preproc_options = { platform; config; source_format;
                           exec_preprocs = EXEC_MAP.empty;
                           copybook_lookup_config =

@@ -43,13 +43,16 @@ type 'a analyzed_file =
     hit: bool;                              (* whether found in project cache *)
   }
 
-let locate Common_args.{ platform; _ } given_filename =
+let locate Common_args.{ project_root; platform; _ } given_filename =
   let filename =                               (* filenames take part in keys *)
     if EzFile.is_absolute given_filename
     then given_filename
     else platform.getcwd () // given_filename
   in
-  let project = Project.for_filename filename in
+  let project = match project_root with
+    | Some dirname -> Project.in_ ~dirname ()
+    | None -> Project.for_filename filename
+  in
   let rootdir = Superbol_project.(string_of_rootdir @@ rootdir project) in
   let contents = EzFile.read_text_file filename in
   if given_filename != filename then
@@ -164,7 +167,11 @@ let derive_from_file
               located in
           let v = derive analyzed in
           ignore @@
-          CACHE.store cache ~key ~label ~witnesses:[WITNESS.sub analysis_key]
+          CACHE.store cache ~key
+            ~label:(Printf.sprintf "%s:%s" label @@
+                    Superbol_project.relative_path_for ~filename
+                      located.project)
+            ~witnesses:[WITNESS.sub analysis_key]
             ~write_item:CACHING.write_item v;
           v, false
       end
@@ -176,7 +183,7 @@ let derive_from_file
     [inputs], without analyzing [filename]; [None] on a miss. *)
 let lookup_derived (Common_args.{ platform; _ } as common)
     ~label ~inputs filename : 'a option =
-  match derived_entry common ~label ~inputs (locate common filename) with
+  match derived_entry common ~label ~inputs @@ locate common filename with
   | Some (cache, key, _, _) ->
       let resolve = RECORDER.resolver ~platform () in
       begin match CACHE.lookup cache ~key ~resolve
@@ -190,7 +197,7 @@ let lookup_derived (Common_args.{ platform; _ } as common)
 (** [report common ~ppf analysis] reports analysis diagnostics on [ppf]. *)
 let report Common_args.{ platform; pretty_progress; _ } ~ppf
     ({ filename; analysis; hit; _ }: ANALYSIS.t analyzed_file) =
-  pretty_progress "%s@ `%s'%s" (if hit then "Found in cache:" else "Analyzed:")
+  pretty_progress "%s:@ `%s'%s" (if hit then "Found in cache" else "Analyzed")
     filename (if analysis.copybook then " (copybook)" else "");
   DIAGS.sink_result ~platform ~ppf @@
   DIAGS.result ~diags:(ANALYSIS.diagnostics analysis) ()
