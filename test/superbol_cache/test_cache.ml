@@ -36,14 +36,20 @@ let world () = { files = []; dirs = []; env = [] }
 (** The resolver a caller is expected to write: rebuild the witness from what is
     true now, and compare.  Note it is never asked about a [Sub] witness. *)
 let resolve world witness =
+  (* Witnesses spell names canonically, which on some hosts means in lowercase;
+     the world is looked up accordingly. *)
+  let find name =
+    List.find_map (fun (n, v) ->
+        if Witness.canonical_path n = name then Some v else None)
+  in
   match witness with
   | File { name; _ } ->
-      begin match List.assoc_opt name world.files with
+      begin match find name world.files with
         | Some contents -> Witness.file ~name ~contents = witness
         | None -> false
       end
   | Dir { name; _ } ->
-      begin match List.assoc_opt name world.dirs with
+      begin match find name world.dirs with
         | Some entries -> Witness.dir ~name ~entries = witness
         | None -> false
       end
