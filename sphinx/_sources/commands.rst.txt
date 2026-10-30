@@ -10,6 +10,15 @@ Common arguments to all sub-commands:
 
 Overview of sub-commands::
   
+  cache analyze
+    Analyze files, reusing and filling the cache of their project
+  
+  cache status
+    Report on the cache of a project
+  
+  cache trim
+    Reclaim entries a project's cache no longer needs
+  
   check syntax
     Check the syntax of a Cobol file
   
@@ -77,6 +86,118 @@ Overview of sub-commands::
     Stats on file of lines (without taking UTF8 chars into account)
 
 
+main.exe cache analyze
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Analyze files, reusing and filling the cache of their project
+
+
+
+**DESCRIPTION**
+
+
+Preprocess, parse and typecheck each FILE as the LSP server would, according to the configuration of the project it belongs to, and report diagnostics.
+
+Analysis results are looked up in, or else stored into, the cache of that project, which is shared with the LSP server: a file analyzed by either is restored by the other, for as long as neither the file nor anything it depends upon (copybooks, project configuration) changes.
+
+Options such as **--dialect**, **--conf**, **--source-format**, **-I**, **--ext**, **-D**, **--recovery** or **--silence** override the project configuration; analyses obtained with them are cached separately, and are not shared with the LSP server.
+
+Files that appear to be copybooks are not analyzed. With **--progress log-err**, tell whether each analysis was found in the cache.
+
+**USAGE**
+::
+  
+  main.exe cache analyze FILE [OPTIONS]
+
+Where options are:
+
+
+* :code:`FILE`   Cobol file to analyze
+
+* :code:`-D VAR=VAL`   Define a pre-processor variable VAR, with value VAL
+
+* :code:`-I DIR`   Add DIR to library search path
+
+* :code:`--conf CONF_FILE`   Set the configuration file to be used
+
+* :code:`--config-dir DIR`   Add DIR to config search path
+
+* :code:`--dialect DIALECT` or :code:`--std DIALECT`   Set the dialect to bu used (overriden by `--conf` if used)
+
+* :code:`--ext EXT`   Add EXT as a filename extension for copybook resolution (default: `cpy` `cbl` `cob`)
+
+* :code:`--free`   Shorthand for `--source-format FREE`
+
+* :code:`--progress MODE`   Set how to display progress of the command.
+MODE can be hide, force, log or log-err.
+      By default progress is displayed when stderr is a TTY.
+
+* :code:`--project-root DIR` or :code:`--root DIR`   Set the root of the project (autodetected on a per-file basis otherwise)
+
+* :code:`--recovery BOOL`   Enable/disable parser recovery after syntax errors (default: true)
+
+* :code:`--silence STRING`   Silence specific messages
+
+* :code:`--source-format SOURCE_FORMAT`   Set the format of source code; allowed values are: { FIXED (the default), FREE}
+Overrides `format` from configuration file if present.
+
+* :code:`--stdout`   Output errors/warnings to stdout
+
+
+main.exe cache status
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Report on the cache of a project
+
+
+
+**DESCRIPTION**
+
+
+Show where the cache of the project containing DIR lives, how much room it takes, and -- with **-l** -- what each entry holds and when it was last used.
+
+**USAGE**
+::
+  
+  main.exe cache status DIR [OPTIONS]
+
+Where options are:
+
+
+* :code:`DIR`   Directory within the project (default: `.')
+
+* :code:`--list-entries` or :code:`-l`   List every entry, not just the totals
+
+
+main.exe cache trim
+~~~~~~~~~~~~~~~~~~~~~
+
+Reclaim entries a project's cache no longer needs
+
+
+
+**DESCRIPTION**
+
+
+Reclaim entries of the project containing DIR, along with every value they alone held.
+
+**--older-than** removes those unused for that many days; **--max-size** removes the least recently used until the cache fits.  Both may be given, and with neither nothing is reclaimed but the leftovers of instances that died mid-write.  **--older-than 0** empties the cache.
+
+**USAGE**
+::
+  
+  main.exe cache trim DIR [OPTIONS]
+
+Where options are:
+
+
+* :code:`DIR`   Directory within the project (default: `.')
+
+* :code:`--max-size SIZE`   Keep the cache under that size, reclaiming the entries least recently used.  Accepts a suffix: 500M, 2G, 64k
+
+* :code:`--older-than DAYS`   Reclaim entries unused for that many days
+
+
 main.exe check syntax
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -87,7 +208,9 @@ Check the syntax of a Cobol file
 **DESCRIPTION**
 
 
+Preprocess and parse each FILE, and report diagnostics.  By default, only the options given on the command line are used.
 
+With **--project**, each FILE is analyzed as the LSP server would: according to the configuration of the project it belongs to (which options given on the command line override), with typechecking, and leaving out files that appear to be copybooks. Results are looked up in the cache of that project, which also holds those of the LSP server and **superbol cache analyze**.  On a miss, results are stored into the cache without the artifacts the LSP server needs, so they are not reused by the latter (use **superbol cache analyze** to fill the cache for the LSP server).
 
 **USAGE**
 ::
@@ -114,8 +237,12 @@ Where options are:
 * :code:`--free`   Shorthand for `--source-format FREE`
 
 * :code:`--progress MODE`   Set how to display progress of the command.
-MODE can be hide, force, log or log-err. 
+MODE can be hide, force, log or log-err.
       By default progress is displayed when stderr is a TTY.
+
+* :code:`--project`   Check each file according to the configuration of its project, reusing and filling the project's cache (see `superbol cache analyze')
+
+* :code:`--project-root DIR` or :code:`--root DIR`   Set the root of the project (autodetected on a per-file basis otherwise)
 
 * :code:`--recovery BOOL`   Enable/disable parser recovery after syntax errors (default: true)
 
@@ -279,8 +406,10 @@ Where options are:
 * :code:`--numeric`   Output indentation size at the beginning of each line
 
 * :code:`--progress MODE`   Set how to display progress of the command.
-MODE can be hide, force, log or log-err. 
+MODE can be hide, force, log or log-err.
       By default progress is displayed when stderr is a TTY.
+
+* :code:`--project-root DIR` or :code:`--root DIR`   Set the root of the project (autodetected on a per-file basis otherwise)
 
 * :code:`--recovery BOOL`   Enable/disable parser recovery after syntax errors (default: true)
 
@@ -347,6 +476,10 @@ Start a COBOL LSP server
 Where options are:
 
 
+* :code:`--cache-max-age DAYS`   Reclaim cache entries that have not been used for that many days. Kept indefinitely by default.
+
+* :code:`--cache-size-limit SIZE`   Keep each project's cache under that size, reclaiming the entries least recently used whenever it is written out.  Accepts a suffix: 500M, 2G, 64k.  Unbounded by default.
+
 * :code:`--caching`   Enable caching (enabled by default)
 
 * :code:`--force-syntax-diagnostics`   Force reporting of syntax error and hint diagnostics for dialects other than COBOL85 (for which they are always enabled)
@@ -401,8 +534,10 @@ Where options are:
 * :code:`--parse`   If true, parse the generated cobol before printing
 
 * :code:`--progress MODE`   Set how to display progress of the command.
-MODE can be hide, force, log or log-err. 
+MODE can be hide, force, log or log-err.
       By default progress is displayed when stderr is a TTY.
+
+* :code:`--project-root DIR` or :code:`--root DIR`   Set the root of the project (autodetected on a per-file basis otherwise)
 
 * :code:`--recovery BOOL`   Enable/disable parser recovery after syntax errors (default: true)
 
@@ -588,8 +723,10 @@ Where options are:
 * :code:`--free`   Shorthand for `--source-format FREE`
 
 * :code:`--progress MODE`   Set how to display progress of the command.
-MODE can be hide, force, log or log-err. 
+MODE can be hide, force, log or log-err.
       By default progress is displayed when stderr is a TTY.
+
+* :code:`--project-root DIR` or :code:`--root DIR`   Set the root of the project (autodetected on a per-file basis otherwise)
 
 * :code:`--recovery BOOL`   Enable/disable parser recovery after syntax errors (default: true)
 

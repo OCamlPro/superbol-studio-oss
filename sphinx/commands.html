@@ -7,8 +7,8 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sub-commands and Arguments &mdash; superbol-studio-oss master
- (f1d4765
-) (2026/10/29 15:53) documentation</title>
+ (090e621
+) (2026/10/30 17:20) documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=beddf052" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=98b44b8a" />
       <link rel="stylesheet" type="text/css" href="_static/css/fixes.css" />
@@ -16,7 +16,7 @@
   
       <script src="_static/jquery.js?v=958b65b0"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=231315a1"></script>
+      <script src="_static/documentation_options.js?v=1f9734ea"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -65,6 +65,9 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="building-lsp.html">Building the LSP binary</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Sub-commands and Arguments</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-cache-analyze">main.exe cache analyze</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-cache-status">main.exe cache status</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-cache-trim">main.exe cache trim</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-check-syntax">main.exe check syntax</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-ebcdic-translate">main.exe ebcdic translate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-env">main.exe env</a></li>
@@ -134,7 +137,16 @@
 <li><p><code class="code docutils literal notranslate"><span class="pre">-v</span></code> or <code class="code docutils literal notranslate"><span class="pre">--verbose</span></code>   Increase verbosity level</p></li>
 </ul>
 <p>Overview of sub-commands:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">check</span> <span class="n">syntax</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">cache</span> <span class="n">analyze</span>
+  <span class="nc">Analyze</span> <span class="n">files</span><span class="o">,</span> <span class="n">reusing</span> <span class="k">and</span> <span class="n">filling</span> <span class="n">the</span> <span class="n">cache</span> <span class="k">of</span> <span class="n">their</span> <span class="n">project</span>
+
+<span class="n">cache</span> <span class="n">status</span>
+  <span class="nc">Report</span> <span class="n">on</span> <span class="n">the</span> <span class="n">cache</span> <span class="k">of</span> <span class="n">a</span> <span class="n">project</span>
+
+<span class="n">cache</span> <span class="n">trim</span>
+  <span class="nc">Reclaim</span> <span class="n">entries</span> <span class="n">a</span> <span class="n">project&#39;s</span> <span class="n">cache</span> <span class="n">no</span> <span class="n">longer</span> <span class="n">needs</span>
+
+<span class="n">check</span> <span class="n">syntax</span>
   <span class="nc">Check</span> <span class="n">the</span> <span class="n">syntax</span> <span class="k">of</span> <span class="n">a</span> <span class="nc">Cobol</span> <span class="n">file</span>
 
 <span class="n">ebcdic</span> <span class="n">translate</span>
@@ -201,10 +213,83 @@
   <span class="nc">Stats</span> <span class="n">on</span> <span class="n">file</span> <span class="k">of</span> <span class="n">lines</span> <span class="o">(</span><span class="n">without</span> <span class="n">taking</span> <span class="nc">UTF8</span> <span class="n">chars</span> <span class="n">into</span> <span class="n">account</span><span class="o">)</span>
 </pre></div>
 </div>
+<section id="main-exe-cache-analyze">
+<h2>main.exe cache analyze<a class="headerlink" href="#main-exe-cache-analyze" title="Link to this heading"></a></h2>
+<p>Analyze files, reusing and filling the cache of their project</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>Preprocess, parse and typecheck each FILE as the LSP server would, according to the configuration of the project it belongs to, and report diagnostics.</p>
+<p>Analysis results are looked up in, or else stored into, the cache of that project, which is shared with the LSP server: a file analyzed by either is restored by the other, for as long as neither the file nor anything it depends upon (copybooks, project configuration) changes.</p>
+<p>Options such as <strong>–dialect</strong>, <strong>–conf</strong>, <strong>–source-format</strong>, <strong>-I</strong>, <strong>–ext</strong>, <strong>-D</strong>, <strong>–recovery</strong> or <strong>–silence</strong> override the project configuration; analyses obtained with them are cached separately, and are not shared with the LSP server.</p>
+<p>Files that appear to be copybooks are not analyzed. With <strong>–progress log-err</strong>, tell whether each analysis was found in the cache.</p>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">cache</span> <span class="n">analyze</span> <span class="nc">FILE</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">FILE</span></code>   Cobol file to analyze</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">-D</span> <span class="pre">VAR=VAL</span></code>   Define a pre-processor variable VAR, with value VAL</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">-I</span> <span class="pre">DIR</span></code>   Add DIR to library search path</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--conf</span> <span class="pre">CONF_FILE</span></code>   Set the configuration file to be used</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--config-dir</span> <span class="pre">DIR</span></code>   Add DIR to config search path</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--dialect</span> <span class="pre">DIALECT</span></code> or <code class="code docutils literal notranslate"><span class="pre">--std</span> <span class="pre">DIALECT</span></code>   Set the dialect to bu used (overriden by <cite>–conf</cite> if used)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--ext</span> <span class="pre">EXT</span></code>   Add EXT as a filename extension for copybook resolution (default: <cite>cpy</cite> <cite>cbl</cite> <cite>cob</cite>)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--free</span></code>   Shorthand for <cite>–source-format FREE</cite></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--progress</span> <span class="pre">MODE</span></code>   Set how to display progress of the command.</p></li>
+</ul>
+<dl class="simple">
+<dt>MODE can be hide, force, log or log-err.</dt><dd><p>By default progress is displayed when stderr is a TTY.</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">--project-root</span> <span class="pre">DIR</span></code> or <code class="code docutils literal notranslate"><span class="pre">--root</span> <span class="pre">DIR</span></code>   Set the root of the project (autodetected on a per-file basis otherwise)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--recovery</span> <span class="pre">BOOL</span></code>   Enable/disable parser recovery after syntax errors (default: true)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--silence</span> <span class="pre">STRING</span></code>   Silence specific messages</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--source-format</span> <span class="pre">SOURCE_FORMAT</span></code>   Set the format of source code; allowed values are: { FIXED (the default), FREE}</p></li>
+</ul>
+<p>Overrides <cite>format</cite> from configuration file if present.</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">--stdout</span></code>   Output errors/warnings to stdout</p></li>
+</ul>
+</section>
+<section id="main-exe-cache-status">
+<h2>main.exe cache status<a class="headerlink" href="#main-exe-cache-status" title="Link to this heading"></a></h2>
+<p>Report on the cache of a project</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>Show where the cache of the project containing DIR lives, how much room it takes, and – with <strong>-l</strong> – what each entry holds and when it was last used.</p>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">cache</span> <span class="n">status</span> <span class="nc">DIR</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">DIR</span></code>   Directory within the project (default: <a href="#id1"><span class="problematic" id="id2">`</span></a>.’)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--list-entries</span></code> or <code class="code docutils literal notranslate"><span class="pre">-l</span></code>   List every entry, not just the totals</p></li>
+</ul>
+</section>
+<section id="main-exe-cache-trim">
+<h2>main.exe cache trim<a class="headerlink" href="#main-exe-cache-trim" title="Link to this heading"></a></h2>
+<p>Reclaim entries a project’s cache no longer needs</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>Reclaim entries of the project containing DIR, along with every value they alone held.</p>
+<p><strong>–older-than</strong> removes those unused for that many days; <strong>–max-size</strong> removes the least recently used until the cache fits.  Both may be given, and with neither nothing is reclaimed but the leftovers of instances that died mid-write.  <strong>–older-than 0</strong> empties the cache.</p>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">cache</span> <span class="n">trim</span> <span class="nc">DIR</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">DIR</span></code>   Directory within the project (default: <a href="#id3"><span class="problematic" id="id4">`</span></a>.’)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--max-size</span> <span class="pre">SIZE</span></code>   Keep the cache under that size, reclaiming the entries least recently used.  Accepts a suffix: 500M, 2G, 64k</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--older-than</span> <span class="pre">DAYS</span></code>   Reclaim entries unused for that many days</p></li>
+</ul>
+</section>
 <section id="main-exe-check-syntax">
 <h2>main.exe check syntax<a class="headerlink" href="#main-exe-check-syntax" title="Link to this heading"></a></h2>
 <p>Check the syntax of a Cobol file</p>
 <p><strong>DESCRIPTION</strong></p>
+<p>Preprocess and parse each FILE, and report diagnostics.  By default, only the options given on the command line are used.</p>
+<p>With <strong>–project</strong>, each FILE is analyzed as the LSP server would: according to the configuration of the project it belongs to (which options given on the command line override), with typechecking, and leaving out files that appear to be copybooks. Results are looked up in the cache of that project, which also holds those of the LSP server and <strong>superbol cache analyze</strong>.  On a miss, results are stored into the cache without the artifacts the LSP server needs, so they are not reused by the latter (use <strong>superbol cache analyze</strong> to fill the cache for the LSP server).</p>
 <p><strong>USAGE</strong></p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">check</span> <span class="n">syntax</span> <span class="nc">FILE</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
@@ -226,6 +311,8 @@
 </dd>
 </dl>
 <ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">--project</span></code>   Check each file according to the configuration of its project, reusing and filling the project’s cache (see <a href="#id5"><span class="problematic" id="id6">`</span></a>superbol cache analyze’)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--project-root</span> <span class="pre">DIR</span></code> or <code class="code docutils literal notranslate"><span class="pre">--root</span> <span class="pre">DIR</span></code>   Set the root of the project (autodetected on a per-file basis otherwise)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--recovery</span> <span class="pre">BOOL</span></code>   Enable/disable parser recovery after syntax errors (default: true)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--silence</span> <span class="pre">STRING</span></code>   Silence specific messages</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--source-format</span> <span class="pre">SOURCE_FORMAT</span></code>   Set the format of source code; allowed values are: { FIXED (the default), FREE}</p></li>
@@ -344,6 +431,7 @@ Set the current default switch</p></li>
 </dd>
 </dl>
 <ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">--project-root</span> <span class="pre">DIR</span></code> or <code class="code docutils literal notranslate"><span class="pre">--root</span> <span class="pre">DIR</span></code>   Set the root of the project (autodetected on a per-file basis otherwise)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--recovery</span> <span class="pre">BOOL</span></code>   Enable/disable parser recovery after syntax errors (default: true)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--silence</span> <span class="pre">STRING</span></code>   Silence specific messages</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--source-format</span> <span class="pre">SOURCE_FORMAT</span></code>   Set the format of source code; allowed values are: { FIXED (the default), FREE}</p></li>
@@ -365,10 +453,10 @@ Set the current default switch</p></li>
 <ul class="simple">
 <li><p><code class="code docutils literal notranslate"><span class="pre">FILES</span></code>   JSON Files to parse</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--gen</span> <span class="pre">FILE</span></code>   Generate FILE from current configuration</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">--grammar</span></code>   Parse files as syntaxes/<a href="#id1"><span class="problematic" id="id2">*</span></a>.json files</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">--language</span></code>   Parse files as language/configuration <a href="#id3"><span class="problematic" id="id4">*</span></a>.json files</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--grammar</span></code>   Parse files as syntaxes/<a href="#id7"><span class="problematic" id="id8">*</span></a>.json files</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--language</span></code>   Parse files as language/configuration <a href="#id9"><span class="problematic" id="id10">*</span></a>.json files</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--manifest</span></code>   Parse files as package.json files</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">--snippets</span></code>   Parse files as snippets/<a href="#id5"><span class="problematic" id="id6">*</span></a>.json files</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--snippets</span></code>   Parse files as snippets/<a href="#id11"><span class="problematic" id="id12">*</span></a>.json files</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--tasks</span></code>   Parse files as .vscode/tasks.json files</p></li>
 </ul>
 </section>
@@ -383,6 +471,8 @@ Set the current default switch</p></li>
 </div>
 <p>Where options are:</p>
 <ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">--cache-max-age</span> <span class="pre">DAYS</span></code>   Reclaim cache entries that have not been used for that many days. Kept indefinitely by default.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--cache-size-limit</span> <span class="pre">SIZE</span></code>   Keep each project’s cache under that size, reclaiming the entries least recently used whenever it is written out.  Accepts a suffix: 500M, 2G, 64k.  Unbounded by default.</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--caching</span></code>   Enable caching (enabled by default)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--force-syntax-diagnostics</span></code>   Force reporting of syntax error and hint diagnostics for dialects other than COBOL85 (for which they are always enabled)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--no-caching</span></code>   Disable caching (enabled by default)</p></li>
@@ -418,6 +508,7 @@ Set the current default switch</p></li>
 </dd>
 </dl>
 <ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">--project-root</span> <span class="pre">DIR</span></code> or <code class="code docutils literal notranslate"><span class="pre">--root</span> <span class="pre">DIR</span></code>   Set the root of the project (autodetected on a per-file basis otherwise)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--recovery</span> <span class="pre">BOOL</span></code>   Enable/disable parser recovery after syntax errors (default: true)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--silence</span> <span class="pre">STRING</span></code>   Silence specific messages</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--source-format</span> <span class="pre">SOURCE_FORMAT</span></code>   Set the format of source code; allowed values are: { FIXED (the default), FREE}</p></li>
@@ -554,6 +645,7 @@ Set the current default switch</p></li>
 </dd>
 </dl>
 <ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">--project-root</span> <span class="pre">DIR</span></code> or <code class="code docutils literal notranslate"><span class="pre">--root</span> <span class="pre">DIR</span></code>   Set the root of the project (autodetected on a per-file basis otherwise)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--recovery</span> <span class="pre">BOOL</span></code>   Enable/disable parser recovery after syntax errors (default: true)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--silence</span> <span class="pre">STRING</span></code>   Silence specific messages</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--source-format</span> <span class="pre">SOURCE_FORMAT</span></code>   Set the format of source code; allowed values are: { FIXED (the default), FREE}</p></li>
