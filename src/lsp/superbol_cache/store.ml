@@ -30,13 +30,15 @@
 
     - make {!TYPES.publish} {e atomic and non-destructive}: a reader either sees
       nothing at the given path or sees the complete contents, never a prefix;
-      and publishing over an existing path leaves that path alone and reports
-      success.  Publishing is expected to go through a temporary file in the
-      target's own directory, followed by a hard link --- [link] fails with
-      [EEXIST] exactly when someone else has already published the same item,
-      which is the wanted behaviour and is reliable over NFS.  [rename] must
-      {e not} be used to replace an existing target: that is neither atomic nor
-      even permitted over SMB.
+      and, unless asked to replace it, publishing over an existing path leaves
+      that path alone and reports success.  Publishing is expected to stage the
+      item under {!Layout.tmp}, which shares the target's file-system, followed
+      by a hard link --- [link] fails with [EEXIST] exactly when someone else
+      has already published the same item, which is the wanted behaviour and is
+      reliable over NFS.  [rename] is only fit for replacing a target, or as a
+      fallback where hard links are unavailable and the target was just seen to
+      be absent: it silently overwrites, and some SMB shares refuse to replace
+      with it at all.
 
     - report failure rather than raise.  A cache is optional by nature, so every
       operation that cannot be carried out is reported as an [Error], which the

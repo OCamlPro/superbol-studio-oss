@@ -57,8 +57,9 @@ let document_keys ~project ~filename ~contents ~language_id =
 
 (* Keyed on what the editor is showing, which is what the cached artifacts were
    actually parsed from -- and not on what the file holds, which may still differ
-   from it.  Since a document is restored by reading the file, keying it on
-   anything else would make it restorable in a state it was never parsed in. *)
+   from it.  Documents are looked up likewise, on the text the editor sends
+   when opening them ({!load_document}), so that a document is only ever
+   restored for the very text it was parsed from. *)
 let store_document ~cache ~project doc =
   let analysis, witnesses, cached = Lsp_document.to_cache doc in
   let filename = cached.doc_cache_filename in
