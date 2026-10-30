@@ -2,6 +2,9 @@
 
 ## [_] Next release
 
+### Added
+- New manifest-based cache [#709](https://github.com/OCamlPro/superbol-studio-oss/pull/709)
+
 ### Fixed
 - Internal errors of the LSP server that may occur on some (rare) corner cases [#702](https://github.com/OCamlPro/superbol-studio-oss/pull/702)
 - Fatal error on ambiguous qualified names appearing in abbreviated relation conditions [#701](https://github.com/OCamlPro/superbol-studio-oss/pull/701)
