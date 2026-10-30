@@ -93,6 +93,10 @@ let analysis_overrides ~config ~conf ~dialect ~format ~libpath ~libexts ~env
     override_show = show;
   }
 
+(* At toplevel in the (very unlikely) case where several calls to [get] are
+   performed by a single CLI instance. *)
+let last_progress_msg_len = ref 0
+
 let get () =
   let project_root = ref None in
   let conf = ref "" in
@@ -260,7 +264,6 @@ let get () =
         ~recovery:(if !explicit_recovery then Some recovery else None)
         ~show:(if !explicit_show then Some !show else None)
     in
-    let last_progress_msg_len = ref 0 in
     (* Pretty.error "@[Preprocessor environment:@;<1 2>@[%a@]@]@." *)
     (*   Cobol_preproc.Env.pp env; *)
     { platform;
@@ -279,11 +282,11 @@ let get () =
         | Show -> fun fmt ->
             Format.kasprintf (fun s ->
                 let len = String.length s in
-                let pad = String.make (max 0 (!last_progress_msg_len - len)) ' ' in
+                let padlen = max 0 (!last_progress_msg_len - len) in
                 last_progress_msg_len := len;
-                Pretty.error "%s%s\r%!" s pad)
-              ("@[" ^^ fmt ^^ "@]")
-        | Log -> fun fmt -> Pretty.out ("@[" ^^ fmt ^^ "@]@.") 
+                Printf.eprintf "%s%*s\r%!" s padlen "")
+              ("@[<h>" ^^ fmt ^^ "@]")
+        | Log -> fun fmt -> Pretty.out ("@[" ^^ fmt ^^ "@]@.")
         | Log_stderr -> fun fmt -> Pretty.error ("@[" ^^ fmt ^^ "@]@.") }
   in
   get, args
