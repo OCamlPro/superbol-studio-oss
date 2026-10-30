@@ -245,7 +245,9 @@ let analyze_for_lsp ~platform ?overrides ~filename ~contents project =
    witnessed, because settings pushed by an LSP client never reach a file we
    could witness.  An overriding COBOL configuration is represented by its
    description, as it cannot be digested itself. *)
-let config_digest ?(overrides = no_overrides) project =
+type config_inputs = Superbol_cache.Types.digest
+
+let config_inputs ?(overrides = no_overrides) project =
   let { config; _ } = with_overrides ~overrides project in
   try
     Option.some @@
@@ -265,27 +267,39 @@ let config_digest ?(overrides = no_overrides) project =
   with Invalid_argument _ ->
     None         (* nothing here should be functional, but if ever, just fail *)
 
+type keys =
+  {
+    inputs: Superbol_cache.Types.digest list;
+    key: Superbol_cache.Types.key;
+    key_for_lsp: Superbol_cache.Types.key;
+  }
+
 (* The document's contents take part in the key, rather than being witnessed:
    entries are published without ever replacing one another, so a document that
-   is edited has to land under a key of its own. *)
-let inputs ?overrides ~filename ~contents project =
-  Option.map begin fun config_digest ->
-    [Digest.string @@ WITNESS.canonical_path filename;
-     Digest.string contents;
-     config_digest]
-  end (config_digest ?overrides project)
+   is edited has to land under a key of its own.
 
-(* Both kinds of results are cached on their own, from the same inputs: neither
+   Both kinds of results are cached on their own, from the same inputs: neither
    is derived from the other, which would make a hit on one require the other
    to be held. *)
-let key ?overrides ~filename ~contents project =
-  Option.map (fun inputs -> CACHE.shallow_key ~label:"analysis" ~inputs) @@
-  inputs ?overrides ~filename ~contents project
+let document_keys config ~filename ~contents =
+  let inputs =
+    [Digest.string @@ WITNESS.canonical_path filename;
+     Digest.string contents;
+     config]
+  in
+  {
+    inputs;
+    key = CACHE.shallow_key ~label:"analysis" ~inputs;
+    key_for_lsp = CACHE.shallow_key ~label:"analysis-for-lsp" ~inputs;
+  }
 
-let key_for_lsp ?overrides ~filename ~contents project =
-  Option.map (fun inputs ->
-      CACHE.shallow_key ~label:"analysis-for-lsp" ~inputs) @@
-  inputs ?overrides ~filename ~contents project
+let keys ?overrides ~filename ~contents project =
+  Option.map (document_keys ~filename ~contents) @@
+  config_inputs ?overrides project
+
+let inputs { inputs; _ } = inputs
+let key { key; _ } = key
+let key_for_lsp { key_for_lsp; _ } = key_for_lsp
 
 let store_any cache ~key ~label ~witnesses v =
   CACHE.store cache ~key ~label ~witnesses ~write_item:CACHING.write_item v
@@ -314,29 +328,31 @@ let lookup_or_analyze cache ~platform ~resolve ~key ~label ~analyze =
       store_any cache ~key ~label ~witnesses:(RECORDER.witnesses recorder) v;
       v, false
 
-let cached_analysis cache ~platform ?overrides ~filename ~contents project =
-  match key ?overrides ~filename ~contents project,
-        key_for_lsp ?overrides ~filename ~contents project with
-  | Some key, Some key_for_lsp ->
-      let resolve = RECORDER.resolver ~platform () in
-      begin match lookup_for_lsp cache ~key:key_for_lsp ~resolve with
-        | Some a ->
-            of_lsp_artifacts a, true
-        | None ->
-            lookup_or_analyze cache ~platform ~resolve ~key
-              ~label:(Project.relative_path_for ~filename project)
-              ~analyze:(analyze ?overrides ~filename ~contents project)
-      end
-  | _ ->
-      analyze ~platform ?overrides ~filename ~contents project, false
-
-let cached_analysis_for_lsp cache ~platform ?overrides ~filename ~contents
-    project =
-  match key_for_lsp ?overrides ~filename ~contents project with
+let cached_analysis_n_key cache ~platform ?overrides
+    ~keys:{ key; key_for_lsp; _ } ~filename ~contents project =
+  let resolve = RECORDER.resolver ~platform () in
+  match lookup_for_lsp cache ~key:key_for_lsp ~resolve with
+  | Some a ->
+      of_lsp_artifacts a, true, key_for_lsp
   | None ->
-      analyze_for_lsp ~platform ?overrides ~filename ~contents project, false
-  | Some key ->
-      lookup_or_analyze cache ~platform ~key
-        ~resolve:(RECORDER.resolver ~platform ())
-        ~label:(Project.relative_path_for ~filename project)
-        ~analyze:(analyze_for_lsp ?overrides ~filename ~contents project)
+      let v, hit =
+        lookup_or_analyze cache ~platform ~resolve ~key
+          ~label:(Project.relative_path_for ~filename project)
+          ~analyze:(analyze ?overrides ~filename ~contents project)
+      in
+      v, hit, key
+
+let cached_analysis cache ~platform ?overrides ~keys ~filename ~contents
+    project =
+  let v, hit, _ =
+    cached_analysis_n_key cache ~platform ?overrides ~keys ~filename ~contents
+      project
+  in
+  v, hit
+
+let cached_analysis_for_lsp cache ~platform ?overrides
+    ~keys:{ key_for_lsp; _ } ~filename ~contents project =
+  lookup_or_analyze cache ~platform ~key:key_for_lsp
+    ~resolve:(RECORDER.resolver ~platform ())
+    ~label:(Project.relative_path_for ~filename project)
+    ~analyze:(analyze_for_lsp ?overrides ~filename ~contents project)

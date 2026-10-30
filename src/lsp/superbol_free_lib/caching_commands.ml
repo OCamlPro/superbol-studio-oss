@@ -30,7 +30,7 @@ type located_file =
     filename: string;
     project: Superbol_project.t;
     contents: string;
-    cache: CACHE.t option;
+    cached: (CACHE.t * ANALYSIS.keys) option;    (* project cache, and keys *)
   }
 
 (** ['a] is either {!ANALYSIS.t} or {!ANALYSIS.for_lsp}. *)
@@ -43,7 +43,9 @@ type 'a analyzed_file =
     hit: bool;                              (* whether found in project cache *)
   }
 
-let locate Common_args.{ project_root; platform; _ } given_filename =
+let locate
+    Common_args.{ project_root; platform; analysis_overrides = overrides; _ }
+    given_filename =
   let filename =                               (* filenames take part in keys *)
     if EzFile.is_absolute given_filename
     then given_filename
@@ -58,15 +60,20 @@ let locate Common_args.{ project_root; platform; _ } given_filename =
   if given_filename != filename then
     Cobol_common.Srcloc.NAMING.register_given_filename ~given_filename
       ~filename;
-  { filename; project; contents; cache = Option.map snd (cache_for rootdir) }
+  let cached =
+    Option.bind (cache_for rootdir) @@ fun (_, cache) ->
+    Option.map (fun keys -> cache, keys) @@
+    ANALYSIS.keys ~overrides ~filename ~contents project
+  in
+  { filename; project; contents; cached }
 
 let analyze_located Common_args.{ platform; analysis_overrides = overrides; _ }
-    { filename; project; contents; cache } =
+    { filename; project; contents; cached } =
   let analysis, hit =
-    match cache with
-    | Some cache ->
-        ANALYSIS.cached_analysis cache ~platform ~overrides ~filename ~contents
-          project
+    match cached with
+    | Some (cache, keys) ->
+        ANALYSIS.cached_analysis cache ~platform ~overrides ~keys ~filename
+          ~contents project
     | None ->
         ANALYSIS.analyze ~platform ~overrides ~filename ~contents
           project, false
@@ -75,12 +82,12 @@ let analyze_located Common_args.{ platform; analysis_overrides = overrides; _ }
 
 let analyze_located_for_lsp
     Common_args.{ platform; analysis_overrides = overrides; _ }
-    { filename; project; contents; cache; _ } =
+    { filename; project; contents; cached } =
   let analysis, hit =
-    match cache with
-    | Some cache ->
-        ANALYSIS.cached_analysis_for_lsp cache ~platform ~overrides ~filename
-          ~contents project
+    match cached with
+    | Some (cache, keys) ->
+        ANALYSIS.cached_analysis_for_lsp cache ~platform ~overrides ~keys
+          ~filename ~contents project
     | None ->
         ANALYSIS.analyze_for_lsp ~platform ~overrides ~filename ~contents
           project, false
@@ -103,56 +110,47 @@ let of_lsp_artifacts_file
     ({ analysis; _ } as file: ANALYSIS.for_lsp analyzed_file) =
   { file with analysis = ANALYSIS.of_lsp_artifacts analysis }
 
-(** [derived_entry common ~label ~inputs located] is the cache, and key of the
-    derived entry, for [located], along with the keys of the analysis entries
-    (normal, and for the LSP) it may derive from. *)
-let derived_entry Common_args.{ analysis_overrides = overrides; _ }
-    ~label ~inputs ({ filename; project; contents; cache }: located_file) =
-  match cache,
-        ANALYSIS.inputs ~overrides ~filename ~contents project,
-        ANALYSIS.key ~overrides ~filename ~contents project,
-        ANALYSIS.key_for_lsp ~overrides ~filename ~contents project with
-  | Some cache, Some analysis_inputs, Some analysis_key, Some lsp_key ->
-      let key = CACHE.shallow_key ~label ~inputs:(analysis_inputs @ inputs) in
-      Some (cache, key, analysis_key, lsp_key)
-  | _ ->
-      None
+(** [derived_entry ~label ~inputs located] is the cache, and key of the derived
+    entry, for [located], along with the keys of the analysis it may derive
+    from. *)
+let derived_entry ~label ~inputs ({ cached; _ }: located_file) =
+  Option.map begin fun (cache, keys) ->
+    let inputs = ANALYSIS.inputs keys @ inputs in
+    cache, CACHE.shallow_key ~label ~inputs, keys
+  end cached
 
-(** [analyze_located_n_witness common ~cache ~analysis_key ~lsp_key located] is
-    the analysis of [located], along with the key of the cache entry it is held
-    in: the analysis for the LSP if [cache] holds one, or else the (normal)
-    analysis, computed and stored on a miss. *)
+(** [analyze_located_n_witness common ~cache ~keys located] is the analysis
+    of [located], along with the key of the cache entry it is held in: the
+    analysis for the LSP if [cache] holds one, or else the (normal) analysis,
+    computed and stored on a miss. *)
 let analyze_located_n_witness
-    (Common_args.{ platform; _ } as common)
-    ~cache ~analysis_key ~lsp_key
-    ({ filename; project; contents; _ } as located: located_file)
+    Common_args.{ platform; analysis_overrides = overrides; _ }
+    ~cache ~keys ({ filename; project; contents; _ }: located_file)
   : ANALYSIS.t analyzed_file * _ =
-  let resolve = RECORDER.resolver ~platform () in
-  match ANALYSIS.lookup_for_lsp cache ~key:lsp_key ~resolve with
-  | Some a ->
-      { filename; project; contents; hit = true;
-        analysis = ANALYSIS.of_lsp_artifacts a }, lsp_key
-  | None ->
-      analyze_located common located, analysis_key
+  let analysis, hit, key =
+    ANALYSIS.cached_analysis_n_key cache ~platform ~overrides ~keys ~filename
+      ~contents project
+  in
+  { filename; project; contents; analysis; hit }, key
 
 let derive_located
     (Common_args.{ platform; _ } as common)
     ~label ~inputs ~(derive: ANALYSIS.t analyzed_file -> 'a) located
   : 'a * bool * ANALYSIS.t analyzed_file Lazy.t =
-  match derived_entry common ~label ~inputs located with
-  | Some (cache, key, analysis_key, lsp_key) ->
+  match derived_entry ~label ~inputs located with
+  | Some (cache, key, keys) ->
       let resolve = RECORDER.resolver ~platform () in
       begin match CACHE.lookup cache ~key ~resolve
                     ~read_item:CACHING.read_item with
       | Ok Some v ->
           v, true, lazy begin
             fst @@
-            analyze_located_n_witness common ~cache ~analysis_key ~lsp_key
+            analyze_located_n_witness common ~cache ~keys
               located
           end
       | Ok None | Error _ ->
           let analyzed, analysis_key =
-            analyze_located_n_witness common ~cache ~analysis_key ~lsp_key
+            analyze_located_n_witness common ~cache ~keys
               located in
           let v = derive analyzed in
           ignore @@
@@ -200,15 +198,15 @@ let derive_n_analyze_file common ~label ~inputs ~derive filename
 
 let lookup_located (Common_args.{ platform; _ } as common) ~label ~inputs
     located : ('a * ANALYSIS.t analyzed_file Lazy.t) option =
-  match derived_entry common ~label ~inputs located with
-  | Some (cache, key, analysis_key, lsp_key) ->
+  match derived_entry ~label ~inputs located with
+  | Some (cache, key, keys) ->
       let resolve = RECORDER.resolver ~platform () in
       begin match CACHE.lookup cache ~key ~resolve
                     ~read_item:CACHING.read_item with
       | Ok Some v ->
           Some (v, lazy begin
               fst @@
-              analyze_located_n_witness common ~cache ~analysis_key ~lsp_key
+              analyze_located_n_witness common ~cache ~keys
                 located
             end)
       | Ok None | Error _ ->

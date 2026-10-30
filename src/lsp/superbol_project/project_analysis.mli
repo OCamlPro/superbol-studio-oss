@@ -174,41 +174,55 @@ val analyze_for_lsp
 
 (** {1 Caching} *)
 
-(** [inputs ?overrides ~filename ~contents project] are the inputs from which
-    the key of an analysis of [filename] is built: they cover everything the
-    analysis depends upon, apart from what it observes of the outside world
-    (copybooks, environment variables...), which is recorded as witnesses
-    instead.  [None] if they cannot be computed (for instance, if one input
-    contains a closure).
+(** Digest of everything about a project and some overrides that bears on how
+    its documents are analyzed.  It may be computed once, and shared among
+    every document of the project that is analyzed with the same overrides. *)
+type config_inputs
 
-    Front-ends may build keys of their own from these inputs, to cache data that
-    depends on the analysis. *)
-val inputs
+(** [config_inputs ?overrides project] are the inputs that all keys of
+    analyses of documents of [project] with [overrides] share.  [None] if they
+    cannot be computed (for instance, if one input contains a closure). *)
+val config_inputs
+  : ?overrides: overrides
+  -> Project.t
+  -> config_inputs option
+
+(** Keys under which the analyses of a document are cached, along with the
+    inputs they are built from: these cover everything the analysis depends
+    upon, apart from what it observes of the outside world (copybooks,
+    environment variables...), which is recorded as witnesses instead. *)
+type keys
+
+(** [document_keys config ~filename ~contents] are the keys of the document
+    [filename], holding [contents], where [config] are the {!config_inputs} of
+    its project and overrides. *)
+val document_keys
+  : config_inputs
+  -> filename: string
+  -> contents: string
+  -> keys
+
+(** [keys ?overrides ~filename ~contents project] combines {!config_inputs}
+    and {!document_keys}. *)
+val keys
   : ?overrides: overrides
   -> filename: string
   -> contents: string
   -> Project.t
-  -> Superbol_cache.Types.digest list option
+  -> keys option
 
-(** [key ?overrides ~filename ~contents project] is the key under which an
-    analysis of [filename] is cached; see {!inputs}. *)
-val key
-  : ?overrides: overrides
-  -> filename: string
-  -> contents: string
-  -> Project.t
-  -> Superbol_cache.Types.key option
+(** [inputs keys] are the digests [keys] are built from.  Front-ends may build
+    keys of their own from these, to cache data that depends on the
+    analysis. *)
+val inputs: keys -> Superbol_cache.Types.digest list
 
-(** [key_for_lsp ?overrides ~filename ~contents project] is the key under which
-    an analysis of [filename] for the LSP is cached; it is built from the same
-    {!inputs} as {!key}, but both kinds of results are stored on their own: a
-    hit on one does not require the other to be held. *)
-val key_for_lsp
-  : ?overrides: overrides
-  -> filename: string
-  -> contents: string
-  -> Project.t
-  -> Superbol_cache.Types.key option
+(** [key keys] is the key under which an analysis is cached. *)
+val key: keys -> Superbol_cache.Types.key
+
+(** [key_for_lsp keys] is the key under which an analysis for the LSP is
+    cached; both kinds of results are stored on their own: a hit on one does
+    not require the other to be held. *)
+val key_for_lsp: keys -> Superbol_cache.Types.key
 
 (** [store_for_lsp cache ~key ~label ~witnesses a] records [a] in [cache], for
     as long as [witnesses] hold. *)
@@ -228,30 +242,50 @@ val lookup_for_lsp
   -> resolve: (Superbol_cache.Types.witness -> bool)
   -> for_lsp option
 
-(** [cached_analysis cache ~platform ?overrides ~filename ~contents project] is
-    the analysis of [filename]: it is obtained from the analysis for the LSP
-    held in [cache] if any, or else from a (normal) analysis, answering
-    witnesses from [platform].  On a miss on both, analyzes the document with
-    {!analyze}, recording what [platform] is asked, and stores the result (which
-    the LSP does not reuse).  The Boolean indicates a hit. *)
+(** In the functions below, [keys] must be the {!keys} of [filename] and
+    [contents] in [project], with [overrides]. *)
+
+(** [cached_analysis cache ~platform ?overrides ~keys ~filename ~contents
+    project] is the analysis of [filename]: it is obtained from the analysis
+    for the LSP held in [cache] if any, or else from a (normal) analysis,
+    answering witnesses from [platform].  On a miss on both, analyzes the
+    document with {!analyze}, recording what [platform] is asked, and stores the
+    result (which the LSP does not reuse).  The Boolean indicates a hit. *)
 val cached_analysis
   : Superbol_cache.Cache.t
   -> platform: Cobol_common.Platform.TYPES.platform
   -> ?overrides: overrides
+  -> keys: keys
   -> filename: string
   -> contents: string
   -> Project.t
   -> t * bool
 
-(** [cached_analysis_for_lsp cache ~platform ?overrides ~filename ~contents
-    project] looks the analysis for the LSP of [filename] up in [cache],
-    answering witnesses from [platform]; on a miss, analyzes the document,
-    recording what [platform] is asked, and stores the result.  The Boolean
-    indicates a hit. *)
+(** [cached_analysis_n_key cache ~platform ?overrides ~keys ~filename
+    ~contents project] is like {!cached_analysis}, except that it also returns
+    the key of the entry that holds the analysis: [key_for_lsp keys] if it
+    was obtained from an analysis for the LSP, or else [key keys].  Entries
+    derived from the analysis may witness it. *)
+val cached_analysis_n_key
+  : Superbol_cache.Cache.t
+  -> platform: Cobol_common.Platform.TYPES.platform
+  -> ?overrides: overrides
+  -> keys: keys
+  -> filename: string
+  -> contents: string
+  -> Project.t
+  -> t * bool * Superbol_cache.Types.key
+
+(** [cached_analysis_for_lsp cache ~platform ?overrides ~keys ~filename
+    ~contents project] looks the analysis for the LSP of [filename] up in
+    [cache], answering witnesses from [platform]; on a miss, analyzes the
+    document, recording what [platform] is asked, and stores the result.  The
+    Boolean indicates a hit. *)
 val cached_analysis_for_lsp
   : Superbol_cache.Cache.t
   -> platform: Cobol_common.Platform.TYPES.platform
   -> ?overrides: overrides
+  -> keys: keys
   -> filename: string
   -> contents: string
   -> Project.t

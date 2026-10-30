@@ -46,12 +46,10 @@ let project_key ~rootdir =
    LSP one. *)
 let document_keys ~project ~filename ~contents ~language_id =
   let overrides = Lsp_document.analysis_overrides ~language_id in
-  match ANALYSIS.key_for_lsp ~overrides ~filename ~contents project,
-        ANALYSIS.inputs ~overrides ~filename ~contents project with
-  | Some analysis_key, Some inputs ->
-      Some (analysis_key, CACHE.shallow_key ~label:"lsp-document" ~inputs)
-  | _ ->
-      None
+  Option.map begin fun keys ->
+    ANALYSIS.key_for_lsp keys,
+    CACHE.shallow_key ~label:"lsp-document" ~inputs:(ANALYSIS.inputs keys)
+  end (ANALYSIS.keys ~overrides ~filename ~contents project)
 
 (* --- Saving --- *)
 

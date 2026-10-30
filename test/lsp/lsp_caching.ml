@@ -257,12 +257,15 @@ let cli_analyze ?(for_lsp = false) ~projdir () =
     lsp_cache_for ~rootdir:(Superbol_project.string_of_rootdir rootdir) in
   let contents = EzFile.read_file filename in
   let platform = Superbol_platform.record in
+  let keys =
+    Option.get @@ Superbol_project.Analysis.keys ~filename ~contents project
+  in
   let hit =
     if for_lsp
     then snd @@ Superbol_project.Analysis.cached_analysis_for_lsp cache
-        ~platform ~filename ~contents project
+        ~platform ~keys ~filename ~contents project
     else snd @@ Superbol_project.Analysis.cached_analysis cache
-        ~platform ~filename ~contents project
+        ~platform ~keys ~filename ~contents project
   in
   print_endline (if hit then "found by the CLI" else "analyzed by the CLI")
 
