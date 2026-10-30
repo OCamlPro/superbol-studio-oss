@@ -44,3 +44,14 @@ let ambiguous_n_anonymous =
           GOBACK.
       *A. GOBACK.  *> forbidden redefinition of A
     |}
+
+let section_starts_with_paragraph =
+  prog "section-starts-with-paragraph"
+    ~procedure:{|
+          PERFORM A.
+          GOBACK.
+       A SECTION.
+       B. PERFORM C.
+          GOBACK.
+       C. GOBACK.
+    |}

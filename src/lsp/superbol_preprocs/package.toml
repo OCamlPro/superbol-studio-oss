@@ -43,7 +43,7 @@ gen-version = "version.ml"
 
 # preprocessing options
 #  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
-# preprocess = "pps ppx_deriving.show"
+# preprocess = "pps ppx_deriving_encoding"
 
 # files to skip while updating at package level
 skip = ["index.mld", "main.ml"]
@@ -54,14 +54,15 @@ skip = ["index.mld", "main.ml"]
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
 cobol_common = "version"
-cobol_preproc = "version"
 cobol_parser = "version"
+cobol_preproc = "version"
 cobol_typeck = "version"
-sql_parser = "version"
 pretty = "version"
+sql_parser = "version"
 
 # package tools dependencies
 [tools]
+# ...
 
 # package fields (depends on package skeleton)
 #Examples:
@@ -72,7 +73,8 @@ pretty = "version"
 #  no-opam-test = "yes" 
 #  no-opam-doc = "yes" 
 #  gen-opam = "some" | "all" 
-#  dune-stanzas = "(flags (:standard (:include linking.sexp)))" 
+#  dune-flags = "(:standard (:include linking.sexp))" 
+#  dune-stanzas = "(foreign_stubs (language c) (names mapfile_stubs))" 
 #  static-clibs = "unix" 
 [fields]
 # ...

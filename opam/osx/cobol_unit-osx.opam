@@ -52,6 +52,7 @@ depends: [
   "ocaml" {>= "4.14.2"}
   "dune" {>= "3.17.0"}
   "cobol_ptree-osx" {= version}
+  "cobol_procedure-osx" {= version}
   "cobol_data-osx" {= version}
   "cobol_config-osx" {= version}
   "cobol_common-osx" {= version}

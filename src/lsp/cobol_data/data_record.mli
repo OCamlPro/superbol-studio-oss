@@ -17,6 +17,7 @@ open Data_types
 
 val size: record -> Data_memory.size
 val storage: record -> data_storage
+val has_definition_issues: record -> bool
 
 module SET: sig
   include Stdlib.Set.S with type elt = record

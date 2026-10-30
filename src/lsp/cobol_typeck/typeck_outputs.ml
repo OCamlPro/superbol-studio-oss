@@ -25,10 +25,10 @@ type references_in_unit =
     (* TODO: const_refs, prog_refs?, others... *)
     (* TODO atm data_refs and proc_refs contains BOTH direct references and indirect references
        e.g.: DISPLAY B IN A result in
-         - a direct reference to B
-         - a indirect reference to A
-      In the future we may need/want to split those 2 kind of references
-     *)
+       - a direct reference to B
+       - a indirect reference to A
+         In the future we may need/want to split those 2 kind of references
+    *)
   }
 type references_in_group = references_in_unit Cobol_unit.Collections.MAP.t
 
@@ -39,10 +39,11 @@ type artifacts =
 
 type outputs =
   {
-    ptree: Cobol_ptree.compilation_group; (** 
-      Parse tree (AST without typing information) copied in the typechecker output 
-      to ease its direct use by further passes in the analysis pipeline and queries 
-      in the LSP server. *)
+    ptree: Cobol_ptree.compilation_group;
+    (** Parse tree (AST without typing information) copied in the typechecker output
+        to ease its direct use by further passes in the analysis pipeline and queries
+        in the LSP server. *)
+
     group: Cobol_unit.Types.group; (** The typed AST view as an unordered set of cobol_unit *)
     artifacts: artifacts; (** Other typing artifacts *)
   }
@@ -53,7 +54,7 @@ type t = outputs
    blocks *)
 type references_acc =
   {
-    current_section: Cobol_unit.Types.procedure_section option;
+    current_section: Cobol_unit.Types.section option;
     refs: references_in_unit;
     diags: Typeck_diagnostics.t;
   }
@@ -97,26 +98,6 @@ let register_data_qualref qn ~loc refs =
 
 let register_proc_qualref qn ~loc refs =
   { refs with proc_refs = register_qualref qn ~loc refs.proc_refs }
-
-let register_data_field_ref ~loc field refs =
-  (* match Cobol_data.Item.qualname ~&item with *)
-  match ~&field.Cobol_data.Types.field_qualname with
-  | None -> refs
-  | Some qn -> register_data_qualref ~&qn ~loc refs
-
-let register_data_renaming_ref ~loc renaming refs =
-  register_data_qualref
-    ~&(~&renaming.Cobol_data.Types.renaming_name) ~loc refs
-
-let register_condition_name_ref ~loc cond_name refs =
-  register_data_qualref
-    ~&(~&cond_name.Cobol_data.Types.condition_name_qualname) ~loc refs
-
-(* let register_table_index_ref ~loc qn refs = *)
-(*   (\* match Cobol_data.Item.qualname ~&item with *\) *)
-(*   match ~&table.Cobol_data.Types.table_index with *)
-(*   | None -> refs *)
-(*   | Some qn -> register_data_qualref qn ~loc refs *)
 
 let register_procedure_ref ~loc block refs =
   match Cobol_unit.Types.block_name block with

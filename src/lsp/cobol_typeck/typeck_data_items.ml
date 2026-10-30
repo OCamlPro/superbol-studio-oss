@@ -430,7 +430,7 @@ let field_layout_n_sizes ~usage ~init_value { item_name;
 let subitem_fields_have_issues { item_rev_fields; _ } =
   LIST.exists begin fun f -> match ~&f with
     | Field { field_has_definition_issues; _ } -> field_has_definition_issues
-    | Table _ -> false
+    | Table { table_has_definition_issues; _ } -> table_has_definition_issues
   end item_rev_fields
 
 

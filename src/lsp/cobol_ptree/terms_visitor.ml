@@ -21,74 +21,80 @@ open Cobol_common.Visitor.INFIX                         (* for `>>` (== `|>`) *)
 
 (* --- *)
 
-class ['a] folder = object
+(** Folder for the terms of the parse tree that are embedded as is in typed
+    trees ({!Cobol_data}, {!Cobol_procedure}). Typed trees reuse these
+    methods, so that a single visitor can traverse them all. *)
+class ['a] shared_folder = object
   inherit ['a] Cobol_common.Visitor.Fold.folder
   method fold_name: (name, 'a) fold = default
   method fold_name': (name with_loc, 'a) fold = default
-  method fold_ident: (ident, 'a) fold = default
   method fold_qualname: (qualname, 'a) fold = default
   method fold_qualname': (qualname with_loc, 'a) fold = default
   method fold_procedure_name: (procedure_name, 'a) fold = default
   method fold_procedure_name': (procedure_name with_loc, 'a) fold = default
   method fold_intrinsic_name: (intrinsic_name, 'a) fold = default
   method fold_intrinsic_name': (intrinsic_name with_loc, 'a) fold = default
-  method fold_qualident: (qualident, 'a) fold = default
-  method fold_address: (address, 'a) fold = default
   method fold_counter: (counter, 'a) fold = default
   method fold_counter_kind: (counter_kind, 'a) fold = default
-  method fold_length_of: (length_of_ term, 'a) fold = default
-  method fold_inline_call: (inline_call, 'a) fold = default
   method fold_trimming_tip: (trimming_tip, 'a) fold = default
-  method fold_inline_invocation: (inline_invocation, 'a) fold = default
-  method fold_effective_arg: (effective_arg, 'a) fold = default
-  method fold_object_view: (object_view, 'a) fold = default
   method fold_object_view_spec: (object_view_spec, 'a) fold = default
   method fold_object_ref: (object_ref, 'a) fold = default
-  method fold_subscript: (subscript, 'a) fold = default
-  method fold_subscript': (subscript with_loc, 'a) fold = default
-  method fold_refmod: (refmod, 'a) fold = default
   method fold_sign: (sign, 'a) fold = default
   method fold_signz: (signz, 'a) fold = default
-  method fold_boolean: (boolean, 'a) fold = default
+  method fold_binop: (binop, 'a) fold = default
+  method fold_unop: (unop, 'a) fold = default
+  method fold_class: (class_, 'a) fold = default
+  method fold_logop: (logop, 'a) fold = default
+  method fold_relop: (relop, 'a) fold = default
+  method fold_rounding_mode: (rounding_mode, 'a) fold = default
+  method fold_rounding: (rounding, 'a) fold = default
+end
+
+class ['a] folder = object
+  inherit ['a] shared_folder
+  method fold_integer: (integer, 'a) fold = default
+  method fold_integer': (integer with_loc, 'a) fold = default
   method fold_alphanum: (alphanum, 'a) fold = default
   method fold_alphanum': (alphanum with_loc, 'a) fold = default
+  method fold_boolean: (boolean, 'a) fold = default
   method fold_national: (national, 'a) fold = default
   method fold_int_figurative: (int_ figurative, 'a) fold = default
   method fold_any_figurative: 'k. ('k figurative, 'a) fold = default
   method fold_floating: (floating, 'a) fold = default
   method fold_fixed: (fixed, 'a) fold = default
-  method fold_integer: (integer, 'a) fold = default
-  method fold_integer': (integer with_loc, 'a) fold = default
-  method fold_binop: (binop, 'a) fold = default
-  method fold_unop: (unop, 'a) fold = default
+  method fold_ident: (ident, 'a) fold = default
+  method fold_qualident: (qualident, 'a) fold = default
+  method fold_address: (address, 'a) fold = default
+  method fold_length_of: (length_of_ term, 'a) fold = default
+  method fold_inline_call: (inline_call, 'a) fold = default
+  method fold_inline_invocation: (inline_invocation, 'a) fold = default
+  method fold_effective_arg: (effective_arg, 'a) fold = default
+  method fold_object_view: (object_view, 'a) fold = default
+  method fold_subscript: (subscript, 'a) fold = default
+  method fold_subscript': (subscript with_loc, 'a) fold = default
+  method fold_refmod: (refmod, 'a) fold = default
   method fold_expr: (expr, 'a) fold = default
   method fold_expr': (expr with_loc, 'a) fold = default
-  method fold_class: (class_, 'a) fold = default
   method fold_condition: (condition, 'a) fold = default
   method fold_condition': (condition with_loc, 'a) fold = default
-  method fold_logop: (logop, 'a) fold = default
-  method fold_relop: (relop, 'a) fold = default
-  method fold_rounding_mode: (rounding_mode, 'a) fold = default
-  method fold_rounding: (rounding, 'a) fold = default
-
 end
 
-let fold_name (v: _ #folder) = leaf v#fold_name
-let fold_name_opt (v: _ #folder) = fold_option ~fold:fold_name v
-let fold_name_list (v: _ #folder) = fold_list ~fold:fold_name v
-let fold_name' (v: _ #folder) =
+let fold_name (v: _ #shared_folder) = leaf v#fold_name
+let fold_name_opt (v: _ #shared_folder) = fold_option ~fold:fold_name v
+let fold_name_list (v: _ #shared_folder) = fold_list ~fold:fold_name v
+let fold_name' (v: _ #shared_folder) =
   handle' v#fold_name' v ~fold:fold_name
 
-let fold_name'_opt (v: _ #folder) = fold_option ~fold:fold_name' v
-let fold_name'_list (v: _ #folder) = fold_list ~fold:fold_name' v
+let fold_name'_opt (v: _ #shared_folder) = fold_option ~fold:fold_name' v
+let fold_name'_list (v: _ #shared_folder) = fold_list ~fold:fold_name' v
 
-let fold_binop (v: _ #folder) = leaf v#fold_binop
-let fold_unop (v: _ #folder) = leaf v#fold_unop
-let fold_logop (v: _ #folder) = leaf v#fold_logop
-let fold_relop (v: _ #folder) = leaf v#fold_relop
-let fold_sign (v: _ #folder) = leaf v#fold_sign
-let fold_signz (v: _ #folder) = leaf v#fold_signz
-let fold_counter_kind (v: _ #folder) = leaf v#fold_counter_kind
+let fold_binop (v: _ #shared_folder) = leaf v#fold_binop
+let fold_unop (v: _ #shared_folder) = leaf v#fold_unop
+let fold_logop (v: _ #shared_folder) = leaf v#fold_logop
+let fold_relop (v: _ #shared_folder) = leaf v#fold_relop
+let fold_sign (v: _ #shared_folder) = leaf v#fold_sign
+let fold_signz (v: _ #shared_folder) = leaf v#fold_signz
+let fold_counter_kind (v: _ #shared_folder) = leaf v#fold_counter_kind
 
 let fold_fixed (v: _ #folder) = leaf v#fold_fixed
 let fold_floating (v: _ #folder) = leaf v#fold_floating
@@ -104,25 +110,48 @@ let fold_alphanum' (v: _ #folder) =
   handle' v#fold_alphanum' v ~fold:fold_alphanum
 let fold_national (v: _ #folder) = leaf v#fold_national
 
-let fold_counter (v: _ #folder) =
+let fold_counter (v: _ #shared_folder) =
   handle v#fold_counter
     ~continue:begin fun { counter_kind; counter_name } x -> x
       >> fold_counter_kind v counter_kind
       >> fold_name'_opt v counter_name
     end
 
-let fold_object_ref (v: _ #folder) =
+let fold_object_ref (v: _ #shared_folder) =
   handle v#fold_object_ref
     ~continue:begin function
       | ExceptionObject | Null | Self -> Fun.id
       | Super s -> fold_name'_opt v s
     end
 
-let fold_intrinsic_name (v: _ #folder) =
+let fold_intrinsic_name (v: _ #shared_folder) =
   leaf v#fold_intrinsic_name
 
-let fold_intrinsic_name' (v: _ #folder) =
+let fold_intrinsic_name' (v: _ #shared_folder) =
   handle' v#fold_intrinsic_name' v ~fold:fold_intrinsic_name
+
+let fold_trimming_tip (v: _ #shared_folder) : trimming_tip -> 'a -> 'a =
+  leaf v#fold_trimming_tip
+
+let fold_object_view_spec (v: _ #shared_folder) =
+  handle v#fold_object_view_spec
+    ~continue:begin function
+      | ObjViewAmbiguous n
+      | ObjViewFactory n
+      | ObjViewOnly n
+      | ObjViewFactoryOnly n -> fold_name' v n
+      | ObjViewUniversal -> Fun.id
+    end
+
+let rec fold_qualname (v: _ #shared_folder) =
+  handle v#fold_qualname
+    ~continue:begin function
+      | Name n -> fold_name' v n
+      | Qual (n, qn) -> fun x -> x >> fold_name' v n >> fold_qualname v qn
+    end
+
+let fold_qualname' (v: _ #shared_folder) =
+  handle' v#fold_qualname' ~fold:fold_qualname v
 
 let rec fold_literal (v: _ #folder) : literal -> 'a -> 'a = function
   | Boolean b -> fold_boolean v b
@@ -176,14 +205,16 @@ and fold_strlit (v: _ #folder) : strlit -> 'a -> 'a = function
 and fold_strlit' (v: _ #folder) =
   fold' ~fold:fold_strlit v
 
-and fold_scalar_ident (v: _ #folder) : scalar_ident_ term -> 'a -> 'a = function
+let rec fold_scalar_ident (v: _ #folder) : scalar_ident_ term -> 'a -> 'a = function
   | Address ai -> fold_address v ai
   | Counter c -> fold_counter v c
   | InlineCall fi -> fold_inline_call v fi
   | InlineInvoke ii -> fold_inline_invocation v ii
   | ObjectRef po -> fold_object_ref v po
   | QualIdent qi -> fold_qualident v qi
-  | ScalarRefMod (i, r) -> fun x -> x >> fold_scalar_ident' v i >> fold_refmod v r
+  | ScalarRefMod (i, r) -> fun x -> x
+    >> fold_scalar_ident' v (UPCAST.scalar_base_ident'_as_scalar_ident' i)
+    >> fold_refmod v r
 
 and fold_scalar_ident' (v: _ #folder) =
   fold' ~fold:fold_scalar_ident v
@@ -203,7 +234,7 @@ and fold_ident (v: _ #folder) =
         >> fold_ident' v (UPCAST.base_ident'_with_refmod' i)
         >> fold_refmod v r
       | ScalarRefMod (i, r) -> fun x -> x
-        >> fold_scalar_ident' v i
+        >> fold_scalar_ident' v (UPCAST.scalar_base_ident'_as_scalar_ident' i)
         >> fold_refmod v r
     end
 
@@ -237,16 +268,6 @@ and fold_qualident (v: _ #folder) =
       >> fold_qualname' v ident_name
       >> fold_list ~fold:fold_subscript' v ident_subscripts
     end
-
-and fold_qualname (v: _ #folder) =
-  handle v#fold_qualname
-    ~continue:begin function
-      | Name n -> fold_name' v n
-      | Qual (n, qn) -> fun x -> x >> fold_name' v n >> fold_qualname v qn
-    end
-
-and fold_qualname' (v: _ #folder) =
-  handle' v#fold_qualname' ~fold:fold_qualname v
 
 and fold_subscript (v: _ #folder) =
   handle v#fold_subscript
@@ -339,16 +360,6 @@ and fold_object_view (v: _ #folder) =
       >> fold_object_view_spec v object_view_spec
     end
 
-and fold_object_view_spec (v: _ #folder) =
-  handle v#fold_object_view_spec
-    ~continue:begin function
-      | ObjViewAmbiguous n
-      | ObjViewFactory n
-      | ObjViewOnly n
-      | ObjViewFactoryOnly n -> fold_name' v n
-      | ObjViewUniversal -> Fun.id
-    end
-
 and fold_expr (v: _ #folder) =
   handle v#fold_expr
     ~continue:begin fun e x -> match e with
@@ -365,9 +376,6 @@ and fold_expr (v: _ #folder) =
 
 and fold_expr' (v: _ #folder) =
   handle' v#fold_expr' ~fold:fold_expr v
-
-and fold_trimming_tip (v: _ #folder) : trimming_tip -> 'a -> 'a =
-  leaf v#fold_trimming_tip
 
 and fold_ident_or_literal (v: _ #folder) : ident_or_literal -> 'a -> 'a = function
   | Address _
@@ -421,7 +429,7 @@ and fold_length_of (v: _ #folder): length_of_ term -> 'a -> 'a =
   handle v#fold_length_of
     ~continue:(function LengthOf i -> fold_ident_or_literal v i)
 
-let fold_class (v: _ #folder) =
+let fold_class (v: _ #shared_folder) =
   handle v#fold_class
     ~continue:begin function
       | AlphabetOrClass n -> fold_name' v n
@@ -573,8 +581,8 @@ let fold_strlit_or_intlit (v: _ #folder) : strlit_or_intlit -> 'a -> 'a = functi
   | StrConcat _ as s -> fold_strlit v s
   | Integer _ | NumFig _ as i -> fold_intlit v i
 
-let fold_qualname_opt (v: _ #folder) = fold_option ~fold:fold_qualname v
-let fold_qualname'_opt (v: _ #folder) = fold_option ~fold:fold_qualname' v
+let fold_qualname_opt (v: _ #shared_folder) = fold_option ~fold:fold_qualname v
+let fold_qualname'_opt (v: _ #shared_folder) = fold_option ~fold:fold_qualname' v
 let fold_strlit_opt (v: _ #folder) = fold_option ~fold:fold_strlit v
 let fold_literal' (v: _ #folder) = fold' ~fold:fold_literal v
 let fold_literal_opt (v: _ #folder) = fold_option ~fold:fold_literal v
@@ -600,10 +608,10 @@ let fold_ident_or_intlit'_opt (v: _ #folder) =
 
 (* --- *)
 
-let fold_rounding_mode (v: _ #folder) =
+let fold_rounding_mode (v: _ #shared_folder) =
   leaf v#fold_rounding_mode
 
-let fold_rounding (v: _ #folder) =
+let fold_rounding (v: _ #shared_folder) =
   handle v#fold_rounding
     ~continue:begin function
       | RoundingMode m -> fold_rounding_mode v m
@@ -612,11 +620,11 @@ let fold_rounding (v: _ #folder) =
 
 (* --- *)
 
-let fold_procedure_name (v: _ #folder) =
+let fold_procedure_name (v: _ #shared_folder) =
   handle v#fold_procedure_name ~continue:(fold_qualname v)
 
-let fold_procedure_name' (v: _ #folder) =
+let fold_procedure_name' (v: _ #shared_folder) =
   handle' v#fold_procedure_name' v ~fold:fold_procedure_name
 
-let fold_procedure_name'_opt (v: _ #folder) =
+let fold_procedure_name'_opt (v: _ #shared_folder) =
   fold_option v ~fold:fold_procedure_name'

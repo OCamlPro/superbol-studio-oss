@@ -54,7 +54,6 @@ depends: [
   "dune" {>= "3.17.0"}
   "pretty-windows" {= version}
   "ezlibcob-windows" {= version}
-  "cobol_unit-windows" {= version}
   "cobol_data-windows" {= version}
   "cir_types-windows" {= version}
   "cir_logic-windows" {= version}

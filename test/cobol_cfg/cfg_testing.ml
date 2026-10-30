@@ -46,14 +46,31 @@ let show_dot_cfgs ?parser_options ?source_format ?filename
     Pretty.out "@[<2>%s:@;%a@]@." name Cobol_cfg.Printer.pp_cfg_dot cfg
   end
 
+let show_dot_section_cfg ?parser_options ?source_format ?filename
+    ?(cfg_options = default_options) ~name contents =
+  Prog_typeck.typeck ?parser_options ?source_format ?filename contents |>
+  Cobol_common.Diagnostics.show_n_forget ~set_status:false ~ppf:Fmt.stdout
+    ~platform:Prog_common.platform |> fun typeck_outputs ->
+  let cfg, _ = Cobol_cfg.Builder.make ~options:cfg_options ~name typeck_outputs in
+  Pretty.out "@[<2>%s:@;%a@]@." name Cobol_cfg.Printer.pp_cfg_dot cfg
+
+let print_ascii_cfg cfg =
+  let dot_string = Pretty.to_string "%a" Cobol_cfg.Printer.pp_cfg_dot cfg in
+  let dot_file = EzFile.temp_file "cfg" ".dot" in
+  EzFile.write_text_file dot_file dot_string;
+  ignore (Pretty.string_to Unix.system "graph-easy %s" dot_file);
+  EzFile.remove dot_file
+
 let show_ascii_cfgs ?parser_options ?source_format ?filename
     ?cfg_options contents =
   Pretty.out "%s@\n---@\n@." contents;
   compute_cfgs ?parser_options ?source_format ?filename ?cfg_options contents |>
-  List.iter begin fun (name, cfg) ->
-    let dot_string = Pretty.to_string "%a" Cobol_cfg.Printer.pp_cfg_dot cfg in
-    let dot_file = EzFile.temp_file name ".dot" in
-    EzFile.write_text_file dot_file dot_string;
-    ignore (Pretty.string_to Unix.system "graph-easy %s" dot_file);
-    EzFile.remove dot_file
-  end
+  List.iter (fun (_, cfg) -> print_ascii_cfg cfg)
+  
+let show_ascii_section_cfg ?parser_options ?source_format ?filename
+    ?(cfg_options = default_options) ~name contents =
+  Prog_typeck.typeck ?parser_options ?source_format ?filename contents |>
+  Cobol_common.Diagnostics.show_n_forget ~set_status:false ~ppf:Fmt.stdout
+    ~platform:Prog_common.platform |> fun typeck_outputs ->
+  let cfg, _ = Cobol_cfg.Builder.make ~options:cfg_options ~name typeck_outputs in
+  print_ascii_cfg cfg

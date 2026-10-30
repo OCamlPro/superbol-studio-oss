@@ -184,7 +184,7 @@ let fold_allocate_kind (v: _ #folder) =
   handle v#fold_allocate_kind
     ~continue:begin function
       | AllocateCharacters e -> fold_expression v e
-      | AllocateDataItem n -> fold_name' v n
+      | AllocateDataItem n -> fold_qualname' v n
     end
 
 let fold_alter_operands' (v: _ #folder) =
@@ -322,7 +322,6 @@ let fold_merge_or_sort_target (v : _ #folder) =
     ~continue:begin function
       | OutputProcedure name_procedure_range ->
           fold_procedure_range v name_procedure_range
-            ~fold:fold_procedure_name'
       | Giving names ->
           fold_list ~fold:fold_name' v names
     end
@@ -430,7 +429,7 @@ let fold_sort_source (v: _ #folder) =
   handle v#fold_sort_source
     ~continue:begin fun s x -> match s with
       | SortInputProcedure pr -> x
-          >> fold_procedure_range ~fold:fold_procedure_name' v pr
+          >> fold_procedure_range v pr
       | SortUsing names -> x
           >> fold_name'_list v names
     end
@@ -465,12 +464,12 @@ let fold_returning (v: _ #folder) =
   handle v#fold_returning
     ~continue:begin fun r x -> match r with
       | ReturningScalar s -> x
-        >> fold_scalar v s
+          >> fold_scalar v s
       | ReturningAddress a -> x
-        >> fold_qualident v a
+          >> fold_qualident v a
       | ReturningInt { value; size } -> x
-        >> fold_literal v value
-        >> fold_option ~fold:fold_literal v size
+          >> fold_literal v value
+          >> fold_option ~fold:fold_literal v size
     end
 
 let fold_exit' (v: _ #folder) =
@@ -584,7 +583,7 @@ let fold_raise' (v: _ #folder) =
 let fold_release' (v: _ #folder) =
   handle' v#fold_release' v
     ~fold:begin fun v {release_item; release_from} x -> x
-      >> fold_qualname v release_item
+      >> fold_qualname' v release_item
       >> fold_option ~fold:fold_ident_or_literal v release_from
     end
 
@@ -661,18 +660,18 @@ let fold_stop_run_return (v: _ #folder) =
   handle v#fold_stop_run_return
     ~continue:begin fun r x -> match r with
       | StopReturning s -> x
-        >> fold_returning v s
+          >> fold_returning v s
       | StopWithStatus { status_kind = _st; status_value} -> x
-        >> fold_option ~fold:fold_scalar v status_value
+          >> fold_option ~fold:fold_scalar v status_value
     end
 
 let fold_stop_arg (v: _ #folder) =
   handle v#fold_stop_arg
     ~continue:begin fun a x -> match a with
       | StopWithQualIdent i -> x
-        >> fold' ~fold:fold_qualname_with_subscripts v i
+          >> fold' ~fold:fold_qualname_with_subscripts v i
       | StopWithLiteral l -> x
-        >> fold_literal' v l
+          >> fold_literal' v l
     end
 
 let fold_stop' (v: _ #folder) =
@@ -709,10 +708,10 @@ let fold_selection_subject (v: _ #folder) =
       | Subject c -> fold_condition v c
       | SubjectConst b -> fold_bool v b
     end
-    
+
 let fold_selection_subject' (v: _ #folder) =
   handle' v#fold_selection_subject' ~fold:fold_selection_subject v
-  
+
 let fold_selection_object (v: _ #folder) =
   handle v#fold_selection_object
     ~continue:begin fun selection_object x ->
@@ -728,7 +727,7 @@ let fold_selection_object (v: _ #folder) =
           >> fold_bool v b
       | SelAny -> x
     end
-    
+
 let fold_selection_object' (v: _ #folder) =
   handle' v#fold_selection_object' ~fold:fold_selection_object v
 
@@ -1009,10 +1008,10 @@ and fold_entry' (v: _ #folder) : entry_stmt with_loc -> 'a -> 'a =
   handle' v#fold_entry' v
     ~fold:begin fun v stmt x -> match stmt with
       | EntrySimple name -> x
-        >> fold_alphanum' v name
+          >> fold_alphanum' v name
       | EntryUsing { entry_name; entry_by_clauses } -> x
-        >> fold_alphanum' v entry_name
-        >> fold_list ~fold:fold_entry_by_clause v entry_by_clauses
+          >> fold_alphanum' v entry_name
+          >> fold_list ~fold:fold_entry_by_clause v entry_by_clauses
       | EntryForGoTo _entry_name -> x
     end
 
@@ -1057,7 +1056,7 @@ and fold_perform_inline' (v: _ #folder) : perform_inline_stmt with_loc -> 'a -> 
 and fold_perform_target' (v: _ #folder) : perform_target_stmt with_loc -> 'a -> 'a =
   handle' v#fold_perform_target' v
     ~fold:begin fun v { perform_target = proc_range; perform_mode } x -> x
-      >> fold_procedure_range ~fold:fold_procedure_name' v proc_range
+      >> fold_procedure_range v proc_range
       >> fold_option ~fold:fold_perform_mode v perform_mode
     end
 
@@ -1079,7 +1078,7 @@ and fold_read' (v: _#folder) =
       >> fold_option ~fold:fold_ident v read_into
       >> fold_option ~fold:fold_read_lock_behavior v read_lock_behavior
       >> fold_option ~fold:fold_bool v read_lock
-      >> fold_option ~fold:fold_qualname v read_key
+      >> fold_option ~fold:fold_qualname' v read_key
       >> fold_option ~fold:fold_read_error_handler v read_error_handler
     end
 
@@ -1124,7 +1123,7 @@ and fold_search' (v: _ #folder) =
   handle' v#fold_search' v
     ~fold:begin fun v { search_item; search_at_end;
                         search_varying; search_when_clauses } x -> x
-      >> fold_qualname v search_item
+      >> fold_qualname' v search_item
       >> fold_handler v search_at_end
       >> fold_option ~fold:fold_ident v search_varying
       >> fold_list ~fold:fold_search_when_clause' v search_when_clauses
@@ -1134,7 +1133,7 @@ and fold_search_all' (v: _ #folder) =
   handle' v#fold_search_all' v
     ~fold:begin fun v { search_all_item; search_all_at_end;
                         search_all_conditions; search_all_action } x -> x
-      >> fold_qualname v search_all_item
+      >> fold_qualname' v search_all_item
       >> fold_handler v search_all_at_end
       >> fold_list ~fold:fold_search_condition v search_all_conditions
       >> fold_statements v search_all_action

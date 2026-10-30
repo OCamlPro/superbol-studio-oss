@@ -54,6 +54,7 @@ depends: [
   "dune" {>= "3.17.0"}
   "pretty-osx" {= version}
   "cobol_unit-osx" {= version}
+  "cobol_procedure-osx" {= version}
   "cobol_data-osx" {= version}
   "cobol_common-osx" {= version}
   "cir_types-osx" {= version}

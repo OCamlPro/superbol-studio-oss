@@ -98,11 +98,25 @@ and use_after_exception =
     use_after_exception_on_files: name with_loc list;
   }
 
+(** This type represents a paragraph introduced either by a section name
+    or by a paragraph name. If introduced by a section name this paragraph
+    is the anonymous paragraph at the beginning of the section. *)
 and paragraph =
   {
     paragraph_name: name with_loc option;
+    (** Contains either:
+        - the given paragraph name for a named paragraph
+        - the given section name for the anonymous paragraph at the
+          beginning of a named section
+        - [None] for the anonymous paragraph at the begining of
+          PROCEDURE DIVISION *)
+
     paragraph_is_section: bool;
+    (** true when this paragraph is an anonymous paragraph at the begining of a section *)
+
     paragraph_segment: integer option;
+    (** optional segment priority number for a section (obsolete in COBOL-85) *)
+   
     paragraph_sentences: statements with_loc list;
   }
 [@@deriving ord]

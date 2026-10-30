@@ -57,6 +57,7 @@ depends: [
   "lsp" {>= "1.18" & < "1.19"}
   "jsonrpc" {>= "1.15"}
   "cobol_typeck" {= version}
+  "cobol_procedure" {= version}
   "cobol_parser" {= version}
   "cobol_indent" {= version}
   "cobol_data" {= version}

@@ -43,7 +43,7 @@ gen-version = "version.ml"
 
 # preprocessing options
 #  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
-# preprocess = "pps ppx_deriving.show"
+# preprocess = "pps ppx_deriving_encoding"
 
 # files to skip while updating at package level
 skip = ["index.mld", "main.ml"]
@@ -53,13 +53,14 @@ skip = ["index.mld", "main.ml"]
 #   ez_file = ">=0.1 <1.3"
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
-ocplib_stuff = "0.4.0"
 ez_file = "0.3.0"
 ez_toml = "version"
+ocplib_stuff = "0.4.0"
 pretty = "version"
 
 # package tools dependencies
 [tools]
+# ...
 
 # package fields (depends on package skeleton)
 #Examples:
@@ -70,7 +71,8 @@ pretty = "version"
 #  no-opam-test = "yes" 
 #  no-opam-doc = "yes" 
 #  gen-opam = "some" | "all" 
-#  dune-stanzas = "(flags (:standard (:include linking.sexp)))" 
+#  dune-flags = "(:standard (:include linking.sexp))" 
+#  dune-stanzas = "(foreign_stubs (language c) (names mapfile_stubs))" 
 #  static-clibs = "unix" 
 [fields]
 # ...

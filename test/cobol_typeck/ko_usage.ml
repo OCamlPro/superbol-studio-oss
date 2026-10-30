@@ -280,6 +280,7 @@ let%expect_test "unsupported-usage" =
       10          01 E PIC X.
     Item definition: {
       qualname: C
+      /!\ with_errors /!\
       offset: 0
       size: 80
       size-max: 80

@@ -11,13 +11,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_ptree                                            (* for statements *)
+open Cobol_procedure.Types                                  (* for statements *)
 open Cobol_unit.Types
 open Cir_types
 open Types
 
 open Syntax
 open Syntax.INFIX
+
+module LIST = Cobol_common.Basics.LIST
 
 (* --- *)
 
@@ -31,10 +33,10 @@ let append_lists r r' =
 (* --- *)
 
 type 'f code_block_builder =
-  ('f Cir_types.code_block, error nel) result Cobol_unit.Visitor.folder
+  ('f Cir_types.code_block, error NEL.t) result Cobol_unit.Visitor.folder
 
 let translate_statements (visitor: _ code_block_builder) statements =
-  List.rev =|< Cobol_ptree.Visitor.fold_statements visitor statements (Ok [])
+  List.rev =|< Cobol_procedure.Visitor.fold_statements visitor statements (Ok [])
 
 let translate_if_statement env visitor stmt =
   let* condition = Expr.resolve_condition env ~&stmt.condition
@@ -58,8 +60,11 @@ let translate_stop_statement env stmt =
   match ~&stmt with
   | StopRun None ->
       Ok [IR_stop { optional_status = None } &@<- stmt]
-  | StopArg Some StopWithQualIdent ident ->
-      let* f = Expr.resolve_data_reference env ident in
+  | StopArg Some StopWithQualIdent qi ->
+      let* { field_ref; field_ref_loc } = Expr.resolve_qualident env qi in
+      let f = { data_field = field_ref;
+                data_ref_loc = field_ref_loc;
+                data_refmod = None } in
       Ok [IR_stop { optional_status = Some f } &@<- stmt]
   | StopRun Some _
   | StopArg _
