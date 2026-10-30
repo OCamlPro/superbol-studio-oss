@@ -33,7 +33,6 @@ class ['a] folder = object
   method fold_paragraph: (paragraph, 'a) fold = default
   method fold_paragraph': (paragraph with_loc, 'a) fold = default
   method fold_procedure_block: (procedure_block, 'a) fold = default
-  method fold_procedure_arg: (procedure_arg, 'a) fold = default
   method fold_procedure_using: (procedure_using, 'a) fold = default
   method fold_procedure_using': (procedure_using with_loc, 'a) fold = default
   method fold_procedure: (procedure, 'a) fold = default
@@ -82,17 +81,10 @@ let fold_procedure_block (v: _ #folder) =
       | Section s -> fold_section' v s
     end
 
-let fold_procedure_arg (v: _ #folder) =
-  handle v#fold_procedure_arg
-    ~continue:begin fun { arg_name_ref; arg_passing_style } x ->
-      ignore arg_passing_style;
-      x
-      >> Cobol_procedure.Visitor.fold_resolved_name v arg_name_ref
-    end
-
 let fold_procedure_using (v: _ #folder) =
   handle v#fold_procedure_using
-    ~continue:(fold_with_loc_list v ~fold:fold_procedure_arg)
+    ~continue:(fold_with_loc_list v
+                 ~fold:Cobol_procedure.Visitor.fold_procedure_arg)
 
 let fold_procedure_using' (v: _ #folder) =
   handle' v#fold_procedure_using' ~fold:fold_procedure_using v

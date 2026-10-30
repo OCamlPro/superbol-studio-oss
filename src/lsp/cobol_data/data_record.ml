@@ -20,6 +20,11 @@ let size: record -> Data_memory.size = fun r ->
 let storage: record -> data_storage = fun r ->
   r.record_storage
 
+let has_definition_issues (r: record) : bool =
+  match ~&(r.record_item) with
+  | Field { field_has_definition_issues; _ } -> field_has_definition_issues
+  | Table { table_has_definition_issues; _ } -> table_has_definition_issues
+
 (* Collections *)
 
 module M = struct

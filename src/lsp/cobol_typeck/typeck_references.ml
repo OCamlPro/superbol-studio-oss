@@ -63,7 +63,17 @@ let resolve_record_name ~data_definitions ?(assume_partial_data_definitions = fa
     resolve_data_qualname (Cobol_ptree.Name name &@<- name) acc
       ~data_definitions ~assume_partial_data_definitions
   in
-  { resolved = res.resolved; resolved_name = name },
+  let resolved, acc = match res.resolved with
+    | Error () -> Error (), acc
+    | Ok (Data_field { record; def; _ } as data_def) ->
+        begin match ~&(record.record_item) with
+          | Field root_field when ~&def == root_field -> Ok record, acc
+          | Table root_table when ~&def == ~&(root_table.table_field) -> Ok record, acc
+          | _ -> Error (), error acc @@ Subfield_where_record_expected { name; data_def }
+        end
+    | Ok data_def -> Error (), error acc @@ Subfield_where_record_expected { name; data_def }
+  in
+  { resolved; resolved_name = name },
   acc
 
 let register_data_qualname ~data_definitions qn' acc =

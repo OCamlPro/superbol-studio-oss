@@ -32,9 +32,8 @@ class ['a] folder =
     inherit ['a] Cobol_ptree.Terms_visitor.shared_folder
 
     (* Terms *)
-    method fold_resolved_name : 'x. ('x resolved_name, 'a) fold = default
-    method fold_data_ref : (data_ref, 'a) fold = default
-    method fold_data_name_ref : (data_name_ref, 'a) fold = default
+    method fold_data_reference : (data_reference, 'a) fold = default
+    method fold_record_reference : (record_reference, 'a) fold = default
     method fold_literal_value : (Cobol_data.Types.literal_value, 'a) fold = default
     method fold_integer_value : (Cobol_data.Types.integer_value, 'a) fold = default
     method fold_alphanum_value : (Cobol_data.Types.alphanum_value, 'a) fold = default
@@ -64,6 +63,7 @@ class ['a] folder =
     method fold_using_arg_default' : (using_arg_default with_loc, 'a) fold = default
     method fold_using_reference_arg' : (using_reference_arg with_loc, 'a) fold = default
     method fold_call_using_clause : (call_using_clause, 'a) fold = default
+    method fold_procedure_arg : (procedure_arg, 'a) fold = default
     method fold_date_time : (Cobol_ptree.date_time, 'a) fold = default
     method fold_divide_operands : (divide_operands, 'a) fold = default
     method fold_file_option : (Cobol_ptree.file_option, 'a) fold = default
@@ -124,7 +124,6 @@ class ['a] folder =
     method fold_display_clause' : (display_clause with_loc, 'a) fold = default
     method fold_display_target' : (Cobol_ptree.display_target with_loc, 'a) fold = default
     method fold_display_with_clause' : (display_with_clause with_loc, 'a) fold = default
-    method fold_entry_by_clause : (entry_by_clause, 'a) fold = default
     method fold_evaluate_branch : (evaluate_branch, 'a) fold = default
     method fold_init_data_category : (Cobol_ptree.init_data_category, 'a) fold = default
     method fold_init_replacing : (init_replacing, 'a) fold = default
@@ -184,7 +183,7 @@ class ['a] folder =
     method fold_evaluate' : (evaluate_stmt with_loc, 'a) fold = default
     method fold_exec_block' : (Cobol_common.Exec_block.t with_loc, 'a) fold = default
     method fold_exit' : (exit_stmt with_loc, 'a) fold = default
-    method fold_free' : (data_ref list with_loc, 'a) fold = default
+    method fold_free' : (data_reference list with_loc, 'a) fold = default
     method fold_generate' : (Cobol_ptree.qualname with_loc with_loc, 'a) fold = default
     method fold_goback' : (goback_stmt with_loc, 'a) fold = default
     method fold_goto' : (goto_stmt with_loc, 'a) fold = default
@@ -234,16 +233,12 @@ let fold_or_error ~fold v = function
 let fold_or_error' ~fold v { payload; loc } =
   fold_or_error v payload ~fold:(fun v x -> fold v (x &@ loc))
 
-let fold_resolved_name (v: _ #folder) =
-  handle v#fold_resolved_name
-    ~continue:(fun { resolved_name; _ } -> P.fold_name' v resolved_name)
-
-let fold_data_ref (v: _ #folder) =
-  handle v#fold_data_ref
+let fold_data_reference (v: _ #folder) =
+  handle v#fold_data_reference
     ~continue:(fun { resolved_name; _ } -> P.fold_qualname' v resolved_name)
 
-let fold_data_name_ref (v: _ #folder) =
-  handle v#fold_data_name_ref
+let fold_record_reference (v: _ #folder) =
+  handle v#fold_record_reference
     ~continue:(fun { resolved_name; _ } -> P.fold_name' v resolved_name)
 
 let fold_literal_value (v: _ #folder) = leaf v#fold_literal_value
@@ -281,7 +276,7 @@ and fold_base_ident (v: _ #folder) =
 and fold_qualident (v: _ #folder) =
   handle v#fold_qualident
     ~continue:(fun { ident_data_ref; ident_subscripts } x -> x
-                >> fold_data_ref v ident_data_ref
+                >> fold_data_reference v ident_data_ref
                 >> fold_list ~fold:fold_subscript' v ident_subscripts)
 
 and fold_subscript (v: _ #folder) =
@@ -291,7 +286,7 @@ and fold_subscript (v: _ #folder) =
         | SubSExpr e -> x
             >> fold_expr' v e
         | SubSIdx (n, i) -> x
-            >> fold_data_name_ref v n
+            >> P.fold_name' v n
             >> fold_integer_value v i)
 
 and fold_subscript' (v: _ #folder) =
@@ -473,7 +468,7 @@ let fold_basic_arithmetic_operands (v: _ #folder) =
             >> fold_scalar v base_operand
             >> fold_rounded_idents v targets
         | ArithCorresponding { source; target } -> x
-            >> fold_data_ref v source
+            >> fold_data_reference v source
             >> fold_rounded_ident v target)
 
 let fold_using_arg_default' (v: _ #folder) =
@@ -496,6 +491,11 @@ let fold_call_using_clause (v: _ #folder) =
             fold_nel ~fold:fold_using_reference_arg' v args
         | CallUsingByContent args
         | CallUsingByValue args -> fold_nel ~fold:fold_expr' v args)
+
+let fold_procedure_arg (v: _ #folder) =
+  handle v#fold_procedure_arg
+    ~continue:(fun { arg_name_ref; arg_passing_style = _ } ->
+        fold_record_reference v arg_name_ref)
 
 let fold_date_time (v: _ #folder) = leaf v#fold_date_time
 
@@ -603,13 +603,13 @@ let fold_start_position (v: _ #folder) =
         | StartPositionLast -> x
         | StartPositionKey { operator; name; length } -> x
             >> P.fold_relop v operator
-            >> fold_data_ref v name
+            >> fold_data_reference v name
             >> fold_option ~fold:fold_expr' v length)
 
 let fold_write_target (v: _ #folder) =
   handle v#fold_write_target
     ~continue:(function
-        | WriteTargetName r -> fold_data_ref v r
+        | WriteTargetName r -> fold_data_reference v r
         | WriteTargetFile n -> P.fold_name' v n)
 
 let fold_procedure_range (v: _ #folder) =
@@ -714,7 +714,7 @@ let fold_sort_spec (v: _ #folder) =
   handle v#fold_sort_spec
     ~continue:(fun { sort_key_direction; sort_key_names } x -> x
                 >> fold_sort_direction v sort_key_direction
-                >> fold_list ~fold:fold_data_ref v sort_key_names)
+                >> fold_list ~fold:fold_data_reference v sort_key_names)
 
 (* --- Statement parts *)
 
@@ -748,7 +748,7 @@ let fold_allocate_kind (v: _ #folder) =
   handle v#fold_allocate_kind
     ~continue:(function
         | AllocateCharacters e -> fold_expr' v e
-        | AllocateDataItem n -> fold_data_ref v n)
+        | AllocateDataItem n -> fold_data_reference v n)
 
 let fold_alter_operands' (v: _ #folder) =
   handle' v#fold_alter_operands' v
@@ -1009,21 +1009,15 @@ let fold_enter' (v: _ #folder) =
             >> P.fold_name' v enter_language
             >> P.fold_name'_opt v enter_routine)
 
-let fold_entry_by_clause (v: _ #folder) =
-  handle v#fold_entry_by_clause
-    ~continue:(function
-        | EntryByReference l
-        | EntryByValue l -> fold_list ~fold:fold_data_name_ref v l)
-
 let fold_entry' (v: _ #folder) =
   handle' v#fold_entry' v
     ~fold:(fun v stmt x -> match stmt with
         | EntrySimple name
         | EntryForGoTo name -> x
             >> fold_string' v name
-        | EntryUsing { entry_name; entry_by_clauses } -> x
+        | EntryUsing { entry_name; entry_using } -> x
             >> fold_string' v entry_name
-            >> fold_list ~fold:fold_entry_by_clause v entry_by_clauses)
+            >> fold_with_loc_list ~fold:fold_procedure_arg v entry_using)
 
 let fold_exec_block' (v: _ #folder) =
   leaf' v#fold_exec_block' v (* Note: leaf *)
@@ -1042,7 +1036,7 @@ let fold_exit' (v: _ #folder) =
         | ExitFunction r -> fold_option ~fold:fold_raising v r)
 
 let fold_free' (v: _ #folder) =
-  handle' v#fold_free' v ~fold:(fold_list ~fold:fold_data_ref)
+  handle' v#fold_free' v ~fold:(fold_list ~fold:fold_data_reference)
 
 let fold_generate' (v: _ #folder) =
   handle' v#fold_generate' v ~fold:P.fold_qualname'
@@ -1127,7 +1121,7 @@ let fold_raise' (v: _ #folder) =
 let fold_release' (v: _ #folder) =
   handle' v#fold_release' v
     ~fold:(fun v { release_item; release_from } x -> x
-            >> fold_data_ref v release_item
+            >> fold_data_reference v release_item
             >> fold_option ~fold:fold_ident_or_literal v release_from)
 
 let fold_resume' (v: _ #folder) =
@@ -1519,7 +1513,7 @@ and fold_read' (v: _ #folder) : read_stmt with_loc -> 'a -> 'a =
             >> fold_option ~fold:fold_ident v read_into
             >> fold_option ~fold:fold_read_lock_behavior v read_lock_behavior
             >> fold_option ~fold:fold_bool v read_lock
-            >> fold_option ~fold:fold_data_ref v read_key
+            >> fold_option ~fold:fold_data_reference v read_key
             >> fold_option ~fold:fold_read_error_handler v read_error_handler)
 
 and fold_receive' (v: _ #folder) : receive_stmt with_loc -> 'a -> 'a =
@@ -1559,7 +1553,7 @@ and fold_search' (v: _ #folder) : search_stmt with_loc -> 'a -> 'a =
   handle' v#fold_search' v
     ~fold:(fun v { search_item; search_varying; search_at_end;
                    search_when_clauses } x -> x
-            >> fold_data_ref v search_item
+            >> fold_data_reference v search_item
             >> fold_handler v search_at_end
             >> fold_option ~fold:fold_ident v search_varying
             >> fold_list ~fold:fold_search_when_clause' v search_when_clauses)
@@ -1568,7 +1562,7 @@ and fold_search_all' (v: _ #folder) : search_all_stmt with_loc -> 'a -> 'a =
   handle' v#fold_search_all' v
     ~fold:(fun v { search_all_item; search_all_at_end; search_all_conditions;
                    search_all_action } x -> x
-            >> fold_data_ref v search_all_item
+            >> fold_data_reference v search_all_item
             >> fold_handler v search_all_at_end
             >> fold_list ~fold:fold_search_condition v search_all_conditions
             >> fold_statements v search_all_action)

@@ -344,10 +344,12 @@ type data_definition =
       {
         record: record;
         def: field_definition with_loc;
+
         main_def: item_definition with_loc option;
         (** Main item definition, if distinct from [Field def]. This gives the
             full definition (including [def] itself) of any item with a
             REDEFINES clause. *)
+
         table_def: table_definition with_loc option;
         (** When [def] is a field with an OCCURS clause (i.e, its
             [field_leading_ranges] field is not empty), this gives the

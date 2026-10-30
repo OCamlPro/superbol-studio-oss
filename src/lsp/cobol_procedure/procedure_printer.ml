@@ -37,10 +37,10 @@ let pp_resolved_qualname pp_resolved : _ resolved_qualname Pretty.printer =
     ]
 
 (* Data references are printed as written in the source *)
-let pp_data_ref : data_ref Pretty.printer =
+let pp_data_reference : data_reference Pretty.printer =
   fun ppf r -> Cobol_ptree.pp_qualname' ppf r.resolved_name
 
-let pp_data_name_ref : data_name_ref Pretty.printer =
+let pp_record_reference : record_reference Pretty.printer =
   fun ppf r -> Cobol_ptree.pp_name' ppf r.resolved_name
 
 let rec pp_ident ppf { ident_base; ident_refmod } =
@@ -77,14 +77,14 @@ and pp_subscript ppf : subscript -> unit = function
   | SubSAll -> string ppf "ALL"
   | SubSExpr e -> pp_expr' ppf e
   | SubSIdx (n, i) ->
-      fmt "%a@ %s@ %a" ppf pp_data_name_ref n
+      fmt "%a@ %s@ %a" ppf Cobol_ptree.pp_name' n
         (if Z.sign i < 0 then "-" else "+") Z.pp_print (Z.abs i)
 
 and pp_refmod ppf { refmod_left; refmod_length } =
   fmt "@[<1>(%a:%a)@]" ppf pp_expr' refmod_left (option pp_expr') refmod_length
 
 and pp_qualident ppf { ident_data_ref; ident_subscripts } =
-  pp_data_ref ppf ident_data_ref;
+  pp_data_reference ppf ident_data_ref;
   if ident_subscripts <> [] then
     fmt "@[<1>(%a)@]" ppf
       (list ~sep:comma (pp_with_loc pp_subscript))
@@ -189,9 +189,6 @@ let rec pp_condition : condition Pretty.printer =
       fmt "@[<1>(%a)@]@ %a@ @[<1>(%a)@]" ppf pp_condition_or_error' a
         Cobol_ptree.pp_logop o pp_condition_or_error' b
 
-and pp_condition' : condition with_loc Pretty.printer =
-  fun ppf -> pp_with_loc pp_condition ppf
-
 and pp_condition_or_error' : condition or_error with_loc Pretty.printer =
   fun ppf -> pp_with_loc (pp_or_error ~err:"invalid condition" pp_condition) ppf
 
@@ -208,9 +205,6 @@ let pp_selection_subject : selection_subject Pretty.printer =
     | SubjectCond c -> pp_condition ppf c
     | SubjectConst b -> string ppf (if b then "TRUE" else "FALSE")
 
-let pp_selection_subject' : selection_subject with_loc Pretty.printer =
-  fun ppf -> pp_with_loc pp_selection_subject ppf
-
 let pp_selection_object : selection_object Pretty.printer =
   fun ppf -> function
     | SelCond c -> pp_condition ppf c
@@ -220,5 +214,18 @@ let pp_selection_object : selection_object Pretty.printer =
     | SelConst b -> string ppf (if b then "TRUE" else "FALSE")
     | SelAny -> string ppf "ANY"
 
-let pp_selection_object' : selection_object with_loc Pretty.printer =
-  fun ppf -> pp_with_loc pp_selection_object ppf
+let pp_arg_passing_style ppf = function
+  | Arg_by_value ->
+      Pretty.print ppf "by@ value"
+  | Arg_by_reference { optional = false } ->
+      Pretty.print ppf "by@ reference"
+  | Arg_by_reference { optional = true } ->
+      Pretty.print ppf "by@ reference,@ optional"
+
+let pp_procedure_arg =
+  Pretty.record [
+    field "arg-name-ref" (fun x -> x.arg_name_ref)
+      (pp_resolved_name Cobol_data.Printer.pp_record);
+    field "passing-style" (fun x -> x.arg_passing_style)
+      pp_arg_passing_style;
+  ]

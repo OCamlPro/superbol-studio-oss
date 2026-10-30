@@ -221,7 +221,7 @@ let ptree_element_at_position ~filename pos group =
       | Procedure _ ->            (* for now, no more info, data-name expected *)
           on_data_name qn acc
 
-    method! fold_resolved_name { resolved_name; _ } acc =
+    method! fold_record_reference { resolved_name; _ } acc =
       let qn = qualname_at_pos ~filename (Name resolved_name) pos in
       Visitor.skip_children @@ on_data_name qn acc
 

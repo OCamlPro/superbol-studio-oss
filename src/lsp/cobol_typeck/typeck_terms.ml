@@ -33,8 +33,8 @@ let rec register_qualifiers ~data_definitions (qn : Cobol_ptree.qualname) acc =
         acc
       |> register_qualifiers ~data_definitions qn
 
-let typeck_data_ref (qn : Cobol_ptree.qualname with_loc)
-  : data_ref Typeck_procedure_monad.t =
+let typeck_data_reference (qn : Cobol_ptree.qualname with_loc)
+  : data_reference Typeck_procedure_monad.t =
   fun env acc ->
   let r, acc =
     (* TODO: report undefined data-names (see
@@ -46,8 +46,8 @@ let typeck_data_ref (qn : Cobol_ptree.qualname with_loc)
   in
   r, register_qualifiers ~&qn acc ~data_definitions:env.data_definitions
 
-let typeck_data_name_ref (n : Cobol_ptree.name with_loc)
-  : data_name_ref Typeck_procedure_monad.t =
+let typeck_record_reference (n : Cobol_ptree.name with_loc)
+  : record_reference Typeck_procedure_monad.t =
   fun env acc ->
   Typeck_references.resolve_record_name n acc
     ~data_definitions:env.data_definitions
@@ -155,7 +155,7 @@ and typeck_scalar_base_ident
 
 and typeck_qualident
     ({ ident_name; ident_subscripts } : Cobol_ptree.qualident) =
-  let+ ident_data_ref = typeck_data_ref ident_name
+  let+ ident_data_ref = typeck_data_reference ident_name
   and+ ident_subscripts = map_list typeck_subscript' ident_subscripts in
   { ident_data_ref; ident_subscripts }
 
@@ -167,8 +167,7 @@ and typeck_subscript (s : Cobol_ptree.subscript with_loc)
       let+ e = typeck_expr' e in
       SubSExpr e
   | SubSIdx (n, sign, i) ->
-      let+ n = typeck_data_name_ref n
-      and+ i = typeck_integer ~loc:~@s i in
+      let+ i = typeck_integer ~loc:~@s i in
       SubSIdx (n, match sign with SgnPositive -> i | SgnNegative -> Z.neg i)
 
 and typeck_subscript' (s : Cobol_ptree.subscript with_loc)

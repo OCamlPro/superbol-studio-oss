@@ -46,6 +46,19 @@ type call_using_clause =
   | CallUsingByValue of expr with_loc Cobol_ptree.nel
 [@@deriving ord]
 
+type arg_passing_style =
+  | Arg_by_reference of { optional: bool }
+  | Arg_by_value
+[@@deriving ord]
+
+(** Formal argument in PROCEDURE DIVISION USING or ENTRY USING *)
+type procedure_arg =
+  {
+    arg_name_ref: record_reference;
+    arg_passing_style: arg_passing_style;
+  }
+[@@deriving ord]
+
 type retry_clause =
   | RetryNTimes of expr with_loc
   | RetryForNSeconds of expr with_loc
@@ -60,7 +73,7 @@ type mcs_command_operands = {
 [@@deriving ord]
 
 type write_target =
-  | WriteTargetName of data_ref
+  | WriteTargetName of data_reference
   | WriteTargetFile of Cobol_ptree.name with_loc
 [@@deriving ord]
 
@@ -75,7 +88,7 @@ type basic_arithmetic_operands =
       targets: rounded_idents;
     }
   | ArithCorresponding of {
-      source: data_ref;
+      source: data_reference;
       target: rounded_ident;
     }
 [@@deriving ord]
@@ -176,7 +189,7 @@ type start_position =
   | StartPositionLast
   | StartPositionKey of {
       operator: Cobol_ptree.relop;
-      name: data_ref;
+      name: data_reference;
       length: expr with_loc option;
     }
 [@@deriving ord]

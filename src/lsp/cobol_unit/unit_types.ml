@@ -104,17 +104,7 @@ type procedure_block =
   | Paragraph of paragraph with_loc
   | Section of section with_loc
 
-type procedure_using = procedure_arg with_loc list
-
-and procedure_arg =
-  {
-    arg_name_ref: Cobol_procedure.Types.data_name_ref;
-    arg_passing_style: arg_passing_style;
-  }
-
-and arg_passing_style =
-  | Arg_by_reference of { optional: bool }
-  | Arg_by_value
+type procedure_using = Cobol_procedure.Types.procedure_arg with_loc list
 
 type procedure =
   {

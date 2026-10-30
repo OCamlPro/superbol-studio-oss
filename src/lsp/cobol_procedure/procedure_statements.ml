@@ -32,14 +32,14 @@ type screen_attribute_clause =
 
 type sort_spec = {
   sort_key_direction: Cobol_ptree.sort_direction;
-  sort_key_names: data_ref list;
+  sort_key_names: data_reference list;
 }
 [@@deriving ord]
 
 (* ALLOCATE *)
 type allocate_kind =
   | AllocateCharacters of expr with_loc
-  | AllocateDataItem of data_ref
+  | AllocateDataItem of data_reference
 [@@deriving ord]
 
 type allocate_stmt = {
@@ -50,16 +50,11 @@ type allocate_stmt = {
 [@@deriving ord]
 
 (* ENTRY *)
-type entry_by_clause =
-  | EntryByReference of data_name_ref list
-  | EntryByValue of data_name_ref list
-[@@deriving ord]
-
 type entry_stmt =
   | EntrySimple of string with_loc
   | EntryUsing of {
       entry_name: string with_loc;
-      entry_by_clauses: entry_by_clause list;
+      entry_using: procedure_arg with_loc list;
     }
   | EntryForGoTo of string with_loc
 [@@deriving ord]
@@ -213,7 +208,7 @@ type open_stmt = open_phrase list
 
 (* RELEASE *)
 type release_stmt = {
-  release_item: data_ref;
+  release_item: data_reference;
   release_from: ident_or_literal option;
 }
 [@@deriving ord]
@@ -407,7 +402,7 @@ and varying_phrase = {
 
 (* SEARCH *)
 and search_stmt = {
-  search_item: data_ref;
+  search_item: data_reference;
   search_varying: ident option;
   search_at_end: handler;
   search_when_clauses: search_when_clause with_loc list;
@@ -420,7 +415,7 @@ and search_when_clause = {
 
 (* SEARCH ALL *)
 and search_all_stmt = {
-  search_all_item: data_ref;
+  search_all_item: data_reference;
   search_all_at_end: handler;
   search_all_conditions: search_condition list;
   search_all_action: statements;
@@ -646,7 +641,7 @@ and read_stmt = {
   read_into: ident option;
   read_lock_behavior: read_lock_behavior option;
   read_lock: bool option;
-  read_key: data_ref option;
+  read_key: data_reference option;
   read_error_handler: (Cobol_ptree.read_error * dual_handler) option;
 }
 
@@ -676,7 +671,7 @@ and statement =
   | Evaluate of evaluate_stmt
   | ExecBlock of Cobol_common.Exec_block.t
   | Exit of exit_stmt
-  | Free of data_ref list
+  | Free of data_reference list
   | Generate of Cobol_ptree.qualname with_loc
   | GoTo of goto_stmt
   | GoBack of goback_stmt

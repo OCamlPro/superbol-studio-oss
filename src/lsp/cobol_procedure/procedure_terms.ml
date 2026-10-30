@@ -37,16 +37,15 @@ type 'a resolved_qualname =
 
 (** Reference to a data item (field, renaming, condition-name, or index).
     References are compared by name, as in the parse tree. *)
-type data_ref =
+type data_reference =
   (Cobol_data.Types.data_definition [@compare fun _ _ -> 0])
     resolved_qualname
 [@@deriving ord]
 
-(** Same as {!data_ref}, for positions where the parse tree only allows a single
-    unqualified name. *)
-type data_name_ref =
-  (Cobol_data.Types.data_definition [@compare fun _ _ -> 0])
-    resolved_name
+(** Reference to a record in the procedure division.
+    Like [data_reference], these are compared by name, as in the parse tree *)
+type record_reference =
+  (Cobol_data.Types.record [@compare fun _ _ -> 0]) resolved_name
 [@@deriving ord]
 
 type literal = Cobol_data.Types.literal_value
@@ -135,15 +134,18 @@ and effective_arg =
   | ArgOmitted
 
 and qualident = {
-  ident_data_ref: data_ref;
+  ident_data_ref: data_reference;
   ident_subscripts: subscript with_loc list;
 }
 
 and subscript =
   | SubSAll
   | SubSExpr of expr with_loc
-  | SubSIdx of data_name_ref * Cobol_data.Types.integer_value
-  (** relative index, with its signed offset *)
+  | SubSIdx of Cobol_ptree.name with_loc * Cobol_data.Types.integer_value
+  (** relative index, with its signed offset
+      LATER: The index name should be resolved with a special index name
+      lookup that is currently not implemented.
+      We simply keep the parsed name for now. *)
 
 and refmod = {
   refmod_left: expr with_loc;

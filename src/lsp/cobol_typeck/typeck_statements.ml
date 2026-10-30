@@ -111,7 +111,7 @@ let typeck_write_target (t : Cobol_ptree.write_target)
   : write_target Typeck_procedure_monad.t =
   match t with
   | WriteTargetName qn ->
-      let+ r = typeck_data_ref qn in
+      let+ r = typeck_data_reference qn in
       WriteTargetName r
   | WriteTargetFile n -> return (WriteTargetFile n)
 
@@ -130,7 +130,7 @@ let typeck_basic_arithmetic_operands
       and+ targets = typeck_rounded_idents ~loc:~@o targets in
       ArithGiving { leading_operands; base_operand; targets }
   | ArithCorresponding { source; target } ->
-      let+ source = typeck_data_ref source
+      let+ source = typeck_data_reference source
       and+ target = typeck_rounded_ident (target &@<- o) in
       ArithCorresponding { source; target }
 
@@ -222,7 +222,7 @@ let typeck_start_position (p : Cobol_ptree.start_position)
   | StartPositionFirst -> return StartPositionFirst
   | StartPositionLast -> return StartPositionLast
   | StartPositionKey { operator; name; length } ->
-      let+ name = typeck_data_ref name
+      let+ name = typeck_data_reference name
       and+ length = map_option typeck_expr' length in
       StartPositionKey { operator; name; length }
 
@@ -288,7 +288,7 @@ let typeck_screen_attribute_clause
 let typeck_sort_spec
     ({ sort_key_direction; sort_key_names } : Cobol_ptree.sort_spec)
   : sort_spec Typeck_procedure_monad.t =
-  let+ sort_key_names = map_list typeck_data_ref sort_key_names in
+  let+ sort_key_names = map_list typeck_data_reference sort_key_names in
   { sort_key_direction; sort_key_names }
 
 let typeck_allocate_stmt (a : Cobol_ptree.allocate_stmt with_loc)
@@ -303,7 +303,7 @@ let typeck_allocate_stmt (a : Cobol_ptree.allocate_stmt with_loc)
         let+ e = typeck_expr' e in
         AllocateCharacters e
     | AllocateDataItem n ->
-        let+ n = typeck_data_ref n in
+        let+ n = typeck_data_reference n in
         AllocateDataItem n
   and+ allocate_returning = map_option typeck_ident' allocate_returning in
   { allocate_kind; allocate_initialized; allocate_returning }
@@ -315,20 +315,24 @@ let typeck_entry_stmt (e : Cobol_ptree.entry_stmt)
       let+ n = typeck_entry_name n in
       EntrySimple n
   | EntryUsing { entry_name; entry_by_clauses } ->
-      let+ entry_name = typeck_entry_name entry_name
-      and+ entry_by_clauses =
-        map_list
-          (function
-            | Cobol_ptree.EntryByReference l ->
-                let+ l = map_list typeck_data_name_ref l in
-                EntryByReference l
-            | EntryByValue l ->
-                let+ l = map_list typeck_data_name_ref l in
-                EntryByValue l
-          )
-          entry_by_clauses
+      let rec typeck_entry_args = function
+        | [] -> return []
+        | Cobol_ptree.EntryByReference names :: clauses ->
+            typeck_clause_args (Arg_by_reference { optional = false })
+              names clauses
+        | EntryByValue names :: clauses ->
+            typeck_clause_args Arg_by_value names clauses
+      and typeck_clause_args arg_passing_style names clauses =
+        match names with
+        | [] -> typeck_entry_args clauses
+        | n :: names ->
+            let+ arg_name_ref = typeck_record_reference n
+            and+ args = typeck_clause_args arg_passing_style names clauses in
+            ({ arg_name_ref; arg_passing_style } &@<- n) :: args
       in
-      EntryUsing { entry_name; entry_by_clauses }
+      let+ entry_name = typeck_entry_name entry_name
+      and+ entry_using = typeck_entry_args entry_by_clauses in
+      EntryUsing { entry_name; entry_using }
   | EntryForGoTo n ->
       let+ n = typeck_entry_name n in
       EntryForGoTo n
@@ -524,7 +528,7 @@ let typeck_release_stmt (r : Cobol_ptree.release_stmt with_loc)
   : release_stmt Typeck_procedure_monad.t =
   let { release_item; release_from } : Cobol_ptree.release_stmt = ~&r in
   let typeck_ident_or_literal x = typeck_ident_or_literal (x &@<- r) in
-  let+ release_item = typeck_data_ref release_item
+  let+ release_item = typeck_data_reference release_item
   and+ release_from = map_option typeck_ident_or_literal release_from in
   { release_item; release_from }
 
@@ -829,7 +833,7 @@ and typeck_statement_payload (s : Cobol_ptree.statement with_loc)
       let+ e = typeck_exit_stmt (e &@<- s) in
       Exit e
   | Free l ->
-      let+ l = map_list typeck_data_ref l in
+      let+ l = map_list typeck_data_reference l in
       Free l
   | Generate n -> return (Generate n)
   | GoTo g ->
@@ -1206,7 +1210,7 @@ and typeck_read_stmt (r : Cobol_ptree.read_stmt with_loc)
   let typeck_ident x = typeck_ident (x &@<- r) in
   let+ read_into = map_option typeck_ident read_into
   and+ read_lock_behavior = map_option typeck_read_lock_behavior lock_behavior
-  and+ read_key = map_option typeck_data_ref read_key
+  and+ read_key = map_option typeck_data_reference read_key
   and+ read_error_handler =
     map_option (fun (e, h) ->
         let+ h = typeck_dual_handler h in
@@ -1274,7 +1278,7 @@ and typeck_search_stmt (s : Cobol_ptree.search_stmt with_loc)
     ~&s
   in
   let typeck_ident x = typeck_ident (x &@<- s) in
-  let+ search_item = typeck_data_ref search_item
+  let+ search_item = typeck_data_reference search_item
   and+ search_varying = map_option typeck_ident search_varying
   and+ search_at_end = typeck_statements search_at_end
   and+ search_when_clauses =
@@ -1302,7 +1306,7 @@ and typeck_search_all_stmt (s : Cobol_ptree.search_all_stmt with_loc)
   } : Cobol_ptree.search_all_stmt =
     ~&s
   in
-  let+ search_all_item = typeck_data_ref search_all_item
+  let+ search_all_item = typeck_data_reference search_all_item
   and+ search_all_at_end = typeck_statements search_all_at_end
   and+ search_all_conditions =
     map_list typeck_search_condition search_all_conditions

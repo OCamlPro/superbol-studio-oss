@@ -52,8 +52,8 @@ let resolve_procedure_args ~data_definitions ~refs pa =
     let acc = { rev_args = arg :: acc.rev_args; refs } in
     match arg_name_ref.resolved with
     | Error () -> acc (* Name resolution errors are already reported *)
-    | Ok arg_data_definition ->
-        match Cobol_data.Item.def_storage arg_data_definition with
+    | Ok arg_record ->
+        match arg_record.record_storage with
         | Linkage -> acc
         | actual_storage ->
             (* LATER: Check dialect here since non-storage procedure arguments
