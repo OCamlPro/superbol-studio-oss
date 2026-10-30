@@ -135,6 +135,39 @@ let analyze_located_n_witness
   | None ->
       analyze_located common located, analysis_key
 
+let derive_located
+    (Common_args.{ platform; _ } as common)
+    ~label ~inputs ~(derive: ANALYSIS.t analyzed_file -> 'a) located
+  : 'a * bool * ANALYSIS.t analyzed_file Lazy.t =
+  match derived_entry common ~label ~inputs located with
+  | Some (cache, key, analysis_key, lsp_key) ->
+      let resolve = RECORDER.resolver ~platform () in
+      begin match CACHE.lookup cache ~key ~resolve
+                    ~read_item:CACHING.read_item with
+      | Ok Some v ->
+          v, true, lazy begin
+            fst @@
+            analyze_located_n_witness common ~cache ~analysis_key ~lsp_key
+              located
+          end
+      | Ok None | Error _ ->
+          let analyzed, analysis_key =
+            analyze_located_n_witness common ~cache ~analysis_key ~lsp_key
+              located in
+          let v = derive analyzed in
+          ignore @@
+          CACHE.store cache ~key
+            ~label:(Printf.sprintf "%s:%s" label @@
+                    Superbol_project.relative_path_for ~filename:located.filename
+                      located.project)
+            ~witnesses:[WITNESS.sub analysis_key]
+            ~write_item:CACHING.write_item v;
+          v, false, Lazy.from_val analyzed
+      end
+  | None ->
+      let analyzed = analyze_located common located in
+      derive analyzed, false, Lazy.from_val analyzed
+
 (** [derive_from_file common ~label ~inputs ~derive filename] is [derive]
     applied to the result of {!analyze_file} on [filename].  The result is
     cached in the project's cache, along with the analysis it is derived from
@@ -149,50 +182,56 @@ let analyze_located_n_witness
     Note that [derive] must return a value that holds no closure, and be fully
     determined by the producer (as identified by the cache), the analysis, and
     [inputs]. *)
-let derive_from_file
-    (Common_args.{ platform; _ } as common)
-    ~label ~inputs ~(derive: ANALYSIS.t analyzed_file -> 'a) filename
-  : 'a * bool =
-  let located = locate common filename in
+let derive_from_file common ~label ~inputs ~derive filename : 'a * bool =
+  let v, hit, _ = derive_located common ~label ~inputs ~derive @@
+    locate common filename in
+  v, hit
+
+(** [derive_n_analyze_file common ~label ~inputs ~derive filename] is like
+    {!derive_from_file}, except that it also returns the analysis of
+    [filename], which is retrieved from the project's cache in case of a hit
+    on the derived value.  Use this to only cache, as derived value, what can
+    not be obtained from the analysis directly. *)
+let derive_n_analyze_file common ~label ~inputs ~derive filename
+  : 'a * bool * ANALYSIS.t analyzed_file =
+  let v, hit, analyzed = derive_located common ~label ~inputs ~derive @@
+    locate common filename in
+  v, hit, Lazy.force analyzed
+
+let lookup_located (Common_args.{ platform; _ } as common) ~label ~inputs
+    located : ('a * ANALYSIS.t analyzed_file Lazy.t) option =
   match derived_entry common ~label ~inputs located with
   | Some (cache, key, analysis_key, lsp_key) ->
       let resolve = RECORDER.resolver ~platform () in
       begin match CACHE.lookup cache ~key ~resolve
                     ~read_item:CACHING.read_item with
       | Ok Some v ->
-          v, true
+          Some (v, lazy begin
+              fst @@
+              analyze_located_n_witness common ~cache ~analysis_key ~lsp_key
+                located
+            end)
       | Ok None | Error _ ->
-          let analyzed, analysis_key =
-            analyze_located_n_witness common ~cache ~analysis_key ~lsp_key
-              located in
-          let v = derive analyzed in
-          ignore @@
-          CACHE.store cache ~key
-            ~label:(Printf.sprintf "%s:%s" label @@
-                    Superbol_project.relative_path_for ~filename
-                      located.project)
-            ~witnesses:[WITNESS.sub analysis_key]
-            ~write_item:CACHING.write_item v;
-          v, false
+          None
       end
   | None ->
-      derive @@ analyze_located common located, false
+      None
 
 (** [lookup_derived common ~label ~inputs filename] retrieves a value
     previously recorded by {!derive_from_file} with the same [label] and
     [inputs], without analyzing [filename]; [None] on a miss. *)
-let lookup_derived (Common_args.{ platform; _ } as common)
-    ~label ~inputs filename : 'a option =
-  match derived_entry common ~label ~inputs @@ locate common filename with
-  | Some (cache, key, _, _) ->
-      let resolve = RECORDER.resolver ~platform () in
-      begin match CACHE.lookup cache ~key ~resolve
-                    ~read_item:CACHING.read_item with
-      | Ok v -> v
-      | Error _ -> None
-      end
-  | None ->
-      None
+let lookup_derived common ~label ~inputs filename : 'a option =
+  Option.map fst @@ lookup_located common ~label ~inputs @@
+  locate common filename
+
+(** [lookup_derived_n_analysis common ~label ~inputs filename] is like
+    {!lookup_derived}, except that it also returns the analysis of [filename]
+    in case of a hit, which is retrieved from the project's cache (it is
+    computed and stored anew if the cache no longer holds it). *)
+let lookup_derived_n_analysis common ~label ~inputs filename
+  : ('a * ANALYSIS.t analyzed_file) option =
+  Option.map (fun (v, analyzed) -> v, Lazy.force analyzed) @@
+  lookup_located common ~label ~inputs @@ locate common filename
 
 (** [report common ~ppf analysis] reports analysis diagnostics on [ppf]. *)
 let report Common_args.{ platform; pretty_progress; _ } ~ppf
