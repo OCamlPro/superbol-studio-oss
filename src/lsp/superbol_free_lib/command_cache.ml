@@ -69,11 +69,10 @@ let trim ~older_than ~max_size dir =
   match Caching_commands.cache_for dir with
   | None -> ()
   | Some (root, cache) ->
+      (* Not [Never], even without bounds: that would skip reclaiming the
+         leftovers of instances that died mid-write. *)
       let policy =
-        if older_than = None && max_size = None
-        then Never
-        else Bounded { max_age = Option.map (( *. ) 86400.) older_than;
-                       max_size }
+        Bounded { max_age = Option.map (( *. ) 86400.) older_than; max_size }
       in
       match CACHE.prune cache ~policy with
       | Ok removed ->
