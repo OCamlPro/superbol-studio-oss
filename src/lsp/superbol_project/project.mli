@@ -43,6 +43,18 @@ module TYPES: sig
     | Same_as_file_directory
     | Given_directory of string
 
+  type cache_storage_location =
+    | No_cache_storage
+    | Store_cache_in_relative_dir of
+        {
+          relative_dirname: string;
+          (** Name of cache directory, relative to project root directory. *)
+        }
+    | Store_cache_in_shared_dir of
+        {
+          dirname: string;
+        }
+
 end
 include module type of TYPES
   with type rootdir = TYPES.rootdir

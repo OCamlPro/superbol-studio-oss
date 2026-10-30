@@ -12,11 +12,10 @@
 (**************************************************************************)
 
 open EzCompat                                                    (* StringMap *)
-open Lsp_project.TYPES
-open Ez_file.V1
 open Lsp_types
 
 module DIAGS = Cobol_common.Diagnostics
+module ANALYSIS = Superbol_project.Analysis
 
 module TYPES = struct
 
@@ -28,6 +27,15 @@ module TYPES = struct
       artifacts: Cobol_parser.Outputs.artifacts;
       checked: checked_doc option;
       rewinder: rewinder option;
+      (* Records what preprocessing observed of the outside world -- copybooks
+         read, directories searched, environment variables consulted -- so that
+         caching this document can be made conditional on all of it, and not
+         merely on the document's own contents.  [None] on a copybook, and on a
+         document that was restored from cache rather than parsed: the analysis
+         of the latter must not be cached again, or the entry would be written
+         back depending on nothing at all and would then match whatever its
+         copybooks had become. *)
+      recorder: Superbol_cache.Recorder.t option;
       (* Used for caching, when loading a cache file as the file is not
          reparsed, then diagnostics are not sent. *)
       parsing_diags: Cobol_parser.Diagnostics.ALL.t;
@@ -46,20 +54,16 @@ module TYPES = struct
       consistent document contents. *)
   exception Internal_error of document * exn * Printexc.raw_backtrace
 
-  (** Persistent representation (for caching) *)
+  (** Persistent representation of LSP-specific data (for caching).  The
+      analysis results are cached separately, as a
+      {!Superbol_project.Analysis.for_lsp}, so that they can be shared with other
+      front-ends. *)
   type cached =
     {
       doc_cache_filename: string;   (* relative to project rootdir *)
-      doc_cache_checksum: Digest.t; (* checked against file on disk on reload *)
-      doc_cache_langid: string;
-      doc_cache_version: int;
-      doc_cache_pplog: Cobol_preproc.Trace.log;
-      doc_cache_tokens: Cobol_parser.Outputs.tokens_with_locs;
-      doc_cache_comments: Cobol_preproc.Text.comments StringMap.t;
-      doc_cache_ignored: Cobol_common.Srcloc.lexloc list;
-      doc_cache_checked: checked_doc option;
-      doc_cache_parsing_diags: Cobol_parser.Diagnostics.ALL.t;
-      doc_cache_typecking_diags: Cobol_typeck.Diagnostics.t;
+      (* No checksum of the document itself: its contents take part in the key
+         this record is stored under, so a change to them yields a different
+         entry rather than one that has to be rejected. *)
     }
 
 end
@@ -69,32 +73,30 @@ type t = document
 let uri { textdoc; _ } = Lsp.Text_document.documentUri textdoc
 let language_id { textdoc; _ } = Lsp.Text_document.languageId textdoc
 
-let source_format_for ~doc =
-  match language_id doc with
+(** [analysis_overrides ~language_id] are the departures from their project's
+    configuration with which documents with the given language identifier are to
+    be analyzed. *)
+let analysis_overrides ~language_id =
+  match language_id with
   | "COBOL_GNU_LISTFILE"
   | "COBOL_GNU_DUMPFILE" ->
-      Cobol_config.SF SFVariable
+      { ANALYSIS.no_overrides with
+        override_source_format = Some (Cobol_config.SF SFVariable) }
   | _ ->
-      Superbol_project.Config.source_format_for
-        ~filename:(Lsp.Uri.to_path (uri doc)) doc.project.config
+      ANALYSIS.no_overrides
 
-let rewindable_parse ({ project; textdoc; _ } as doc) =
+let analysis_overrides_for doc =
+  analysis_overrides ~language_id:(language_id doc)
+
+let rewindable_parse ~platform ({ project; textdoc; _ } as doc) =
+  let filename = Lsp.Uri.to_path (uri doc) in
+  let overrides = analysis_overrides_for doc in
   Cobol_parser.rewindable_parse_with_artifacts
-    ~options:Cobol_parser.Options.{
-        (default ~exec_scanners: Superbol_preprocs.exec_scanners) with
-        recovery = EnableRecovery { silence_benign_recoveries = true };
-        config = project.config.cobol_config;
-      } @@
+    ~options:(ANALYSIS.parser_options ~overrides project) @@
   Cobol_preproc.preprocessor
-    ~options:Cobol_preproc.Options.{
-        (default ~platform:Lsp_platform.record) with
-        copybook_lookup_config =
-          Lsp_project.copybook_lookup_config_for ~uri:(uri doc) project;
-        config = project.config.cobol_config;
-        source_format = source_format_for ~doc;
-      } @@
-  Cobol_preproc.Input.string
-    ~filename:(Lsp.Uri.to_path (uri doc)) @@
+    ~options:(ANALYSIS.preproc_options ~platform ~overrides ~filename
+                project) @@
+  Cobol_preproc.Input.string ~filename @@
   Lsp.Text_document.text textdoc
 
 let no_artifacts =
@@ -104,24 +106,13 @@ let no_artifacts =
                          rev_ignored = [] }
 
 let check doc ptree =
-  let module Config = (val doc.project.config.cobol_config) in
   let Cobol_parser.Outputs.{ result = ptree, rewinder;
                              diags = parsing_diags } = ptree in
-  let Cobol_typeck.Results.{ result = checked;
-                             diags = typecking_diags } =
-    Cobol_typeck.compilation_group
-      ~fold_exec_block':Superbol_preprocs.Esql.fold_exec_block'
-      ~options:{ binary_size = Config.binary_size#value }
-      ptree
+  let checked, typecking_diags =
+    ANALYSIS.typecheck ~parsing_diags doc.project ptree
+      ~overrides:(analysis_overrides_for doc)
   in
   let artifacts = Cobol_parser.artifacts ptree in
-  let typecking_diags =
-    (* Do not report typeck diagnostics in case of syntax or pre-processing
-       errors: *)
-    if Cobol_parser.Diagnostics.ALL.has_errors parsing_diags
-    then Cobol_typeck.Diagnostics.none
-    else typecking_diags
-  in
   { doc with artifacts;
              parsing_diags;
              typecking_diags;
@@ -130,16 +121,27 @@ let check doc ptree =
 
 let parse_and_analyze ({ copybook; _ } as doc) =
   if copybook then                                                    (* skip *)
-    { doc with artifacts = no_artifacts; rewinder = None; checked = None }
+    { doc with artifacts = no_artifacts; rewinder = None; checked = None;
+               recorder = None }
   else
-    check doc @@ rewindable_parse doc
+    (* The recorder outlives this parse: a later incremental reparse runs on the
+       preprocessor state captured in the rewinder, and so keeps reporting to
+       this same recorder.  Witnesses only ever accumulate, which costs a
+       needless miss at worst and never a wrong hit. *)
+    let recorder = Superbol_cache.Recorder.create ~platform:Lsp_platform.record in
+    let doc =
+      check doc @@
+      rewindable_parse ~platform:(Superbol_cache.Recorder.platform recorder) doc
+    in
+    { doc with recorder = Some recorder }
 
 let reparse_and_analyze ?position ({ copybook; rewinder; textdoc; _ } as doc) =
   match position, rewinder with
   | None, _ | _, None ->
       parse_and_analyze doc
   | _, Some _ when copybook ->                                         (* skip *)
-      { doc with artifacts = no_artifacts; rewinder = None; checked = None }
+      { doc with artifacts = no_artifacts; rewinder = None; checked = None;
+                 recorder = None }
   | Some position, Some rewinder ->
       check doc @@
       Cobol_parser.rewind_and_parse rewinder ~position @@ fun ~last_pp:_ ->
@@ -181,7 +183,8 @@ let rec inspect_at ~position ~f ({ copybook; rewinder; textdoc; _ } as doc) =
 let blank ~project textdoc =
   let uri = Lsp.Text_document.documentUri textdoc in
   let copybook =
-    Lsp_project.detect_copybook project ~uri
+    ANALYSIS.detect_copybook project ~platform:Lsp_platform.record
+      ~filename:(Lsp.Uri.to_path uri)
       ~contents:(Lsp.Text_document.text textdoc)
   in
   if copybook then
@@ -194,6 +197,7 @@ let blank ~project textdoc =
     parsing_diags = Cobol_parser.Diagnostics.ALL.none;
     typecking_diags = Cobol_typeck.Diagnostics.none;
     checked = None;
+    recorder = None;
     copybook;
   }
 
@@ -249,56 +253,56 @@ let diagnostics { parsing_diags; typecking_diags; _ } =
 
 (** Caching utilities *)
 
-let to_cache ({ project; textdoc; checked; parsing_diags; typecking_diags;
-                artifacts = { pplog; tokens;
-                              rev_comments; rev_ignored; _ }; _ } as doc) =
-  {
-    doc_cache_filename = Lsp_project.relative_path_for ~uri:(uri doc) project;
-    doc_cache_checksum = Digest.string (Lsp.Text_document.text textdoc);
-    doc_cache_langid = Lsp.Text_document.languageId textdoc;
-    doc_cache_version = Lsp.Text_document.version textdoc;
-    doc_cache_pplog = pplog;
-    doc_cache_tokens = Lazy.force tokens;
-    doc_cache_comments = rev_comments;
-    doc_cache_ignored = rev_ignored;
-    doc_cache_checked = checked;
-    doc_cache_parsing_diags = parsing_diags;
-    doc_cache_typecking_diags = typecking_diags;
-  }
+(** [to_cache doc] splits [doc] into its analysis results, the witnesses these
+    were obtained against, and LSP-specific data.  The witnesses are [None] on a
+    document whose analysis was restored from cache rather than performed: there
+    is then nothing to store it against, and the entry it was restored from is
+    there already anyway. *)
+let to_cache ({ project; copybook; checked; parsing_diags; typecking_diags;
+                recorder; artifacts; _ } as doc) =
+  let analysis =
+    if copybook
+    then ANALYSIS.copybook_for_lsp
+    else ANALYSIS.of_artifacts_for_lsp ~checked ~parsing_diags
+        ~typeck_diags:typecking_diags ~parsing_artifacts:artifacts
+  in
+  let witnesses =
+    match recorder with
+    | Some recorder ->
+        (* An incremental reparse keeps reporting to the recorder, so it holds
+           strictly more than what was known when the parse first finished. *)
+        Some (Superbol_cache.Recorder.witnesses recorder)
+    | None when copybook ->
+        Some []        (* detection depends on nothing beyond the key's inputs *)
+    | None ->
+        None
+  in
+  analysis, witnesses,
+  { doc_cache_filename = Lsp_project.relative_path_for ~uri:(uri doc) project }
 
-(* NB: Note this checks against the actual file on disk, which may be different
-   from what a client sends upon opening. *)
-(** Raises [Failure] in case of bad checksum. *)
-let of_cache ~project ~params
-    { doc_cache_filename = filename;
-      doc_cache_checksum = checksum;
-      doc_cache_langid = languageId;
-      doc_cache_version = version;
-      doc_cache_pplog = pplog;
-      doc_cache_tokens = tokens;
-      doc_cache_comments = rev_comments;
-      doc_cache_ignored = rev_ignored;
-      doc_cache_checked = checked;
-      doc_cache_parsing_diags = parsing_diags;
-      doc_cache_typecking_diags = typecking_diags } =
-  let absolute_filename = Lsp_project.absolute_path_for ~filename project in
-  if checksum <> Digest.file absolute_filename then
-    failwith "Bad checksum"
-  else
-    let uri = Lsp.Uri.of_path absolute_filename
-    and text = EzFile.read_file absolute_filename in
-    let doc = Lsp.Types.DidOpenTextDocumentParams.create
-        ~textDocument:(Lsp.Types.TextDocumentItem.create
-                         ~languageId ~text ~uri ~version) in
-    let doc =
-      blank ~project @@
-      Lsp.Text_document.make doc ~position_encoding:params.position_encoding
-    in
-    { doc with artifacts = { pplog; tokens = lazy tokens;
-                             rev_comments; rev_ignored };
-               parsing_diags;
-               typecking_diags;
-               checked }
+(** [of_cache ~project ~params ~doc analysis cached] rebuilds a document from
+    the client's [doc], and its cached analysis [analysis].
+
+    The caller has already established that the contents of [doc] are what
+    [analysis] was recorded against: the contents take part in the key the entry
+    is stored under.  Everything {e else} the analysis depended upon is checked
+    by the cache, against the witnesses it was stored with. *)
+let of_cache ~project ~params ~doc (analysis: ANALYSIS.for_lsp)
+    (_: cached option) =                      (* nothing to restore from it yet *)
+  let textdoc =
+    Lsp.Text_document.make doc ~position_encoding:params.position_encoding
+  in
+  {
+    project;
+    textdoc;
+    copybook = analysis.lsp_copybook;
+    artifacts = ANALYSIS.artifacts analysis;
+    rewinder = None;
+    parsing_diags = analysis.lsp_parsing_diags;
+    typecking_diags = analysis.lsp_typeck_diags;
+    checked = analysis.lsp_checked;
+    recorder = None;
+  }
 
 (* --- *)
 

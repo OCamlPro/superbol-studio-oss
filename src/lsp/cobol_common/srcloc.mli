@@ -118,6 +118,11 @@ val start_pos_in: filename: string -> srcloc -> Lexing.position
 val end_pos_in: filename: string -> srcloc -> Lexing.position
 val shallow_start_pos: srcloc -> Lexing.position option
 
+(** Returns the given filename of the start position; use
+    {!NAMING.register_given_filename} to associate an internal filename
+    (typically, absolute) with a given filename (e.g, relative). *)
+val start_filename: srcloc -> string
+
 val concat: srcloc -> srcloc -> srcloc
 val concat_srclocs: srcloc list -> srcloc option
 val append_srclocs: srcloc -> srcloc list -> srcloc
@@ -156,6 +161,18 @@ val copy_from: filename:string -> copyloc:srcloc -> 'a with_loc -> 'a with_loc
 
 module TESTING: sig
   val register_file_contents: filename:string -> string -> unit
+end
+
+module NAMING: sig
+  (** Associates an internal filename (typically, absolute) with a given
+      filename (e.g, relative).  The given name is then used in place of the
+      internal one when printing locations in [pp_srcloc], and returned by
+      {!start_filename} or {!given_filename}. *)
+  val register_given_filename: filename:string -> given_filename:string -> unit
+
+  (** [given_filename filename] returns the given filename that was last
+      associated with [filename], if any. Otherwise, returns [filename]. *)
+  val given_filename: string -> string
 end
 
 val no_copy: copylocs

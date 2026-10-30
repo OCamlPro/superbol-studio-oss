@@ -52,6 +52,7 @@ depends: [
   "toml" {>= "7.1.0" & < "8.0.0"}
   "superbol_project" {= version}
   "superbol_preprocs" {= version}
+  "superbol_cache" {= version}
   "pretty" {= version}
   "lsp" {>= "1.18" & < "1.19"}
   "jsonrpc" {>= "1.15"}

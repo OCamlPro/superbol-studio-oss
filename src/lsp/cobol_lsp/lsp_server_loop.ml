@@ -13,9 +13,6 @@
 
 (** LSP server's main I/O-driven loop *)
 
-open Ez_file.V1
-open Ez_file.V1.EzFile.OP
-
 module TYPES = struct
   type extensions =
     {
@@ -27,66 +24,6 @@ include TYPES
 let default_extensions =
   {
     alternate_request_handers = [];
-  }
-
-(** [config ~project_layout ~enable_caching ~enable_client_configs
-    ~fallback_storage_directory ()] creates an LSP configuration structure for
-    identifying and managing projects.
-
-    - [project_layout] describes the layout of projects to be managed by the
-      LSP;
-
-    - [enable_caching] (defaulting to [true]) permits the storage of
-      pre-computed data, to allow faster LSP restarts;
-
-    - [enable_client_configs] (defaulting to [false]) enables requests for
-      configuration settings to the client;
-
-    - [force_syntax_diagnostics] (defaulting to [false]) forces reporting of
-      syntax and pre-processor-related diagnostics (for dialects other that
-      COBOL85, for which they are always enabled);
-
-    - [fallback_storage_directory], when provided (and if [enable_caching]
-      holds), is the name of a directory that is used to store a cache whenever
-      [project_layout] does not provide a per-project storage directory ({i i.e,}
-      [project_layout.relative_work_dirname = None]). *)
-let config
-    ~(project_layout: Lsp_project.layout)
-    ?(enable_caching = true)
-    ?(enable_client_configs = false)
-    ?(force_syntax_diagnostics = false)
-    ?(fallback_storage_directory: string option)
-    () =
-  let cache_storage: Lsp_types.cache_storage =
-    match project_layout.relative_work_dirname, fallback_storage_directory with
-    | _ when not enable_caching ->
-        No_storage
-    | None, None ->
-        No_storage
-    | None, Some dirname ->
-        Store_in_shared_dir { dirname }
-    | Some relative_work_dirname, _ ->
-        let invalid_dir reason =
-          Fmt.invalid_arg
-            ("relative_work_dirname: "^^reason^^" (got `%s')")
-            relative_work_dirname
-        in
-        if relative_work_dirname = ""
-        then invalid_dir "invalid directory name";
-        if EzFile.is_absolute relative_work_dirname
-        then invalid_dir "relative directory name expected";
-        Store_in_file {
-          relative_filename = relative_work_dirname // "lsp-cache";
-        }
-  in
-  Lsp_types.{
-    cache_config = {
-      cache_storage;
-      cache_verbose = true;
-    };
-    project_layout;
-    enable_client_configs;
-    force_syntax_diagnostics;
   }
 
 (** Start the lsp server, listening and responding on stdin and stdout.  This is

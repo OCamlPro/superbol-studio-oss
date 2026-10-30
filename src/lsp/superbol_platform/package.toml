@@ -56,6 +56,7 @@ skip = ["index.mld", "main.ml"]
 cobol_common = "version"
 cobol_preproc = "version"
 ez_file = ">=0.5"
+superbol_cache = "version"
 pretty = "version"
 
 # package tools dependencies

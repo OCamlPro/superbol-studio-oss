@@ -15,35 +15,35 @@
 
 open Lsp.Types
 
-type config =
+type lsp_config =
   {
-    project_layout: Superbol_project.layout;
-    cache_config: cache_config;
+    lsp_project_layout: Superbol_project.layout;
+    (** Describes the layout of projects to be managed by the LSP *)
+
+    lsp_cache_for: rootdir:string -> Superbol_cache.Cache.t;
+    (** [cache_for] looks up a cache based on a given project directory.  An
+        application with no file-system at hand passes
+        {!Superbol_cache.Cache.disabled}, which disables caching: every lookup
+        misses and nothing is stored. *)
+
+    lsp_cache_pruning_policy: Superbol_cache.Types.prune_policy;
+    (** What a cache is allowed to keep, and/or for how long. *)
+
+    lsp_cache_verbose: bool;
+    (** Make the LSP server report some information on its operations on project
+        caches. *)
+
     enable_client_configs: bool;
+    (** Enable requests for configuration settings to the client. *)
+
     force_syntax_diagnostics: bool;
+    (** Force reporting of syntax and pre-processor-related diagnostics (for
+        dialects other that COBOL85, for which they are always enabled). *)
   }
-
-and cache_config =
-  {
-    cache_storage: cache_storage;
-    cache_verbose: bool;
-  }
-
-and cache_storage =
-  | No_storage
-  | Store_in_file of
-      {
-        (** Name of cache file, relative to project root directory. *)
-        relative_filename: string;
-      }
-  | Store_in_shared_dir of
-      {
-        dirname: string;
-      }
 
 type params =
   {
-    config: config;
+    config: lsp_config;
     root_uri: DocumentUri.t option;
     workspace_folders: DocumentUri.t list;                 (* includes root_uri *)
     with_semantic_tokens: bool;

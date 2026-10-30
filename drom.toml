@@ -236,6 +236,10 @@ dir = "src/lsp/superbol_project"
 # edit 'src/lsp/superbol_project/package.toml' for package-specific options
 
 [[package]]
+dir = "src/lsp/superbol_cache"
+# edit 'src/lsp/superbol_cache/package.toml' for package-specific options
+
+[[package]]
 dir = "src/lsp/superbol_platform"
 # edit 'src/lsp/superbol_platform/package.toml' for package-specific options
 

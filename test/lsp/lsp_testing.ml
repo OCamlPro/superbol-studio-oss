@@ -34,12 +34,7 @@ let () =
 let platform =
   Superbol_platform.record
 and layout =
-  Superbol_free_lib.Project.layout
-and cache_config =
-  LSP.Types.{
-    cache_storage = No_storage;
-    cache_verbose = false;
-  }
+  Superbol_project.Layout.default
 
 let init_temp_project ?(toml = "") () =
   let projdir = Superbol_testutils.Tempdir.make_n_enter "superbol-project" in
@@ -49,16 +44,19 @@ let init_temp_project ?(toml = "") () =
 
 let make_server ?(with_semantic_tokens = false) () =
   Cobol_common.Platform.copy ~dst:LSP.Platform.record ~src:platform;
-  LSP.Server.init ~params:{ config = { project_layout = layout;
-                                       cache_config;
-                                       enable_client_configs = false;
-                                       force_syntax_diagnostics = true };
-                            root_uri = None;
-                            workspace_folders = [];
-                            with_semantic_tokens;
-                            with_client_file_watcher = `no;
-                            with_client_config_watcher = false;
-                            position_encoding = `UTF16 }
+  LSP.Server.init
+    ~params:{ config = { lsp_project_layout = layout;
+                         lsp_cache_for = Lsp_caching.lsp_cache_for;
+                         lsp_cache_verbose = false;
+                         lsp_cache_pruning_policy = Never;
+                         enable_client_configs = false;
+                         force_syntax_diagnostics = true };
+              root_uri = None;
+              workspace_folders = [];
+              with_semantic_tokens;
+              with_client_file_watcher = `no;
+              with_client_config_watcher = false;
+              position_encoding = `UTF16 }
 
 let add_cobol_doc server ~projdir filename text =
   let path = projdir // filename in
@@ -91,7 +89,7 @@ let add_cobol_doc server ~projdir filename text =
 (*   print_endline *)
 
 let projdir_marker = "__rootdir__"
-let projuri_marker = "file://"^projdir_marker 
+let projuri_marker = "file://"^projdir_marker
 
 type test_project =
   {

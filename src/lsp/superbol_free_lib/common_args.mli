@@ -13,9 +13,13 @@
 
 type t = {
   platform : Cobol_common.Platform.TYPES.platform;
+  project_root: string option;
   preproc_options: Cobol_preproc.Options.preproc_options;
   parser_options: Cobol_parser.Options.parser_options;
   pretty_progress: 'a. 'a Pretty.proc;
+  analysis_overrides: Superbol_project.Analysis.overrides;
+  (** Only what is explicitly given on the command line, for commands that
+      analyze documents according to the configuration of their project. *)
 }
 
 val get : unit -> (unit -> t) * Ezcmd.V2.EZCMD.TYPES.arg_list

@@ -29,6 +29,9 @@ let record =
     error = Pretty.error;
     getcwd = (fun () -> Ez_file.V1.Slashifier.slashify @@ Sys.getcwd ());
     read_text_file = (fun file -> Ez_file.V1.EzFile.read_text_file file);
+    list_dir = begin fun dir ->
+      try Array.to_list (Sys.readdir dir) with Sys_error _ -> []
+    end;
     with_stdin = (fun ~f -> f Stdlib.stdin);
     peek_channel_prefix;
     mk_temp_dir = Tempdir.create;
@@ -39,4 +42,4 @@ let record =
   }
 
 module Tempdir = Tempdir
-module Caching = Caching
+module Cache_store = Cache_store

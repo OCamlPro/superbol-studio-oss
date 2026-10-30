@@ -49,6 +49,7 @@ install: [
 depends: [
   "ocaml" {>= "4.14.2"}
   "dune" {>= "3.17.0"}
+  "superbol_cache" {= version}
   "pretty" {= version}
   "ez_file" {>= "0.5"}
   "cobol_preproc" {= version}

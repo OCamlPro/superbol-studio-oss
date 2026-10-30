@@ -43,4 +43,34 @@ val load
   : rootdir: Superbol_project.rootdir
   -> layout: Superbol_project.layout
   -> params: params
-  -> Lsp_document.t URIMap.t
+  -> (* Lsp_document.t URIMap.t *)Lsp_project.t option
+
+(** {2 Saving a single document} *)
+
+(** [save_document ~params doc] persists the cache of [doc] alone, and records
+    it in the cache of its project so that a later session finds it again.  The
+    other documents of that project are left as they are.
+
+    Used when a document is saved by the editor: that is when what the file
+    holds and what was parsed are known to agree, which is the condition for a
+    cached document to be of any use.
+
+    Some notifications about the saving process may be pushed via
+    {!Lsp_io.send_notification}. *)
+val save_document
+  : params: params
+  -> Lsp_document.t
+  -> unit
+
+(** {2 Loading a single document} *)
+
+(** [load_document ~project ~params ~doc] attempts to restore the document
+    [doc] that the client has just opened, from the cache of [project].  Returns
+    [None] whenever its analysis is missing from the cache, or out-dated.
+
+    The analysis may have been stored by another front-end. *)
+val load_document
+  : project: Lsp_project.t
+  -> params: params
+  -> doc: Lsp.Types.DidOpenTextDocumentParams.t
+  -> Lsp_document.t option

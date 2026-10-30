@@ -351,41 +351,61 @@ let compare: srcloc -> srcloc -> int = fun a b ->
 
 (** {2 Pretty-printing} *)
 
+module TABLE =
+  Ephemeron.K1.Make (struct
+    include String                                     (* structural equality *)
+    let hash = Hashtbl.hash
+  end)
+
+let given_filename, register_given_filename =
+  (* [given_filename] is what we expect to be kept at its place in memory,
+     whereas [filename] may be re-computed.  We use two tables to keep the
+     latter alive for as long as the former does. *)
+  let filename_of_given_filename = TABLE.create 3 in (* Note phys eq may be enough here  *)
+  let given_filename_of_filename = TABLE.create 3 in
+  begin fun filename ->
+    match TABLE.find_opt given_filename_of_filename filename with
+    | Some given_filename ->
+        given_filename
+    | None ->
+        filename
+  end,
+  begin fun ~filename ~given_filename ->
+    TABLE.replace filename_of_given_filename given_filename filename;
+    TABLE.replace given_filename_of_filename filename given_filename;
+  end
+
 let retrieve_file_lines, register_file_contents =
-  let module Cache =
-    Ephemeron.K1.Make (struct
-      include String
-      let hash = Hashtbl.hash
-    end)
-  in
-  let file_cache = lazy (Cache.create 3) in
+  let file_cache = lazy (TABLE.create 3) in
   begin fun ~platform file ->
     let file_cache = Lazy.force file_cache in
-    try Cache.find file_cache file
-    with Not_found ->
-      let contents = platform.read_text_file file in
-      let lines = String.split_on_char '\n' contents in
-      let lines = Array.of_list lines in
-      let lines =
-        (* Retain the behavior of `EzFile.read_lines` that do not automatically
-           append an empty line at the end *)
-        if lines.(Array.length lines - 1) = ""
-        then Array.sub lines 0 (Array.length lines - 1)
-        else lines
-      in
-      Cache.replace file_cache file lines;
-      lines
+    match TABLE.find_opt file_cache file with
+    | Some lines ->
+        lines
+    | None ->
+        let contents = platform.read_text_file file in
+        let lines = String.split_on_char '\n' contents in
+        let lines = Array.of_list lines in
+        let lines =
+          (* Retain the behavior of `EzFile.read_lines` that do not automatically
+             append an empty line at the end *)
+          if lines.(Array.length lines - 1) = ""
+          then Array.sub lines 0 (Array.length lines - 1)
+          else lines
+        in
+        TABLE.replace file_cache file lines;
+        lines
   end,
   begin fun ~filename contents ->
     let file_cache = Lazy.force file_cache in
     let lines = Array.of_list @@ String.split_on_char '\n' contents in
-    Cache.replace file_cache filename lines
+    TABLE.replace file_cache filename lines
   end
 
 type raw_loc = string * (int * int) * (int * int)
 
 let pp_file_loc ppf ((file, pos1, pos2): raw_loc) =
-  Pretty.print ppf "%s:%a" file Fmt.text_loc (pos1, pos2)
+  Pretty.print ppf "%s:%a" (given_filename file) Fmt.text_loc (pos1, pos2)
 
 (** Note this should always end with a newline character *)
 let pp_raw_loc: ?platform:platform -> raw_loc Pretty.printer =
@@ -505,6 +525,9 @@ let pp_srcloc ~platform = pp_srcloc_with_optional_caret ~platform
 
 let pp_file_loc ppf loc =
   pp_file_loc ppf (to_raw_loc @@ as_lexloc loc)
+
+let start_filename loc =
+  given_filename (start_pos loc).pos_fname
 
 let pp_src ppf = function
   | Source_location l ->
@@ -798,6 +821,11 @@ let copy_from ~filename ~copyloc { payload; loc } =
 
 module TESTING = struct
   let register_file_contents = register_file_contents
+end
+
+module NAMING = struct
+  let register_given_filename = register_given_filename
+  let given_filename = given_filename
 end
 
 (* --- *)

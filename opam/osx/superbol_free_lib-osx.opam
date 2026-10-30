@@ -54,6 +54,7 @@ depends: [
   "vscode-json-osx" {= version}
   "superbol_preprocs-osx" {= version}
   "superbol_platform-osx" {= version}
+  "superbol_cache-osx" {= version}
   "sql_preproc-osx" {= version}
   "lwt-osx" {>= "5" & < "5.9"}
   "ez_toml-osx" {= version}

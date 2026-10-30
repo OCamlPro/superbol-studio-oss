@@ -332,14 +332,59 @@ let copybook_lookup_config_for ~filename config =
 
 exception BAD_CHECKSUM
 
-type cached = t                                        (* same representation *)
+(* The COBOL configuration is deliberately absent here, and kept as the name of
+   the dialect it is built from instead.  It is a first-class module full of
+   objects and closures, and serialising those ties the result to the
+   byte-identical executable -- something neither the producer tag nor anything
+   else a cache can observe is able to establish.  Reading such an item back in
+   another build is undefined behaviour rather than a miss, which a cache
+   directory shared between users would run into routinely.
 
-let to_cache config =
-  { config with toml_handle = Ezr_toml.cacheable config.toml_handle }
+   Rebuilding it from the dialect costs nothing next to what caching saves, and
+   is what the configuration file itself is read as: a dialect name is the only
+   thing a COBOL configuration is ever built from here. *)
+type cached =
+  {
+    cached_dialect: string;
+    cached_source_format: Cobol_config.source_format_spec;
+    cached_source_format_by_extension:
+      (string * Cobol_config.source_format_spec) list;
+    cached_libpath: path list;
+    cached_libexts: string list;
+    cached_indent_config: (string * int) list;
+    cached_toml_handle: Ezr_toml.cacheable;
+  }
 
-let of_cache ~config_filename ({ toml_handle; _ } as config) =
+let to_cache { cobol_config; source_format; source_format_by_extension;
+               libpath; libexts; indent_config; toml_handle } =
+  {
+    cached_dialect =
+      Cobol_config.DIALECT.to_string @@ Cobol_config.dialect cobol_config;
+    cached_source_format = source_format;
+    cached_source_format_by_extension = source_format_by_extension;
+    cached_libpath = libpath;
+    cached_libexts = libexts;
+    cached_indent_config = indent_config;
+    cached_toml_handle = Ezr_toml.cacheable toml_handle;
+  }
+
+let of_cache ~config_filename
+    { cached_dialect; cached_source_format; cached_source_format_by_extension;
+      cached_libpath; cached_libexts; cached_indent_config;
+      cached_toml_handle = toml_handle } =
   if Ezr_toml.checksum toml_handle <> Digest.file config_filename
   then raise BAD_CHECKSUM;
+  let DIAGS.{ result = cobol_config; _ } =
+    cobol_config_from_dialect_name ~verbose:false cached_dialect in
+  let config =
+    { cobol_config;
+      source_format = cached_source_format;
+      source_format_by_extension = cached_source_format_by_extension;
+      libpath = cached_libpath;
+      libexts = cached_libexts;
+      indent_config = cached_indent_config;
+      toml_handle }
+  in
   Ezr_toml.add_section_update toml_handle
     config_section_name (config_repr config);
   config

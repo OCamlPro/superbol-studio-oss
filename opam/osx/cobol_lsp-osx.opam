@@ -54,6 +54,7 @@ depends: [
   "toml-osx" {>= "7.1.0" & < "8.0.0"}
   "superbol_project-osx" {= version}
   "superbol_preprocs-osx" {= version}
+  "superbol_cache-osx" {= version}
   "pretty-osx" {= version}
   "lsp-osx" {>= "1.18" & < "1.19"}
   "jsonrpc-osx" {>= "1.15"}

@@ -15,13 +15,6 @@ open Ez_file.V1
 
 module DIAGS = Cobol_common.Diagnostics
 
-let layout =
-  Superbol_project.{
-    project_config_filename = "superbol.toml";
-    relative_work_dirname = Some "_superbol";
-    rootdir_fallback_policy = Same_as_file_directory;
-  }
-
 let try_load ~f arg =
   try f arg with
   | Superbol_project.Config.ERROR e ->
@@ -34,24 +27,22 @@ let try_load ~f arg =
 
 (* Direct loading (based on directory name) *)
 
-let in_ ~dirname =
-  Pretty.error "Loading project in `%s'@." dirname;
+let in_ ~dirname ?(layout = Superbol_project.Layout.default) () =
   try_load () ~f:begin fun () ->
     let rootdir = Superbol_project.rootdir_at ~dirname in
     let project = Superbol_project.for_ ~rootdir ~layout in
     DIAGS.show_n_forget project ~platform:Superbol_platform.record
   end
 
-let load ?(dirname = EzFile.current_dir_name) () = in_ ~dirname
+let load ?(dirname = EzFile.current_dir_name) = in_ ~dirname
 
 (* Indirect loading (based on file name, looking up the directory hierarchy) *)
 
-let for_ ~filename =
-  Pretty.error "Looking up project for `%s'@." filename;
+let for_ ~filename ?(layout = Superbol_project.Layout.default) () =
   try_load () ~f:begin fun () ->
     let rootdir = Superbol_project.rootdir_for ~filename ~layout in
     let project = Superbol_project.for_ ~rootdir ~layout in
     DIAGS.show_n_forget project ~platform:Superbol_platform.record
   end
 
-let for_filename filename = for_ ~filename
+let for_filename ?layout filename = for_ ~filename ?layout ()

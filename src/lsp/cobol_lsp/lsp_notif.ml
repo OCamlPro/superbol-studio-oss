@@ -33,6 +33,8 @@ let on_notification state notif =
       Running (Lsp_server.did_open params registry)
   | Running registry, TextDocumentDidChange params ->
       Running (Lsp_server.did_change params registry)
+  | Running registry, DidSaveTextDocument params ->
+      Running (Lsp_server.did_save params registry)
   | Running registry, TextDocumentDidClose params ->
       Running (Lsp_server.did_close params registry)
   | Running _, Exit ->
