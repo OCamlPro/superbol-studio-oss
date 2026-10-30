@@ -43,6 +43,28 @@ type 'a analyzed_file =
     hit: bool;                              (* whether found in project cache *)
   }
 
+(* The project's cache, along with the inputs that keys of analyses of its
+   documents with some overrides share.  Projects are loaded once per root
+   directory ({!Superbol_project.for_}), and so is their cache: these are
+   computed again only for another project (e.g, if its configuration was
+   reloaded), or other overrides. *)
+let cached_configs = Hashtbl.create 1
+
+let cached_config ~overrides project =
+  let rootdir = Superbol_project.(string_of_rootdir @@ rootdir project) in
+  match Hashtbl.find_opt cached_configs rootdir with
+  | Some (project', overrides', cached_config)
+    when project' == project && overrides' == overrides ->
+      cached_config
+  | _ ->
+      let cached_config =
+        Option.bind (cache_for rootdir) @@ fun (_, cache) ->
+        Option.map (fun config -> cache, config) @@
+        ANALYSIS.config_inputs ~overrides project
+      in
+      Hashtbl.replace cached_configs rootdir (project, overrides, cached_config);
+      cached_config
+
 let locate
     Common_args.{ project_root; platform; analysis_overrides = overrides; _ }
     given_filename =
@@ -55,15 +77,14 @@ let locate
     | Some dirname -> Project.in_ ~dirname ()
     | None -> Project.for_filename filename
   in
-  let rootdir = Superbol_project.(string_of_rootdir @@ rootdir project) in
   let contents = EzFile.read_text_file filename in
   if given_filename != filename then
     Cobol_common.Srcloc.NAMING.register_given_filename ~given_filename
       ~filename;
   let cached =
-    Option.bind (cache_for rootdir) @@ fun (_, cache) ->
-    Option.map (fun keys -> cache, keys) @@
-    ANALYSIS.keys ~overrides ~filename ~contents project
+    Option.map begin fun (cache, config) ->
+      cache, ANALYSIS.document_keys config ~filename ~contents
+    end (cached_config ~overrides project)
   in
   { filename; project; contents; cached }
 
