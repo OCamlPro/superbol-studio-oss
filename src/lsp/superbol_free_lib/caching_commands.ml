@@ -34,14 +34,18 @@ type analyzed_file =
     hit: bool;                              (* whether found in project cache *)
   }
 
-let locate Common_args.{ platform; _ } filename =
-  let filename =
-    if EzFile.is_absolute filename then filename
-    else platform.getcwd () // filename        (* filenames take part in keys *)
+let locate Common_args.{ platform; _ } given_filename =
+  let filename =                               (* filenames take part in keys *)
+    if EzFile.is_absolute given_filename
+    then given_filename
+    else platform.getcwd () // given_filename
   in
   let project = Project.for_filename filename in
   let rootdir = Superbol_project.(string_of_rootdir @@ rootdir project) in
   let contents = EzFile.read_text_file filename in
+  if given_filename != filename then
+    Cobol_common.Srcloc.NAMING.register_given_filename ~given_filename
+      ~filename;
   filename, project, contents, Option.map snd (cache_for rootdir)
 
 let analyze_located Common_args.{ platform; analysis_overrides = overrides; _ }

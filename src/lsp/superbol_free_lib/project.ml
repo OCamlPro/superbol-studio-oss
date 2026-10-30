@@ -28,7 +28,6 @@ let try_load ~f arg =
 (* Direct loading (based on directory name) *)
 
 let in_ ~dirname ?(layout = Superbol_project.Layout.default) () =
-  Pretty.error "Loading project in `%s'@." dirname;
   try_load () ~f:begin fun () ->
     let rootdir = Superbol_project.rootdir_at ~dirname in
     let project = Superbol_project.for_ ~rootdir ~layout in
@@ -40,7 +39,6 @@ let load ?(dirname = EzFile.current_dir_name) = in_ ~dirname
 (* Indirect loading (based on file name, looking up the directory hierarchy) *)
 
 let for_ ~filename ?(layout = Superbol_project.Layout.default) () =
-  Pretty.error "Looking up project for `%s'@." filename;
   try_load () ~f:begin fun () ->
     let rootdir = Superbol_project.rootdir_for ~filename ~layout in
     let project = Superbol_project.for_ ~rootdir ~layout in
