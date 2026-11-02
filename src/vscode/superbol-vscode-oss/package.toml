@@ -77,6 +77,9 @@ dune-stanzas = """
  (enabled_if (= %{context_name} "default"))
 """
 dune-trailer = """
+; Hack to workaround the fact that Dune does not allow `enabled_if`
+; on `install` stanzas ; this is needed because we disable building
+; this executable (and all JS libraries) when cross-compiling
 (rule
  (target superbol_vscode_platform.bc.js)
  (action (write-file %{target} ""))

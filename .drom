@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-bfaf31ba7e158366e9747d4b77fbb5b8:.
+7a93a6f55b7f2401da55ce58ccc33530:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -1208,7 +1208,7 @@ a18438bf6e347bb93779045b0a7006d1:src/vscode/superbol-vscode-lib/version.mlt
 
 # begin context for src/vscode/superbol-vscode-oss/dune
 # file src/vscode/superbol-vscode-oss/dune
-fdf11e015b7be08613077faeef040a87:src/vscode/superbol-vscode-oss/dune
+e658100b6bc155d41db60e77abe4fd1b:src/vscode/superbol-vscode-oss/dune
 # end context for src/vscode/superbol-vscode-oss/dune
 
 # begin context for src/vscode/superbol-vscode-oss/package.toml

@@ -61,7 +61,14 @@ cobol_typeck = "version"
 ez_cmdliner = "0.3.0"
 ez_file = ">=0.4"
 ez_toml = "version"
+
+# We only depend on `lwt` via `ez_api` (and we don't even use any bit
+# of `lwt` at all).  But we still need to add the following constraint
+# on `lwt` so it installs properly on windows:
+# Note: lwt-osx.5.9.0 currently fails to build; the upper-bound may be
+# lifted once it does.
 lwt = ">=5 <5.9"
+
 sql_preproc = "version"
 superbol_cache = "version"
 superbol_platform = "version"
