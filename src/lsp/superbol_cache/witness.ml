@@ -28,8 +28,17 @@ let canonical_path name = Canon.path ~case_insensitive:!insensitive name
 let file ~name ~contents =
   File { name = canonical_path name; digest = Digest.string contents }
 
-let dir ~name ~entries =
-  Dir { name = canonical_path name;
+(* Copybook lookups always match names regardless of case, whatever the host
+   does, so extensions are compared in lowercase. *)
+let ext_of entry = String.lowercase_ascii (Filename.extension entry)
+
+let dir ?exts ~name ~entries () =
+  let exts = Option.map (List.sort_uniq String.compare) exts in
+  let entries = match exts with
+    | None -> entries
+    | Some exts -> List.filter (fun e -> List.mem (ext_of e) exts) entries
+  in
+  Dir { name = canonical_path name; exts;
         digest = Digest.string
             (Canon.listing ~case_insensitive:!insensitive entries) }
 

@@ -47,6 +47,11 @@ type witness =
   | Dir of
       {
         name: string;          (** canonical path of the directory searched *)
+        exts: string list option;
+        (** when given, the listing is restricted to the entries whose
+            extension, in lowercase and as {!Filename.extension} renders it
+            (with its leading period, or [""] for none), is one of these;
+            sorted and without duplicates *)
         digest: digest;        (** digest of its sorted, canonical listing *)
       }
   | Env of

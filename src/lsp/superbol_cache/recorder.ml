@@ -22,8 +22,9 @@ module TYPES = struct
       mutable rec_witnesses: Types.witness list;
       (* Directories are listed on the recorder's own account, over and above
          what the lookup itself does, so each one is listed at most once for the
-         whole of a parse. *)
-      rec_listed: (string, unit) Hashtbl.t;
+         whole of a parse; each restriction of a listing is witnessed once. *)
+      rec_listings: (string, string list) Hashtbl.t;
+      rec_listed: (string * string list, unit) Hashtbl.t;
     }
 
 end
@@ -62,16 +63,38 @@ let lookup_dirs ~lookup_config ?fromfile ?libname () =
   in
   lookup_config.Cobol_common.Copybook.TYPES.lookup_path @ named
 
-let record_dir t dir =
-  if not (Hashtbl.mem t.rec_listed dir) then begin
-    Hashtbl.replace t.rec_listed dir ();
-    add t @@ Witness.dir ~name:(absolute t dir)
-      ~entries:(t.rec_platform.list_dir dir)
+(* The extensions of the entries a copybook lookup may pick.  [Copybook_finder]
+   tries the name as given, then with each of the lookup extensions appended,
+   comparing names regardless of case; a directory listing restricted to these
+   extensions therefore still holds every candidate, while files of any other
+   kind may come and go without invalidating anything.  The extensions are
+   taken from the candidate names themselves rather than from the configuration
+   alone, which is what keeps [COPY "BOOK.TXT"], or an extension-less [BOOK],
+   honest. *)
+let lookup_exts ~lookup_config textname =
+  let base = match textname with `Word w | `Alphanum w -> w in
+  List.map (fun ext -> Witness.ext_of (base ^ "." ^ ext))
+    lookup_config.Cobol_common.Copybook.TYPES.lookup_exts @
+  [Witness.ext_of base]
+  |> List.sort_uniq String.compare
+
+let record_dir t ~exts dir =
+  if not (Hashtbl.mem t.rec_listed (dir, exts)) then begin
+    Hashtbl.replace t.rec_listed (dir, exts) ();
+    let entries = match Hashtbl.find_opt t.rec_listings dir with
+      | Some entries -> entries
+      | None ->
+          let entries = t.rec_platform.list_dir dir in
+          Hashtbl.replace t.rec_listings dir entries;
+          entries
+    in
+    add t @@ Witness.dir ~exts ~name:(absolute t dir) ~entries ()
   end
 
 let create ~platform =
   { rec_platform = platform;
     rec_witnesses = [];
+    rec_listings = Hashtbl.create 16;
     rec_listed = Hashtbl.create 16 }
 
 let platform t =
@@ -88,7 +111,9 @@ let platform t =
       value
     end;
     find_lib = begin fun ~lookup_config ?fromfile ?libname textname ->
-      List.iter (record_dir t) (lookup_dirs ~lookup_config ?fromfile ?libname ());
+      let exts = lookup_exts ~lookup_config textname in
+      List.iter (record_dir t ~exts)
+        (lookup_dirs ~lookup_config ?fromfile ?libname ());
       inner.find_lib ~lookup_config ?fromfile ?libname textname
     end }
 
@@ -108,7 +133,7 @@ let resolver ~platform ?(contents_of = fun _ -> None) () =
           | None -> false
           | Some contents -> Witness.file ~name ~contents = witness
         end
-    | Dir { name; _ } ->
+    | Dir { name; exts; _ } ->
         let entries = match Hashtbl.find_opt listed name with
           | Some entries -> entries
           | None ->
@@ -116,7 +141,7 @@ let resolver ~platform ?(contents_of = fun _ -> None) () =
               Hashtbl.replace listed name entries;
               entries
         in
-        Witness.dir ~name ~entries = witness
+        Witness.dir ?exts ~name ~entries () = witness
     | Env { var; value } ->
         platform.getenv_opt var = value
     | Sub _ ->

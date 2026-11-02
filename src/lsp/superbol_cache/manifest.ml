@@ -60,8 +60,14 @@ let encode { manifest_label; manifest_witnesses; manifest_object } =
   let record = function
     | File { name; digest } ->
         Printf.sprintf "F %s %s" (Digest.to_hex digest) (escape name)
-    | Dir { name; digest } ->
+    | Dir { name; exts = None; digest } ->
         Printf.sprintf "D %s %s" (Digest.to_hex digest) (escape name)
+    | Dir { name; exts = Some exts; digest } ->
+        (* One field per extension; the empty one, for entries that have none,
+           is an empty field. *)
+        String.concat " " @@
+        Printf.sprintf "R %s %s" (Digest.to_hex digest) (escape name) ::
+        List.map escape exts
     | Env { var; value = None } ->
         Printf.sprintf "E %s" (escape var)
     | Env { var; value = Some value } ->
@@ -93,7 +99,12 @@ let decode s =
         File { name = unescape name; digest = digest_of_hex d } :: witnesses
     | ["D"; d; name] ->
         label, obj,
-        Dir { name = unescape name; digest = digest_of_hex d } :: witnesses
+        Dir { name = unescape name; exts = None;
+              digest = digest_of_hex d } :: witnesses
+    | "R" :: d :: name :: exts ->
+        label, obj,
+        Dir { name = unescape name; exts = Some (List.map unescape exts);
+              digest = digest_of_hex d } :: witnesses
     | ["E"; var] ->
         label, obj, Env { var = unescape var; value = None } :: witnesses
     | ["V"; var; value] ->

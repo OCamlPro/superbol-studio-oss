@@ -37,14 +37,30 @@ val canonical_path: string -> string
     [contents]. *)
 val file: name:string -> contents:string -> Types.witness
 
-(** [dir ~name ~entries] witnesses that the directory [name] was searched and
-    held exactly [entries].
+(** [dir ?exts ~name ~entries ()] witnesses that the directory [name] was
+    searched and held exactly [entries].
 
     This is what keeps a copybook lookup honest: resolving a copybook in one
     directory of a search path asserts that the directories before it held no
     candidate, so a copybook {e added} to one of them must be a miss even though
-    no file that was read has changed. *)
-val dir: name:string -> entries:string list -> Types.witness
+    no file that was read has changed.
+
+    When [exts] is given, only the entries whose extension (in lowercase, as
+    {!Filename.extension} renders it: [".cpy"], or [""] for none) belongs to
+    [exts] are witnessed, so that adding or removing any other entry leaves the
+    witness intact.  [entries] may then be the whole listing: the restriction is
+    applied here, which is what lets a resolver rebuild the witness from the
+    same listing. *)
+val dir
+  : ?exts:string list
+  -> name:string
+  -> entries:string list
+  -> unit
+  -> Types.witness
+
+(** [ext_of entry] is the extension of [entry] as {!dir} compares it against
+    [exts]: in lowercase, with its leading period, or [""] for none. *)
+val ext_of: string -> string
 
 (** [env ~var ~value] witnesses that [var] was consulted and found unset
     ([None]) or set to a given value. *)
