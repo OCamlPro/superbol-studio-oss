@@ -579,13 +579,17 @@ let handle_semtoks_full,
       ~f:begin fun ~doc:{ semtoks; _ } _ ->
         (* Tokens for the whole document are computed once, and kept in the
            document (they may have been restored from cache, along with its
-           analysis): a request for a range just picks from them. *)
-        let data = Lazy.force semtoks in
-        let data = match range with
-          | None -> data
-          | Some range -> Lsp_semtoks.restrict ~range data
-        in
-        Some (SemanticTokens.create ~data ())
+           analysis): a request for a range just picks from them.  They may be
+           missing from a document that was restored from cache by a server
+           whose client does not ask for semantic tokens. *)
+        Option.map begin fun semtoks ->
+          let data = Lazy.force semtoks in
+          let data = match range with
+            | None -> data
+            | Some range -> Lsp_semtoks.restrict ~range data
+          in
+          SemanticTokens.create ~data ()
+        end semtoks
       end
   in
   (fun registry (SemanticTokensParams.{ textDocument; _ }) ->

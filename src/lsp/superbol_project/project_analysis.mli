@@ -45,35 +45,17 @@ val diagnostics: t -> Cobol_common.Diagnostics.Set.t
 
 (** {2 Results for the LSP} *)
 
-(** Semantic tokens of a document, in the encoding of the LSP (relative
-    positions, five integers per token).  They only cover the document itself,
-    and not its copybooks. *)
-type semantic_tokens = int array
-
-(** Computes the semantic tokens of the document [filename], from its parsing
-    artifacts and its typechecking outputs.  This module does not know how: the
-    LSP provides it, and front-ends that fill the cache for the LSP should pass
-    the very same function, as it does not take part in cache keys. *)
-type semantic_tokens_of =
-  filename: string ->
-  Cobol_parser.Outputs.artifacts ->
-  Cobol_typeck.Outputs.t ->
-  semantic_tokens
-
-(** What an analysis yields, along with what is needed to answer LSP requests:
-    some parsing artifacts (preprocessing log, comments, ignored regions), and
-    semantic tokens.  These are more costly to compute and to cache.
+(** What an analysis yields, along with the parsing artifacts that are needed
+    to answer LSP requests (preprocessing log, comments, ignored regions).
+    These are more costly to compute and to cache.
 
     Tokens are not held: they are the largest part of the parsing artifacts by
-    far, and are only needed to compute the semantic tokens, which are much
-    more compact.  The semantic tokens themselves are [None] when they were not
-    computed (e.g, by an LSP server whose client does not ask for any): they
-    then have to be obtained from another analysis. *)
+    far, and are only needed to compute semantic tokens, which are much more
+    compact, and are cached instead (when needed). *)
 type for_lsp =
   {
     lsp_copybook: bool;
     lsp_pplog: Cobol_preproc.Trace.log;
-    lsp_semantic_tokens: semantic_tokens option;
     lsp_comments: Cobol_preproc.Text.comments StringMap.t;
     lsp_ignored: Cobol_common.Srcloc.lexloc list;
     lsp_checked: Cobol_typeck.Outputs.t option;
@@ -81,23 +63,28 @@ type for_lsp =
     lsp_typeck_diags: Cobol_typeck.Diagnostics.t;
   }
 
+(** Semantic tokens of a document, in the encoding of the LSP (relative
+    positions, five integers per token).  They only cover the document itself,
+    and not its copybooks.  They are cached on their own, apart from the
+    analysis for the LSP they are computed from (see
+    {!store_semantic_tokens}). *)
+type semantic_tokens = int array
+
 (** [of_artifacts_for_lsp ~checked ~parsing_diags ~typeck_diags
-    ~semantic_tokens ~parsing_artifacts] gathers the outputs of an analysis of a
-    document that is not a copybook.  The tokens of [parsing_artifacts] are
-    dropped (and not forced). *)
+    ~parsing_artifacts] gathers the outputs of an analysis of a document that
+    is not a copybook.  The tokens of [parsing_artifacts] are dropped (and not
+    forced). *)
 val of_artifacts_for_lsp
   : checked: Cobol_typeck.Outputs.t option
   -> parsing_diags: Cobol_parser.Diagnostics.ALL.t
   -> typeck_diags: Cobol_typeck.Diagnostics.t
-  -> semantic_tokens: semantic_tokens option
-  -> parsing_artifacts:Cobol_parser.Outputs.artifacts
+  -> parsing_artifacts: Cobol_parser.Outputs.artifacts
   -> for_lsp
 
-(** [artifacts a] rebuilds the parsing artifacts held in [a], with no
-    tokens. *)
+(** [artifacts a] rebuilds the parsing artifacts held in [a], without tokens. *)
 val artifacts: for_lsp -> Cobol_parser.Outputs.artifacts
 
-(** Result for the LSP for a copybook. *)
+(** Result for the LSP, for a copybook. *)
 val copybook_for_lsp: for_lsp
 
 (** [of_lsp_artifacts a] drops the artifacts of [a]. *)
@@ -185,14 +172,11 @@ val analyze
   -> Project.t
   -> t
 
-(** [analyze_for_lsp ~platform ?overrides ~semantic_tokens ~filename ~contents
-    project] is like {!analyze}, except that parsing artifacts are collected as
-    well, and semantic tokens computed with [semantic_tokens] (so they are
-    never [None] in the result). *)
+(** [analyze_for_lsp ~platform ?overrides ~filename ~contents project] is like
+    {!analyze}, except that parsing artifacts are collected as well. *)
 val analyze_for_lsp
   : platform: Cobol_common.Platform.TYPES.platform
   -> ?overrides: overrides
-  -> semantic_tokens: semantic_tokens_of
   -> filename: string
   -> contents: string
   -> Project.t
@@ -284,6 +268,31 @@ val lookup_for_lsp
   -> resolve: (Superbol_cache.Types.witness -> bool)
   -> for_lsp option
 
+(** [semantic_tokens_key keys] is the key under which the semantic tokens of
+    the document [keys] are for are cached. *)
+val semantic_tokens_key: keys -> Superbol_cache.Types.key
+
+(** [store_semantic_tokens cache ~keys ~label s] records the semantic tokens
+    [s] in [cache], for as long as the analysis for the LSP they were computed
+    from (under [key_for_lsp keys]) holds.  Front-ends that do not need
+    semantic tokens may store analyses for the LSP without them: front-ends that
+    need them should then consider such an analysis as missing.  The caller is
+    responsible for recording the entry in some slot (see {!slot}). *)
+val store_semantic_tokens
+  : Superbol_cache.Cache.t
+  -> keys: keys
+  -> label: string
+  -> semantic_tokens
+  -> (unit, Superbol_cache.Types.error) result
+
+(** [lookup_semantic_tokens cache ~keys ~resolve] retrieves the semantic tokens
+    of the document [keys] are for from [cache]. *)
+val lookup_semantic_tokens
+  : Superbol_cache.Cache.t
+  -> keys: keys
+  -> resolve: (Superbol_cache.Types.witness -> bool)
+  -> semantic_tokens option
+
 (** In the functions below, [keys] must be the keys of [filename] and
     [contents] in [project] with [overrides], as given by [keys ?overrides
     ~filename ~contents project]. *)
@@ -323,12 +332,24 @@ val cached_analysis_n_key
     ~filename ~contents project] looks the analysis for the LSP of [filename] up
     in [cache], answering witnesses from [platform]; on a miss, analyzes the
     document with {!analyze_for_lsp}, recording what [platform] is asked, and
-    stores the result.  The Boolean indicates a hit. *)
+    stores the result, along with semantic tokens computed with
+    [semantic_tokens] (unless the document is a copybook).  The Boolean
+    indicates a hit; semantic tokens are not looked up, so a hit does not
+    entail they are held.
+
+    [semantic_tokens] computes the semantic tokens of the document [filename],
+    from its parsing artifacts and its typechecking outputs.  This module does
+    not know how: the LSP provides it, and front-ends that fill the cache for
+    the LSP should pass the very same function, as it does not take part in
+    cache keys. *)
 val cached_analysis_for_lsp
   : Superbol_cache.Cache.t
   -> platform: Cobol_common.Platform.TYPES.platform
   -> ?overrides: overrides
-  -> semantic_tokens: semantic_tokens_of
+  -> semantic_tokens: (filename: string ->
+                       Cobol_parser.Outputs.artifacts ->
+                       Cobol_typeck.Outputs.t ->
+                       semantic_tokens)
   -> keys: keys
   -> filename: string
   -> contents: string

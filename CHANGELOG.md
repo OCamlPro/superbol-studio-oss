@@ -4,6 +4,7 @@
 
 ### Added
 - New manifest-based cache [#709](https://github.com/OCamlPro/superbol-studio-oss/pull/709) [#711](https://github.com/OCamlPro/superbol-studio-oss/pull/711) [#712](https://github.com/OCamlPro/superbol-studio-oss/pull/712)
+- Smaller cache entries [#715](https://github.com/OCamlPro/superbol-studio-oss/pull/715)
 
 ### Fixed
 - Internal errors of the LSP server that may occur on some (rare) corner cases [#702](https://github.com/OCamlPro/superbol-studio-oss/pull/702)

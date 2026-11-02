@@ -47,14 +47,21 @@ let project_key ~rootdir =
 
    Both are recorded in a slot that every version of the document shares, so
    that storing a new version reclaims those of the previous one (see
-   {!store_document}). *)
+   {!store_document}).
+
+   Semantic tokens are stored on their own, depending on the analysis too, and
+   only by servers whose client asks for them.  They are recorded in a slot of
+   their own, or else a server that does not store them would reclaim those
+   stored by another for the same version. *)
 let document_keys ~project ~filename ~contents ~language_id =
   let overrides = Lsp_document.analysis_overrides ~language_id in
   Option.map begin fun keys ->
-    ANALYSIS.key_for_lsp keys,
+    keys,
     CACHE.shallow_key ~label:"lsp-document" ~inputs:(ANALYSIS.inputs keys),
     ANALYSIS.slot ~label:"lsp-document" keys
   end (ANALYSIS.keys ~overrides ~filename ~contents project)
+
+let semtoks_slot keys = ANALYSIS.slot ~label:"semantic-tokens" keys
 
 (* --- Saving --- *)
 
@@ -69,7 +76,7 @@ let document_keys ~project ~filename ~contents ~language_id =
    was stored before, by this session or an earlier one, are superseded.  The
    CLI records what it stores in slots of its own. *)
 let store_document ~cache ~project ~with_semantic_tokens doc =
-  let analysis, witnesses, cached =
+  let analysis, semtoks, witnesses, cached =
     Lsp_document.to_cache ~with_semantic_tokens doc
   in
   let filename = cached.doc_cache_filename in
@@ -78,7 +85,8 @@ let store_document ~cache ~project ~with_semantic_tokens doc =
   let language_id = Lsp_document.language_id doc in
   match document_keys ~project ~filename:absolute ~contents ~language_id with
   | None -> None
-  | Some (analysis_key, lsp_key, slot) ->
+  | Some (keys, lsp_key, slot) ->
+      let analysis_key = ANALYSIS.key_for_lsp keys in
       let stored_analysis =
         match witnesses with
         | None -> Ok ()        (* restored from cache: not stored over again *)
@@ -95,6 +103,16 @@ let store_document ~cache ~project ~with_semantic_tokens doc =
       | Ok () ->
           (* Failing to supersede only leaves the previous version behind. *)
           ignore @@ CACHE.supersede cache ~slot [analysis_key; lsp_key];
+          Option.iter begin fun semtoks ->
+            match
+              ANALYSIS.store_semantic_tokens cache ~keys ~label:filename semtoks
+            with
+            | Ok () ->
+                ignore @@ CACHE.supersede cache ~slot:(semtoks_slot keys)
+                  [ANALYSIS.semantic_tokens_key keys]
+            | Error _ ->
+                ()
+          end semtoks;
           Some filename
       | Error _ -> None
 
@@ -169,7 +187,11 @@ let save ~params:{ config; _ } docs =
 
 (* The analysis entry may have been stored by another front-end, in which case
    there is no LSP entry yet: the document is restored all the same, and the
-   LSP entry is written whenever the document is next stored. *)
+   LSP entry is written whenever the document is next stored.
+
+   A server whose client asks for semantic tokens needs them too: without
+   them, the document is parsed afresh, and its semantic tokens are stored along
+   with it. *)
 let load_document ~project ~params
     ~doc:(Lsp.Types.DidOpenTextDocumentParams.{ textDocument; _ } as doc) =
   let Lsp_project.{ rootdir; _ } = project in
@@ -178,32 +200,48 @@ let load_document ~project ~params
   let resolve =
     Superbol_cache.Recorder.resolver ~platform:Lsp_platform.record ()
   in
+  let not_reading ?(reason = "") () =
+    if params.config.lsp_cache_verbose then
+      Lsp_io.log_info "Not@ reading@ document@ cache@ for@ %s%s" filename
+        reason;
+    None
+  in
   match
     document_keys ~project ~filename ~contents:textDocument.text
       ~language_id:textDocument.languageId
   with
   | None ->
       None
-  | Some (analysis_key, lsp_key, _) ->
-      match ANALYSIS.lookup_for_lsp cache ~key:analysis_key ~resolve with
-      | Some analysis ->
-          let cached =
-            match
-              CACHE.lookup cache ~key:lsp_key ~resolve
-                ~read_item:CACHING.read_item
-            with
-            | Ok cached -> cached
-            | Error _ -> None
-          in
-          let doc = Lsp_document.of_cache ~project ~params ~doc analysis cached in
-          if params.config.lsp_cache_verbose then
-            Lsp_io.log_info "Successfully@ read@ document@ cache@ for@ %s"
-              (Lsp.Uri.to_string @@ Lsp_document.uri doc);
-          Some doc
+  | Some (keys, lsp_key, _) ->
+      match
+        ANALYSIS.lookup_for_lsp cache ~key:(ANALYSIS.key_for_lsp keys) ~resolve
+      with
       | None ->
-          if params.config.lsp_cache_verbose then
-            Lsp_io.log_info "Not@ reading@ document@ cache@ for@ %s" filename;
-          None
+          not_reading ()
+      | Some analysis ->
+          let semtoks =
+            if analysis.lsp_copybook then None
+            else ANALYSIS.lookup_semantic_tokens cache ~keys ~resolve
+          in
+          if params.with_semantic_tokens &&
+             not analysis.lsp_copybook && Option.is_none semtoks
+          then not_reading ~reason:" (no semantic tokens)" ()
+          else
+            let cached =
+              match
+                CACHE.lookup cache ~key:lsp_key ~resolve
+                  ~read_item:CACHING.read_item
+              with
+              | Ok cached -> cached
+              | Error _ -> None
+            in
+            let doc =
+              Lsp_document.of_cache ~project ~params ~doc ?semtoks analysis cached
+            in
+            if params.config.lsp_cache_verbose then
+              Lsp_io.log_info "Successfully@ read@ document@ cache@ for@ %s"
+                (Lsp.Uri.to_string @@ Lsp_document.uri doc);
+            Some doc
 
 let load ~rootdir ~layout ~params =
   let cache = cache_for ~config:params.config ~rootdir in

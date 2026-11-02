@@ -29,7 +29,11 @@ val data
 (** [whole ~filename artifacts checked] computes all the semantic tokens of the
     document [filename] (and none of its copybooks), from its parsing artifacts
     and typechecking outputs.  Forces the tokens of [artifacts]. *)
-val whole: Superbol_project.Analysis.semantic_tokens_of
+val whole
+  : filename: string
+  -> Cobol_parser.Outputs.artifacts
+  -> Cobol_typeck.Outputs.t
+  -> Superbol_project.Analysis.semantic_tokens
 
 (** [restrict ~range data] keeps the semantic tokens of [data] that intersect
     [range].  This yields the same as computing semantic tokens for [range]
