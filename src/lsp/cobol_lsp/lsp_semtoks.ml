@@ -700,3 +700,42 @@ let data ~filename ~range ~tokens ~pplog
      LIST.tail_merge compare_semtoks semtoks2 @@
      LIST.tail_merge compare_semtoks semtoks3 @@
      LIST.tail_merge compare_semtoks semtoks4 @@ semtoks5)
+
+(** [whole ~filename artifacts checked] computes all semantic tokens of
+    [filename], from its parsing artifacts and typechecking outputs. *)
+let whole ~filename
+    Cobol_parser.Outputs.{ tokens; pplog; rev_comments; rev_ignored }
+    Cobol_typeck.Outputs.{ ptree; _ } =
+  let rev_comments =
+    Option.value ~default:[] @@
+    EzCompat.StringMap.find_opt "" rev_comments
+  in
+  data ~filename ~range:None ~tokens:(Lazy.force tokens) ~pplog
+    ~rev_comments ~rev_ignored ~ptree
+
+(** [restrict ~range data] keeps the semantic tokens of [data] that intersect
+    [range], in the sense of {!Lsp_position.intersects_lexloc}: as every
+    semantic token lies on a single line, it intersects [range] whenever its
+    start does not follow the end of [range], and its end does not precede the
+    start of [range]. *)
+let restrict ~(range: Lsp.Types.Range.t) (data: int array) : int array =
+  let before (l, c) (Lsp.Types.Position.{ line; character }) =
+    l < line || l = line && c < character
+  and after (l, c) (Lsp.Types.Position.{ line; character }) =
+    l > line || l = line && c > character
+  in
+  let n = Array.length data / 5 in
+  let kept = ref [] in
+  let line = ref 0 and start = ref 0 in
+  for i = 0 to n - 1 do
+    let dline = data.(5 * i) and dstart = data.(5 * i + 1) in
+    if dline > 0 then (line := !line + dline; start := dstart)
+    else start := !start + dstart;
+    let length = data.(5 * i + 2) in
+    if not (after (!line, !start) range.end_ ||
+            before (!line, !start + length) range.start)
+    then kept := { line = !line; start = !start; length;
+                   toktyp = { index = data.(5 * i + 3); name = "" };
+                   tokmods = { flags = data.(5 * i + 4) } } :: !kept
+  done;
+  relative_semtoks (List.rev !kept)

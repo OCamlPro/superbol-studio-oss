@@ -25,3 +25,18 @@ val data
   -> rev_ignored: Cobol_common.Srcloc.lexloc list
   -> ptree: Cobol_ptree.compilation_group
   -> int array
+
+(** [whole ~filename artifacts checked] computes all the semantic tokens of the
+    document [filename] (and none of its copybooks), from its parsing artifacts
+    and typechecking outputs.  Forces the tokens of [artifacts]. *)
+val whole: Superbol_project.Analysis.semantic_tokens_of
+
+(** [restrict ~range data] keeps the semantic tokens of [data] that intersect
+    [range].  This yields the same as computing semantic tokens for [range]
+    directly, except for regions that span several lines (ignored by the
+    preprocessor): these are kept only when their first line intersects
+    [range], which is the only line they are highlighted on anyway. *)
+val restrict
+  : range: Lsp.Types.Range.t
+  -> int array
+  -> int array

@@ -30,6 +30,7 @@ module Server = Lsp_server
 module Project = Lsp_project
 module Project_cache = Lsp_project_cache
 module Document = Lsp_document
+module Semtoks = Lsp_semtoks
 module Diagnostics = Lsp_diagnostics
 module Request = Lsp_request
 module Lookup = Lsp_lookup

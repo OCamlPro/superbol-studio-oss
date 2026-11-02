@@ -44,11 +44,19 @@ let diagnostics { parsing_diags; typeck_diags; _ } =
 
 (* --- Results for the LSP --- *)
 
+type semantic_tokens = int array
+
+type semantic_tokens_of =
+  filename: string ->
+  Cobol_parser.Outputs.artifacts ->
+  Cobol_typeck.Outputs.t ->
+  semantic_tokens
+
 type for_lsp =
   {
     lsp_copybook: bool;
     lsp_pplog: Cobol_preproc.Trace.log;
-    lsp_tokens: Cobol_parser.Outputs.tokens_with_locs;
+    lsp_semantic_tokens: semantic_tokens option;
     lsp_comments: Cobol_preproc.Text.comments StringMap.t;
     lsp_ignored: Cobol_common.Srcloc.lexloc list;
     lsp_checked: Cobol_typeck.Outputs.t option;
@@ -56,13 +64,16 @@ type for_lsp =
     lsp_typeck_diags: Cobol_typeck.Diagnostics.t;
   }
 
-let of_artifacts_for_lsp ~checked ~parsing_diags ~typeck_diags
-    ~parsing_artifacts:Cobol_parser.Outputs.{ pplog; tokens;
-                                              rev_comments; rev_ignored } =
+(* Tokens are not kept: they are the largest part of the artifacts by far, and
+   they are only ever needed to compute the semantic tokens, which are much
+   smaller and are kept instead (when they have been computed). *)
+let of_artifacts_for_lsp ~checked ~parsing_diags ~typeck_diags ~semantic_tokens
+    ~parsing_artifacts:Cobol_parser.Outputs.{ pplog; rev_comments; rev_ignored;
+                                              tokens = _ } =
   {
     lsp_copybook = false;
     lsp_pplog = pplog;
-    lsp_tokens = Lazy.force tokens;
+    lsp_semantic_tokens = semantic_tokens;
     lsp_comments = rev_comments;
     lsp_ignored = rev_ignored;
     lsp_checked = checked;
@@ -70,9 +81,9 @@ let of_artifacts_for_lsp ~checked ~parsing_diags ~typeck_diags
     lsp_typeck_diags = typeck_diags;
   }
 
-let artifacts { lsp_pplog; lsp_tokens; lsp_comments; lsp_ignored; _ } =
+let artifacts { lsp_pplog; lsp_comments; lsp_ignored; _ } =
   Cobol_parser.Outputs.{ pplog = lsp_pplog;
-                         tokens = lazy lsp_tokens;
+                         tokens = lazy [];
                          rev_comments = lsp_comments;
                          rev_ignored = lsp_ignored }
 
@@ -80,7 +91,7 @@ let copybook_for_lsp =
   {
     lsp_copybook = true;
     lsp_pplog = Cobol_preproc.Trace.empty;
-    lsp_tokens = [];
+    lsp_semantic_tokens = Some [||];
     lsp_comments = StringMap.empty;
     lsp_ignored = [];
     lsp_checked = None;
@@ -224,7 +235,8 @@ let analyze ~platform ?overrides ~filename ~contents project =
     { copybook = false; checked = Some checked; parsing_diags; typeck_diags }
 
 (* Same as [analyze], with a parse that collects artifacts. *)
-let analyze_for_lsp ~platform ?overrides ~filename ~contents project =
+let analyze_for_lsp ~platform ?overrides ~semantic_tokens ~filename ~contents
+    project =
   if detect_copybook ~platform ?overrides ~filename ~contents project
   then copybook_for_lsp
   else
@@ -235,8 +247,11 @@ let analyze_for_lsp ~platform ?overrides ~filename ~contents project =
     let checked, typeck_diags =
       typecheck ?overrides ~parsing_diags project parsed
     in
+    let parsing_artifacts = Cobol_parser.artifacts parsed in
     of_artifacts_for_lsp ~checked:(Some checked) ~parsing_diags ~typeck_diags
-      ~parsing_artifacts:(Cobol_parser.artifacts parsed)
+      ~semantic_tokens:(Some (semantic_tokens ~filename parsing_artifacts
+                                checked))
+      ~parsing_artifacts
 
 (* --- Caching --- *)
 
@@ -360,10 +375,11 @@ let cached_analysis cache ~platform ?overrides ~keys ~filename ~contents
   in
   v, hit
 
-let cached_analysis_for_lsp cache ~platform ?overrides
+let cached_analysis_for_lsp cache ~platform ?overrides ~semantic_tokens
     ~keys:({ key_for_lsp; _ } as keys) ~filename ~contents project =
   lookup_or_analyze cache ~platform ~key:key_for_lsp
     ~slot:(slot ~label:"analysis-for-lsp" keys)
     ~resolve:(RECORDER.resolver ~platform ())
     ~label:(Project.relative_path_for ~filename project)
-    ~analyze:(analyze_for_lsp ?overrides ~filename ~contents project)
+    ~analyze:(analyze_for_lsp ?overrides ~semantic_tokens ~filename ~contents
+                project)

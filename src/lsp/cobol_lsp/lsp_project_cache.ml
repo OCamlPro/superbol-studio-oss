@@ -68,8 +68,10 @@ let document_keys ~project ~filename ~contents ~language_id =
    lands under keys of its own; once it is, the entries of whichever version
    was stored before, by this session or an earlier one, are superseded.  The
    CLI records what it stores in slots of its own. *)
-let store_document ~cache ~project doc =
-  let analysis, witnesses, cached = Lsp_document.to_cache doc in
+let store_document ~cache ~project ~with_semantic_tokens doc =
+  let analysis, witnesses, cached =
+    Lsp_document.to_cache ~with_semantic_tokens doc
+  in
   let filename = cached.doc_cache_filename in
   let absolute = Lsp_project.absolute_path_for ~filename project in
   let contents = Lsp.Text_document.text doc.Lsp_document.textdoc in
@@ -133,17 +135,18 @@ let do_save ~config docs =
 
 (* --- Saving one document --- *)
 
-let do_save_document ~config (Lsp_document.{ project; _ } as doc) =
+let do_save_document ~config ~with_semantic_tokens
+    (Lsp_document.{ project; _ } as doc) =
   let Lsp_project.{ rootdir; _ } = project in
   let cache = cache_for ~config ~rootdir in
-  match store_document ~cache ~project doc with
+  match store_document ~cache ~project ~with_semantic_tokens doc with
   | None -> ()
   | Some filename ->
       if config.lsp_cache_verbose then
         Lsp_io.log_info "Wrote@ document@ cache@ for@ %s" filename
 
-let save_document ~params:{ config; _ } doc =
-  try do_save_document ~config doc with
+let save_document ~params:{ config; with_semantic_tokens; _ } doc =
+  try do_save_document ~config ~with_semantic_tokens doc with
   | Unix.Unix_error (e, op, args) ->
       if config.lsp_cache_verbose then
         Lsp_io.log_debug "While@ saving@ document@ cache:@ %s %s:@ %s"

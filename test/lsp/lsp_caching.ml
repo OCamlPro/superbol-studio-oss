@@ -46,7 +46,8 @@ let lsp_cache_for ~rootdir =
   | None ->
       Superbol_cache.Cache.disabled
 
-let server ?(bounds = Superbol_cache.Types.Never) () =
+let server ?(bounds = Superbol_cache.Types.Never)
+    ?(with_semantic_tokens = false) () =
   Cobol_common.Platform.copy
     ~dst:LSP.Platform.record ~src:Superbol_platform.record;
   LSP.Server.init
@@ -58,7 +59,7 @@ let server ?(bounds = Superbol_cache.Types.Never) () =
                          force_syntax_diagnostics = true };
               root_uri = None;
               workspace_folders = [];
-              with_semantic_tokens = false;
+              with_semantic_tokens;
               with_client_file_watcher = `no;
               with_client_config_watcher = false;
               position_encoding = `UTF16 }
@@ -264,6 +265,7 @@ let cli_analyze ?(for_lsp = false) ~projdir () =
     if for_lsp
     then snd @@ Superbol_project.Analysis.cached_analysis_for_lsp cache
         ~platform ~keys ~filename ~contents project
+        ~semantic_tokens:Cobol_lsp.Semtoks.whole
     else snd @@ Superbol_project.Analysis.cached_analysis cache
         ~platform ~keys ~filename ~contents project
   in

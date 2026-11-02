@@ -25,6 +25,10 @@ module TYPES = struct
       textdoc: Lsp.Text_document.t;
       copybook: bool;
       artifacts: Cobol_parser.Outputs.artifacts;
+      (* Semantic tokens of the whole document, computed on demand.  The tokens
+         of [artifacts] are not cached: they are empty on a document restored
+         from cache, and its semantic tokens come from the cache instead. *)
+      semtoks: Superbol_project.Analysis.semantic_tokens Lazy.t;
       checked: checked_doc option;
       rewinder: rewinder option;
       (* Records what preprocessing observed of the outside world -- copybooks
@@ -105,6 +109,8 @@ let no_artifacts =
                          rev_comments = StringMap.empty;
                          rev_ignored = [] }
 
+let no_semtoks = Lazy.from_val [||]
+
 let check doc ptree =
   let Cobol_parser.Outputs.{ result = ptree, rewinder;
                              diags = parsing_diags } = ptree in
@@ -113,7 +119,13 @@ let check doc ptree =
       ~overrides:(analysis_overrides_for doc)
   in
   let artifacts = Cobol_parser.artifacts ptree in
+  let semtoks =
+    (* Not capturing [doc], which holds the artifacts of the previous parse *)
+    let filename = Lsp.Uri.to_path (uri doc) in
+    lazy (Lsp_semtoks.whole ~filename artifacts checked)
+  in
   { doc with artifacts;
+             semtoks;
              parsing_diags;
              typecking_diags;
              rewinder = Some rewinder;
@@ -121,7 +133,8 @@ let check doc ptree =
 
 let parse_and_analyze ({ copybook; _ } as doc) =
   if copybook then                                                    (* skip *)
-    { doc with artifacts = no_artifacts; rewinder = None; checked = None;
+    { doc with artifacts = no_artifacts; semtoks = no_semtoks;
+               rewinder = None; checked = None;
                recorder = None }
   else
     (* The recorder outlives this parse: a later incremental reparse runs on the
@@ -140,7 +153,8 @@ let reparse_and_analyze ?position ({ copybook; rewinder; textdoc; _ } as doc) =
   | None, _ | _, None ->
       parse_and_analyze doc
   | _, Some _ when copybook ->                                         (* skip *)
-      { doc with artifacts = no_artifacts; rewinder = None; checked = None;
+      { doc with artifacts = no_artifacts; semtoks = no_semtoks;
+                 rewinder = None; checked = None;
                  recorder = None }
   | Some position, Some rewinder ->
       check doc @@
@@ -193,6 +207,7 @@ let blank ~project textdoc =
     project;
     textdoc;
     artifacts = no_artifacts;
+    semtoks = no_semtoks;
     rewinder = None;
     parsing_diags = Cobol_parser.Diagnostics.ALL.none;
     typecking_diags = Cobol_typeck.Diagnostics.none;
@@ -253,19 +268,18 @@ let diagnostics { parsing_diags; typecking_diags; _ } =
 
 (** Caching utilities *)
 
-(** [to_cache doc] splits [doc] into its analysis results, the witnesses these
-    were obtained against, and LSP-specific data.  The witnesses are [None] on a
-    document whose analysis was restored from cache rather than performed: there
-    is then nothing to store it against, and the entry it was restored from is
-    there already anyway. *)
-let to_cache ({ project; copybook; checked; parsing_diags; typecking_diags;
-                recorder; artifacts; _ } as doc) =
-  let analysis =
-    if copybook
-    then ANALYSIS.copybook_for_lsp
-    else ANALYSIS.of_artifacts_for_lsp ~checked ~parsing_diags
-        ~typeck_diags:typecking_diags ~parsing_artifacts:artifacts
-  in
+(** [to_cache ~with_semantic_tokens doc] splits [doc] into its analysis
+    results, the witnesses these were obtained against, and LSP-specific data.
+    The witnesses are [None] on a document whose analysis was restored from
+    cache rather than performed: there is then nothing to store it against, and
+    the entry it was restored from is there already anyway.
+
+    Semantic tokens are part of the analysis results if they were computed
+    already, or else if [with_semantic_tokens] holds (the client is then bound
+    to ask for them anyway); they are left out otherwise. *)
+let to_cache ~with_semantic_tokens
+    ({ project; copybook; checked; parsing_diags; typecking_diags;
+       recorder; artifacts; semtoks; _ } as doc) =
   let witnesses =
     match recorder with
     | Some recorder ->
@@ -277,6 +291,20 @@ let to_cache ({ project; copybook; checked; parsing_diags; typecking_diags;
     | None ->
         None
   in
+  let analysis =
+    if copybook
+    then ANALYSIS.copybook_for_lsp
+    else
+      let semantic_tokens =
+        if Option.is_some witnesses &&
+           (with_semantic_tokens || Lazy.is_val semtoks)
+        then Some (Lazy.force semtoks)
+        else None
+      in
+      ANALYSIS.of_artifacts_for_lsp ~checked ~parsing_diags
+        ~typeck_diags:typecking_diags ~parsing_artifacts:artifacts
+        ~semantic_tokens
+  in
   analysis, witnesses,
   { doc_cache_filename = Lsp_project.relative_path_for ~uri:(uri doc) project }
 
@@ -286,17 +314,40 @@ let to_cache ({ project; copybook; checked; parsing_diags; typecking_diags;
     The caller has already established that the contents of [doc] are what
     [analysis] was recorded against: the contents take part in the key the entry
     is stored under.  Everything {e else} the analysis depended upon is checked
-    by the cache, against the witnesses it was stored with. *)
+    by the cache, against the witnesses it was stored with.
+
+    If [analysis] holds no semantic tokens, they are computed on demand, from
+    another analysis of the document: its tokens were not cached. *)
 let of_cache ~project ~params ~doc (analysis: ANALYSIS.for_lsp)
     (_: cached option) =                      (* nothing to restore from it yet *)
   let textdoc =
     Lsp.Text_document.make doc ~position_encoding:params.position_encoding
+  in
+  let semtoks =
+    match analysis.lsp_semantic_tokens with
+    | Some semtoks ->
+        Lazy.from_val semtoks
+    | None ->
+        let filename = Lsp.Uri.to_path @@ Lsp.Text_document.documentUri textdoc
+        and contents = Lsp.Text_document.text textdoc
+        and overrides =
+          analysis_overrides ~language_id:(Lsp.Text_document.languageId textdoc)
+        in
+        lazy begin
+          (* A plain parse, not a rewindable one: only its semantic tokens are
+             kept.  These are never [None] in its result. *)
+          Option.value ~default:[||] @@
+          (ANALYSIS.analyze_for_lsp project ~platform:Lsp_platform.record
+             ~overrides ~semantic_tokens:Lsp_semtoks.whole
+             ~filename ~contents).lsp_semantic_tokens
+        end
   in
   {
     project;
     textdoc;
     copybook = analysis.lsp_copybook;
     artifacts = ANALYSIS.artifacts analysis;
+    semtoks;
     rewinder = None;
     parsing_diags = analysis.lsp_parsing_diags;
     typecking_diags = analysis.lsp_typeck_diags;

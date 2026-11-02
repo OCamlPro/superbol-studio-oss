@@ -576,14 +576,14 @@ let handle_semtoks_full,
     handle_semtoks_range =
   let handle registry ?range (doc: TextDocumentIdentifier.t) =
     try_with_checked_doc registry doc
-      ~f:begin fun ~doc:{ artifacts = { pplog; tokens;
-                                        rev_comments; rev_ignored; _ };
-                          _ } Cobol_typeck.Outputs.{ ptree; _ } ->
-        let data =
-          let rev_comments = StringMap.find "" rev_comments in
-          Lsp_semtoks.data ~filename:(Lsp.Uri.to_path doc.uri) ~range
-            ~pplog ~rev_comments ~rev_ignored
-            ~tokens:(Lazy.force tokens) ~ptree
+      ~f:begin fun ~doc:{ semtoks; _ } _ ->
+        (* Tokens for the whole document are computed once, and kept in the
+           document (they may have been restored from cache, along with its
+           analysis): a request for a range just picks from them. *)
+        let data = Lazy.force semtoks in
+        let data = match range with
+          | None -> data
+          | Some range -> Lsp_semtoks.restrict ~range data
         in
         Some (SemanticTokens.create ~data ())
       end
@@ -1039,4 +1039,6 @@ module INTERNAL = struct
   let document_symbol = handle_document_symbol
   let formatting = handle_formatting
   let rename = handle_rename
+  let semtoks_full = handle_semtoks_full
+  let semtoks_range = handle_semtoks_range
 end
