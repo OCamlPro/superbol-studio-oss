@@ -28,28 +28,46 @@ module TYPES = struct
 
   (* represented using a source location tree. *)
   and _ slt =
-    | Raw: raw -> [>raw_] slt
-    | Cpy: { copied: any_ slt; copyloc: copyloc } -> [>cpy_] slt
-    | Rpl: replacement -> [>rpl_] slt
-    | Cat: { left: left_ slt; right: right_ slt } -> [>cat_] slt
+    | Raw:
+        {
+          fname: string;
+          lnum: int;          (* line of the start position *)
+          cnum: int;          (* offset of the start position *)
+          col: int;           (* column of the start position *)
+          len: int;           (* offset of the end position - [cnum] *)
+          lines_n_a: int;     (* (line of the end position - [lnum]) * 2 +
+                                 area-a flag (OCaml int trick ;)) *)
+          ecol: int;          (* column of the end position *)
+        } -> [>raw_] slt
+    | Cpy:                                                            (* COPY *)
+        {
+          copied: any_ slt;
+          copyloc: copyloc;
+        } -> [>cpy_] slt
+    | Rpl:                                                   (* REPLACE(MENT) *)
+        {
+          old: any_ slt;  (* should only keep ref. of starting pos if needed for
+                             area-a detection... *)
+          new_: srcloc;     (* location of replacement spec (e.g, pseudotext) *)
+          in_area_a: bool;
+          replloc: srcloc;
+        } -> [>rpl_] slt
+    | Cat:                                                   (* concatenation *)
+        {
+          left: left_ slt;
+          right: right_ slt;
+        } -> [>cat_] slt
     (* invariant: Cat {left = Cpy _ ; right = Cpy _}: the two copies are not
        from the same file. *)
 
   (* Raw lexical range *)
   and lexloc = Lexing.position * Lexing.position
-  and raw = Lexing.position * Lexing.position * bool           (* area-a flag *)
+
+  (* Compact raw locations *)
+  and raw = raw_ slt
 
   (* Representation of a file copy operation *)
   and copyloc = { filename: string; copyloc: srcloc (* option *) }
-
-  and replacement =
-    {
-      old: any_ slt;      (* should only keep ref. of starting pos if needed for
-                             area-a detection... *)
-      new_: srcloc;         (* location of replacement spec (e.g, pseudotext) *)
-      in_area_a: bool;
-      replloc: srcloc;
-    }
 
   (* A (con)cat(enation) allows any sort of source location on its left... *)
   and left_ = any_
@@ -86,6 +104,41 @@ module TYPES = struct
 end
 include TYPES
 
+(* Raw locations *)
+
+(* [mk_raw lexloc ~in_area_a] builds a raw location from [lexloc].  Both
+   positions are expected to belong to the same file: filename of start position
+   is kept. *)
+let mk_raw ((s, e): lexloc) ~in_area_a : _ slt =
+  Raw { fname = s.pos_fname;
+        lnum = s.pos_lnum;
+        cnum = s.pos_cnum;
+        col = s.pos_cnum - s.pos_bol;
+        len = e.pos_cnum - s.pos_cnum;
+        lines_n_a = (e.pos_lnum - s.pos_lnum) * 2 + Bool.to_int in_area_a;
+        ecol = e.pos_cnum - e.pos_bol }
+
+let lexpos ~fname ~lnum ~cnum ~col =
+  Lexing.{ pos_fname = fname; pos_lnum = lnum; pos_cnum = cnum;
+           pos_bol = cnum - col }
+
+let unraw: raw -> Lexing.position * Lexing.position * bool = function
+  | Raw { fname; lnum; cnum; col; len; lines_n_a; ecol } ->
+      lexpos ~fname ~lnum ~cnum ~col,
+      lexpos ~fname ~lnum:(lnum + lines_n_a asr 1) ~cnum:(cnum + len) ~col:ecol,
+      lines_n_a land 1 = 1
+
+let raw_start: raw -> Lexing.position = function
+  | Raw { fname; lnum; cnum; col; _ } -> lexpos ~fname ~lnum ~cnum ~col
+
+let raw_end: raw -> Lexing.position = function
+  | Raw { fname; lnum; cnum; len; lines_n_a; ecol; _ } ->
+      lexpos ~fname ~lnum:(lnum + lines_n_a asr 1) ~cnum:(cnum + len) ~col:ecol
+
+let raw_lexloc loc =
+  let s, e, _ = unraw loc in
+  s, e
+
 (* For debugging: *)
 
 let pp_lexpos ppf Lexing.{ pos_fname; pos_lnum; pos_cnum; pos_bol } =
@@ -96,7 +149,8 @@ let pp_srcloc_struct: srcloc Pretty.printer =
     Pretty.print ppf "%d-%d" pos_lnum (pos_cnum - pos_bol)
   in
   let rec pp: type t. t slt Pretty.printer = fun ppf -> function
-    | Raw (s, e, _) ->
+    | Raw _ as loc ->
+        let s, e, _ = unraw loc in
         Pretty.print ppf "<%a|%a>"
           pp_lexpos s pp_lexpos' e
     | Cpy { copied; _ } ->
@@ -117,7 +171,7 @@ let pp_srcloc_struct: srcloc Pretty.printer =
 
 (** copied, but original (replaced) position upon replacing *)
 let rec start_pos: type t. t slt -> Lexing.position = function
-  | Raw (s, _, _) -> s
+  | Raw _ as loc -> raw_start loc
   | Cpy { copied; _ } -> start_pos copied
   | Rpl { old; _ } -> start_pos old
   | Cat { left; _ } -> start_pos left
@@ -127,7 +181,7 @@ let rec start_pos: type t. t slt -> Lexing.position = function
     the start position of replaced text, not the position of its
     replacement). Returns [None] otherwise. *)
 let rec shallow_start_pos = function
-  | Raw (s, _, _) -> Some s
+  | Raw _ as loc -> Some (raw_start loc)
   | Cpy _ -> None
   | Rpl { old; _ } -> shallow_start_pos old
   | Cat { left; _ } -> shallow_start_pos left
@@ -137,7 +191,7 @@ let rec shallow_start_pos = function
     not subject to any replacement or copy.  Returns [None] otherwise. *)
 let shallow_multiline_lexloc_in ~filename loc =
   let rec aux: type t. t slt -> lexloc option = function
-    | Raw (s, e, _) when s.pos_fname = filename -> Some (s, e)
+    | Raw { fname; _ } as loc when fname = filename -> Some (raw_lexloc loc)
     | Raw _ | Cpy _ | Rpl _ -> None
     | Cat { left; right } -> match aux left, aux right with
       | Some (s, _), Some (_, e)
@@ -151,12 +205,12 @@ let shallow_multiline_lexloc_in ~filename loc =
     {!shallow_multiline_lexloc_in}, except that any returned lexical location is
     guaranteed to span a single line. *)
 let shallow_single_line_lexloc_in ~filename = function
-  | Raw (s, e, _) when s.pos_fname = filename -> Some (s, e)
+  | Raw { fname; _ } as loc when fname = filename -> Some (raw_lexloc loc)
   | Raw _ | Cpy _ | Rpl _ | Cat _ -> None
 
 let start_pos_in ~filename ~traverse_replaces =
   let rec aux: type t. t slt -> Lexing.position option = function
-    | Raw (s, _, _) when s.pos_fname = filename -> Some s
+    | Raw { fname; _ } as loc when fname = filename -> Some (raw_start loc)
     | Raw _ -> None
     | Cat { left; right } -> or_else left right
     | Cpy { copied; copyloc = { copyloc; _ } } -> or_else copied copyloc
@@ -169,7 +223,7 @@ let start_pos_in ~filename ~traverse_replaces =
 
 let end_pos_in ~filename ~traverse_replaces =
   let rec aux: type t. t slt -> Lexing.position option = function
-    | Raw (_, e, _) when e.pos_fname = filename -> Some e
+    | Raw { fname; _ } as loc when fname = filename -> Some (raw_end loc)
     | Raw _ -> None
     | Cat { left; right } -> or_else right left
     | Cpy { copied; copyloc = { copyloc; _ } } -> or_else copied copyloc
@@ -207,8 +261,8 @@ let forget_preproc
   let start_pos_in = start_pos_in ~traverse_replaces
   and end_pos_in = end_pos_in ~traverse_replaces in
   let rec aux: type t. t slt -> lexloc = function
-    | Raw (s, e, _) ->
-        s, e
+    | Raw _ as loc ->
+        raw_lexloc loc
     | Cpy { copied; copyloc = { copyloc; _ } } ->
         aux (if traverse_copies then copied else copyloc)
     | Rpl { new_; old; _ } ->
@@ -258,7 +312,7 @@ let shallow_single_line_lexloc_in =
 let shallow_single_line_lexlocs_in
     ?(ignore_invalid_filename = false) ~filename loc =
   let rec aux: type t. t slt -> (lexloc list as 'a) -> 'a = function
-    | Raw (s, e, _) when s.pos_fname = filename -> List.cons (s, e)
+    | Raw { fname; _ } as loc when fname = filename -> List.cons (raw_lexloc loc)
     | Raw _ | Cpy _ | Rpl _ -> Fun.id
     | Cat { left; right } -> fun acc -> acc |> aux right |> aux left
   in
@@ -281,7 +335,7 @@ let lexloc_in ~filename loc =
   start_pos_in ~filename loc, end_pos_in ~filename loc
 
 let as_unique_lexloc = function
-  | Raw (s, e, _) -> Some (s, e)
+  | Raw _ as loc -> Some (raw_lexloc loc)
   | _ -> None
 
 (** [as_copy loc] returns a copybook filename associated with the location of
@@ -298,13 +352,13 @@ let as_copy = function
 (** [in_area_a loc] indicates whether the location [loc] has a left-most raw
     location that was built with the [in_area_a] flag. *)
 let rec in_area_a: srcloc -> bool = function
-  | Raw (_, _, a) -> a
+  | Raw { lines_n_a; _ } -> lines_n_a land 1 = 1
   | Cpy { copied; _ } -> in_area_a copied
   | Rpl { in_area_a; _ } -> in_area_a
   | Cat { left; _ } -> in_area_a left
 
 let is_pointwise: srcloc -> bool = function
-  | Raw (s, e, _) -> s.pos_cnum == e.pos_cnum && s.pos_fname = e.pos_fname
+  | Raw { len; _ } -> len == 0
   | _ -> false
 
 let scan ?(kind: [`TopDown | `BottomUp] = `TopDown) ~cpy ~rpl =
@@ -542,10 +596,11 @@ let pp_src ppf = function
 (** [raw ~in_area_a lexloc] builds a raw source location from a pair of left-
     and right- lexing positions from the same file, optionally setting an
     [in_area_a] flag (that defaults to [false]) to indicate whether the location
-    is the first on its line, and starts in Area A of the source format. *)
+    is the first on its line, and starts in Area A of the source format.  Only
+    the filename of the start position is kept. *)
 let raw ?(in_area_a = false) ((s, e): lexloc) : srcloc =
   assert Lexing.(s.pos_cnum <= e.pos_cnum);               (* ensure proper use *)
-  let loc = Raw (s, e, in_area_a) in
+  let loc = mk_raw (s, e) ~in_area_a in
   if Lexing.(s.pos_fname <> e.pos_fname) then
     Pretty.error
       "%a@\n>> Internal warning in `%s.raw`: file names mismatch (`%s` != `%s`)\
@@ -563,26 +618,30 @@ let dummy =
 
 (** {2 Composition & truncation} *)
 
-(** [may_join_as_single_raw a b] checks whether a lexloc {i l{_ a}} with a a
-    left-hand lexing position [a] and a lexloc {i l{_ b}} with a right-hand
-    position [b], may be joined to form a single raw source location
-    (internal). *)
-let may_join_as_single_raw (a: Lexing.position) (b: Lexing.position) =
-  a.pos_fname = b.pos_fname &&
-  a.pos_lnum  == b.pos_lnum &&           (* ensure we are stay on a single line *)
-  a.pos_cnum  >= b.pos_cnum - 1
+(** [may_join_as_single_raw l1 l2] checks whether two raw locations [l1] and
+    [l2] may be joined to form a single raw source location. *)
+let may_join_as_single_raw: raw -> raw -> bool = fun (Raw r1) (Raw r2) ->
+  r1.fname = r2.fname &&
+  r1.lnum + (r1.lines_n_a asr 1) == r2.lnum &&   (* ensure we are stay on a single
+                                                  line *)
+  r1.cnum + r1.len >= r2.cnum - 1
+
+let join_raws: raw -> raw -> [>raw_] slt = fun (Raw r1) (Raw r2) ->
+  let end_lnum = r2.lnum + (r2.lines_n_a asr 1) in
+  Raw { r1 with
+        len = r2.cnum + r2.len - r1.cnum;
+        lines_n_a = (end_lnum - r1.lnum) * 2 + (r1.lines_n_a land 1);
+        ecol = r2.ecol }
 
 (** [concat l1 l2] concatenates two adjacent source locations [l1] and [l2]. *)
 let rec concat: srcloc -> srcloc -> srcloc = fun l1 l2 -> match l1, l2 with
-  | Raw (s1, e1, in_area_a),
-    Raw (s2, e2, _)
-    when may_join_as_single_raw e1 s2 ->
-      Raw (s1, e2, in_area_a)
+  | (Raw _ as l1), (Raw _ as l2)
+    when may_join_as_single_raw l1 l2 ->
+      join_raws l1 l2
 
-  | Cat { left; right = Raw (s1, e1, in_area_a) },
-    Raw (s2, e2, _)
-    when may_join_as_single_raw e1 s2 ->
-      Cat { left; right = Raw (s1, e2, in_area_a) }
+  | Cat { left; right = Raw _ as l1 }, (Raw _ as l2)
+    when may_join_as_single_raw l1 l2 ->
+      Cat { left; right = join_raws l1 l2 }
 
   | Cpy { copied = l1; copyloc = c1 },
     Cpy { copied = l2; copyloc = c2 }
@@ -634,17 +693,9 @@ let show_direction = function
     [length] exceeds the length of [l].  *)
 let take direction length loc =
   (* Assumes raw lexlocs do not span over several lines *)
-  let open Lexing in
   let rec take: type k. _ -> k slt -> _ = fun length -> function
-    | Raw (s, e, a) as loc ->
-        let len = e.pos_cnum - s.pos_cnum in
-        if len > length
-        then match direction with
-          | Prefix ->
-              Raw (s, { e with pos_cnum = s.pos_cnum + length }, a), 0
-          | Suffix ->
-              Raw ({ s with pos_cnum = e.pos_cnum - length }, e, false), 0
-        else loc, length - len
+    | Raw _ as loc ->
+        take_in_raw length loc
     | Cpy ({ copied; _ } as cpy) ->
         let copied, rem = take length copied in
         Cpy { cpy with copied }, rem
@@ -662,6 +713,17 @@ let take direction length loc =
           if rem <= 0 then loc, rem else
             let left, rem = take rem left in
             concat left right, rem
+  and take_in_raw length (Raw r as loc: raw) =
+    if r.len > length
+    then
+      let delta = r.len - length in
+      match direction with
+      | Prefix ->                             (* the end moves back by [delta] *)
+          Raw { r with len = length; ecol = r.ecol - delta }, 0
+      | Suffix ->    (* the start moves by [delta], and is no longer in area A *)
+          Raw { r with cnum = r.cnum + delta; col = r.col + delta;
+                       len = length; lines_n_a = r.lines_n_a land (lnot 1) }, 0
+    else loc, length - r.len
   in
   let loc', rem = take length loc in
   if rem < 0 then
@@ -677,20 +739,12 @@ let take direction length loc =
     [length] exceeds the length of [l].  *)
 let trunc direction length loc =
   (* Assumes raw lexlocs do not span over several lines *)
-  let open Lexing in
   let rec cut: type k. _ -> k slt -> _ = fun length -> function
     | (Raw _ | Cpy _ | Rpl _ | Cat _) as loc
       when length == 0 ->
         Some loc, 0
-    | Raw (s, e, a) ->
-        let len = e.pos_cnum - s.pos_cnum in
-        if len > length
-        then match direction with
-          | Prefix ->
-              Some (Raw ({ s with pos_cnum = s.pos_cnum + length }, e, false)), 0
-          | Suffix ->
-              Some (Raw (s, { e with pos_cnum = e.pos_cnum - length }, a)), 0
-        else None, length - len
+    | Raw _ as loc ->
+        cut_in_raw length loc
     | Cpy ({ copied; _ } as cpy) ->
         begin match cut length copied with
           | Some copied, rem -> Some (Cpy { cpy with copied }), rem
@@ -712,6 +766,17 @@ let trunc direction length loc =
             | Some right, rem -> Some (concat left right), rem
             | None, rem -> cut rem left
           end
+  and cut_in_raw length (Raw r: raw) =
+    if r.len > length
+    then match direction with
+      | Prefix ->   (* the start moves by [length], and is no longer in area A *)
+          Some (Raw { r with cnum = r.cnum + length; col = r.col + length;
+                             len = r.len - length;
+                             lines_n_a = r.lines_n_a land (lnot 1) }), 0
+      | Suffix ->                            (* the end moves back by [length] *)
+          Some (Raw { r with len = r.len - length;
+                             ecol = r.ecol - length }), 0
+    else None, length - r.len
   in
   match cut length loc with
   | Some loc', rem when rem == 0 ->
