@@ -23,15 +23,15 @@ type error =
   | MismatchingSelectionLength of { nb_sel_subjects: int ; sel_object_list: selection_object with_loc list; }
 
 type warning =
-  | UnusedSubject of expr with_loc
+  | UnusedSubject of Cobol_procedure.Types.expr with_loc
   | UnusedRelOp of relop with_loc
 
 let error_loc = function
-  | AbbrevMissingSubject loc 
+  | AbbrevMissingSubject loc
   | AbbrevMissingRelOp loc
-  | ClassCondMissingSubject loc 
-  | SignCondMissingSubject loc 
-  | OmittedMissingSubject loc 
+  | ClassCondMissingSubject loc
+  | SignCondMissingSubject loc
+  | OmittedMissingSubject loc
   | SelRangeWithoutSubjectValue loc ->
       loc
   | MismatchingSelectionLength { sel_object_list; _ } ->
@@ -57,7 +57,7 @@ let warning_loc = function
   | UnusedSubject { loc; _ }
   | UnusedRelOp { loc; _ } ->
       loc
-  
+
 let pp_warning ppf = function
   | UnusedSubject _ ->
       Pretty.print ppf "This abbreviated condition subject is never used."

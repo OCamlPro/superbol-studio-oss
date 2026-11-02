@@ -53,6 +53,7 @@ depends: [
   "dune" {>= "3.17.0"}
   "cobol_unit-osx" {= version}
   "cobol_ptree-osx" {= version}
+  "cobol_procedure-osx" {= version}
   "cobol_parser-osx" {= version}
   "cobol_data-osx" {= version}
   "cobol_config-osx" {= version}

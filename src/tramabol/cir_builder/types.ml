@@ -52,13 +52,15 @@ type unsupported_stuff = ..
 (* Note: edit the corresponding function in `printer.ml` when adjusting this
    type. *)
 type unsupported_stuff +=
-  | Condition of Cobol_ptree.condition with_loc
+  | Base_ident of Cobol_procedure.Types.base_ident
+  | Condition of
+      Cobol_procedure.Types.condition Cobol_procedure.Types.or_error with_loc
   | Dynamic_span
   | Dynamic_table
-  | Expression of Cobol_ptree.expr with_loc
-  | Statement of Cobol_ptree.statement
-  | Subscript of Cobol_ptree.subscript with_loc
-  | Term: _ Cobol_ptree.term -> unsupported_stuff
+  | Expression of Cobol_procedure.Types.expr with_loc
+  | Scalar of Cobol_procedure.Types.scalar
+  | Statement of Cobol_procedure.Types.statement
+  | Subscript of Cobol_procedure.Types.subscript with_loc
   | Variable_length_field
 
 type undefined_stuff =

@@ -462,6 +462,7 @@
    (lsp (and ( >= 1.18 )( < 1.19 )))
    (jsonrpc ( >= 1.15 ))
    (cobol_typeck (= :version))
+   (cobol_procedure (= :version))
    (cobol_parser (= :version))
    (cobol_indent (= :version))
    (cobol_data (= :version))
@@ -624,6 +625,7 @@
    (ocaml (>= 4.14.2))
    (cobol_unit (= :version))
    (cobol_ptree (= :version))
+   (cobol_procedure (= :version))
    (cobol_parser (= :version))
    (cobol_data (= :version))
    (cobol_config (= :version))
@@ -646,6 +648,7 @@
  (depends
    (ocaml (>= 4.14.2))
    (cobol_ptree (= :version))
+   (cobol_procedure (= :version))
    (cobol_data (= :version))
    (cobol_config (= :version))
    (cobol_common (= :version))
@@ -777,6 +780,7 @@
    (ocaml (>= 4.14.2))
    (ocamlgraph (and (>= 2.1.0) (< 3.0.0)))
    (cobol_typeck (= :version))
+   (cobol_procedure (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
@@ -1067,7 +1071,6 @@
    (ocaml (>= 4.14.2))
    (pretty (= :version))
    (ezlibcob (= :version))
-   (cobol_unit (= :version))
    (cobol_data (= :version))
    (cir_types (= :version))
    (cir_logic (= :version))
@@ -1109,6 +1112,7 @@
    (ocaml (>= 4.14.2))
    (pretty (= :version))
    (cobol_unit (= :version))
+   (cobol_procedure (= :version))
    (cobol_data (= :version))
    (cobol_common (= :version))
    (cir_types (= :version))
@@ -1130,6 +1134,26 @@
    (ocaml (>= 4.14.2))
    (pretty (= :version))
    (cir_types (= :version))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name cobol_procedure)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.2))
+   (ppx_deriving ( >= 5.2.1 ))
+   (cobol_ptree (= :version))
+   (cobol_data (= :version))
+   (cobol_common (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )

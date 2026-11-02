@@ -35,18 +35,17 @@ type allocate_stmt =
 
 and allocate_kind =
   | AllocateCharacters of expr with_loc (*arith exp that evaluates to int (may be rounded)*)
-  | AllocateDataItem of name with_loc
+  | AllocateDataItem of qualname with_loc
 [@@deriving ord]
 
 let pp_allocate_kind ppf = function
   | AllocateCharacters e ->
-    Fmt.pf ppf "%a@ CHARACTERS" pp_expr' e
+      Fmt.pf ppf "%a@ CHARACTERS" pp_expr' e
   | AllocateDataItem n ->
-    pp_name ppf n.payload
+      pp_qualname ppf n.payload
 
 let pp_allocate_stmt ppf
-  { allocate_kind = ak; allocate_initialized = ai; allocate_returning = ar }
-=
+    { allocate_kind = ak; allocate_initialized = ai; allocate_returning = ar } =
   Fmt.pf ppf "ALLOCATE@ %a" pp_allocate_kind ak;
   if ai then Fmt.pf ppf "@ INITIALIZED";
   Option.iter (Fmt.pf ppf "@ RETURNING@ %a" (pp_with_loc pp_ident)) ar
@@ -92,8 +91,8 @@ and close_format =
 
 let pp_close_format ppf = function
   | CloseUnitReel for_removal ->
-    Fmt.pf ppf "REEL";
-    if for_removal then Fmt.pf ppf "@ FOR@ REMOVAL"
+      Fmt.pf ppf "REEL";
+      if for_removal then Fmt.pf ppf "@ FOR@ REMOVAL"
   | CloseWithLock -> Fmt.pf ppf "WITH@ LOCK"
   | CloseWithNoRewind -> Fmt.pf ppf "With@ NO@ REWIND"
 
@@ -126,10 +125,10 @@ type entry_by_clause =
 type entry_stmt =
   | EntrySimple of alphanum with_loc
   | EntryUsing of
-    {
-      entry_name: alphanum with_loc;
-      entry_by_clauses: entry_by_clause list;
-    }
+      {
+        entry_name: alphanum with_loc;
+        entry_by_clauses: entry_by_clause list;
+      }
   | EntryForGoTo of alphanum with_loc
 [@@deriving ord]
 
@@ -141,37 +140,37 @@ let pp_entry_by_clause ppf = function
 
 let pp_entry_stmt ppf = function
   | EntrySimple name ->
-    Fmt.pf ppf "ENTRY@ %a" (pp_with_loc pp_alphanum) name
+      Fmt.pf ppf "ENTRY@ %a" (pp_with_loc pp_alphanum) name
   | EntryUsing { entry_name; entry_by_clauses } ->
-    Fmt.pf ppf "ENTRY@ %a%a"
-      (pp_with_loc pp_alphanum) entry_name
-      Fmt.(list ~sep:nop (sp ++ pp_entry_by_clause)) entry_by_clauses
+      Fmt.pf ppf "ENTRY@ %a%a"
+        (pp_with_loc pp_alphanum) entry_name
+        Fmt.(list ~sep:nop (sp ++ pp_entry_by_clause)) entry_by_clauses
   | EntryForGoTo entry_name ->
-    Fmt.pf ppf "ENTRY@ FOR GO TO %a"
-      (pp_with_loc pp_alphanum) entry_name
+      Fmt.pf ppf "ENTRY@ FOR GO TO %a"
+        (pp_with_loc pp_alphanum) entry_name
 
 (* RETURNING/GIVING x *)
 type returning =
   | ReturningScalar of scalar
   | ReturningAddress of qualident
   | ReturningInt of
-    {
-      value : literal;
-      size : literal option;
-    }
+      {
+        value : literal;
+        size : literal option;
+      }
 [@@deriving ord]
 
 let pp_returning ppf = function
   | ReturningScalar s ->
-    pp_scalar ppf s
+      pp_scalar ppf s
   | ReturningAddress n ->
-    Fmt.pf ppf "RETURNING@ ADDRESS@ OF@ %a"
-    pp_qualident n
+      Fmt.pf ppf "RETURNING@ ADDRESS@ OF@ %a"
+        pp_qualident n
   | ReturningInt { value = v; size = None } ->
-    Fmt.pf ppf "RETURNING@ %a" pp_literal v
+      Fmt.pf ppf "RETURNING@ %a" pp_literal v
   | ReturningInt { value = v; size = Some v' } ->
-    Fmt.pf ppf "RETURNING@ %a WITH SIZE %a"
-    pp_literal v pp_literal v'
+      Fmt.pf ppf "RETURNING@ %a WITH SIZE %a"
+        pp_literal v pp_literal v'
 
 type program_exit_status =
   | ExitDefault
@@ -198,14 +197,14 @@ type exit_stmt =
 let pp_exit_stmt ppf = function
   | ExitSimple -> Fmt.pf ppf "EXIT"
   | ExitProgram s ->
-    Fmt.pf ppf "EXIT PROGRAM%a" pp_program_exit_status s
+      Fmt.pf ppf "EXIT PROGRAM%a" pp_program_exit_status s
   | ExitMethod ro ->
-    Fmt.pf ppf "EXIT METHOD%a" Fmt.(option (sp ++ pp_raising)) ro
+      Fmt.pf ppf "EXIT METHOD%a" Fmt.(option (sp ++ pp_raising)) ro
   | ExitFunction ro ->
-    Fmt.pf ppf "EXIT FUNCTION%a" Fmt.(option (sp ++ pp_raising)) ro
+      Fmt.pf ppf "EXIT FUNCTION%a" Fmt.(option (sp ++ pp_raising)) ro
   | ExitPerform cycle ->
-    Fmt.pf ppf "EXIT PERFORM";
-    if cycle then Fmt.pf ppf " CYCLE";
+      Fmt.pf ppf "EXIT PERFORM";
+      if cycle then Fmt.pf ppf " CYCLE";
   | ExitParagraph -> Fmt.pf ppf "EXIT PARAGRAPH"
   | ExitSection -> Fmt.pf ppf "EXIT SECTION"
 
@@ -271,12 +270,11 @@ let pp_init_replacing ppf { init_replacing_category = c; init_replacing_replacem
   Fmt.pf ppf "%a@ DATA@ BY@ %a" pp_init_data_category c pp_ident_or_literal ri
 
 let pp_initialize_stmt ppf
-  { init_items = items
-  ; init_filler = filler
-  ; init_category = cat
-  ; init_replacings = r
-  ; init_to_default = to_default }
-=
+    { init_items = items;
+      init_filler = filler;
+      init_category = cat;
+      init_replacings = r;
+      init_to_default = to_default } =
   Fmt.pf ppf "INITIALIZE@ %a%t%a"
     Fmt.(list ~sep:sp pp_ident) items
     (if filler then Fmt.fmt "@ FILLER" else Fmt.fmt "")
@@ -300,8 +298,7 @@ type invoke_stmt =
 [@@deriving ord]
 
 let pp_invoke_stmt ppf
-  { invoke_target = t; invoke_method = m; invoke_using = u; invoke_returning = r}
-=
+    { invoke_target = t; invoke_method = m; invoke_using = u; invoke_returning = r} =
   Fmt.pf ppf "INVOKE@ %a@ %a" pp_ident t pp_ident_or_strlit m;
   if u != [] then
     Fmt.pf ppf "@ USING@ %a" Fmt.(list ~sep:sp pp_call_using_clause) u;
@@ -403,19 +400,19 @@ let pp_inspect_direction ppf = function
 
 let pp_inspect_where =
   Fmt.(pair
-    ~sep:sp pp_inspect_direction
-      (NEL.pp ~fopen:"@ " ~fsep:"@ OR@ "~fclose:"@ " pp_ident_or_nonnum))
+         ~sep:sp pp_inspect_direction
+         (NEL.pp ~fopen:"@ " ~fsep:"@ OR@ "~fclose:"@ " pp_ident_or_nonnum))
 
 let pp_converting ppf {
-  converting_from = cf; converting_to = ct; converting_where = cw
-} =
+    converting_from = cf; converting_to = ct; converting_where = cw
+  } =
   Fmt.pf ppf "CONVERTING@ %a@ TO@ %a%a"
     pp_ident_or_nonnum cf
     pp_ident_or_nonnum ct
     Fmt.(if cw == [] then any "" else sp ++ list ~sep:sp pp_inspect_where) cw
 
 let pp_replacing_range_spec ppf {
-  replacing_item = ri; replacing_by = rb; replacing_where = rw } =
+    replacing_item = ri; replacing_by = rb; replacing_where = rw } =
   Fmt.pf ppf "%a@ BY@ %a%a"
     pp_ident_or_nonnum ri
     pp_ident_or_nonnum rb
@@ -423,13 +420,13 @@ let pp_replacing_range_spec ppf {
 
 let pp_replacing_clause ppf = function
   | ReplacingCharacters { replacement; where } ->
-    Fmt.pf ppf "CHARACTERS@ BY@ %a%a"
-      pp_ident_or_nonnum replacement
-      Fmt.(if where == [] then any "" else sp ++ list ~sep:sp pp_inspect_where) where
+      Fmt.pf ppf "CHARACTERS@ BY@ %a%a"
+        pp_ident_or_nonnum replacement
+        Fmt.(if where == [] then any "" else sp ++ list ~sep:sp pp_inspect_where) where
   | ReplacingRange (rr, rrss) ->
-    Fmt.pf ppf "%a@ %a"
-      pp_replacing_range rr
-      Fmt.(list ~sep:sp pp_replacing_range_spec) rrss
+      Fmt.pf ppf "%a@ %a"
+        pp_replacing_range rr
+        Fmt.(list ~sep:sp pp_replacing_range_spec) rrss
 
 let pp_replacing = pp_with_loc pp_replacing_clause
 
@@ -444,12 +441,12 @@ let pp_tallying_spec ppf { tallying_item = ti; tallying_where = tw } =
 
 let pp_tallying_clause ppf = function
   | TallyingCharacters iws ->
-    Fmt.pf ppf "CHARACTERS@ %a"
-      Fmt.(list ~sep:sp pp_inspect_where) iws
+      Fmt.pf ppf "CHARACTERS@ %a"
+        Fmt.(list ~sep:sp pp_inspect_where) iws
   | TallyingRange (r, tss) ->
-    Fmt.pf ppf "%a@ %a"
-      pp_tallying_range r
-      Fmt.(list ~sep:sp pp_tallying_spec) tss
+      Fmt.pf ppf "%a@ %a"
+        pp_tallying_range r
+        Fmt.(list ~sep:sp pp_tallying_spec) tss
 
 let pp_tallying ppf { tallying_target = tt; tallying_clauses = tcs } =
   Fmt.pf ppf "%a@ FOR@ %a"
@@ -458,14 +455,14 @@ let pp_tallying ppf { tallying_target = tt; tallying_clauses = tcs } =
 
 let pp_inspect_spec ppf = function
   | InspectTallying ts ->
-    Fmt.pf ppf "TALLYING@ %a" Fmt.(list ~sep:sp pp_tallying) ts
+      Fmt.pf ppf "TALLYING@ %a" Fmt.(list ~sep:sp pp_tallying) ts
   | InspectReplacing rs ->
-    Fmt.pf ppf "REPLACING@ %a"
-      Fmt.(list ~sep:sp (pp_with_loc pp_replacing_clause)) rs
+      Fmt.pf ppf "REPLACING@ %a"
+        Fmt.(list ~sep:sp (pp_with_loc pp_replacing_clause)) rs
   | InspectBoth (ts, rs) ->
-    Fmt.pf ppf "TALLYING@ %a@ REPLACING@ %a"
-      Fmt.(list ~sep:sp pp_tallying) ts
-      Fmt.(list ~sep:sp (pp_with_loc pp_replacing_clause)) rs
+      Fmt.pf ppf "TALLYING@ %a@ REPLACING@ %a"
+        Fmt.(list ~sep:sp pp_tallying) ts
+        Fmt.(list ~sep:sp (pp_with_loc pp_replacing_clause)) rs
   | InspectConverting c -> pp_converting ppf c
 
 let pp_inspect_stmt ppf { inspect_item = ii; inspect_spec = is } =
@@ -483,16 +480,15 @@ type merge_stmt =
 [@@deriving ord]
 
 and merge_or_sort_target =
-  | OutputProcedure of procedure_name with_loc procedure_range
+  | OutputProcedure of procedure_range
   | Giving of name with_loc list
 [@@deriving ord]
 
 let pp_merge_or_sort_target ppf = function
   | OutputProcedure pr ->
-    Fmt.pf ppf "OUTPUT@ PROCEDURE@ IS@ %a"
-      (pp_procedure_range pp_procedure_name') pr
+      Fmt.pf ppf "OUTPUT@ PROCEDURE@ IS@ %a" pp_procedure_range pr
   | Giving ns ->
-    Fmt.pf ppf "GIVING@ %a" Fmt.(list ~sep:sp (pp_with_loc pp_name)) ns
+      Fmt.pf ppf "GIVING@ %a" Fmt.(list ~sep:sp (pp_with_loc pp_name)) ns
 
 let pp_merge_stmt ppf { merge_file = mf;
                         merge_keys = mk;
@@ -537,13 +533,13 @@ type move_stmt =              (* TODO: maybe split in two distinct statements *)
 
 let pp_move_stmt ppf = function
   | MoveSimple { from; to_ } ->
-    Fmt.pf ppf "MOVE@ %a@ TO@ %a"
-      pp_scalar from
-      Fmt.(list ~sep:sp pp_ident) to_
+      Fmt.pf ppf "MOVE@ %a@ TO@ %a"
+        pp_scalar from
+        Fmt.(list ~sep:sp pp_ident) to_
   | MoveCorresponding { from; to_ } ->
-    Fmt.pf ppf "MOVE CORRESPONDING@ %a@ TO@ %a"
-      pp_ident from
-      Fmt.(list ~sep:sp pp_ident) to_
+      Fmt.pf ppf "MOVE CORRESPONDING@ %a@ TO@ %a"
+        pp_ident from
+        Fmt.(list ~sep:sp pp_ident) to_
 
 
 (* OPEN *)
@@ -581,14 +577,14 @@ let pp_open_stmt =
 (* RELEASE *)
 type release_stmt =
   {
-    release_item: qualname;
+    release_item: qualname with_loc;
     release_from: ident_or_literal option;
   }
 [@@deriving ord]
 
 let pp_release_stmt ppf { release_item = ri; release_from = rf } =
   Fmt.pf ppf "RELEASE@ %a%a"
-    pp_qualname ri
+    pp_qualname' ri
     Fmt.(option (sp ++ const string "FROM" ++ sp ++ pp_ident_or_literal)) rf
 
 
@@ -629,12 +625,12 @@ let pp_message_ending_indicator ppf = function
 
 let pp_send_operands ppf = function
   | SendSimple { from } ->
-    Fmt.pf ppf "FROM@ %a" pp_ident from
+      Fmt.pf ppf "FROM@ %a" pp_ident from
   | SendWith { from = f; ending_indicator = ei; advancing = apo; replace } ->
-    Fmt.(option (const string "FROM" ++ sp ++ pp_ident ++ sp)) ppf f;
-    pp_message_ending_indicator ppf ei;
-    Fmt.(option (sp ++ pp_advancing_phrase)) ppf apo;
-    if replace then Fmt.pf ppf "@ REPLACING LINE"
+      Fmt.(option (const string "FROM" ++ sp ++ pp_ident ++ sp)) ppf f;
+      pp_message_ending_indicator ppf ei;
+      Fmt.(option (sp ++ pp_advancing_phrase)) ppf apo;
+      if replace then Fmt.pf ppf "@ REPLACING LINE"
 
 let pp_send_stmt ppf { send_name; send_operands } =
   Fmt.pf ppf "SEND@ %a@ %a"
@@ -729,40 +725,40 @@ let pp_set_stmt ppf ss =
   Fmt.pf ppf "SET@ ";
   match ss with
   | SetAmbiguous { targets; set_method; value } ->
-    Fmt.pf ppf "%a@ %a@ %a"
-      Fmt.(list ~sep:sp pp_ident) targets
-      pp_set_ambiguous_method set_method
-      pp_expr' value
+      Fmt.pf ppf "%a@ %a@ %a"
+        Fmt.(list ~sep:sp pp_ident) targets
+        pp_set_ambiguous_method set_method
+        pp_expr' value
   | SetSwitch sssl ->
-    Fmt.(list ~sep:sp pp_set_switch_spec) ppf sssl
+      Fmt.(list ~sep:sp pp_set_switch_spec) ppf sssl
   | SetCondition scsl ->
-    Fmt.(list ~sep:sp pp_set_condition_spec) ppf scsl
+      Fmt.(list ~sep:sp pp_set_condition_spec) ppf scsl
   | SetAttribute { name = n; attribute_switches = ass } ->
-    Fmt.pf ppf "%a@ %a"
-      (pp_with_loc pp_name) n
-      Fmt.(list ~sep:sp pp_set_attribute_switch) ass
+      Fmt.pf ppf "%a@ %a"
+        (pp_with_loc pp_name) n
+        Fmt.(list ~sep:sp pp_set_attribute_switch) ass
   | SetSaveLocale { target; locale } ->
-    Fmt.pf ppf "%a@ %a"
-      pp_ident target pp_set_save_locale locale
+      Fmt.pf ppf "%a@ %a"
+        pp_ident target pp_set_save_locale locale
   | SetLocale { target; source } ->
-    Fmt.pf ppf "LOCALE@ %a@ TO@ %a"
-      pp_set_locale_target target
-      pp_set_locale_source source
+      Fmt.pf ppf "LOCALE@ %a@ TO@ %a"
+        pp_set_locale_target target
+        pp_set_locale_source source
   | SetSavedException ->
-    Fmt.words ppf "LAST EXCEPTION TO OFF"
+      Fmt.words ppf "LAST EXCEPTION TO OFF"
   | SetFloatContent { targets; content; sign } ->
-    Fmt.pf ppf "CONTENT@ %a@ TO@ %a%a"
-      Fmt.(list ~sep:sp pp_ident) targets
-      pp_float_content content
-      Fmt.(option (sp ++ pp_sign)) sign
+      Fmt.pf ppf "CONTENT@ %a@ TO@ %a%a"
+        Fmt.(list ~sep:sp pp_ident) targets
+        pp_float_content content
+        Fmt.(option (sp ++ pp_sign)) sign
   | SetEnvironment { variable; value } ->                         (* GnuCOBOL *)
-    Fmt.pf ppf "ENVIRONMENT@ %a@ TO@ %a"
-      pp_ident_or_literal variable
-      pp_ident_or_literal value
+      Fmt.pf ppf "ENVIRONMENT@ %a@ TO@ %a"
+        pp_ident_or_literal variable
+        pp_ident_or_literal value
   | SetEntry { targets ; value } ->
-    Fmt.pf ppf "%a@ TO@ ENTRY@ %a"
-      Fmt.(list ~sep:sp pp_ident) targets
-      pp_ident_or_nonnum value
+      Fmt.pf ppf "%a@ TO@ ENTRY@ %a"
+        Fmt.(list ~sep:sp pp_ident) targets
+        pp_ident_or_nonnum value
 
 (* SORT *)
 type sort_stmt =
@@ -785,34 +781,33 @@ type sort_stmt =
 [@@deriving ord]
 
 and sort_source =                                                (* SORT only *)
-  | SortInputProcedure of procedure_name with_loc procedure_range
+  | SortInputProcedure of procedure_range
   | SortUsing of name with_loc list
 [@@deriving ord]
 
 let pp_sort_source ppf = function
   | SortInputProcedure pr ->
-    Fmt.pf ppf "INPUT@ PROCEDURE@ %a"
-      (pp_procedure_range pp_procedure_name') pr
+      Fmt.pf ppf "INPUT@ PROCEDURE@ %a" pp_procedure_range pr
   | SortUsing ns ->
-    Fmt.pf ppf "USING@ %a"
-      Fmt.(list ~sep:sp (pp_with_loc pp_name)) ns
+      Fmt.pf ppf "USING@ %a"
+        Fmt.(list ~sep:sp (pp_with_loc pp_name)) ns
 
 let pp_sort_stmt ppf = function
   | SortFile { file; keys; duplicate_in_order; collating; source; target } ->
-    Fmt.pf ppf "SORT@ %a@ %a%a%a@ %a@ %a"
-      pp_qualident file
-      Fmt.(list ~sep:sp Data_descr.pp_sort_spec) keys
-      Fmt.(if duplicate_in_order then any "@ DUPLICATES" else nop) ()
-      Fmt.(option (any "@ COLLATING SEQUENCE@ " ++
-                   pp_alphabet_specification)) collating
-      pp_sort_source source
-      pp_merge_or_sort_target target
+      Fmt.pf ppf "SORT@ %a@ %a%a%a@ %a@ %a"
+        pp_qualident file
+        Fmt.(list ~sep:sp Data_descr.pp_sort_spec) keys
+        Fmt.(if duplicate_in_order then any "@ DUPLICATES" else nop) ()
+        Fmt.(option (any "@ COLLATING SEQUENCE@ " ++
+                     pp_alphabet_specification)) collating
+        pp_sort_source source
+        pp_merge_or_sort_target target
   | SortTable { table; keys; duplicate_in_order; collating } ->
-    Fmt.pf ppf "SORT@ %a" pp_qualident table;
-    if keys != [] then Fmt.(sp ++ list ~sep:sp Data_descr.pp_sort_spec) ppf keys;
-    if duplicate_in_order then Fmt.pf ppf "@ DUPLICATES";
-    Fmt.(option (any "@ COLLATING SEQUENCE@ " ++
-                 pp_alphabet_specification)) ppf collating
+      Fmt.pf ppf "SORT@ %a" pp_qualident table;
+      if keys != [] then Fmt.(sp ++ list ~sep:sp Data_descr.pp_sort_spec) ppf keys;
+      if duplicate_in_order then Fmt.pf ppf "@ DUPLICATES";
+      Fmt.(option (any "@ COLLATING SEQUENCE@ " ++
+                   pp_alphabet_specification)) ppf collating
 
 
 (* STOP *)
@@ -863,11 +858,11 @@ let pp_stop_stmt ppf = function
   | StopRun None ->
       Fmt.pf ppf "STOP RUN"
   | StopRun Some StopReturning r ->
-    Fmt.pf ppf "STOP@ RUN%a"
-      Fmt.(sp ++ pp_returning) r
+      Fmt.pf ppf "STOP@ RUN%a"
+        Fmt.(sp ++ pp_returning) r
   | StopRun Some StopWithStatus s ->
-    Fmt.pf ppf "STOP@ RUN%a"
-      Fmt.(sp ++ pp_stop_run_status) s
+      Fmt.pf ppf "STOP@ RUN%a"
+        Fmt.(sp ++ pp_stop_run_status) s
   | StopError ->
       Fmt.pf ppf "STOP ERROR"
   | StopThread None ->

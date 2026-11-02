@@ -380,7 +380,7 @@ let fold_sort_spec (v: _ #folder) =
   handle v#fold_sort_spec
     ~continue:begin fun { sort_key_direction; sort_key_names } x -> x
       >> fold_sort_direction v sort_key_direction
-      >> fold_list ~fold:fold_qualname v sort_key_names
+      >> fold_list ~fold:fold_qualname' v sort_key_names
     end
 
 let fold_source_destination_clause (v: _ #folder) =
@@ -411,7 +411,7 @@ let fold_usage_clause (v: _ #folder) =
           fold_name' v n
       | Pointer n
       | ProgramPointer n ->
-        fold_name'_opt v n
+          fold_name'_opt v n
       | Binary
       | Bit
       | Display
@@ -435,7 +435,7 @@ let fold_usage_clause (v: _ #folder) =
         (* |  [`Comp0 | `Comp1 | `Comp2 | `Comp3 | `Comp5 | `Comp6 | *)
         (*                    `CompX | `CompN | `Comp9 | `Comp10 | `Comp15 | *)
         (*                    `BinaryCLong of signedness option] *)
-          ->
+        ->
           Fun.id
       | Type n ->
           fold_name' v n
@@ -462,8 +462,8 @@ let fold_validation_clause (v: _ #folder) =
       | PresentWhen c -> fold_condition' v c
       | Varying l -> fold_list ~fold:fold_data_varying v l
       | ValidateStatus { is_; when_; on; for_ } -> ignore (when_, on); fun x -> x
-        >> fold_ident_or_literal v is_
-        >> fold_list ~fold:fold_ident v for_
+            >> fold_ident_or_literal v is_
+            >> fold_list ~fold:fold_ident v for_
     end
 
 let fold_file_label (v: _ #folder) =

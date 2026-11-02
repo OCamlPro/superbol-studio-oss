@@ -86,3 +86,67 @@ let%expect_test "ambiguous-n-anonymous" =
         4 -> 3 [style="dashed", ];
 
         } |}];;
+
+let%expect_test "section-starts-with-paragraph" =
+  Cfg_testing.show_dot_cfgs Cfg_basic.section_starts_with_paragraph;
+  [%expect {|
+           PROGRAM-ID. section-starts-with-paragraph.
+           DATA DIVISION.
+           PROCEDURE DIVISION.
+           PERFORM A.
+              GOBACK.
+           A SECTION.
+           B. PERFORM C.
+              GOBACK.
+           C. GOBACK.
+
+    ---
+
+    section-starts-with-paragraph:
+      digraph G {
+        node [shape=box, ];
+        0 [shape=doubleoctagon, label="Entry\nparagraph", ];
+        2 [label="B IN A", ];
+        3 [label="C IN A", ];
+
+
+        0 -> 2 [style="dashed", ];
+        2 -> 3 [style="dashed", ];
+
+        } |}];;
+
+let%expect_test "section-starts-with-paragraph-section-cfg" =
+  Cfg_testing.show_dot_section_cfg Cfg_basic.section_starts_with_paragraph
+    ~name:"A (section-starts-with-paragraph)";
+  [%expect {|
+    A (section-starts-with-paragraph):
+      digraph G {
+        node [shape=box, ];
+        1 [label="B", ];
+        2 [label="C", ];
+        3 [shape=doubleoctagon, label="A", ];
+
+
+        1 -> 2 [style="dashed", ];
+        3 -> 1 [style="dotted", ];
+
+        } |}];;
+
+let%expect_test "performs-section-cfg" =
+  Cfg_testing.show_dot_section_cfg Cfg_basic.performs
+    ~name:"A (performs)";
+  [%expect {|
+    A (performs):
+      digraph G {
+        node [shape=box, ];
+        1 [shape=doubleoctagon, label="A", ];
+        2 [label="B", ];
+        3 [label="C", ];
+        4 [shape=plaintext, label="D", ];
+
+
+        1 -> 2 [style="dashed", ];
+        2 -> 3 [style="dashed", ];
+        3 -> 4 [style="dashed", ];
+
+        } |}];;

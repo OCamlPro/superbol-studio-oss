@@ -12,11 +12,11 @@
 (**************************************************************************)
 
 open Cobol_ptree
-open Cobol_common
-open Cobol_unit.Types
-open Typeck_results
+open Cobol_procedure.Types
+open Typeck_procedure_monad
 open Typeck_diagnostics
-open Srcloc.INFIX
+open Cobol_common.Srcloc.TYPES
+open Cobol_common.Srcloc.INFIX
 
 type abbrev_implied_parts =
   | Nothing
@@ -65,45 +65,21 @@ let state_with_relop state rel =
 type object_bool_expr_disambiguation =
   | CondBoolExpr
   | CondObject
-  | CondUnknown
+  | CondResolveError
 
-let disambiguate_object_vs_bool_expr data_items expr =
-  let rec is_bool_ident: ident -> object_bool_expr_disambiguation =
-    function
-    | QualIdent { ident_name; _ } ->
-        begin match Cobol_unit.Resolver_map.find ~&ident_name data_items with
-          | Cobol_data.Types.Data_condition _ ->
-              CondBoolExpr
-          | _ ->
-              CondObject
-          | exception Not_found
-          | exception Cobol_unit.Resolver_map.Ambiguous _ ->
-              (* Typechecking of references will already flag this resolution failure:
-                     We use the special CondUnknown return value to avoid generating more
-                     errors related to this failure. *)
-              CondUnknown
-        end
-    | RefMod (a, _) ->
-        is_bool_ident (UPCAST.base_ident_as_ident ~&a)
-    | ScalarRefMod (a, _) ->
-        is_bool_ident (UPCAST.scalar_ident_as_ident ~&a)
-    | Address _
-    | Counter _
-    | InlineCall _
-    | InlineInvoke _
-    | ObjectView _
-    | ObjectRef _ ->
-        CondObject
-  in
-  match expr with
-  | Atom (QualIdent _ | RefMod _ | ScalarRefMod _ | Address _ | Counter _ |
-          InlineCall _ | InlineInvoke _ | ObjectRef _ as a) ->
-      is_bool_ident a
-  | Atom (Alphanum _ | Boolean _ | Integer _ | Fixed _ | Floating _ |
-          National _ | Fig _ | NumFig _ | LengthOf _ | Concat _ | StrConcat _)
-  | Unop _
-  | Binop _ ->
-      CondObject
+let disambiguate_object_vs_bool_expr (e : expr) =
+  match e with
+  | Atom (ScalarIdent { ident_base = QualIdent q; _ }) ->
+      begin match q.ident_data_ref.resolved with
+        | Ok (Cobol_data.Types.Data_condition _) -> CondBoolExpr
+        | Ok _ -> CondObject
+        | Error () ->
+            (* Typechecking of references already flagged this resolution
+               failure: We use the special CondResolveError return value to avoid
+               generating more errors related to this failure. *)
+            CondResolveError
+      end
+  | _ -> CondObject
 
 let warn_before_state_reset state =
   match state.unused with
@@ -118,45 +94,52 @@ let warn_before_state_reset state =
 let use_and_reset_subject ~f ~missing_subject_error state =
   begin match state.subject with
     | Some subj ->
-        some_result (f subj), { state with relop = None; unused = Nothing }
-    | None -> no_result ~diags:[Condition_error missing_subject_error], state
+        return (f subj, { state with relop = None; unused = Nothing })
+    | None ->
+        return ~diags:[Condition_error missing_subject_error]
+          (Error () &@ Typeck_condition_diagnostics.error_loc
+             missing_subject_error, state)
   end
 
-let rec expand_abbrev_cond env abbrev_cond state :
-  expanded_cond with_loc option with_diags * abbrev_condition_expansion_state
-  =
+let rec expand_abbrev_cond (abbrev_cond: Cobol_ptree.condition with_loc) state
+  : (condition or_error with_loc * _) Typeck_procedure_monad.t =
   match ~&abbrev_cond with
   | CondSubject (subj, c) ->
-      expand_abbrev_cond env c (new_state_with_subject subj)
+      let* subj = Typeck_terms.typeck_expr' subj in
+      expand_abbrev_cond c (new_state_with_subject subj)
   | CondRelOp _ when state.subject = None ->
       (* This case throws an error early to improve error location *)
-      ( no_result ~diags:[Condition_error (AbbrevMissingSubject ~@abbrev_cond)],
-        no_subject_state )
-  | CondRelOp (rel, c) -> expand_abbrev_cond env c (state_with_relop state rel)
+      return ~diags:[Condition_error (AbbrevMissingSubject ~@abbrev_cond)]
+        (Error () &@<- abbrev_cond, no_subject_state)
+  | CondRelOp (rel, c) ->
+      expand_abbrev_cond c (state_with_relop state rel)
   | CondObjectOrExpr expr ->
-      begin match disambiguate_object_vs_bool_expr env ~&expr with
+      let* expr = Typeck_terms.typeck_expr' expr in
+      begin match disambiguate_object_vs_bool_expr ~&expr with
         | CondBoolExpr ->
-            ( some_result
-                ~diags:(warn_before_state_reset state)
-                (Expr expr &@<- abbrev_cond),
-              no_subject_state )
+            return ~diags:(warn_before_state_reset state)
+              (Ok (Expr expr) &@<- abbrev_cond, no_subject_state)
         | CondObject ->
             begin match state.subject, state.relop with
               | Some subj, Some relop ->
-                  ( some_result (Relation (subj, ~&relop, expr) &@<- abbrev_cond),
-                    { state with unused = Nothing } )
+                  return (Ok (Relation (subj, ~&relop, expr)) &@<- abbrev_cond,
+                          { state with unused = Nothing })
               | None, _ ->
-                  ( no_result ~diags:[Condition_error (AbbrevMissingSubject ~@abbrev_cond)],
-                    state )
+                  return
+                    ~diags:[Condition_error
+                              (AbbrevMissingSubject ~@abbrev_cond)]
+                    (Error () &@<- abbrev_cond, state)
               | Some _, None ->
-                  ( no_result ~diags:[Condition_error (AbbrevMissingRelOp ~@abbrev_cond)],
-                    state )
+                  return
+                    ~diags:[Condition_error (AbbrevMissingRelOp ~@abbrev_cond)]
+                    (Error () &@<- abbrev_cond, state)
             end
-        | CondUnknown -> no_result ~diags:[], state
+        | CondResolveError ->
+            return (Error () &@<- abbrev_cond, state)
       end
   | CondParen c ->
-      let exp_cond, new_state =
-        expand_abbrev_cond env c { state with changed_in_parens = Nothing }
+      let+ exp_cond, new_state =
+        expand_abbrev_cond c { state with changed_in_parens = Nothing }
       in
       let state =
         match new_state.changed_in_parens with
@@ -172,51 +155,47 @@ let rec expand_abbrev_cond env abbrev_cond state :
       in
       exp_cond, state
   | CondNot c ->
-      let exp_cond, state = expand_abbrev_cond env c state in
-      map_some_result ~f:(fun ec -> Not ec &@<- abbrev_cond) exp_cond, state
+      let+ exp_cond, state = expand_abbrev_cond c state in
+      Ok (Not exp_cond) &@<- abbrev_cond, state
   | CondCombined (a, o, b) ->
-      let exp_a, state = expand_abbrev_cond env a state in
-      let exp_b, state = expand_abbrev_cond env b state in
-      ( merge_results
-          ~f:(fun a b ->
-              match a, b with
-              | Some a, Some b -> Some (Combined (a, o, b) &@<- abbrev_cond)
-              | _ -> None
-            )
-          exp_a exp_b,
-        state )
+      let* exp_a, state = expand_abbrev_cond a state in
+      let+ exp_b, state = expand_abbrev_cond b state in
+      Ok (Combined (exp_a, o, exp_b)) &@<- abbrev_cond, state
   | CondClass cl ->
-      use_and_reset_subject
-        ~f:(fun subj -> ClassCond (subj, cl) &@<- abbrev_cond)
-        ~missing_subject_error:(ClassCondMissingSubject ~@abbrev_cond) state
+      use_and_reset_subject state
+        ~f:(fun subj -> Ok (ClassCond (subj, cl)) &@<- abbrev_cond)
+        ~missing_subject_error:(ClassCondMissingSubject ~@abbrev_cond)
   | CondSign sign ->
-      use_and_reset_subject
-        ~f:(fun subj -> SignCond (subj, sign) &@<- abbrev_cond)
-        ~missing_subject_error:(SignCondMissingSubject ~@abbrev_cond) state
+      use_and_reset_subject state
+        ~f:(fun subj -> Ok (SignCond (subj, sign)) &@<- abbrev_cond)
+        ~missing_subject_error:(SignCondMissingSubject ~@abbrev_cond)
   | CondOmitted ->
-      use_and_reset_subject
-        ~f:(fun subj -> Omitted subj &@<- abbrev_cond)
-        ~missing_subject_error:(OmittedMissingSubject ~@abbrev_cond) state
+      use_and_reset_subject state
+        ~f:(fun subj -> Ok (Omitted subj) &@<- abbrev_cond)
+        ~missing_subject_error:(OmittedMissingSubject ~@abbrev_cond)
 
-let expand_condition env (cond : condition with_loc) :
-  expanded_cond with_loc option with_diags =
-  let c, _ = expand_abbrev_cond env cond no_subject_state in
+let expand_condition (cond : Cobol_ptree.condition with_loc)
+  : condition or_error with_loc Typeck_procedure_monad.t =
+  let+ c, _ = expand_abbrev_cond cond no_subject_state in
   c
 
-let expand_selection_subject env subj =
+let expand_selection_subject (subj: Cobol_ptree.selection_subject with_loc)
+  : selection_subject or_error with_loc Typeck_procedure_monad.t =
   match ~&subj with
   | Subject (CondObjectOrExpr subject) ->
-      begin match disambiguate_object_vs_bool_expr env ~&subject with
+      let+ subject = Typeck_terms.typeck_expr' subject in
+      begin match disambiguate_object_vs_bool_expr ~&subject with
         | CondObject ->
-            some_result (SubjectValue subject &@<- subj)
+            Ok (SubjectValue subject) &@<- subj
         | CondBoolExpr ->
-            some_result (SubjectCond (Expr subject) &@<- subj)
-        | CondUnknown ->
-            no_result ~diags:[]
+            Ok (SubjectCond (Expr subject)) &@<- subj
+        | CondResolveError ->
+            Error () &@<- subj
       end
   | Subject s ->
-      map_some_result ~f:(fun c -> SubjectCond ~&c &@<- c) (expand_condition env (s &@<- subj))
-  | SubjectConst b -> some_result (SubjectConst b &@<- subj)
+      let+ c = expand_condition (s &@<- subj) in
+      Result.map (fun c -> SubjectCond c) ~&c &@<- c
+  | SubjectConst b -> return (Ok (SubjectConst b) &@<- subj)
 
 (* WARNING: expanding using this function will potentially duplicate a SubjectValue
    expression inside the resulting SelCond.
@@ -225,22 +204,33 @@ let expand_selection_subject env subj =
    Consider replacing SubjectValue complex expressions with a temporary variable before
    expanding if the resulting expanded_selection_object should be used for evaluation.
    However note that both GnuCOBOL 3.3 and MF duplicate subject evaluation side-effects. *)
-let expand_selection_object env subj (obj: selection_object with_loc) =
+let expand_selection_object subj (obj: Cobol_ptree.selection_object with_loc)
+  : selection_object or_error with_loc Typeck_procedure_monad.t =
   match ~&subj, ~&obj with
-  | _, SelAny -> some_result (SelAny &@<- obj)
+  | _, SelAny -> return (Ok SelAny &@<- obj)
   | _, SelConst oc ->
-      some_result (SelConst oc &@<- obj)
+      return (Ok (SelConst oc) &@<- obj)
   | (SubjectConst _ | SubjectCond _), SelCond c ->
-      map_some_result ~f:(fun x -> SelCond ~&x &@<- x) (expand_condition env (c &@<- obj))
-  | SubjectValue _, SelCond (CondObjectOrExpr value) when
-      disambiguate_object_vs_bool_expr env ~&value = CondObject ->
-      some_result (SelValue { negated = false; value } &@<- obj)
-  | SubjectValue _, SelCond (CondNot { payload = CondObjectOrExpr value; _ }) when
-      disambiguate_object_vs_bool_expr env ~&value = CondObject ->
-      some_result (SelValue { negated = true; value } &@<- obj)
+      let+ x = expand_condition (c &@<- obj) in
+      Result.map (fun x -> SelCond x) ~&x &@<- x
+  | SubjectValue _, SelCond (CondObjectOrExpr value) ->
+      let+ value = Typeck_terms.typeck_expr' value in
+      begin match disambiguate_object_vs_bool_expr ~&value with
+        | CondObject -> Ok (SelValue { negated = false; value }) &@<- obj
+        | CondBoolExpr -> Ok (SelCond (Expr value)) &@<- obj
+        | CondResolveError -> Error () &@<- obj
+      end
+  | SubjectValue _, SelCond (CondNot ({ payload = CondObjectOrExpr value; _ }
+                                      as c)) ->
+      let+ value = Typeck_terms.typeck_expr' value in
+      begin match disambiguate_object_vs_bool_expr ~&value with
+        | CondObject -> Ok (SelValue { negated = true; value }) &@<- obj
+        | CondBoolExpr -> Ok (SelCond (Not (Ok (Expr value) &@<- c))) &@<- obj
+        | CondResolveError -> Error () &@<- obj
+      end
   | SubjectValue subject, SelCond c ->
-      let xc, _ =
-        expand_abbrev_cond env (c &@<- obj)
+      let+ xc, _ =
+        expand_abbrev_cond (c &@<- obj)
           {
             subject = Some subject;
             relop = Some (Eq &@<- subj);
@@ -248,46 +238,49 @@ let expand_selection_object env subj (obj: selection_object with_loc) =
             changed_in_parens = Nothing
           }
       in
-      map_some_result ~f:(fun x -> SelCond ~&x &@<- x) xc
-  | SubjectValue _, SelRange r ->
-      some_result (SelRange r &@<- obj)
+      Result.map (fun x -> SelCond x) ~&xc &@<- xc
+  | SubjectValue _, SelRange { sel_range_negated; sel_range_start;
+                               sel_range_stop; sel_range_alphabet } ->
+      let+ sel_range_start = Typeck_terms.typeck_expr' sel_range_start
+      and+ sel_range_stop = Typeck_terms.typeck_expr' sel_range_stop in
+      Ok (SelRange { sel_range_negated; sel_range_start;
+                     sel_range_stop; sel_range_alphabet }) &@<- obj
   | _, SelRange _ ->
-      no_result ~diags:[Condition_error (SelRangeWithoutSubjectValue ~@obj)]
+      return ~diags:[Condition_error (SelRangeWithoutSubjectValue ~@obj)]
+        (Error () &@<- obj)
 
 
 (* --- *)
 
-let check_procedure ~env ~(diags: Typeck_diagnostics.t) procedure =
-  let visitor = object
-    inherit [Typeck_diagnostics.t] Cobol_unit.Visitor.folder
+let expand_selection_subjects subjects
+  : selection_subject or_error with_loc list Typeck_procedure_monad.t =
+  map_list expand_selection_subject subjects
 
-    method! fold_condition' c diags =
-      let c = expand_condition env c in
-      Visitor.skip_children @@ Typeck_diagnostics.union diags (forget_result c)
-
-    method! fold_evaluate' eval_stmt diags =
-      let diags, expanded_subjects = List.fold_left_map (fun diags s ->
-          let subj = expand_selection_subject env s in
-          Typeck_diagnostics.union diags subj.diags, subj.result
-        ) diags ~&eval_stmt.eval_subjects
-      in
-      let diags = List.fold_left (fun diags branch ->
-          List.fold_left (fun diags obj_list ->
-              try
-                List.fold_left2 (fun diags subj_opt obj ->
-                    match subj_opt with
-                    | Some subj ->
-                        Typeck_diagnostics.union diags (forget_result (expand_selection_object env subj obj))
-                    | None -> diags (* Do not add object error if the subject is already invalid *)
-                  ) diags expanded_subjects obj_list
-              with
-              | Invalid_argument _ ->
-                  Typeck_diagnostics.union diags [Condition_error (MismatchingSelectionLength {
-                      nb_sel_subjects = List.length expanded_subjects; sel_object_list = obj_list })]
-            ) diags branch.eval_selection
-        ) diags ~&eval_stmt.eval_branches
-      in
-      Visitor.skip_children @@ diags
-  end in
-
-  Cobol_unit.Visitor.fold_procedure visitor procedure diags
+(** Expands one list of selection objects of a WHEN clause, given the expanded
+    EVALUATE subjects.  Objects are ill-typed when their subject is ill-typed
+    (without any further error), or when there is no corresponding subject. *)
+let expand_selection_objects subjects obj_list
+  : selection_object or_error with_loc list Typeck_procedure_monad.t =
+  let rec expand_objects subjects obj_list =
+    match subjects, obj_list with
+    | { payload = Ok subj; loc } :: subjects, obj :: obj_list ->
+        let+ obj = expand_selection_object (subj &@ loc) obj
+        and+ obj_list = expand_objects subjects obj_list in
+        obj :: obj_list
+    | { payload = Error (); _ } :: subjects, obj :: obj_list ->
+        let+ obj_list = expand_objects subjects obj_list in
+        (Error () &@<- obj) :: obj_list
+    | [], obj_list ->
+        return (List.map (fun obj -> Error () &@<- obj) obj_list)
+    | _, [] ->
+        return []
+  in
+  let+ () =
+    if List.compare_lengths subjects obj_list <> 0 then
+      report @@ Condition_error
+        (MismatchingSelectionLength { nb_sel_subjects = List.length subjects;
+                                      sel_object_list = obj_list })
+    else
+      return ()
+  and+ obj_list = expand_objects subjects obj_list in
+  obj_list

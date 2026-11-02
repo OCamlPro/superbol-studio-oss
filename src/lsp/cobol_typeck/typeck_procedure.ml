@@ -13,6 +13,7 @@
 
 open Typeck_outputs                                     (* for references_acc *)
 open Typeck_procedure_diagnostics
+open Cobol_procedure.Types
 open Cobol_unit.Types
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
@@ -26,9 +27,7 @@ type output =
     references: Typeck_outputs.references_in_unit;
   }
 
-let baseloc_of_qualname: Cobol_ptree.qualname -> srcloc = function
-  | Name name
-  | Qual (name, _) -> ~@name
+let baseloc_of_qualname = Typeck_references.baseloc_of_qualname
 
 let error acc err =
   { acc with diags = Proc_error err :: acc.diags }
@@ -45,30 +44,21 @@ let resolve_procedure_args ~data_definitions ~refs pa =
   let error acc err = { acc with refs = error acc.refs err } in
 
   let resolve_arg_name_ref ~arg_name ~arg_passing_style acc =
-    let register_linkage_record ~arg_data_definition acc =
-      match Cobol_data.Item.def_storage arg_data_definition.resolved with
-      | Linkage ->
-          { acc with
-            rev_args = ({ arg_data_definition;
-                          arg_passing_style } &@<- arg_name) :: acc.rev_args }
-      | actual_storage ->
-          error acc @@ Invalid_proc_arg_storage { arg_name; actual_storage }
+    let arg_name_ref, refs =
+      Typeck_references.resolve_record_name arg_name acc.refs
+        ~data_definitions
     in
-    match
-      (* CHECKME: may need to only lookup among records (maybe also only in
-         LINKAGE), not among every data def. *)
-      let arg_data_definition, refs =
-        Typeck_references.resolve_record_name arg_name acc.refs
-          ~data_definitions
-      in
-      { acc with refs }, arg_data_definition
-    with
-    | acc, Error () ->
-        acc                                                   (* skip arg def *)
-    | acc, Ok arg_data_definition ->
-        register_linkage_record ~arg_data_definition acc
-    | exception Not_found ->
-        error acc @@ Procedure_arg_record_not_found { arg_name }
+    let arg = { arg_name_ref; arg_passing_style } &@<- arg_name in
+    let acc = { rev_args = arg :: acc.rev_args; refs } in
+    match arg_name_ref.resolved with
+    | Error () -> acc (* Name resolution errors are already reported *)
+    | Ok arg_record ->
+        match arg_record.record_storage with
+        | Linkage -> acc
+        | actual_storage ->
+            (* LATER: Check dialect here since non-storage procedure arguments
+               are valid in MF dialect and correspond to a callee-side copy. *)
+            error acc @@ Invalid_proc_arg_storage { arg_name; actual_storage }
   in
 
   Cobol_ptree.Visitor.fold_procedure_using_phrase object
@@ -95,118 +85,131 @@ let procedure_of_compilation_unit ~data_definitions ~refs cu' =
     type acc =
       {
         blocks: procedure_block Resolver_map.t;
-        block_list: procedure_block list;
+        section_list: section with_loc list;
         current_section: section_under_construction with_loc option;
-        args: Cobol_ptree.procedure_using_phrase with_loc option;
+        procedure_using: procedure_using with_loc option;
+        refs: references_acc;
       }
     and section_under_construction =
       {
-        sec_name: Cobol_ptree.procedure_name with_loc;
-        sec_paragraphs: procedure_paragraph with_loc list;
+        sec_name: Cobol_ptree.name with_loc option;
+        sec_segment: Cobol_data.Types.integer_value option;
+        sec_paragraphs: paragraph with_loc list;
       }
 
     let init =
       {
         blocks = Resolver_map.empty;
-        block_list = [];
+        section_list = [];
         current_section = None;
-        args = None;
+        procedure_using = None;
+        refs;
       }
-
-    let procedure_blocks acc =
-      {
-        named = acc.blocks;
-        list = List.rev acc.block_list;
-      }
-
-    let procedure_using acc =
-      match acc.args with
-      | None ->
-          None, refs
-      | Some args ->
-          resolve_procedure_args ~data_definitions ~refs args
 
     let procedure acc =
-      let procedure_using, references = procedure_using acc in
       {
-        procedure_blocks = procedure_blocks acc;
-        procedure_using;
+        procedure_blocks = acc.blocks;
+        procedure_sections = List.rev acc.section_list;
+        procedure_using = acc.procedure_using;
       },
-      references
+      acc.refs
 
     let name n : Cobol_ptree.qualname = Name n
     let qual n q : Cobol_ptree.qualname = Qual (n, q)
 
-    let section_block
+    let finish_section
         ({ payload = suc; loc }: section_under_construction with_loc) =
       let section_paragraphs =
-        List.fold_left begin fun ({ named; list } as paragraphs) paragraph ->
-          match ~&paragraph.paragraph_name with
-          | None ->
-              { paragraphs with list = paragraph :: list }
-          | Some qn ->
-              { named = Resolver_map.add ~&qn paragraph named;
-                list = paragraph :: list }
-        end { named = Resolver_map.empty; list = [] } suc.sec_paragraphs
+        (* The section is completely empty: add an empty paragraph to ensure
+           that each section has at least one paragraph *)
+        if suc.sec_paragraphs = [] then
+          let empty_paragraph : paragraph = {
+            paragraph_name = None;
+            paragraph_sentences = [] }
+          in
+          { named = Resolver_map.empty;
+            list = [empty_paragraph &@ loc] }
+        else
+          List.fold_left (fun ({ named; list } as paragraphs) paragraph ->
+              match ~&paragraph.paragraph_name with
+              | None ->
+                  { paragraphs with list = paragraph :: list }
+              | Some qn ->
+                  { named = Resolver_map.add ~&qn paragraph named;
+                    list = paragraph :: list }
+            ) { named = Resolver_map.empty; list = [] } suc.sec_paragraphs
       in
-      Section ({ section_name = suc.sec_name; section_paragraphs } &@ loc)
-
-    let simple_paragraph (p: Cobol_ptree.paragraph with_loc) acc =
-      match acc.current_section, ~&p.paragraph_name with
-      | None, Some n ->
-          { paragraph_name = Some (name n &@<- n);
-            paragraph = p } &@<- p
-      | Some { payload = { sec_name = qn; _ }; _ }, Some n ->
-          { paragraph_name = Some (qual n ~&qn &@<- n);
-            paragraph = p } &@<- p
-      | _, None ->
-          { paragraph_name = None;
-            paragraph = p } &@<- p
-
-    let paragraph_block p =
-      Paragraph p
+      { section_name = suc.sec_name;
+        section_segment = suc.sec_segment;
+        section_paragraphs } &@ loc
 
     let commit_section acc =
       match acc.current_section with
-      | Some ({ payload = { sec_name = qn; _ }; _ } as section) ->
-          let section = section_block section in
+      | Some ({ payload = { sec_name; _ }; _ } as section) ->
+          let section = finish_section section in
+          let blocks = match sec_name with
+            | Some sec_name -> Resolver_map.add (name sec_name) (Section section) acc.blocks
+            | None -> acc.blocks
+          in
           { acc with
-            blocks = Resolver_map.add ~&qn section acc.blocks;
-            block_list = section :: acc.block_list;
+            blocks;
+            section_list = section :: acc.section_list;
             current_section = None }
       | None ->
           acc
 
-    let start_new_section n s acc =
-      let acc = commit_section acc in
-      let sec_paragraphs = [simple_paragraph s acc] in
-      { acc with
-        current_section = Some ({ sec_name = name n &@<- n;
-                                  sec_paragraphs } &@<- s) }
+    let typeck_paragraph ~paragraph_name (p: Cobol_ptree.paragraph) acc =
+      let paragraph_sentences, refs =
+        Typeck_statements.typeck_sentences p.paragraph_sentences
+          Typeck_procedure_monad.{ data_definitions } acc.refs
+      in
+      let acc = { acc with refs } in
+      { paragraph_name; paragraph_sentences }, acc
 
-    let named_paragraph n p acc =
-      let p = simple_paragraph p acc in
-      let qn, block_list, current_section =
-        match acc.current_section with
-        | None ->
-            name n,
-            paragraph_block p :: acc.block_list,
-            None
-        | Some s ->
-            let loc = Cobol_common.Srcloc.concat ~@s ~@p in
-            let sec_paragraphs = p :: ~&s.sec_paragraphs in
-            qual n ~&(~&s.sec_name),
-            acc.block_list,
-            Some ({ ~&s with sec_paragraphs } &@ loc)
+    let start_new_section (p: Cobol_ptree.paragraph with_loc) acc =
+      let n = ~&p.paragraph_name in
+      let acc = commit_section acc in
+      let sec_segment, refs =
+        Typeck_procedure_monad.map_option
+          (Typeck_terms.typeck_integer ~loc:~@p) ~&p.paragraph_segment
+          Typeck_procedure_monad.{ data_definitions } acc.refs
+      in
+      let acc = { acc with refs } in
+      let sec_paragraphs, acc =
+        (* Avoid adding an empty section header paragraph if unneeded, and
+           remove section name from the location of the unnamed paragraph at
+           the begining of section. *)
+        if ~&p.paragraph_sentences = [] then
+          [], acc
+        else
+          let header_paragraph, acc = typeck_paragraph ~paragraph_name:None ~&p acc in
+          let loc = Option.get (Cobol_common.Srcloc.concat_locs ~&p.paragraph_sentences) in
+          [header_paragraph &@ loc], acc
       in
       { acc with
-        blocks = Resolver_map.add qn (paragraph_block p) acc.blocks;
-        block_list;
-        current_section }
+        current_section = Some ({ sec_name = n;
+                                  sec_segment;
+                                  sec_paragraphs } &@<- p) }
 
-    let anonymous_paragraph p acc =         (* only at beginning of procedure *)
+    let add_paragraph_in_current_section (p: Cobol_ptree.paragraph with_loc) acc =
+      let s, loc = match acc.current_section with
+        | None -> { sec_name = None; sec_segment = None; sec_paragraphs = [] }, ~@p
+        | Some s -> ~&s, Cobol_common.Srcloc.concat ~@s ~@p
+      in
+      let paragraph_name = match ~&p.paragraph_name, s.sec_name with
+        | None, _ -> None (* For first paragraph of PROCEDURE DIVISION *)
+        | Some n, None -> Some (name n &@<- n)
+        | Some n, Some sn -> Some (qual n (name sn) &@<- n)
+      in
+      let typed_paragraph, acc = typeck_paragraph ~paragraph_name ~&p acc in
+      let p = typed_paragraph &@<- p in
+      let blocks = match paragraph_name with
+        | None -> acc.blocks
+        | Some qn -> Resolver_map.add ~&qn (Paragraph p) acc.blocks
+      in
       { acc with
-        block_list = paragraph_block (simple_paragraph p acc) :: acc.block_list }
+        blocks;
+        current_section = Some ({ s with sec_paragraphs = p :: s.sec_paragraphs } &@ loc) }
 
   end in
 
@@ -222,14 +225,17 @@ let procedure_of_compilation_unit ~data_definitions ~refs cu' =
         commit_section                  (* be sure to handle the last section *)
 
     method! fold_procedure_using_phrase' args acc =
-      Visitor.skip_children { acc with args = Some args }
+      let procedure_using, refs =
+        resolve_procedure_args ~data_definitions ~refs:acc.refs args
+      in
+      Visitor.skip_children { acc with procedure_using; refs }
 
     method! fold_paragraph' p acc =
-      Visitor.skip_children @@ match ~&p with
-      | { paragraph_is_section = true;
-          paragraph_name = Some name; _ } -> start_new_section name p acc
-      | { paragraph_name = Some name; _ } -> named_paragraph name p acc
-      | { paragraph_name = None; _ }      -> anonymous_paragraph p acc
+      Visitor.skip_children @@
+      if ~&p.paragraph_is_section then
+        start_new_section p acc
+      else
+        add_paragraph_in_current_section p acc
 
     method! fold_nested_programs _  = Visitor.skip                    (* TODO *)
   end in
@@ -248,24 +254,19 @@ let collect_references
   let visitor = object (v)
     inherit [references_acc] Cobol_unit.Visitor.folder
 
-    method! fold_qualname qn acc =                (* TODO: data_name' instead *)
-      Visitor.do_children @@
-      Typeck_references.register_data_qualname
-        ~data_definitions
-        (qn &@ baseloc_of_qualname qn) acc
-
-    method! fold_procedure_section ({ section_paragraphs; _ } as s)
+    method! fold_section ({ section_paragraphs; _ } as s)
         ({ current_section; _ } as acc) =
       let acc =
         Visitor.fold_list v section_paragraphs.list
-          ~fold:Cobol_unit.Visitor.fold_procedure_paragraph'
+          ~fold:Cobol_unit.Visitor.fold_paragraph'
           { acc with current_section = Some s }
       in
       Visitor.skip { acc with current_section }
 
-    method! fold_procedure_paragraph { paragraph; _ } acc =
+    method! fold_paragraph { paragraph_sentences; _ } acc =
       Visitor.skip @@
-      Cobol_ptree.Proc_division_visitor.fold_paragraph' v paragraph acc
+      Visitor.fold_list v paragraph_sentences
+        ~fold:Cobol_procedure.Visitor.fold_statements' acc
 
     method! fold_procedure_name' qn
         ({ current_section = enclosing_section; _ } as acc) =
@@ -306,11 +307,5 @@ let of_compilation_unit ~data_definitions ~fold_exec_block' cu' =
   in
   let { refs = references; diags; _ } =
     collect_references ~data_definitions ~fold_exec_block' ~refs procedure
-  in
-  (* LATER: It would be great to store those expanded conditions. 
-    But we do not recreate a full typed tree for now.*)
-  let diags =
-    Typeck_condition.check_procedure 
-      ~env:(data_definitions.data_items.named) ~diags procedure
   in
   { procedure; references }, diags

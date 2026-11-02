@@ -28,11 +28,11 @@ type alphabet_specification =                      (* At least one is required *
 let pp_character_classification pp ppf (alphanumeric, national) =
   match alphanumeric, national with
   | Some a, Some n ->
-    Fmt.pf ppf "FOR ALPHANUMERIC %a@ FOR NATIONAL %a" pp a pp n
+      Fmt.pf ppf "FOR ALPHANUMERIC %a@ FOR NATIONAL %a" pp a pp n
   | Some a, None ->
-    Fmt.pf ppf "FOR ALPHANUMERIC %a" pp a
+      Fmt.pf ppf "FOR ALPHANUMERIC %a" pp a
   | None, Some n ->
-    Fmt.pf ppf "FOR NATIONAL %a" pp n
+      Fmt.pf ppf "FOR NATIONAL %a" pp n
   | None, None -> (* Type invariant *) assert false
 
 let pp_alphabet_specification ppf { alphanumeric; national } =
@@ -79,7 +79,7 @@ let pp_position ppf = function
   | LinePosition i -> Fmt.pf ppf "LINE %a" pp_ident_or_intlit i
   | ColumnPosition i -> Fmt.pf ppf "COL %a" pp_ident_or_intlit i
   | LineColumnPosition (l, c) ->
-    Fmt.pf ppf "LINE %a@ COL %a" pp_ident_or_intlit l pp_ident_or_intlit c
+      Fmt.pf ppf "LINE %a@ COL %a" pp_ident_or_intlit l pp_ident_or_intlit c
   | CompoundPosition i -> Fmt.pf ppf "%a" pp_ident_or_intlit i
 
 (* CALL, INVOKE *)
@@ -163,7 +163,7 @@ let pp_modifier_opt modifier pp =
   Fmt.(option (sp ++ const string modifier ++ const string " " ++ pp))
 
 let pp_mcs_command_operands
-  ppf { mcs_command_kind = k; mcs_command_target = t; mcs_command_key = key } =
+    ppf { mcs_command_kind = k; mcs_command_target = t; mcs_command_key = key } =
   Fmt.pf ppf "%a@ %a%a"
     pp_mcs_kind k
     (pp_with_loc pp_name) t
@@ -182,12 +182,12 @@ let pp_stage ppf = function
 
 (* REWRITE, WRITE *)
 type write_target =
-  | WriteTargetName of qualname
+  | WriteTargetName of qualname with_loc
   | WriteTargetFile of name with_loc
 [@@deriving ord]
 
 let pp_write_target ppf = function
-  | WriteTargetName n -> pp_qualname ppf n
+  | WriteTargetName n -> pp_qualname' ppf n
   | WriteTargetFile n -> Fmt.pf ppf "FILE@ %a" (pp_with_loc pp_name) n
 
 
@@ -230,7 +230,7 @@ type basic_arithmetic_operands =
   | ArithCorresponding of (* ADD/SUBTRACT CORRESPONDING <source> TO/FROM
                              <target> *)
       {
-        source: qualname;
+        source: qualname with_loc;
         target: rounded_ident;
       }
 [@@deriving ord]
@@ -257,7 +257,7 @@ let pp_basic_arithmetic_operands ?sep ppf bao =
         ppf ((leading_operands, base_operand), pp_giving targets)
   | ArithCorresponding { source; target } ->
       pp_arithmetic_operands ~modifier:"CORRESPONDING" ?sep
-        pp_qualname pp_rounded_ident
+        pp_qualname' pp_rounded_ident
         ppf ((source, target), [])
 
 
@@ -294,14 +294,14 @@ let pp_remainder_opt = function
 
 let pp_divide_operands ppf = function
   | DivideInto { divisor; dividends } ->
-    pp_arithmetic_operands ~sep:"INTO" pp_scalar pp_rounded_idents
-      ppf ((divisor, dividends), [])
+      pp_arithmetic_operands ~sep:"INTO" pp_scalar pp_rounded_idents
+        ppf ((divisor, dividends), [])
   | DivideGiving { divisor; dividend; giving; into; remainder } ->
-    let pair = if into then divisor, dividend else dividend, divisor in
-    pp_arithmetic_operands ~sep:(if into then "INTO" else "BY")
-      pp_scalar pp_scalar
-      ppf (pair, LIST.append ~loc:__LOC__ (pp_giving giving)
-             (pp_remainder_opt remainder))
+      let pair = if into then divisor, dividend else dividend, divisor in
+      pp_arithmetic_operands ~sep:(if into then "INTO" else "BY")
+        pp_scalar pp_scalar
+        ppf (pair, LIST.append ~loc:__LOC__ (pp_giving giving)
+               (pp_remainder_opt remainder))
 
 
 (* EVALUATE *)
@@ -325,23 +325,25 @@ type selection_range =
   }
 [@@deriving ord]
 
-let pp_selection_range ppf 
+let pp_selection_range ppf
     { sel_range_negated; sel_range_start; sel_range_stop; sel_range_alphabet } =
   if sel_range_negated then Fmt.pf ppf "NOT@ ";
   Fmt.pf ppf "%a@ THROUGH@ %a%a"
     pp_expr' sel_range_start
     pp_expr' sel_range_stop
-    Fmt.(option (sp ++ const string "IN" ++ sp ++ pp_with_loc pp_name)) 
+    Fmt.(option (sp ++ const string "IN" ++ sp ++ pp_with_loc pp_name))
     sel_range_alphabet
 
 type selection_object =
-  | SelCond of condition (** Condition with a potentially omitted subject
+  | SelCond of condition
+  (** Condition with a potentially omitted subject
       interpreted as an abbreviated condition prepended by the corresponding subject in EVALUATE.
       May start with CondSubject to denote an independant condition.
       Typically used for clauses such as:
       - WHEN > 5 (matching subject should be an integer)
       - WHEN A > 3 (matching subject should be either TRUE or FALSE)
       - WHEN <= 3 OR A > 3 (matching subject should be an integer) *)
+
   | SelRange of selection_range
   | SelConst of bool
   | SelAny
@@ -372,13 +374,13 @@ type multiply_operands =
 
 let pp_multiply_operands ppf = function
   | MultiplyBy { multiplier; multiplicand = mc } ->
-    pp_arithmetic_operands ~sep:"BY"
-      pp_scalar pp_rounded_idents
-      ppf ((multiplier, mc), [])
+      pp_arithmetic_operands ~sep:"BY"
+        pp_scalar pp_rounded_idents
+        ppf ((multiplier, mc), [])
   | MultiplyGiving { multiplier = a; multiplicand = b; targets = c } ->
-    pp_arithmetic_operands ~sep:"BY"
-      pp_scalar pp_scalar
-      ppf ((a, b), pp_giving c)
+      pp_arithmetic_operands ~sep:"BY"
+        pp_scalar pp_scalar
+        ppf ((a, b), pp_giving c)
 
 
 (* OPEN *)
@@ -426,7 +428,7 @@ type raise_operand =
 let pp_raise_operand ppf = function
   | RaiseIdent i -> Fmt.pf ppf "RAISE@ %a" pp_ident i
   | RaiseException nwl ->
-    Fmt.pf ppf "RAISE@ EXCEPTION@ %a" (pp_with_loc pp_name) nwl
+      Fmt.pf ppf "RAISE@ EXCEPTION@ %a" (pp_with_loc pp_name) nwl
 
 
 (* EXIT & GOBACK *)
@@ -488,7 +490,7 @@ type search_condition =
 
 let pp_search_condition ppf = function
   | IsEqual { data_item = di; condition = c } ->
-    Fmt.pf ppf "%a@ EQUAL@ %a" pp_qualident di pp_expr' c
+      Fmt.pf ppf "%a@ EQUAL@ %a" pp_qualident di pp_expr' c
   | Cond qi -> pp_qualident ppf qi
 
 
@@ -508,10 +510,10 @@ type advancing_phrase =
 
 let pp_advancing_phrase ppf = function
   | AdvancingLines { stage; lines; ambiguous } ->
-    Fmt.pf ppf "%a@ ADVANCING@ %a" pp_stage stage pp_ident_or_intlit lines;
-    if not ambiguous then Fmt.pf ppf "@ LINES"
+      Fmt.pf ppf "%a@ ADVANCING@ %a" pp_stage stage pp_ident_or_intlit lines;
+      if not ambiguous then Fmt.pf ppf "@ LINES"
   | AdvancingPage { stage } ->
-    Fmt.pf ppf "%a@ ADVANCING@ PAGE" pp_stage stage
+      Fmt.pf ppf "%a@ ADVANCING@ PAGE" pp_stage stage
 
 
 (* SET *)
@@ -620,11 +622,11 @@ let pp_set_locale_source ppf = function
 
 let pp_float_content ppf = function
   | FarthestFromZero iar ->
-    Fmt.pf ppf "FARTHEST-FROM-ZERO";
-    if iar then Fmt.pf ppf "@ IN-ARITHMETIC-RANGE"
+      Fmt.pf ppf "FARTHEST-FROM-ZERO";
+      if iar then Fmt.pf ppf "@ IN-ARITHMETIC-RANGE"
   | NearestToZero iar ->
-    Fmt.pf ppf "NEAREST-TO-ZERO";
-    if iar then Fmt.pf ppf "@ IN-ARITHMETIC-RANGE"
+      Fmt.pf ppf "NEAREST-TO-ZERO";
+      if iar then Fmt.pf ppf "@ IN-ARITHMETIC-RANGE"
   | FloatInfinity -> Fmt.pf ppf "FLOAT-INFINITY"
   | FloatNotANumber -> Fmt.pf ppf "FLOAT-NOT-A-NUMBER"
   | FloatNotANumberSignaling -> Fmt.pf ppf "FLOAT-NOT-A-NUMBER-SIGNALING"
@@ -637,7 +639,7 @@ type start_position =
   | StartPositionKey of
       {
         operator: relop;
-        name: qualname;
+        name: qualname with_loc;
         length: expr with_loc option;
       }
   (* any relop except IS NOT EQUAL TO or IS NOT = *)
@@ -647,10 +649,10 @@ let pp_start_position ppf = function
   | StartPositionFirst -> Fmt.pf ppf "FIRST"
   | StartPositionLast -> Fmt.pf ppf "LAST"
   | StartPositionKey { operator = op; name = n; length = l } ->
-    Fmt.pf ppf "KEY@ %a@ %a%a"
-      pp_relop op
-      pp_qualname n
-      Fmt.(option (sp ++ const words "WITH LENGTH" ++ pp_expr')) l
+      Fmt.pf ppf "KEY@ %a@ %a%a"
+        pp_relop op
+        pp_qualname' n
+        Fmt.(option (sp ++ const words "WITH LENGTH" ++ pp_expr')) l
 
 
 (* STRING *)
@@ -698,24 +700,23 @@ type unstring_target =
 [@@deriving ord]
 
 let pp_unstring_target ppf
-  { unstring_target = i
-  ; unstring_target_delimiter = d
-  ; unstring_target_count = c }
-=
+    { unstring_target = i;
+      unstring_target_delimiter = d;
+      unstring_target_count = c } =
   Fmt.pf ppf "%a%a%a"
     pp_ident i
     Fmt.(option (sp ++ const string "DELIMITER" ++ sp ++ pp_ident)) d
     Fmt.(option (sp ++ const string "COUNT" ++ sp ++ pp_ident)) c
 
-(* --- generics --- *)
+(* --- procedure section/paragraph range --- *)
 
-type 'a procedure_range =
+type procedure_range =
   {
-    procedure_start: 'a;
-    procedure_end: 'a option;
+    procedure_start: procedure_name with_loc;
+    procedure_end: procedure_name with_loc option;
   }
 [@@deriving ord]
 
-let pp_procedure_range pp ppf { procedure_start; procedure_end } =
-  pp ppf procedure_start;
-  Fmt.(option (sp ++ const string "THROUGH" ++ sp ++ pp)) ppf procedure_end
+let pp_procedure_range ppf { procedure_start; procedure_end } =
+  pp_procedure_name' ppf procedure_start;
+  Fmt.(option (sp ++ const string "THROUGH" ++ sp ++ pp_procedure_name')) ppf procedure_end

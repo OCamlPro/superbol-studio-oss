@@ -46,7 +46,7 @@ let positions ~uri group artifacts =
       enter_context Procedure_division
     method! fold_data_definitions _ =
       enter_context Data_division
-    method! fold_paragraph' _ =
+    method! fold_statements' _ =
       Cobol_common.Visitor.skip
     method! fold_procedure_name' =
       take_when_in Procedure_division

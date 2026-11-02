@@ -111,8 +111,8 @@ let ranges_in ~filename ptree group =
       inherit [range list] Cobol_unit.Visitor.folder
       method! fold_unit_config _ = Visitor.skip
       method! fold_item_definition' = wide_region
-      method! fold_procedure_section' = wide_region
-      method! fold_procedure_paragraph' = wide_region
+      method! fold_section' = wide_region
+      method! fold_paragraph' = wide_region
       method! fold_statement' = wide_region
       method! fold_exec_block' = leaf_region        (* EXEC block in PROC DIV *)
     end group ptree_ranges

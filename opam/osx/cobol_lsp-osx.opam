@@ -59,6 +59,7 @@ depends: [
   "lsp-osx" {>= "1.18" & < "1.19"}
   "jsonrpc-osx" {>= "1.15"}
   "cobol_typeck-osx" {= version}
+  "cobol_procedure-osx" {= version}
   "cobol_parser-osx" {= version}
   "cobol_indent-osx" {= version}
   "cobol_data-osx" {= version}

@@ -250,7 +250,7 @@ let semtoks_from_ptree ~filename ?range ptree =
 
     (* data-level *)
     method! fold_data_level' _dl acc =
-        Visitor.skip_children acc                 (* left to textmate grammar *)
+      Visitor.skip_children acc                 (* left to textmate grammar *)
 
     (* paragraph name *)
     method! fold_paragraph { paragraph_name; paragraph_is_section;
@@ -449,7 +449,7 @@ let semtoks_from_ptree ~filename ?range ptree =
       |> add_option add_ident read_into VarModif
       |> fold_option ~fold:fold_read_lock_behavior self read_lock_behavior
       |> fold_option ~fold:fold_bool self read_lock
-      |> fold_option ~fold:fold_qualname self read_key
+      |> fold_option ~fold:fold_qualname' self read_key
       |> fold_option ~fold:fold_read_error_handler self read_error_handler
       |> Visitor.skip_children
 
@@ -473,7 +473,7 @@ let semtoks_from_ptree ~filename ?range ptree =
                                        search_varying;
                                        search_at_end;
                                        search_when_clauses }; _ } acc = acc
-      |> fold_qualname self search_item
+      |> fold_qualname' self search_item
       |> add_option add_ident search_varying VarModif
       |> fold_statements self search_at_end
       |> fold_list ~fold:fold_search_when_clause' self search_when_clauses

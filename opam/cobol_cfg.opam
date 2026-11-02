@@ -51,6 +51,7 @@ depends: [
   "dune" {>= "3.17.0"}
   "ocamlgraph" {>= "2.1.0" & < "3.0.0"}
   "cobol_typeck" {= version}
+  "cobol_procedure" {= version}
   "odoc" {with-doc}
   "dune" {>= "3.17.0" & < "3.19.0"}
 ]

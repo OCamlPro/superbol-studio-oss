@@ -20,3 +20,4 @@ include Typeck_engine
 (* Additional: *)
 module References = Typeck_references
 module Condition = Typeck_condition
+module Name = Typeck_name

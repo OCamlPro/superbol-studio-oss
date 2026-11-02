@@ -17,9 +17,9 @@ open Terms
 
 (* ----------------------------- DATA DIVISION ----------------------------- *)
 type format_clause =
- | Bit
- | Character
- | Numeric
+  | Bit
+  | Character
+  | Numeric
 [@@deriving ord]
 
 let pp_format_clause ppf = function
@@ -60,10 +60,10 @@ let pp_record_clause ppf = function
   | FixedLength n ->
       Fmt.pf ppf "RECORD %a" (pp_with_loc pp_integer) n
   | VariableLength { min_length; max_length; depending } ->
-    Fmt.pf ppf "RECORD VARYING%a%a%a"
-      Fmt.(option (any " " ++ pp_with_loc pp_integer)) min_length
-      Fmt.(option (any " TO " ++ pp_with_loc pp_integer)) max_length
-      Fmt.(option (any " " ++ pp_depending_phrase)) depending
+      Fmt.pf ppf "RECORD VARYING%a%a%a"
+        Fmt.(option (any " " ++ pp_with_loc pp_integer)) min_length
+        Fmt.(option (any " TO " ++ pp_with_loc pp_integer)) max_length
+        Fmt.(option (any " " ++ pp_depending_phrase)) depending
   | FixedOrVariableLength { min_length; max_length } ->
       Fmt.pf ppf "RECORD %a TO %a"
         (pp_with_loc pp_integer) min_length
@@ -110,9 +110,9 @@ type file_linage_clause =                                  (* file descr only *)
 [@@deriving ord]
 
 let pp_file_linage_clause ppf
-  { file_linage_lines = fll; file_linage_with_footing_at = wfa;
-    file_linage_lines_at_top = top; file_linage_lines_at_bottom = bot }
-=
+    { file_linage_lines = fll; file_linage_with_footing_at = wfa;
+      file_linage_lines_at_top = top; file_linage_lines_at_bottom = bot }
+  =
   Fmt.pf ppf "LINAGE %a LINES" pp_qualname_or_intlit fll;
   Fmt.(option (any "@ FOOTING " ++ pp_qualname_or_intlit)) ppf wfa;
   Fmt.(option (any "@ TOP " ++ pp_qualname_or_intlit)) ppf top;
@@ -131,8 +131,8 @@ type condition_name_value =
 [@@deriving ord]
 
 let pp_condition_name_value ppf
-  { condition_name_value = cnv; condition_name_through = cnt }
-=
+    { condition_name_value = cnv; condition_name_through = cnt }
+  =
   match cnt with
   | Some cnt -> Fmt.pf ppf "%a THROUGH %a" pp_literal' cnv pp_literal' cnt
   | None -> pp_literal' ppf cnv
@@ -232,7 +232,7 @@ type data_occurs_clause =
 and sort_spec =
   {
     sort_key_direction: sort_direction;
-    sort_key_names: qualname list;
+    sort_key_names: qualname with_loc list;
   }
 
 and sort_direction =
@@ -245,7 +245,7 @@ let pp_sort_direction ppf = function
 
 let pp_sort_spec ppf { sort_key_direction = skd; sort_key_names = skns } =
   Fmt.pf ppf "%a %a" pp_sort_direction skd
-    Fmt.(list ~sep:(any " ") pp_qualname) skns
+    Fmt.(list ~sep:(any " ") pp_qualname') skns
 
 let pp_indexed_by = Fmt.(any "INDEXED " ++ list ~sep:(any " ") pp_name')
 
@@ -257,26 +257,26 @@ let pp_integer' = pp_with_loc pp_integer
 
 let pp_data_occurs_clause ppf = function
   | OccursFixed { times; count_in; key_is; indexed_by } ->
-    Fmt.pf ppf "OCCURS %a%a%a%a"
-      pp_integer' times
-      Fmt.(option (any " COUNT IN " ++ pp_qualname')) count_in
-      Fmt.(list ~sep:nop (sp ++ pp_sort_spec)) key_is
-      pp_indexed_by_opt indexed_by
+      Fmt.pf ppf "OCCURS %a%a%a%a"
+        pp_integer' times
+        Fmt.(option (any " COUNT IN " ++ pp_qualname')) count_in
+        Fmt.(list ~sep:nop (sp ++ pp_sort_spec)) key_is
+        pp_indexed_by_opt indexed_by
   | OccursDepending { from; to_; depending; key_is; indexed_by } ->
-    Fmt.pf ppf "OCCURS %a%a %a%a%a"
-      Fmt.(option (pp_integer' ++ any " TO ")) from
-      pp_integer' to_
-      pp_depending_phrase depending
-      Fmt.(list ~sep:nop (sp ++ pp_sort_spec)) key_is
-      pp_indexed_by_opt indexed_by
+      Fmt.pf ppf "OCCURS %a%a %a%a%a"
+        Fmt.(option (pp_integer' ++ any " TO ")) from
+        pp_integer' to_
+        pp_depending_phrase depending
+        Fmt.(list ~sep:nop (sp ++ pp_sort_spec)) key_is
+        pp_indexed_by_opt indexed_by
   | OccursDynamic { capacity_in; from; to_; initialized; key_is; indexed_by } ->
-    Fmt.pf ppf "OCCURS DYNAMIC%a%a%a%a%a%a"
-      Fmt.(option (any " CAPACITY " ++ pp_name')) capacity_in
-      Fmt.(option (any " FROM " ++ pp_integer')) from
-      Fmt.(option (any " TO " ++ pp_integer')) to_
-      Fmt.(if initialized.payload then any " INITIALIZED" else nop) ()
-      Fmt.(list ~sep:nop (sp ++ pp_sort_spec)) key_is
-      pp_indexed_by_opt indexed_by
+      Fmt.pf ppf "OCCURS DYNAMIC%a%a%a%a%a%a"
+        Fmt.(option (any " CAPACITY " ++ pp_name')) capacity_in
+        Fmt.(option (any " FROM " ++ pp_integer')) from
+        Fmt.(option (any " TO " ++ pp_integer')) to_
+        Fmt.(if initialized.payload then any " INITIALIZED" else nop) ()
+        Fmt.(list ~sep:nop (sp ++ pp_sort_spec)) key_is
+        pp_indexed_by_opt indexed_by
 
 type data_varying =
   {
@@ -287,8 +287,8 @@ type data_varying =
 [@@deriving ord]
 
 let pp_data_varying ppf
-  { data_varying = v; data_varying_from = f; data_varying_by = b}
-=
+    { data_varying = v; data_varying_from = f; data_varying_by = b}
+  =
   Fmt.pf ppf "%a%a%a"
     pp_name' v
     Fmt.(option (any "@ FROM " ++ pp_expr')) f
@@ -341,46 +341,46 @@ let pp_property_clause ppf { property_with_no; property_is_final } =
   if property_is_final then Fmt.pf ppf "@ FINAL"
 
 type usage_clause =
- | Binary
- | BinaryChar of signedness option                                (* +COB2002 *)
- | BinaryShort of signedness option                               (* +COB2002 *)
- | BinaryLong of signedness option                                (* +COB2002 *)
- | BinaryDouble of signedness option                              (* +COB2002 *)
- | Bit                                                            (* +COB2002 *)
- | Display
- | FloatBinary32 of endianness_mode option                        (* +COB2002 *)
- | FloatBinary64 of endianness_mode option                        (* +COB2002 *)
- | FloatBinary128 of endianness_mode option                       (* +COB2002 *)
- | FloatDecimal16 of encoding_endianness                          (* +COB2002 *)
- | FloatDecimal34 of encoding_endianness                          (* +COB2002 *)
- | FloatExtended                                                  (* +COB2002 *)
- | FloatLong                                                      (* +COB2002 *)
- | FloatShort                                                     (* +COB2002 *)
- | Index
- | National                                                       (* +COB2002 *)
- | ObjectReference of object_reference_kind option                (* +COB2002 *)
- | PackedDecimal
- | Pointer of name with_loc option                                (* +COB2002 *)
- | ProcedurePointer                                               (* MF *)
- | FunctionPointer of name with_loc                               (* +COB2002 *)
- | ProgramPointer of name with_loc option                         (* +COB2002 *)
- | UsagePending of [`Comp0 | `Comp1 | `Comp2 | `Comp3 | `Comp5 | `Comp6 |
-                    `CompX | `CompN | `Comp9 | `Comp10 | `Comp15 |
-                    `BinaryCLong of signedness option]
- | Type of name with_loc                                          (* MF *)
+  | Binary
+  | BinaryChar of signedness option                                (* +COB2002 *)
+  | BinaryShort of signedness option                               (* +COB2002 *)
+  | BinaryLong of signedness option                                (* +COB2002 *)
+  | BinaryDouble of signedness option                              (* +COB2002 *)
+  | Bit                                                            (* +COB2002 *)
+  | Display
+  | FloatBinary32 of endianness_mode option                        (* +COB2002 *)
+  | FloatBinary64 of endianness_mode option                        (* +COB2002 *)
+  | FloatBinary128 of endianness_mode option                       (* +COB2002 *)
+  | FloatDecimal16 of encoding_endianness                          (* +COB2002 *)
+  | FloatDecimal34 of encoding_endianness                          (* +COB2002 *)
+  | FloatExtended                                                  (* +COB2002 *)
+  | FloatLong                                                      (* +COB2002 *)
+  | FloatShort                                                     (* +COB2002 *)
+  | Index
+  | National                                                       (* +COB2002 *)
+  | ObjectReference of object_reference_kind option                (* +COB2002 *)
+  | PackedDecimal
+  | Pointer of name with_loc option                                (* +COB2002 *)
+  | ProcedurePointer                                               (* MF *)
+  | FunctionPointer of name with_loc                               (* +COB2002 *)
+  | ProgramPointer of name with_loc option                         (* +COB2002 *)
+  | UsagePending of [`Comp0 | `Comp1 | `Comp2 | `Comp3 | `Comp5 | `Comp6 |
+                     `CompX | `CompN | `Comp9 | `Comp10 | `Comp15 |
+                     `BinaryCLong of signedness option]
+  | Type of name with_loc                                          (* MF *)
 [@@deriving ord]
 
 and signedness =
- | Signed
- | Unsigned
+  | Signed
+  | Unsigned
 
 and endianness_mode =
- | HighOrderLeft
- | HighOrderRight
+  | HighOrderLeft
+  | HighOrderRight
 
 and encoding_mode =
- | BinaryEncoding
- | DecimalEncoding
+  | BinaryEncoding
+  | DecimalEncoding
 
 and encoding_endianness =
   {
@@ -418,16 +418,16 @@ let pp_encoding_endianness ppf { encoding_mode; endianness_mode } =
   | Some em, None -> pp_encoding_mode ppf em
   | None, Some ee -> pp_endianness_mode ppf ee
   | Some em, Some ee ->
-    Fmt.pf ppf "%a@ %a" pp_encoding_mode em pp_endianness_mode ee
+      Fmt.pf ppf "%a@ %a" pp_encoding_mode em pp_endianness_mode ee
 
 let pp_object_reference_kind ppf = function
   | ActiveClass { factory_of } ->
-    if factory_of then Fmt.pf ppf "FACTORY OF ";
-    Fmt.pf ppf "ACTIVE-CLASS"
+      if factory_of then Fmt.pf ppf "FACTORY OF ";
+      Fmt.pf ppf "ACTIVE-CLASS"
   | NamedClass { class_or_interface_name = n; factory_of; only } ->
-    if factory_of then Fmt.pf ppf "FACTORY OF ";
-    pp_name' ppf n;
-    if only then Fmt.pf ppf " ONLY"
+      if factory_of then Fmt.pf ppf "FACTORY OF ";
+      pp_name' ppf n;
+      if only then Fmt.pf ppf " ONLY"
 
 let pp_usage_clause ppf = function
   | Binary -> Fmt.pf ppf "BINARY"
@@ -509,12 +509,12 @@ type validation_clause =
 [@@deriving ord]
 
 and class_clause =
- | Alphabetic
- | AlphabeticLower
- | AlphabeticUpper
- | Boolean
- | Numeric
- | ClassOrAlphabet of name with_loc
+  | Alphabetic
+  | AlphabeticLower
+  | AlphabeticUpper
+  | Boolean
+  | Numeric
+  | ClassOrAlphabet of name with_loc
 
 and validate_when =
   | ValidateWhenError
@@ -562,13 +562,13 @@ let pp_validation_clause ppf = function
   | PresentWhen c -> pp_present_when_clause ppf c
   | Varying dvs -> pp_varying_clause ppf dvs
   | ValidateStatus { is_; when_; on; for_ } ->
-    Fmt.pf ppf "VALIDATE-STATUS %a %a%a FOR %a"
-      pp_ident_or_literal is_
-      pp_validate_when when_
-      Fmt.(
-        if on == [] then nop else list ~sep:nop (sp ++ pp_validation_stage)
-      ) on
-      Fmt.(list ~sep:sp pp_ident) for_
+      Fmt.pf ppf "VALIDATE-STATUS %a %a%a FOR %a"
+        pp_ident_or_literal is_
+        pp_validate_when when_
+        Fmt.(
+          if on == [] then nop else list ~sep:nop (sp ++ pp_validation_stage)
+        ) on
+        Fmt.(list ~sep:sp pp_ident) for_
 
 type data_value_clause =
   | ValueData of literal with_loc
@@ -623,14 +623,14 @@ let pp_report_type_clause ppf = function
   | PageHeading -> Fmt.pf ppf "TYPE PH"
   | PageFooting -> Fmt.pf ppf "TYPE PF"
   | ControlHeading o ->
-    Fmt.pf ppf "TYPE CH%a"
-      Fmt.(option (
-        any " FOR " ++ using fst pp_report_data_name_or_final ++
-        using snd (fun ppf b -> if b then Fmt.pf ppf " OR PAGE" else ())
-      )) o
+      Fmt.pf ppf "TYPE CH%a"
+        Fmt.(option (
+            any " FOR " ++ using fst pp_report_data_name_or_final ++
+            using snd (fun ppf b -> if b then Fmt.pf ppf " OR PAGE" else ())
+          )) o
   | ControlFooting o ->
-    Fmt.pf ppf "TYPE CF%a"
-    Fmt.(option (any " FOR " ++ pp_report_data_name_or_final)) o
+      Fmt.pf ppf "TYPE CF%a"
+        Fmt.(option (any " FOR " ++ pp_report_data_name_or_final)) o
 
 type next_group_clause =
   | ReportNextAbsolute of integer
@@ -642,8 +642,8 @@ let pp_next_group_clause ppf = function
   | ReportNextAbsolute i -> Fmt.pf ppf "NEXT GROUP IS %a" pp_integer i
   | ReportNextRelative i -> Fmt.pf ppf "NEXT GROUP IS PLUS %a" pp_integer i
   | ReportNextNextPage wr ->
-    Fmt.pf ppf "NEXT GROUP IS NEXT PAGE";
-    if wr then Fmt.pf ppf " WITH RESET"
+      Fmt.pf ppf "NEXT GROUP IS NEXT PAGE";
+      if wr then Fmt.pf ppf " WITH RESET"
 
 type column_position =
   | ColumnAbsolute of integer
@@ -747,7 +747,7 @@ type screen_line_column_clause =
 let pp_screen_line_column_clause ppf = function
   | Absolute ii -> pp_ident_or_intlit ppf ii
   | Relative (pm, ii) ->
-    pp_polarity ppf pm; pp_ident_or_intlit ppf ii
+      pp_polarity ppf pm; pp_ident_or_intlit ppf ii
 
 type source_destination_clause =
   | From of ident_or_literal
@@ -805,18 +805,18 @@ let pp_report_clause ppf = function
   | Global -> Fmt.pf ppf "GLOBAL"
   | Code i -> Fmt.pf ppf "CODE %a" pp_ident i
   | Control { final; controls } ->
-    Fmt.pf ppf "CONTROL ";
-    if final then Fmt.pf ppf "FINAL ";
-    Fmt.(list ~sep:sp pp_name') ppf controls
+      Fmt.pf ppf "CONTROL ";
+      if final then Fmt.pf ppf "FINAL ";
+      Fmt.(list ~sep:sp pp_name') ppf controls
   | PageLimit { lines; columns; heading; first_detail; last_control_heading; last_detail; footing } ->
-    Fmt.pf ppf "PAGE LIMIT IS%a%a%a%a%a%a%a"
-      Fmt.(option (any " " ++ pp_integer ++ any " LINES")) lines
-      Fmt.(option (any " " ++ pp_integer ++ any " COLUMNS")) columns
-      Fmt.(option (any "@ HEADING " ++ pp_integer)) heading
-      Fmt.(option (any "@ FIRST DETAIL " ++ pp_integer)) first_detail
-      Fmt.(option (any "@ LAST CH " ++ pp_integer)) last_control_heading
-      Fmt.(option (any "@ LAST DETAIL " ++ pp_integer)) last_detail
-      Fmt.(option (any "@ FOOTING " ++ pp_integer)) footing
+      Fmt.pf ppf "PAGE LIMIT IS%a%a%a%a%a%a%a"
+        Fmt.(option (any " " ++ pp_integer ++ any " LINES")) lines
+        Fmt.(option (any " " ++ pp_integer ++ any " COLUMNS")) columns
+        Fmt.(option (any "@ HEADING " ++ pp_integer)) heading
+        Fmt.(option (any "@ FIRST DETAIL " ++ pp_integer)) first_detail
+        Fmt.(option (any "@ LAST CH " ++ pp_integer)) last_control_heading
+        Fmt.(option (any "@ LAST DETAIL " ++ pp_integer)) last_detail
+        Fmt.(option (any "@ FOOTING " ++ pp_integer)) footing
 
 
 type constant_value =
@@ -870,8 +870,8 @@ let pp_comm_clause ppf = function
   | CommSymbolic (cc, n) -> Fmt.pf ppf "%a IS %a" pp_comm_channel cc pp_name' n
   | CommDestinationCount n -> Fmt.pf ppf "DESTINATION COUNT IS %a" pp_name' n
   | CommDestinationTable (i, il) ->
-    Fmt.pf ppf "DESTINATION TABLE OCCURS %a TIMES %a"
-      pp_integer i Fmt.(list ~sep:sp (any "INDEXED BY " ++ pp_name')) il
+      Fmt.pf ppf "DESTINATION TABLE OCCURS %a TIMES %a"
+        pp_integer i Fmt.(list ~sep:sp (any "INDEXED BY " ++ pp_name')) il
   | CommMessageCount n -> Fmt.pf ppf "COUNT IS %a" pp_name' n
   | CommMessageDate n -> Fmt.pf ppf "MESSAGE DATE IS %a" pp_name' n
   | CommMessageTime n -> Fmt.pf ppf "MESSAGE TIME IS %a" pp_name' n

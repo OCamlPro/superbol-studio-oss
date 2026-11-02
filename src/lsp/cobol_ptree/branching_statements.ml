@@ -102,7 +102,7 @@ and evaluate_branch =
 (* PERFORM *)
 and perform_target_stmt =
   {
-    perform_target: procedure_name with_loc procedure_range;
+    perform_target: procedure_range;
     perform_mode: perform_mode option;
   }
 
@@ -139,7 +139,7 @@ and varying_phrase =
 (* SEARCH *)
 and search_stmt =
   {
-    search_item: qualname;
+    search_item: qualname with_loc;
     search_varying: ident option;
     search_at_end: handler;
     search_when_clauses: search_when_clause with_loc list;
@@ -154,7 +154,7 @@ and search_when_clause =
 (* SEARCH ALL *)
 and search_all_stmt =
   {
-    search_all_item: qualname;
+    search_all_item: qualname with_loc;
     search_all_at_end: handler;
     search_all_conditions: search_condition list;
     search_all_action: statements;
@@ -278,12 +278,12 @@ and display_target =
   | DisplayUponDeviceViaMnemonic of display_device_mnemonic with_loc
 
 and display_device_mnemonic =
- | DisplayDeviceEnvName
- | DisplayDeviceEnvValue
- | DisplayDeviceArgNumber
- | DisplayDeviceCommandLine
- | DisplayDevicePrinter
- | DisplayDeviceTerminal
+  | DisplayDeviceEnvName
+  | DisplayDeviceEnvValue
+  | DisplayDeviceArgNumber
+  | DisplayDeviceCommandLine
+  | DisplayDevicePrinter
+  | DisplayDeviceTerminal
 
 and display_with_clause =
   | DisplayAttribute of Data_descr.screen_attribute_clause
@@ -458,7 +458,7 @@ and read_stmt =
     read_into: ident option;
     read_lock_behavior: read_lock_behavior option;
     read_lock: bool option;
-    read_key: qualname option;
+    read_key: qualname with_loc option;
     read_error_handler: (read_error * dual_handler) option;
   }
 
@@ -551,7 +551,7 @@ let pp_display_device_mnemonic ppf = function
 let pp_display_target ppf = function
   | DisplayUponName nwl -> Fmt.pf ppf "UPON@ %a" (pp_with_loc pp_name) nwl
   | DisplayUponDeviceViaMnemonic mn ->
-    Fmt.pf ppf "UPON@ %a" (pp_with_loc pp_display_device_mnemonic) mn
+      Fmt.pf ppf "UPON@ %a" (pp_with_loc pp_display_device_mnemonic) mn
 
 let pp_read_error ppf = function
   | ReadAtEnd -> Fmt.pf ppf "AT END"
@@ -573,8 +573,7 @@ let pp_call_target ppf = function
       pp_call_proto ppf prototype
 
 let pp_dual_handler pp ?close ?(on = Fmt.any "ON EXCEPTION") ?off ppf
-  { dual_handler_pos = p; dual_handler_neg = n }
-=
+    { dual_handler_pos = p; dual_handler_neg = n } =
   let off = Option.value ~default:Fmt.(any "NOT " ++ on) off in
   if p != [] then
     Fmt.(
@@ -595,9 +594,9 @@ let pp_branching_stmt op ?pos ?neg pp_args pp_stmt ppf (args, clauses, dh) =
   Fmt.(list ~sep:nop (sp ++ box ~indent:2 (fun ppf pf -> pf ppf ())))
     ppf clauses;
   Option.iter (fun dh ->
-    pp_dual_handler pp_stmt
-      ?on:pos ?off:neg ~close:Fmt.(any "END-" ++ const string op)
-      ppf dh) dh;
+      pp_dual_handler pp_stmt
+        ?on:pos ?off:neg ~close:Fmt.(any "END-" ++ const string op)
+        ppf dh) dh;
   Fmt.pf ppf "@]"
 
 let opt_clause fmtt = function
@@ -639,7 +638,7 @@ and pp_evaluate_branch ppf { eval_selection; eval_actions } =
 
 and pp_perform_target_stmt ppf { perform_target; perform_mode } =
   Fmt.pf ppf "@[<hv>PERFORM@;<1 2>%a%a@]"
-    (pp_procedure_range pp_procedure_name') perform_target
+    pp_procedure_range perform_target
     Fmt.(option (sp ++ pp_perform_mode)) perform_mode
 
 and pp_perform_inline_stmt ppf { perform_inline_mode; perform_statements } =
@@ -651,19 +650,18 @@ and pp_perform_mode ppf = function
   | PerformForever -> Fmt.pf ppf "FOREVER"
   | PerformNTimes i -> Fmt.pf ppf "%a TIMES" pp_ident_or_intlit i
   | PerformUntil { with_test = _; until = None } ->
-    Fmt.pf ppf "UNTIL EXIT"
+      Fmt.pf ppf "UNTIL EXIT"
   | PerformUntil { with_test; until = Some until } ->
-    Fmt.(option (any " TEST " ++ pp_stage ++ sp)) ppf with_test;
-    Fmt.pf ppf "UNTIL %a" pp_condition' until
+      Fmt.(option (any " TEST " ++ pp_stage ++ sp)) ppf with_test;
+      Fmt.pf ppf "UNTIL %a" pp_condition' until
   | PerformVarying { with_test; varying; after } ->
-    Fmt.(option (any " TEST " ++ pp_stage ++ sp)) ppf with_test;
-    Fmt.pf ppf "VARYING %a"
-      Fmt.(list ~sep:(any "@ AFTER ") (pp_with_loc pp_varying_phrase))
-      (varying :: after);
+      Fmt.(option (any " TEST " ++ pp_stage ++ sp)) ppf with_test;
+      Fmt.pf ppf "VARYING %a"
+        Fmt.(list ~sep:(any "@ AFTER ") (pp_with_loc pp_varying_phrase))
+        (varying :: after);
 
 and pp_varying_phrase ppf
-  { varying_ident = vi; varying_from = vf; varying_by = vb; varying_until = vu }
-=
+    { varying_ident = vi; varying_from = vf; varying_by = vb; varying_until = vu } =
   Fmt.pf ppf "%a FROM %a%a UNTIL %a"
     pp_ident vi
     pp_scalar vf
@@ -674,7 +672,7 @@ and pp_varying_phrase ppf
 
 and pp_search_stmt ppf { search_item = si; search_varying = sv;
                          search_at_end = h; search_when_clauses = swc } =
-  Fmt.pf ppf "SEARCH %a" pp_qualname si;
+  Fmt.pf ppf "SEARCH %a" pp_qualname' si;
   Fmt.(option (any "@ VARYING " ++ pp_ident)) ppf sv;
   List.iter (fun pf -> pf ppf ()) @@
   list_clause Fmt.(any "@ AT END " ++ box pp_handler) h;
@@ -685,7 +683,7 @@ and pp_search_all_stmt ppf { search_all_item = si;
                              search_all_at_end = h;
                              search_all_conditions = c;
                              search_all_action = a } =
-  Fmt.pf ppf "SEARCH ALL %a" pp_qualname si;
+  Fmt.pf ppf "SEARCH ALL %a" pp_qualname' si;
   List.iter (fun pf -> pf ppf ()) @@
   list_clause Fmt.(any "@ AT END " ++ box pp_handler) h;
   Fmt.(any "@ WHEN " ++ list ~sep:(any " AND@ ") pp_search_condition) ppf c;
@@ -771,14 +769,14 @@ and pp_accept_misc ppf = function
 
 and pp_accept_clause ppf = function
   | AcceptAt position ->
-    Fmt.pf ppf "AT@ %a" pp_position position
+      Fmt.pf ppf "AT@ %a" pp_position position
   | AcceptFromCRT ->
-    Fmt.pf ppf "FROM@ CRT@"
+      Fmt.pf ppf "FROM@ CRT@"
   | AcceptModeBlock ->
-    Fmt.pf ppf "MODE@ IS@ BLOCK@"
+      Fmt.pf ppf "MODE@ IS@ BLOCK@"
   | AcceptWith with_ ->
-    Fmt.pf ppf "WITH@ %a"
-      Fmt.(list ~sep:sp (pp_with_loc pp_accept_with_clause)) with_
+      Fmt.pf ppf "WITH@ %a"
+        Fmt.(list ~sep:sp (pp_with_loc pp_accept_with_clause)) with_
 
 and pp_accept_with_clause ppf = function
   | AcceptAttribute ac -> Data_descr.pp_screen_attribute_clause ppf ac
@@ -807,29 +805,27 @@ and pp_accept_with_clause ppf = function
 (* DISPLAY *)
 
 and pp_display_stmt ppf
-  { display_items_clauses; no_advancing; on_exception }
-=
+    { display_items_clauses; no_advancing; on_exception } =
   Fmt.pf ppf "DISPLAY@ %a"
     Fmt.(list ~sep:sp pp_display_items_clauses) display_items_clauses;
   if no_advancing then Fmt.pf ppf "@ NO@ ADVANCING";
   pp_dual_handler pp_statement ~close:Fmt.(any "END-DISPLAY") ppf on_exception
 
 and pp_display_items_clauses ppf
-  { display_items; display_clauses }
-=
+    { display_items; display_clauses } =
   Fmt.pf ppf "%a%a"
     Fmt.(list ~sep:sp (pp_with_loc pp_ident_or_literal)) display_items
     Fmt.(list ~sep:sp (pp_with_loc pp_display_clause)) display_clauses
 
 and pp_display_clause ppf = function
- | DisplayAt p ->
-   Fmt.pf ppf "AT@ %a" pp_position p
- | DisplayUpon dt ->
-   Fmt.pf ppf "%a" (pp_with_loc pp_display_target) dt
- | DisplayModeIsBlock ->
-   Fmt.pf ppf "MODE@ BLOCK@"
- | DisplayWith sc ->
-   Fmt.(list ~sep:sp (pp_with_loc pp_display_with_clause)) ppf sc
+  | DisplayAt p ->
+      Fmt.pf ppf "AT@ %a" pp_position p
+  | DisplayUpon dt ->
+      Fmt.pf ppf "%a" (pp_with_loc pp_display_target) dt
+  | DisplayModeIsBlock ->
+      Fmt.pf ppf "MODE@ BLOCK@"
+  | DisplayWith sc ->
+      Fmt.(list ~sep:sp (pp_with_loc pp_display_with_clause)) ppf sc
 
 and pp_display_with_clause ppf = function
   | DisplayAttribute ac -> Data_descr.pp_screen_attribute_clause ppf ac
@@ -851,20 +847,16 @@ and pp_basic_arithmetic_stmt ~sep op ppf { basic_arith_operands = ops;
 (* CALL *)
 
 and pp_call_stmt ppf
-  { call_static = cs
-  ; call_target = ct
-  ; call_using = cu
-  ; call_returning = returning
-  ; call_error_handler = cho }
-=
+    { call_static = cs; call_target = ct; call_using = cu;
+      call_returning = returning; call_error_handler = cho } =
   let on, dh =
     match cho with
     | Some CallOnOverflow h ->
-      Some (Fmt.any "ON OVERFLOW"), { dual_handler_pos = h; dual_handler_neg = [] }
+        Some (Fmt.any "ON OVERFLOW"), { dual_handler_pos = h; dual_handler_neg = [] }
     | Some CallOnException dh ->
-      Some (Fmt.any "ON EXCEPTION"), dh
+        Some (Fmt.any "ON EXCEPTION"), dh
     | None ->
-      None, { dual_handler_pos = []; dual_handler_neg  = [] }
+        None, { dual_handler_pos = []; dual_handler_neg  = [] }
   in
   Fmt.pf ppf "@[CALL %s"
     (if cs then "STATIC " else "");
@@ -879,8 +871,7 @@ and pp_call_stmt ppf
 (* COMPUTE *)
 
 and pp_compute_stmt ppf
-  { compute_targets = ts; compute_expr = e; compute_on_size_error = dh}
-=
+    { compute_targets = ts; compute_expr = e; compute_on_size_error = dh} =
   Fmt.pf ppf "@[COMPUTE@;<1 2>@[@[%a@] = @[%a@]@]"
     pp_rounded_idents ts pp_expr' e;
   pp_dual_handler pp_statement
@@ -897,7 +888,7 @@ and pp_delete_stmt ppf { delete_targets; delete_retry; delete_on_invalid_key} =
   pp_dual_handler pp_statement
     ~on:Fmt.(any "INVALID KEY") ~close:Fmt.(any "END-DELETE")
     ppf delete_on_invalid_key;
-  Fmt.pf ppf "@]";
+  Fmt.pf ppf "@]"
 
 (* DIVIDE *)
 
@@ -914,10 +905,9 @@ and pp_multiply_stmt ppf { multiply_operands; multiply_on_size_error = dh } =
 (* READ *)
 
 and pp_read_stmt ppf {
-  read_file = rf; read_direction = rd; read_into = ri;
-  read_lock_behavior = rlb; read_lock = rl; read_key = rk;
-  read_error_handler = reh }
-=
+    read_file = rf; read_direction = rd; read_into = ri;
+    read_lock_behavior = rlb; read_lock = rl; read_key = rk;
+    read_error_handler = reh } =
   let pp_with_lock ppf b =
     if b then Fmt.pf ppf "LOCK" else Fmt.pf ppf "NO LOCK"
   in
@@ -927,7 +917,7 @@ and pp_read_stmt ppf {
     Fmt.(option (any "@ INTO " ++ pp_ident)) ppf ri;
     Fmt.(option (sp ++ pp_read_lock_behavior)) ppf rlb;
     Fmt.(option (sp ++ pp_with_lock)) ppf b;
-    Fmt.(option (sp ++ any "KEY " ++ pp_qualname)) ppf k
+    Fmt.(option (sp ++ any "KEY " ++ pp_qualname')) ppf k
   in
   let pos = Option.map (fun (re, _) -> Fmt.const pp_read_error re) reh in
   let dh = Option.map snd reh in
@@ -937,9 +927,8 @@ and pp_read_stmt ppf {
 (* RECEIVE *)
 
 and pp_receive_stmt ppf {
-  receive_name = rn; receive_kind = rk; receive_into = ri;
-  receive_on_no_data = dh }
-=
+    receive_name = rn; receive_kind = rk; receive_into = ri;
+    receive_on_no_data = dh } =
   let pp_receive_header ppf (rn, rk, ri) =
     Fmt.pf ppf "%a@ %a@ INTO %a"
       pp_name' rn pp_mcs_awaiting_item rk pp_ident ri
@@ -951,8 +940,7 @@ and pp_receive_stmt ppf {
 (* RETURN *)
 
 and pp_return_stmt ppf
-  { return_file = rf; return_into = ri; return_at_end = dh }
-=
+    { return_file = rf; return_into = ri; return_at_end = dh } =
   let pp_return_header ppf (rn, ri) =
     pp_name' ppf rn;
     Fmt.(option (sp ++ any "INTO " ++ pp_with_loc pp_ident)) ppf ri
@@ -963,9 +951,8 @@ and pp_return_stmt ppf
 (* REWRITE *)
 
 and pp_rewrite_stmt ppf {
-  rewrite_to = rt; rewrite_from = rf; rewrite_retry = rr;
-  rewrite_lock = rl; rewrite_invalid_key_handler = dh }
-=
+    rewrite_to = rt; rewrite_from = rf; rewrite_retry = rr;
+    rewrite_lock = rl; rewrite_invalid_key_handler = dh } =
   let pp_with_lock ppf b =
     if b then Fmt.pf ppf "LOCK" else Fmt.pf ppf "NO LOCK"
   in
@@ -982,8 +969,7 @@ and pp_rewrite_stmt ppf {
 (* START *)
 
 and pp_start_stmt ppf
-  { start_file = sf; start_position = sp; start_on_invalid_key = dh }
-=
+    { start_file = sf; start_position = sp; start_on_invalid_key = dh } =
   let pp_start_header ppf (sf, sp) =
     pp_name' ppf sf;
     Fmt.(option (sp ++ pp_start_position)) ppf sp
@@ -995,9 +981,8 @@ and pp_start_stmt ppf
 (* STRING *)
 
 and pp_string_stmt ppf {
-  string_sources = ss; string_target = st; string_pointer = sp;
-  string_on_overflow = dh }
-=
+    string_sources = ss; string_target = st; string_pointer = sp;
+    string_on_overflow = dh } =
   let pp_string_header ppf (ss, st) =
     Fmt.pf ppf "%a@ INTO@ %a"
       Fmt.(list ~sep:sp pp_string_source) ss
@@ -1005,42 +990,40 @@ and pp_string_stmt ppf {
   in
   pp_branching_stmt "STRING" pp_string_header pp_statement ppf
     ~pos:Fmt.(any "ON OVERFLOW") ((ss, st), (
-      opt_clause Fmt.(any "POINTER " ++ pp_ident) sp
-    ), Some dh)
+        opt_clause Fmt.(any "POINTER " ++ pp_ident) sp
+      ), Some dh)
 
 (* UNSTRING *)
 
 and pp_unstring_stmt ppf {
-  unstring_source = us; unstring_delimiters = uds; unstring_targets = uts;
-  unstring_pointer = up; unstring_tallying = ut; unstring_on_overflow = dh }
-=
+    unstring_source = us; unstring_delimiters = uds; unstring_targets = uts;
+    unstring_pointer = up; unstring_tallying = ut; unstring_on_overflow = dh } =
   pp_branching_stmt "UNSTRING" pp_ident pp_statement ppf
-  ~pos:Fmt.(any "ON OVERFLOW") (us, (
-    list_clause Fmt.(
-      any "DELIMITED BY " ++ list ~sep:(any "OR@ ") pp_unstring_delimiter
-    ) uds @
-    list_clause Fmt.(any "INTO " ++ list ~sep:sp pp_unstring_target) uts @
-    opt_clause Fmt.(any "POINTER " ++ pp_ident) up @
-    opt_clause Fmt.(any "TALLYING " ++ pp_ident) ut
-  ), Some dh)
+    ~pos:Fmt.(any "ON OVERFLOW") (us, (
+        list_clause Fmt.(
+            any "DELIMITED BY " ++ list ~sep:(any "OR@ ") pp_unstring_delimiter
+          ) uds @
+        list_clause Fmt.(any "INTO " ++ list ~sep:sp pp_unstring_target) uts @
+        opt_clause Fmt.(any "POINTER " ++ pp_ident) up @
+        opt_clause Fmt.(any "TALLYING " ++ pp_ident) ut
+      ), Some dh)
 
 (* WRITE *)
 
 and pp_write_stmt ppf
-  { write_to; write_from; write_advancing; write_retry; write_lock;
-    write_error_handler = weh }
-=
+    { write_to; write_from; write_advancing; write_retry; write_lock;
+      write_error_handler = weh } =
   let pos = Option.map (fun (we, _) -> Fmt.const pp_write_error we) weh in
   let dh = Option.map snd weh in
   pp_branching_stmt "WRITE" ?pos pp_write_target pp_statement ppf
     (write_to, (
-      opt_clause Fmt.(any "FROM@ " ++ pp_ident_or_literal) write_from @
-      opt_clause pp_advancing_phrase write_advancing @
-      opt_clause pp_retry_clause write_retry @
-      opt_clause
-        Fmt.((fun ppf b -> if not b then pf ppf "NO ") ++ any "LOCK")
-        write_lock
-    ), dh)
+        opt_clause Fmt.(any "FROM@ " ++ pp_ident_or_literal) write_from @
+        opt_clause pp_advancing_phrase write_advancing @
+        opt_clause pp_retry_clause write_retry @
+        opt_clause
+          Fmt.((fun ppf b -> if not b then pf ppf "NO ") ++ any "LOCK")
+          write_lock
+      ), dh)
 
 and pp_statement ppf = function
   | Accept s -> pp_accept_stmt ppf s
@@ -1068,10 +1051,10 @@ and pp_statement ppf = function
       Fmt.pf ppf "GENERATE@ %a" pp_qualname' qn
   | GoTo s -> pp_goto_stmt ppf s
   | GoBack s ->
-    Fmt.pf ppf "GOBACK%a"
-      Fmt.(option (sp ++ pp_raising)) s.goback_raising;
-    Option.iter (Fmt.pf ppf "@ %a" (pp_with_loc pp_ident_or_intlit))
-      s.goback_returning
+      Fmt.pf ppf "GOBACK%a"
+        Fmt.(option (sp ++ pp_raising)) s.goback_raising;
+      Option.iter (Fmt.pf ppf "@ %a" (pp_with_loc pp_ident_or_intlit))
+        s.goback_returning
   | If s -> pp_if_stmt ppf s
   | Initialize s -> pp_initialize_stmt ppf s
   | Initiate ns ->

@@ -22,7 +22,7 @@ open Cobol_common.Srcloc.INFIX
 
 class ['a] folder = object
   (* inherit ['a] Cobol_common.Visitor.Fold.folder *)
-  inherit ['a] Cobol_ptree.Terms_visitor.folder
+  inherit ['a] Cobol_ptree.Terms_visitor.shared_folder
   method fold_literal_value: (literal_value, 'a) fold = default
   method fold_record: (record, 'a) fold = default
   method fold_storage: (data_storage, 'a) fold = default
@@ -214,8 +214,7 @@ and fold_table_definition (v: _ #folder) =
       >> fold_memory_size v table_size_max
       >> fold_table_range v table_range
       (* >> Cobol_ptree.Terms_visitor.fold_qualname'_opt v table_index *)
-      >> fold_list v table_init_values
-        ~fold:Cobol_ptree.Terms_visitor.fold_literal'
+      >> fold_list ~fold:fold_literal_value' v table_init_values
       >> Cobol_ptree.Terms_visitor.fold_qualname'_opt v table_redefines
       >> fold_item_redefinitions v table_redefinitions
     end

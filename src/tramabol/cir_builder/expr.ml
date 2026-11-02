@@ -11,7 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_ptree                                                 (* for terms *)
+open Cobol_procedure.Types                                       (* for terms *)
+open Cobol_common.Srcloc.TYPES
 open Cir_types
 open Types
 
@@ -78,16 +79,16 @@ and resolve_subscript env s =
 
 and resolve_expr env e =
   match ~&e with
-  | Atom term ->
-      resolve_term env (term &@<- e)
+  | Atom s ->
+      resolve_scalar env (s &@<- e)
   | _ ->
       error @@ Unsupported { stuff = Expression e; loc = ~@e }
 
-and resolve_qualident env qi =
-  resolve_data_reference ~subscripts:~&qi.ident_subscripts env ~&qi.ident_name
-    ~loc:~@qi
+and resolve_qualident env (qi: qualident with_loc) =
+  resolve_data_reference env ~&qi.ident_data_ref.resolved_name
+    ~subscripts:~&qi.ident_subscripts ~loc:~@qi
 
-and resolve_refmod env (r: Cobol_ptree.refmod) =
+and resolve_refmod env (r: Cobol_procedure.Types.refmod) =
   let* refmod_left = resolve_expr env r.refmod_left
   and* refmod_length =
     match r.refmod_length with
@@ -96,70 +97,66 @@ and resolve_refmod env (r: Cobol_ptree.refmod) =
   in
   Ok { refmod_left; refmod_length }
 
-and resolve_term
-  : type k. (('f, _, _) env -> k term with_loc ->
-             ('f field_reference, errors) result) = fun env t ->
-  match ~&t with
-  | Name _
-  | Qual _ as qn ->
-      resolve_data_reference ~loc:~@t env (qn &@<- t)
+and resolve_base_ident env (i: base_ident with_loc) =
+  match ~&i with
   | QualIdent qi ->
-      resolve_qualident env (qi &@<- t)
-  | Alphanum _
-  | Boolean _
-  | Fixed _
-  | Floating _
-  | Integer _
-  | NumFig _
-  | Fig _
-  | StrConcat _
-  | Concat _
-  | National _ as lit ->
-      Literal.create ~builder:env.builder (lit &@<- t)
-  | RefMod _
-  | ScalarRefMod _ ->
-      error @@ Unexpected { stuff = Reference_modification; loc = ~@t }
+      resolve_qualident env (qi &@<- i)
   | Address _
   | Counter _
   | InlineCall _
   | InlineInvoke _
-  | LengthOf _
   | ObjectView _
   | ObjectRef _ ->
-      error @@ Unsupported { stuff = Term ~&t; loc = ~@t }
+      error @@ Unsupported { stuff = Base_ident ~&i; loc = ~@i }
 
-let resolve_field_reference = resolve_term                           (* alias *)
+and resolve_ident env (i: ident with_loc) =
+  match ~&i with
+  | { ident_base; ident_refmod = None } ->
+      resolve_base_ident env (ident_base &@<- i)
+  | { ident_refmod = Some _; _ } ->
+      error @@ Unexpected { stuff = Reference_modification; loc = ~@i }
 
-let resolve_data_reference
-  : type k. (('f, _, _) env -> k term with_loc ->
-             ('f data_reference, errors) result) = fun env t ->
+and resolve_scalar env (s: scalar with_loc) =
+  match ~&s with
+  | ScalarIdent i ->
+      resolve_ident env (i &@<- s)
+  | ScalarLiteral Ok lit ->
+      Literal.create ~builder:env.builder (lit &@<- s)
+  | ScalarLiteral Error ()                 (* invalid literal, already reported *)
+  | LengthOf _ ->
+      error @@ Unsupported { stuff = Scalar ~&s; loc = ~@s }
+
+let resolve_ident_or_literal env (t: ident_or_literal with_loc) =
   match ~&t with
-  | RefMod (ident, refmod) ->
-      let* { field_ref; field_ref_loc } = resolve_term env ident
-      and* refmod = resolve_refmod env refmod in
-      Ok { data_field = field_ref;
-           data_ref_loc = field_ref_loc;
-           data_refmod = Some refmod }
-  | ScalarRefMod (ident, refmod) ->
-      let* { field_ref; field_ref_loc } = resolve_term env ident
+  | Ident i ->
+      resolve_ident env (i &@<- t)
+  | Literal Ok lit ->
+      Literal.create ~builder:env.builder (lit &@<- t)
+  | Literal Error () ->                  (* invalid literal, already reported *)
+      error @@ Unsupported { stuff = Scalar (ScalarLiteral (Error ()));
+                             loc = ~@t }
+
+let resolve_field_reference = resolve_ident_or_literal               (* alias *)
+
+let resolve_data_reference env (t: ident_or_literal with_loc) =
+  match ~&t with
+  | Ident { ident_base; ident_refmod = Some refmod } ->
+      let* { field_ref; field_ref_loc } =
+        resolve_base_ident env (ident_base &@<- t)
       and* refmod = resolve_refmod env refmod in
       Ok { data_field = field_ref;
            data_ref_loc = field_ref_loc;
            data_refmod = Some refmod }
   | _ ->
-      let* { field_ref; field_ref_loc } = resolve_term env t in
+      let* { field_ref; field_ref_loc } = resolve_ident_or_literal env t in
       Ok { data_field = field_ref;
            data_ref_loc = field_ref_loc;
            data_refmod = None }
 
-let resolve_condition
-  : ('f, _, _) env -> Cobol_ptree.condition with_loc -> ('f condition, errors) result =
-  fun env c ->
+let resolve_condition env
+    (c: Cobol_procedure.Types.condition or_error with_loc) =
   match ~&c with
-  | CondSubject (subject,
-                 { payload = CondRelOp ({ payload = Eq; _ },
-                                        { payload = CondObjectOrExpr expr; _ });
-                   _ }) ->
+  | Ok (Relation (subject, Eq, expr)) ->
       let* subject = resolve_expr env subject
       and* expr = resolve_expr env expr in
       Ok (false, subject, expr)

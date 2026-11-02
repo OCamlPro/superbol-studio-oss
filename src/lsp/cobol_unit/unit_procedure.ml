@@ -16,27 +16,27 @@
 open Unit_types
 
 let rec find
-    ?(enclosing_section: procedure_section option)
+    ?(enclosing_section: section option)
     (procedure_name: Cobol_ptree.procedure_name)
     (procedure: procedure)
   : procedure_block =
   match enclosing_section with
   | None ->
-      Unit_resolver_map.find procedure_name procedure.procedure_blocks.named
+      Unit_resolver_map.find procedure_name procedure.procedure_blocks
   | Some { section_paragraphs; _ } ->
       try
         Paragraph (Unit_resolver_map.find procedure_name section_paragraphs.named)
       with Not_found -> find procedure_name procedure
 
 let rec full_qn
-    ?(enclosing_section: procedure_section option)
+    ?(enclosing_section: section option)
     (procedure_name: Cobol_ptree.procedure_name)
     (procedure: procedure)
   =
   match enclosing_section with
   | None ->
       (Unit_resolver_map.find_binding procedure_name
-         procedure.procedure_blocks.named).full_qn
+         procedure.procedure_blocks).full_qn
   | Some { section_paragraphs; _ } ->
       try
         (Unit_resolver_map.find_binding procedure_name section_paragraphs.named).full_qn
