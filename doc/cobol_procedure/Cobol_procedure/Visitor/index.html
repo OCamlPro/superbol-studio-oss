@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Visitor (cobol_procedure.Cobol_procedure.Visitor)</title><meta charset="utf-8"/><link rel="stylesheet" href="../../../odoc.support/odoc.css"/><meta name="generator" content="odoc 3.1.0"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><script src="../../../odoc.support/highlight.pack.js"></script><script>hljs.initHighlightingOnLoad();</script></head><body class="odoc"><nav class="odoc-nav"><a href="../index.html">Up</a> – <a href="../../../index.html">Index</a> &#x00BB; <a href="../../index.html">cobol_procedure</a> &#x00BB; <a href="../index.html">Cobol_procedure</a> &#x00BB; Visitor</nav><header class="odoc-preamble"><h1>Module <code><span>Cobol_procedure.Visitor</span></code></h1><p>Folding visitor for the typed procedure tree.</p><p>Methods for the terms that are shared with the parse tree (names, literals, procedure names...) are inherited from <a href="../../../cobol_ptree/Cobol_ptree/Terms_visitor/class-shared_folder/index.html"><code>Cobol_ptree.Terms_visitor.shared_folder</code></a>. Other methods have the same name as in the parse tree visitors.</p><p>Ill-typed statements are leaves: their parse tree is never visited.</p></header><div class="odoc-content"><div class="odoc-spec"><div class="spec module anchored" id="module-P"><a href="#module-P" class="anchor"></a><code><span><span class="keyword">module</span> P</span><span> = <a href="../../../cobol_ptree/Cobol_ptree/Terms_visitor/index.html">Cobol_ptree.Terms_visitor</a></span></code></div></div><div class="odoc-spec"><div class="spec class anchored" id="class-folder"><a href="#class-folder" class="anchor"></a><code><span><span class="keyword">class</span> 'a </span><span><a href="class-folder/index.html">folder</a></span><span> : <span class="keyword">object</span> ... <span class="keyword">end</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_or_error"><a href="#val-fold_or_error" class="anchor"></a><code><span><span class="keyword">val</span> fold_or_error : 
+  <span><span class="label">fold</span>:<span>(<span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'b</span> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'c</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'c</span>)</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span>(<span class="type-var">'b</span>, unit)</span> <span class="xref-unresolved">Stdlib</span>.result</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'c</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'c</span></span></code></div><div class="spec-doc"><p>Ill-typed parts of the tree are not visited.</p></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_or_error'"><a href="#val-fold_or_error'" class="anchor"></a><code><span><span class="keyword">val</span> fold_or_error' : 
+  <span><span class="label">fold</span>:<span>(<span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span><span><span class="type-var">'b</span> <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'c</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'c</span>)</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span><span>(<span class="type-var">'b</span>, unit)</span> <span class="xref-unresolved">Stdlib</span>.result</span> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'c</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'c</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_data_reference"><a href="#val-fold_data_reference" class="anchor"></a><code><span><span class="keyword">val</span> fold_data_reference : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span>(<a href="../../../cobol_data/Cobol_data/Types/index.html#type-data_definition">Cobol_data.Types.data_definition</a>,
+    <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-qualname">Cobol_ptree.qualname</a> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span>)</span>
+    <span class="xref-unresolved">Cobol_procedure__.Procedure_terms.resolved_reference</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_record_reference"><a href="#val-fold_record_reference" class="anchor"></a><code><span><span class="keyword">val</span> fold_record_reference : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span>(<a href="../../../cobol_data/Cobol_data/Types/index.html#type-record">Cobol_data.Types.record</a>,
+    <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-name">Cobol_ptree.name</a> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span>)</span>
+    <span class="xref-unresolved">Cobol_procedure__.Procedure_terms.resolved_reference</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_literal_value"><a href="#val-fold_literal_value" class="anchor"></a><code><span><span class="keyword">val</span> fold_literal_value : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../../cobol_data/Cobol_data/Types/index.html#type-literal_value">Cobol_data.Types.literal_value</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_literal_value'"><a href="#val-fold_literal_value'" class="anchor"></a><code><span><span class="keyword">val</span> fold_literal_value' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><a href="../../../cobol_data/Cobol_data/Types/index.html#type-literal_value">Cobol_data.Types.literal_value</a> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_integer_value"><a href="#val-fold_integer_value" class="anchor"></a><code><span><span class="keyword">val</span> fold_integer_value : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../../cobol_data/Cobol_data/Types/index.html#type-integer_value">Cobol_data.Types.integer_value</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_alphanum_value"><a href="#val-fold_alphanum_value" class="anchor"></a><code><span><span class="keyword">val</span> fold_alphanum_value : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../../cobol_data/Cobol_data/Types/index.html#type-alphanum_value">Cobol_data.Types.alphanum_value</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_ident"><a href="#val-fold_ident" class="anchor"></a><code><span><span class="keyword">val</span> fold_ident : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_terms.ident</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_base_ident"><a href="#val-fold_base_ident" class="anchor"></a><code><span><span class="keyword">val</span> fold_base_ident : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_terms.base_ident</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_qualident"><a href="#val-fold_qualident" class="anchor"></a><code><span><span class="keyword">val</span> fold_qualident : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_terms.qualident</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_subscript"><a href="#val-fold_subscript" class="anchor"></a><code><span><span class="keyword">val</span> fold_subscript : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_terms.subscript</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_subscript'"><a href="#val-fold_subscript'" class="anchor"></a><code><span><span class="keyword">val</span> fold_subscript' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_terms.subscript</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_refmod"><a href="#val-fold_refmod" class="anchor"></a><code><span><span class="keyword">val</span> fold_refmod : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_terms.refmod</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_address"><a href="#val-fold_address" class="anchor"></a><code><span><span class="keyword">val</span> fold_address : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_terms.address</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_inline_call"><a href="#val-fold_inline_call" class="anchor"></a><code><span><span class="keyword">val</span> fold_inline_call : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_terms.inline_call</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_inline_invocation"><a href="#val-fold_inline_invocation" class="anchor"></a><code><span><span class="keyword">val</span> fold_inline_invocation : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_terms.inline_invocation</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_effective_arg"><a href="#val-fold_effective_arg" class="anchor"></a><code><span><span class="keyword">val</span> fold_effective_arg : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_terms.effective_arg</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_object_view"><a href="#val-fold_object_view" class="anchor"></a><code><span><span class="keyword">val</span> fold_object_view : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_terms.object_view</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_expr"><a href="#val-fold_expr" class="anchor"></a><code><span><span class="keyword">val</span> fold_expr : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><span class="xref-unresolved">Cobol_procedure__.Procedure_terms.expr</span> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_expr'"><a href="#val-fold_expr'" class="anchor"></a><code><span><span class="keyword">val</span> fold_expr' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_terms.expr</span> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_ident_or_literal"><a href="#val-fold_ident_or_literal" class="anchor"></a><code><span><span class="keyword">val</span> fold_ident_or_literal : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><a href="../../../cobol_data/Cobol_data/Types/index.html#type-literal_value">Cobol_data.Types.literal_value</a> <span class="xref-unresolved">Cobol_procedure__.Procedure_terms.or_ident</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_ident_or_nonnum"><a href="#val-fold_ident_or_nonnum" class="anchor"></a><code><span><span class="keyword">val</span> fold_ident_or_nonnum : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><a href="../../../cobol_data/Cobol_data/Types/index.html#type-literal_value">Cobol_data.Types.literal_value</a> <span class="xref-unresolved">Cobol_procedure__.Procedure_terms.or_ident</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_scalar"><a href="#val-fold_scalar" class="anchor"></a><code><span><span class="keyword">val</span> fold_scalar : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_terms.scalar</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_length_of"><a href="#val-fold_length_of" class="anchor"></a><code><span><span class="keyword">val</span> fold_length_of : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><a href="../../../cobol_data/Cobol_data/Types/index.html#type-literal_value">Cobol_data.Types.literal_value</a> <span class="xref-unresolved">Cobol_procedure__.Procedure_terms.or_ident</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_ident_or_alphanum"><a href="#val-fold_ident_or_alphanum" class="anchor"></a><code><span><span class="keyword">val</span> fold_ident_or_alphanum : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><a href="../../../cobol_data/Cobol_data/Types/index.html#type-alphanum_value">Cobol_data.Types.alphanum_value</a> <span class="xref-unresolved">Cobol_procedure__.Procedure_terms.or_ident</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_ident_or_intlit"><a href="#val-fold_ident_or_intlit" class="anchor"></a><code><span><span class="keyword">val</span> fold_ident_or_intlit : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><a href="../../../cobol_data/Cobol_data/Types/index.html#type-integer_value">Cobol_data.Types.integer_value</a> <span class="xref-unresolved">Cobol_procedure__.Procedure_terms.or_ident</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_ident_or_strlit"><a href="#val-fold_ident_or_strlit" class="anchor"></a><code><span><span class="keyword">val</span> fold_ident_or_strlit : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><a href="../../../cobol_data/Cobol_data/Types/index.html#type-literal_value">Cobol_data.Types.literal_value</a> <span class="xref-unresolved">Cobol_procedure__.Procedure_terms.or_ident</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_ident'"><a href="#val-fold_ident'" class="anchor"></a><code><span><span class="keyword">val</span> fold_ident' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_terms.ident</span> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_ident'_opt"><a href="#val-fold_ident'_opt" class="anchor"></a><code><span><span class="keyword">val</span> fold_ident'_opt : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_terms.ident</span> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span>
+    option</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_scalar'"><a href="#val-fold_scalar'" class="anchor"></a><code><span><span class="keyword">val</span> fold_scalar' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_terms.scalar</span> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_ident_or_literal'"><a href="#val-fold_ident_or_literal'" class="anchor"></a><code><span><span class="keyword">val</span> fold_ident_or_literal' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span><a href="../../../cobol_data/Cobol_data/Types/index.html#type-literal_value">Cobol_data.Types.literal_value</a> <span class="xref-unresolved">Cobol_procedure__.Procedure_terms.or_ident</span></span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_ident_or_nonnum'"><a href="#val-fold_ident_or_nonnum'" class="anchor"></a><code><span><span class="keyword">val</span> fold_ident_or_nonnum' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span><a href="../../../cobol_data/Cobol_data/Types/index.html#type-literal_value">Cobol_data.Types.literal_value</a> <span class="xref-unresolved">Cobol_procedure__.Procedure_terms.or_ident</span></span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_ident_or_intlit'"><a href="#val-fold_ident_or_intlit'" class="anchor"></a><code><span><span class="keyword">val</span> fold_ident_or_intlit' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span><a href="../../../cobol_data/Cobol_data/Types/index.html#type-integer_value">Cobol_data.Types.integer_value</a> <span class="xref-unresolved">Cobol_procedure__.Procedure_terms.or_ident</span></span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_condition"><a href="#val-fold_condition" class="anchor"></a><code><span><span class="keyword">val</span> fold_condition : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_terms.condition</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_condition'"><a href="#val-fold_condition'" class="anchor"></a><code><span><span class="keyword">val</span> fold_condition' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_terms.condition</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_condition_or_error'"><a href="#val-fold_condition_or_error'" class="anchor"></a><code><span><span class="keyword">val</span> fold_condition_or_error' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span><span>(<span class="xref-unresolved">Cobol_procedure__.Procedure_terms.condition</span>, unit)</span> <span class="xref-unresolved">Stdlib</span>.result</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_alphabet_specification"><a href="#val-fold_alphabet_specification" class="anchor"></a><code><span><span class="keyword">val</span> fold_alphabet_specification : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-alphabet_specification">Cobol_ptree.alphabet_specification</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_rounded_ident"><a href="#val-fold_rounded_ident" class="anchor"></a><code><span><span class="keyword">val</span> fold_rounded_ident : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_terms.ident</span> <a href="../../../cobol_ptree/Cobol_ptree/index.html#type-rounded">Cobol_ptree.rounded</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_rounded_idents"><a href="#val-fold_rounded_idents" class="anchor"></a><code><span><span class="keyword">val</span> fold_rounded_idents : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_terms.ident</span> <a href="../../../cobol_ptree/Cobol_ptree/index.html#type-rounded">Cobol_ptree.rounded</a></span> list</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_basic_arithmetic_operands"><a href="#val-fold_basic_arithmetic_operands" class="anchor"></a><code><span><span class="keyword">val</span> fold_basic_arithmetic_operands : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.basic_arithmetic_operands</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_using_arg_default'"><a href="#val-fold_using_arg_default'" class="anchor"></a><code><span><span class="keyword">val</span> fold_using_arg_default' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.using_arg_default</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_using_reference_arg'"><a href="#val-fold_using_reference_arg'" class="anchor"></a><code><span><span class="keyword">val</span> fold_using_reference_arg' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.using_reference_arg</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_call_using_clause"><a href="#val-fold_call_using_clause" class="anchor"></a><code><span><span class="keyword">val</span> fold_call_using_clause : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.call_using_clause</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_procedure_arg"><a href="#val-fold_procedure_arg" class="anchor"></a><code><span><span class="keyword">val</span> fold_procedure_arg : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.procedure_arg</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_date_time"><a href="#val-fold_date_time" class="anchor"></a><code><span><span class="keyword">val</span> fold_date_time : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-date_time">Cobol_ptree.date_time</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_divide_operands"><a href="#val-fold_divide_operands" class="anchor"></a><code><span><span class="keyword">val</span> fold_divide_operands : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.divide_operands</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_file_option"><a href="#val-fold_file_option" class="anchor"></a><code><span><span class="keyword">val</span> fold_file_option : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-file_option">Cobol_ptree.file_option</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_multiply_operands"><a href="#val-fold_multiply_operands" class="anchor"></a><code><span><span class="keyword">val</span> fold_multiply_operands : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.multiply_operands</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_mcs_awaiting_item"><a href="#val-fold_mcs_awaiting_item" class="anchor"></a><code><span><span class="keyword">val</span> fold_mcs_awaiting_item : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-mcs_awaiting_item">Cobol_ptree.mcs_awaiting_item</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_mcs_kind"><a href="#val-fold_mcs_kind" class="anchor"></a><code><span><span class="keyword">val</span> fold_mcs_kind : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-mcs_kind">Cobol_ptree.mcs_kind</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_mcs_command_operands"><a href="#val-fold_mcs_command_operands" class="anchor"></a><code><span><span class="keyword">val</span> fold_mcs_command_operands : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.mcs_command_operands</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_open_mode"><a href="#val-fold_open_mode" class="anchor"></a><code><span><span class="keyword">val</span> fold_open_mode : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-open_mode">Cobol_ptree.open_mode</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_position"><a href="#val-fold_position" class="anchor"></a><code><span><span class="keyword">val</span> fold_position : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.position</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_raising"><a href="#val-fold_raising" class="anchor"></a><code><span><span class="keyword">val</span> fold_raising : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.raising</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_read_direction"><a href="#val-fold_read_direction" class="anchor"></a><code><span><span class="keyword">val</span> fold_read_direction : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-read_direction">Cobol_ptree.read_direction</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_retry_clause"><a href="#val-fold_retry_clause" class="anchor"></a><code><span><span class="keyword">val</span> fold_retry_clause : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.retry_clause</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_read_lock_behavior"><a href="#val-fold_read_lock_behavior" class="anchor"></a><code><span><span class="keyword">val</span> fold_read_lock_behavior : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.read_lock_behavior</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_search_condition"><a href="#val-fold_search_condition" class="anchor"></a><code><span><span class="keyword">val</span> fold_search_condition : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.search_condition</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_sharing_mode"><a href="#val-fold_sharing_mode" class="anchor"></a><code><span><span class="keyword">val</span> fold_sharing_mode : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-sharing_mode">Cobol_ptree.sharing_mode</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_stage"><a href="#val-fold_stage" class="anchor"></a><code><span><span class="keyword">val</span> fold_stage : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-stage">Cobol_ptree.stage</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_advancing_phrase"><a href="#val-fold_advancing_phrase" class="anchor"></a><code><span><span class="keyword">val</span> fold_advancing_phrase : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.advancing_phrase</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_start_position"><a href="#val-fold_start_position" class="anchor"></a><code><span><span class="keyword">val</span> fold_start_position : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.start_position</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_write_target"><a href="#val-fold_write_target" class="anchor"></a><code><span><span class="keyword">val</span> fold_write_target : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.write_target</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_procedure_range"><a href="#val-fold_procedure_range" class="anchor"></a><code><span><span class="keyword">val</span> fold_procedure_range : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-procedure_range">Cobol_ptree.procedure_range</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_selection_subject"><a href="#val-fold_selection_subject" class="anchor"></a><code><span><span class="keyword">val</span> fold_selection_subject : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.selection_subject</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_selection_subject'"><a href="#val-fold_selection_subject'" class="anchor"></a><code><span><span class="keyword">val</span> fold_selection_subject' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.selection_subject</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_selection_object"><a href="#val-fold_selection_object" class="anchor"></a><code><span><span class="keyword">val</span> fold_selection_object : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.selection_object</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_selection_object'"><a href="#val-fold_selection_object'" class="anchor"></a><code><span><span class="keyword">val</span> fold_selection_object' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.selection_object</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_screen_attribute"><a href="#val-fold_screen_attribute" class="anchor"></a><code><span><span class="keyword">val</span> fold_screen_attribute : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-screen_attribute">Cobol_ptree.screen_attribute</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_set_ambiguous_method"><a href="#val-fold_set_ambiguous_method" class="anchor"></a><code><span><span class="keyword">val</span> fold_set_ambiguous_method : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-set_ambiguous_method">Cobol_ptree.set_ambiguous_method</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_on_off"><a href="#val-fold_on_off" class="anchor"></a><code><span><span class="keyword">val</span> fold_on_off : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-on_off">Cobol_ptree.on_off</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_locale_category"><a href="#val-fold_locale_category" class="anchor"></a><code><span><span class="keyword">val</span> fold_locale_category : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-locale_category">Cobol_ptree.locale_category</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_set_save_locale"><a href="#val-fold_set_save_locale" class="anchor"></a><code><span><span class="keyword">val</span> fold_set_save_locale : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-set_save_locale">Cobol_ptree.set_save_locale</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_set_attribute_switch"><a href="#val-fold_set_attribute_switch" class="anchor"></a><code><span><span class="keyword">val</span> fold_set_attribute_switch : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-set_attribute_switch">Cobol_ptree.set_attribute_switch</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_set_locale_target"><a href="#val-fold_set_locale_target" class="anchor"></a><code><span><span class="keyword">val</span> fold_set_locale_target : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-set_locale_target">Cobol_ptree.set_locale_target</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_set_locale_source"><a href="#val-fold_set_locale_source" class="anchor"></a><code><span><span class="keyword">val</span> fold_set_locale_source : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.set_locale_source</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_float_content"><a href="#val-fold_float_content" class="anchor"></a><code><span><span class="keyword">val</span> fold_float_content : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-float_content">Cobol_ptree.float_content</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_screen_attribute_clause"><a href="#val-fold_screen_attribute_clause" class="anchor"></a><code><span><span class="keyword">val</span> fold_screen_attribute_clause : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.screen_attribute_clause</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_erase_clause"><a href="#val-fold_erase_clause" class="anchor"></a><code><span><span class="keyword">val</span> fold_erase_clause : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-erase_clause">Cobol_ptree.erase_clause</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_blank_clause"><a href="#val-fold_blank_clause" class="anchor"></a><code><span><span class="keyword">val</span> fold_blank_clause : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-blank_clause">Cobol_ptree.blank_clause</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_sort_direction"><a href="#val-fold_sort_direction" class="anchor"></a><code><span><span class="keyword">val</span> fold_sort_direction : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-sort_direction">Cobol_ptree.sort_direction</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_sort_spec"><a href="#val-fold_sort_spec" class="anchor"></a><code><span><span class="keyword">val</span> fold_sort_spec : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.sort_spec</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_varying_phrase"><a href="#val-fold_varying_phrase" class="anchor"></a><code><span><span class="keyword">val</span> fold_varying_phrase : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.varying_phrase</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_varying_phrase'"><a href="#val-fold_varying_phrase'" class="anchor"></a><code><span><span class="keyword">val</span> fold_varying_phrase' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.varying_phrase</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_perform_mode"><a href="#val-fold_perform_mode" class="anchor"></a><code><span><span class="keyword">val</span> fold_perform_mode : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.perform_mode</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_allocate_kind"><a href="#val-fold_allocate_kind" class="anchor"></a><code><span><span class="keyword">val</span> fold_allocate_kind : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.allocate_kind</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_alter_operands'"><a href="#val-fold_alter_operands'" class="anchor"></a><code><span><span class="keyword">val</span> fold_alter_operands' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-alter_operands">Cobol_ptree.alter_operands</a> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_call_proto"><a href="#val-fold_call_proto" class="anchor"></a><code><span><span class="keyword">val</span> fold_call_proto : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.call_proto</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_call_target"><a href="#val-fold_call_target" class="anchor"></a><code><span><span class="keyword">val</span> fold_call_target : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.call_target</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_close_format"><a href="#val-fold_close_format" class="anchor"></a><code><span><span class="keyword">val</span> fold_close_format : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-close_format">Cobol_ptree.close_format</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_close_phrase"><a href="#val-fold_close_phrase" class="anchor"></a><code><span><span class="keyword">val</span> fold_close_phrase : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-close_phrase">Cobol_ptree.close_phrase</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_init_data_category"><a href="#val-fold_init_data_category" class="anchor"></a><code><span><span class="keyword">val</span> fold_init_data_category : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-init_data_category">Cobol_ptree.init_data_category</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_init_category"><a href="#val-fold_init_category" class="anchor"></a><code><span><span class="keyword">val</span> fold_init_category : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-init_category">Cobol_ptree.init_category</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_init_replacing"><a href="#val-fold_init_replacing" class="anchor"></a><code><span><span class="keyword">val</span> fold_init_replacing : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.init_replacing</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_inspect_where"><a href="#val-fold_inspect_where" class="anchor"></a><code><span><span class="keyword">val</span> fold_inspect_where : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(<a href="../../../cobol_ptree/Cobol_ptree/index.html#type-inspect_direction">Cobol_ptree.inspect_direction</a>
+   * <span><span><a href="../../../cobol_data/Cobol_data/Types/index.html#type-literal_value">Cobol_data.Types.literal_value</a> <span class="xref-unresolved">Cobol_procedure__.Procedure_terms.or_ident</span></span>
+       <a href="../../../cobol_ptree/Cobol_ptree/index.html#type-nel">Cobol_ptree.nel</a></span>)</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_tallying_spec"><a href="#val-fold_tallying_spec" class="anchor"></a><code><span><span class="keyword">val</span> fold_tallying_spec : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.tallying_spec</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_tallying_clause'"><a href="#val-fold_tallying_clause'" class="anchor"></a><code><span><span class="keyword">val</span> fold_tallying_clause' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.tallying_clause</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_tallying"><a href="#val-fold_tallying" class="anchor"></a><code><span><span class="keyword">val</span> fold_tallying : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.tallying</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_replacing_range_spec"><a href="#val-fold_replacing_range_spec" class="anchor"></a><code><span><span class="keyword">val</span> fold_replacing_range_spec : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.replacing_range_spec</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_replacing_clause"><a href="#val-fold_replacing_clause" class="anchor"></a><code><span><span class="keyword">val</span> fold_replacing_clause : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.replacing_clause</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_replacing"><a href="#val-fold_replacing" class="anchor"></a><code><span><span class="keyword">val</span> fold_replacing : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.replacing_clause</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_converting"><a href="#val-fold_converting" class="anchor"></a><code><span><span class="keyword">val</span> fold_converting : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.converting</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_inspect_spec"><a href="#val-fold_inspect_spec" class="anchor"></a><code><span><span class="keyword">val</span> fold_inspect_spec : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.inspect_spec</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_merge_or_sort_target"><a href="#val-fold_merge_or_sort_target" class="anchor"></a><code><span><span class="keyword">val</span> fold_merge_or_sort_target : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-merge_or_sort_target">Cobol_ptree.merge_or_sort_target</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_named_file_option"><a href="#val-fold_named_file_option" class="anchor"></a><code><span><span class="keyword">val</span> fold_named_file_option : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-named_file_option">Cobol_ptree.named_file_option</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_open_phrase"><a href="#val-fold_open_phrase" class="anchor"></a><code><span><span class="keyword">val</span> fold_open_phrase : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.open_phrase</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_read_error"><a href="#val-fold_read_error" class="anchor"></a><code><span><span class="keyword">val</span> fold_read_error : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-read_error">Cobol_ptree.read_error</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_set_switch_spec"><a href="#val-fold_set_switch_spec" class="anchor"></a><code><span><span class="keyword">val</span> fold_set_switch_spec : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.set_switch_spec</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_set_condition_spec"><a href="#val-fold_set_condition_spec" class="anchor"></a><code><span><span class="keyword">val</span> fold_set_condition_spec : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.set_condition_spec</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_status_kind"><a href="#val-fold_status_kind" class="anchor"></a><code><span><span class="keyword">val</span> fold_status_kind : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-status_kind">Cobol_ptree.status_kind</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_string_delimiter"><a href="#val-fold_string_delimiter" class="anchor"></a><code><span><span class="keyword">val</span> fold_string_delimiter : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.string_delimiter</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_string_source"><a href="#val-fold_string_source" class="anchor"></a><code><span><span class="keyword">val</span> fold_string_source : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.string_source</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_unstring_delimiter"><a href="#val-fold_unstring_delimiter" class="anchor"></a><code><span><span class="keyword">val</span> fold_unstring_delimiter : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.unstring_delimiter</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_unstring_target"><a href="#val-fold_unstring_target" class="anchor"></a><code><span><span class="keyword">val</span> fold_unstring_target : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.unstring_target</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_write_error"><a href="#val-fold_write_error" class="anchor"></a><code><span><span class="keyword">val</span> fold_write_error : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-write_error">Cobol_ptree.write_error</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_message_ending_indicator"><a href="#val-fold_message_ending_indicator" class="anchor"></a><code><span><span class="keyword">val</span> fold_message_ending_indicator : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.message_ending_indicator</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_send_operands"><a href="#val-fold_send_operands" class="anchor"></a><code><span><span class="keyword">val</span> fold_send_operands : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.send_operands</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_sort_source"><a href="#val-fold_sort_source" class="anchor"></a><code><span><span class="keyword">val</span> fold_sort_source : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-sort_source">Cobol_ptree.sort_source</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_returning"><a href="#val-fold_returning" class="anchor"></a><code><span><span class="keyword">val</span> fold_returning : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.returning</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_stop_run_return"><a href="#val-fold_stop_run_return" class="anchor"></a><code><span><span class="keyword">val</span> fold_stop_run_return : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.stop_run_return</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_stop_arg"><a href="#val-fold_stop_arg" class="anchor"></a><code><span><span class="keyword">val</span> fold_stop_arg : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.stop_arg</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_allocate'"><a href="#val-fold_allocate'" class="anchor"></a><code><span><span class="keyword">val</span> fold_allocate' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.allocate_stmt</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_alter'"><a href="#val-fold_alter'" class="anchor"></a><code><span><span class="keyword">val</span> fold_alter' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-alter_stmt">Cobol_ptree.alter_stmt</a> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_cancel'"><a href="#val-fold_cancel'" class="anchor"></a><code><span><span class="keyword">val</span> fold_cancel' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span><span><a href="../../../cobol_data/Cobol_data/Types/index.html#type-literal_value">Cobol_data.Types.literal_value</a> <span class="xref-unresolved">Cobol_procedure__.Procedure_terms.or_ident</span></span>
+    list</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_close'"><a href="#val-fold_close'" class="anchor"></a><code><span><span class="keyword">val</span> fold_close' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-close_stmt">Cobol_ptree.close_stmt</a> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_disable'"><a href="#val-fold_disable'" class="anchor"></a><code><span><span class="keyword">val</span> fold_disable' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.mcs_command_operands</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_enable'"><a href="#val-fold_enable'" class="anchor"></a><code><span><span class="keyword">val</span> fold_enable' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.mcs_command_operands</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_enter'"><a href="#val-fold_enter'" class="anchor"></a><code><span><span class="keyword">val</span> fold_enter' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-enter_stmt">Cobol_ptree.enter_stmt</a> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_entry'"><a href="#val-fold_entry'" class="anchor"></a><code><span><span class="keyword">val</span> fold_entry' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.entry_stmt</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_exec_block'"><a href="#val-fold_exec_block'" class="anchor"></a><code><span><span class="keyword">val</span> fold_exec_block' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><a href="../../../cobol_common/Cobol_common/Exec_block/index.html#type-t">Cobol_common.Exec_block.t</a> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_exit'"><a href="#val-fold_exit'" class="anchor"></a><code><span><span class="keyword">val</span> fold_exit' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.exit_stmt</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_free'"><a href="#val-fold_free'" class="anchor"></a><code><span><span class="keyword">val</span> fold_free' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span><span><span>(<a href="../../../cobol_data/Cobol_data/Types/index.html#type-data_definition">Cobol_data.Types.data_definition</a>,
+    <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-qualname">Cobol_ptree.qualname</a> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span>)</span>
+    <span class="xref-unresolved">Cobol_procedure__.Procedure_terms.resolved_reference</span></span>
+    list</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_generate'"><a href="#val-fold_generate'" class="anchor"></a><code><span><span class="keyword">val</span> fold_generate' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-qualname">Cobol_ptree.qualname</a> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_goback'"><a href="#val-fold_goback'" class="anchor"></a><code><span><span class="keyword">val</span> fold_goback' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.goback_stmt</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_goto'"><a href="#val-fold_goto'" class="anchor"></a><code><span><span class="keyword">val</span> fold_goto' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.goto_stmt</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_initialize'"><a href="#val-fold_initialize'" class="anchor"></a><code><span><span class="keyword">val</span> fold_initialize' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.initialize_stmt</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_initiate'"><a href="#val-fold_initiate'" class="anchor"></a><code><span><span class="keyword">val</span> fold_initiate' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span><span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-name">Cobol_ptree.name</a> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> list</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_inspect'"><a href="#val-fold_inspect'" class="anchor"></a><code><span><span class="keyword">val</span> fold_inspect' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.inspect_stmt</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_invoke'"><a href="#val-fold_invoke'" class="anchor"></a><code><span><span class="keyword">val</span> fold_invoke' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.invoke_stmt</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_merge'"><a href="#val-fold_merge'" class="anchor"></a><code><span><span class="keyword">val</span> fold_merge' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.merge_stmt</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_move'"><a href="#val-fold_move'" class="anchor"></a><code><span><span class="keyword">val</span> fold_move' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.move_stmt</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_open'"><a href="#val-fold_open'" class="anchor"></a><code><span><span class="keyword">val</span> fold_open' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.open_phrase</span> list</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_purge'"><a href="#val-fold_purge'" class="anchor"></a><code><span><span class="keyword">val</span> fold_purge' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-name">Cobol_ptree.name</a> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_raise'"><a href="#val-fold_raise'" class="anchor"></a><code><span><span class="keyword">val</span> fold_raise' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_operands.raise_operand</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_release'"><a href="#val-fold_release'" class="anchor"></a><code><span><span class="keyword">val</span> fold_release' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.release_stmt</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_resume'"><a href="#val-fold_resume'" class="anchor"></a><code><span><span class="keyword">val</span> fold_resume' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-resume_stmt">Cobol_ptree.resume_stmt</a> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_send'"><a href="#val-fold_send'" class="anchor"></a><code><span><span class="keyword">val</span> fold_send' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.send_stmt</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_set'"><a href="#val-fold_set'" class="anchor"></a><code><span><span class="keyword">val</span> fold_set' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.set_stmt</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_sort'"><a href="#val-fold_sort'" class="anchor"></a><code><span><span class="keyword">val</span> fold_sort' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.sort_stmt</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_stop'"><a href="#val-fold_stop'" class="anchor"></a><code><span><span class="keyword">val</span> fold_stop' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.stop_stmt</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_terminate'"><a href="#val-fold_terminate'" class="anchor"></a><code><span><span class="keyword">val</span> fold_terminate' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-terminate_stmt">Cobol_ptree.terminate_stmt</a> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_transform'"><a href="#val-fold_transform'" class="anchor"></a><code><span><span class="keyword">val</span> fold_transform' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.transform_stmt</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_unlock'"><a href="#val-fold_unlock'" class="anchor"></a><code><span><span class="keyword">val</span> fold_unlock' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-unlock_stmt">Cobol_ptree.unlock_stmt</a> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_validate'"><a href="#val-fold_validate'" class="anchor"></a><code><span><span class="keyword">val</span> fold_validate' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_terms.ident</span> list</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_statement'"><a href="#val-fold_statement'" class="anchor"></a><code><span><span class="keyword">val</span> fold_statement' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.statement</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_statements"><a href="#val-fold_statements" class="anchor"></a><code><span><span class="keyword">val</span> fold_statements : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.statement</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span>
+    list</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_statements'"><a href="#val-fold_statements'" class="anchor"></a><code><span><span class="keyword">val</span> fold_statements' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.statement</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span>
+    list</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_handler"><a href="#val-fold_handler" class="anchor"></a><code><span><span class="keyword">val</span> fold_handler : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.statement</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span>
+    list</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_dual_handler"><a href="#val-fold_dual_handler" class="anchor"></a><code><span><span class="keyword">val</span> fold_dual_handler : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.dual_handler</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_basic_arith_stmt"><a href="#val-fold_basic_arith_stmt" class="anchor"></a><code><span><span class="keyword">val</span> fold_basic_arith_stmt : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.basic_arithmetic_stmt</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_accept'"><a href="#val-fold_accept'" class="anchor"></a><code><span><span class="keyword">val</span> fold_accept' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.accept_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_accept_misc"><a href="#val-fold_accept_misc" class="anchor"></a><code><span><span class="keyword">val</span> fold_accept_misc : <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span> <span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-accept_misc">Cobol_ptree.accept_misc</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_accept_clause'"><a href="#val-fold_accept_clause'" class="anchor"></a><code><span><span class="keyword">val</span> fold_accept_clause' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.accept_clause</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_accept_with_clause'"><a href="#val-fold_accept_with_clause'" class="anchor"></a><code><span><span class="keyword">val</span> fold_accept_with_clause' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.accept_with_clause</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_add'"><a href="#val-fold_add'" class="anchor"></a><code><span><span class="keyword">val</span> fold_add' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.basic_arithmetic_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_call'"><a href="#val-fold_call'" class="anchor"></a><code><span><span class="keyword">val</span> fold_call' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.call_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_call_error_handler"><a href="#val-fold_call_error_handler" class="anchor"></a><code><span><span class="keyword">val</span> fold_call_error_handler : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.call_error_handler</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_compute'"><a href="#val-fold_compute'" class="anchor"></a><code><span><span class="keyword">val</span> fold_compute' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.compute_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_delete'"><a href="#val-fold_delete'" class="anchor"></a><code><span><span class="keyword">val</span> fold_delete' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.delete_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_display'"><a href="#val-fold_display'" class="anchor"></a><code><span><span class="keyword">val</span> fold_display' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.display_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_display_items_clauses"><a href="#val-fold_display_items_clauses" class="anchor"></a><code><span><span class="keyword">val</span> fold_display_items_clauses : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.display_items_clauses</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_display_clause'"><a href="#val-fold_display_clause'" class="anchor"></a><code><span><span class="keyword">val</span> fold_display_clause' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.display_clause</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_display_target'"><a href="#val-fold_display_target'" class="anchor"></a><code><span><span class="keyword">val</span> fold_display_target' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><a href="../../../cobol_ptree/Cobol_ptree/index.html#type-display_target">Cobol_ptree.display_target</a> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_display_with_clause'"><a href="#val-fold_display_with_clause'" class="anchor"></a><code><span><span class="keyword">val</span> fold_display_with_clause' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.display_with_clause</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_divide'"><a href="#val-fold_divide'" class="anchor"></a><code><span><span class="keyword">val</span> fold_divide' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.divide_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_evaluate'"><a href="#val-fold_evaluate'" class="anchor"></a><code><span><span class="keyword">val</span> fold_evaluate' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.evaluate_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_evaluate_branch"><a href="#val-fold_evaluate_branch" class="anchor"></a><code><span><span class="keyword">val</span> fold_evaluate_branch : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.evaluate_branch</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_if'"><a href="#val-fold_if'" class="anchor"></a><code><span><span class="keyword">val</span> fold_if' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.if_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_multiply'"><a href="#val-fold_multiply'" class="anchor"></a><code><span><span class="keyword">val</span> fold_multiply' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.multiply_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_perform_inline'"><a href="#val-fold_perform_inline'" class="anchor"></a><code><span><span class="keyword">val</span> fold_perform_inline' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.perform_inline_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_perform_target'"><a href="#val-fold_perform_target'" class="anchor"></a><code><span><span class="keyword">val</span> fold_perform_target' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.perform_target_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_read_error_handler"><a href="#val-fold_read_error_handler" class="anchor"></a><code><span><span class="keyword">val</span> fold_read_error_handler : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(<a href="../../../cobol_ptree/Cobol_ptree/index.html#type-read_error">Cobol_ptree.read_error</a> * <span class="xref-unresolved">Cobol_procedure__.Procedure_statements.dual_handler</span>)</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_read'"><a href="#val-fold_read'" class="anchor"></a><code><span><span class="keyword">val</span> fold_read' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.read_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_receive'"><a href="#val-fold_receive'" class="anchor"></a><code><span><span class="keyword">val</span> fold_receive' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.receive_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_return'"><a href="#val-fold_return'" class="anchor"></a><code><span><span class="keyword">val</span> fold_return' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.return_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_rewrite'"><a href="#val-fold_rewrite'" class="anchor"></a><code><span><span class="keyword">val</span> fold_rewrite' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.rewrite_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_search_when_clause'"><a href="#val-fold_search_when_clause'" class="anchor"></a><code><span><span class="keyword">val</span> fold_search_when_clause' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.search_when_clause</span>
+    <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_search'"><a href="#val-fold_search'" class="anchor"></a><code><span><span class="keyword">val</span> fold_search' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.search_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_search_all'"><a href="#val-fold_search_all'" class="anchor"></a><code><span><span class="keyword">val</span> fold_search_all' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.search_all_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_start'"><a href="#val-fold_start'" class="anchor"></a><code><span><span class="keyword">val</span> fold_start' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.start_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_string_stmt'"><a href="#val-fold_string_stmt'" class="anchor"></a><code><span><span class="keyword">val</span> fold_string_stmt' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.string_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_subtract'"><a href="#val-fold_subtract'" class="anchor"></a><code><span><span class="keyword">val</span> fold_subtract' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.basic_arithmetic_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_unstring'"><a href="#val-fold_unstring'" class="anchor"></a><code><span><span class="keyword">val</span> fold_unstring' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.unstring_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_write_error_handler"><a href="#val-fold_write_error_handler" class="anchor"></a><code><span><span class="keyword">val</span> fold_write_error_handler : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(<a href="../../../cobol_ptree/Cobol_ptree/index.html#type-write_error">Cobol_ptree.write_error</a>
+   * <span class="xref-unresolved">Cobol_procedure__.Procedure_statements.dual_handler</span>)</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_write'"><a href="#val-fold_write'" class="anchor"></a><code><span><span class="keyword">val</span> fold_write' : 
+  <span><span><span class="type-var">'a</span> <a href="class-folder/index.html">folder</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="xref-unresolved">Cobol_procedure__.Procedure_statements.write_stmt</span>
+    <span class="xref-unresolved">Cobol_common__Srcloc.TYPES.with_loc</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'a</span></span></code></div></div></div></body></html>
