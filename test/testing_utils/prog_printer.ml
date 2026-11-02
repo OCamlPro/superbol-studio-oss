@@ -48,18 +48,25 @@ let pp_optional_section_header title ppf = function
         "\n\
         \       %s SECTION." title
 
+let pp_using ppf = function
+  | None -> ()
+  | Some s ->
+      Pretty.print ppf " USING %s" (String.trim s)
+
 let prog
     ?file_control
     ?file_section
     ?working_storage
     ?local_storage
+    ?linkage
+    ?using
     ?procedure
     prog_name =
   Pretty.to_string
     "\
        \       PROGRAM-ID. %s.%a%a%a\n\
-       \       DATA DIVISION.%a%a%a\n\
-       \       PROCEDURE DIVISION.%a\n"
+       \       DATA DIVISION.%a%a%a%a\n\
+       \       PROCEDURE DIVISION%a.%a\n"
     prog_name
     (pp_optional_division_header "ENVIRONMENT") file_control
     (pp_optional_section_header "INPUT-OUTPUT") file_control
@@ -67,4 +74,6 @@ let prog
     (pp_section "FILE") file_section
     (pp_section "WORKING-STORAGE") working_storage
     (pp_section "LOCAL-STORAGE") local_storage
+    (pp_section "LINKAGE") linkage
+    pp_using using
     pp_maybe procedure

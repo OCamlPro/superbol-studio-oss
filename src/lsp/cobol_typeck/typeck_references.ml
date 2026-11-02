@@ -69,9 +69,9 @@ let resolve_record_name ~data_definitions ?(assume_partial_data_definitions = fa
         begin match ~&(record.record_item) with
           | Field root_field when ~&def == root_field -> Ok record, acc
           | Table root_table when ~&def == ~&(root_table.table_field) -> Ok record, acc
-          | _ -> Error (), error acc @@ Subfield_where_record_expected { name; data_def }
+          | _ -> Error (), error acc @@ Not_a_toplevel_record { name; data_def }
         end
-    | Ok data_def -> Error (), error acc @@ Subfield_where_record_expected { name; data_def }
+    | Ok data_def -> Error (), error acc @@ Not_a_toplevel_record { name; data_def }
   in
   { resolved; resolved_name = name },
   acc

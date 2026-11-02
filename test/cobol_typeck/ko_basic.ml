@@ -60,3 +60,32 @@ let%expect_test "error-group-with-pic" =
        6          PROCEDURE DIVISION.
     >> Error: Unexpected PICTURE clause for group item 'A'
   |}];;
+
+let%expect_test "non-toplevel-proc-arg" =
+  dotest @@ prog "non-toplevel-proc-arg"
+    ~linkage:{|
+       01 A.
+         02 A-1 PIC X.
+           88 A-OK VALUE "Y".
+    |}
+    ~using:"A-1 A-OK";
+  [%expect {|
+    prog.cob:7.32-7.35:
+       4          01 A.
+       5            02 A-1 PIC X.
+       6              88 A-OK VALUE "Y".
+       7 >        PROCEDURE DIVISION USING A-1 A-OK.
+    ----                                   ^^^
+       8
+    >> Error: Data name 'A-1' does not reference a 01- or 77-level item in the
+              DATA DIVISION
+
+    prog.cob:7.36-7.40:
+       4          01 A.
+       5            02 A-1 PIC X.
+       6              88 A-OK VALUE "Y".
+       7 >        PROCEDURE DIVISION USING A-1 A-OK.
+    ----                                       ^^^^
+       8
+    >> Error: Data name 'A-OK' does not reference a 01- or 77-level item in the
+              DATA DIVISION |}];;

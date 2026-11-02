@@ -55,3 +55,33 @@ let%expect_test "unexpected-redefines-target" =
     >> Error: Unexpected target name 'A-3' in REDEFINES clause for item 'A-24';
               expected 'A-2'
   |}];;
+
+let%expect_test "redefines-proc-arg" =
+  dotest @@ prog "redefines-proc-arg"
+    ~linkage:{|
+       01 A.
+         02 A-1 PIC X.
+         02 A-2 REDEFINES A-1 PIC 9.
+       01 B REDEFINES A PIC X.
+    |}
+    ~using:"A-2 B";
+  [%expect {|
+    prog.cob:8.32-8.35:
+       5            02 A-1 PIC X.
+       6            02 A-2 REDEFINES A-1 PIC 9.
+       7          01 B REDEFINES A PIC X.
+       8 >        PROCEDURE DIVISION USING A-2 B.
+    ----                                   ^^^
+       9
+    >> Error: Data item 'A-2' with a REDEFINES clause is not allowed here
+              (expecting a not-redefined 01- or 77-level data item)
+
+    prog.cob:8.36-8.37:
+       5            02 A-1 PIC X.
+       6            02 A-2 REDEFINES A-1 PIC 9.
+       7          01 B REDEFINES A PIC X.
+       8 >        PROCEDURE DIVISION USING A-2 B.
+    ----                                       ^
+       9
+    >> Error: Data item 'B' with a REDEFINES clause is not allowed here
+              (expecting a not-redefined 01- or 77-level data item) |}];;

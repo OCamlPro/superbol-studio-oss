@@ -28,7 +28,7 @@ type error =
   | Undefined_data_name of Cobol_ptree.qualname with_loc
   | Ambiguous_data_name of qualname_ambiguity
   | Ambiguous_proc_name of qualname_ambiguity
-  | Subfield_where_record_expected of
+  | Not_a_toplevel_record of
       {
         name: Cobol_ptree.name with_loc;
         data_def: Cobol_data.Types.data_definition;
@@ -44,7 +44,7 @@ let error_loc = function
   | Undefined_data_name { loc; _ }
   | Ambiguous_data_name { given_qualname = { loc; _ }; _ }
   | Ambiguous_proc_name { given_qualname = { loc; _ }; _ }
-  | Subfield_where_record_expected { name = { loc; _ }; _ }
+  | Not_a_toplevel_record { name = { loc; _ }; _ }
   | Invalid_proc_arg_storage { arg_name = { loc; _ }; _ } ->
       loc
 
@@ -64,9 +64,14 @@ let pp_error ppf = function
       pp_qualname_ambiguity ~kind:"data-name" ppf ambiguity
   | Ambiguous_proc_name ambiguity ->
       pp_qualname_ambiguity ~kind:"procedure-name" ppf ambiguity
-  | Subfield_where_record_expected { name; _ } ->
+  | Not_a_toplevel_record { name; data_def = Data_field { main_def = Some _; _ }; _ } ->
       Pretty.print ppf
-        "Data@ name@ %a@ does@ not@ reference@ the@ root@ of@ a@ record@ in@ DATA@ DIVISION@ as@ expected"
+        "Data@ item@ '%a'@ with@ a@ REDEFINES@ clause@ is@ not@ allowed@ here@ \
+         (expecting@ a@ not-redefined@ 01-@ or@ 77-level@ data@ item)"
+        Cobol_ptree.pp_name' name
+  | Not_a_toplevel_record { name; data_def = _ } ->
+      Pretty.print ppf
+        "Data@ name@ '%a'@ does@ not@ reference@ a@ 01-@ or@ 77-level@ item@ in@ the@ DATA@ DIVISION"
         Cobol_ptree.pp_name' name
   | Invalid_proc_arg_storage { arg_name; actual_storage } ->
       Pretty.print ppf

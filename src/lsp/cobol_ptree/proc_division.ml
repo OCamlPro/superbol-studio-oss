@@ -115,8 +115,8 @@ and paragraph =
     (** true when this paragraph is an anonymous paragraph at the begining of a section *)
 
     paragraph_segment: integer option;
-    (** optional segment priority number for a section (obsolete in COBOL-85) *)
-   
+    (** optional segment priority number for a section (already obsolete in COBOL-85) *)
+
     paragraph_sentences: statements with_loc list;
   }
 [@@deriving ord]
