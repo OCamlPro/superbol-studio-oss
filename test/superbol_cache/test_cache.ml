@@ -48,9 +48,9 @@ let resolve world witness =
         | Some contents -> Witness.file ~name ~contents = witness
         | None -> false
       end
-  | Dir { name; _ } ->
+  | Dir { name; exts; _ } ->
       begin match find name world.dirs with
-        | Some entries -> Witness.dir ~name ~entries = witness
+        | Some entries -> Witness.dir ?exts ~name ~entries () = witness
         | None -> false
       end
   | Env { var; value } ->
@@ -119,8 +119,8 @@ let%expect_test "a copybook added earlier in the path is a miss" =
   w.files <- ["/p/lib2/BOOK.cpy", "01 X PIC 9."];
   let k = key "uses BOOK" in
   put cache ~key:k
-    ~witnesses:[Witness.dir ~name:"/p/lib1" ~entries:["OTHER.cpy"];
-                Witness.dir ~name:"/p/lib2" ~entries:["BOOK.cpy"];
+    ~witnesses:[Witness.dir ~name:"/p/lib1" ~entries:["OTHER.cpy"] ();
+                Witness.dir ~name:"/p/lib2" ~entries:["BOOK.cpy"] ();
                 Witness.file ~name:"/p/lib2/BOOK.cpy"
                   ~contents:"01 X PIC 9."]
     "parsed with BOOK from lib2";
@@ -130,6 +130,57 @@ let%expect_test "a copybook added earlier in the path is a miss" =
   [%expect {|
     hit: parsed with BOOK from lib2
     miss |}];;
+
+let%expect_test "a listing restricted to extensions ignores other files" =
+  let _clock, _store, cache = setup () in
+  let w = world () in
+  let exts = [".cpy"; ""] in
+  w.dirs <- ["/p/lib1", ["OTHER.cpy"; "main.cbl"]];
+  let k = key "uses BOOK" in
+  put cache ~key:k
+    ~witnesses:[Witness.dir ~exts ~name:"/p/lib1"
+                  ~entries:["OTHER.cpy"; "main.cbl"] ()]
+    "parsed without BOOK from lib1";
+  w.dirs <- ["/p/lib1", ["OTHER.cpy"; "main.cbl"; "main.o"; "BOOK.CBL"]];
+  get cache w ~key:k;
+  w.dirs <- ["/p/lib1", ["OTHER.cpy"; "main.cbl"; "BOOK.CPY"]];
+  get cache w ~key:k;
+  w.dirs <- ["/p/lib1", ["OTHER.cpy"; "main.cbl"; "BOOK"]];
+  get cache w ~key:k;
+  [%expect {|
+    hit: parsed without BOOK from lib1
+    miss
+    miss |}];;
+
+let%expect_test "a lookup witnesses the extensions of its candidates" =
+  let platform =
+    { Cobol_common.Platform.innocuous with
+      getcwd = (fun () -> "/p");
+      list_dir = (fun _ -> ["OTHER.cpy"; "notes.txt"]) }
+  in
+  let lookup_config =
+    Cobol_common.Copybook.lookup_config ~libexts:["CPY"; "cob"] ["lib"] in
+  let show textname =
+    let recorder = Recorder.create ~platform in
+    ignore @@ (Recorder.platform recorder).find_lib ~lookup_config textname;
+    List.iter (function
+        | Dir { name; exts = Some exts; _ } ->
+            Printf.printf "%s: [%s]\n" name
+              (String.concat "; " (List.map (Printf.sprintf "%S") exts))
+        | _ -> ()) (Recorder.witnesses recorder)
+  in
+  show (`Word "BOOK");
+  show (`Alphanum "BOOK.TXT");
+  [%expect {|
+    /p/lib: [""; ".cob"; ".cpy"]
+    /p/lib: [".cob"; ".cpy"; ".txt"] |}];;
+
+let%expect_test "restricted listings survive a manifest round-trip" =
+  let w = Witness.dir ~exts:[".cpy"; ""] ~name:"/p/a b" ~entries:[] () in
+  let m = { manifest_label = "unit"; manifest_object = Digest.string "";
+            manifest_witnesses = [w] } in
+  Printf.printf "%b\n" (Manifest.decode (Manifest.encode m) = Ok m);
+  [%expect {| true |}];;
 
 let%expect_test "an environment variable tells unset from set" =
   let _clock, _store, cache = setup () in
