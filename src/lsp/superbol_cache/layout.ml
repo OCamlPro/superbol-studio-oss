@@ -45,6 +45,22 @@ let object_ digest =
   let hex = Digest.to_hex digest in
   Printf.sprintf "%s/%s/%s" objects (fanout hex) hex
 
+(** Slots name the entries currently standing for some subject (typically, the
+    current version of a document), so that they can be reclaimed once
+    superseded.  They are neither entries nor values, and are kept apart from
+    both so that monitoring and pruning by size need not tell them apart. *)
+let slots = version_dir ^ "/slots"
+
+let slot key =
+  Printf.sprintf "%s/%s/%s" slots (fanout key) key
+
+(** [is_key s] holds of the hexadecimal renderings of digests, which is all a
+    key may be: anything else read back from storage is not to be turned into a
+    path. *)
+let is_key s =
+  String.length s = 32 &&
+  String.for_all (function '0'..'9' | 'a'..'f' -> true | _ -> false) s
+
 (** [is_version_dir name] holds of the top-level entries this library owns, so
     that the pruner can tell a sibling format's subtree from unrelated files a
     user may have left in the cache root. *)

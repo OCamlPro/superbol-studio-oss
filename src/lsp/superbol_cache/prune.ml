@@ -169,6 +169,17 @@ let reclaim_stale_staging store ~now ~grace =
     if now -. item_last_hit > grace then store.remove path
   end (items store Layout.tmp)
 
+(* A slot is only rewritten when what it names changes, so its date says nothing
+   of whether those entries are in use.  Losing it is harmless all the same: the
+   entries it named are then no longer superseded by the next version of their
+   subject, and are left to the very age bound that reclaimed the slot. *)
+let reclaim_aged_slots store ~now ~max_age =
+  Option.iter begin fun max_age ->
+    List.iter begin fun (path, { item_last_hit; _ }) ->
+      if now -. item_last_hit > max_age then store.remove path
+    end (items store Layout.slots)
+  end max_age
+
 (* A neighbouring format's subtree is left entirely alone until all of it has
    gone stale: an instance built against it may well be running right now, and
    its layout is none of our business.  With no age bound there is no telling
@@ -211,6 +222,7 @@ let run ~store ~policy =
         if complete then
           sweep_unheld_values store ~now ~grace ~entries (values store);
         reclaim_stale_staging store ~now ~grace;
+        reclaim_aged_slots store ~now ~max_age;
         reclaim_stale_formats store ~now ~max_age;
         aged + oversized
       in

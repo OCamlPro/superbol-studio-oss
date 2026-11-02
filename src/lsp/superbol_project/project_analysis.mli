@@ -212,9 +212,25 @@ val keys
   -> keys option
 
 (** [inputs keys] are the digests [keys] are built from.  Front-ends may build
-    keys of their own from these, to cache data that depends on the
-    analysis. *)
+    keys of their own from these, to cache data that depends on the analysis. *)
 val inputs: keys -> Superbol_cache.Types.digest list
+
+(** [slot ~label ?inputs keys] is the slot in which to record the entry of kind
+    [label] for the document [keys]. [inputs] should hold whatever the entry
+    depends upon besides its analysis, as for a key derived from {!inputs}.
+
+    The slot is shared by every version of the document, so that storing the
+    entry of one version may supersede that of the previous one (see
+    {!Superbol_cache.Cache.supersede}).  Entries of distinct kinds belong in
+    distinct slots: they are stored at different times, and one must not
+    supersede another of the same version.
+
+    The functions below record the analyses they store in such slots. *)
+val slot
+  : label: string
+  -> ?inputs: Superbol_cache.Types.digest list
+  -> keys
+  -> Superbol_cache.Types.key
 
 (** [key keys] is the key under which an analysis is cached. *)
 val key: keys -> Superbol_cache.Types.key

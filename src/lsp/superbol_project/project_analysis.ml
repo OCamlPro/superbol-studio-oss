@@ -270,6 +270,7 @@ let config_inputs ?(overrides = no_overrides) project =
 type keys =
   {
     inputs: Superbol_cache.Types.digest list;
+    slot_inputs: Superbol_cache.Types.digest list;
     key: Superbol_cache.Types.key;
     key_for_lsp: Superbol_cache.Types.key;
   }
@@ -282,13 +283,11 @@ type keys =
    is derived from the other, which would make a hit on one require the other
    to be held. *)
 let document_keys config ~filename ~contents =
-  let inputs =
-    [Digest.string @@ WITNESS.canonical_path filename;
-     Digest.string contents;
-     config]
-  in
+  let filename = Digest.string @@ WITNESS.canonical_path filename in
+  let inputs = [filename; Digest.string contents; config] in
   {
     inputs;
+    slot_inputs = [filename; config];
     key = CACHE.shallow_key ~label:"analysis" ~inputs;
     key_for_lsp = CACHE.shallow_key ~label:"analysis-for-lsp" ~inputs;
   }
@@ -298,6 +297,10 @@ let keys ?overrides ~filename ~contents project =
   config_inputs ?overrides project
 
 let inputs { inputs; _ } = inputs
+
+let slot ~label ?(inputs = []) { slot_inputs; _ } =
+  CACHE.shallow_key ~label:(label ^ "-slot") ~inputs:(slot_inputs @ inputs)
+
 let key { key; _ } = key
 let key_for_lsp { key_for_lsp; _ } = key_for_lsp
 
@@ -316,20 +319,26 @@ let lookup_for_lsp cache ~key ~resolve : for_lsp option =
   lookup_any cache ~key ~resolve
 
 (* Looks [key] up, or else performs [analyze] while recording what [platform]
-   is asked, and stores the result under [key]. *)
-let lookup_or_analyze cache ~platform ~resolve ~key ~label ~analyze =
+   is asked, and stores the result under [key], superseding whatever entry
+   [slot] recorded for another version of the document. *)
+let lookup_or_analyze cache ~platform ~resolve ~key ~slot ~label ~analyze =
   match lookup_any cache ~key ~resolve with
   | Some v ->
       v, true
   | None ->
       let recorder = RECORDER.create ~platform in
       let v = analyze ~platform:(RECORDER.platform recorder) in
-      ignore @@
-      store_any cache ~key ~label ~witnesses:(RECORDER.witnesses recorder) v;
+      begin
+        match
+          store_any cache ~key ~label ~witnesses:(RECORDER.witnesses recorder) v
+        with
+        | Ok () -> ignore @@ CACHE.supersede cache ~slot [key]
+        | Error _ -> ()
+      end;
       v, false
 
 let cached_analysis_n_key cache ~platform ?overrides
-    ~keys:{ key; key_for_lsp; _ } ~filename ~contents project =
+    ~keys:({ key; key_for_lsp; _ } as keys) ~filename ~contents project =
   let resolve = RECORDER.resolver ~platform () in
   match lookup_for_lsp cache ~key:key_for_lsp ~resolve with
   | Some a ->
@@ -337,6 +346,7 @@ let cached_analysis_n_key cache ~platform ?overrides
   | None ->
       let v, hit =
         lookup_or_analyze cache ~platform ~resolve ~key
+          ~slot:(slot ~label:"analysis" keys)
           ~label:(Project.relative_path_for ~filename project)
           ~analyze:(analyze ?overrides ~filename ~contents project)
       in
@@ -351,8 +361,9 @@ let cached_analysis cache ~platform ?overrides ~keys ~filename ~contents
   v, hit
 
 let cached_analysis_for_lsp cache ~platform ?overrides
-    ~keys:{ key_for_lsp; _ } ~filename ~contents project =
+    ~keys:({ key_for_lsp; _ } as keys) ~filename ~contents project =
   lookup_or_analyze cache ~platform ~key:key_for_lsp
+    ~slot:(slot ~label:"analysis-for-lsp" keys)
     ~resolve:(RECORDER.resolver ~platform ())
     ~label:(Project.relative_path_for ~filename project)
     ~analyze:(analyze_for_lsp ?overrides ~filename ~contents project)

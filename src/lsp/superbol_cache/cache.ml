@@ -133,7 +133,17 @@ let lookup t ~key ~resolve ~read_item =
 
 (* --- Storing --- *)
 
-let store { cache_store; _ } ~key ~label ~witnesses ~write_item value =
+(* Values are shared by every entry that holds the same bytes, and telling
+   whether any other entry names one would mean reading all of them.  A value
+   that has just stopped being named by the entry that held it is reclaimed
+   anyway: in practice, values are seldom shared beyond the versions of one
+   subject, which the callers below take care of; and an entry left pointing at
+   nothing is merely a miss, after which storing its value again repairs it. *)
+let remove_value { cache_store; _ } ~unless_one_of digest =
+  if not (List.mem digest unless_one_of) then
+    cache_store.remove (Layout.object_ digest)
+
+let store ({ cache_store; _ } as t) ~key ~label ~witnesses ~write_item value =
   match write_item value with
   | Error err ->
       Error (Unreadable err)
@@ -155,6 +165,7 @@ let store { cache_store; _ } ~key ~label ~witnesses ~write_item value =
           manifest_witnesses = witnesses;
           manifest_object }
       in
+      let replaced = read_manifest t key in
       let published =
         Result.bind
           (cache_store.publish ~path:(Layout.object_ manifest_object)
@@ -164,7 +175,52 @@ let store { cache_store; _ } ~key ~label ~witnesses ~write_item value =
               ~contents:(Manifest.encode manifest) ~replace:true
           end
       in
+      (* The value of the manifest just replaced is named by nothing now, unless
+         it was the very same. *)
+      begin match published, replaced with
+        | Ok (), Some { manifest_object = previous; _ } ->
+            remove_value t previous ~unless_one_of:[manifest_object]
+        | _ ->
+            ()
+      end;
       Result.map_error (fun msg -> Storage msg) published
+
+(* --- Superseding --- *)
+
+let read_slot { cache_store; _ } slot =
+  match cache_store.read (Layout.slot slot) with
+  | Error _ | Ok None -> []
+  | Ok Some contents ->
+      List.filter Layout.is_key (String.split_on_char '\n' contents)
+
+let supersede ({ cache_store; _ } as t) ~slot keys =
+  let keys = List.sort_uniq String.compare keys in
+  let previous = read_slot t slot in
+  if previous = keys then Ok ()          (* the usual case: nothing to write *)
+  else
+    match
+      cache_store.publish ~path:(Layout.slot slot)
+        ~contents:(String.concat "\n" keys) ~replace:true
+    with
+    | Error msg ->
+        Error (Storage msg)
+    | Ok () ->
+        let held =
+          List.filter_map (fun key -> Option.map (fun m -> m.manifest_object)
+                              (read_manifest t key)) keys
+        in
+        List.iter begin fun key ->
+          if not (List.mem key keys) then
+            match read_manifest t key with
+            | None ->
+                ()
+            | Some { manifest_object; _ } ->
+                (* The manifest goes first, so that no entry is ever seen
+                   pointing at a value that is gone. *)
+                cache_store.remove (Layout.manifest key);
+                remove_value t manifest_object ~unless_one_of:held
+        end previous;
+        Ok ()
 
 (* --- Monitoring --- *)
 

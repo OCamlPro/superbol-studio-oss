@@ -89,9 +89,9 @@ val lookup
     [key], to be returned by a later {!lookup} for as long as every one of
     [witnesses] keeps holding.
 
-    Storing over an entry that is already there is a success and leaves it
-    alone: two instances that computed the same thing need not agree on which of
-    them wins. *)
+    Storing over an entry that is already there replaces it, since the work is
+    redone once a dependency has changed and lands under the same key; the value
+    it held is then reclaimed, unless it is the very same. *)
 val store
   : t
   -> key: Types.key
@@ -99,6 +99,39 @@ val store
   -> witnesses: Types.witness list
   -> write_item: ('a -> (string, Types.read_error) result)
   -> 'a
+  -> (unit, Types.error) result
+
+(** {2 Superseding}
+
+    Keys are computed from what is known beforehand, which for a document
+    includes its contents: every version of it lands under a key of its own, and
+    nothing about one version tells the cache that another is now obsolete.
+    Left alone, those versions accumulate until pruning reclaims them, which
+    with policy [Never] is never.
+
+    A {e slot} is the caller's way of saying so: it names whatever the keys of
+    the entries standing for one subject (say, a document and its
+    configuration, regardless of contents) were last recorded to be.  Slots are
+    addressed like entries, by a {!shallow_key} whose inputs leave out what
+    distinguishes one version from the next.
+
+    Note that the value of an entry that is replaced or superseded is reclaimed
+    right away, without checking whether some unrelated entry holds the very
+    same bytes: doing so would mean reading every entry.  Should one do, it
+    becomes a miss, and storing its value again repairs it. *)
+
+(** [supersede t ~slot keys] records [keys] as the entries currently standing
+    for [slot], and removes those it recorded previously that are not among
+    [keys], along with their values unless one of [keys] holds them.
+
+    Nothing is written when [keys] are already what [slot] records.  Should two
+    instances supersede the same slot concurrently, the last one wins, and at
+    worst an entry is either left behind or reclaimed early: neither affects
+    what a later {!lookup} returns, beyond turning a hit into a miss. *)
+val supersede
+  : t
+  -> slot: Types.key
+  -> Types.key list
   -> (unit, Types.error) result
 
 (** {2 Monitoring and pruning} *)

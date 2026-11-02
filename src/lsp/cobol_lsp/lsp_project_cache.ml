@@ -43,12 +43,17 @@ let project_key ~rootdir =
 (* Each document has two entries: its analysis for the LSP, which other
    front-ends may reuse, and LSP-specific data.  Both are keyed on the same
    inputs, and the latter depends on the former, so that any miss on the
-   analysis entails a miss on the LSP one. *)
+   analysis entails a miss on the LSP one.
+
+   Both are recorded in a slot that every version of the document shares, so
+   that storing a new version reclaims those of the previous one (see
+   {!store_document}). *)
 let document_keys ~project ~filename ~contents ~language_id =
   let overrides = Lsp_document.analysis_overrides ~language_id in
   Option.map begin fun keys ->
     ANALYSIS.key_for_lsp keys,
-    CACHE.shallow_key ~label:"lsp-document" ~inputs:(ANALYSIS.inputs keys)
+    CACHE.shallow_key ~label:"lsp-document" ~inputs:(ANALYSIS.inputs keys),
+    ANALYSIS.slot ~label:"lsp-document" keys
   end (ANALYSIS.keys ~overrides ~filename ~contents project)
 
 (* --- Saving --- *)
@@ -57,7 +62,12 @@ let document_keys ~project ~filename ~contents ~language_id =
    actually parsed from -- and not on what the file holds, which may still differ
    from it.  Documents are looked up likewise, on the text the editor sends
    when opening them ({!load_document}), so that a document is only ever
-   restored for the very text it was parsed from. *)
+   restored for the very text it was parsed from.
+
+   Contents being part of the keys, each version of a document that is stored
+   lands under keys of its own; once it is, the entries of whichever version
+   was stored before, by this session or an earlier one, are superseded.  The
+   CLI records what it stores in slots of its own. *)
 let store_document ~cache ~project doc =
   let analysis, witnesses, cached = Lsp_document.to_cache doc in
   let filename = cached.doc_cache_filename in
@@ -66,7 +76,7 @@ let store_document ~cache ~project doc =
   let language_id = Lsp_document.language_id doc in
   match document_keys ~project ~filename:absolute ~contents ~language_id with
   | None -> None
-  | Some (analysis_key, lsp_key) ->
+  | Some (analysis_key, lsp_key, slot) ->
       let stored_analysis =
         match witnesses with
         | None -> Ok ()        (* restored from cache: not stored over again *)
@@ -80,7 +90,10 @@ let store_document ~cache ~project doc =
           ~witnesses:[WITNESS.sub analysis_key]
           ~write_item:CACHING.write_item cached
       with
-      | Ok () -> Some filename
+      | Ok () ->
+          (* Failing to supersede only leaves the previous version behind. *)
+          ignore @@ CACHE.supersede cache ~slot [analysis_key; lsp_key];
+          Some filename
       | Error _ -> None
 
 let store_project ~cache ~quiet (Lsp_project.{ rootdir; _ } as project) =
@@ -168,7 +181,7 @@ let load_document ~project ~params
   with
   | None ->
       None
-  | Some (analysis_key, lsp_key) ->
+  | Some (analysis_key, lsp_key, _) ->
       match ANALYSIS.lookup_for_lsp cache ~key:analysis_key ~resolve with
       | Some analysis ->
           let cached =
