@@ -82,5 +82,6 @@ let reply (cp: ClientCapabilities.t) =
     ~completionProvider:completion_option
     ~workspace
     ~documentSymbolProvider:(`Bool true)
+    ~workspaceSymbolProvider:(`Bool true)
     ~codeLensProvider
     ~renameProvider:(`Bool true)

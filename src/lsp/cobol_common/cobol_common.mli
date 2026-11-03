@@ -49,3 +49,7 @@ val init_default_exn_printers: unit -> unit
 (** Exit the program with a status that depends on diagnostics reported in
     {!Diagnostics.show_n_forget} (or {!Diagnostics.sink_result}).  *)
 val exit: ?status:int -> unit -> _
+
+(** [record_failure ()] makes {!exit} exit with a status of at least 2, to tell
+    some input could not be processed at all. *)
+val record_failure: unit -> unit

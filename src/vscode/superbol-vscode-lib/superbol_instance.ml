@@ -40,6 +40,9 @@ let client { language_client; _ } = language_client
 
 let context { context; _ } = context
 
+let cli_invocation { context; lsp_server_prefix = server_prefix; _ } =
+  Superbol_languageclient.cli_invocation ~context ~server_prefix
+
 let subscribe_disposable { context; _ } disposable =
   Vscode.ExtensionContext.subscribe context ~disposable
 

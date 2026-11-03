@@ -85,4 +85,8 @@ module INTERNAL: sig
     : Lsp_server.t
     -> Lsp.Types.SemanticTokensRangeParams.t
     -> Lsp.Types.SemanticTokens.t option
+  val workspace_symbol
+    : Lsp_server.t
+    -> Lsp.Types.WorkspaceSymbolParams.t
+    -> Lsp.Types.SymbolInformation.t list option
 end

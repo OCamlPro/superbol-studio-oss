@@ -27,11 +27,68 @@ let cobol_file_patterns =
     "**/*.[pP]{co,CO}";
   ]
 
+let exclude_dirs_setting = "cobol.excludeDirs"
+
+(* Same treatment of entries as `excludes_dir' in
+   `superbol_project/project_config.ml'. *)
+let trim_dir s =
+  let s =
+    if String.starts_with ~prefix:"./" s
+    then String.sub s 2 (String.length s - 2) else s
+  in
+  if String.length s > 1 && String.ends_with ~suffix:"/" s
+  then String.sub s 0 (String.length s - 1) else s
+
+(* [relative_path] is that of a file, with "/" as separator.  Entries that hold
+   a "/" are directory paths relative to the root; others are directory names
+   that match at any depth. *)
+let excluded_by entries ~relative_path =
+  let entries = List.map trim_dir entries in
+  let paths, names = List.partition (fun e -> String.contains e '/') entries in
+  let rec check prefix = function
+    | [] | [_] ->                                     (* the file name itself *)
+        false
+    | dir :: rest ->
+        let path = if prefix = "" then dir else prefix ^ "/" ^ dir in
+        List.mem dir names || List.mem path paths || check path rest
+  in
+  check "" (String.split_on_char '/' relative_path)
+
+(* Exclusions are taken from the setting of each workspace folder, which the
+   server also uses for projects that have no `superbol.toml'.
+
+   Files are filtered after the search, rather than via the `excludes' glob
+   given to `findFiles': that glob would replace the `files.exclude' setting,
+   that we want to keep honoring. *)
+let not_excluded uris =
+  let entries_by_folder = Hashtbl.create 1 in
+  let entries_for folder =
+    let key = Uri.toString (WorkspaceFolder.uri folder) () in
+    match Hashtbl.find_opt entries_by_folder key with
+    | Some entries -> entries
+    | None ->
+        let entries =
+          Superbol_config.strings exclude_dirs_setting
+            ~scope:(`WorkspaceFolder folder)
+        in
+        Hashtbl.add entries_by_folder key entries;
+        entries
+  in
+  List.filter begin fun uri ->
+    match Workspace.getWorkspaceFolder ~uri with
+    | None ->
+        true
+    | Some folder ->
+        not @@ excluded_by (entries_for folder) ~relative_path:
+          (Workspace.asRelativePath () ~pathOrUri:(`Uri uri)
+             ~includeWorkspaceFolder:false)
+  end uris
+
 let find_cobol_files ~token =
   let open Promise.Syntax in
   let rec aux acc = function
     | [] ->
-        Promise.return (List.rev acc)
+        Promise.return (not_excluded @@ List.rev acc)
     | pattern :: patterns ->
         let* uris = Workspace.findFiles () ~includes:(`String pattern) ~token in
         aux (List.rev_append uris acc) patterns
@@ -242,6 +299,65 @@ let analyze_workspace instance ~progress ~token =
   in
   loop 0 0 uris
 
+(** {3 Analysis in parallel processes}
+
+    Files are analyzed by `superbol cache analyze' processes (see
+    {!Superbol_jobs}), that fill the caches of the server.  Documents are not
+    opened in the server: it finds their workspace symbols in its caches, and
+    restores their analyses (and publishes their diagnostics) once they are
+    opened. *)
+
+let report_processes_completion ~analyzed ~failed ~missed =
+  let total = analyzed + failed + missed in
+  let outcome =
+    if missed = 0 then
+      Printf.sprintf "SuperBOL: analyzed %u file%s"
+        analyzed (plural analyzed "" "s")
+    else
+      Printf.sprintf "SuperBOL: analysis interrupted after %u of %u file%s"
+        (analyzed + failed) total (plural total "" "s")
+  and failures =
+    if failed = 0 then ""
+    else Printf.sprintf "; %u file%s could not be analyzed (see the log)"
+        failed (plural failed "" "s")
+  in
+  let _ =
+    Window.showInformationMessage ()
+      ~message:(outcome ^ failures ^ "; diagnostics are reported upon \
+                                       opening files") |>
+    Promise.then_ ~fulfilled:(fun (_: unit option) -> Promise.return ())
+  in
+  Promise.return ()
+
+let analyze_workspace_in_processes cli ~progress ~token =
+  let open Promise.Syntax in
+  let* uris = find_cobol_files ~token in
+  let total = List.length uris in
+  let percent i = i * 100 / max 1 total in
+  let analyzed = ref 0 and failed = ref 0 in
+  let on_start ~processes =
+    Progress.report progress ~value:Progress.{
+        message = Some (Printf.sprintf "analyzing %u file%s in %u process%s"
+                          total (plural total "" "s")
+                          processes (plural processes "" "es"));
+        increment = None;
+      }
+  and on_completion (job: Superbol_jobs.job) ~ok =
+    let before = !analyzed + !failed and n = List.length job.files in
+    if ok then analyzed := !analyzed + n else failed := !failed + n;
+    let after = before + n in
+    Progress.report progress ~value:Progress.{
+        message = Some (Printf.sprintf "%u/%u files" after total);
+        increment = Some (percent after - percent before);
+      }
+  in
+  let* () =
+    Superbol_jobs.run cli ~token ~on_start ~on_completion
+      (Superbol_jobs.make uris)
+  in
+  report_processes_completion ~analyzed:!analyzed ~failed:!failed
+    ~missed:(total - !analyzed - !failed)
+
 (* The server drops all diagnostics unless `forceSyntaxDiagnostics' is set or
    the dialect is COBOL85 (see `dispatch_diagnostics' in `lsp_server.ml').  The
    dialect is per project, so we warn instead of refusing. *)
@@ -284,13 +400,15 @@ let enable_syntax_diagnostics () =
   in
   ()
 
-let scan_workspace instance =
-  Window.withProgress (module Interop.Js.Unit)
+let with_analysis_progress task =
+  Window.withProgress (module Interop.Js.Unit) ~task
     ~options:(ProgressOptions.create
                 ~location:(`ProgressLocation ProgressLocation.Notification)
                 ~title:"SuperBOL: analyzing COBOL files"
                 ~cancellable:true ())
-    ~task:(analyze_workspace instance)
+
+let scan_workspace instance =
+  with_analysis_progress (analyze_workspace instance)
 
 let run_analysis instance =
   match Superbol_instance.client instance with
@@ -298,12 +416,18 @@ let run_analysis instance =
       Superbol_printer.show_error_message @@
       Error Superbol_types.Client_not_running
   | Some _ ->
-      let open Promise.Syntax in
-      let* decision = check_diagnostics_reported () in
-      match decision with
-      | `Abort -> Promise.return ()
-      | `Enable -> enable_syntax_diagnostics ()
-      | `Scan -> scan_workspace instance
+      (* A server we do not run ourselves may not share our file-system, so we
+         leave the analysis to it, by opening every document. *)
+      match Superbol_instance.cli_invocation instance with
+      | Some cli ->
+          with_analysis_progress (analyze_workspace_in_processes cli)
+      | None ->
+          let open Promise.Syntax in
+          let* decision = check_diagnostics_reported () in
+          match decision with
+          | `Abort -> Promise.return ()
+          | `Enable -> enable_syntax_diagnostics ()
+          | `Scan -> scan_workspace instance
 
 (** {2 Copybook directory retrieval} *)
 

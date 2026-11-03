@@ -113,6 +113,8 @@ let%expect_test "a dialect given as a .conf file survives the round trip from/to
               source-format-by-extension = [  ]
               #Copybook filename extensions
               copyexts = [ "cpy", "cbl", "cob" ]
+              #Directories that hold no source file to consider in project-wide operations: names of directories (anywhere in the project), or paths relative to the project root
+              exclude-dirs = [ "_build", "_opam", "node_modules" ]
               #Where to find copybooks
               [[cobol.copybooks]]
               file-relative = false

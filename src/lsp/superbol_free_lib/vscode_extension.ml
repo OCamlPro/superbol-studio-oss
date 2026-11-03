@@ -400,6 +400,20 @@ let configuration =
       ~default:Cobol_common.Copybook.copybook_extensions
       ~order:5;
 
+    Manifest.PROPERTY.strings "superbol.cobol.excludeDirs"
+      ~title:"Excluded Directories"
+      ~markdownDescription:
+        (with_superbol_toml_note
+           "Directories that hold no COBOL source file to consider in \
+            project-wide operations, such as workspace symbol lookups or the \
+            analysis of every COBOL file in the workspace.  Each entry is either \
+            a directory name, that matches at any depth (e.g. `node_modules`), \
+            or a path relative to the project root when it holds a `/` \
+            (e.g. `tests/fixtures`).\n\nNote: files excluded with \
+            `#files.exclude#` are also left out of the workspace analysis.")
+      ~default:Superbol_project.Config.default_exclude_dirs
+      ~order:6;
+
     (* Paths *)
 
     Manifest.PROPERTY.string "superbol.cobcPath"
@@ -433,12 +447,35 @@ let configuration =
       ~default:false
       ~markdownDescription:
         (with_extra_keyword_commment
-           "Use storage provided by Visual Studio Code for caching. When \
-            this setting is set to *false*, the cache related to the \
-            contents of a given workspace folder *f* is stored in a file \
-            named *f*`/_superbol/lsp-cache`.\n\nNote: cache files are not \
-            removed automatically, whatever their location.")
+           "Use storage provided by Visual Studio Code for caching. When this \
+            setting is set to *false*, the cache related to the contents of a \
+            given workspace folder *f* is stored within a directory named \
+            *f*`/_superbol/cache`.\n\nNote: at the moment, cache files are not \
+            automatically pruned.")
       ~order:22;
+
+    (* Workspace analysis *)
+
+    Manifest.PROPERTY.int "superbol.workspaceAnalysis.maxProcesses"
+      ~title:"Parallel Analysis Processes"
+      ~default:0
+      ~minimum:0
+      ~markdownDescription:
+        (with_extra_keyword_commment
+           "Maximum number of processes that the `SuperBOL: Analyze Every COBOL \
+            Files in the Workspace` command runs at once; `0` stands for one \
+            less than the number of available processors.")
+      ~order:31;
+
+    Manifest.PROPERTY.int "superbol.workspaceAnalysis.filesPerProcess"
+      ~title:"Files per Analysis Process"
+      ~default:25
+      ~minimum:1
+      ~markdownDescription:
+        (with_extra_keyword_commment
+           "Number of COBOL files that each process launched by the `SuperBOL: \
+            Analyze Every COBOL File in the Workspace` command analyzes.")
+      ~order:32;
 
     (* Debugger-specific: *)
 
@@ -451,13 +488,13 @@ let configuration =
         (with_extra_keyword_commment
            "Display storage property and field attributes (e.g. size of \
             alphanumerics, digits and scale of numerics).")
-      ~order:31;
+      ~order:41;
 
     Manifest.PROPERTY.null_string "superbol.debugger.libcobPath"
       ~title:"GnuCOBOL Runtime Library"
       ~scope:"machine-overridable"
       ~description:"Path to the GnuCOBOL runtime library file."
-      ~order:32;
+      ~order:42;
 
     Manifest.PROPERTY.string "superbol.debugger.gdbPath"
       ~title:"GNU Debugger Executable"
@@ -466,7 +503,7 @@ let configuration =
       ~markdownDescription:
         (with_extra_keyword_commment
            "Path to the GNU debugger executable.")
-      ~order:33;
+      ~order:43;
 
     Manifest.PROPERTY.string "superbol.debugger.cobcrunPath"
       ~title:"GnuCOBOL module loader"
@@ -475,7 +512,7 @@ let configuration =
       ~markdownDescription:
         (with_extra_keyword_commment
            "Path to `cobcrun`, the GnuCOBOL module loader.")
-      ~order:34;
+      ~order:44;
   ]
 
 let taskDefinitions =
@@ -680,7 +717,7 @@ let contributes =
       Manifest.tomlValidation
         ~fileMatch:"superbol.toml"
         (* TODO: change this address to a more permanent one; also, substitute `master` for a version tag *)
-        ~url:"https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema-0.2.3.json";
+        ~url:"https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema-1.2.0.json";
     ]
     ~menus
 

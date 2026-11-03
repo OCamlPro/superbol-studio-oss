@@ -837,6 +837,47 @@ let handle_document_symbol registry (params: DocumentSymbolParams.t) =
       Some (`DocumentSymbol symbols)
     end
 
+(** { Workspace Symbol } *)
+
+(* Results are capped: clients filter and rank them anew as the query is
+   refined, and large responses mostly cost serialization time. *)
+let workspace_symbols_limit = 1000
+
+let handle_workspace_symbol
+    ({ projects; docs; params; _ }: registry)
+    (wsparams: WorkspaceSymbolParams.t) =
+  (* Symbols of open documents are computed from their current contents. *)
+  let open_docs =
+    URIMap.fold begin fun uri doc acc ->
+      match Lsp_document.checked doc with
+      | { ptree; _ } ->
+          let filename = Lsp.Uri.to_path uri in
+          (uri, Lsp_workspace_symbols.of_ptree ~filename ptree) :: acc
+      | exception Lsp_document.(Unparseable _ | Copybook _) ->
+          acc
+    end docs []
+  in
+  (* Open documents are told apart from walked files by their canonical paths,
+     as both may spell the same file differently (e.g. the case of a Windows
+     drive letter, that [Lsp.Uri.to_path] lowercases). *)
+  let canonical_path = Superbol_cache.Witness.canonical_path in
+  let open_files =
+    URIMap.fold (fun uri _ acc -> StringSet.add (canonical_path @@
+                                                 Lsp.Uri.to_path uri) acc)
+      docs StringSet.empty
+  in
+  let is_open filename = StringSet.mem (canonical_path filename) open_files in
+  let cached_docs =
+    Lsp_project.SET.to_seq projects |>
+    Seq.flat_map (Lsp_project_cache.workspace_symbols ~params ~except:is_open)
+  in
+  try
+    Some (Lsp_workspace_symbols.search ~query:wsparams.query
+            ~limit:workspace_symbols_limit @@
+          Seq.append (List.to_seq open_docs) cached_docs)
+  with e ->
+    Lsp_error.internal "Caught exception: %a" Fmt.exn e
+
 (** { Document Code Lens } *)
 
 let handle_codelens registry ({ textDocument; _ }: CodeLensParams.t) =
@@ -950,6 +991,8 @@ let on_request
         Ok (handle_shutdown registry, ShuttingDown)
     | DocumentSymbol params ->
         Ok (handle_document_symbol registry params, state)
+    | WorkspaceSymbol params ->
+        Ok (handle_workspace_symbol registry params, state)
     | TextDocumentCodeLens (* CodeLensParams.t.t *) params ->
         Ok (handle_codelens registry params, state)
     | TextDocumentRename params ->
@@ -978,7 +1021,6 @@ let on_request
     | TextDocumentLink  (* DocumentLinkParams.t.t *) _
     | TextDocumentLinkResolve  (* DocumentLink.t.t *) _
     | TextDocumentMoniker  (* MonikerParams.t.t *) _
-    | WorkspaceSymbol  (* WorkspaceSymbolParams.t.t *) _
     | DebugEcho (* DebugEcho.Params.t *) _
     | DebugTextDocumentGet  (* DebugTextDocumentGet.Params.t *) _
     | TextDocumentHighlight  (* DocumentHighlightParams.t.t *) _
@@ -1045,4 +1087,5 @@ module INTERNAL = struct
   let rename = handle_rename
   let semtoks_full = handle_semtoks_full
   let semtoks_range = handle_semtoks_range
+  let workspace_symbol = handle_workspace_symbol
 end
