@@ -256,7 +256,8 @@ let lookup_derived_n_analysis common ~label ~inputs filename
 let report Common_args.{ platform; pretty_progress; _ } ~ppf
     ({ filename; analysis; hit; _ }: ANALYSIS.t analyzed_file) =
   pretty_progress "%s:@ `%s'%s" (if hit then "Found in cache" else "Analyzed")
-    filename (if analysis.copybook then " (copybook)" else "");
+    (Cobol_common.Srcloc.NAMING.given_filename filename)
+    (if analysis.copybook then " (copybook)" else "");
   DIAGS.sink_result ~platform ~ppf @@
   DIAGS.result ~diags:(ANALYSIS.diagnostics analysis) ()
 
@@ -267,28 +268,29 @@ let report Common_args.{ platform; pretty_progress; _ } ~ppf
 let analyze_n_report (Common_args.{ pretty_progress; _ } as common) ~for_lsp
     ~ppf files =
   List.iter begin fun filename ->
-    pretty_progress "Analyzing@ `%s'" filename;
+    pretty_progress "Analyzing@ `%s'"
+      (Cobol_common.Srcloc.NAMING.given_filename filename);
     report common ~ppf @@
     if for_lsp
     then of_lsp_artifacts_file @@ analyze_file_for_lsp common filename
     else analyze_file common filename
   end files
 
-(** [with_analysis_results common ~f ~ppf files] analyzes [files] with
+(** [fold_analysis_results common ~f ~ppf files acc] analyzes [files] with
     {!analyze_file}, in turn, reports analysis diagnostics on [ppf], and then
-    passes the analysis result to [f]. *)
-let with_analysis_results common ~f ~ppf files =
-  List.iter begin fun filename ->
+    passes the analysis result and an accumulator to [f]. *)
+let fold_analysis_results common ~f ~ppf files acc =
+  List.fold_left begin fun acc filename ->
     let res = analyze_file common filename in
     report common ~ppf res;
-    f res
-  end files
+    f res acc
+  end acc files
 
-(** [with_typeck_outputs common ~f ~ppf files] acts like
-    [with_analysis_results], except [f] is given the type-checking result as
+(** [fold_typeck_outputs common ~f ~ppf files acc] acts like
+    [fold_analysis_results], except [f] is given the type-checking result as
     second argument. Therefore [f] is only called if the type-checking
     succeeds. *)
-let with_typeck_outputs ~f =
-  with_analysis_results ~f:begin fun res ->
-    Option.iter (f res) res.analysis.checked
-  end
+let fold_typeck_outputs ~f files acc =
+  fold_analysis_results ~f:begin fun res ->
+    Option.fold ~none:Fun.id ~some:(f res) res.analysis.checked
+  end files acc
