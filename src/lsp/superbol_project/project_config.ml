@@ -32,6 +32,7 @@ module TYPES = struct
     mutable libpath: path list;
     mutable libexts: string list;
     mutable indent_config: (string * int) list;
+    mutable exclude_dirs: string list;
     toml_handle: Ezr_toml.toml_handle;
   }
 
@@ -73,6 +74,7 @@ let default_libpath = [RelativeToProjectRoot "."]
 let default_libexts = Cobol_common.Copybook.copybook_extensions
 let default_indent_config = []
 let default_source_format_by_extension = []
+let default_exclude_dirs = ["_build"; "_opam"; "node_modules"]
 
 let default_dialect_name = "default"
 
@@ -84,6 +86,7 @@ let default = {
   libpath = default_libpath;
   libexts = default_libexts;
   indent_config = default_indent_config;
+  exclude_dirs = default_exclude_dirs;
   toml_handle = Ezr_toml.make_empty ();
 }
 
@@ -115,6 +118,9 @@ let libpath_repr libpath =
 
 let libexts_repr libexts =
   TOML.value_of_strings @@ Array.of_list libexts
+
+let exclude_dirs_repr exclude_dirs =
+  TOML.value_of_strings @@ Array.of_list exclude_dirs
 
 let source_format_by_extension_entry_repr (ext, fmt) =
   TOML.table_of_list [
@@ -166,7 +172,15 @@ let config_repr config ~name =
       option
         ~name: "indent"
         ~after_comments: ["Indenter configuration"]
-        (indent_repr config.indent_config)
+        (indent_repr config.indent_config);
+
+      option
+        ~name: "exclude-dirs"
+        ~after_comments: ["Directories that hold no source file to consider \
+                           in project-wide operations: names of directories \
+                           (anywhere in the project), or paths relative to \
+                           the project root"]
+        (exclude_dirs_repr config.exclude_dirs)
     ]
 
 
@@ -209,6 +223,10 @@ let get_libexts toml =
   try Array.to_list @@ TOML.get_strings toml ["copyexts"]
   with Not_found -> default_libexts
 
+let get_exclude_dirs toml =
+  try Array.to_list @@ TOML.get_strings toml ["exclude-dirs"]
+  with Not_found -> default_exclude_dirs
+
 let get_indent_config toml =
   try
     EzCompat.StringMap.fold (fun name node v ->
@@ -237,7 +255,8 @@ let load_file ?(verbose=false) config_filename =
         source_format_by_extension = get_source_format_by_extension section;
         libpath = get_libpath section;
         libexts = get_libexts section;
-        indent_config = get_indent_config section }
+        indent_config = get_indent_config section;
+        exclude_dirs = get_exclude_dirs section }
   in
   try
     let toml_handle = Ezr_toml.load ~verbose config_filename in
@@ -270,7 +289,8 @@ let reload ?(verbose=false) ~config_filename config =
     and source_format_by_extension = get_source_format_by_extension section
     and libpath = get_libpath section
     and libexts = get_libexts section
-    and indent_config = get_indent_config section in
+    and indent_config = get_indent_config section
+    and exclude_dirs = get_exclude_dirs section in
     let changed =
       config.source_format <> source_format ||
       config.source_format_by_extension <> source_format_by_extension ||
@@ -278,6 +298,7 @@ let reload ?(verbose=false) ~config_filename config =
       config.libexts <> libexts ||
       config.indent_config <> indent_config ||
       config.dialect_name <> dialect_name ||
+      config.exclude_dirs <> exclude_dirs ||
       config.cobol_config <> cobol_config
     in
     config.cobol_config <- cobol_config;
@@ -287,6 +308,7 @@ let reload ?(verbose=false) ~config_filename config =
     config.libpath <- libpath;
     config.libexts <- libexts;
     config.indent_config <- indent_config;
+    config.exclude_dirs <- exclude_dirs;
     DIAGS.result changed ~diags
   in
   try
@@ -303,6 +325,7 @@ let reload ?(verbose=false) ~config_filename config =
       config.libpath <- default.libpath;
       config.libexts <- default.libexts;
       config.indent_config <- default.indent_config;
+      config.exclude_dirs <- default.exclude_dirs;
       DIAGS.result true
   with TOML.Types.Error (loc, _code, error) ->
     raise @@ ERROR (Invalid_toml { loc; error })
@@ -331,6 +354,22 @@ let libpath_for ~filename { libpath; _ } =
     | RelativeToProjectRoot str -> str
     | RelativeToFileDir str -> Filename.dirname filename // str
   end libpath
+
+let excludes_dir ~relative_path { exclude_dirs; _ } =
+  let trim s =
+    let s = if String.starts_with ~prefix:"./" s
+      then String.sub s 2 (String.length s - 2) else s in
+    if String.length s > 1 && String.ends_with ~suffix:"/" s
+    then String.sub s 0 (String.length s - 1) else s
+  in
+  let relative_path = trim relative_path in
+  let name = Filename.basename relative_path in
+  List.exists begin fun entry ->
+    let entry = trim entry in
+    if String.contains entry '/'
+    then String.equal entry relative_path
+    else String.equal entry name
+  end exclude_dirs
 
 let copybook_lookup_config_for ~filename config =
   Cobol_common.Copybook.lookup_config (libpath_for ~filename config)
@@ -362,13 +401,14 @@ type cached =
     cached_libpath: path list;
     cached_libexts: string list;
     cached_indent_config: (string * int) list;
+    cached_exclude_dirs: string list;
     cached_toml_handle: Ezr_toml.cacheable;
   }
 
 (* The dialect is cached as configured, so that a configuration read from a
    file is read from that file again. *)
 let to_cache { dialect_name; source_format; source_format_by_extension;
-               libpath; libexts; indent_config; toml_handle;
+               libpath; libexts; indent_config; exclude_dirs; toml_handle;
                cobol_config = _ } =
   {
     cached_dialect = dialect_name;
@@ -377,13 +417,14 @@ let to_cache { dialect_name; source_format; source_format_by_extension;
     cached_libpath = libpath;
     cached_libexts = libexts;
     cached_indent_config = indent_config;
+    cached_exclude_dirs = exclude_dirs;
     cached_toml_handle = Ezr_toml.cacheable toml_handle;
   }
 
 let of_cache ~config_filename
     { cached_dialect; cached_source_format; cached_source_format_by_extension;
       cached_libpath; cached_libexts; cached_indent_config;
-      cached_toml_handle = toml_handle } =
+      cached_exclude_dirs; cached_toml_handle = toml_handle } =
   if Ezr_toml.checksum toml_handle <> Digest.file config_filename
   then raise BAD_CHECKSUM;
   let DIAGS.{ result = cobol_config; _ } =
@@ -396,6 +437,7 @@ let of_cache ~config_filename
       libpath = cached_libpath;
       libexts = cached_libexts;
       indent_config = cached_indent_config;
+      exclude_dirs = cached_exclude_dirs;
       toml_handle }
   in
   Ezr_toml.add_section_update toml_handle

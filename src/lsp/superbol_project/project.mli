@@ -164,3 +164,8 @@ module MAP: Map.S with type key = t
 val string_of_rootdir: rootdir -> string
 val relative_path_for: filename:string -> t -> string
 val absolute_path_for: filename:string -> t -> string
+
+(** [work_dirname ~layout project] is the directory where working files of
+    [project] (caches, etc.) are put according to [layout], if any.  Walks
+    through the sources of the project should skip it. *)
+val work_dirname: layout:layout -> t -> string option

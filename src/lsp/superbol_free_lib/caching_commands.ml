@@ -21,9 +21,79 @@ module WITNESS = Superbol_cache.Witness
 module DIAGS = Cobol_common.Diagnostics
 module ANALYSIS = Superbol_project.Analysis
 
-let cache_for rootdir =
-  Superbol_project.Cache.for_ ~rootdir
-    ~storage_location:Superbol_project.Cache.default_storage_location
+(** How projects are set up, and where their caches live. *)
+type setup =
+  {
+    layout: Superbol_project.layout;
+    storage_location: Superbol_project.TYPES.cache_storage_location;
+    client_settings: (string * Yojson.Safe.t) list option;
+    (** Settings of an LSP client, for projects without configuration file *)
+  }
+
+let default_setup =
+  {
+    layout = Superbol_project.Layout.default;
+    storage_location = Superbol_project.Cache.default_storage_location;
+    client_settings = None;
+  }
+
+(** [lsp_like_setup ?storage_directory ?client_settings ()] sets projects up as
+    an LSP server started with [--storage-directory storage_directory] does,
+    and whose client sends [client_settings]. *)
+let lsp_like_setup ?storage_directory ?client_settings () =
+  let layout =
+    Superbol_project.Layout.create ?shared_storage_directory:storage_directory
+      ()
+  in
+  let storage_location =
+    Result.fold ~ok:Fun.id ~error:(Pretty.failwith "%s") @@
+    Superbol_project.Cache.storage_location ~project_layout:layout ()
+      ?fallback_storage_directory:storage_directory
+  in
+  { layout; storage_location; client_settings }
+
+let cache_for ?(setup = default_setup) rootdir =
+  Superbol_project.Cache.for_ ~rootdir ~storage_location:setup.storage_location
+
+(* As the LSP server does (see `use_client_config_for' in
+   `cobol_lsp/lsp_server.ml'), client settings only apply to projects that have
+   no configuration file.  These are configured once per root directory, apart
+   from the projects {!Superbol_project.for_} shares. *)
+let configured_projects = Hashtbl.create 1
+
+let settings_reporter =
+  Cobol_lsp.Project.{
+    report_dialect_diags = begin fun _ diags ->
+      DIAGS.Set.pp ~platform:Superbol_platform.record Fmt.stderr diags
+    end;
+    report_config_error = begin fun e ->
+      Pretty.error "%a@." Superbol_project.Diagnostics.pp_error e
+    end;
+    report_invalid_setting = begin fun ~key msg ->
+      Pretty.error "Invalid@ value@ for@ setting@ %s:@ %s@." key msg
+    end;
+  }
+
+let with_client_settings ~setup project =
+  match setup.client_settings with
+  | None ->
+      project
+  | Some _ when Sys.file_exists project.Superbol_project.config_filename ->
+      project
+  | Some assoc ->
+      let rootdir = Superbol_project.rootdir project in
+      let key = Superbol_project.string_of_rootdir rootdir in
+      match Hashtbl.find_opt configured_projects key with
+      | Some project ->
+          project
+      | None ->
+          let project =
+            Superbol_project.with_default_config ~rootdir ~layout:setup.layout
+          in
+          ignore @@ Cobol_lsp.Project.update_project_config assoc project
+            ~reporter:settings_reporter;
+          Hashtbl.add configured_projects key project;
+          project
 
 type located_file =
   {
@@ -50,7 +120,7 @@ type 'a analyzed_file =
    reloaded), or other overrides. *)
 let cached_configs = Hashtbl.create 1
 
-let cached_config ~overrides project =
+let cached_config ~setup ~overrides project =
   let rootdir = Superbol_project.(string_of_rootdir @@ rootdir project) in
   match Hashtbl.find_opt cached_configs rootdir with
   | Some (project', overrides', cached_config)
@@ -58,14 +128,14 @@ let cached_config ~overrides project =
       cached_config
   | _ ->
       let cached_config =
-        Option.bind (cache_for rootdir) @@ fun (_, cache) ->
+        Option.bind (cache_for ~setup rootdir) @@ fun (_, cache) ->
         Option.map (fun config -> cache, config) @@
         ANALYSIS.config_inputs ~overrides project
       in
       Hashtbl.replace cached_configs rootdir (project, overrides, cached_config);
       cached_config
 
-let locate
+let locate ?(setup = default_setup)
     Common_args.{ project_root; platform; analysis_overrides = overrides; _ }
     given_filename =
   let filename =                               (* filenames take part in keys *)
@@ -73,9 +143,10 @@ let locate
     then given_filename
     else platform.getcwd () // given_filename
   in
-  let project = match project_root with
-    | Some dirname -> Project.in_ ~dirname ()
-    | None -> Project.for_filename filename
+  let layout = setup.layout in
+  let project = with_client_settings ~setup @@ match project_root with
+    | Some dirname -> Project.in_ ~dirname ~layout ()
+    | None -> Project.for_filename filename ~layout
   in
   let contents = EzFile.read_text_file filename in
   if given_filename != filename then
@@ -84,7 +155,7 @@ let locate
   let cached =
     Option.map begin fun (cache, config) ->
       cache, ANALYSIS.document_keys config ~filename ~contents
-    end (cached_config ~overrides project)
+    end (cached_config ~setup ~overrides project)
   in
   { filename; project; contents; cached }
 
@@ -105,13 +176,21 @@ let analyze_located_for_lsp
     Common_args.{ platform; analysis_overrides = overrides; _ }
     { filename; project; contents; cached } =
   (* Semantic tokens are computed (and cached) as the LSP does, as it is the LSP
-     that will reuse them. *)
+     that will reuse them; workspace symbols as well. *)
   let semantic_tokens = Cobol_lsp.Semtoks.whole in
   let analysis, hit =
     match cached with
     | Some (cache, keys) ->
-        ANALYSIS.cached_analysis_for_lsp cache ~platform ~overrides ~keys
-          ~semantic_tokens ~filename ~contents project
+        let analysis, hit as res =
+          ANALYSIS.cached_analysis_for_lsp cache ~platform ~overrides ~keys
+            ~semantic_tokens ~filename ~contents project
+        in
+        (* Workspace symbols are likewise stored as the LSP does, so that it
+           can retrieve them without opening the document. *)
+        Cobol_lsp.Workspace_symbols.store_for_analysis cache ~keys ~filename
+          ~label:(Superbol_project.relative_path_for ~filename project)
+          ~fresh:(not hit) analysis;
+        res
     | None ->
         ANALYSIS.analyze_for_lsp ~platform ~overrides ~filename ~contents
           project, false
@@ -127,8 +206,9 @@ let analyze_file common filename : ANALYSIS.t analyzed_file =
 (** [analyze_file_for_lsp common filename] is like {!analyze_file}, except that
     it provides an analysis for the LSP.  Use this to get all artifacts the LSP
     would need, or to fill the cache for the LSP. *)
-let analyze_file_for_lsp common filename : ANALYSIS.for_lsp analyzed_file =
-  analyze_located_for_lsp common @@ locate common filename
+let analyze_file_for_lsp ?setup common filename
+  : ANALYSIS.for_lsp analyzed_file =
+  analyze_located_for_lsp common @@ locate ?setup common filename
 
 let of_lsp_artifacts_file
     ({ analysis; _ } as file: ANALYSIS.for_lsp analyzed_file) =
@@ -145,10 +225,10 @@ let derived_entry ~label ~inputs ({ cached; _ }: located_file) =
     keys
   end cached
 
-(** [analyze_located_n_witness common ~cache ~keys located] is the analysis
-    of [located], along with the key of the cache entry it is held in: the
-    analysis for the LSP if [cache] holds one, or else the (normal) analysis,
-    computed and stored on a miss. *)
+(** [analyze_located_n_witness common ~cache ~keys located] is the analysis of
+    [located], along with the key of the cache entry it is held in: the analysis
+    for the LSP if [cache] holds one, or else the (normal) analysis, computed
+    and stored on a miss. *)
 let analyze_located_n_witness
     Common_args.{ platform; analysis_overrides = overrides; _ }
     ~cache ~keys ({ filename; project; contents; _ }: located_file)
@@ -217,10 +297,10 @@ let derive_from_file common ~label ~inputs ~derive filename : 'a * bool =
   v, hit
 
 (** [derive_n_analyze_file common ~label ~inputs ~derive filename] is like
-    {!derive_from_file}, except that it also returns the analysis of
-    [filename], which is retrieved from the project's cache in case of a hit
-    on the derived value.  Use this to only cache, as derived value, what can
-    not be obtained from the analysis directly. *)
+    {!derive_from_file}, except that it also returns the analysis of [filename],
+    which is retrieved from the project's cache in case of a hit on the derived
+    value.  Use this to only cache, as derived value, what can not be obtained
+    from the analysis directly. *)
 let derive_n_analyze_file common ~label ~inputs ~derive filename
   : 'a * bool * ANALYSIS.t analyzed_file =
   let v, hit, analyzed = derive_located common ~label ~inputs ~derive @@
@@ -246,44 +326,67 @@ let lookup_located (Common_args.{ platform; _ } as common) ~label ~inputs
   | None ->
       None
 
-(** [lookup_derived common ~label ~inputs filename] retrieves a value
-    previously recorded by {!derive_from_file} with the same [label] and
-    [inputs], without analyzing [filename]; [None] on a miss. *)
+(** [lookup_derived common ~label ~inputs filename] retrieves a value previously
+    recorded by {!derive_from_file} with the same [label] and [inputs], without
+    analyzing [filename]; [None] on a miss. *)
 let lookup_derived common ~label ~inputs filename : 'a option =
   Option.map fst @@ lookup_located common ~label ~inputs @@
   locate common filename
 
 (** [lookup_derived_n_analysis common ~label ~inputs filename] is like
-    {!lookup_derived}, except that it also returns the analysis of [filename]
-    in case of a hit, which is retrieved from the project's cache (it is
-    computed and stored anew if the cache no longer holds it). *)
+    {!lookup_derived}, except that it also returns the analysis of [filename] in
+    case of a hit, which is retrieved from the project's cache (it is computed
+    and stored anew if the cache no longer holds it). *)
 let lookup_derived_n_analysis common ~label ~inputs filename
   : ('a * ANALYSIS.t analyzed_file) option =
   Option.map (fun (v, analyzed) -> v, Lazy.force analyzed) @@
   lookup_located common ~label ~inputs @@ locate common filename
 
-(** [report common ~ppf analysis] reports analysis diagnostics on [ppf]. *)
-let report Common_args.{ platform; pretty_progress; _ } ~ppf
-    ({ filename; analysis; hit; _ }: ANALYSIS.t analyzed_file) =
+(** [report common ~error_status ~show_diagnostics ~ppf analysis] reports
+    analysis diagnostics on [ppf], unless [show_diagnostics] is [false].
+    Errors among them, shown or not, make the program exit with a non-zero
+    status, unless [error_status] is [false].  Both default to [true]. *)
+let report Common_args.{ platform; pretty_progress; _ }
+    ?(error_status = true) ?(show_diagnostics = true)
+    ~ppf ({ filename; analysis; hit; _ }: ANALYSIS.t analyzed_file) =
   pretty_progress "%s:@ `%s'%s" (if hit then "Found in cache" else "Analyzed")
     (Cobol_common.Srcloc.NAMING.given_filename filename)
     (if analysis.copybook then " (copybook)" else "");
-  DIAGS.sink_result ~platform ~ppf @@
+  let ppf =
+    if show_diagnostics then ppf
+    else Format.make_formatter (fun _ _ _ -> ()) ignore
+  in
+  DIAGS.sink_result ~platform ~ppf ~set_status:error_status @@
   DIAGS.result ~diags:(ANALYSIS.diagnostics analysis) ()
 
-(** [analyze_n_report common ~for_lsp ~ppf files] analyzes [files] in turn,
-    and reports diagnostics on [ppf].  Files are analyzed with
-    {!analyze_file_for_lsp} if [for_lsp] holds (so the cache is filled for the
-    LSP), or else with {!analyze_file}. *)
-let analyze_n_report (Common_args.{ pretty_progress; _ } as common) ~for_lsp
-    ~ppf files =
+(** [analyze_n_report ?setup ?error_status ?show_diagnostics common ~for_lsp
+    ~ppf files] analyzes [files] in turn, and reports diagnostics on [ppf].
+    Files are analyzed with {!analyze_file_for_lsp} if [for_lsp] holds (so the
+    cache is filled for the LSP), or else with {!analyze_file}; [setup] only
+    applies to the former.  See {!report} for [error_status] and
+    [show_diagnostics]; files that cannot be analyzed are reported on [ppf]
+    regardless. *)
+let analyze_n_report ?setup ?error_status ?show_diagnostics
+    (Common_args.{ pretty_progress; _ } as common) ~for_lsp ~ppf files =
   List.iter begin fun filename ->
     pretty_progress "Analyzing@ `%s'"
       (Cobol_common.Srcloc.NAMING.given_filename filename);
-    report common ~ppf @@
-    if for_lsp
-    then of_lsp_artifacts_file @@ analyze_file_for_lsp common filename
-    else analyze_file common filename
+    match
+      if for_lsp
+      then of_lsp_artifacts_file @@ analyze_file_for_lsp ?setup common filename
+      else analyze_file common filename
+    with
+    | analyzed ->
+        report common ?error_status ?show_diagnostics ~ppf analyzed
+    | exception (Out_of_memory | Stack_overflow | Sys.Break as e) ->
+        raise e
+    | exception e ->
+        (* Carry on with the remaining files, but exit with a status that tells
+           some file could not be analyzed, regardless of [error_status]. *)
+        Cobol_common.record_failure ();
+        Pretty.print ppf "@[<hov>Could@ not@ analyze@ `%s':@ %a@]@."
+          (Cobol_common.Srcloc.NAMING.given_filename filename)
+          Pretty.failure e
   end files
 
 (** [fold_analysis_results common ~f ~ppf files acc] analyzes [files] with

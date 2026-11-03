@@ -46,7 +46,16 @@ let scan_server_command cmd =
     None
 
 
-let server_command ~server_prefix ~context ?cmd () =
+(* What the server and the CLI commands that share its caches run with. *)
+type superbol_command =
+  {
+    kind: [`exe | `js];
+    command: string;
+    env: string Interop.Dict.t;
+    storage_args: string list;
+  }
+
+let superbol_command ~server_prefix ~context ?cmd () =
   let root_uri = Vscode.ExtensionContext.extensionUri context
   and storage_uri =
     (* Use the global state URI as the server stores caches on a per-project
@@ -56,7 +65,7 @@ let server_command ~server_prefix ~context ?cmd () =
     then Some (Vscode.ExtensionContext.globalStorageUri context)
     else None
   in
-  let server_kind, command =
+  let kind, command =
     match cmd with
     | Some cmd ->
         `exe, cmd
@@ -69,14 +78,22 @@ let server_command ~server_prefix ~context ?cmd () =
   let env =
     Interop.Dict.add "COB_CONFIG_DIR_FALLBACK" fallback_config_dir
       Node.Process.Env.env
+  and storage_args =
+    match storage_uri with
+    | None -> []
+    | Some uri -> ["--storage-directory"; Vscode.Uri.fsPath uri]
+  in
+  { kind; command; env; storage_args }
+
+let server_command ~server_prefix ~context ?cmd () =
+  let { kind = server_kind; command; env; storage_args } =
+    superbol_command ~server_prefix ~context ?cmd ()
   in
   let args =
     let force_diagnostics = Superbol_config.bool "forceSyntaxDiagnostics" in
     "lsp" ::
     (if force_diagnostics then ["--force-syntax-diagnostics"] else []) @
-    (match storage_uri with
-     | None -> []
-     | Some uri -> ["--storage-directory"; Vscode.Uri.fsPath uri])
+    storage_args
   in
   let server_options =
     match server_kind with
@@ -100,6 +117,35 @@ let server_access ~context ~server_prefix =
       | Some access -> access
       | None -> server_command ~server_prefix ~context ~cmd ()
 
+
+type cli_invocation =
+  {
+    program: string;
+    args_prefix: string list;
+    cli_env: string Interop.Dict.t;
+    cli_storage_args: string list;
+  }
+
+(* A bundled node module is run with the node runtime that runs VS Code
+   itself, as the language client does when it forks the server. *)
+let cli_invocation ~context ~server_prefix =
+  let invocation { kind; command; env; storage_args } =
+    match kind with
+    | `exe ->
+        Some { program = command; args_prefix = []; cli_env = env;
+               cli_storage_args = storage_args }
+    | `js ->
+        Some { program = Node.Process.execPath; args_prefix = [command];
+               cli_env = Interop.Dict.add "ELECTRON_RUN_AS_NODE" "1" env;
+               cli_storage_args = storage_args }
+  in
+  match Superbol_config.superbol_exe () with
+  | None ->
+      invocation @@ superbol_command ~server_prefix ~context ()
+  | Some cmd ->
+      match scan_server_command cmd with
+      | Some TCP _ | Some Sub_process _ -> None      (* not run by us *)
+      | None -> invocation @@ superbol_command ~server_prefix ~context ~cmd ()
 
 let client_options () =
   LSP.ClientOptions.create ()
