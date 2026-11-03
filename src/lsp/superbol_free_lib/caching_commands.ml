@@ -104,11 +104,14 @@ let analyze_located Common_args.{ platform; analysis_overrides = overrides; _ }
 let analyze_located_for_lsp
     Common_args.{ platform; analysis_overrides = overrides; _ }
     { filename; project; contents; cached } =
+  (* Semantic tokens are computed (and cached) as the LSP does, as it is the LSP
+     that will reuse them. *)
+  let semantic_tokens = Cobol_lsp.Semtoks.whole in
   let analysis, hit =
     match cached with
     | Some (cache, keys) ->
         ANALYSIS.cached_analysis_for_lsp cache ~platform ~overrides ~keys
-          ~filename ~contents project
+          ~semantic_tokens ~filename ~contents project
     | None ->
         ANALYSIS.analyze_for_lsp ~platform ~overrides ~filename ~contents
           project, false

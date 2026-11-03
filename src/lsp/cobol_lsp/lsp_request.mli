@@ -77,4 +77,12 @@ module INTERNAL: sig
     -> Lsp_server.t
     -> Lsp.Types.RenameParams.t
     -> Lsp.Types.WorkspaceEdit.t
+  val semtoks_full
+    : Lsp_server.t
+    -> Lsp.Types.SemanticTokensParams.t
+    -> Lsp.Types.SemanticTokens.t option
+  val semtoks_range
+    : Lsp_server.t
+    -> Lsp.Types.SemanticTokensRangeParams.t
+    -> Lsp.Types.SemanticTokens.t option
 end
