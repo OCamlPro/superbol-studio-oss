@@ -131,13 +131,15 @@ let of_lsp_artifacts_file
     ({ analysis; _ } as file: ANALYSIS.for_lsp analyzed_file) =
   { file with analysis = ANALYSIS.of_lsp_artifacts analysis }
 
-(** [derived_entry ~label ~inputs located] is the cache, and key of the derived
-    entry, for [located], along with the keys of the analysis it may derive
-    from. *)
+(** [derived_entry ~label ~inputs located] is the cache, key and slot of the
+    derived entry, for [located], along with the keys of the analysis it may
+    derive from. *)
 let derived_entry ~label ~inputs ({ cached; _ }: located_file) =
   Option.map begin fun (cache, keys) ->
-    let inputs = ANALYSIS.inputs keys @ inputs in
-    cache, CACHE.shallow_key ~label ~inputs, keys
+    cache,
+    CACHE.shallow_key ~label ~inputs:(ANALYSIS.inputs keys @ inputs),
+    ANALYSIS.slot ~label ~inputs keys,
+    keys
   end cached
 
 (** [analyze_located_n_witness common ~cache ~keys located] is the analysis
@@ -159,7 +161,7 @@ let derive_located
     ~label ~inputs ~(derive: ANALYSIS.t analyzed_file -> 'a) located
   : 'a * bool * ANALYSIS.t analyzed_file Lazy.t =
   match derived_entry ~label ~inputs located with
-  | Some (cache, key, keys) ->
+  | Some (cache, key, slot, keys) ->
       let resolve = RECORDER.resolver ~platform () in
       begin match CACHE.lookup cache ~key ~resolve
                     ~read_item:CACHING.read_item with
@@ -174,13 +176,18 @@ let derive_located
             analyze_located_n_witness common ~cache ~keys
               located in
           let v = derive analyzed in
-          ignore @@
-          CACHE.store cache ~key
-            ~label:(Printf.sprintf "%s:%s" label @@
-                    Superbol_project.relative_path_for ~filename:located.filename
-                      located.project)
-            ~witnesses:[WITNESS.sub analysis_key]
-            ~write_item:CACHING.write_item v;
+          begin
+            match
+              CACHE.store cache ~key
+                ~label:(Printf.sprintf "%s:%s" label @@
+                        Superbol_project.relative_path_for
+                          ~filename:located.filename located.project)
+                ~witnesses:[WITNESS.sub analysis_key]
+                ~write_item:CACHING.write_item v
+            with
+            | Ok () -> ignore @@ CACHE.supersede cache ~slot [key]
+            | Error _ -> ()
+          end;
           v, false, Lazy.from_val analyzed
       end
   | None ->
@@ -220,7 +227,7 @@ let derive_n_analyze_file common ~label ~inputs ~derive filename
 let lookup_located (Common_args.{ platform; _ } as common) ~label ~inputs
     located : ('a * ANALYSIS.t analyzed_file Lazy.t) option =
   match derived_entry ~label ~inputs located with
-  | Some (cache, key, keys) ->
+  | Some (cache, key, _, keys) ->
       let resolve = RECORDER.resolver ~platform () in
       begin match CACHE.lookup cache ~key ~resolve
                     ~read_item:CACHING.read_item with

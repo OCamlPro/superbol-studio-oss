@@ -319,3 +319,88 @@ let%expect_test "editing a copybook is a miss for both" =
   cli_analyze ~projdir ();
   cleanup projdir;
   [%expect {| analyzed by the CLI |}];;
+
+(* --- Superseding earlier versions --- *)
+
+let show_cache_stats ~projdir =
+  let rootdir =
+    Superbol_project.rootdir_for ~filename:(projdir // "prog.cob") ~layout in
+  let cache =
+    lsp_cache_for ~rootdir:(Superbol_project.string_of_rootdir rootdir) in
+  match Superbol_cache.Cache.stats cache with
+  | Ok { stats_entries; stats_objects; _ } ->
+      Printf.printf "entries: %d, values: %d\n" stats_entries stats_objects
+  | Error _ ->
+      print_endline "stats: failed"
+
+let%expect_test "storing a new version reclaims the previous one" =
+  let projdir = setup ~copybook_dirs:[".", "       01 X PIC X.\n"] () in
+  ignore [%expect.output];
+  show_cache_stats ~projdir;
+  [%expect {| entries: 3, values: 3 |}];
+  (* Edited between sessions: the new version is stored when opened... *)
+  ignore (write ~projdir "prog.cob" (program ^ "      *> edited\n"));
+  reopen_and_save ~projdir;
+  ignore [%expect.output];
+  show_cache_stats ~projdir;
+  [%expect {| entries: 3, values: 3 |}];
+  (* ... and the previous one is gone: reverting is a miss. *)
+  ignore (write ~projdir "prog.cob" program);
+  reopen ~projdir;
+  report [%expect.output];
+  cleanup projdir;
+  [%expect {| parsed afresh |}];;
+
+let%expect_test "saving an edited document reclaims the previous version" =
+  let projdir =
+    setup ~persist:persist_on_did_save
+      ~copybook_dirs:[".", "       01 X PIC X.\n"] ()
+  in
+  ignore [%expect.output];
+  let server = open_doc (server ()) ~projdir "prog.cob" in
+  ignore [%expect.output];
+  let uri = Lsp.Uri.of_path (projdir // "prog.cob") in
+  let server =
+    LSP.Server.did_change
+      Lsp.Types.DidChangeTextDocumentParams.{
+        textDocument = Lsp.Types.VersionedTextDocumentIdentifier.create ~uri
+            ~version:1;
+        contentChanges = [
+          Lsp.Types.TextDocumentContentChangeEvent.create
+            ~text:(program ^ "      *> edited\n") () ];
+      } server
+  in
+  ignore (write ~projdir "prog.cob" (program ^ "      *> edited\n"));
+  persist_on_did_save server ~projdir;
+  ignore [%expect.output];
+  show_cache_stats ~projdir;   (* the analysis and LSP data; no project yet *)
+  [%expect {| entries: 2, values: 2 |}];
+  reopen ~projdir;
+  report [%expect.output];
+  [%expect {| restored from cache |}];
+  ignore (write ~projdir "prog.cob" program);
+  reopen ~projdir;
+  report [%expect.output];
+  cleanup projdir;
+  [%expect {| parsed afresh |}];;
+
+let%expect_test "the CLI supersedes the analyses it stored for earlier versions" =
+  let projdir = setup ~copybook_dirs:[".", "       01 X PIC X.\n"] () in
+  ignore [%expect.output];
+  let version n = program ^ Printf.sprintf "      *> version %d\n" n in
+  List.iter begin fun for_lsp ->
+    ignore (write ~projdir "prog.cob" (version 2));
+    cli_analyze ~for_lsp ~projdir ();
+    ignore (write ~projdir "prog.cob" (version 3));
+    cli_analyze ~for_lsp ~projdir ();
+    ignore (write ~projdir "prog.cob" (version 2));
+    cli_analyze ~for_lsp ~projdir ();
+  end [false; true];
+  cleanup projdir;
+  [%expect {|
+    analyzed by the CLI
+    analyzed by the CLI
+    analyzed by the CLI
+    analyzed by the CLI
+    analyzed by the CLI
+    analyzed by the CLI |}];;

@@ -529,3 +529,126 @@ let%expect_test "a disabled cache misses and stores nothing" =
   [%expect {|
     store: failed
     miss |}];;
+
+(* --- Superseding --- *)
+
+let show_stats cache =
+  match Cache.stats cache with
+  | Ok { stats_entries; stats_objects; _ } ->
+      Printf.printf "entries: %d, values: %d\n" stats_entries stats_objects
+  | Error _ -> print_endline "stats: failed"
+
+let supersede cache ~slot keys =
+  match Cache.supersede cache ~slot keys with
+  | Ok () -> ()
+  | Error _ -> print_endline "supersede: failed"
+
+let%expect_test "a new version supersedes the entries of the previous one" =
+  let _clock, _store, cache = setup () in
+  let w = world () in
+  let slot = key ~label:"slot" "a.cbl" in
+  let v1 = key "a.cbl, version 1" and v2 = key "a.cbl, version 2" in
+  put cache ~key:v1 ~witnesses:[] "parsed version 1";
+  supersede cache ~slot [v1];
+  supersede cache ~slot [v1];                   (* recording it again is fine *)
+  get cache w ~key:v1;
+  put cache ~key:v2 ~witnesses:[] "parsed version 2";
+  supersede cache ~slot [v2];
+  get cache w ~key:v1;
+  get cache w ~key:v2;
+  show_stats cache;
+  [%expect {|
+    hit: parsed version 1
+    miss
+    hit: parsed version 2
+    entries: 1, values: 1 |}];;
+
+let%expect_test "superseding keeps a value that a new entry still holds" =
+  (* Two versions that differ in a way that does not show in what was cached
+     share their value; and so do the entries of any one slot that hold the same
+     bytes. *)
+  let _clock, _store, cache = setup () in
+  let w = world () in
+  let slot = key ~label:"slot" "a.cbl" in
+  let v1 = key "a.cbl, version 1" and v2 = key "a.cbl, version 2" in
+  let aux1 = key ~label:"aux" "a.cbl, version 1"
+  and aux2 = key ~label:"aux" "a.cbl, version 2" in
+  put cache ~key:v1 ~witnesses:[] "same";
+  put cache ~key:aux1 ~witnesses:[] "aux";
+  supersede cache ~slot [v1; aux1];
+  put cache ~key:v2 ~witnesses:[] "same";
+  put cache ~key:aux2 ~witnesses:[] "aux";
+  supersede cache ~slot [aux2; v2];
+  get cache w ~key:v1;
+  get cache w ~key:v2;
+  get cache w ~key:aux2;
+  show_stats cache;
+  [%expect {|
+    miss
+    hit: same
+    hit: aux
+    entries: 2, values: 2 |}];;
+
+let%expect_test "slots are independent of one another" =
+  let _clock, _store, cache = setup () in
+  let w = world () in
+  let a = key "a.cbl" and b = key "b.cbl" in
+  put cache ~key:a ~witnesses:[] "parsed a";
+  supersede cache ~slot:(key ~label:"slot" "a.cbl") [a];
+  put cache ~key:b ~witnesses:[] "parsed b";
+  supersede cache ~slot:(key ~label:"slot" "b.cbl") [b];
+  get cache w ~key:a;
+  get cache w ~key:b;
+  [%expect {|
+    hit: parsed a
+    hit: parsed b |}];;
+
+let%expect_test "a damaged slot names nothing to remove" =
+  let _clock, store, cache = setup () in
+  let w = world () in
+  let slot = key ~label:"slot" "a.cbl" in
+  let a = key "a.cbl" in
+  put cache ~key:a ~witnesses:[] "parsed a";
+  ignore @@ store.publish ~path:(Layout.slot slot) ~replace:true
+    ~contents:("../manifests/" ^ String.sub a 0 2 ^ "/" ^ a ^ "\nnot a key");
+  supersede cache ~slot [key "a.cbl, version 2"];
+  get cache w ~key:a;
+  [%expect {| hit: parsed a |}];;
+
+let%expect_test "replacing an entry reclaims the value it held" =
+  let _clock, _store, cache = setup () in
+  let w = world () in
+  w.files <- ["/p/BOOK.cpy", "01 X PIC 9."];
+  let k = key "a.cbl" in
+  put cache ~key:k
+    ~witnesses:[Witness.file ~name:"/p/BOOK.cpy" ~contents:"01 X PIC X."]
+    "parsed with a PIC X";
+  put cache ~key:k
+    ~witnesses:[Witness.file ~name:"/p/BOOK.cpy" ~contents:"01 X PIC 9."]
+    "parsed with a PIC 9";
+  get cache w ~key:k;
+  show_stats cache;
+  [%expect {|
+    hit: parsed with a PIC 9
+    entries: 1, values: 1 |}];;
+
+let%expect_test "an age bound reclaims slots" =
+  let clock, store, cache = setup () in
+  let slot = key ~label:"slot" "a.cbl" in
+  let a = key "a.cbl" in
+  put cache ~key:a ~witnesses:[] "parsed a";
+  supersede cache ~slot [a];
+  let show () =
+    Printf.printf "slot: %s\n"
+      (match store.read (Layout.slot slot) with
+       | Ok Some _ -> "present" | Ok None -> "absent" | Error _ -> "error")
+  in
+  ignore (Cache.prune cache ~policy:Never);
+  show ();
+  clock := 5000.;
+  ignore (Cache.prune cache ~policy:(Bounded { max_age = Some 500.;
+                                               max_size = None }));
+  show ();
+  [%expect {|
+    slot: present
+    slot: absent |}];;
