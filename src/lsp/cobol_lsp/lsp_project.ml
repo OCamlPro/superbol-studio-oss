@@ -105,10 +105,12 @@ let update_dialect ({ config; _ } as project) str : bool =
       Superbol_project.Config.cobol_config_from_dialect_name str
         ~verbose:false
     in
-    if result = config.cobol_config            (* note: structural comparison *)
+    if result = config.cobol_config &&         (* note: structural comparison *)
+       String.equal str config.dialect_name
     then false
     else begin
       config.cobol_config <- result;
+      config.dialect_name <- str;
       show_diagnostics project diags;
       true
     end
@@ -215,7 +217,6 @@ let reload_project_config project =
 (** Reconstruct a JSON `Assoc from the current configuration.  *)
 let get_project_config ?(flat = true) project : Yojson.Safe.t =
   let config = Superbol_project.config project in
-  let module Config = (val config.cobol_config) in
   let copybooks =
     List.map begin function
       | RelativeToProjectRoot dir ->
@@ -232,7 +233,7 @@ let get_project_config ?(flat = true) project : Yojson.Safe.t =
   let cobol =
     [
       "dialect",
-      `String (Cobol_config.DIALECT.to_string Config.dialect);
+      `String config.dialect_name;
 
       "sourceFormat",
       `String (Cobol_config.Options.string_of_format config.source_format);
