@@ -205,7 +205,7 @@ let indent_tokens ~config tokens =
     | _
       -> ()
 (*
-      Printf.kprintf failwith "No END-%s token"
+      Printf.ksprintf failwith "No END-%s token"
         ( Misc.string_of_token token )
 *)
   in
