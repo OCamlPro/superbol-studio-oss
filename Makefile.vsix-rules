@@ -90,6 +90,16 @@ else				#platform-specific
 	./$(SUPERBOL_LSP_BUILT) json vscode --gen - | diff -u package.json -
 endif
 
+.PHONY: test-vscode
+
+# Debugger integration tests, run within VS Code against the debug bundle.
+# They need `cobc` and `gdb`, and a display: use `xvfb-run -a make
+# test-vscode` on headless machines.  Set `VSCODE_TEST_EXECUTABLE` to
+# use a given VS Code instead of downloading one.
+test-vscode: build-debug
+	${DUNE} build ${DUNE_ARGS} test/vscode_debugger/main.bc.js
+	node test/vscode_debugger/run.js
+
 .PHONY: build-debug bundle-debug
 
 build-debug:

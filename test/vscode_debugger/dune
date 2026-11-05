@@ -1,0 +1,11 @@
+; Integration tests of the debugger, run within VS Code's extension test
+; host: see `run.js` and the `test-vscode` target in `Makefile.vsix-rules`.
+
+(executable
+ (name main)
+ (modes js)
+ (libraries vscode-js-stubs vscode-debugprotocol node-js-stubs
+            interop-js-stubs promise_jsoo js_of_ocaml gen_js_api)
+ (preprocess (pps gen_js_api.ppx))
+ (js_of_ocaml (flags --disable=genprim))
+ (enabled_if (= %{context_name} "default")))
