@@ -25,6 +25,7 @@ module TYPES = struct
 
   type config = {
     mutable cobol_config: Cobol_config.t;
+    mutable dialect_name: string;
     mutable source_format: Cobol_config.source_format_spec;
     mutable source_format_by_extension:
       (string * Cobol_config.source_format_spec) list;
@@ -73,8 +74,11 @@ let default_libexts = Cobol_common.Copybook.copybook_extensions
 let default_indent_config = []
 let default_source_format_by_extension = []
 
+let default_dialect_name = "default"
+
 let default = {
   cobol_config = Cobol_config.default;
+  dialect_name = default_dialect_name;
   source_format = Cobol_config.Auto;
   source_format_by_extension = default_source_format_by_extension;
   libpath = default_libpath;
@@ -88,8 +92,8 @@ let new_default () =
 
 (* Translation to TOML *)
 
-let dialect_repr dialect =
-  TOML.value_of_string @@ Cobol_config.DIALECT.to_string dialect
+let dialect_repr dialect_name =
+  TOML.value_of_string dialect_name
 
 let format_repr format =
   TOML.value_of_string @@ Cobol_config.Options.string_of_format format
@@ -137,7 +141,7 @@ let config_repr config ~name =
       option
         ~name: "dialect"
         ~after_comments: ["Default dialect for COBOL source files"]
-        (dialect_repr @@ Cobol_config.dialect config.cobol_config);
+        (dialect_repr config.dialect_name);
 
       option
         ~name: "source-format"
@@ -176,7 +180,7 @@ let get_source_format toml =
     default.source_format
 
 let get_dialect toml =
-  TOML.get_string toml ["dialect"] ~default:"default"
+  TOML.get_string toml ["dialect"] ~default:default_dialect_name
 
 let get_source_format_by_extension_entry toml =
   let ext = TOML.get_string toml ["extension"] in
@@ -222,10 +226,12 @@ let get_indent_config toml =
 let load_file ?(verbose=false) config_filename =
   let load_section toml_handle keys toml =
     let section = TOML.get keys toml in
+    let dialect_name = get_dialect section in
     let DIAGS.{ result = cobol_config; diags } =
-      cobol_config_from_dialect_name ~verbose @@ get_dialect section in
+      cobol_config_from_dialect_name ~verbose dialect_name in
     DIAGS.result ~diags
       { cobol_config;
+        dialect_name;
         toml_handle;
         source_format = get_source_format section;
         source_format_by_extension = get_source_format_by_extension section;
@@ -257,8 +263,9 @@ let reload ?(verbose=false) ~config_filename config =
        parsed/checked, so that [config] remains unchanged in case an exception
        is thrown. *)
     let section = TOML.get keys toml in
+    let dialect_name = get_dialect section in
     let DIAGS.{ result = cobol_config; diags } =
-      cobol_config_from_dialect_name ~verbose @@ get_dialect section
+      cobol_config_from_dialect_name ~verbose dialect_name
     and source_format = get_source_format section
     and source_format_by_extension = get_source_format_by_extension section
     and libpath = get_libpath section
@@ -270,9 +277,11 @@ let reload ?(verbose=false) ~config_filename config =
       config.libpath <> libpath ||
       config.libexts <> libexts ||
       config.indent_config <> indent_config ||
+      config.dialect_name <> dialect_name ||
       config.cobol_config <> cobol_config
     in
     config.cobol_config <- cobol_config;
+    config.dialect_name <- dialect_name;
     config.source_format <- source_format;
     config.source_format_by_extension <- source_format_by_extension;
     config.libpath <- libpath;
@@ -287,6 +296,7 @@ let reload ?(verbose=false) ~config_filename config =
       reload_section toml [config_section_name]
     with Not_found ->                         (* missing section: use defaults *)
       config.cobol_config <- default.cobol_config;
+      config.dialect_name <- default.dialect_name;
       config.source_format <- default.source_format;
       config.source_format_by_extension <-
         default.source_format_by_extension;
@@ -355,11 +365,13 @@ type cached =
     cached_toml_handle: Ezr_toml.cacheable;
   }
 
-let to_cache { cobol_config; source_format; source_format_by_extension;
-               libpath; libexts; indent_config; toml_handle } =
+(* The dialect is cached as configured, so that a configuration read from a
+   file is read from that file again. *)
+let to_cache { dialect_name; source_format; source_format_by_extension;
+               libpath; libexts; indent_config; toml_handle;
+               cobol_config = _ } =
   {
-    cached_dialect =
-      Cobol_config.DIALECT.to_string @@ Cobol_config.dialect cobol_config;
+    cached_dialect = dialect_name;
     cached_source_format = source_format;
     cached_source_format_by_extension = source_format_by_extension;
     cached_libpath = libpath;
@@ -378,6 +390,7 @@ let of_cache ~config_filename
     cobol_config_from_dialect_name ~verbose:false cached_dialect in
   let config =
     { cobol_config;
+      dialect_name = cached_dialect;
       source_format = cached_source_format;
       source_format_by_extension = cached_source_format_by_extension;
       libpath = cached_libpath;

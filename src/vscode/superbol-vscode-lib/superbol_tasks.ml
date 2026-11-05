@@ -141,10 +141,13 @@ let cobc_execution ?config attributes =
       end |>
     config_string "cobol.dialect" ~config
       ~append:begin function
-        | "gnucobol" -> List.cons "-std=default"
-        | s when s <> "" && not (Filename.is_relative s) ->
-                  List.cons ("-conf=" ^ s)
-        | s -> List.cons ("-std=" ^ s)
+        | "gnucobol" ->
+            List.cons "-std=default"
+        | s when s <> "" && (not (Filename.is_relative s) ||
+                             Filename.check_suffix s ".conf") ->
+            List.cons ("-conf=" ^ s)
+        | s ->
+            List.cons ("-std=" ^ s)
       end|>
     config_string "cobol.sourceFormat" ~config
       ~append:(fun f -> List.cons ("-fformat=" ^ f)) |>

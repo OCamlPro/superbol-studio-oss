@@ -25,6 +25,8 @@
     depend on which GnuCOBOL configuration files happen to be installed. *)
 
 open Lsp_testing
+open Ez_file.V1
+open EzFile.OP
 
 let layout = Superbol_project.Layout.default
 
@@ -67,3 +69,54 @@ let%expect_test "a project survives the round trip" =
   [%expect {|
     before: dialect default, format fixed by the project, copyexts cpy,CPY
     after:  dialect default, format fixed by the project, copyexts cpy,CPY |}];;
+
+let%expect_test "a dialect given as a .conf file survives the round trip from/to \
+                 the client" =
+  let { projdir; end_with_postproc }, _ = make_lsp_project () in
+  let conf = projdir // "my.conf" in
+  EzFile.write_text_file conf "name: \"mf-strict\"\n";
+  EzFile.write_text_file (projdir // layout.project_config_filename)
+    (Pretty.to_string "[cobol]\ndialect = %S\n" conf);
+  let describe ppf project =
+    let config = LSP.Project.config project in
+    Pretty.print ppf "%s (%s)"
+      config.dialect_name
+      Cobol_config.(DIALECT.to_string @@ dialect config.cobol_config)
+  in
+  let project = LSP.Project.in_existing_dir projdir ~layout in
+  ignore (Superbol_project.reload_config project); (* as if changed by client *)
+  let reported =
+    Yojson.Safe.Util.(to_string @@ member "cobol.dialect" @@
+                      LSP.Project.get_project_config project)
+  and written =
+    (* As the command that writes the project configuration does. *)
+    Superbol_project.save_config project;
+    EzFile.read_text_file (projdir // layout.project_config_filename)
+  in
+  let restored =
+    LSP.Project.of_cache ~rootdir:(LSP.Project.rootdir project) ~layout @@
+    Marshal.from_string (Marshal.to_string (LSP.Project.to_cache project) []) 0
+  in
+  Pretty.out "before:   %a@." describe project;
+  Pretty.out "reported: %s@." reported;
+  Pretty.out "written:  @[%a@]@." Fmt.lines written;
+  Pretty.out "after:    %a@." describe restored;
+  end_with_postproc  [%expect.output];
+  [%expect {|
+    before:   __rootdir__/my.conf (mf-strict)
+    reported: __rootdir__/my.conf
+    written:  [cobol]
+              dialect = "__rootdir__/my.conf"
+              #Default source reference-format
+              source-format = "auto"
+              #Per-extension source reference-format overrides
+              source-format-by-extension = [  ]
+              #Copybook filename extensions
+              copyexts = [ "cpy", "cbl", "cob" ]
+              #Where to find copybooks
+              [[cobol.copybooks]]
+              file-relative = false
+              dir = "."
+              #Indenter configuration
+              [cobol.indent]
+    after:    __rootdir__/my.conf (mf-strict) |}];;

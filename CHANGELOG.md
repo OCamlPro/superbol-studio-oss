@@ -10,6 +10,7 @@
 - Memory usage [#714](https://github.com/OCamlPro/superbol-studio-oss/pull/714)
 
 ### Fixed
+- Handling of dialects given as configuration files (e.g. `dialect.conf`) in build tasks [#???](https://github.com/OCamlPro/superbol-studio-oss/pull/???)
 - Internal errors of the LSP server that may occur on some (rare) corner cases [#702](https://github.com/OCamlPro/superbol-studio-oss/pull/702)
 - Fatal error on ambiguous qualified names appearing in abbreviated relation conditions [#701](https://github.com/OCamlPro/superbol-studio-oss/pull/701)
 - Wrong "missing PICTURE" error on group items with a `USAGE` clause [#700](https://github.com/OCamlPro/superbol-studio-oss/pull/700)

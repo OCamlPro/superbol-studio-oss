@@ -21,6 +21,8 @@ module TYPES: sig
 
   type config = (* private *) {
     mutable cobol_config: Cobol_config.t;
+    mutable dialect_name: string;
+    (** Builtin GnuCOBOL dialect name, or the name of a configuration file. *)
     mutable source_format: Cobol_config.source_format_spec;
     mutable source_format_by_extension:
       (string * Cobol_config.source_format_spec) list;
