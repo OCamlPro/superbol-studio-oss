@@ -3,7 +3,7 @@
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
 (*                                                                        *)
-(*  Copyright (c) 2023 OCamlPro SAS                                       *)
+(*  Copyright (c) 2026 OCamlPro SAS                                       *)
 (*                                                                        *)
 (*  All rights reserved.                                                  *)
 (*  This source code is licensed under the MIT license found in the       *)
@@ -82,7 +82,7 @@ let path ctx file = Node.Path.join [ ctx.dir; file ]
 let built : (string, (ctx, string) result) Hashtbl.t = Hashtbl.create 7
 
 (** Builds [p] once, in a sub-directory of [workdir]. *)
-let build ~workdir p : ctx res =
+let build p ~workdir : ctx res =
   match Hashtbl.find_opt built p.name with
   | Some r -> Promise.return r
   | None ->
@@ -196,12 +196,18 @@ let on_adapter_message message =
        | _ -> ())
   | _ -> ()
 
+(* Debug sessions started since the last [stop_debugging], latest first. *)
+let started_sessions : Vscode.DebugSession.t list ref = ref []
+
 let record_sessions () =
   let tracker _session = DebugAdapterTracker.create ~onDidSendMessage:on_adapter_message () in
   ignore @@ Debug.registerDebugAdapterTrackerFactory ~debugType:debug_type
     ~factory:(DebugAdapterTrackerFactory.create ~createDebugAdapterTracker:tracker ());
   ignore @@ Debug.onDidTerminateDebugSession () ~listener:(fun session ->
-      if Vscode.DebugSession.type_ session = debug_type then push Terminated)
+      if Vscode.DebugSession.type_ session = debug_type then push Terminated);
+  ignore @@ Debug.onDidStartDebugSession () ~listener:(fun session ->
+      if Vscode.DebugSession.type_ session = debug_type then
+        started_sessions := session :: !started_sessions)
 
 let rec next_event ~deadline : event res =
   match Queue.take_opt events with
@@ -232,9 +238,9 @@ let next_stop ?(timeout = event_timeout_ms) () : stop res =
       Promise.map (fun () -> Ok stop) (sleep 100)
 
 (** Waits for the end of the session. *)
-let terminated () : unit res =
+let terminated ?(timeout = event_timeout_ms) () : unit res =
   let open Syntax in
-  let* e = next_event ~deadline:(Node.Date.now () +. event_timeout_ms) in
+  let* e = next_event ~deadline:(Node.Date.now () +. timeout) in
   match e with
   | Terminated -> ok ()
   | Stopped _ as e -> error "expected the program to terminate, but %s" (describe e)
@@ -336,6 +342,7 @@ let stop_debugging () =
   remove_all_breakpoints ();
   Queue.clear events;
   pending_stop := None;
+  started_sessions := [];
   Buffer.clear stdout_buf;
   Buffer.clear console_buf;
   Promise.return ()
@@ -431,12 +438,17 @@ type test =
   {
     title: string;
     kind: kind;
-    prog: program;
+    prepare: workdir:string -> ctx res;   (** sets up what [body] works on *)
     body: ctx -> unit res;
   }
 
-let expected title prog body = { title; kind = Expected; prog; body }
-let probe title prog body = { title; kind = Probe; prog; body }
+(** Tests that debug the given program, built beforehand. *)
+let expected title prog body = { title; kind = Expected; prepare = build prog; body }
+let probe title prog body = { title; kind = Probe; prepare = build prog; body }
+
+(** Tests that work on what [prepare] sets up. *)
+let expected_with title prepare body = { title; kind = Expected; prepare; body }
+let probe_with title prepare body = { title; kind = Probe; prepare; body }
 
 type suite = { suite: string; tests: test list }
 
@@ -446,7 +458,7 @@ let run_test ~workdir ~suite_name test : outcome Promise.t =
   let open Promise.Syntax in
   let* result =
     let open Syntax in
-    let* ctx = build ~workdir test.prog in
+    let* ctx = test.prepare ~workdir in
     test.body ctx in
   let* () = stop_debugging () in
   let label = match test.kind, result with

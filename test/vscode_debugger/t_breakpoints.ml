@@ -3,7 +3,7 @@
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
 (*                                                                        *)
-(*  Copyright (c) 2023 OCamlPro SAS                                       *)
+(*  Copyright (c) 2026 OCamlPro SAS                                       *)
 (*                                                                        *)
 (*  All rights reserved.                                                  *)
 (*  This source code is licensed under the MIT license found in the       *)
@@ -77,7 +77,7 @@ let suite = { suite = "Breakpoints"; tests = [
       let* s = start ctx src ~bps:[bp src 16] in
       expect_line ~what:"stop" 16 s);
 
-  probe "breakpoints added while stopped are hit" bps (fun ctx ->
+  expected "breakpoints added while stopped are hit" bps (fun ctx ->
       let* _ = start ctx src ~bps:[bp src 13] in
       let* () = update_breakpoints (fun () -> add_breakpoints ctx [bp src 16]) in
       let* s = continue_ () in

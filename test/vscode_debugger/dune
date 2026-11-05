@@ -1,5 +1,6 @@
-; Integration tests of the debugger, run within VS Code's extension test
-; host: see `run.js` and the `test-vscode` target in `Makefile.vsix-rules`.
+; Integration tests of the debugger, run within VS Code's extension
+; test host: see `run.js` and the `test-vscode-debug` target in
+; `Makefile.header`.
 
 (executable
  (name main)

@@ -3,7 +3,7 @@
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
 (*                                                                        *)
-(*  Copyright (c) 2023 OCamlPro SAS                                       *)
+(*  Copyright (c) 2026 OCamlPro SAS                                       *)
 (*                                                                        *)
 (*  All rights reserved.                                                  *)
 (*  This source code is licensed under the MIT license found in the       *)
@@ -12,8 +12,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Bindings to the parts of VS Code's debug API that the vendored [vscode]
-    bindings do not cover. *)
+(** Bindings to the parts of VS Code's debug and task APIs that the vendored
+    [vscode] bindings do not cover. *)
 
 open Interop
 
@@ -68,6 +68,7 @@ end
 
 module Debug = struct
   module OnDidTerminateDebugSession = Vscode.Event.Make (Vscode.DebugSession)
+  module OnDidStartDebugSession = Vscode.Event.Make (Vscode.DebugSession)
 
   include
     [%js:
@@ -95,7 +96,10 @@ module Debug = struct
       [@@js.global "__SUPERBOL__.vscode.debug.registerDebugAdapterTrackerFactory"]
 
     val onDidTerminateDebugSession: OnDidTerminateDebugSession.t
-      [@@js.global "__SUPERBOL__.vscode.debug.onDidTerminateDebugSession"]]
+      [@@js.global "__SUPERBOL__.vscode.debug.onDidTerminateDebugSession"]
+
+    val onDidStartDebugSession: OnDidStartDebugSession.t
+      [@@js.global "__SUPERBOL__.vscode.debug.onDidStartDebugSession"]]
 end
 
 (** Sending DAP requests to the debug adapter of a session.  Responses are
@@ -125,3 +129,46 @@ module Extension = struct
     [%js:
     val activate: Vscode.Extension.t -> unit Promise.t [@@js.call]]
 end
+
+module TaskExecution = struct
+  include Interface.Make ()
+
+  include
+    [%js:
+    val task: t -> Vscode.Task.t [@@js.get]
+    val terminate: t -> unit [@@js.call]]
+end
+
+module TaskStartEvent = struct
+  include Interface.Make ()
+
+  include
+    [%js:
+    val execution: t -> TaskExecution.t [@@js.get]]
+end
+
+module TaskProcessEndEvent = struct
+  include Interface.Make ()
+
+  include
+    [%js:
+    val execution: t -> TaskExecution.t [@@js.get]
+    val exitCode: t -> int or_undefined [@@js.get]]
+end
+
+module Tasks = struct
+  module OnDidStartTask = Vscode.Event.Make (TaskStartEvent)
+  module OnDidEndTaskProcess = Vscode.Event.Make (TaskProcessEndEvent)
+
+  include
+    [%js:
+    val onDidStartTask: OnDidStartTask.t
+      [@@js.global "__SUPERBOL__.vscode.tasks.onDidStartTask"]
+
+    val onDidEndTaskProcess: OnDidEndTaskProcess.t
+      [@@js.global "__SUPERBOL__.vscode.tasks.onDidEndTaskProcess"]
+
+    val taskExecutions: unit -> TaskExecution.t list
+      [@@js.get "__SUPERBOL__.vscode.tasks.taskExecutions"]]
+end
+

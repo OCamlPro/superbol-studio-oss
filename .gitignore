@@ -31,6 +31,7 @@ _build
 /gnucobol-config
 ATTIC
 /out
+/.vscode-test
 !.vscode/tasks.json
 !.vscode/launch.json
 *.vsix
@@ -40,4 +41,3 @@ ATTIC
 _superbol
 
 
-/.vscode-test

@@ -3,7 +3,7 @@
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
 (*                                                                        *)
-(*  Copyright (c) 2023 OCamlPro SAS                                       *)
+(*  Copyright (c) 2026 OCamlPro SAS                                       *)
 (*                                                                        *)
 (*  All rights reserved.                                                  *)
 (*  This source code is licensed under the MIT license found in the       *)
@@ -72,7 +72,7 @@ let rec steps_until ~last ?(limit = 30) acc : int list res =
 
 let suite = { suite = "Stepping"; tests = [
 
-  probe "step over walks the main paragraph without entering performed paragraphs"
+  expected "step over walks the main paragraph without entering performed paragraphs"
     performs (fun ctx ->
         let* s = start_at ctx [9] in
         let* () = expect_line ~what:"first stop" 9 s in
@@ -82,23 +82,23 @@ let suite = { suite = "Stepping"; tests = [
         check (collapsed = [10; 11; 12; 13; 14; 12; 13; 14; 12; 16; 17; 18])
           "unexpected stops: %s" (String.concat " " (List.map string_of_int lines)));
 
-  probe "step over PERFORM ... TIMES skips all iterations" performs (fun ctx ->
+  expected "step over PERFORM ... TIMES skips all iterations" performs (fun ctx ->
       let* s = start_at ctx [11] in
       let* () = expect_line ~what:"first stop" 11 s in
       let* s = step_over () in
       expect_line ~what:"after stepping over" 12 s);
 
-  probe "step into PERFORM enters the paragraph" performs (fun ctx ->
+  expected "step into PERFORM enters the paragraph" performs (fun ctx ->
       let* _ = start_at ctx [10] in
       let* s = step_into () in
       check (List.mem (line_of s) [19; 20]) "expected line 19 or 20, got %d" (line_of s));
 
-  probe "step into a statement other than PERFORM steps over it" performs (fun ctx ->
+  expected "step into a statement other than PERFORM steps over it" performs (fun ctx ->
       let* _ = start_at ctx [9] in
       let* s = step_into () in
       expect_line ~what:"after stepping into DISPLAY" 10 s);
 
-  probe "step out of nested paragraphs returns to the main paragraph" performs (fun ctx ->
+  expected "step out of nested paragraphs returns to the main paragraph" performs (fun ctx ->
       (* The first stop on line 23 is from 10 > PARA-A > 21 > PARA-B. *)
       let* _ = start_at ctx [23] in
       let* s = step_out () in
@@ -106,14 +106,14 @@ let suite = { suite = "Stepping"; tests = [
       let* s = continue_ () in
       expect_line ~what:"after continuing" 23 s);
 
-  probe "step out of a paragraph reached by breakpoint" performs (fun ctx ->
+  expected "step out of a paragraph reached by breakpoint" performs (fun ctx ->
       let* _ = start_at ctx [20] in
       let* s = step_out () in
       let* () = expect_line ~what:"after stepping out" 11 s in
       let* s = step_over () in
       expect_line ~what:"after stepping over" 12 s);
 
-  probe "step out of a paragraph performed THRU continues with the range" performs
+  expected "step out of a paragraph performed THRU continues with the range" performs
     (fun ctx ->
        (* 6th stop on 23 is via 16 > PARA-A > 21; PARA-A then falls through
           into PARA-B, as the PERFORM on line 16 goes THRU PARA-B. *)
@@ -123,7 +123,7 @@ let suite = { suite = "Stepping"; tests = [
        let* s = step_out () in
        expect_line ~what:"after stepping out" 23 s);
 
-  probe "breakpoints interrupt step over" performs (fun ctx ->
+  expected "breakpoints interrupt step over" performs (fun ctx ->
       let* s = start_at ctx [11; 23] in
       let* () = expect_line ~what:"first stop" 23 s in
       let* s = continue_ () in

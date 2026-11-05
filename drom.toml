@@ -82,6 +82,7 @@ dot-gitignore-trailer = """
 /gnucobol-config
 ATTIC
 /out
+/.vscode-test
 !.vscode/tasks.json
 !.vscode/launch.json
 *.vsix
