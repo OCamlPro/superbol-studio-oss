@@ -178,15 +178,24 @@ let analyze_cmd =
                 server does when its client sends these settings of the \
                 `superbol.cobol' section (e.g. `{\"dialect\": \"ibm\"}')";
              ["encoding"],
-             Arg.Symbol (Cobol_common.Text_encoding.supported_names, fun s ->
-                 encoding :=
-                   Some (Result.get_ok @@ Cobol_common.Text_encoding.of_name s)),
+             Arg.String begin fun s ->
+               (* Unsupported encodings are not an error, as the LSP server
+                  reads files as they are with those. *)
+               encoding :=
+                 match Cobol_common.Text_encoding.of_name s with
+                 | Ok enc ->
+                     Some enc
+                 | Error msg ->
+                     Cobol_common.Diagnostics.Now.warn Fmt.stderr
+                       "%s;@ files@ are@ read@ as@ they@ are" msg;
+                     None
+             end,
              EZCMD.info ~docv:"ENCODING"
-               "Decode files as an LSP client does when it opens them with \
-                this encoding, given as an identifier of the \
-                `files.encoding' setting of Visual Studio Code (e.g. `utf8', \
-                `windows1252', `cp850'); files are read as they are by \
-                default" ])
+               "Decode files as Visual Studio Code does with this value of \
+                its `files.encoding' setting (e.g. `windows1252', `cp850').  \
+                Files are read as they are by default, or (with a warning \
+                listing the supported encodings) if ENCODING is not \
+                supported" ])
     ~doc:"Analyze files, reusing and filling the cache of their project"
     ~man:[ `S "DESCRIPTION";
            `Blocks [ `P "Preprocess, parse and typecheck each FILE as the LSP \
