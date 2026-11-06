@@ -12,7 +12,7 @@
 
 ### Improved
 - Memory usage of the LSP server [#714](https://github.com/OCamlPro/superbol-studio-oss/pull/714)
-- Workspace analyzis for every COBOL file, that now runs in parallel sub-processes [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
+- Workspace analyzis for every COBOL file, that now runs in parallel sub-processes, and reports diagnostics of files that are not open [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
 
 ### Fixed
 - Handling of dialects given as configuration files (e.g. `dialect.conf`) in build tasks [#716](https://github.com/OCamlPro/superbol-studio-oss/pull/716)

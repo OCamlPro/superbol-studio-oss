@@ -173,6 +173,23 @@ let handle_get_project_config_command param registry =
     Lsp_error.invalid_params "param = %s (association list with \"uri\" key \
                               expected)" Yojson.Safe.(to_string (param :> t))
 
+(* Params: [{ "uris": [ uri, ... ] }]; reply: [{ "missed": [ uri, ... ] }]. *)
+let handle_publish_cached_diagnostics param registry =
+  try
+    let uris =
+      List.assoc "uris" (assoc_of_jsonrpc_struct param) |>
+      Yojson.Safe.Util.to_list |>
+      List.map Lsp.Uri.t_of_yojson
+    in
+    let registry, missed =
+      Lsp_server.publish_cached_diagnostics uris registry
+    in
+    Ok (`Assoc ["missed", `List (List.map Lsp.Uri.yojson_of_t missed)],
+        Running registry)
+  with Yojson.Safe.Util.(Type_error _ | Undefined _) | Not_found ->
+    Lsp_error.invalid_params "param = %s (association list with \"uris\" key \
+                              expected)" Yojson.Safe.(to_string (param :> t))
+
 let handle_get_cfg registry params =
   let params = Jsonrpc.Structured.yojson_of_t params in
   let uri, name, options = Yojson.Safe.Util.(
@@ -1009,6 +1026,9 @@ let on_request
     | UnknownRequest { meth = "superbol/getPossibleCFG";
                        params = Some param } ->
         Ok (handle_get_possible_cfg registry param, state)
+    | UnknownRequest { meth = "superbol/publishCachedDiagnostics";
+                       params = Some param } ->
+        handle_publish_cached_diagnostics param registry
     | UnknownRequest { meth = "superbol/findProcedure";
                        params = Some param } ->
         Ok (handle_find_procedure registry param, state)

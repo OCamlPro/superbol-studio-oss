@@ -19,3 +19,4 @@ module Diagnostics = Project_diagnostics
 module Cache = Project_cache
 module Walk = Project_walk
 module Analysis = Project_analysis
+module Cached_diagnostics = Project_cached_diagnostics

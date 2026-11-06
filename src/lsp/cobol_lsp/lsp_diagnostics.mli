@@ -22,6 +22,12 @@ include module type of TYPES
   with type diagnostics = TYPES.diagnostics
 type t = diagnostics
 
+(** [normalize_uri uri] designates the same file as [uri], spelled as the keys
+    of the diagnostics that the functions below give.  URIs of a same file may
+    differ (e.g. in the case of a Windows drive letter): those of documents
+    should be normalized before being looked up in such maps. *)
+val normalize_uri: Lsp.Uri.t -> Lsp.Uri.t
+
 val translate_one
   : ?focus_on_main_doc: bool
   -> rootdir: string

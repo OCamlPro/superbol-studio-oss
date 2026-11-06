@@ -93,10 +93,37 @@ let find_cobol_files ~token =
 (* Files are analyzed by `superbol cache analyze' processes (see
    {!Superbol_jobs}), that fill the caches of the server.  Documents are not
    opened in the server: it finds their workspace symbols in its caches, and
-   restores their analyses (and publishes their diagnostics) once they are
-   opened. *)
+   restores their analyses once they are opened.  Once a batch of files is
+   analyzed, the server is asked to publish their diagnostics, that it also
+   finds in its caches. *)
 
-let report_processes_completion ~analyzed ~failed ~missed =
+(* [publish_cached_diagnostics client uris] asks the server to publish the
+   diagnostics of [uris] it finds in its caches, and gives the number of those
+   it does not find (all of them in case of failure, that is logged). *)
+let publish_cached_diagnostics client uris =
+  let data =
+    Jsonoo.Encode.(object_ [
+        "uris", list (fun uri -> string @@ Uri.toString uri ()) uris
+      ])
+  in
+  Vscode_languageclient.LanguageClient.sendRequest client ()
+    ~meth:"superbol/publishCachedDiagnostics" ~data |>
+  Promise.then_
+    ~fulfilled:begin fun reply ->
+      Promise.return @@
+      try List.length Jsonoo.Decode.(field "missed" (list id) reply)
+      with Jsonoo.Decode_error _ -> 0
+    end
+    ~rejected:begin fun err ->
+      let err_js = Promise.error_to_js err in
+      Superbol_printer.log_error
+        "SuperBOL: could not publish diagnostics of %u file%s: %s"
+        (List.length uris) (plural (List.length uris) "" "s")
+        (Ojs.string_of_js (Ojs.get_prop_ascii err_js "message"));
+      Promise.return (List.length uris)
+    end
+
+let report_processes_completion ~analyzed ~failed ~missed ~undiagnosed =
   let total = analyzed + failed + missed in
   let outcome =
     if missed = 0 then
@@ -109,21 +136,27 @@ let report_processes_completion ~analyzed ~failed ~missed =
     if failed = 0 then ""
     else Printf.sprintf "; %u file%s could not be analyzed (see the log)"
         failed (plural failed "" "s")
+  and diagnostics =
+    if undiagnosed = 0 then ""
+    else Printf.sprintf "; diagnostics of %u file%s are reported upon \
+                         opening %s"
+        undiagnosed (plural undiagnosed "" "s")
+        (plural undiagnosed "it" "them")
   in
   let _ =
     Window.showInformationMessage ()
-      ~message:(outcome ^ failures ^ "; diagnostics are reported upon \
-                                       opening files") |>
+      ~message:(outcome ^ failures ^ diagnostics) |>
     Promise.then_ ~fulfilled:(fun (_: unit option) -> Promise.return ())
   in
   Promise.return ()
 
-let analyze_workspace_in_processes cli ~progress ~token =
+let analyze_workspace_in_processes ~client cli ~progress ~token =
   let open Promise.Syntax in
   let* uris = find_cobol_files ~token in
   let total = List.length uris in
   let percent i = i * 100 / max 1 total in
   let analyzed = ref 0 and failed = ref 0 in
+  let publications = ref [] in
   let on_start ~processes =
     Progress.report progress ~value:Progress.{
         message = Some (Printf.sprintf "analyzing %u file%s in %u process%s"
@@ -133,7 +166,12 @@ let analyze_workspace_in_processes cli ~progress ~token =
       }
   and on_completion (job: Superbol_jobs.job) ~ok =
     let before = !analyzed + !failed and n = List.length job.files in
-    if ok then analyzed := !analyzed + n else failed := !failed + n;
+    if ok then begin
+      analyzed := !analyzed + n;
+      publications :=
+        publish_cached_diagnostics client job.files :: !publications
+    end else
+      failed := !failed + n;
     let after = before + n in
     Progress.report progress ~value:Progress.{
         message = Some (Printf.sprintf "%u/%u files" after total);
@@ -144,8 +182,10 @@ let analyze_workspace_in_processes cli ~progress ~token =
     Superbol_jobs.run cli ~token ~on_start ~on_completion
       (Superbol_jobs.make uris)
   in
+  let* undiagnosed = Promise.all (Array.of_list !publications) in
   report_processes_completion ~analyzed:!analyzed ~failed:!failed
     ~missed:(total - !analyzed - !failed)
+    ~undiagnosed:(Array.fold_left (+) 0 undiagnosed)
 
 let with_analysis_progress task =
   Window.withProgress (module Interop.Js.Unit) ~task
@@ -159,9 +199,10 @@ let run_analysis instance =
   | None ->
       Superbol_printer.show_error_message @@
       Error Superbol_types.Client_not_running
-  | Some _ ->
+  | Some client ->
       with_analysis_progress @@
-      analyze_workspace_in_processes (Superbol_instance.cli_invocation instance)
+      analyze_workspace_in_processes ~client
+        (Superbol_instance.cli_invocation instance)
 
 (** {2 Copybook directory retrieval} *)
 

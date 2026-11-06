@@ -17,6 +17,7 @@ open Lsp_types
 open Cobol_common.Platform.TYPES
 
 module ANALYSIS = Superbol_project.Analysis
+module CACHED_DIAGS = Superbol_project.Cached_diagnostics
 module CACHE = Superbol_cache.Cache
 module CACHING = Superbol_cache.Caching
 module WITNESS = Superbol_cache.Witness
@@ -56,7 +57,8 @@ let project_key ~rootdir =
    stored by another for the same version.  Workspace symbols are likewise
    stored on their own (see {!Lsp_workspace_symbols}), so that they can be
    retrieved for documents that are not open, without restoring their
-   analysis. *)
+   analysis; and so are diagnostics (see
+   {!Superbol_project.Cached_diagnostics}). *)
 let document_keys ~project ~filename ~contents ~language_id =
   let overrides = Lsp_document.analysis_overrides ~language_id in
   Option.map begin fun keys ->
@@ -119,6 +121,8 @@ let store_document ~cache ~project ~with_semantic_tokens doc =
           end semtoks;
           Lsp_workspace_symbols.store_for_analysis cache ~keys ~label:filename
             ~filename:absolute ~fresh:(Option.is_some witnesses) analysis;
+          CACHED_DIAGS.store_for_analysis cache ~keys ~label:filename
+            ~fresh:(Option.is_some witnesses) analysis;
           Some filename
       | Error _ -> None
 
@@ -334,3 +338,26 @@ let workspace_symbols ~params ~except project =
         Option.map (fun symbols -> Lsp.Uri.of_path filename, symbols) @@
         lookup_symbols ~cache ~config ~resolve ~now project filename
       end
+
+(* --- Diagnostics --- *)
+
+let cached_diagnostics ~params project filenames =
+  let rootdir = Lsp_project.rootdir project in
+  let cache = cache_for ~config:params.config ~rootdir in
+  (* As for workspace symbols, files that are not open are analyzed without
+     overrides. *)
+  match ANALYSIS.config_inputs project with
+  | None ->
+      List.map (fun filename -> filename, None) filenames
+  | Some config ->
+      let platform = Lsp_platform.record in
+      let resolve = Superbol_cache.Recorder.resolver ~platform () in
+      List.map begin fun filename ->
+        filename,
+        match platform.read_text_file filename with
+        | exception Sys_error _ ->
+            None
+        | contents ->                (* read as the CLI does, so keys agree *)
+            let keys = ANALYSIS.document_keys config ~filename ~contents in
+            CACHED_DIAGS.lookup cache ~keys ~resolve
+      end filenames
