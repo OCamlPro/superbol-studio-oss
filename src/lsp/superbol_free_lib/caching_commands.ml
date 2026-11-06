@@ -31,8 +31,8 @@ type setup =
     client_settings: (string * Yojson.Safe.t) list option;
     (** Settings of an LSP client, for projects without configuration file *)
     encoding: Cobol_common.Text_encoding.t option;
-    (** Encoding the LSP client decodes files with, before sending them to the
-        server; files are read as they are if [None]. *)
+    (** Encoding the LSP client decodes files with; overrides the
+        [source_encoding] of projects. *)
   }
 
 let default_setup =
@@ -155,12 +155,11 @@ let locate ?(setup = default_setup)
     | Some dirname -> Project.in_ ~dirname ~layout ()
     | None -> Project.for_filename filename ~layout
   in
-  let contents = EzFile.read_text_file filename in
   (* Documents are keyed on their contents: decode them as the LSP client does,
      for keys to match those of the documents it sends to the server. *)
   let contents =
-    Option.fold setup.encoding ~none:contents
-      ~some:(fun enc -> Cobol_common.Text_encoding.decode enc contents)
+    Superbol_project.decode_source ?encoding:setup.encoding project @@
+    EzFile.read_text_file filename
   in
   if given_filename != filename then
     Cobol_common.Srcloc.NAMING.register_given_filename ~given_filename

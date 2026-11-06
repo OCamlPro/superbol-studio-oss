@@ -31,6 +31,10 @@ module TYPES: sig
     mutable indent_config: (string * int) list;
     mutable exclude_dirs: string list;
     (** See {!excludes_dir}. *)
+    mutable source_encoding: Cobol_common.Text_encoding.t option;
+    (** Encoding that source files read from disk are decoded with (see
+        {!Project.decode_source}).  Not saved in the configuration file: the
+        LSP server sets it according to the settings of its client. *)
     toml_handle: Ezr_toml.toml_handle;
   }
 
