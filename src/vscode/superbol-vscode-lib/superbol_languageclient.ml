@@ -14,10 +14,6 @@
 
 module LSP = Vscode_languageclient
 
-type server_access =
-  | Sub_process of LSP.ServerOptions.t
-  | TCP of { host: string; port: int }
-
 let find_superbol ~server_prefix ~root_uri =
   try
     Superbol_extension.find_executable ~prog_prefix:server_prefix
@@ -26,25 +22,6 @@ let find_superbol ~server_prefix ~root_uri =
     (* If there is no bundled executable for the current platform, fall back to
        looking for the server binary in the PATH *)
     `exe, server_prefix
-
-let scan_host_and_port url =
-  let fail () = Format.ksprintf failwith "Invalid %S" url in
-  match String.split_on_char ':' url with
-  | [host; port] ->
-      (try TCP { host; port = int_of_string port }
-       with Invalid_argument _ -> fail ())
-  | _ ->
-      fail ()
-
-let scan_server_command cmd =
-  let prefix = "tcp://" in
-  if String.starts_with ~prefix cmd then
-    let l = String.length prefix in
-    let url = String.sub cmd l (String.length cmd - l) in
-    Some (scan_host_and_port url)
-  else
-    None
-
 
 (* What the server and the CLI commands that share its caches run with. *)
 type superbol_command =
@@ -85,9 +62,10 @@ let superbol_command ~server_prefix ~context ?cmd () =
   in
   { kind; command; env; storage_args }
 
-let server_command ~server_prefix ~context ?cmd () =
-  let { kind = server_kind; command; env; storage_args } =
-    superbol_command ~server_prefix ~context ?cmd ()
+let server_options ~context ~server_prefix =
+  let { kind; command; env; storage_args } =
+    superbol_command ~server_prefix ~context
+      ?cmd:(Superbol_config.superbol_exe ()) ()
   in
   let args =
     let force_diagnostics = Superbol_config.bool "forceSyntaxDiagnostics" in
@@ -95,28 +73,14 @@ let server_command ~server_prefix ~context ?cmd () =
     (if force_diagnostics then ["--force-syntax-diagnostics"] else []) @
     storage_args
   in
-  let server_options =
-    match server_kind with
-    | `exe ->
-        `Executable (LSP.Executable.create () ~command ~args
-                       ~options:(LSP.ExecutableOptions.create ~env ()))
-    | `js ->
-        `NodeModule (LSP.NodeModule.create ()
-                       ~module_:command ~transport:`stdio ~args
-                       ~options:(LSP.ForkOptions.create ~env ()))
-  in
-  Sub_process server_options
-
-
-let server_access ~context ~server_prefix =
-  match Superbol_config.superbol_exe () with
-  | None ->
-      server_command ~server_prefix ~context ()
-  | Some cmd ->
-      match scan_server_command cmd with
-      | Some access -> access
-      | None -> server_command ~server_prefix ~context ~cmd ()
-
+  match kind with
+  | `exe ->
+      `Executable (LSP.Executable.create () ~command ~args
+                     ~options:(LSP.ExecutableOptions.create ~env ()))
+  | `js ->
+      `NodeModule (LSP.NodeModule.create ()
+                     ~module_:command ~transport:`stdio ~args
+                     ~options:(LSP.ForkOptions.create ~env ()))
 
 type cli_invocation =
   {
@@ -129,23 +93,18 @@ type cli_invocation =
 (* A bundled node module is run with the node runtime that runs VS Code
    itself, as the language client does when it forks the server. *)
 let cli_invocation ~context ~server_prefix =
-  let invocation { kind; command; env; storage_args } =
-    match kind with
-    | `exe ->
-        Some { program = command; args_prefix = []; cli_env = env;
-               cli_storage_args = storage_args }
-    | `js ->
-        Some { program = Node.Process.execPath; args_prefix = [command];
-               cli_env = Interop.Dict.add "ELECTRON_RUN_AS_NODE" "1" env;
-               cli_storage_args = storage_args }
+  let { kind; command; env; storage_args } =
+    superbol_command ~server_prefix ~context
+      ?cmd:(Superbol_config.superbol_exe ()) ()
   in
-  match Superbol_config.superbol_exe () with
-  | None ->
-      invocation @@ superbol_command ~server_prefix ~context ()
-  | Some cmd ->
-      match scan_server_command cmd with
-      | Some TCP _ | Some Sub_process _ -> None      (* not run by us *)
-      | None -> invocation @@ superbol_command ~server_prefix ~context ~cmd ()
+  match kind with
+  | `exe ->
+      { program = command; args_prefix = []; cli_env = env;
+        cli_storage_args = storage_args }
+  | `js ->
+      { program = Node.Process.execPath; args_prefix = [command];
+        cli_env = Interop.Dict.add "ELECTRON_RUN_AS_NODE" "1" env;
+        cli_storage_args = storage_args }
 
 let client_options () =
   LSP.ClientOptions.create ()

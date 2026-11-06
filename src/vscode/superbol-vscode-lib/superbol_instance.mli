@@ -22,7 +22,7 @@ val client: t -> client option
 val context: t -> Vscode.ExtensionContext.t
 
 (** See {!Superbol_languageclient.cli_invocation}. *)
-val cli_invocation: t -> Superbol_languageclient.cli_invocation option
+val cli_invocation: t -> Superbol_languageclient.cli_invocation
 
 val stop_language_server: t -> unit Promise.t
 val start_language_server: t -> unit Promise.t

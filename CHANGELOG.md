@@ -7,6 +7,9 @@
 - Smaller cache entries [#715](https://github.com/OCamlPro/superbol-studio-oss/pull/715)
 - Support for workspace symbols lookup in the LSP server, for open documents and for documents whose analysis is cached [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
 
+### Removed
+- Support for connecting to the LSP server remotely (`tcp://` values of `superbol.lspPath`) [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
+
 ### Improved
 - Memory usage of the LSP server [#714](https://github.com/OCamlPro/superbol-studio-oss/pull/714)
 - Workspace analyzis for every COBOL file, that now runs in parallel sub-processes [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
