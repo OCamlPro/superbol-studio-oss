@@ -100,3 +100,16 @@ val workspace_symbols
   -> except: (string -> bool)
   -> Lsp_project.t
   -> (Lsp.Uri.t * Lsp_workspace_symbols.t) Seq.t
+
+(** {2 Diagnostics} *)
+
+(** [cached_diagnostics ~params project filenames] retrieves the diagnostics of
+    each of the (absolute) [filenames], as held in the cache of [project], for
+    files analyzed without overrides (as {!workspace_symbols} does).  Files are
+    never analyzed here: [None] is associated with those whose diagnostics are
+    not cached, or are out-dated. *)
+val cached_diagnostics
+  : params: params
+  -> Lsp_project.t
+  -> string list
+  -> (string * Lsp_cached_diagnostics.t option) list

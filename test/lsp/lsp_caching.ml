@@ -47,7 +47,8 @@ let lsp_cache_for ~rootdir =
       Superbol_cache.Cache.disabled
 
 let server ?(bounds = Superbol_cache.Types.Never)
-    ?(with_semantic_tokens = false) ?(enable_client_configs = false) () =
+    ?(with_semantic_tokens = false) ?(enable_client_configs = false)
+    ?(workspace_folders = []) () =
   Cobol_common.Platform.copy
     ~dst:LSP.Platform.record ~src:Superbol_platform.record;
   LSP.Server.init
@@ -58,7 +59,7 @@ let server ?(bounds = Superbol_cache.Types.Never)
                          enable_client_configs;
                          force_syntax_diagnostics = true };
               root_uri = None;
-              workspace_folders = [];
+              workspace_folders;
               with_semantic_tokens;
               with_client_file_watcher = `no;
               with_client_config_watcher = false;
@@ -410,13 +411,13 @@ let%expect_test "storing a new version reclaims the previous one" =
   let projdir = setup ~copybook_dirs:[".", "       01 X PIC X.\n"] () in
   ignore [%expect.output];
   show_cache_stats ~projdir;
-  [%expect {| entries: 4, values: 4 |}];
+  [%expect {| entries: 5, values: 5 |}];
   (* Edited between sessions: the new version is stored when opened... *)
   ignore (write ~projdir "prog.cob" (program ^ "      *> edited\n"));
   reopen_and_save ~projdir;
   ignore [%expect.output];
   show_cache_stats ~projdir;
-  [%expect {| entries: 4, values: 4 |}];
+  [%expect {| entries: 5, values: 5 |}];
   (* ... and the previous one is gone: reverting is a miss. *)
   ignore (write ~projdir "prog.cob" program);
   reopen ~projdir;
@@ -446,8 +447,10 @@ let%expect_test "saving an edited document reclaims the previous version" =
   ignore (write ~projdir "prog.cob" (program ^ "      *> edited\n"));
   persist_on_did_save server ~projdir;
   ignore [%expect.output];
-  show_cache_stats ~projdir;   (* the analysis and LSP data; no project yet *)
-  [%expect {| entries: 3, values: 3 |}];
+  (* The analysis, LSP data, workspace symbols and diagnostics; no project
+     yet. *)
+  show_cache_stats ~projdir;
+  [%expect {| entries: 4, values: 4 |}];
   reopen ~projdir;
   report [%expect.output];
   [%expect {| restored from cache |}];

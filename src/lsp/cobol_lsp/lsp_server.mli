@@ -80,6 +80,14 @@ val did_close
 val find_document
   : Lsp.Types.TextDocumentIdentifier.t -> t -> Lsp_document.t
 
+(** [publish_cached_diagnostics uris registry] publishes the diagnostics of the
+    documents at [uris] that are not open, as held in the caches of their
+    projects, along with those they report for other documents (typically
+    copybooks).  Returns the URIs of the documents whose diagnostics are not
+    cached, or are out-dated, or that belong to no known project. *)
+val publish_cached_diagnostics
+  : Lsp.Uri.t list -> t -> t * Lsp.Uri.t list
+
 val jsonrpc_of_error
   : 'a error -> string -> Jsonrpc.Response.Error.t
 

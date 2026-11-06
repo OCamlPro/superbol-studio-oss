@@ -176,7 +176,7 @@ let analyze_located_for_lsp
     Common_args.{ platform; analysis_overrides = overrides; _ }
     { filename; project; contents; cached } =
   (* Semantic tokens are computed (and cached) as the LSP does, as it is the LSP
-     that will reuse them; workspace symbols as well. *)
+     that will reuse them; workspace symbols and diagnostics as well. *)
   let semantic_tokens = Cobol_lsp.Semtoks.whole in
   let analysis, hit =
     match cached with
@@ -185,11 +185,13 @@ let analyze_located_for_lsp
           ANALYSIS.cached_analysis_for_lsp cache ~platform ~overrides ~keys
             ~semantic_tokens ~filename ~contents project
         in
-        (* Workspace symbols are likewise stored as the LSP does, so that it
-           can retrieve them without opening the document. *)
+        (* Workspace symbols and diagnostics are likewise stored as the LSP
+           does, so that it can retrieve them without opening the document. *)
+        let label = Superbol_project.relative_path_for ~filename project in
         Cobol_lsp.Workspace_symbols.store_for_analysis cache ~keys ~filename
-          ~label:(Superbol_project.relative_path_for ~filename project)
-          ~fresh:(not hit) analysis;
+          ~label ~fresh:(not hit) analysis;
+        Cobol_lsp.Cached_diagnostics.store_for_analysis cache ~keys
+          ~label ~fresh:(not hit) analysis;
         res
     | None ->
         ANALYSIS.analyze_for_lsp ~platform ~overrides ~filename ~contents
