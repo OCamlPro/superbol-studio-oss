@@ -524,7 +524,9 @@ let run_suites suites : int Promise.t =
             | { suite; tests } :: rest ->
                 log "";
                 log "%s" suite;
+                let started = Node.Date.now () in
                 let* outcomes = loop [] (List.map (fun t -> suite, t) tests) in
+                log "  (%s: %.0fs)" suite ((Node.Date.now () -. started) /. 1000.);
                 suites_loop (acc @ outcomes) rest in
           let* outcomes = suites_loop [] suites in
           Promise.return (summary outcomes)

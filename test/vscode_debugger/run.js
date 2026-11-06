@@ -11,6 +11,11 @@
 //                           depends on (default: `.vscode-test/extensions`)
 //   SUPERBOL_TEST_SUITES    Only run suites whose names contain one of these
 //                           comma-separated words (e.g. `tasks,debug conf`)
+//   SUPERBOL_TEST_JOBS      Number of VS Code instances that run the suites
+//                           in parallel (default: 1); each instance runs a
+//                           share of the selected suites, balanced by their
+//                           weights in `main.ml`, and its output is shown
+//                           once it is done
 //   SUPERBOL_LSP            LSP server to use (default: the one built in
 //                           `_build`, if any)
 
@@ -21,7 +26,6 @@ const path = require("path");
 const {
   downloadAndUnzipVSCode,
   resolveCliPathFromVSCodeExecutablePath,
-  runTests,
 } = require("@vscode/test-electron");
 
 const INSTALL_ATTEMPTS = 3;
@@ -157,55 +161,145 @@ function cliPath(executable) {
     || resolveCliPathFromVSCodeExecutablePath(executable);
 }
 
+/** Value of `SUPERBOL_TEST_JOBS`. */
+function jobCount() {
+  const given = process.env.SUPERBOL_TEST_JOBS;
+  if (given === undefined || given === "") {
+    return 1;
+  }
+  const jobs = Number(given);
+  if (!Number.isInteger(jobs) || jobs < 1) {
+    throw new Error(`SUPERBOL_TEST_JOBS=${given}: expected a positive integer`);
+  }
+  return jobs;
+}
+
+/** Creates the isolated profile of a test instance: its user data, the
+ * directory where the tests build their programs, and the workspace folder
+ * for tests of build tasks and debug configurations. */
+function makeProfile(root) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "superbol-vscode-test-"));
+  const profile = {
+    dir,
+    userDataDir: path.join(dir, "user-data"),
+    workDir: path.join(dir, "work"),
+    projectDir: path.join(dir, "project"),
+  };
+  fs.mkdirSync(profile.workDir);
+  fs.mkdirSync(profile.projectDir);
+  writeUserSettings(profile.userDataDir, root);
+  return profile;
+}
+
+/** Runs the tests in a VS Code instance using `profile`, with the extra
+ * environment `env`, and passes its output to `write(stream, chunk)`.
+ * Resolves to the exit code of the instance (or the signal that killed
+ * it). */
+function runInstance({ executable, root, tests, extensionsDir, profile, env, write }) {
+  const args = [
+    profile.projectDir,
+    "--no-sandbox",
+    "--disable-workspace-trust",
+    // Avoids errors of GPU processes, notably under xvfb.
+    "--disable-gpu",
+    `--user-data-dir=${profile.userDataDir}`,
+    `--extensions-dir=${extensionsDir}`,
+    `--extensionDevelopmentPath=${root}`,
+    `--extensionTestsPath=${tests}`,
+  ];
+  return new Promise((resolve) => {
+    const child = cp.spawn(executable, args, {
+      env: {
+        ...process.env,
+        ...env,
+        SUPERBOL_TEST_WORKDIR: profile.workDir,
+        SUPERBOL_TEST_PROJECT: profile.projectDir,
+      },
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    child.stdout.on("data", (chunk) => write(process.stdout, chunk));
+    child.stderr.on("data", (chunk) => write(process.stderr, chunk));
+    let finished = false;
+    const finish = (status) => {
+      if (!finished) {
+        finished = true;
+        resolve(status);
+      }
+    };
+    child.on("error", (err) => {
+      write(process.stderr, `Failed to start ${executable}: ${err.message}\n`);
+      finish("error");
+    });
+    // Waits for the streams to be closed, so that all output is written.
+    child.on("close", (code, signal) => finish(code ?? signal));
+  });
+}
+
+/** Runs `jobs` instances in parallel, each on a shard of the suites, and
+ * shows the output of each one in a block once it is done.  Returns the
+ * exit statuses of the instances. */
+function runInstances(jobs, options, profiles) {
+  if (jobs === 1) {
+    return Promise.all([runInstance({
+      ...options, profile: profiles[0], env: {},
+      write: (stream, chunk) => stream.write(chunk),
+    })]);
+  }
+  return Promise.all(profiles.map(async (profile, k) => {
+    const output = [];
+    const status = await runInstance({
+      ...options, profile, env: { SUPERBOL_TEST_SHARD: `${k}/${jobs}` },
+      write: (stream, chunk) => output.push([stream, chunk]),
+    });
+    process.stdout.write(`\n===== Job ${k + 1}/${jobs} (exit status: ${status}) =====\n`);
+    for (const [stream, chunk] of output) {
+      stream.write(chunk);
+    }
+    return status;
+  }));
+}
+
 async function main() {
   const root = path.resolve(__dirname, "../..");
   const manifest = require(path.join(root, "package.json"));
   const tests = path.join(root, "_build/default/test/vscode_debugger/main.bc.js");
-  const vscodeExecutablePath =
+  const jobs = jobCount();
+  const executable =
     process.env.VSCODE_TEST_EXECUTABLE
       ? givenExecutable(process.env.VSCODE_TEST_EXECUTABLE)
       : await downloadAndUnzipVSCode();
-  const cli = cliPath(vscodeExecutablePath);
+  const cli = cliPath(executable);
   const extensionsDir =
     process.env.VSCODE_TEST_CACHE || path.join(root, ".vscode-test", "extensions");
 
-  // Isolate the test instance from the user's own profile.
-  const profile = fs.mkdtempSync(path.join(os.tmpdir(), "superbol-vscode-test-"));
-  const userDataDir = path.join(profile, "user-data");
-  // Where the tests build their programs.
-  const workDir = path.join(profile, "work");
-  fs.mkdirSync(workDir);
-  // The workspace folder, for tests of build tasks and debug configurations.
-  const projectDir = path.join(profile, "project");
-  fs.mkdirSync(projectDir);
-  writeUserSettings(userDataDir, root);
+  // Isolate each test instance from the user's own profile, and from the
+  // other instances.
+  const profiles = [];
   try {
+    for (let k = 0; k < jobs; k++) {
+      profiles.push(makeProfile(root));
+    }
     // VS Code refuses to activate the extension without its dependencies.
-    installDependencies(cli, extensionsDir, userDataDir,
+    // Install them before the instances start, as they share them.
+    installDependencies(cli, extensionsDir, profiles[0].userDataDir,
                         manifest.extensionDependencies || []);
-    await runTests({
-      vscodeExecutablePath,
-      extensionDevelopmentPath: root,
-      extensionTestsPath: tests,
-      extensionTestsEnv: {
-        SUPERBOL_TEST_WORKDIR: workDir,
-        SUPERBOL_TEST_PROJECT: projectDir,
-      },
-      launchArgs: [
-        projectDir,
-        "--disable-workspace-trust",
-        // Avoids errors of GPU processes, notably under xvfb.
-        "--disable-gpu",
-        `--user-data-dir=${userDataDir}`,
-        `--extensions-dir=${extensionsDir}`,
-      ],
-    });
+    const statuses =
+      await runInstances(jobs, { executable, root, tests, extensionsDir }, profiles);
+    const failed = statuses.filter((status) => status !== 0).length;
+    if (jobs > 1) {
+      console.log(`\n${jobs - failed} of ${jobs} jobs succeeded`);
+    }
+    return failed === 0;
   } finally {
-    fs.rmSync(profile, { recursive: true, force: true });
+    for (const profile of profiles) {
+      fs.rmSync(profile.dir, { recursive: true, force: true });
+    }
   }
 }
 
-main().catch((err) => {
+main().then((ok) => {
+  process.exitCode = ok ? 0 : 1;
+}, (err) => {
   console.error("Failed to run tests:", err);
   process.exit(1);
 });
