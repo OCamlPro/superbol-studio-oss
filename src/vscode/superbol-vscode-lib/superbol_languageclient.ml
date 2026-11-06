@@ -57,6 +57,40 @@ let superbol_command ~server_prefix ~context =
   in
   { kind; command; env; storage_args }
 
+(* Sizes as the server accepts them (see `Arg_utils.size_of_string'). *)
+let is_size s =
+  let digits =
+    match s.[String.length s - 1] with
+    | 'k' | 'K' | 'm' | 'M' | 'g' | 'G' -> String.sub s 0 (String.length s - 1)
+    | _ -> s
+  in
+  digits <> "" && String.for_all (function '0'..'9' -> true | _ -> false) digits
+
+(* Arguments for the pruning of caches.  An invalid size limit is ignored (with
+   a warning), as the server would refuse to start otherwise. *)
+let cache_pruning_args () =
+  let size_limit =
+    match String.trim @@ Superbol_config.string "cache.sizeLimit" with
+    | "" ->
+        []
+    | s when is_size s ->
+        ["--cache-size-limit"; s]
+    | s ->
+        let _ =
+          Vscode.Window.showWarningMessage ()
+            ~message:(Printf.sprintf
+                        "SuperBOL: ignoring invalid cache size limit `%s' \
+                         (expected a number of bytes, with an optional `k', \
+                         `M' or `G' suffix)" s)
+        in
+        []
+  and max_age =
+    match Superbol_config.positive_int "cache.maxAge" ~default:0 with
+    | 0 -> []
+    | days -> ["--cache-max-age"; string_of_int days]
+  in
+  size_limit @ max_age
+
 let server_options ~context ~server_prefix =
   let { kind; command; env; storage_args } =
     superbol_command ~server_prefix ~context
@@ -65,7 +99,8 @@ let server_options ~context ~server_prefix =
     let force_diagnostics = Superbol_config.bool "forceSyntaxDiagnostics" in
     "lsp" ::
     (if force_diagnostics then ["--force-syntax-diagnostics"] else []) @
-    storage_args
+    storage_args @
+    cache_pruning_args ()
   in
   match kind with
   | `exe ->
@@ -118,3 +153,5 @@ let server_needs_restart_after ~config_change =
   in
   affects "superbol.forceSyntaxDiagnostics"                          (* scope? *)
   || affects "superbol.cacheInGlobalStorage"
+  || affects "superbol.cache.sizeLimit"
+  || affects "superbol.cache.maxAge"

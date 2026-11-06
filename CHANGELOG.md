@@ -6,6 +6,7 @@
 - New manifest-based cache [#709](https://github.com/OCamlPro/superbol-studio-oss/pull/709) [#711](https://github.com/OCamlPro/superbol-studio-oss/pull/711) [#712](https://github.com/OCamlPro/superbol-studio-oss/pull/712)
 - Smaller cache entries [#715](https://github.com/OCamlPro/superbol-studio-oss/pull/715)
 - Support for workspace symbols lookup in the LSP server, for open documents and for documents whose analysis is cached [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
+- Settings `superbol.cache.sizeLimit` (20G by default) and `superbol.cache.maxAge`, for pruning the caches of the LSP server [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
 
 ### Removed
 - The `superbol.lspPath` setting, and with it the support for connecting to the LSP server remotely (`tcp://` values) [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
