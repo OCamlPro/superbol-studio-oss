@@ -439,9 +439,33 @@ let configuration =
            "Use storage provided by Visual Studio Code for caching. When this \
             setting is set to *false*, the cache related to the contents of a \
             given workspace folder *f* is stored within a directory named \
-            *f*`/_superbol/cache`.\n\nNote: at the moment, cache files are not \
-            automatically pruned.")
+            *f*`/_superbol/cache`.\n\nSee `#superbol.cache.sizeLimit#` and \
+            `#superbol.cache.maxAge#` for how cache files are pruned.")
       ~order:22;
+
+    Manifest.PROPERTY.string "superbol.cache.sizeLimit"
+      ~title:"Cache Size Limit"
+      ~default:"20G"
+      ~markdownDescription:
+        (with_extra_keyword_commment
+           "Size under which the language server keeps the cache of each \
+            project, by reclaiming the entries that were used least recently \
+            whenever it writes the cache out (e.g. when it stops).  A number of \
+            bytes, with an optional `k`, `M` or `G` suffix for kibibytes, \
+            mebibytes or gibibytes (e.g. `500M`, `20G`); leave empty for no \
+            limit.")
+      ~order:23;
+
+    Manifest.PROPERTY.int "superbol.cache.maxAge"
+      ~title:"Cache Entry Maximum Age"
+      ~default:0
+      ~minimum:0
+      ~markdownDescription:
+        (with_extra_keyword_commment
+           "Number of days after which the language server reclaims cache \
+            entries that have not been used, whenever it writes the cache out \
+            (e.g. when it stops); `0` keeps them indefinitely.")
+      ~order:24;
 
     (* Workspace analysis *)
 

@@ -176,10 +176,25 @@
           "order": 21
         },
         "superbol.cacheInGlobalStorage": {
-          "markdownDescription": "Use storage provided by Visual Studio Code for caching. When this setting is set to *false*, the cache related to the contents of a given workspace folder *f* is stored within a directory named *f*`/_superbol/cache`.\n\nNote: at the moment, cache files are not automatically pruned.\n<!-- COBOL -->",
+          "markdownDescription": "Use storage provided by Visual Studio Code for caching. When this setting is set to *false*, the cache related to the contents of a given workspace folder *f* is stored within a directory named *f*`/_superbol/cache`.\n\nSee `#superbol.cache.sizeLimit#` and `#superbol.cache.maxAge#` for how cache files are pruned.\n<!-- COBOL -->",
           "type": "boolean",
           "default": false,
           "order": 22
+        },
+        "superbol.cache.sizeLimit": {
+          "title": "Cache Size Limit",
+          "markdownDescription": "Size under which the language server keeps the cache of each project, by reclaiming the entries that were used least recently whenever it writes the cache out (e.g. when it stops).  A number of bytes, with an optional `k`, `M` or `G` suffix for kibibytes, mebibytes or gibibytes (e.g. `500M`, `20G`); leave empty for no limit.\n<!-- COBOL -->",
+          "type": "string",
+          "default": "20G",
+          "order": 23
+        },
+        "superbol.cache.maxAge": {
+          "title": "Cache Entry Maximum Age",
+          "markdownDescription": "Number of days after which the language server reclaims cache entries that have not been used, whenever it writes the cache out (e.g. when it stops); `0` keeps them indefinitely.\n<!-- COBOL -->",
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "order": 24
         },
         "superbol.workspaceAnalysis.maxProcesses": {
           "title": "Parallel Analysis Processes",
