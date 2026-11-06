@@ -191,7 +191,7 @@
         },
         "superbol.workspaceAnalysis.maxProcesses": {
           "title": "Parallel Analysis Processes",
-          "markdownDescription": "Maximum number of processes that the `SuperBOL: Analyze Every COBOL Files in the Workspace` command runs at once; `0` stands for one less than the number of available processors.\n<!-- COBOL -->",
+          "markdownDescription": "Maximum number of processes that the `SuperBOL: Analyze Every COBOL File in the Workspace` command runs at once; `0` stands for one less than the number of available processors.\n<!-- COBOL -->",
           "type": "number",
           "default": 0,
           "minimum": 0,

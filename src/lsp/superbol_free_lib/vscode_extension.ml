@@ -463,7 +463,7 @@ let configuration =
       ~markdownDescription:
         (with_extra_keyword_commment
            "Maximum number of processes that the `SuperBOL: Analyze Every COBOL \
-            Files in the Workspace` command runs at once; `0` stands for one \
+            File in the Workspace` command runs at once; `0` stands for one \
             less than the number of available processors.")
       ~order:31;
 
