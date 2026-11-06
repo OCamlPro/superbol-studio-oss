@@ -47,7 +47,8 @@ let lsp_cache_for ~rootdir =
       Superbol_cache.Cache.disabled
 
 let server ?(bounds = Superbol_cache.Types.Never)
-    ?(with_semantic_tokens = false) () =
+    ?(with_semantic_tokens = false) ?(enable_client_configs = false)
+    ?(workspace_folders = []) () =
   Cobol_common.Platform.copy
     ~dst:LSP.Platform.record ~src:Superbol_platform.record;
   LSP.Server.init
@@ -55,10 +56,10 @@ let server ?(bounds = Superbol_cache.Types.Never)
                          lsp_cache_for;
                          lsp_cache_verbose = true;
                          lsp_cache_pruning_policy = bounds;
-                         enable_client_configs = false;
+                         enable_client_configs;
                          force_syntax_diagnostics = true };
               root_uri = None;
-              workspace_folders = [];
+              workspace_folders;
               with_semantic_tokens;
               with_client_file_watcher = `no;
               with_client_config_watcher = false;
@@ -322,6 +323,77 @@ let%expect_test "editing a copybook is a miss for both" =
   cleanup projdir;
   [%expect {| analyzed by the CLI |}];;
 
+(* --- Sharing analyses with the CLI, for projects configured by the client --- *)
+
+(** Settings that differ from the defaults, and take part in cache keys. *)
+let client_settings : (string * Yojson.Safe.t) list =
+  [ "sourceFormat", `String "fixed";
+    "copyexts", `List [`String "cpy"] ]
+
+(** Sets up a project that has no configuration file, holding [prog.cob] and a
+    copybook. *)
+let setup_unconfigured () =
+  let projdir = Superbol_testutils.Tempdir.make_n_enter "superbol-client" in
+  ignore (write ~projdir "BOOK.cpy" "       01 X PIC X.\n");
+  ignore (write ~projdir "prog.cob" program);
+  projdir
+
+(** Analyzes [prog.cob] as `superbol cache analyze --client-settings' does. *)
+let cli_analyze_with_settings ~projdir settings =
+  let setup =
+    Superbol_free_lib.Caching_commands.lsp_like_setup ()
+      ~client_settings:settings
+  in
+  let common = fst (Superbol_free_lib.Common_args.get ()) () in
+  let analyzed =
+    Superbol_free_lib.Caching_commands.analyze_file_for_lsp ~setup common
+      (projdir // "prog.cob")
+  in
+  print_endline (if analyzed.hit then "found by the CLI"
+                 else "analyzed by the CLI")
+
+let request_id_regexp = Str.regexp {|"id":\([0-9]+\)|}
+
+(** Opens [prog.cob] with a fresh server that has its client's settings enabled,
+    and answers the server's request for them with [settings].  [output] gives
+    what the server has printed so far. *)
+let open_with_client_settings ~projdir ~output settings =
+  let server = open_doc (server ~enable_client_configs:true ()) ~projdir
+      "prog.cob" in
+  let requests = output () in
+  let id =
+    try
+      ignore (Str.search_forward request_id_regexp requests 0);
+      int_of_string (Str.matched_group 1 requests)
+    with Not_found -> failwith "no request for the client's settings"
+  in
+  ignore (LSP.Server.on_client_response id (`List [`Assoc settings]) server)
+
+let%expect_test "an analysis stored by the CLI with client settings is \
+                 restored by the LSP when its client sends the same" =
+  let projdir = setup_unconfigured () in
+  cli_analyze_with_settings ~projdir client_settings;
+  cli_analyze_with_settings ~projdir client_settings;
+  [%expect {|
+    analyzed by the CLI
+    found by the CLI |}];
+  open_with_client_settings ~projdir client_settings
+    ~output:(fun () -> [%expect.output]);
+  report [%expect.output];
+  cleanup projdir;
+  [%expect {| restored from cache |}];;
+
+let%expect_test "an analysis stored by the CLI with client settings is not \
+                 restored by the LSP when its client sends others" =
+  let projdir = setup_unconfigured () in
+  cli_analyze_with_settings ~projdir client_settings;
+  [%expect {| analyzed by the CLI |}];
+  open_with_client_settings ~projdir []
+    ~output:(fun () -> [%expect.output]);
+  report [%expect.output];
+  cleanup projdir;
+  [%expect {| parsed afresh |}];;
+
 (* --- Superseding earlier versions --- *)
 
 let show_cache_stats ~projdir =
@@ -339,13 +411,13 @@ let%expect_test "storing a new version reclaims the previous one" =
   let projdir = setup ~copybook_dirs:[".", "       01 X PIC X.\n"] () in
   ignore [%expect.output];
   show_cache_stats ~projdir;
-  [%expect {| entries: 3, values: 3 |}];
+  [%expect {| entries: 5, values: 5 |}];
   (* Edited between sessions: the new version is stored when opened... *)
   ignore (write ~projdir "prog.cob" (program ^ "      *> edited\n"));
   reopen_and_save ~projdir;
   ignore [%expect.output];
   show_cache_stats ~projdir;
-  [%expect {| entries: 3, values: 3 |}];
+  [%expect {| entries: 5, values: 5 |}];
   (* ... and the previous one is gone: reverting is a miss. *)
   ignore (write ~projdir "prog.cob" program);
   reopen ~projdir;
@@ -375,8 +447,10 @@ let%expect_test "saving an edited document reclaims the previous version" =
   ignore (write ~projdir "prog.cob" (program ^ "      *> edited\n"));
   persist_on_did_save server ~projdir;
   ignore [%expect.output];
-  show_cache_stats ~projdir;   (* the analysis and LSP data; no project yet *)
-  [%expect {| entries: 2, values: 2 |}];
+  (* The analysis, LSP data, workspace symbols and diagnostics; no project
+     yet. *)
+  show_cache_stats ~projdir;
+  [%expect {| entries: 4, values: 4 |}];
   reopen ~projdir;
   report [%expect.output];
   [%expect {| restored from cache |}];

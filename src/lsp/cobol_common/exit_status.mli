@@ -13,6 +13,11 @@
 
 (** Placeholder for process exit status *)
 
+(** Records that errors were reported: the exit status will be odd. *)
 val raise: unit -> unit
+
+(** Records that some work could not be carried out (e.g. some input could not
+    be processed): the exit status will be at least 2. *)
+val fail: unit -> unit
 
 val exit: ?status:int -> unit -> 'a

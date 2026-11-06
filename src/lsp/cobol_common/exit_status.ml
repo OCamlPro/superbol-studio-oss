@@ -16,5 +16,8 @@ let status_ref = ref 0
 let raise () =
   status_ref := !status_ref lor 1
 
+let fail () =
+  status_ref := !status_ref lor 2
+
 let exit ?(status= 0) () =
   exit (max status !status_ref)

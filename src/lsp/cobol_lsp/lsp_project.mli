@@ -16,6 +16,15 @@
 module TYPES: sig
   include module type of Superbol_project.Config.TYPES
   include module type of Superbol_project.TYPES
+
+  (** How problems met while applying client settings are reported. *)
+  type settings_reporter =
+    {
+      report_dialect_diags: project -> Cobol_common.Diagnostics.Set.t -> unit;
+      (** Diagnostics about loading the configuration of a dialect *)
+      report_config_error: Superbol_project.Diagnostics.error -> unit;
+      report_invalid_setting: key:string -> string -> unit;
+    }
 end
 include module type of TYPES
   with type path = TYPES.path
@@ -90,7 +99,22 @@ module MAP: Map.S with type key = t
     configuration of the given project has changed. *)
 
 val reload_project_config: t -> bool
-val update_project_config: (string * Yojson.Safe.t) list -> t -> bool
+
+(** Reports problems as an LSP server does: on its client. *)
+val lsp_settings_reporter: settings_reporter
+
+(** [update_project_config ~reporter assoc project] updates the configuration of
+    [project] according to key/value pairs in [assoc], that are settings of the
+    [superbol.cobol] section of an LSP client, and reports problems with
+    [reporter] (defaults to {!lsp_settings_reporter}).
+
+    Front-ends other than the LSP server may use this to configure projects
+    exactly as the LSP server does, so that they share cached analyses. *)
+val update_project_config
+  : ?reporter: settings_reporter
+  -> (string * Yojson.Safe.t) list
+  -> t
+  -> bool
 val get_project_config: ?flat:bool -> t -> Yojson.Safe.t
 
 (** {1 Miscellaneous} *)

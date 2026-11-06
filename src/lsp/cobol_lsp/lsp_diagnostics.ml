@@ -21,15 +21,22 @@ end
 include TYPES
 type t = diagnostics
 
+(* [Lsp.Uri.to_path] gives a single spelling of every path (e.g. with a
+   lowercase drive letter on Windows), whereas URIs built from paths keep them
+   as they are given: going through the former makes URIs that designate the
+   same file equal. *)
+let normalize_uri uri =
+  Lsp.Uri.of_path (Lsp.Uri.to_path uri)
+
 let translate_one ?focus_on_main_doc ~rootdir ~uri (diag: DIAG.t) =
   let uri, range = match DIAG.location diag with
     | Some loc ->
         let Lsp.Types.Location.{ range; uri } =
           Lsp_position.location_of_srcloc ?focus_on_main_doc ~rootdir ~uri loc
         in
-        uri, range
+        normalize_uri uri, range
     | None ->
-        uri, Lsp_position.pointwise_range_at_start
+        normalize_uri uri, Lsp_position.pointwise_range_at_start
   in
   let diag =
     Lsp.Types.Diagnostic.create ()
@@ -51,7 +58,7 @@ let translate ?focus_on_main_doc ~rootdir ~uri diagnostics =
   DIAG.Set.fold begin fun diagnostic ->
     translate_one ~rootdir ?focus_on_main_doc ~uri diagnostic |>
     URIMap.union (fun _uri a b -> Some (List.rev_append a b))
-  end diagnostics (URIMap.singleton uri [])
+  end diagnostics (URIMap.singleton (normalize_uri uri) [])
 
 let publish diagnostics : unit =
   URIMap.iter (fun uri diags -> Lsp_io.send_diagnostics ~uri diags) diagnostics

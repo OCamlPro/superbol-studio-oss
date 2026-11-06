@@ -33,7 +33,6 @@ Welcome to SuperBOL Studio OSS
 
    building-lsp
    commands
-   remote-lsp
 
 .. toctree::
    :maxdepth: 2

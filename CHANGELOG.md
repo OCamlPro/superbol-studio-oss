@@ -5,12 +5,18 @@
 ### Added
 - New manifest-based cache [#709](https://github.com/OCamlPro/superbol-studio-oss/pull/709) [#711](https://github.com/OCamlPro/superbol-studio-oss/pull/711) [#712](https://github.com/OCamlPro/superbol-studio-oss/pull/712)
 - Smaller cache entries [#715](https://github.com/OCamlPro/superbol-studio-oss/pull/715)
+- Support for workspace symbols lookup in the LSP server, for open documents and for documents whose analysis is cached [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
+- Settings `superbol.cache.sizeLimit` (20G by default) and `superbol.cache.maxAge`, for pruning the caches of the LSP server [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
+
+### Removed
+- The `superbol.lspPath` setting, and with it the support for connecting to the LSP server remotely (`tcp://` values) [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
 
 ### Improved
-- Memory usage [#714](https://github.com/OCamlPro/superbol-studio-oss/pull/714)
+- Memory usage of the LSP server [#714](https://github.com/OCamlPro/superbol-studio-oss/pull/714)
+- Workspace analyzis for every COBOL file, that now runs in parallel sub-processes, and reports diagnostics of files that are not open [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
 
 ### Fixed
-- Handling of dialects given as configuration files (e.g. `dialect.conf`) in build tasks [#???](https://github.com/OCamlPro/superbol-studio-oss/pull/???)
+- Handling of dialects given as configuration files (e.g. `dialect.conf`) in build tasks [#716](https://github.com/OCamlPro/superbol-studio-oss/pull/716)
 - Internal errors of the LSP server that may occur on some (rare) corner cases [#702](https://github.com/OCamlPro/superbol-studio-oss/pull/702)
 - Fatal error on ambiguous qualified names appearing in abbreviated relation conditions [#701](https://github.com/OCamlPro/superbol-studio-oss/pull/701)
 - Wrong "missing PICTURE" error on group items with a `USAGE` clause [#700](https://github.com/OCamlPro/superbol-studio-oss/pull/700)

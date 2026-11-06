@@ -40,6 +40,9 @@ let client { language_client; _ } = language_client
 
 let context { context; _ } = context
 
+let cli_invocation { context; lsp_server_prefix = server_prefix; _ } =
+  Superbol_languageclient.cli_invocation ~context ~server_prefix
+
 let subscribe_disposable { context; _ } disposable =
   Vscode.ExtensionContext.subscribe context ~disposable
 
@@ -58,25 +61,10 @@ let start_language_server ({ lsp_server_prefix = server_prefix; context; _ } as 
   let open Promise.Syntax in
   let* () = stop_language_server t in
   let client =
-    match Superbol_languageclient.server_access ~server_prefix ~context with
-    | Sub_process serverOptions ->
-        LanguageClient.make () ~id ~name ~serverOptions
-          ~clientOptions:(Superbol_languageclient.client_options ())
-    | TCP { host; port } ->
-        LanguageClient.from_stream ~id ~name begin fun () ->
-          let socket = Node.Net.Socket.(connect (make ())) ~host ~port in
-          Node.Net.Socket.on socket @@ `Connect begin fun () ->
-            subscribe_disposable t @@
-            Vscode.Window.setStatusBarMessage ()
-              ~text:(Printf.sprintf "SuperBOL LSP client successfully connected \
-                                     to %s on port %u" host port)
-              ~hide:(`AfterTimeout 10000)
-          end;
-          Promise.return @@
-          Vscode_languageclient.StreamInfo.create ()
-            ~writer:socket
-            ~reader:socket
-        end
+    LanguageClient.make () ~id ~name
+      ~serverOptions:(Superbol_languageclient.server_options
+                        ~server_prefix ~context)
+      ~clientOptions:(Superbol_languageclient.client_options ())
   in
   let+ () = LanguageClient.start client in
   t.language_client <- Some client

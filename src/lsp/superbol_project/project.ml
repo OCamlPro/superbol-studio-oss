@@ -119,6 +119,9 @@ let relative_path_for ~filename { rootdir; _ } =
   try Project_utils.relative_path ~filename rootdir
   with Invalid_argument _ -> filename             (* if not in project rootdir *)
 
+let work_dirname ~layout { rootdir; _ } =
+  Option.map (Filename.concat rootdir) layout.relative_work_dirname
+
 let absolute_path_for ~filename { rootdir; _ } =
   if EzFile.is_absolute filename
   then filename       (* in case the file is not within its project directory *)

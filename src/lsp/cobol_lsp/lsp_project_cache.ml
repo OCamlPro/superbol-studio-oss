@@ -14,6 +14,7 @@
 
 open Lsp_imports
 open Lsp_types
+open Cobol_common.Platform.TYPES
 
 module ANALYSIS = Superbol_project.Analysis
 module CACHE = Superbol_cache.Cache
@@ -52,7 +53,10 @@ let project_key ~rootdir =
    Semantic tokens are stored on their own, depending on the analysis too, and
    only by servers whose client asks for them.  They are recorded in a slot of
    their own, or else a server that does not store them would reclaim those
-   stored by another for the same version. *)
+   stored by another for the same version.  Workspace symbols are likewise
+   stored on their own (see {!Lsp_workspace_symbols}), so that they can be
+   retrieved for documents that are not open, without restoring their
+   analysis; and so are diagnostics (see {!Lsp_cached_diagnostics}). *)
 let document_keys ~project ~filename ~contents ~language_id =
   let overrides = Lsp_document.analysis_overrides ~language_id in
   Option.map begin fun keys ->
@@ -113,6 +117,10 @@ let store_document ~cache ~project ~with_semantic_tokens doc =
             | Error _ ->
                 ()
           end semtoks;
+          Lsp_workspace_symbols.store_for_analysis cache ~keys ~label:filename
+            ~filename:absolute ~fresh:(Option.is_some witnesses) analysis;
+          Lsp_cached_diagnostics.store_for_analysis cache ~keys ~label:filename
+            ~fresh:(Option.is_some witnesses) analysis;
           Some filename
       | Error _ -> None
 
@@ -259,3 +267,99 @@ let load ~rootdir ~layout ~params =
           Some project
       | exception _ ->                                     (* TODO: avoid this *)
           None
+
+(* --- Workspace symbols --- *)
+
+(* Symbols retrieved for files that are not open, by absolute filename.  Each is
+   retrieved again whenever the file changes on disk, or the project it was
+   retrieved for is replaced (e.g. upon reloading its configuration).  Changes
+   to the copybooks it depends upon go unnoticed until then.
+
+   Misses are remembered for a little while only, so that symbols stored in the
+   meantime (by the CLI, or upon closing the document) are noticed. *)
+type memo =
+  {
+    memo_project: Lsp_project.t;
+    memo_stamp: float * int;                                   (* mtime, size *)
+    memo_symbols: Lsp_workspace_symbols.t option;
+    memo_time: float;
+  }
+
+let symbols_memo: (string, memo) Hashtbl.t = Hashtbl.create 17
+let miss_lifetime = 30.
+
+let lookup_symbols ~cache ~config ~resolve ~now project filename =
+  let platform = Lsp_platform.record in
+  match platform.stat_file filename with
+  | None ->
+      Hashtbl.remove symbols_memo filename;
+      None
+  | Some { file_mtime; file_size; _ } ->
+      let stamp = file_mtime, file_size in
+      match Hashtbl.find_opt symbols_memo filename with
+      | Some { memo_project; memo_stamp; memo_symbols; memo_time }
+        when memo_project == project && memo_stamp = stamp &&
+             (Option.is_some memo_symbols || now -. memo_time < miss_lifetime) ->
+          memo_symbols
+      | _ ->
+          let symbols =
+            (* Read as the CLI does, so that keys agree. *)
+            match platform.read_text_file filename with
+            | exception Sys_error _ ->
+                None
+            | contents ->
+                let keys = ANALYSIS.document_keys config ~filename ~contents in
+                Lsp_workspace_symbols.lookup cache ~keys ~resolve
+          in
+          Hashtbl.replace symbols_memo filename
+            { memo_project = project; memo_stamp = stamp;
+              memo_symbols = symbols; memo_time = now };
+          symbols
+
+(** [workspace_symbols ~params ~except project] are the symbols of the source
+    files of [project] that are held in its cache, except for those whose
+    filename satisfies [except] (typically, open documents).  Files are never
+    analyzed: those whose symbols are not cached are left out. *)
+let workspace_symbols ~params ~except project =
+  let cache = cache_for ~config:params.config ~rootdir:(Lsp_project.rootdir project) in
+  (* Files that are not open are analyzed without overrides (as the [languageId]
+     of documents is only known once opened). *)
+  match ANALYSIS.config_inputs project with
+  | None ->
+      Seq.empty
+  | Some config ->
+      let resolve =
+        Superbol_cache.Recorder.resolver ~platform:Lsp_platform.record ()
+      in
+      let now = Lsp_platform.record.now () in
+      Lsp_project_walk.source_files project
+        ~layout:params.config.lsp_project_layout |>
+      List.to_seq |>
+      Seq.filter (fun filename -> not (except filename)) |>
+      Seq.filter_map begin fun filename ->
+        Option.map (fun symbols -> Lsp.Uri.of_path filename, symbols) @@
+        lookup_symbols ~cache ~config ~resolve ~now project filename
+      end
+
+(* --- Diagnostics --- *)
+
+let cached_diagnostics ~params project filenames =
+  let rootdir = Lsp_project.rootdir project in
+  let cache = cache_for ~config:params.config ~rootdir in
+  (* As for workspace symbols, files that are not open are analyzed without
+     overrides. *)
+  match ANALYSIS.config_inputs project with
+  | None ->
+      List.map (fun filename -> filename, None) filenames
+  | Some config ->
+      let platform = Lsp_platform.record in
+      let resolve = Superbol_cache.Recorder.resolver ~platform () in
+      List.map begin fun filename ->
+        filename,
+        match platform.read_text_file filename with
+        | exception Sys_error _ ->
+            None
+        | contents ->                (* read as the CLI does, so keys agree *)
+            let keys = ANALYSIS.document_keys config ~filename ~contents in
+            Lsp_cached_diagnostics.lookup cache ~keys ~resolve
+      end filenames
