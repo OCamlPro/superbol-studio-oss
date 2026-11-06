@@ -295,13 +295,15 @@ module Variable = struct
 
   include
     [%js:
-    val name:             t -> string [@@js.get]
-    val value:            t -> string [@@js.get]
-    val type_:            t -> string or_undefined [@@js.get "type"]
-    val presentationHint: t -> VariablePresentationHint.t or_undefined [@@js.get]
-    val namedVariables:   t -> int or_undefined [@@js.get]
-    val indexedVariables: t -> int or_undefined [@@js.get]
-    val memoryReference:  t -> string or_undefined [@@js.get]]
+    val name:               t -> string [@@js.get]
+    val value:              t -> string [@@js.get]
+    val type_:              t -> string or_undefined [@@js.get "type"]
+    val presentationHint:   t -> VariablePresentationHint.t or_undefined [@@js.get]
+    val evaluateName:       t -> string or_undefined [@@js.get]
+    val variablesReference: t -> int [@@js.get]
+    val namedVariables:     t -> int or_undefined [@@js.get]
+    val indexedVariables:   t -> int or_undefined [@@js.get]
+    val memoryReference:    t -> string or_undefined [@@js.get]]
 end
 
 module BreakpointLocation = struct
@@ -717,10 +719,10 @@ module StoppedEvent = struct
     type body = {
       reason:            reason;
       description:       string or_undefined;
-      threadId:          string or_undefined;
-      preserveFocusHint: string or_undefined;
+      threadId:          int or_undefined;
+      preserveFocusHint: bool or_undefined;
       text:              string or_undefined;
-      allThreadStopped:  bool or_undefined;
+      allThreadsStopped: bool or_undefined;
       hitBreakpointIds:  int list or_undefined;
     } [@@js]
 

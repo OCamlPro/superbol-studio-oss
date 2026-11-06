@@ -129,6 +129,20 @@ test-utf8-promote:
 	\! opam exec -- $(AUTOFONCE_EXE) 2>/dev/null || \
 	   opam exec -- $(AUTOFONCE_EXE) promote -t utf8 --apply
 
+# Debugger integration tests, run within VS Code against the debug
+# bundle.  They need `cobc` and `cobcrun` in version 3.x, `gdb`, and a
+# display: use `xvfb-run -a make test-vscode-debug` on headless
+# machines.  Set `VSCODE_TEST_EXECUTABLE` to a VS Code executable, its
+# command-line script (e.g. `/usr/bin/code`), or its installation
+# directory, to use it instead of downloading one.
+.PHONY: test-vscode-debug
+test-vscode-debug: build-debug
+	${DUNE} build ${DUNE_ARGS} test/vscode_debugger/main.bc.js \
+		src/lsp/superbol-free/main.exe
+	@echo -n "cobc   : "; command -v cobc
+	@echo -n "cobcrun: "; command -v cobcrun
+	node test/vscode_debugger/run.js
+
 MASTER_REMOTE ?= origin
 
 .PHONY: build-master
