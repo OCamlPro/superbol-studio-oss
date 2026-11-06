@@ -71,13 +71,15 @@ let write ~projdir filename text =
   EzFile.write_file path text;
   path
 
-let open_doc server ~projdir filename =
+(** Opens [filename], whose contents the client sends after applying [decode]
+    (as VS Code does according to its [files.encoding] setting). *)
+let open_doc ?(decode = Fun.id) server ~projdir filename =
   let path = projdir // filename in
   LSP.Server.did_open
     Lsp.Types.DidOpenTextDocumentParams.{
       textDocument = Lsp.Types.TextDocumentItem.{
           languageId = "cobol"; version = 0;
-          text = EzFile.read_file path; uri = Lsp.Uri.of_path path;
+          text = decode (EzFile.read_file path); uri = Lsp.Uri.of_path path;
         };
     } server
 
@@ -130,8 +132,8 @@ let setup ?(toml = "") ?(persist = persist_on_shutdown) ?bounds
   projdir
 
 (** Opens the program again with a fresh server, as a later session would. *)
-let reopen ~projdir =
-  ignore (open_doc (server ()) ~projdir "prog.cob")
+let reopen ?decode ~projdir () =
+  ignore (open_doc ?decode (server ()) ~projdir "prog.cob")
 
 (** Same, but writing the cache back out on the way, as a session that ends
     normally does. *)
@@ -146,7 +148,7 @@ let cleanup projdir =
 let%expect_test "an unchanged project is restored from cache" =
   let projdir = setup ~copybook_dirs:[".", "       01 X PIC X.\n"] () in
   ignore [%expect.output];
-  reopen ~projdir;
+  reopen ~projdir ();
   report [%expect.output];
   cleanup projdir;
   [%expect {| restored from cache |}];;
@@ -155,7 +157,7 @@ let%expect_test "editing the program itself is a miss" =
   let projdir = setup ~copybook_dirs:[".", "       01 X PIC X.\n"] () in
   ignore [%expect.output];
   ignore (write ~projdir "prog.cob" (program ^ "      *> edited\n"));
-  reopen ~projdir;
+  reopen ~projdir ();
   report [%expect.output];
   cleanup projdir;
   [%expect {| parsed afresh |}];;
@@ -167,7 +169,7 @@ let%expect_test "editing a copybook the program COPYs is a miss" =
   let projdir = setup ~copybook_dirs:[".", "       01 X PIC X.\n"] () in
   ignore [%expect.output];
   ignore (write ~projdir "BOOK.cpy" "       01 X PIC 9(4).\n");
-  reopen ~projdir;
+  reopen ~projdir ();
   report [%expect.output];
   cleanup projdir;
   [%expect {| parsed afresh |}];;
@@ -183,7 +185,7 @@ let%expect_test "a copybook appearing earlier in the lookup path is a miss" =
   in
   ignore [%expect.output];
   ignore (write ~projdir ("first" // "BOOK.cpy") "       01 X PIC 9(4).\n");
-  reopen ~projdir;
+  reopen ~projdir ();
   report [%expect.output];
   cleanup projdir;
   [%expect {| parsed afresh |}];;
@@ -197,7 +199,7 @@ let%expect_test "a document restored from cache still depends on its copybooks" 
   reopen_and_save ~projdir;                       (* a whole session, cache to cache *)
   ignore [%expect.output];
   ignore (write ~projdir "BOOK.cpy" "       01 X PIC 9(4).\n");
-  reopen ~projdir;
+  reopen ~projdir ();
   report [%expect.output];
   cleanup projdir;
   [%expect {| parsed afresh |}];;
@@ -210,12 +212,12 @@ let%expect_test "saving the file persists the document on its own" =
       ~copybook_dirs:[".", "       01 X PIC X.\n"] ()
   in
   ignore [%expect.output];
-  reopen ~projdir;
+  reopen ~projdir ();
   report [%expect.output];
   [%expect {| restored from cache |}];
   (* And what it wrote depends on the copybook, like any other entry. *)
   ignore (write ~projdir "BOOK.cpy" "       01 X PIC 9(4).\n");
-  reopen ~projdir;
+  reopen ~projdir ();
   report [%expect.output];
   cleanup projdir;
   [%expect {| parsed afresh |}];;
@@ -229,7 +231,7 @@ let%expect_test "a size bound is honoured when the cache is written out" =
                                               max_size = Some 10_000_000L }) ()
   in
   ignore [%expect.output];
-  reopen ~projdir;
+  reopen ~projdir ();
   report [%expect.output];
   cleanup projdir;
   [%expect {| restored from cache |}];
@@ -240,7 +242,7 @@ let%expect_test "a size bound is honoured when the cache is written out" =
                                               max_size = Some 0L }) ()
   in
   ignore [%expect.output];
-  reopen ~projdir;
+  reopen ~projdir ();
   report [%expect.output];
   cleanup projdir;
   [%expect {| parsed afresh |}];;
@@ -285,7 +287,7 @@ let%expect_test "an analysis stored by the CLI is restored by the LSP" =
     analyzed by the CLI
     found by the CLI
     found by the CLI |}];
-  reopen ~projdir;
+  reopen ~projdir ();
   report [%expect.output];
   cleanup projdir;
   [%expect {| restored from cache |}];;
@@ -299,7 +301,7 @@ let%expect_test "an analysis not meant for the LSP is not restored by it" =
   [%expect {|
     analyzed by the CLI
     found by the CLI |}];
-  reopen ~projdir;
+  reopen ~projdir ();
   report [%expect.output];
   cleanup projdir;
   [%expect {| parsed afresh |}];;
@@ -315,7 +317,7 @@ let%expect_test "editing a copybook is a miss for both" =
   let projdir = setup ~copybook_dirs:[".", "       01 X PIC X.\n"] () in
   ignore [%expect.output];
   ignore (write ~projdir "BOOK.cpy" "       01 X PIC 9(4).\n");
-  reopen ~projdir;
+  reopen ~projdir ();
   report [%expect.output];
   [%expect {| parsed afresh |}];
   ignore (write ~projdir "BOOK.cpy" "       01 X PIC 9(5).\n");
@@ -394,6 +396,85 @@ let%expect_test "an analysis stored by the CLI with client settings is not \
   cleanup projdir;
   [%expect {| parsed afresh |}];;
 
+(* --- Sharing analyses of files that are not plain UTF-8 with the CLI --- *)
+
+module TE = Cobol_common.Text_encoding
+
+(** Analyzes [prog.cob] as `superbol cache analyze' does, with [--encoding
+    encoding] if given. *)
+let cli_analyze_with_encoding ?encoding ~projdir () =
+  let setup =
+    Superbol_free_lib.Caching_commands.lsp_like_setup ()
+      ?encoding:(Option.map (fun e -> Result.get_ok (TE.of_name e)) encoding)
+  in
+  let common = fst (Superbol_free_lib.Common_args.get ()) () in
+  let analyzed =
+    Superbol_free_lib.Caching_commands.analyze_file_for_lsp ~setup common
+      (projdir // "prog.cob")
+  in
+  print_endline (if analyzed.hit then "found by the CLI"
+                 else "analyzed by the CLI")
+
+(** Decodes as VS Code does with [files.encoding] set to [encoding]. *)
+let vscode_decode encoding = TE.decode (Result.get_ok (TE.of_name encoding))
+
+(** [program], with a comment and a literal in windows-1252. *)
+let windows1252_program =
+  program ^ "      * caf\xe9 cr\xe8me \x80\n           DISPLAY \"\xe9t\xe9\".\n"
+
+let%expect_test "a windows-1252 program stored by the CLI with that encoding \
+                 is restored by the LSP" =
+  let projdir = setup ~copybook_dirs:[".", "       01 X PIC X.\n"] () in
+  ignore [%expect.output];
+  ignore (write ~projdir "prog.cob" windows1252_program);
+  cli_analyze_with_encoding ~encoding:"windows1252" ~projdir ();
+  cli_analyze_with_encoding ~encoding:"windows1252" ~projdir ();
+  [%expect {|
+    analyzed by the CLI
+    found by the CLI |}];
+  reopen ~decode:(vscode_decode "windows1252") ~projdir ();
+  report [%expect.output];
+  cleanup projdir;
+  [%expect {| restored from cache |}];;
+
+let%expect_test "a windows-1252 program stored by the CLI without encoding is \
+                 not restored by the LSP" =
+  let projdir = setup ~copybook_dirs:[".", "       01 X PIC X.\n"] () in
+  ignore [%expect.output];
+  ignore (write ~projdir "prog.cob" windows1252_program);
+  cli_analyze_with_encoding ~projdir ();
+  [%expect {| analyzed by the CLI |}];
+  reopen ~decode:(vscode_decode "windows1252") ~projdir ();
+  report [%expect.output];
+  cleanup projdir;
+  [%expect {| parsed afresh |}];;
+
+let%expect_test "a UTF-8 program with a byte order mark stored by the CLI is \
+                 restored by the LSP" =
+  let projdir = setup ~copybook_dirs:[".", "       01 X PIC X.\n"] () in
+  ignore [%expect.output];
+  (* Without its byte order mark, this is the program the LSP has stored. *)
+  ignore (write ~projdir "prog.cob" ("\xef\xbb\xbf" ^ program));
+  cli_analyze_with_encoding ~encoding:"utf8" ~projdir ();
+  [%expect {| found by the CLI |}];
+  reopen ~decode:(vscode_decode "utf8") ~projdir ();
+  report [%expect.output];
+  cleanup projdir;
+  [%expect {| restored from cache |}];;
+
+let%expect_test "giving an encoding does not change keys of ASCII programs" =
+  let projdir = setup ~copybook_dirs:[".", "       01 X PIC X.\n"] () in
+  ignore [%expect.output];
+  ignore (write ~projdir "prog.cob" (program ^ "      *> edited\n"));
+  cli_analyze_with_encoding ~projdir ();
+  cli_analyze_with_encoding ~encoding:"windows1252" ~projdir ();
+  cli_analyze_with_encoding ~encoding:"utf8" ~projdir ();
+  cleanup projdir;
+  [%expect {|
+    analyzed by the CLI
+    found by the CLI
+    found by the CLI |}];;
+
 (* --- Superseding earlier versions --- *)
 
 let show_cache_stats ~projdir =
@@ -420,7 +501,7 @@ let%expect_test "storing a new version reclaims the previous one" =
   [%expect {| entries: 5, values: 5 |}];
   (* ... and the previous one is gone: reverting is a miss. *)
   ignore (write ~projdir "prog.cob" program);
-  reopen ~projdir;
+  reopen ~projdir ();
   report [%expect.output];
   cleanup projdir;
   [%expect {| parsed afresh |}];;
@@ -451,11 +532,11 @@ let%expect_test "saving an edited document reclaims the previous version" =
      yet. *)
   show_cache_stats ~projdir;
   [%expect {| entries: 4, values: 4 |}];
-  reopen ~projdir;
+  reopen ~projdir ();
   report [%expect.output];
   [%expect {| restored from cache |}];
   ignore (write ~projdir "prog.cob" program);
-  reopen ~projdir;
+  reopen ~projdir ();
   report [%expect.output];
   cleanup projdir;
   [%expect {| parsed afresh |}];;

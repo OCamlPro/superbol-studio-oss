@@ -30,6 +30,9 @@ type setup =
     storage_location: Superbol_project.TYPES.cache_storage_location;
     client_settings: (string * Yojson.Safe.t) list option;
     (** Settings of an LSP client, for projects without configuration file *)
+    encoding: Cobol_common.Text_encoding.t option;
+    (** Encoding the LSP client decodes files with, before sending them to the
+        server; files are read as they are if [None]. *)
   }
 
 let default_setup =
@@ -37,12 +40,14 @@ let default_setup =
     layout = Superbol_project.Layout.default;
     storage_location = Superbol_project.Cache.default_storage_location;
     client_settings = None;
+    encoding = None;
   }
 
-(** [lsp_like_setup ?storage_directory ?client_settings ()] sets projects up as
-    an LSP server started with [--storage-directory storage_directory] does,
-    and whose client sends [client_settings]. *)
-let lsp_like_setup ?storage_directory ?client_settings () =
+(** [lsp_like_setup ?storage_directory ?client_settings ?encoding ()] sets
+    projects up as an LSP server started with [--storage-directory
+    storage_directory] does, whose client sends [client_settings] and decodes
+    files with [encoding]. *)
+let lsp_like_setup ?storage_directory ?client_settings ?encoding () =
   let layout =
     Superbol_project.Layout.create ?shared_storage_directory:storage_directory
       ()
@@ -52,7 +57,7 @@ let lsp_like_setup ?storage_directory ?client_settings () =
     Superbol_project.Cache.storage_location ~project_layout:layout ()
       ?fallback_storage_directory:storage_directory
   in
-  { layout; storage_location; client_settings }
+  { layout; storage_location; client_settings; encoding }
 
 let cache_for ?(setup = default_setup) rootdir =
   Superbol_project.Cache.for_ ~rootdir ~storage_location:setup.storage_location
@@ -151,6 +156,12 @@ let locate ?(setup = default_setup)
     | None -> Project.for_filename filename ~layout
   in
   let contents = EzFile.read_text_file filename in
+  (* Documents are keyed on their contents: decode them as the LSP client does,
+     for keys to match those of the documents it sends to the server. *)
+  let contents =
+    Option.fold setup.encoding ~none:contents
+      ~some:(fun enc -> Cobol_common.Text_encoding.decode enc contents)
+  in
   if given_filename != filename then
     Cobol_common.Srcloc.NAMING.register_given_filename ~given_filename
       ~filename;

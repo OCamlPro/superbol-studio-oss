@@ -137,6 +137,7 @@ let client_settings_of_string s =
 let analyze_cmd =
   let files = ref [] and ppf = ref Fmt.stderr
   and storage_directory = ref None and client_settings = ref None
+  and encoding = ref None
   and error_status = ref true and show_diagnostics = ref true in
   let common, common_args = Common_args.get () in
   EZCMD.sub "cache analyze"
@@ -145,6 +146,7 @@ let analyze_cmd =
          Caching_commands.lsp_like_setup ()
            ?storage_directory:!storage_directory
            ?client_settings:!client_settings
+           ?encoding:!encoding
        in
        Caching_commands.analyze_n_report (common ()) ~for_lsp:true ~setup
          ~error_status:!error_status ~show_diagnostics:!show_diagnostics
@@ -174,7 +176,17 @@ let analyze_cmd =
              EZCMD.info ~docv:"JSON"
                "Configure projects that have no `superbol.toml' file as an LSP \
                 server does when its client sends these settings of the \
-                `superbol.cobol' section (e.g. `{\"dialect\": \"ibm\"}')" ])
+                `superbol.cobol' section (e.g. `{\"dialect\": \"ibm\"}')";
+             ["encoding"],
+             Arg.Symbol (Cobol_common.Text_encoding.supported_names, fun s ->
+                 encoding :=
+                   Some (Result.get_ok @@ Cobol_common.Text_encoding.of_name s)),
+             EZCMD.info ~docv:"ENCODING"
+               "Decode files as an LSP client does when it opens them with \
+                this encoding, given as an identifier of the \
+                `files.encoding' setting of Visual Studio Code (e.g. `utf8', \
+                `windows1252', `cp850'); files are read as they are by \
+                default" ])
     ~doc:"Analyze files, reusing and filling the cache of their project"
     ~man:[ `S "DESCRIPTION";
            `Blocks [ `P "Preprocess, parse and typecheck each FILE as the LSP \
@@ -191,6 +203,11 @@ let analyze_cmd =
                          and $(b,--storage-directory) designates the caches of \
                          an LSP server started with that option, so that \
                          analyses are shared with that server.";
+                     `P "Visual Studio Code decodes files according to its \
+                         $(b,files.encoding) setting before sending them to \
+                         the server: analyses of files that are not plain \
+                         UTF-8 are only shared with the server when \
+                         $(b,--encoding) gives that same encoding.";
                      `P "Options such as $(b,--dialect), $(b,--conf), \
                          $(b,--source-format), $(b,-I), $(b,--ext), $(b,-D), \
                          $(b,--recovery) or $(b,--silence) override the project \
