@@ -45,7 +45,7 @@ let loop = program "loop" [ "loop.cbl", {|       IDENTIFICATION DIVISION.
 
 (* 10: MOVE 1 TO ITEM (IDX), with IDX out of bounds; built with runtime
    checks. *)
-let rterr = program "rterr" ~cobc_args:[ "-x"; "-g"; "-debug" ] [ "rterr.cbl", {|       IDENTIFICATION DIVISION.
+let rterr = program "rterr" ~cobc_args:("-x" :: debug_args @ [ "-debug" ]) [ "rterr.cbl", {|       IDENTIFICATION DIVISION.
        PROGRAM-ID. rterr.
        DATA DIVISION.
        WORKING-STORAGE SECTION.
@@ -60,7 +60,7 @@ let rterr = program "rterr" ~cobc_args:[ "-x"; "-g"; "-debug" ] [ "rterr.cbl", {
 |} ]
 
 (* Built as a module, to run with cobcrun. *)
-let modul = program "modul" ~cobc_args:[ "-m"; "-g" ] [ "modul.cbl", {|       IDENTIFICATION DIVISION.
+let modul = program "modul" ~cobc_args:("-m" :: debug_args) [ "modul.cbl", {|       IDENTIFICATION DIVISION.
        PROGRAM-ID. modul.
        PROCEDURE DIVISION.
            DISPLAY "in module".

@@ -83,20 +83,20 @@ let suite = { suite = "Build tasks"; tests = [
     (in_project hello) (fun ctx ->
         let* r = build ctx module_debug in
         let* () = check_exit r in
-        let* () = check_args r ~present:[ "-m"; "-g" ] ~absent:[ "-x" ] in
+        let* () = check_args r ~present:[ "-m"; "-g"; "-O0" ] ~absent:[ "-x" ] in
         check_exists ctx (module_file "hello"));
 
   expected_with "build module builds a module without debug information" (in_project hello)
     (fun ctx ->
        let* r = build ctx module_release in
        let* () = check_exit r in
-       let* () = check_args r ~present:[ "-m" ] ~absent:[ "-g"; "-x" ] in
+       let* () = check_args r ~present:[ "-m" ] ~absent:[ "-g"; "-O0"; "-x" ] in
        check_exists ctx (module_file "hello"));
 
   expected_with "build executable (debug) builds an executable" (in_project hello) (fun ctx ->
       let* r = build ctx executable_debug in
       let* () = check_exit r in
-      let* () = check_args r ~present:[ "-x"; "-g" ] ~absent:[ "-m" ] in
+      let* () = check_args r ~present:[ "-x"; "-g"; "-O0" ] ~absent:[ "-m" ] in
       check_exists ctx (executable_file "hello"));
 
   expected_with "compilation errors are reported as problems on the source file"
@@ -147,7 +147,7 @@ let suite = { suite = "Build tasks"; tests = [
     (fun ctx ->
        let* r = build ctx "build hello as a module" in
        let* () = check_exit r in
-       let* () = check_args r ~present:[ "-m"; "-g" ] ~absent:[ "-x" ] in
+       let* () = check_args r ~present:[ "-m"; "-g"; "-O0" ] ~absent:[ "-x" ] in
        check_exists ctx (module_file "hello"));
 
   expected_with "a tasks.json task can build an executable"

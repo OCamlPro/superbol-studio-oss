@@ -72,7 +72,12 @@ type program =
 
 (** A program made of the given sources, built as an executable with debug
     information. *)
-let program ?(cobc_args = [ "-x"; "-g" ]) name sources = { name; sources; cobc_args }
+(** Arguments of [cobc] for programs to debug: like those of SuperBOL's debug
+    build tasks, they disable C optimizations that [cobc] may enable by
+    default, and that break debugging. *)
+let debug_args = [ "-g"; "-A"; "-O0"; "-A"; "-U_FORTIFY_SOURCE" ]
+
+let program ?(cobc_args = "-x" :: debug_args) name sources = { name; sources; cobc_args }
 
 (** Where a test finds the program it debugs. *)
 type ctx = { dir: string }
