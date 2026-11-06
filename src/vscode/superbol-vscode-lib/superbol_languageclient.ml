@@ -32,7 +32,7 @@ type superbol_command =
     storage_args: string list;
   }
 
-let superbol_command ~server_prefix ~context ?cmd () =
+let superbol_command ~server_prefix ~context =
   let root_uri = Vscode.ExtensionContext.extensionUri context
   and storage_uri =
     (* Use the global state URI as the server stores caches on a per-project
@@ -42,12 +42,7 @@ let superbol_command ~server_prefix ~context ?cmd () =
     then Some (Vscode.ExtensionContext.globalStorageUri context)
     else None
   in
-  let kind, command =
-    match cmd with
-    | Some cmd ->
-        `exe, cmd
-    | None ->
-        find_superbol ~server_prefix ~root_uri
+  let kind, command = find_superbol ~server_prefix ~root_uri
   and fallback_config_dir =
     Vscode.Uri.fsPath @@
     Vscode.Uri.joinPath root_uri ~pathSegments:["gnucobol-config"]
@@ -65,7 +60,6 @@ let superbol_command ~server_prefix ~context ?cmd () =
 let server_options ~context ~server_prefix =
   let { kind; command; env; storage_args } =
     superbol_command ~server_prefix ~context
-      ?cmd:(Superbol_config.superbol_exe ()) ()
   in
   let args =
     let force_diagnostics = Superbol_config.bool "forceSyntaxDiagnostics" in
@@ -95,7 +89,6 @@ type cli_invocation =
 let cli_invocation ~context ~server_prefix =
   let { kind; command; env; storage_args } =
     superbol_command ~server_prefix ~context
-      ?cmd:(Superbol_config.superbol_exe ()) ()
   in
   match kind with
   | `exe ->
@@ -123,6 +116,5 @@ let server_needs_restart_after ~config_change =
     Vscode.ConfigurationChangeEvent.affectsConfiguration config_change ()
       ~section ?scope
   in
-  affects "superbol.lspPath"         (* machine setting: no need for a scope *)
-  || affects "superbol.forceSyntaxDiagnostics"                       (* scope? *)
+  affects "superbol.forceSyntaxDiagnostics"                          (* scope? *)
   || affects "superbol.cacheInGlobalStorage"
