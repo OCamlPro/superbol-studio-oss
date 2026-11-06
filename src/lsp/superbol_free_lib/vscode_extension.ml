@@ -423,17 +423,6 @@ let configuration =
       ~description:"Path to the GnuCOBOL compiler executable."
       ~order:11;
 
-    Manifest.PROPERTY.string "superbol.lspPath"
-      ~title:"SuperBOL Executable"
-      ~default:""
-      ~scope:"machine"
-      ~markdownDescription:
-        (with_extra_keyword_commment
-           "Name of the `superbol-free` executable if available in PATH; \
-            may be an absolute path otherwise. Leave empty to use the \
-            bundled `superbol-free`, if available.")
-      ~order:12;
-
     (* Flags *)
 
     Manifest.PROPERTY.bool "superbol.forceSyntaxDiagnostics"
