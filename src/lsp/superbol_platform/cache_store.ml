@@ -160,7 +160,11 @@ let create ~root () =
                      Windows shares.  Renaming is sound here only because the
                      target was just seen to be absent. *)
                   if not (Sys.file_exists target) then Unix.rename staged target
-          end
+          end;
+        (* Not the result of the system calls above: under js_of_ocaml, some
+           (like [rename]) return [undefined] rather than [()], which then
+           fails to compare equal to [()]. *)
+        ()
       end
   in
   let with_lock name ~f =
