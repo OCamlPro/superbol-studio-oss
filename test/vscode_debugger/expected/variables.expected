@@ -1,0 +1,19 @@
+Variables
+  ok      the Local scope lists the level-01 items of WORKING-STORAGE
+  ok      alphanumeric items show their text
+  ok      values reflect the statements executed so far
+  BUG?    changing a numeric item stores the number, right-justified
+            -> program output: "N=4200 NAME=ALICE   \n"
+  ok      changing an alphanumeric item affects the rest of the execution
+  BUG?    numeric DISPLAY items show a number, not their raw storage
+            -> N shows "\"0005\""
+  BUG?    signed decimal items show their sign and decimal point
+            -> S (-12.5) shows "\"0125p\""
+  BUG?    binary (COMP) items show their numeric value
+            -> C (77) shows "\"\\000\\000\\000M\""
+  BUG?    items are typed after their COBOL category
+            -> N is typed group, NAME is typed group
+  BUG?    group items expand into their subordinate items
+            -> REC cannot be expanded (shows "\"042ABCD\"")
+  BUG?    tables expand into their elements
+            -> TBL cannot be expanded (shows "\"000700\"")

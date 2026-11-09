@@ -92,7 +92,8 @@ let suite = { suite = "Session lifecycle"; tests = [
       let* () = launch ctx "rterr.cbl" in
       let* _ = next_event ~deadline:(Node.Date.now () +. event_timeout_ms) in
       let all = program_output () ^ console_output () in
-      check (contains ~sub:"ITEM" all) "no mention of ITEM in: %S" all);
+      diagnose "[output and console: %S]" all;
+      check (contains ~sub:"ITEM" all) "no mention of ITEM in the output or debug console");
 
   probe "program output is shown as soon as it is printed" hello (fun ctx ->
       let* _ = start ctx "hello.cbl" ~bps:[bp "hello.cbl" 5] in
@@ -117,8 +118,10 @@ let suite = { suite = "Session lifecycle"; tests = [
       let* () = launch ctx "hello.cbl" in
       let* () = terminated () in
       let console = console_output () in
+      (* What gdb prints depends on its version and configuration. *)
+      diagnose "[console: %S]"
+        (if String.length console > 300 then String.sub console 0 300 ^ "..." else console);
       check (not (contains ~sub:"shared library event" console
                   || contains ~sub:"debuginfod" console))
-        "debug console shows: %S"
-        (if String.length console > 300 then String.sub console 0 300 ^ "..." else console));
+        "the debug console shows internal messages of gdb");
 ] }

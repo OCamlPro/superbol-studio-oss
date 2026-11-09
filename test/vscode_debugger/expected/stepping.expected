@@ -1,0 +1,11 @@
+Stepping
+  ok      step over walks the main paragraph without entering performed paragraphs
+  ok      step over PERFORM ... TIMES skips all iterations
+  ok      step into PERFORM enters the paragraph
+  ok      step into a statement other than PERFORM steps over it
+  ok      step out of nested paragraphs returns to the main paragraph
+  ok      step out of a paragraph reached by breakpoint
+  ok      step out of a paragraph performed THRU continues with the range
+  ok      breakpoints interrupt step over
+  ok      step over STOP RUN ends the session
+  ok      step out of the main paragraph ends the session

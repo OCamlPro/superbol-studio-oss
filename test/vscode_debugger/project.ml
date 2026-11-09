@@ -364,14 +364,16 @@ let describe_terminals () =
              | Some s -> Printf.sprintf " (exit code %d)" (Vscode.TerminalExitStatus.code s)))
           terminals)
 
-(** Adds what happened to errors of [r]. *)
+(** Adds what happened to errors of [r].  The end of the debug console only
+    goes to the log, as it varies from one run to the next (process
+    identifiers, order of outputs of [gdb] and the program). *)
 let with_context r : _ res =
   Promise.map (Result.map_error (fun msg ->
       let console = console_output () in
       let n = String.length console in
-      Printf.sprintf "%s\n               [%s]\n               [%s]\n               [%s]\n               [console: %S]"
-        msg (describe_runs ()) (describe_sessions ()) (describe_terminals ())
-        (if n > 400 then String.sub console (n - 400) 400 else console))) r
+      diagnose "[console: %S]" (if n > 400 then String.sub console (n - 400) 400 else console);
+      Printf.sprintf "%s\n               [%s]\n               [%s]\n               [%s]"
+        msg (describe_runs ()) (describe_sessions ()) (describe_terminals ()))) r
 
 (** F5, and waits for the first stop. *)
 let f5_stop () : stop res =

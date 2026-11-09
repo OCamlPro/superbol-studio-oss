@@ -135,13 +135,55 @@ test-utf8-promote:
 # machines.  Set `VSCODE_TEST_EXECUTABLE` to a VS Code executable, its
 # command-line script (e.g. `/usr/bin/code`), or its installation
 # directory, to use it instead of downloading one.
+#
+# Each suite that runs writes a transcript of its outcomes in
+# `VSCODE_DEBUG_TRANSCRIPTS`, which is then compared with the expected
+# one in `VSCODE_DEBUG_EXPECTED`.  The target fails if some expected
+# behaviors fail, or some transcripts differ: use
+# `make test-vscode-debug-promote` to accept the transcripts of the last
+# run (only those of the suites it ran).
+VSCODE_DEBUG_TRANSCRIPTS = ${DUNE_BUILD_DIR}/vscode-debug-transcripts
+VSCODE_DEBUG_EXPECTED = test/vscode_debugger/expected
+
 .PHONY: test-vscode-debug
 test-vscode-debug: build-debug
 	${DUNE} build ${DUNE_ARGS} test/vscode_debugger/main.bc.js \
 		src/lsp/superbol-free/main.exe
 	@echo -n "cobc   : "; command -v cobc
 	@echo -n "cobcrun: "; command -v cobcrun
-	node test/vscode_debugger/run.js
+	rm -rf $(VSCODE_DEBUG_TRANSCRIPTS)
+	mkdir -p $(VSCODE_DEBUG_TRANSCRIPTS)
+	@status=0; \
+	SUPERBOL_TEST_TRANSCRIPTS=$(abspath $(VSCODE_DEBUG_TRANSCRIPTS)) \
+		node test/vscode_debugger/run.js || status=1; \
+	$(MAKE) --no-print-directory test-vscode-debug-diff || status=1; \
+	exit $$status
+
+# Compares the transcripts of the last run with the expected ones.
+.PHONY: test-vscode-debug-diff
+test-vscode-debug-diff:
+	@differ=0; \
+	for output in $(VSCODE_DEBUG_TRANSCRIPTS)/*.output; do \
+	  test -f "$$output" || continue; \
+	  expected=$(VSCODE_DEBUG_EXPECTED)/$$(basename "$$output" .output).expected; \
+	  test -f "$$expected" || expected=/dev/null; \
+	  diff -u --label "$$expected" --label "$$output" \
+	    "$$expected" "$$output" || differ=1; \
+	done; \
+	if [ $$differ -ne 0 ]; then \
+	  echo "Transcripts differ: use \`make test-vscode-debug-promote' to accept them."; \
+	  exit 1; \
+	fi
+
+# Replaces expected transcripts with those of the last run.
+.PHONY: test-vscode-debug-promote
+test-vscode-debug-promote:
+	@mkdir -p $(VSCODE_DEBUG_EXPECTED)
+	@for output in $(VSCODE_DEBUG_TRANSCRIPTS)/*.output; do \
+	  test -f "$$output" || continue; \
+	  expected=$(VSCODE_DEBUG_EXPECTED)/$$(basename "$$output" .output).expected; \
+	  cmp -s "$$output" "$$expected" || { cp "$$output" "$$expected"; echo "Promoted $$expected"; }; \
+	done
 
 MASTER_REMOTE ?= origin
 

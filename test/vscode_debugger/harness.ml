@@ -61,6 +61,75 @@ let contains ~sub s =
   let rec at i = i + n <= m && (String.sub s i n = sub || at (i + 1)) in
   at 0
 
+(** [s] with every occurrence of [sub] replaced by [by]. *)
+let replace_all ~sub ~by s =
+  let n = String.length sub and m = String.length s in
+  if n = 0 then s else begin
+    let b = Buffer.create m in
+    let rec go i =
+      if i > m - n then Buffer.add_string b (String.sub s i (m - i))
+      else if String.sub s i n = sub then (Buffer.add_string b by; go (i + n))
+      else (Buffer.add_char b s.[i]; go (i + 1)) in
+    go 0;
+    Buffer.contents b
+  end
+
+(* --- Transcripts ---------------------------------------------------------- *)
+
+(** When the [SUPERBOL_TEST_TRANSCRIPTS] environment variable names a
+    directory, each suite writes there a transcript of its tests, in a file
+    named after the suite (see {!transcript_file}), and updates it after
+    each test.  Transcripts only show what does not vary from one run to the
+    next (no timings, and directories of the test instance replaced with
+    placeholders), so that [make test-vscode-debug] can compare them with
+    the expected ones in [expected/], and [make promote-vscode-debug] can
+    replace those. *)
+let transcripts_dir () =
+  match Node.Process.Env.get "SUPERBOL_TEST_TRANSCRIPTS" with
+  | None | Some "" -> None
+  | Some dir -> Some dir
+
+(** Base name of the transcript of a suite: its name in lower case, with
+    dashes instead of other characters than letters and digits. *)
+let transcript_file suite =
+  String.map (function 'a'..'z' | '0'..'9' as c -> c | _ -> '-')
+    (String.lowercase_ascii suite) ^ ".output"
+
+let transcript = Buffer.create 1024
+
+(** Replaces the directories of the test instance with placeholders. *)
+let normalize s =
+  List.fold_left (fun s (var, placeholder) ->
+      match Node.Process.Env.get var with
+      | None | Some "" -> s
+      | Some dir -> replace_all ~sub:dir ~by:placeholder s) s
+    [ "SUPERBOL_TEST_WORKDIR", "$WORKDIR"; "SUPERBOL_TEST_PROJECT", "$PROJECT" ]
+
+let add_to_transcript fmt =
+  Printf.ksprintf (fun s -> Buffer.add_string transcript (normalize s ^ "\n")) fmt
+
+(** [note "..."] adds an observation of the running test to the transcript
+    of its suite (and to the log): use it to record what the debugger does
+    without asserting what it should do, and let the comparison with the
+    expected transcript catch changes. *)
+let note fmt =
+  Printf.ksprintf (fun s -> log "            | %s" s; add_to_transcript "            | %s" s) fmt
+
+(** Details of the outcome of the running test that only go to the log, as
+    they vary from one run or machine to the next (see {!diagnose}). *)
+let diagnostics = Buffer.create 256
+
+(** [diagnose "..."] adds details to the failure message of the running
+    test in the log, but not in the transcript of its suite. *)
+let diagnose fmt =
+  Printf.ksprintf (fun s -> Buffer.add_string diagnostics ("\n               " ^ s)) fmt
+
+(** Writes the transcript of [suite] so far. *)
+let write_transcript suite =
+  Option.iter (fun dir ->
+      Node.Fs.writeFileSync (Node.Path.join [ dir; transcript_file suite ])
+        (Buffer.contents transcript)) (transcripts_dir ())
+
 (* --- Programs under test ------------------------------------------------ *)
 
 type program =
@@ -461,6 +530,7 @@ type outcome = { test: test; suite_name: string; result: (unit, string) result }
 
 let run_test ~workdir ~suite_name test : outcome Promise.t =
   let open Promise.Syntax in
+  Buffer.clear diagnostics;
   let* result =
     let open Syntax in
     let* ctx = test.prepare ~workdir in
@@ -471,8 +541,11 @@ let run_test ~workdir ~suite_name test : outcome Promise.t =
     | Expected, Error _ -> "FAIL    "
     | Probe, Ok () -> "no bug  "
     | Probe, Error _ -> "BUG?    " in
-  log "  %s%s%s" label test.title
-    (match result with Ok () -> "" | Error msg -> "\n            -> " ^ msg);
+  let details = match result with Ok () -> "" | Error msg -> "\n            -> " ^ msg in
+  log "  %s%s%s%s" label test.title details
+    (if Result.is_error result then Buffer.contents diagnostics else "");
+  add_to_transcript "  %s%s%s" label test.title details;
+  write_transcript suite_name;
   Promise.return { test; suite_name; result }
 
 let summary outcomes =
@@ -507,6 +580,11 @@ let run_suites suites : int Promise.t =
   match Node.Process.Env.get "SUPERBOL_TEST_WORKDIR" with
   | _ when not (have_cobc && have_gdb) ->
       log "SKIPPED: `cobc` or `gdb` is not available";
+      (* Let the comparison with expected transcripts show it. *)
+      List.iter (fun { suite; _ } ->
+          Buffer.clear transcript;
+          add_to_transcript "SKIPPED: `cobc` or `gdb` is not available";
+          write_transcript suite) suites;
       Promise.return 0
   | None ->
       log "FAILED: SUPERBOL_TEST_WORKDIR is not set";
@@ -529,6 +607,9 @@ let run_suites suites : int Promise.t =
             | { suite; tests } :: rest ->
                 log "";
                 log "%s" suite;
+                Buffer.clear transcript;
+                add_to_transcript "%s" suite;
+                write_transcript suite;
                 let started = Node.Date.now () in
                 let* outcomes = loop [] (List.map (fun t -> suite, t) tests) in
                 log "  (%s: %.0fs)" suite ((Node.Date.now () -. started) /. 1000.);

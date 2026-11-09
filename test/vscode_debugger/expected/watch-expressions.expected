@@ -1,0 +1,16 @@
+Watch expressions
+  ok      watching an elementary numeric item shows its value
+  ok      watching an alphanumeric item shows its text
+  ok      watching an unknown name reports it cannot be evaluated
+  BUG?    watching a subordinate item shows its value
+            -> REC-ID: expected 42, got "Failed to evaluate REC-ID"
+  BUG?    watching a qualified item shows its value
+            -> REC-ID OF REC: expected 42, got "Failed to evaluate REC-ID OF REC"
+  BUG?    watching a table element shows its value
+            -> ITEM (2): expected 7, got "Failed to evaluate ITEM (2)"
+  BUG?    watching a binary (COMP) item shows its value
+            -> C: expected 77, got "Failed to evaluate C"
+  BUG?    watching an arithmetic expression computes it
+            -> N + 1 (N = 5): expected 6, got "\"00051\""
+  BUG?    watching a numeric item shows a number, not its raw storage
+            -> N: got "\"0005\""

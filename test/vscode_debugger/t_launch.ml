@@ -237,6 +237,7 @@ let suite = { suite = "Debug configurations"; tests = [
         let* () = open_file ctx "hello.cbl" in
         debug_start ();
         let* () = with_context (terminated ~timeout:15_000. ()) in
+        diagnose "[console: %S]" (console_output ());
         check (contains ~sub:"hello" (console_output ()))
-          "nothing reported in the debug console: %S" (console_output ()));
+          "nothing reported in the debug console");
 ] }

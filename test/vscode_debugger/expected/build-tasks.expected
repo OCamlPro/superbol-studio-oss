@@ -1,0 +1,18 @@
+Build tasks
+  ok      the four default build tasks are offered
+  ok      build module (debug) builds a module of the active file with debug information
+  ok      build module builds a module without debug information
+  ok      build executable (debug) builds an executable
+  ok      compilation errors are reported as problems on the source file
+  ok      a build task without an active editor does not build anything
+  ok      copybook directories from superbol.toml are passed to cobc
+  ok      the dialect from superbol.toml is passed to cobc
+  ok      the superbol.cobcPath setting selects the compiler
+  ok      a tasks.json task of type superbol builds a module by default
+  ok      a tasks.json task can build an executable
+  ok      extraArgs of a tasks.json task are passed to cobc
+  ok      a tasks.json task with a missing compiler fails
+  no bug  listingsTarget of a tasks.json task generates listings in that directory
+  BUG?    customizing a default build task in tasks.json applies to that task
+            -> tasks named SuperBOL: build module (debug): SuperBOL/build module (debug), Workspace/SuperBOL: build module (debug)
+  no bug  building a file whose name contains a space
