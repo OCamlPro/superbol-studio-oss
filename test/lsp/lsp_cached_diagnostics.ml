@@ -54,10 +54,10 @@ let make_project () =
 
 (** Analyzes [filename] as `superbol cache analyze' does. *)
 let cli_analyze ~projdir filename =
-  let setup = Superbol_free_lib.Caching_commands.lsp_like_setup () in
+  let setup = Superbol_free_lib.Project_commands.lsp_like_setup () in
   let common = fst (Superbol_free_lib.Common_args.get ()) () in
   ignore @@
-  Superbol_free_lib.Caching_commands.analyze_file_for_lsp ~setup common
+  Superbol_free_lib.Project_commands.analyze_file_for_lsp ~setup common
     (projdir // filename)
 
 let print_diagnostics ~file = function

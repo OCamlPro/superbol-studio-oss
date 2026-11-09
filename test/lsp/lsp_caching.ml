@@ -343,12 +343,12 @@ let setup_unconfigured () =
 (** Analyzes [prog.cob] as `superbol cache analyze --client-settings' does. *)
 let cli_analyze_with_settings ~projdir settings =
   let setup =
-    Superbol_free_lib.Caching_commands.lsp_like_setup ()
+    Superbol_free_lib.Project_commands.lsp_like_setup ()
       ~client_settings:settings
   in
   let common = fst (Superbol_free_lib.Common_args.get ()) () in
   let analyzed =
-    Superbol_free_lib.Caching_commands.analyze_file_for_lsp ~setup common
+    Superbol_free_lib.Project_commands.analyze_file_for_lsp ~setup common
       (projdir // "prog.cob")
   in
   print_endline (if analyzed.hit then "found by the CLI"
@@ -404,12 +404,12 @@ module TE = Cobol_common.Text_encoding
     encoding] if given. *)
 let cli_analyze_with_encoding ?encoding ~projdir () =
   let setup =
-    Superbol_free_lib.Caching_commands.lsp_like_setup ()
+    Superbol_free_lib.Project_commands.lsp_like_setup ()
       ?encoding:(Option.map (fun e -> Result.get_ok (TE.of_name e)) encoding)
   in
   let common = fst (Superbol_free_lib.Common_args.get ()) () in
   let analyzed =
-    Superbol_free_lib.Caching_commands.analyze_file_for_lsp ~setup common
+    Superbol_free_lib.Project_commands.analyze_file_for_lsp ~setup common
       (projdir // "prog.cob")
   in
   print_endline (if analyzed.hit then "found by the CLI"

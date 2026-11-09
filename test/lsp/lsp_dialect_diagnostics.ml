@@ -118,13 +118,13 @@ let%expect_test "the CLI loads dialects given by client settings" =
   EzFile.write_text_file filename
     "       IDENTIFICATION DIVISION.\n       PROGRAM-ID. prog.\n";
   let setup =
-    { (Superbol_free_lib.Caching_commands.lsp_like_setup ()
+    { (Superbol_free_lib.Project_commands.lsp_like_setup ()
          ~client_settings:["dialect", `String conf])
       with project_root = Some dir }
   in
   let common = fst (Superbol_free_lib.Common_args.get ()) () in
-  let { project; _ }: _ Superbol_free_lib.Caching_commands.analyzed_file =
-    Superbol_free_lib.Caching_commands.analyze_file_for_lsp ~setup common
+  let { project; _ }: _ Superbol_free_lib.Project_commands.analyzed_file =
+    Superbol_free_lib.Project_commands.analyze_file_for_lsp ~setup common
       filename
   in
   ignore [%expect.output];

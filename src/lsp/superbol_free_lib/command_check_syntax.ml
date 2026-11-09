@@ -37,7 +37,7 @@ let cmd =
     "check syntax"          (* add the corresponding line in Main.subcommands *)
     begin fun () ->
       if !in_project
-      then Caching_commands.analyze_n_report (common ()) ~for_lsp:false
+      then Project_commands.analyze_n_report (common ()) ~for_lsp:false
              ~setup:(project_setup ()) ~ppf:!ppf !files
       else action (common ()) ~ppf:!ppf !files
     end

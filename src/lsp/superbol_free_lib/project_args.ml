@@ -41,8 +41,8 @@ let get () =
        encodings) if ENCODING is not supported";
   ] in
   let given arg ~default = match arg with None -> default | given -> given in
-  let get ?(setup = Caching_commands.default_setup) () =
-    Caching_commands.{
+  let get ?(setup = Project_commands.default_setup) () =
+    Project_commands.{
       setup with
       project_root = given !project_root ~default:setup.project_root;
       encoding = given !encoding ~default:setup.encoding;

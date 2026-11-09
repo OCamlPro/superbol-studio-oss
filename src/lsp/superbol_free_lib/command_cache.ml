@@ -39,7 +39,7 @@ let pp_age ppf seconds =
 (* --- *)
 
 let status ~verbose dir =
-  match Caching_commands.cache_for dir with
+  match Project_commands.cache_for dir with
   | None -> ()
   | Some (root, cache) ->
       match CACHE.stats cache, CACHE.entries cache with
@@ -66,7 +66,7 @@ let status ~verbose dir =
           Pretty.error "Could not read the cache at %s@." root
 
 let trim ~older_than ~max_size dir =
-  match Caching_commands.cache_for dir with
+  match Project_commands.cache_for dir with
   | None -> ()
   | Some (root, cache) ->
       (* Not [Never], even without bounds: that would skip reclaiming the
@@ -144,11 +144,11 @@ let analyze_cmd =
     (fun () ->
        let setup =
          project_setup () ~setup:
-           (Caching_commands.lsp_like_setup ()
+           (Project_commands.lsp_like_setup ()
               ?storage_directory:!storage_directory
               ?client_settings:!client_settings)
        in
-       Caching_commands.analyze_n_report (common ()) ~for_lsp:true ~setup
+       Project_commands.analyze_n_report (common ()) ~for_lsp:true ~setup
          ~error_status:!error_status ~show_diagnostics:!show_diagnostics
          ~ppf:!ppf !files)
     ~args:(common_args @ project_args @

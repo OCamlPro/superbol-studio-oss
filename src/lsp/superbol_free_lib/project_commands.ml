@@ -11,6 +11,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Helpers for commands that analyze files within their projects, according to
+    their configuration, reusing and filling the caches of these projects. *)
+
 open Ez_file.V1
 open EzFile.OP
 

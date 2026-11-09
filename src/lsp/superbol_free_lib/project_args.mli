@@ -15,8 +15,8 @@
     {!Common_args}. *)
 
 (** [get ()] is the arguments, along with a function that applies them to a
-    setup ({!Caching_commands.default_setup} by default). *)
+    setup ({!Project_commands.default_setup} by default). *)
 val get
   : unit
-  -> (?setup:Caching_commands.setup -> unit -> Caching_commands.setup)
+  -> (?setup:Project_commands.setup -> unit -> Project_commands.setup)
      * Ezcmd.V2.EZCMD.TYPES.arg_list

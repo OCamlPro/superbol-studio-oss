@@ -20,8 +20,8 @@ open Common_args
     or an explanation of why there is no such unit. *)
 let typeck_file ~setup
     ({ platform; analysis_overrides = overrides; _ } as common) filename =
-  let Caching_commands.{ filename; project; contents; analysis; _ } =
-    Caching_commands.analyze_file ~setup common filename
+  let Project_commands.{ filename; project; contents; analysis; _ } =
+    Project_commands.analyze_file ~setup common filename
   in
   Cobol_common.Diagnostics.Set.pp ~platform Fmt.stderr @@
   Superbol_project.Analysis.diagnostics analysis;

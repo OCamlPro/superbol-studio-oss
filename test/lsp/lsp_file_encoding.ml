@@ -50,13 +50,13 @@ let make_project () =
     does. *)
 let cli_analyze ~projdir =
   let setup =
-    Superbol_free_lib.Caching_commands.lsp_like_setup ()
+    Superbol_free_lib.Project_commands.lsp_like_setup ()
       ~encoding:(Result.get_ok @@
                  Cobol_common.Text_encoding.of_name "windows1252")
   in
   let common = fst (Superbol_free_lib.Common_args.get ()) () in
   ignore @@
-  Superbol_free_lib.Caching_commands.analyze_file_for_lsp ~setup common
+  Superbol_free_lib.Project_commands.analyze_file_for_lsp ~setup common
     (projdir // "other.cbl")
 
 (** A server with client settings enabled, for the project in [projdir] as a
