@@ -137,9 +137,9 @@ let client_settings_of_string s =
 let analyze_cmd =
   let files = ref [] and ppf = ref Fmt.stderr
   and storage_directory = ref None and client_settings = ref None
-  and error_status = ref true and show_diagnostics = ref true
-  and jobs = ref 1 and batch_size = ref None in
+  and error_status = ref true and show_diagnostics = ref true in
   let common, common_args = Common_args.get () in
+  let parallel, parallel_args = Parallel_batches.args () in
   let project_setup, project_args = Project_args.get () in
   let analyze files =
     let setup =
@@ -153,8 +153,9 @@ let analyze_cmd =
       ~ppf:!ppf files
   in
   (* Processes that analyze batches of files are given every option that was
-     given to this one, except [--jobs] and [--batch-size]; common options such
-     as [-v] or [--color] are passed on separately. *)
+     given to this one, except [--jobs] and [--batch-size]; {!Parallel_batches}
+     passes the verbosity on with [-v], and colors and margins through the
+     environment. *)
   let given_args, args =
     Arg_utils.recording @@
     common_args @ project_args @
@@ -186,29 +187,14 @@ let analyze_cmd =
   in
   EZCMD.sub "cache analyze"
     (fun () ->
+       let jobs, batch_size = parallel () in
        (* Processes report progress on the files they analyze as asked, except
           on a line of their own, as their outputs are copied when they end. *)
        let args = List.filter ((<>) "--progress=force") (given_args ()) in
-       Parallel_batches.run ~jobs:!jobs ?batch_size:!batch_size
-         ~command:["cache"; "analyze"]
-         ~progress:(common ()).progress_display
-         ~args:(List.init !Globals.verbosity (fun _ -> "-v") @ args)
+       Parallel_batches.run ~jobs ?batch_size ~command:["cache"; "analyze"]
+         ~progress:(common ()).progress_display ~args
          ~sequential:analyze !files)
-    ~args:(args @
-           [ ["jobs"; "j"], Arg.Int begin fun n ->
-               if n < 1 then Cobol_common.fatal "Not a number of jobs: %d" n;
-               jobs := n
-             end,
-             EZCMD.info ~docv:"N"
-               "Analyze files in up to N processes at once (default: 1)";
-             ["batch-size"; "n"], Arg.Int begin fun n ->
-               if n < 1 then Cobol_common.fatal "Not a batch size: %d" n;
-               batch_size := Some n
-             end,
-             EZCMD.info ~docv:"K"
-               "With $(b,--jobs), analyze files in batches of K, each in a \
-                process of its own (default: the size that splits files into \
-                as many batches as there are jobs, up to 25)" ])
+    ~args:(args @ parallel_args)
     ~doc:"Analyze files, reusing and filling the cache of their project"
     ~man:[ `S "DESCRIPTION";
            `Blocks [ `P "Preprocess, parse and typecheck each FILE as the LSP \

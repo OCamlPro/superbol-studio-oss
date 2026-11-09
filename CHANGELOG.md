@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Sub-command `superbol parallel`, for running any sub-command on batches of files in parallel processes [#720](https://github.com/OCamlPro/superbol-studio-oss/pull/720)
 - Option `--color` of every `superbol` command, and environment variable `SUPERBOL_COLOR`, for forcing or disabling colors in outputs [#720](https://github.com/OCamlPro/superbol-studio-oss/pull/720)
 - Options `--jobs` and `--batch-size` of `superbol cache analyze`, for analyzing batches of files in parallel processes [#720](https://github.com/OCamlPro/superbol-studio-oss/pull/720)
 - Support for files that are not UTF-8 in the workspace analysis, according to the `files.encoding` setting of VS Code [#719](https://github.com/OCamlPro/superbol-studio-oss/pull/719)

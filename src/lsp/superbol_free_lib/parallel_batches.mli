@@ -20,7 +20,8 @@ val supported: bool
 
 (** [run ~jobs ?batch_size ~command ~args ~sequential files] splits [files]
     into batches of [batch_size] files, and runs this program as [<command>
-    <args> -- <batch>] in a process of its own for each, with at most [jobs]
+    <args> -- <batch>] in a process of its own for each (preceded by [-v] as
+    many times as needed for the same verbosity), with at most [jobs]
     processes at once: a process is started on the next batch left as soon as
     another one ends.  Progress is reported as [progress] tells, each time a
     process ends.  The output of each process is held back until it ends,
@@ -47,6 +48,11 @@ val run
   -> sequential: (string list -> unit)
   -> string list
   -> unit
+
+(** [args ()] is a function that gives the number of jobs and the size of
+    batches for {!run}, along with the arguments ([--jobs] and [--batch-size])
+    that set them. *)
+val args: unit -> (unit -> int * int option) * Ezcmd.V2.EZCMD.TYPES.arg_list
 
 (** Name of an environment variable that hides the banner of this program
     when set; it is set for every process {!run} starts. *)

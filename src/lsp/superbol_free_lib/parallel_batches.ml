@@ -164,6 +164,30 @@ let run_batches ~jobs ~progress ~argv batches =
     if !num_processed <> num_processed' then report_progress ()
   done
 
+let args () =
+  let jobs = ref 1 and batch_size = ref None in
+  let open Ezcmd.V2 in
+  let open EZCMD.TYPES in
+  (fun () -> !jobs, !batch_size),
+  [
+    ["jobs"; "j"], Arg.Int begin fun n ->
+      if n < 1 then Cobol_common.fatal "Not a number of jobs: %d" n;
+      jobs := n
+    end,
+    EZCMD.info ~docv:"N"
+      "Process files in up to N processes at once (default: 1)";
+
+    ["batch-size"; "n"], Arg.Int begin fun n ->
+      if n < 1 then Cobol_common.fatal "Not a batch size: %d" n;
+      batch_size := Some n
+    end,
+    EZCMD.info ~docv:"K" @@
+    Printf.sprintf
+      "With $(b,--jobs), process files in batches of K, each in a process of \
+       its own (default: the size that splits files into as many batches as \
+       there are jobs, up to %d)" max_batch_size;
+  ]
+
 let run ~jobs ?batch_size ~progress ~command ~args ~sequential files =
   let jobs = max 1 jobs and num_files = List.length files in
   let batch_size = match batch_size with
@@ -177,4 +201,6 @@ let run ~jobs ?batch_size ~progress ~command ~args ~sequential files =
     sequential files
   else
     run_batches ~jobs ~progress (batches batch_size files)
-      ~argv:(Sys.executable_name :: command @ args @ ["--"])
+      ~argv:(Sys.executable_name ::
+             List.init !Globals.verbosity (fun _ -> "-v") @
+             command @ args @ ["--"])
