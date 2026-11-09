@@ -54,11 +54,10 @@ let iter_comma_separated_spec ~showable ~option_name ~f spec =
   end StringSet.empty |>
   fun unknowns ->
   if not (StringSet.is_empty unknowns) then
-    raise @@ Stdlib.Arg.Bad
-      Pretty.(to_string "@[Unknown@ arguments@ for@ `%s':@ %a@]"
-                option_name
-                (list ~fopen:"" ~fsep:",@ " ~fclose:"" string)
-                (StringSet.elements unknowns))
+    Cobol_common.fatal "@[Unknown@ arguments@ for@ `%s':@ %a@]"
+      option_name
+      Pretty.(list ~fopen:"" ~fsep:",@ " ~fclose:"" string)
+      (StringSet.elements unknowns)
 
 (** Departures from project configurations that are explicitly requested on the
     command line, for commands that analyze documents within their projects. *)
@@ -241,8 +240,8 @@ let get () =
       | s, None ->
           Cobol_config.from_file ~platform ~verbose ~search_path s
       | _ ->
-          Pretty.failwith "Flags `--conf` and `--dialect` or `--std` cannot be \
-                           used together"
+          Cobol_common.fatal "Flags `--conf` and `--dialect` or `--std` \
+                              cannot be used together"
     in
     let source_format =
       match !format with
@@ -271,7 +270,8 @@ let get () =
             { src_payload = value;
               src = Process_parameter } env
         with Not_found ->
-          Pretty.failwith "Invalid argument `%s' given to flag `-D`" definition
+          Cobol_common.fatal "Invalid argument `%s' given to flag `-D`"
+            definition
       end !definitions Cobol_preproc.Env.empty
     in
     let progress_display = progress_display () in

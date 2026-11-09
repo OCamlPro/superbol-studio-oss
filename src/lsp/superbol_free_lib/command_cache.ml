@@ -111,7 +111,7 @@ let trim_cmd =
              ["max-size"],
              Arg.String begin fun s -> match Arg_utils.size_of_string s with
                | Ok size -> max_size := Some size
-               | Error () -> Pretty.failwith "Not a size: %s" s
+               | Error () -> Cobol_common.fatal "Not a size: %s" s
              end,
              EZCMD.info ~docv:"SIZE"
                "Keep the cache under that size, reclaiming the entries least \
@@ -132,7 +132,7 @@ let client_settings_of_string s =
   | `Assoc assoc -> assoc
   | `Null -> []
   | _ | exception Yojson.Json_error _ ->
-      Pretty.failwith "Expected a JSON object: %s" s
+      Cobol_common.fatal "Expected a JSON object: %s" s
 
 let analyze_cmd =
   let files = ref [] and ppf = ref Fmt.stderr
