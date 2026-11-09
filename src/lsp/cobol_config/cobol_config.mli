@@ -56,6 +56,15 @@ val from_dialect
   -> Types.DIALECT.t
   -> (module T) Cobol_common.Diagnostics.with_diags
 
+(** [dialect_file ~search_path dialect] is the configuration file that
+    {!from_dialect} loads for [dialect], if any and if it is found in
+    [search_path].  The caveat about {!default_search_path} given for
+    {!from_file} applies here as well. *)
+val dialect_file
+  : ?search_path: string list
+  -> Types.DIALECT.t
+  -> string option
+
 val dialect: t -> dialect
 
 val tab_stops: t -> int list

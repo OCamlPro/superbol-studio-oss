@@ -283,22 +283,33 @@ let from_file ?search_path ?(verbose=false) file =
   in
   DIAGS.result (module Config: T) ~diags:(Diags.inspect ~reset:true)
 
-let from_dialect ?search_path ?verbose d =
+(* NB: [Some] is shadowed by a constructor of {!Types}. *)
+let dialect_config_filename: DIALECT.t -> string option = function
+  | DIALECT.Default ->
+      Option.none
+  | DIALECT.GnuCOBOL ->
+      Option.some "default.conf"
+  | dialect ->
+      let name = DIALECT.to_string dialect in
+      Option.some @@
+      if String.ends_with ~suffix:".conf" name
+      then name
+      else Pretty.to_string "%s.conf" name
+
+let dialect_file ?search_path d =
   let search_path = retrieve_search_path ?search_path () in
-  let config_filename = function
-    | DIALECT.GnuCOBOL -> "default.conf"
-    | dialect ->
-        if String.ends_with ~suffix:".conf" (DIALECT.to_string dialect)
-        then DIALECT.to_string dialect
-        else Pretty.to_string "%s.conf" (DIALECT.to_string dialect)
-  in
-  let load_gnucobol_conf conf =
-    from_file ~search_path ?verbose @@
-    find_file ~search_path (config_filename conf)
-  in
-  match d with
-  | DIALECT.Default -> DIAGS.result (module Default: T)
-  | d               -> load_gnucobol_conf d
+  Option.bind (dialect_config_filename d) begin fun filename ->
+    try Option.some (find_file ~search_path filename)
+    with ERROR _ -> Option.none
+  end
+
+let from_dialect ?search_path ?verbose d =
+  match (dialect_config_filename d: string option) with
+  | None ->
+      DIAGS.result (module Default: T)
+  | Some filename ->
+      let search_path = retrieve_search_path ?search_path () in
+      from_file ~search_path ?verbose @@ find_file ~search_path filename
 
 let dialect (module C: T) = C.dialect
 

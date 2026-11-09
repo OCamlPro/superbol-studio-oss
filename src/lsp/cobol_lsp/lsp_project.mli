@@ -20,8 +20,11 @@ module TYPES: sig
   (** How problems met while applying client settings are reported. *)
   type settings_reporter =
     {
-      report_dialect_diags: project -> Cobol_common.Diagnostics.Set.t -> unit;
-      (** Diagnostics about loading the configuration of a dialect *)
+      report_dialect_diags:
+        dialect_name:string -> project -> Cobol_common.Diagnostics.Set.t ->
+        unit;
+      (** Diagnostics about loading the configuration of dialect
+          [dialect_name] for a project *)
       report_config_error: Superbol_project.Diagnostics.error -> unit;
       report_invalid_setting: key:string -> string -> unit;
     }

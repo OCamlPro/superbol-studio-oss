@@ -65,7 +65,7 @@ let configured_projects = Hashtbl.create 1
 
 let settings_reporter =
   Cobol_lsp.Project.{
-    report_dialect_diags = begin fun _ diags ->
+    report_dialect_diags = begin fun ~dialect_name:_ _ diags ->
       DIAGS.Set.pp ~platform:Superbol_platform.record Fmt.stderr diags
     end;
     report_config_error = begin fun e ->

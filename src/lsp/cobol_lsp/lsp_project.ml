@@ -21,7 +21,8 @@ module TYPES = struct
   (** How problems met while applying client settings are reported. *)
   type settings_reporter =
     {
-      report_dialect_diags: project -> DIAGS.Set.t -> unit;
+      report_dialect_diags:
+        dialect_name:string -> project -> DIAGS.Set.t -> unit;
       report_config_error: Superbol_project.Diagnostics.error -> unit;
       report_invalid_setting: key:string -> string -> unit;
     }
@@ -96,10 +97,58 @@ let absolute_path_for =
     mutations on project's configurations. They return [true] if the
     configuration of the given project has changed. *)
 
+(* Diagnostics about loading the dialect a project is given via client settings
+   are published on its configuration file, if any: the project itself has no
+   configuration file then, and they hold no location anyway.  [dialect_files]
+   maps the root directory of every such project to the URI of that file, so
+   that diagnostics are withdrawn once no project uses it anymore.
+
+   Otherwise, they are notified and logged, once per dialect. *)
+let dialect_files: (string, Lsp.Uri.t) Hashtbl.t = Hashtbl.create 1
+let notified_dialects: (string, unit) Hashtbl.t = Hashtbl.create 1
+
+let report_dialect_diags ~dialect_name project diags =
+  let rootdir = string_of_rootdir @@ rootdir project in
+  let previous = Hashtbl.find_opt dialect_files rootdir in
+  let file =
+    try Cobol_config.dialect_file @@ Cobol_config.DIALECT.of_string dialect_name
+    with Invalid_argument _ -> None
+  in
+  begin match file with
+    | Some file ->
+        let file =
+          if Filename.is_relative file
+          then Filename.concat (Sys.getcwd ()) file else file
+        in
+        let uri = Lsp_diagnostics.normalize_uri @@ Lsp.Uri.of_path file in
+        Hashtbl.replace dialect_files rootdir uri;
+        Lsp_diagnostics.publish @@
+        Lsp_diagnostics.translate diags ~uri ~focus_on_main_doc:false
+          ~rootdir:(Filename.dirname file)
+    | None ->
+        Hashtbl.remove dialect_files rootdir;
+        if diags <> DIAGS.Set.none &&
+           not (Hashtbl.mem notified_dialects dialect_name)
+        then begin
+          Hashtbl.replace notified_dialects dialect_name ();
+          Lsp_io.notify_warn "Problems@ in@ the@ configuration@ of@ dialect@ \
+                              `%s'@ (see@ the@ log)" dialect_name;
+          Lsp_io.log_warn "Loading@ dialect@ `%s':@ %a" dialect_name
+            (DIAGS.Set.pp ?platform:None) diags
+        end
+  end;
+  (* Withdraw the diagnostics of the file the project used before, unless
+     another project still uses it. *)
+  Option.iter begin fun previous ->
+    if not (Hashtbl.fold (fun _ uri used -> used || Lsp.Uri.equal uri previous)
+              dialect_files false)
+    then Lsp_io.send_diagnostics ~uri:previous []
+  end previous
+
 (** Reports problems as an LSP server does. *)
 let lsp_settings_reporter =
   {
-    report_dialect_diags = show_diagnostics ~force:false;
+    report_dialect_diags;
     report_config_error = begin fun e ->
       Lsp_io.notify_error "%a" Superbol_project.Diagnostics.pp_error e
     end;
@@ -131,7 +180,7 @@ let update_dialect ~reporter ({ config; _ } as project) str : bool =
     else begin
       config.cobol_config <- result;
       config.dialect_name <- str;
-      reporter.report_dialect_diags project diags;
+      reporter.report_dialect_diags ~dialect_name:str project diags;
       true
     end
   with Superbol_project.Config.ERROR e ->
