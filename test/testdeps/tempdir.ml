@@ -13,5 +13,5 @@
 
 let make_n_enter dirname_pattern =
   let rundir = Superbol_platform.Tempdir.create dirname_pattern in
-  Unix.chdir rundir;
+  Sys.chdir rundir;                      (* [Unix.chdir] is missing in JS *)
   rundir

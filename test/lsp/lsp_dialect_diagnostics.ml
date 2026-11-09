@@ -68,7 +68,7 @@ let print_output ~dir output =
 (** Removes [dir] after leaving it: Windows refuses to remove the current
     directory. *)
 let remove_temp_dir dir =
-  Unix.chdir (Filename.dirname dir);
+  Sys.chdir (Filename.dirname dir);       (* [Unix.chdir] is missing in JS *)
   EzFile.remove_dir ~all:true dir
 
 let%expect_test "problems in a dialect given by client settings are published \

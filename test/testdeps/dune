@@ -2,5 +2,6 @@
   (name superbol_testutils)
   (wrapped true)
   (libraries autofonce_lib superbol_platform)
-  (flags (:standard)))
+  (flags (:standard))
+  (js_of_ocaml (javascript_files testdeps_stubs.js)))
 
