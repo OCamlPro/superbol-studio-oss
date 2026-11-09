@@ -79,28 +79,26 @@ let not_excluded uris =
              ~includeWorkspaceFolder:false)
   end uris
 
-let find_cobol_files ~token =
+let find_cobol_files ?token () =
   let open Promise.Syntax in
   let rec aux acc = function
     | [] ->
         Promise.return (not_excluded @@ List.rev acc)
     | pattern :: patterns ->
-        let* uris = Workspace.findFiles () ~includes:(`String pattern) ~token in
+        let* uris = Workspace.findFiles () ~includes:(`String pattern) ?token in
         aux (List.rev_append uris acc) patterns
   in
   aux [] cobol_file_patterns
 
 (* Files are analyzed by `superbol cache analyze' processes (see
-   {!Superbol_jobs}), that fill the caches of the server.  Documents are not
-   opened in the server: it finds their workspace symbols in its caches, and
-   restores their analyses once they are opened.  Once a batch of files is
-   analyzed, the server is asked to publish their diagnostics, that it also
-   finds in its caches. *)
+   {!Superbol_jobs}) that fill the caches of the server, without being opened
+   in the server.  After each batch, the server is asked to publish their
+   diagnostics from its caches. *)
 
-(* [publish_cached_diagnostics client uris] asks the server to publish the
-   diagnostics of [uris] it finds in its caches, and gives the number of those
-   it does not find (all of them in case of failure, that is logged). *)
-let publish_cached_diagnostics client uris =
+(* [request_publication client uris] asks the server to publish the cached
+   diagnostics of [uris], and gives the number of files it missed, or the error
+   message of the request. *)
+let request_publication client uris =
   let data =
     Jsonoo.Encode.(object_ [
         "uris", list (fun uri -> string @@ Uri.toString uri ()) uris
@@ -110,18 +108,31 @@ let publish_cached_diagnostics client uris =
     ~meth:"superbol/publishCachedDiagnostics" ~data |>
   Promise.then_
     ~fulfilled:begin fun reply ->
-      Promise.return @@
-      try List.length Jsonoo.Decode.(field "missed" (list id) reply)
-      with Jsonoo.Decode_error _ -> 0
+      Promise.return @@ Ok begin
+        try List.length Jsonoo.Decode.(field "missed" (list id) reply)
+        with Jsonoo.Decode_error _ -> 0
+      end
     end
     ~rejected:begin fun err ->
       let err_js = Promise.error_to_js err in
-      Superbol_printer.log_error
-        "SuperBOL: could not publish diagnostics of %u file%s: %s"
-        (List.length uris) (plural (List.length uris) "" "s")
-        (Ojs.string_of_js (Ojs.get_prop_ascii err_js "message"));
-      Promise.return (List.length uris)
+      Promise.return @@
+      Error (Ojs.string_of_js (Ojs.get_prop_ascii err_js "message"))
     end
+
+let log_publication_error ~uris msg =
+  Superbol_printer.log_error
+    "SuperBOL: could not publish diagnostics of %u file%s: %s"
+    (List.length uris) (plural (List.length uris) "" "s") msg
+
+(* Same as [request_publication], with failures logged and counted as misses
+   of every file. *)
+let publish_cached_diagnostics client uris =
+  Promise.then_ (request_publication client uris) ~fulfilled:begin function
+    | Ok missed -> Promise.return missed
+    | Error msg ->
+        log_publication_error ~uris msg;
+        Promise.return (List.length uris)
+  end
 
 let report_processes_completion ~analyzed ~failed ~missed ~undiagnosed =
   let total = analyzed + failed + missed in
@@ -152,7 +163,7 @@ let report_processes_completion ~analyzed ~failed ~missed ~undiagnosed =
 
 let analyze_workspace_in_processes ~client cli ~progress ~token =
   let open Promise.Syntax in
-  let* uris = find_cobol_files ~token in
+  let* uris = find_cobol_files ~token () in
   let total = List.length uris in
   let percent i = i * 100 / max 1 total in
   let analyzed = ref 0 and failed = ref 0 in
@@ -203,6 +214,79 @@ let run_analysis instance =
       with_analysis_progress @@
       analyze_workspace_in_processes ~client
         (Superbol_instance.cli_invocation instance)
+
+(** {2 Diagnostics of files analyzed in earlier sessions} *)
+
+let publish_on_start_setting =
+  "workspaceAnalysis.publishCachedDiagnosticsOnStartup"
+
+(* The server handles one request at a time, and reads every file it is given:
+   small batches let other requests through in between. *)
+let files_per_publication = 50
+
+let with_publication_progress task =
+  Window.withProgress (module Interop.Js.Unit) ~task
+    ~options:(ProgressOptions.create
+                ~location:(`ProgressLocation ProgressLocation.Notification)
+                ~title:"SuperBOL: reporting diagnostics of analyzed files"
+                ~cancellable:true ())
+
+(* Diagnostics of documents that are not open do not survive the language
+   client, so the server is asked to publish those it holds in its caches
+   (e.g. from a workspace analysis in an earlier session) whenever it starts.
+   Files are never analyzed: those that changed since, or were never analyzed,
+   are just missed.
+
+   Batches are sent one after another, until the progress notification is
+   cancelled, the server restarts (the new one starts over), or a request fails
+   (e.g. if the server does not support it). *)
+let publish_cached_diagnostics_on_start instance client =
+  if Superbol_config.bool publish_on_start_setting then
+    let open Promise.Syntax in
+    let current () = match Superbol_instance.client instance with
+      | Some c -> c == client
+      | None -> false
+    in
+    let publish uris ~progress ~token =
+      let total = List.length uris in
+      let percent i = i * 100 / max 1 total in
+      let stopped () =
+        not (current ()) || CancellationToken.isCancellationRequested token
+      in
+      let rec aux ~published ~missed = function
+        | [] ->
+            Superbol_printer.log
+              "SuperBOL: published cached diagnostics of %u file%s \
+               (%u without)" published (plural published "" "s") missed;
+            Promise.return ()
+        | _ when stopped () ->
+            Promise.return ()
+        | uris :: batches ->
+            let* res = request_publication client uris in
+            match res with
+            | Ok m ->
+                let before = published + missed in
+                let after = before + List.length uris in
+                Progress.report progress ~value:Progress.{
+                    message = Some (Printf.sprintf "%u/%u files" after total);
+                    increment = Some (percent after - percent before);
+                  };
+                aux batches ~published:(published + List.length uris - m)
+                  ~missed:(missed + m)
+            | Error msg ->
+                if current () then log_publication_error ~uris msg;
+                Promise.return ()
+      in
+      aux ~published:0 ~missed:0 @@
+      Superbol_jobs.chunks files_per_publication uris
+    in
+    let _: unit Promise.t =
+      let* uris = find_cobol_files () in
+      if uris = [] || not (current ())
+      then Promise.return ()
+      else with_publication_progress (publish uris)
+    in
+    ()
 
 (** {2 Copybook directory retrieval} *)
 

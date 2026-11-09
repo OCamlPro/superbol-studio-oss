@@ -22,7 +22,8 @@ open Promise.Syntax
 type t = {
   context: Vscode.ExtensionContext.t;
   lsp_server_prefix: string;
-  mutable language_client: LanguageClient.t option
+  mutable language_client: LanguageClient.t option;
+  mutable start_hooks: (LanguageClient.t -> unit) list;
 }
 type client = LanguageClient.t
 
@@ -33,7 +34,8 @@ let name = "SuperBOL Language Server"
 let make ~lsp_server_prefix ~context = {
   lsp_server_prefix;
   context;
-  language_client = None
+  language_client = None;
+  start_hooks = [];
 }
 
 let client { language_client; _ } = language_client
@@ -42,6 +44,9 @@ let context { context; _ } = context
 
 let cli_invocation { context; lsp_server_prefix = server_prefix; _ } =
   Superbol_languageclient.cli_invocation ~context ~server_prefix
+
+let on_language_server_start t hook =
+  t.start_hooks <- t.start_hooks @ [hook]
 
 let subscribe_disposable { context; _ } disposable =
   Vscode.ExtensionContext.subscribe context ~disposable
@@ -67,7 +72,8 @@ let start_language_server ({ lsp_server_prefix = server_prefix; context; _ } as 
       ~clientOptions:(Superbol_languageclient.client_options ())
   in
   let+ () = LanguageClient.start client in
-  t.language_client <- Some client
+  t.language_client <- Some client;
+  List.iter (fun hook -> hook client) t.start_hooks
 
 
 let start_autorestarter instance =

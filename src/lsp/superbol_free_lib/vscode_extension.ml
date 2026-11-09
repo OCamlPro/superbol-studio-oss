@@ -490,6 +490,20 @@ let configuration =
             Analyze Every COBOL File in the Workspace` command analyzes.")
       ~order:32;
 
+    Manifest.PROPERTY.bool
+      "superbol.workspaceAnalysis.publishCachedDiagnosticsOnStartup"
+      ~title:"Report Cached Diagnostics on Startup"
+      ~default:true
+      ~markdownDescription:
+        (with_extra_keyword_commment
+           "Whenever the language server starts, report the diagnostics of \
+            the COBOL files of the workspace that it finds in its caches \
+            (e.g. after the `SuperBOL: Analyze Every COBOL File in the \
+            Workspace` command has been run in an earlier session).  Files \
+            are not analyzed: those that have changed since, or have never \
+            been analyzed, are left out until they are opened.")
+      ~order:33;
+
     (* Debugger-specific: *)
 
     Manifest.PROPERTY.bool

@@ -22,6 +22,9 @@ type job = private
     client_settings: string;        (** [superbol.cobol] section, as JSON *)
   }
 
+(** [chunks n l] splits [l] into consecutive lists of at most [n] elements. *)
+val chunks: int -> 'a list -> 'a list list
+
 (** [make uris] splits [uris] into jobs of at most
     [superbol.workspaceAnalysis.filesPerProcess] files, that each belong to a
     single workspace folder (whose settings they carry).  Files that belong to

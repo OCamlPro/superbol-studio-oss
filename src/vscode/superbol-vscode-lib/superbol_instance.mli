@@ -24,6 +24,10 @@ val context: t -> Vscode.ExtensionContext.t
 (** See {!Superbol_languageclient.cli_invocation}. *)
 val cli_invocation: t -> Superbol_languageclient.cli_invocation
 
+(** [on_language_server_start t hook] has [hook] called with the client each
+    time {!start_language_server} has (re)started the language server. *)
+val on_language_server_start: t -> (client -> unit) -> unit
+
 val stop_language_server: t -> unit Promise.t
 val start_language_server: t -> unit Promise.t
 val start_autorestarter: t -> unit

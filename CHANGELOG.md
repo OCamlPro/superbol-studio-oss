@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Reporting of the diagnostics of workspace files found in the caches of the language server whenever it starts, so that those of files analyzed in earlier sessions show up again (setting `superbol.workspaceAnalysis.publishCachedDiagnosticsOnStartup`, enabled by default) [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
 - Reporting of diagnostics about loading dialect configuration files given in the settings (e.g. `dialect.conf`), that are now published on these files instead of being silently dropped [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
 - Settings `superbol.cache.sizeLimit` (20G by default) and `superbol.cache.maxAge`, for pruning the caches of the LSP server [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
 - Support for workspace symbols lookup in the LSP server, for open documents and for documents whose analysis is cached [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
