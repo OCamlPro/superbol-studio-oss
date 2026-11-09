@@ -137,21 +137,21 @@ let client_settings_of_string s =
 let analyze_cmd =
   let files = ref [] and ppf = ref Fmt.stderr
   and storage_directory = ref None and client_settings = ref None
-  and encoding = ref None
   and error_status = ref true and show_diagnostics = ref true in
   let common, common_args = Common_args.get () in
+  let project_setup, project_args = Project_args.get () in
   EZCMD.sub "cache analyze"
     (fun () ->
        let setup =
-         Caching_commands.lsp_like_setup ()
-           ?storage_directory:!storage_directory
-           ?client_settings:!client_settings
-           ?encoding:!encoding
+         project_setup () ~setup:
+           (Caching_commands.lsp_like_setup ()
+              ?storage_directory:!storage_directory
+              ?client_settings:!client_settings)
        in
        Caching_commands.analyze_n_report (common ()) ~for_lsp:true ~setup
          ~error_status:!error_status ~show_diagnostics:!show_diagnostics
          ~ppf:!ppf !files)
-    ~args:(common_args @
+    ~args:(common_args @ project_args @
            [ [], Arg.Anons (fun list -> files := list),
              EZCMD.info ~docv:"FILE" "Cobol file to analyze";
              ["stdout"], Arg.Unit (fun () -> ppf := Fmt.stdout),
@@ -176,26 +176,7 @@ let analyze_cmd =
              EZCMD.info ~docv:"JSON"
                "Configure projects that have no `superbol.toml' file as an LSP \
                 server does when its client sends these settings of the \
-                `superbol.cobol' section (e.g. `{\"dialect\": \"ibm\"}')";
-             ["encoding"],
-             Arg.String begin fun s ->
-               (* Unsupported encodings are not an error, as the LSP server
-                  reads files as they are with those. *)
-               encoding :=
-                 match Cobol_common.Text_encoding.of_name s with
-                 | Ok enc ->
-                     Some enc
-                 | Error msg ->
-                     Cobol_common.Diagnostics.Now.warn Fmt.stderr
-                       "%s;@ files@ are@ read@ as@ they@ are" msg;
-                     None
-             end,
-             EZCMD.info ~docv:"ENCODING"
-               "Decode files as Visual Studio Code does with this value of \
-                its `files.encoding' setting (e.g. `windows1252', `cp850').  \
-                Files are read as they are by default, or (with a warning \
-                listing the supported encodings) if ENCODING is not \
-                supported" ])
+                `superbol.cobol' section (e.g. `{\"dialect\": \"ibm\"}')" ])
     ~doc:"Analyze files, reusing and filling the cache of their project"
     ~man:[ `S "DESCRIPTION";
            `Blocks [ `P "Preprocess, parse and typecheck each FILE as the LSP \

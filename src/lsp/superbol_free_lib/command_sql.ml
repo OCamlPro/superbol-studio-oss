@@ -18,10 +18,10 @@ open Common_args
     and filling the project's cache.  Returns the effective preprocessing
     options for [filename], its contents, and the compilation unit it holds;
     or an explanation of why there is no such unit. *)
-let typeck_file ({ platform; analysis_overrides = overrides; _ } as common)
-    filename =
+let typeck_file ~setup
+    ({ platform; analysis_overrides = overrides; _ } as common) filename =
   let Caching_commands.{ filename; project; contents; analysis; _ } =
-    Caching_commands.analyze_file common filename
+    Caching_commands.analyze_file ~setup common filename
   in
   Cobol_common.Diagnostics.Set.pp ~platform Fmt.stderr @@
   Superbol_project.Analysis.diagnostics analysis;
@@ -62,11 +62,11 @@ let typeck_file ({ platform; analysis_overrides = overrides; _ } as common)
           Error (Pretty.to_string "No@ compilation@ unit@ found@ in@ %s"
                    filename)
 
-let parse ~sql_in_copybooks ~test_extension common files =
+let parse ~sql_in_copybooks ~test_extension ~setup common files =
   let platform = common.platform in
   List.iter
     (fun filename ->
-       match typeck_file common filename with
+       match typeck_file ~setup common filename with
        | Error msg ->
            Pretty.error "@[Skipping:@ %s@]@." msg
        | Ok (Cobol_preproc.Options.{ source_format;
@@ -113,14 +113,15 @@ let preproc_cmd =
   let test_extension = ref false in
   let files = ref [] in
   let common, common_args = Common_args.get () in
+  let project_setup, project_args = Project_args.get () in
   EZCMD.sub "sql preproc"
     (fun () ->
       let common = common () in
       Printexc.record_backtrace true;
       parse ~sql_in_copybooks:!sql_in_copybooks common
-      ~test_extension:!test_extension !files )
+      ~test_extension:!test_extension ~setup:(project_setup ()) !files )
     ~args:
-      ( common_args
+      ( common_args @ project_args
       @ [ ( [],
             Arg.Anons (fun l -> files := l),
             EZCMD.info ~docv:"FILE" "COBOL files to preproc" );

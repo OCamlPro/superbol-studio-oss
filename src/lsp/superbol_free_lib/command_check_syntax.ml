@@ -31,16 +31,17 @@ let cmd =
   let ppf = ref Fmt.stderr in
   let in_project = ref false in
   let common, common_args = Common_args.get () in
+  let project_setup, project_args = Project_args.get () in
 
   EZCMD.sub
     "check syntax"          (* add the corresponding line in Main.subcommands *)
     begin fun () ->
       if !in_project
       then Caching_commands.analyze_n_report (common ()) ~for_lsp:false
-             ~ppf:!ppf !files
+             ~setup:(project_setup ()) ~ppf:!ppf !files
       else action (common ()) ~ppf:!ppf !files
     end
-    ~args:(common_args @ [
+    ~args:(common_args @ project_args @ [
         [],
         Arg.Anons (fun list -> files := list),
         EZCMD.info ~docv:"FILE" "Cobol file to check";
@@ -67,6 +68,8 @@ let cmd =
             server and $(b,superbol cache analyze).  On a miss, results are \
             stored into the cache without the artifacts the LSP server needs, \
             so they are not reused by the latter (use $(b,superbol cache \
-            analyze) to fill the cache for the LSP server).";
+            analyze) to fill the cache for the LSP server).  \
+            $(b,--project-root) and $(b,--encoding) only apply with \
+            $(b,--project).";
       ];
     ]

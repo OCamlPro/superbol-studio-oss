@@ -22,7 +22,6 @@ open Cobol_parser.Options
 
 type t = {
   platform: Cobol_common.Platform.TYPES.platform;
-  project_root: string option;
   preproc_options: preproc_options;
   parser_options: parser_options;
   pretty_progress: 'a. 'a Pretty.proc;
@@ -98,7 +97,6 @@ let analysis_overrides ~config ~conf ~dialect ~format ~libpath ~libexts ~env
 let last_progress_msg_len = ref 0
 
 let get () =
-  let project_root = ref None in
   let conf = ref "" in
   let dialect = ref None in
   let format = ref Cobol_config.Auto in
@@ -131,10 +129,6 @@ let get () =
   let progress_display_opt = ref None  in
 
   let args = [
-    ["project-root"; "root"], Arg.File (fun f -> project_root := Some f),
-    EZCMD.info ~docv:"DIR" "Set the root of the project (autodetected on a \
-                            per-file basis otherwise)";
-
     ["conf"], Arg.Set_string conf,
     EZCMD.info ~docv:"CONF_FILE" "Set the configuration file to be used";
 
@@ -267,7 +261,6 @@ let get () =
     (* Pretty.error "@[Preprocessor environment:@;<1 2>@[%a@]@]@." *)
     (*   Cobol_preproc.Env.pp env; *)
     { platform;
-      project_root = !project_root;
       preproc_options = { platform; config; source_format;
                           exec_preprocs = EXEC_MAP.empty;
                           copybook_lookup_config =

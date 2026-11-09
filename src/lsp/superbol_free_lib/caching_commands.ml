@@ -23,20 +23,24 @@ module ANALYSIS = Superbol_project.Analysis
 module CACHED_DIAGS = Superbol_project.Cached_diagnostics
 module SEMTOKS = Superbol_project.Semantic_tokens
 
-(** How projects are set up, and where their caches live. *)
+(** How projects are set up, and where their caches live.  Functions below that
+    take an optional [setup] default to {!default_setup}. *)
 type setup =
   {
+    project_root: string option;
+    (** Root of the project of every file (detected for each file otherwise) *)
     layout: Superbol_project.layout;
     storage_location: Superbol_project.TYPES.cache_storage_location;
     client_settings: (string * Yojson.Safe.t) list option;
     (** Settings of an LSP client, for projects without configuration file *)
     encoding: Cobol_common.Text_encoding.t option;
-    (** Encoding the LSP client decodes files with; overrides the
-        [source_encoding] of projects. *)
+    (** Encoding to decode files with (as an LSP client does), overriding the
+        [source_encoding] of projects *)
   }
 
 let default_setup =
   {
+    project_root = None;
     layout = Superbol_project.Layout.default;
     storage_location = Superbol_project.Cache.default_storage_location;
     client_settings = None;
@@ -57,7 +61,7 @@ let lsp_like_setup ?storage_directory ?client_settings ?encoding () =
     Superbol_project.Cache.storage_location ~project_layout:layout ()
       ?fallback_storage_directory:storage_directory
   in
-  { layout; storage_location; client_settings; encoding }
+  { project_root = None; layout; storage_location; client_settings; encoding }
 
 let cache_for ?(setup = default_setup) rootdir =
   Superbol_project.Cache.for_ ~rootdir ~storage_location:setup.storage_location
@@ -143,7 +147,7 @@ let cached_config ~setup ~overrides project =
       cached_config
 
 let locate ?(setup = default_setup)
-    Common_args.{ project_root; platform; analysis_overrides = overrides; _ }
+    Common_args.{ platform; analysis_overrides = overrides; _ }
     given_filename =
   let filename =                               (* filenames take part in keys *)
     if EzFile.is_absolute given_filename
@@ -151,7 +155,8 @@ let locate ?(setup = default_setup)
     else platform.getcwd () // given_filename
   in
   let layout = setup.layout in
-  let project = with_client_settings ~setup ~platform @@ match project_root with
+  let project =
+    with_client_settings ~setup ~platform @@ match setup.project_root with
     | Some dirname -> Project.in_ ~dirname ~layout ()
     | None -> Project.for_filename filename ~layout
   in
@@ -214,8 +219,8 @@ let analyze_located_for_lsp
 (** [analyze_file common filename] analyzes [filename] according to the
     configuration of its project and the overrides in [common], reusing or else
     filling the project's cache. *)
-let analyze_file common filename : ANALYSIS.t analyzed_file =
-  analyze_located common @@ locate common filename
+let analyze_file ?setup common filename : ANALYSIS.t analyzed_file =
+  analyze_located common @@ locate ?setup common filename
 
 (** [analyze_file_for_lsp common filename] is like {!analyze_file}, except that
     it provides an analysis for the LSP.  Use this to get all artifacts the LSP
@@ -305,9 +310,10 @@ let derive_located
     Note that [derive] must return a value that holds no closure, and be fully
     determined by the producer (as identified by the cache), the analysis, and
     [inputs]. *)
-let derive_from_file common ~label ~inputs ~derive filename : 'a * bool =
+let derive_from_file ?setup common ~label ~inputs ~derive filename
+  : 'a * bool =
   let v, hit, _ = derive_located common ~label ~inputs ~derive @@
-    locate common filename in
+    locate ?setup common filename in
   v, hit
 
 (** [derive_n_analyze_file common ~label ~inputs ~derive filename] is like
@@ -315,10 +321,10 @@ let derive_from_file common ~label ~inputs ~derive filename : 'a * bool =
     which is retrieved from the project's cache in case of a hit on the derived
     value.  Use this to only cache, as derived value, what can not be obtained
     from the analysis directly. *)
-let derive_n_analyze_file common ~label ~inputs ~derive filename
+let derive_n_analyze_file ?setup common ~label ~inputs ~derive filename
   : 'a * bool * ANALYSIS.t analyzed_file =
   let v, hit, analyzed = derive_located common ~label ~inputs ~derive @@
-    locate common filename in
+    locate ?setup common filename in
   v, hit, Lazy.force analyzed
 
 let lookup_located (Common_args.{ platform; _ } as common) ~label ~inputs
@@ -343,18 +349,18 @@ let lookup_located (Common_args.{ platform; _ } as common) ~label ~inputs
 (** [lookup_derived common ~label ~inputs filename] retrieves a value previously
     recorded by {!derive_from_file} with the same [label] and [inputs], without
     analyzing [filename]; [None] on a miss. *)
-let lookup_derived common ~label ~inputs filename : 'a option =
+let lookup_derived ?setup common ~label ~inputs filename : 'a option =
   Option.map fst @@ lookup_located common ~label ~inputs @@
-  locate common filename
+  locate ?setup common filename
 
 (** [lookup_derived_n_analysis common ~label ~inputs filename] is like
     {!lookup_derived}, except that it also returns the analysis of [filename] in
     case of a hit, which is retrieved from the project's cache (it is computed
     and stored anew if the cache no longer holds it). *)
-let lookup_derived_n_analysis common ~label ~inputs filename
+let lookup_derived_n_analysis ?setup common ~label ~inputs filename
   : ('a * ANALYSIS.t analyzed_file) option =
   Option.map (fun (v, analyzed) -> v, Lazy.force analyzed) @@
-  lookup_located common ~label ~inputs @@ locate common filename
+  lookup_located common ~label ~inputs @@ locate ?setup common filename
 
 (** [report common ~error_status ~show_diagnostics ~ppf analysis] reports
     analysis diagnostics on [ppf], unless [show_diagnostics] is [false].
@@ -376,10 +382,9 @@ let report Common_args.{ platform; pretty_progress; _ }
 (** [analyze_n_report ?setup ?error_status ?show_diagnostics common ~for_lsp
     ~ppf files] analyzes [files] in turn, and reports diagnostics on [ppf].
     Files are analyzed with {!analyze_file_for_lsp} if [for_lsp] holds (so the
-    cache is filled for the LSP), or else with {!analyze_file}; [setup] only
-    applies to the former.  See {!report} for [error_status] and
-    [show_diagnostics]; files that cannot be analyzed are reported on [ppf]
-    regardless. *)
+    cache is filled for the LSP), or else with {!analyze_file}.  See {!report}
+    for [error_status] and [show_diagnostics]; files that cannot be analyzed
+    are reported on [ppf] regardless. *)
 let analyze_n_report ?setup ?error_status ?show_diagnostics
     (Common_args.{ pretty_progress; _ } as common) ~for_lsp ~ppf files =
   List.iter begin fun filename ->
@@ -388,7 +393,7 @@ let analyze_n_report ?setup ?error_status ?show_diagnostics
     match
       if for_lsp
       then of_lsp_artifacts_file @@ analyze_file_for_lsp ?setup common filename
-      else analyze_file common filename
+      else analyze_file ?setup common filename
     with
     | analyzed ->
         report common ?error_status ?show_diagnostics ~ppf analyzed
@@ -406,9 +411,9 @@ let analyze_n_report ?setup ?error_status ?show_diagnostics
 (** [fold_analysis_results common ~f ~ppf files acc] analyzes [files] with
     {!analyze_file}, in turn, reports analysis diagnostics on [ppf], and then
     passes the analysis result and an accumulator to [f]. *)
-let fold_analysis_results common ~f ~ppf files acc =
+let fold_analysis_results ?setup common ~f ~ppf files acc =
   List.fold_left begin fun acc filename ->
-    let res = analyze_file common filename in
+    let res = analyze_file ?setup common filename in
     report common ~ppf res;
     f res acc
   end acc files
@@ -417,7 +422,7 @@ let fold_analysis_results common ~f ~ppf files acc =
     [fold_analysis_results], except [f] is given the type-checking result as
     second argument. Therefore [f] is only called if the type-checking
     succeeds. *)
-let fold_typeck_outputs ~f files acc =
-  fold_analysis_results ~f:begin fun res ->
+let fold_typeck_outputs ?setup ~f files acc =
+  fold_analysis_results ?setup ~f:begin fun res ->
     Option.fold ~none:Fun.id ~some:(f res) res.analysis.checked
   end files acc
