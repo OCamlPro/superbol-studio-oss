@@ -84,7 +84,9 @@ let%expect_test "a dialect given as a .conf file survives the round trip from/to
       Cobol_config.(DIALECT.to_string @@ dialect config.cobol_config)
   in
   let project = LSP.Project.in_existing_dir projdir ~layout in
-  ignore (Superbol_project.reload_config project); (* as if changed by client *)
+  (* As if changed by the client: *)
+  ignore (Superbol_project.reload_config project
+            ~platform:Superbol_platform.record);
   let reported =
     Yojson.Safe.Util.(to_string @@ member "cobol.dialect" @@
                       LSP.Project.get_project_config project)

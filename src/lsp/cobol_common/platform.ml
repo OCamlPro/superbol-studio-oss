@@ -63,6 +63,16 @@ module TYPES = struct
     (** [now ()] is the current time, in seconds since the epoch. *)
     mutable now: unit -> float;
     mutable read_text_file : string -> string ;
+    (** [read_text_file_in_path ~search_path filename] gives the path and
+        contents of the first file named [filename] in [search_path] (or of
+        [filename] itself if it is not implicit); [None] if there is none.
+        Raises [Sys_error] if a file is found but cannot be read.  Looking up
+        and reading at once ensures the contents are those of the path given.
+
+        A platform that overrides [read_text_file] should override this field
+        too (see {!FS.read_text_file_in_path}). *)
+    mutable read_text_file_in_path:
+      search_path:string list -> string -> (string * string) option;
     mutable list_dir : string -> string list ;
     (** [stat_file ?follow path] describes [path], following symbolic links
         unless [follow] is [false] (defaults to [true]); [None] if [path] cannot
@@ -114,6 +124,7 @@ let innocuous = {
      records what a lookup path held simply records that it held nothing. *)
   list_dir = (fun _dir -> []);
   stat_file = (fun ?follow:_ _path -> None);
+  read_text_file_in_path = (fun ~search_path:_ _filename -> None);
   with_stdin = begin fun ~f:_ ->
     Pretty.string_to (fun msg -> raise (Sys_error msg))
       "with_stdin: Filesystem operations are unavailable"
@@ -141,7 +152,8 @@ let innocuous = {
 }
 
 let copy ~dst ~src:{ verbosity; eprintf; error; getcwd; now; with_stdin;
-                     read_text_file; list_dir; stat_file;
+                     read_text_file; read_text_file_in_path;
+                     list_dir; stat_file;
                      peek_channel_prefix;
                      mk_temp_dir; remove_dir;
                      autodetect_format; is_source_file; is_hidden_file;
@@ -153,6 +165,7 @@ let copy ~dst ~src:{ verbosity; eprintf; error; getcwd; now; with_stdin;
   dst.getcwd <- getcwd;
   dst.now <- now;
   dst.read_text_file <- read_text_file;
+  dst.read_text_file_in_path <- read_text_file_in_path;
   dst.list_dir <- list_dir;
   dst.stat_file <- stat_file;
   dst.with_stdin <- with_stdin;
@@ -169,6 +182,24 @@ let copy ~dst ~src:{ verbosity; eprintf; error; getcwd; now; with_stdin;
 
 (** High-level filesystem operations *)
 module FS = struct
+
+  (** [read_text_file_in_path ~concat ~read_text_file ~stat_file] implements
+      [platform.read_text_file_in_path], naming candidates [concat dir
+      filename].  A candidate that cannot be read is skipped if [stat_file]
+      tells it does not exist. *)
+  let read_text_file_in_path ~concat ~read_text_file ~stat_file
+      ~search_path filename =
+    let try_read path =
+      match read_text_file path with
+      | contents ->
+          Some (path, contents)
+      | exception Sys_error _ when Option.is_none (stat_file path) ->
+          None
+    in
+    if not (Filename.is_implicit filename)
+    then try_read filename
+    else List.find_map (fun dir -> try_read (concat dir filename))
+        search_path
 
   (** [with_temp_dir ~platform ?given_temp_dir f] creates a temporary directory
       [temp_dir] and executes [f ~temp_dir] if [given_temp_dir] is [None], or

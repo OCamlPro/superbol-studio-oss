@@ -53,7 +53,8 @@ val default_exclude_dirs: string list
 (** [load_file ~verbose config_filename] loads the given project configuration
     file.  Raises {!ERROR} or [Sys_error] in case of failure. *)
 val load_file
-  : ?verbose:bool
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> ?verbose:bool
   -> string
   -> t Cobol_common.Diagnostics.with_diags
 
@@ -66,7 +67,8 @@ val save
 (** [reload ~verbose ~config_filename config] returns [true], possibly along
     diagnostics, if the reloaded configuration has changed. *)
 val reload
-  : ?verbose:bool
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> ?verbose:bool
   -> config_filename:string
   -> t
   -> bool Cobol_common.Diagnostics.with_diags
@@ -108,8 +110,16 @@ val copybook_lookup_config_for
     Those may also raise {!ERROR}*)
 
 val cobol_config_from_dialect_name
-  : verbose:bool -> string
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> verbose:bool -> string
   -> Cobol_config.t Cobol_common.Diagnostics.with_diags
+
+(** Same as {!cobol_config_from_dialect_name}, also giving the configuration
+    file loaded, if any (see {!Cobol_config.from_dialect_n_file}). *)
+val cobol_config_n_file_from_dialect_name
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> verbose:bool -> string
+  -> (Cobol_config.t * string option) Cobol_common.Diagnostics.with_diags
 
 val cobol_source_format
   : string
@@ -121,4 +131,8 @@ exception BAD_CHECKSUM
 
 type cached
 val to_cache: t -> cached
-val of_cache: config_filename:string -> cached -> t
+val of_cache
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> config_filename:string
+  -> cached
+  -> t

@@ -56,12 +56,19 @@ let __init_default_exn_printers =
 
 (* Intermediate converters *)
 
-let cobol_config_from_dialect_name ~verbose dialect_name =
-  try Cobol_config.(from_dialect ~verbose @@ DIALECT.of_string dialect_name) with
+let cobol_config_n_file_from_dialect_name ~platform ~verbose dialect_name =
+  try
+    Cobol_config.(from_dialect_n_file ~platform ~verbose @@
+                  DIALECT.of_string dialect_name)
+  with
   | Invalid_argument e ->
       raise @@ ERROR (Unknown_dialect e)
   | Cobol_config.ERROR e ->
       raise @@ ERROR (Cobol_config_error e)
+
+let cobol_config_from_dialect_name ~platform ~verbose dialect_name =
+  DIAGS.map_result ~f:fst @@
+  cobol_config_n_file_from_dialect_name ~platform ~verbose dialect_name
 
 let cobol_source_format source_format_name =
   try Cobol_config.Options.format_of_string source_format_name
@@ -241,12 +248,12 @@ let get_indent_config toml =
 
    For now, many of the `get_*` functions just raise {!ERROR}. *)
 
-let load_file ?(verbose=false) config_filename =
+let load_file ~platform ?(verbose=false) config_filename =
   let load_section toml_handle keys toml =
     let section = TOML.get keys toml in
     let dialect_name = get_dialect section in
     let DIAGS.{ result = cobol_config; diags } =
-      cobol_config_from_dialect_name ~verbose dialect_name in
+      cobol_config_from_dialect_name ~platform ~verbose dialect_name in
     DIAGS.result ~diags
       { cobol_config;
         dialect_name;
@@ -276,7 +283,7 @@ let save ?verbose ~config_filename config =
   Ezr_toml.save ?verbose config_filename config.toml_handle
 
 
-let reload ?(verbose=false) ~config_filename config =
+let reload ~platform ?(verbose=false) ~config_filename config =
   let reload_section keys toml =
     (* Note: we only mutate [config] when items have been properly
        parsed/checked, so that [config] remains unchanged in case an exception
@@ -284,7 +291,7 @@ let reload ?(verbose=false) ~config_filename config =
     let section = TOML.get keys toml in
     let dialect_name = get_dialect section in
     let DIAGS.{ result = cobol_config; diags } =
-      cobol_config_from_dialect_name ~verbose dialect_name
+      cobol_config_from_dialect_name ~platform ~verbose dialect_name
     and source_format = get_source_format section
     and source_format_by_extension = get_source_format_by_extension section
     and libpath = get_libpath section
@@ -421,14 +428,14 @@ let to_cache { dialect_name; source_format; source_format_by_extension;
     cached_toml_handle = Ezr_toml.cacheable toml_handle;
   }
 
-let of_cache ~config_filename
+let of_cache ~platform ~config_filename
     { cached_dialect; cached_source_format; cached_source_format_by_extension;
       cached_libpath; cached_libexts; cached_indent_config;
       cached_exclude_dirs; cached_toml_handle = toml_handle } =
   if Ezr_toml.checksum toml_handle <> Digest.file config_filename
   then raise BAD_CHECKSUM;
   let DIAGS.{ result = cobol_config; _ } =
-    cobol_config_from_dialect_name ~verbose:false cached_dialect in
+    cobol_config_from_dialect_name ~platform ~verbose:false cached_dialect in
   let config =
     { cobol_config;
       dialect_name = cached_dialect;

@@ -253,12 +253,12 @@ let%expect_test "a size bound is honoured when the cache is written out" =
 let cli_analyze ?(for_lsp = false) ~projdir () =
   let filename = projdir // "prog.cob" in
   let rootdir = Superbol_project.rootdir_for ~filename ~layout in
+  let platform = Superbol_platform.record in
   let project = Cobol_common.Diagnostics.forget_diags @@
-    Superbol_project.for_ ~rootdir ~layout in
+    Superbol_project.for_ ~platform ~rootdir ~layout in
   let cache =
     lsp_cache_for ~rootdir:(Superbol_project.string_of_rootdir rootdir) in
   let contents = EzFile.read_file filename in
-  let platform = Superbol_platform.record in
   let keys =
     Option.get @@ Superbol_project.Analysis.keys ~filename ~contents project
   in

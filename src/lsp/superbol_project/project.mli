@@ -84,12 +84,18 @@ val rootdir_at: dirname:string -> rootdir
     directory [dirname] is used instead. *)
 val rootdir_for: filename:string -> layout:layout -> rootdir
 
-(** [for_ ~rootdir ~layout] retrieves a project based on its root directory.
+(** [for_ ~platform ~rootdir ~layout] retrieves a project based on its root
+    directory.
 
     This may trigger reading project configuration files if the project was not
     yet loaded.  The name of the project's configuration file is determined by
-    the [layout] argument. *)
-val for_: rootdir:rootdir -> layout:layout -> t with_diags
+    the [layout] argument.  The configuration files of its dialect are accessed
+    through [platform]. *)
+val for_
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> rootdir:rootdir
+  -> layout:layout
+  -> t with_diags
 
 (** [with_default_config ~rootdir ~layout] initializes a project structure with
     a default configuration. *)
@@ -126,7 +132,12 @@ val to_cache: t -> cached
 (** [of_cache ~rootdir ~layout cached_project] attempts to load and return a
     cached project.  Behaves like [for_ ~rootdir ~layout] in case of error
     (outdated or missing configuration file). *)
-val of_cache: rootdir:rootdir -> layout:layout -> cached -> t with_diags
+val of_cache
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> rootdir:rootdir
+  -> layout:layout
+  -> cached
+  -> t with_diags
 
 (** {1 Project configuration} *)
 
@@ -145,7 +156,11 @@ val save_config: ?verbose:bool -> t -> unit
     its associated TOML file.  Returns [true] when the reloaded configuration
     does not match with the one before the call.  Prints some informative
     message on [stderr] if [verbose] is set. *)
-val reload_config: ?verbose:bool -> t -> bool with_diags
+val reload_config
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> ?verbose:bool
+  -> t
+  -> bool with_diags
 
 (** {1 Collections} *)
 

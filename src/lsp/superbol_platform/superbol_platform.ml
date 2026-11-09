@@ -35,6 +35,9 @@ let stat_file ?(follow = true) path =
   | exception Unix.Unix_error _ ->
       None
 
+let read_text_file file =
+  Ez_file.V1.EzFile.read_text_file file
+
 let record =
   {
     verbosity = 0;
@@ -42,7 +45,11 @@ let record =
     error = Pretty.error;
     getcwd = (fun () -> Ez_file.V1.Slashifier.slashify @@ Sys.getcwd ());
     now = Unix.gettimeofday;
-    read_text_file = (fun file -> Ez_file.V1.EzFile.read_text_file file);
+    read_text_file;
+    read_text_file_in_path =
+      Cobol_common.Platform.FS.read_text_file_in_path
+        ~concat:Ez_file.V1.Slashifier.concat
+        ~read_text_file ~stat_file:(fun path -> stat_file path);
     list_dir = begin fun dir ->
       try Array.to_list (Sys.readdir dir) with Sys_error _ -> []
     end;

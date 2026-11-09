@@ -22,7 +22,8 @@ module TYPES = struct
   type settings_reporter =
     {
       report_dialect_diags:
-        dialect_name:string -> project -> DIAGS.Set.t -> unit;
+        dialect_name:string -> dialect_file:string option ->
+        project -> DIAGS.Set.t -> unit;
       report_config_error: Superbol_project.Diagnostics.error -> unit;
       report_invalid_setting: key:string -> string -> unit;
     }
@@ -69,7 +70,7 @@ let on_project_config_error e ~rootdir ~layout =
 let for_ ~rootdir ~layout =
   try
     show_n_forget_diagnostics @@
-    Superbol_project.for_ ~rootdir ~layout
+    Superbol_project.for_ ~platform:Lsp_platform.record ~rootdir ~layout
   with Superbol_project.Config.ERROR e ->
     on_project_config_error e ~rootdir ~layout
 
@@ -97,28 +98,23 @@ let absolute_path_for =
     mutations on project's configurations. They return [true] if the
     configuration of the given project has changed. *)
 
-(* Diagnostics about loading the dialect a project is given via client settings
-   are published on its configuration file, if any: the project itself has no
-   configuration file then, and they hold no location anyway.  [dialect_files]
-   maps the root directory of every such project to the URI of that file, so
-   that diagnostics are withdrawn once no project uses it anymore.
-
-   Otherwise, they are notified and logged, once per dialect. *)
+(* Diagnostics about loading a dialect given by client settings have no
+   location, and the project has no configuration file then: they are published
+   on the file of the dialect ([dialect_file]) if any, or else notified and
+   logged once per dialect.  [dialect_files] maps each project root to the URI
+   of that file, so that its diagnostics are withdrawn once no project uses
+   it. *)
 let dialect_files: (string, Lsp.Uri.t) Hashtbl.t = Hashtbl.create 1
 let notified_dialects: (string, unit) Hashtbl.t = Hashtbl.create 1
 
-let report_dialect_diags ~dialect_name project diags =
+let report_dialect_diags ~dialect_name ~dialect_file project diags =
   let rootdir = string_of_rootdir @@ rootdir project in
   let previous = Hashtbl.find_opt dialect_files rootdir in
-  let file =
-    try Cobol_config.dialect_file @@ Cobol_config.DIALECT.of_string dialect_name
-    with Invalid_argument _ -> None
-  in
-  begin match file with
+  begin match dialect_file with
     | Some file ->
         let file =
           if Filename.is_relative file
-          then Filename.concat (Sys.getcwd ()) file else file
+          then Filename.concat (Lsp_platform.record.getcwd ()) file else file
         in
         let uri = Lsp_diagnostics.normalize_uri @@ Lsp.Uri.of_path file in
         Hashtbl.replace dialect_files rootdir uri;
@@ -168,11 +164,11 @@ let update_source_format ~reporter { config; _ } str : bool =
     reporter.report_config_error (Unknown_source_format e);
     false
 
-let update_dialect ~reporter ({ config; _ } as project) str : bool =
+let update_dialect ~platform ~reporter ({ config; _ } as project) str : bool =
   try
-    let { result; diags } =
-      Superbol_project.Config.cobol_config_from_dialect_name str
-        ~verbose:false
+    let { result = result, dialect_file; diags } =
+      Superbol_project.Config.cobol_config_n_file_from_dialect_name str
+        ~platform ~verbose:false
     in
     if result = config.cobol_config &&         (* note: structural comparison *)
        String.equal str config.dialect_name
@@ -180,7 +176,8 @@ let update_dialect ~reporter ({ config; _ } as project) str : bool =
     else begin
       config.cobol_config <- result;
       config.dialect_name <- str;
-      reporter.report_dialect_diags ~dialect_name:str project diags;
+      reporter.report_dialect_diags ~dialect_name:str ~dialect_file project
+        diags;
       true
     end
   with Superbol_project.Config.ERROR e ->
@@ -248,8 +245,9 @@ let update_exclude_dirs: t -> Yojson.Safe.t -> bool = fun { config; _ } json ->
 (** [update_project_config assoc project] updates the configuration of [project]
     according to key/value paires in [assoc]; returns [true] whenever the
     configuration upon termination differs from the configuration upon call. *)
-let update_project_config ?(reporter = lsp_settings_reporter) assoc project
-  : bool =
+let update_project_config
+    ?(platform = Lsp_platform.record) ?(reporter = lsp_settings_reporter)
+    assoc project : bool =
   let from_string project (s: Yojson.Safe.t) ~f : bool =
     match s with
     | `String "" -> false
@@ -267,7 +265,7 @@ let update_project_config ?(reporter = lsp_settings_reporter) assoc project
   List.fold_left begin fun u (key, update) ->
     update_config assoc key update project || u
   end false [
-    "dialect", from_string ~f:(update_dialect ~reporter);
+    "dialect", from_string ~f:(update_dialect ~platform ~reporter);
     "sourceFormat", from_string ~f:(update_source_format ~reporter);
     "sourceFormatByExtension", update_source_format_by_extension;
     "copybooks", update_copybooks;
@@ -279,7 +277,9 @@ let update_project_config ?(reporter = lsp_settings_reporter) assoc project
 (** Returns [true] whenever the configuration has changed. *)
 let reload_project_config project =
   try
-    let { result = changed; diags } = Superbol_project.reload_config project in
+    let { result = changed; diags } =
+      Superbol_project.reload_config project ~platform:Lsp_platform.record
+    in
     show_diagnostics ~force:true project diags;
     changed
   with
@@ -346,6 +346,7 @@ let to_cache project =
 let of_cache ~rootdir ~layout cached =
   try
     show_n_forget_diagnostics @@
-    Superbol_project.of_cache ~rootdir ~layout cached
+    Superbol_project.of_cache ~platform:Lsp_platform.record ~rootdir ~layout
+      cached
   with Superbol_project.Config.ERROR e ->
     on_project_config_error e ~rootdir ~layout

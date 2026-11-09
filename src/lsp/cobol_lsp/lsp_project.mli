@@ -21,10 +21,10 @@ module TYPES: sig
   type settings_reporter =
     {
       report_dialect_diags:
-        dialect_name:string -> project -> Cobol_common.Diagnostics.Set.t ->
-        unit;
+        dialect_name:string -> dialect_file:string option -> project ->
+        Cobol_common.Diagnostics.Set.t -> unit;
       (** Diagnostics about loading the configuration of dialect
-          [dialect_name] for a project *)
+          [dialect_name] for a project, from [dialect_file] if any *)
       report_config_error: Superbol_project.Diagnostics.error -> unit;
       report_invalid_setting: key:string -> string -> unit;
     }
@@ -106,15 +106,18 @@ val reload_project_config: t -> bool
 (** Reports problems as an LSP server does: on its client. *)
 val lsp_settings_reporter: settings_reporter
 
-(** [update_project_config ~reporter assoc project] updates the configuration of
-    [project] according to key/value pairs in [assoc], that are settings of the
-    [superbol.cobol] section of an LSP client, and reports problems with
-    [reporter] (defaults to {!lsp_settings_reporter}).
+(** [update_project_config ~platform ~reporter assoc project] applies to
+    [project] the settings of the [superbol.cobol] section of an LSP client
+    given in [assoc], reporting problems with [reporter] (defaults to
+    {!lsp_settings_reporter}).  Returns [true] if the configuration changed.
 
-    Front-ends other than the LSP server may use this to configure projects
-    exactly as the LSP server does, so that they share cached analyses. *)
+    Other front-ends may use this to configure projects as the LSP server does,
+    so that they share cached analyses.  They must then give their own
+    [platform] to load dialect files with, as the default
+    ({!Lsp_platform.record}) is only set up once the server runs. *)
 val update_project_config
-  : ?reporter: settings_reporter
+  : ?platform: Cobol_common.Platform.TYPES.platform
+  -> ?reporter: settings_reporter
   -> (string * Yojson.Safe.t) list
   -> t
   -> bool

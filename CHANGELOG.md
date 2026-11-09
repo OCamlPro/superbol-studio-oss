@@ -17,6 +17,7 @@
 - Workspace analyzis for every COBOL file, that now runs in parallel sub-processes, and reports diagnostics of files that are not open [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
 
 ### Fixed
+- Lookup of files included by a configuration file given with `--conf`, that are now looked up next to that file first, even when it is found in the search path [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
 - Handling of dialects given as configuration files (e.g. `dialect.conf`) in build tasks [#716](https://github.com/OCamlPro/superbol-studio-oss/pull/716)
 - Internal errors of the LSP server that may occur on some (rare) corner cases [#702](https://github.com/OCamlPro/superbol-studio-oss/pull/702)
 - Fatal error on ambiguous qualified names appearing in abbreviated relation conditions [#701](https://github.com/OCamlPro/superbol-studio-oss/pull/701)

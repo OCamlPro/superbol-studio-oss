@@ -65,7 +65,7 @@ let configured_projects = Hashtbl.create 1
 
 let settings_reporter =
   Cobol_lsp.Project.{
-    report_dialect_diags = begin fun ~dialect_name:_ _ diags ->
+    report_dialect_diags = begin fun ~dialect_name:_ ~dialect_file:_ _ diags ->
       DIAGS.Set.pp ~platform:Superbol_platform.record Fmt.stderr diags
     end;
     report_config_error = begin fun e ->
@@ -76,7 +76,7 @@ let settings_reporter =
     end;
   }
 
-let with_client_settings ~setup project =
+let with_client_settings ~setup ~platform project =
   match setup.client_settings with
   | None ->
       project
@@ -93,7 +93,7 @@ let with_client_settings ~setup project =
             Superbol_project.with_default_config ~rootdir ~layout:setup.layout
           in
           ignore @@ Cobol_lsp.Project.update_project_config assoc project
-            ~reporter:settings_reporter;
+            ~platform ~reporter:settings_reporter;
           Hashtbl.add configured_projects key project;
           project
 
@@ -146,7 +146,7 @@ let locate ?(setup = default_setup)
     else platform.getcwd () // given_filename
   in
   let layout = setup.layout in
-  let project = with_client_settings ~setup @@ match project_root with
+  let project = with_client_settings ~setup ~platform @@ match project_root with
     | Some dirname -> Project.in_ ~dirname ~layout ()
     | None -> Project.for_filename filename ~layout
   in

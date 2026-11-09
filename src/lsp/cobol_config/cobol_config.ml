@@ -23,6 +23,7 @@ module Default = Default
 module Diagnostics = Config_diagnostics
 
 module DIAGS = Cobol_common.Diagnostics
+open Cobol_common.Platform.TYPES
 
 let fallback_config_dir_var = "COB_CONFIG_DIR_FALLBACK"
 
@@ -43,47 +44,50 @@ let print_options: Pretty.delayed = fun ppf ->
   Pretty.list ~fopen:"@[<v>" ~fsep:"@\n" ~fclose:"@]" (fun ppf v -> v#pp ppf)
     ppf !all_configs
 
-let default_search_path =
+let default_search_path ~platform =
+  let getenv_opt = platform.getenv_opt in
   let append root ~sub = match root with
     | Some d -> [d // sub]
     | None -> []
   in
-  lazy begin
-    let cwd = EzFile.getcwd () in
-    let cob_config_dir =
-      Option.to_list (Sys.getenv_opt "COB_CONFIG_DIR")
-    and fallback_dir =
-      Option.to_list (Sys.getenv_opt fallback_config_dir_var)
-    in
-    let xdg_superbol_dir =      (* is this available on win32/cygwin as well? *)
-      append ~sub:"superbol/gnucobol-config" @@
-      match Sys.getenv_opt "XDG_CONFIG_HOME" with
-      | Some p -> Some p
-      | None -> Option.map (fun d -> d // ".config") (Sys.getenv_opt "HOME")
-    and windose_specific =
-      if Sys.(win32 || cygwin)
-      then append ~sub:"SuperBOL" (Sys.getenv_opt "APPDATA") @
-           append ~sub:"SuperBOL" (Sys.getenv_opt "LOCALAPPDATA")
-      else []
-    and unix_specific =
-      if Sys.(unix || cygwin)
-      then ["/usr/local/share/gnucobol/config";
-            "/usr/share/gnucobol/config";
-            "/etc/gnucobol"]
-      else []
-    in
-    cwd :: cob_config_dir @ xdg_superbol_dir @ windose_specific @ unix_specific @
-    fallback_dir
-  end
+  let cwd = platform.getcwd () in
+  let cob_config_dir =
+    Option.to_list (getenv_opt "COB_CONFIG_DIR")
+  and fallback_dir =
+    Option.to_list (getenv_opt fallback_config_dir_var)
+  in
+  let xdg_superbol_dir =        (* is this available on win32/cygwin as well? *)
+    append ~sub:"superbol/gnucobol-config" @@
+    match getenv_opt "XDG_CONFIG_HOME" with
+    | Some p -> Some p
+    | None -> Option.map (fun d -> d // ".config") (getenv_opt "HOME")
+  and windose_specific =
+    if Sys.(win32 || cygwin)
+    then append ~sub:"SuperBOL" (getenv_opt "APPDATA") @
+         append ~sub:"SuperBOL" (getenv_opt "LOCALAPPDATA")
+    else []
+  and unix_specific =
+    if Sys.(unix || cygwin)
+    then ["/usr/local/share/gnucobol/config";
+          "/usr/share/gnucobol/config";
+          "/etc/gnucobol"]
+    else []
+  in
+  cwd :: cob_config_dir @ xdg_superbol_dir @ windose_specific @ unix_specific @
+  fallback_dir
 
-let retrieve_search_path ?search_path () =
+let retrieve_search_path ~platform ?search_path () =
   (match search_path with
    | Some p -> p
-   | None -> []) @ Lazy.force default_search_path
+   | None -> []) @ default_search_path ~platform
 
-let find_file ~search_path filename =
-  try EzFile.find_in_path search_path filename
-  with Not_found -> raise @@ ERROR (Missing_file (filename, search_path))
+(* Gives the path where [filename] is found in [search_path], along with its
+   contents. *)
+let read_file_in_path ~platform ~search_path filename =
+  match (platform.read_text_file_in_path ~search_path filename
+         : (string * string) option) with
+  | Some found -> found
+  | None -> raise @@ ERROR (Missing_file (filename, search_path))
 
 (* --- *)
 
@@ -188,7 +192,7 @@ let make_conf (module Words: Words.S) conf_ptree =
    Words.SYSTEM_NAMES.system_names (),
    Words.REGISTERS.registers ())
 
-let parse_file file =
+let parse_contents ~filename contents =
   let open Lexing in
   let module I = Conf_parser.MenhirInterpreter in
   let syntax_error ?loc msg = raise @@ ERROR (Syntax_error (loc, msg)) in
@@ -221,21 +225,24 @@ let parse_file file =
          token, lexbuf.lex_start_p, lexbuf.lex_curr_p)
       checkpoint
   in
-  let ic = open_in file in
-  let lexbuf = Lexing.from_channel ~with_positions:true ic in
-  let ast =
-    try parse lexbuf (Conf_parser.Incremental.file lexbuf.lex_curr_p)
-    with Conf_lexer.ERROR e -> raise @@ ERROR (Lexing_error e)
-  in
-  close_in ic;
-  ast
+  let lexbuf = Lexing.from_string ~with_positions:true contents in
+  Lexing.set_filename lexbuf filename;
+  try parse lexbuf (Conf_parser.Incremental.file lexbuf.lex_curr_p)
+  with Conf_lexer.ERROR e -> raise @@ ERROR (Lexing_error e)
 
-let load_file (module Words: Words.S) ?search_path file =
-  let search_path = retrieve_search_path ?search_path () in
-  let search_path = EzFile.dirname file :: search_path in
+(* Gives the path where [file] is found, and its options, including those of the
+   files it includes (looked up next to it first). *)
+let load_file (module Words: Words.S) ~platform ?search_path file =
+  let search_path = retrieve_search_path ~platform ?search_path () in
+  let path, contents =
+    read_file_in_path ~platform file
+      ~search_path:(EzFile.dirname file :: search_path)
+  in
+  let search_path = EzFile.dirname path :: search_path in
   let rec load acc file =
-    let file = find_file ~search_path file in
-    let options = parse_file file in
+    let path, contents = read_file_in_path ~platform ~search_path file in
+    process acc ~path contents
+  and process acc ~path contents =
     List.fold_left begin fun acc option -> match option with
       | Conf_ast.Value _ ->
           option :: acc
@@ -252,15 +259,16 @@ let load_file (module Words: Words.S) ?search_path file =
           load acc filename
       | Include filename ->
           load acc filename
-    end acc options
+    end acc (parse_contents ~filename:path contents)
   in
-  List.rev @@ load [] file
+  path, List.rev @@ process [] ~path contents
 
-let from_file ?search_path ?(verbose=false) file =
+(* Same as [from_file], also giving the path of the file loaded. *)
+let from_file_n_path ~platform ?search_path ?(verbose=false) file =
   if verbose then
     Pretty.error "Loading: `%s'@." file;
   let module Words = Words.Make () in
-  let options = load_file (module Words) ?search_path file in
+  let path, options = load_file (module Words) ~platform ?search_path file in
   let options, words, intrinsic, system_names, registers
     = make_conf (module Words) options in
   let module Diags = DIAGS.InitStateful () in
@@ -281,7 +289,11 @@ let from_file ?search_path ?(verbose=false) file =
       let registers = registers
     end)
   in
-  DIAGS.result (module Config: T) ~diags:(Diags.inspect ~reset:true)
+  DIAGS.result ((module Config: T), path) ~diags:(Diags.inspect ~reset:true)
+
+let from_file ~platform ?search_path ?verbose file =
+  DIAGS.map_result ~f:fst @@
+  from_file_n_path ~platform ?search_path ?verbose file
 
 (* NB: [Some] is shadowed by a constructor of {!Types}. *)
 let dialect_config_filename: DIALECT.t -> string option = function
@@ -296,20 +308,17 @@ let dialect_config_filename: DIALECT.t -> string option = function
       then name
       else Pretty.to_string "%s.conf" name
 
-let dialect_file ?search_path d =
-  let search_path = retrieve_search_path ?search_path () in
-  Option.bind (dialect_config_filename d) begin fun filename ->
-    try Option.some (find_file ~search_path filename)
-    with ERROR _ -> Option.none
-  end
-
-let from_dialect ?search_path ?verbose d =
+let from_dialect_n_file ~platform ?search_path ?verbose d =
   match (dialect_config_filename d: string option) with
   | None ->
-      DIAGS.result (module Default: T)
+      DIAGS.result ((module Default: T), Option.none)
   | Some filename ->
-      let search_path = retrieve_search_path ?search_path () in
-      from_file ~search_path ?verbose @@ find_file ~search_path filename
+      DIAGS.map_result ~f:(fun (config, path) -> config, Option.some path) @@
+      from_file_n_path ~platform ?search_path ?verbose filename
+
+let from_dialect ~platform ?search_path ?verbose d =
+  DIAGS.map_result ~f:fst @@
+  from_dialect_n_file ~platform ?search_path ?verbose d
 
 let dialect (module C: T) = C.dialect
 
