@@ -21,6 +21,7 @@ module WITNESS = Superbol_cache.Witness
 module DIAGS = Cobol_common.Diagnostics
 module ANALYSIS = Superbol_project.Analysis
 module CACHED_DIAGS = Superbol_project.Cached_diagnostics
+module SEMTOKS = Superbol_project.Semantic_tokens
 
 (** How projects are set up, and where their caches live. *)
 type setup =
@@ -183,7 +184,7 @@ let analyze_located_for_lsp
     match cached with
     | Some (cache, keys) ->
         let analysis, hit as res =
-          ANALYSIS.cached_analysis_for_lsp cache ~platform ~overrides ~keys
+          SEMTOKS.cached_analysis_for_lsp cache ~platform ~overrides ~keys
             ~semantic_tokens ~filename ~contents project
         in
         (* Workspace symbols and diagnostics are likewise stored as the LSP

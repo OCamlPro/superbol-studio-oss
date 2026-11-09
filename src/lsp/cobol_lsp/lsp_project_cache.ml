@@ -18,6 +18,7 @@ open Cobol_common.Platform.TYPES
 
 module ANALYSIS = Superbol_project.Analysis
 module CACHED_DIAGS = Superbol_project.Cached_diagnostics
+module SEMTOKS = Superbol_project.Semantic_tokens
 module CACHE = Superbol_cache.Cache
 module CACHING = Superbol_cache.Caching
 module WITNESS = Superbol_cache.Witness
@@ -51,14 +52,14 @@ let project_key ~rootdir =
    that storing a new version reclaims those of the previous one (see
    {!store_document}).
 
-   Semantic tokens are stored on their own, depending on the analysis too, and
-   only by servers whose client asks for them.  They are recorded in a slot of
-   their own, or else a server that does not store them would reclaim those
-   stored by another for the same version.  Workspace symbols are likewise
-   stored on their own (see {!Lsp_workspace_symbols}), so that they can be
-   retrieved for documents that are not open, without restoring their
-   analysis; and so are diagnostics (see
-   {!Superbol_project.Cached_diagnostics}). *)
+   Semantic tokens ({!Superbol_project.Semantic_tokens}) are stored on their
+   own, depending on the analysis too, and only by servers whose client asks
+   for them.  They are recorded in a slot of their own, or else a server that
+   does not store them would reclaim those stored by another for the same
+   version.  So are workspace symbols ({!Lsp_workspace_symbols}) and
+   diagnostics ({!Superbol_project.Cached_diagnostics}), that can then be
+   retrieved for documents that are not open without restoring their
+   analysis. *)
 let document_keys ~project ~filename ~contents ~language_id =
   let overrides = Lsp_document.analysis_overrides ~language_id in
   Option.map begin fun keys ->
@@ -66,8 +67,6 @@ let document_keys ~project ~filename ~contents ~language_id =
     CACHE.shallow_key ~label:"lsp-document" ~inputs:(ANALYSIS.inputs keys),
     ANALYSIS.slot ~label:"lsp-document" keys
   end (ANALYSIS.keys ~overrides ~filename ~contents project)
-
-let semtoks_slot keys = ANALYSIS.slot ~label:"semantic-tokens" keys
 
 (* --- Saving --- *)
 
@@ -109,16 +108,7 @@ let store_document ~cache ~project ~with_semantic_tokens doc =
       | Ok () ->
           (* Failing to supersede only leaves the previous version behind. *)
           ignore @@ CACHE.supersede cache ~slot [analysis_key; lsp_key];
-          Option.iter begin fun semtoks ->
-            match
-              ANALYSIS.store_semantic_tokens cache ~keys ~label:filename semtoks
-            with
-            | Ok () ->
-                ignore @@ CACHE.supersede cache ~slot:(semtoks_slot keys)
-                  [ANALYSIS.semantic_tokens_key keys]
-            | Error _ ->
-                ()
-          end semtoks;
+          Option.iter (SEMTOKS.store cache ~keys ~label:filename) semtoks;
           Lsp_workspace_symbols.store_for_analysis cache ~keys ~label:filename
             ~filename:absolute ~fresh:(Option.is_some witnesses) analysis;
           CACHED_DIAGS.store_for_analysis cache ~keys ~label:filename
@@ -231,7 +221,7 @@ let load_document ~project ~params
       | Some analysis ->
           let semtoks =
             if analysis.lsp_copybook then None
-            else ANALYSIS.lookup_semantic_tokens cache ~keys ~resolve
+            else SEMTOKS.lookup cache ~keys ~resolve
           in
           if params.with_semantic_tokens &&
              not analysis.lsp_copybook && Option.is_none semtoks

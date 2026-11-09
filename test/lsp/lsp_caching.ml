@@ -264,7 +264,7 @@ let cli_analyze ?(for_lsp = false) ~projdir () =
   in
   let hit =
     if for_lsp
-    then snd @@ Superbol_project.Analysis.cached_analysis_for_lsp cache
+    then snd @@ Superbol_project.Semantic_tokens.cached_analysis_for_lsp cache
         ~platform ~keys ~filename ~contents project
         ~semantic_tokens:Cobol_lsp.Semtoks.whole
     else snd @@ Superbol_project.Analysis.cached_analysis cache
