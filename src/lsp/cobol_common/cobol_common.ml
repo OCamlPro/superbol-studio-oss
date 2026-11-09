@@ -30,6 +30,7 @@ let fatal fmt = Pretty.string_to (fun s -> raise @@ FatalError s) fmt
 
 include Exit_status
 let record_failure = Exit_status.fail
+let record_errors = Exit_status.raise
 
 (* Register a printer for some common exceptions. *)
 let init_default_exn_printers () =

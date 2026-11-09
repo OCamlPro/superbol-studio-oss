@@ -54,3 +54,8 @@ val exit: ?status:int -> unit -> _
 (** [record_failure ()] makes {!exit} exit with a status of at least 2, to tell
     some input could not be processed. *)
 val record_failure: unit -> unit
+
+(** [record_errors ()] makes {!exit} exit with a status that is odd, to tell
+    some input holds errors, as when they are reported in
+    {!Diagnostics.show_n_forget}. *)
+val record_errors: unit -> unit

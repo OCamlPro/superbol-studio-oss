@@ -68,14 +68,28 @@ let () =
 
 let main ?style_renderer ?utf_8 () =
 
-  (* Print a banner only if ~/.config/superbol/NO-BANNER is absent *)
-  if not @@ Sys.file_exists ( Misc.config_dir // "NO-BANNER" ) then
+  (* Print a banner only if ~/.config/superbol/NO-BANNER is absent, and this
+     process does not analyze a batch of files for another one *)
+  if not (Sys.file_exists ( Misc.config_dir // "NO-BANNER" ) ||
+          Option.is_some (Sys.getenv_opt Parallel_batches.no_banner_var)) then
     Printf.eprintf
       "SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.\n%!";
   Pretty.init_formatters ?style_renderer ?utf_8 ();
+  (* Set outputs up as the environment says; [--color] takes precedence, as it
+     is parsed afterwards. *)
+  List.iter begin fun (var, set) ->
+    Option.iter begin fun spec ->
+      match set spec with
+      | Ok () -> ()
+      | Error msg ->
+          Cobol_common.Diagnostics.Now.warn Fmt.stderr
+            "Ignoring@ the@ value@ of@ %s:@ %s" var msg
+    end (Sys.getenv_opt var)
+  end [Globals.colors_var, Pretty.set_colors;
+       Globals.margins_var, Pretty.set_margins];
   Globals.MAIN.main
     (* ~on_error:Cobol_common.keep_temporary_files *)
     ~on_exit:Cobol_common.exit
     ~print_config:Config.print
-    ~common_args:[]
+    ~common_args:Globals.common_args
     public_subcommands

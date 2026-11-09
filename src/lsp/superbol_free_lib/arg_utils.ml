@@ -83,3 +83,42 @@ let size_of_string s =
   match Int64.of_string_opt (String.sub s 0 digits) with
   | Some n when n >= 0L -> Ok (Int64.mul n scale)
   | Some _ | None -> Error ()
+
+(** [recording args] is [args], along with a function that lists the arguments
+    among them that were given, as they would be given on the command line
+    (anonymous arguments excepted).  See the interface. *)
+let recording (args: arg_list) =
+  let recorded = ref [] in
+  let record name value =
+    let arg = match name, value with
+      | n, None when String.length n = 1 -> "-" ^ n
+      | n, None -> "--" ^ n
+      | n, Some v when String.length n = 1 -> "-" ^ n ^ v
+      | n, Some v -> "--" ^ n ^ "=" ^ v
+    in
+    recorded := arg :: !recorded
+  in
+  let flag n f = Arg.Unit (fun () -> f (); record n None)
+  and with_value n to_string f = fun v -> f v; record n (Some (to_string v)) in
+  let float_to_string = Printf.sprintf "%.17g" in
+  let wrap = function
+    | [], spec -> spec
+    | n :: _, spec ->
+        match (spec: Arg.spec) with
+        | Unit f -> flag n f
+        | Set r -> flag n (fun () -> r := true)
+        | Clear r -> flag n (fun () -> r := false)
+        | Bool f -> Bool (with_value n string_of_bool f)
+        | Set_bool r -> Bool (with_value n string_of_bool (( := ) r))
+        | String f -> String (with_value n Fun.id f)
+        | Set_string r -> String (with_value n Fun.id (( := ) r))
+        | File f -> File (with_value n Fun.id f)
+        | Int f -> Int (with_value n string_of_int f)
+        | Set_int r -> Int (with_value n string_of_int (( := ) r))
+        | Float f -> Float (with_value n float_to_string f)
+        | Set_float r -> Float (with_value n float_to_string (( := ) r))
+        | Symbol (l, f) -> Symbol (l, with_value n Fun.id f)
+        | Anon _ | Anons _ -> spec
+  in
+  (fun () -> List.rev !recorded),
+  List.map (fun (names, spec, info) -> names, wrap (names, spec), info) args
