@@ -64,7 +64,7 @@ let platform =
 
 let from_dialect dialect =
   Cobol_common.Diagnostics.show_n_forget ~platform @@
-  Cobol_config.from_dialect dialect
+  Cobol_config.from_dialect ~platform dialect
 
 let pp_diagnostics =
   Cobol_common.Diagnostics.Set.pp ~platform

@@ -12,14 +12,25 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type server_access =
-  | Sub_process of Vscode_languageclient.ServerOptions.t
-  | TCP of { host: string; port: int }
-
-val server_access
+val server_options
   : context: Vscode.ExtensionContext.t
   -> server_prefix: string
-  -> server_access
+  -> Vscode_languageclient.ServerOptions.t
+
+(** How to run CLI commands of the language server executable, so that they
+    share its caches. *)
+type cli_invocation =
+  {
+    program: string;
+    args_prefix: string list;      (** to put before the command's arguments *)
+    cli_env: string Interop.Dict.t;
+    cli_storage_args: string list;
+  }
+
+val cli_invocation
+  : context: Vscode.ExtensionContext.t
+  -> server_prefix: string
+  -> cli_invocation
 
 val client_options
   : unit

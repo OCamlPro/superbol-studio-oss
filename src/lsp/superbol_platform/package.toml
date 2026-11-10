@@ -76,4 +76,6 @@ pretty = "version"
 #  dune-stanzas = "(foreign_stubs (language c) (names mapfile_stubs))" 
 #  static-clibs = "unix" 
 [fields]
-# ...
+dune-stanzas = """
+  (js_of_ocaml (javascript_files cache_store_stubs.js))
+"""

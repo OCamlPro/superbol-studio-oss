@@ -33,7 +33,7 @@ val whole
   : filename: string
   -> Cobol_parser.Outputs.artifacts
   -> Cobol_typeck.Outputs.t
-  -> Superbol_project.Analysis.semantic_tokens
+  -> Superbol_project.Semantic_tokens.t
 
 (** [restrict ~range data] keeps the semantic tokens of [data] that intersect
     [range].  This yields the same as computing semantic tokens for [range]

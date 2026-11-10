@@ -4,6 +4,7 @@ on:
   pull_request:
     branches: [ master ]
   push:
+    branches: [ master ]
   # manual run in actions tab - for all branches
   workflow_dispatch:
 
@@ -61,10 +62,6 @@ jobs:
                    mingw-w64-${{ matrix.env }}-json-c
                    mingw-w64-${{ matrix.env }}-db
 
-      - name: Bootstrap GnuCOBOL
-        shell: msys2 {0}
-        run: import/gnucobol4/build_aux/bootstrap install
-
       - name: Setup build environment
         shell: pwsh
         run: |
@@ -77,6 +74,28 @@ jobs:
           echo CFGOPT="$env:CFGOPT --with-math=gmp --with-curses=ncursesw --with-xml2 --with-json=json-c" >> $env:GITHUB_ENV
           echo CFGOPT="$env:CFGOPT --with-db --with-indexed=db" >> $env:GITHUB_ENV
 
+      - name: Prepare installation of GnuCOBOL 4.x
+        id: gnucobol4
+        shell: bash
+        run: |
+          echo "commit=$(git -C import/gnucobol4 rev-parse HEAD)" >> $GITHUB_OUTPUT
+          echo "image=${ImageOS:-unknown}" >> $GITHUB_OUTPUT
+          # MSYS2 packages are updated in each run: rebuild at least monthly,
+          # in case libraries GnuCOBOL depends on change their DLL names
+          echo "month=$(date +%Y-%m)" >> $GITHUB_OUTPUT
+
+      - name: Retrieve cache of GnuCOBOL 4.x
+        uses: actions/cache/restore@v5
+        id: cache-gnucobol4
+        with:
+          path: C:\GnuCOBOL4
+          key: gnucobol-4.x-msys2-${{ steps.gnucobol4.outputs.image }}-${{ matrix.sys }}-${{ steps.gnucobol4.outputs.month }}-${{ steps.gnucobol4.outputs.commit }}-${{ env.CFGOPT }}
+
+      - name: Bootstrap GnuCOBOL
+        shell: msys2 {0}
+        run: import/gnucobol4/build_aux/bootstrap install
+        if: steps.cache-gnucobol4.outputs.cache-hit != 'true'
+
       - name: Configure GnuCOBOL
         shell: msys2 {0}
         run: |
@@ -85,14 +104,25 @@ jobs:
           # command it provides, to workaround a diff bug under the MSYS2 CI
           sed -i 's/-Qunused-arguments//g' ../configure
           PATH="$PATH:/c/Program Files/Git/usr/bin" ../configure $CFGOPT CFLAGS=-std=c17 LDFLAGS=-lintl --prefix="C:/GnuCOBOL4"
+        if: steps.cache-gnucobol4.outputs.cache-hit != 'true'
 
       - name: Build GnuCOBOL
         shell: msys2 {0}
         run: make -C import/gnucobol4/_build --jobs=$(($(nproc)+1))
+        if: steps.cache-gnucobol4.outputs.cache-hit != 'true'
 
       - name: Install GnuCOBOL
         shell: msys2 {0}
         run: make -C import/gnucobol4/_build --jobs=$(($(nproc)+1)) install
+        if: steps.cache-gnucobol4.outputs.cache-hit != 'true'
+
+      # Saved without the DLLs of MSYS2, copied afresh in each run
+      - name: Save cache of GnuCOBOL 4.x
+        uses: actions/cache/save@v5
+        with:
+          path: C:\GnuCOBOL4
+          key: ${{ steps.cache-gnucobol4.outputs.cache-primary-key }}
+        if: steps.cache-gnucobol4.outputs.cache-hit != 'true'
 
       - name: Copy GnuCOBOL dependencies
         shell: msys2 {0}
@@ -117,13 +147,14 @@ jobs:
           opam-pin: false
 
       - name: Retrieve cache of local opam switch
-        uses: actions/cache@v5
+        uses: actions/cache/restore@v5
         id: cache-opam
         with:
           path: _opam
           key: v5-${{ runner.os }}-msys2-${{ matrix.sys }}-4.14.2-superbol-studio-oss-${{ hashFiles('**/*.opam', '.github/workflows/windows-msys2.yml') }}
 
-      - run: |
+      - id: opam-deps
+        run: |
           opam install .\opam\*.opam .\vendors\ANSITerminal\ANSITerminal.opam .\vendors\goblint-cil\goblint-cil.opam .\test\opam\*.opam --deps-only --with-test
 
       - run: make
@@ -136,4 +167,12 @@ jobs:
           opam clean --switch-cleanup --logs
           find _opam -type f -a \( -name '*.cmt' -o -name '*.cmti' \) -delete
         shell: bash
-        if: steps.cache-opam.outputs.cache-hit != 'true'
+        # Even when a later step failed, as long as dependencies are installed
+        if: ${{ always() && steps.cache-opam.outputs.cache-hit != 'true' && steps.opam-deps.outcome == 'success' }}
+
+      - name: Save cache of local opam switch
+        uses: actions/cache/save@v5
+        with:
+          path: _opam
+          key: ${{ steps.cache-opam.outputs.cache-primary-key }}
+        if: ${{ always() && steps.cache-opam.outputs.cache-hit != 'true' && steps.opam-deps.outcome == 'success' }}

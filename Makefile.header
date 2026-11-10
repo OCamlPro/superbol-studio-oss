@@ -129,6 +129,17 @@ test-utf8-promote:
 	\! opam exec -- $(AUTOFONCE_EXE) 2>/dev/null || \
 	   opam exec -- $(AUTOFONCE_EXE) promote -t utf8 --apply
 
+# Runs the tests of the LSP server compiled into JavaScript, with nodejs (the
+# server that ships in universal VSIXs).  The tests are those of the native
+# server, copied into `js` sub-directories: expectations are shared, and to be
+# promoted with `test-promote`.
+JS_TEST_DIRS = test/superbol_cache/js test/lsp/js
+
+.PHONY: test-js
+test-js:
+	${DUNE} build ${DUNE_ARGS} --profile=universal \
+		$(addprefix @,$(addsuffix /runtest,$(JS_TEST_DIRS)))
+
 # Debugger integration tests, run within VS Code against the debug
 # bundle.  They need `cobc` and `cobcrun` in version 3.x, `gdb`, and a
 # display: use `xvfb-run -a make test-vscode-debug` on headless

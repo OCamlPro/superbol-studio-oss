@@ -2,10 +2,10 @@
 
 (library
  (name test_superbol_cache)
- (modules test_cache test_cache_store)
+ (modules test_cache test_cache_store test_config_loading)
  (preprocess
   (pps ppx_expect))
  (inline_tests
   (modes best)) ; add js for testing with nodejs
- (libraries superbol_cache superbol_platform)
+ (libraries superbol_cache superbol_platform cobol_config)
  )

@@ -100,15 +100,16 @@ let with_default_config ~rootdir ~layout:{ project_config_filename; _ } =
     config_filename = rootdir // project_config_filename;
   }
 
-let try_reading_config_file ~rootdir ~layout:{ project_config_filename; _ } =
+let try_reading_config_file ~platform ~rootdir
+    ~layout:{ project_config_filename; _ } =
   let config_filename = rootdir // project_config_filename in
-  Project_config.load_file config_filename |>
+  Project_config.load_file ~platform config_filename |>
   DIAGS.map_result ~f:(fun config -> { rootdir; config; config_filename })
 
-let for_ ~rootdir ~layout =
+let for_ ~platform ~rootdir ~layout =
   try DIAGS.result @@ TABLE.find table rootdir
   with Not_found ->
-    let project = try_reading_config_file ~layout ~rootdir in
+    let project = try_reading_config_file ~platform ~layout ~rootdir in
     TABLE.replace table rootdir project.result;
     project
 
@@ -118,6 +119,9 @@ let copybook_lookup_config_for ~filename { config; _ } =
 let relative_path_for ~filename { rootdir; _ } =
   try Project_utils.relative_path ~filename rootdir
   with Invalid_argument _ -> filename             (* if not in project rootdir *)
+
+let work_dirname ~layout { rootdir; _ } =
+  Option.map (Filename.concat rootdir) layout.relative_work_dirname
 
 let absolute_path_for ~filename { rootdir; _ } =
   if EzFile.is_absolute filename
@@ -164,8 +168,8 @@ let detect_copybook ~platform ~filename ?contents project =
 let save_config ?verbose { config_filename; config; _ } =
   Project_config.save ?verbose ~config_filename config
 
-let reload_config ?verbose { config_filename; config; _ } =
-  Project_config.reload ?verbose ~config_filename config
+let reload_config ~platform ?verbose { config_filename; config; _ } =
+  Project_config.reload ~platform ?verbose ~config_filename config
 
 (* Caching *)
 
@@ -175,15 +179,15 @@ type cached = Project_config.cached
 let to_cache { config; _ } =
   Project_config.to_cache config
 
-let of_cache ~rootdir ~layout cached =
+let of_cache ~platform ~rootdir ~layout cached =
   let config_filename = rootdir // layout.project_config_filename in
   try
-    let config = Project_config.of_cache ~config_filename cached in
+    let config = Project_config.of_cache ~platform ~config_filename cached in
     let project = { rootdir; config; config_filename } in
     TABLE.replace table rootdir project;
     DIAGS.result project
   with Project_config.BAD_CHECKSUM | Sys_error _ ->
-    for_ ~rootdir ~layout
+    for_ ~platform ~rootdir ~layout
 
 (* Collections *)
 

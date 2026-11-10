@@ -15,19 +15,20 @@ open EzCompat
 
 let srcdir = Testsuite_utils.srcdir     (* ../output-tests/testsuite_utils.ml *)
 let confdir = Testsuite_utils.confdir
-let search_path = Lazy.force Cobol_config.default_search_path
+let platform = Testsuite_utils.platform
+let search_path = Cobol_config.default_search_path ~platform
 
 module Default_conf =
   (val Cobol_config.default)
 
 module Parsed_conf =
   (val (Cobol_common.Diagnostics.show_n_forget @@
-        Cobol_config.from_file ~search_path @@
+        Cobol_config.from_file ~platform ~search_path @@
         Filename.concat confdir "default.conf"))
 
 module MF_conf =
   (val (Cobol_common.Diagnostics.show_n_forget @@
-        Cobol_config.(from_dialect ~search_path DIALECT.mf_strict)))
+        Cobol_config.(from_dialect ~platform ~search_path DIALECT.mf_strict)))
 
 let both_diff s1 s2 =
   StringSet.union
@@ -214,7 +215,7 @@ let load_conf contents =
   let search_path = Filename.dirname file :: confdir :: search_path in
   Fun.protect ~finally:(fun () -> Sys.remove file) @@ fun () ->
   Cobol_common.Diagnostics.show_n_forget @@
-  Cobol_config.from_file ~search_path (Filename.basename file)
+  Cobol_config.from_file ~platform ~search_path (Filename.basename file)
 
 let tab_stops_of_conf value =
   let module Conf =

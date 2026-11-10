@@ -3,15 +3,25 @@
 ## [_] Next release
 
 ### Added
-- New manifest-based cache [#709](https://github.com/OCamlPro/superbol-studio-oss/pull/709) [#711](https://github.com/OCamlPro/superbol-studio-oss/pull/711) [#712](https://github.com/OCamlPro/superbol-studio-oss/pull/712)
+- Reporting of the diagnostics of workspace files found in the caches of the language server whenever it starts, so that those of files analyzed in earlier sessions show up again (setting `superbol.workspaceAnalysis.publishCachedDiagnosticsOnStartup`, enabled by default) [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
+- Reporting of diagnostics about loading dialect configuration files given in the settings (e.g. `dialect.conf`), that are now published on these files instead of being silently dropped [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
+- Settings `superbol.cache.sizeLimit` (20G by default) and `superbol.cache.maxAge`, for pruning the caches of the LSP server [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
+- Support for workspace symbols lookup in the LSP server, for open documents and for documents whose analysis is cached [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
 - Smaller cache entries [#715](https://github.com/OCamlPro/superbol-studio-oss/pull/715)
+- New manifest-based cache [#709](https://github.com/OCamlPro/superbol-studio-oss/pull/709) [#711](https://github.com/OCamlPro/superbol-studio-oss/pull/711) [#712](https://github.com/OCamlPro/superbol-studio-oss/pull/712)
+
+### Removed
+- The `superbol.lspPath` setting, and with it the support for connecting to the LSP server remotely (`tcp://` values) [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
 
 ### Improved
-- Memory usage [#714](https://github.com/OCamlPro/superbol-studio-oss/pull/714)
+- Memory usage of the LSP server [#714](https://github.com/OCamlPro/superbol-studio-oss/pull/714)
+- Workspace analyzis for every COBOL file, that now runs in parallel sub-processes, and reports diagnostics of files that are not open [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
 
 ### Fixed
 - Stepping and breakpoints in programs built by debug build tasks, with GnuCOBOL configured to optimize C code (e.g. with `--enable-hardening`) [#718](https://github.com/OCamlPro/superbol-studio-oss/pull/718)
-- Handling of dialects given as configuration files (e.g. `dialect.conf`) in build tasks [#???](https://github.com/OCamlPro/superbol-studio-oss/pull/???)
+- Handling of dialects given as configuration files whose path holds uppercase letters (e.g. `Dialects/My.conf`), that were looked up with a lowercased path [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
+- Lookup of files included by a configuration file given with `--conf`, that are now looked up next to that file first, even when it is found in the search path [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
+- Handling of dialects given as configuration files (e.g. `dialect.conf`) in build tasks [#716](https://github.com/OCamlPro/superbol-studio-oss/pull/716)
 - Internal errors of the LSP server that may occur on some (rare) corner cases [#702](https://github.com/OCamlPro/superbol-studio-oss/pull/702)
 - Fatal error on ambiguous qualified names appearing in abbreviated relation conditions [#701](https://github.com/OCamlPro/superbol-studio-oss/pull/701)
 - Wrong "missing PICTURE" error on group items with a `USAGE` clause [#700](https://github.com/OCamlPro/superbol-studio-oss/pull/700)

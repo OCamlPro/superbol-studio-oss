@@ -149,6 +149,18 @@
           "items": "string",
           "order": 5
         },
+        "superbol.cobol.excludeDirs": {
+          "title": "Excluded Directories",
+          "markdownDescription": "Directories that hold no COBOL source file to consider in project-wide operations, such as workspace symbol lookups or the analysis of every COBOL file in the workspace.  Each entry is either a directory name, that matches at any depth (e.g. `node_modules`), or a path relative to the project root when it holds a `/` (e.g. `tests/fixtures`).\n\nNote: files excluded with `#files.exclude#` are also left out of the workspace analysis.\n\n*(May be overriden in project-specific `superbol.toml` files)*.",
+          "type": "array",
+          "default": [
+            "_build",
+            "_opam",
+            "node_modules"
+          ],
+          "items": "string",
+          "order": 6
+        },
         "superbol.cobcPath": {
           "title": "GnuCOBOL Compiler Executable",
           "type": "string",
@@ -157,14 +169,6 @@
           "scope": "machine-overridable",
           "order": 11
         },
-        "superbol.lspPath": {
-          "title": "SuperBOL Executable",
-          "markdownDescription": "Name of the `superbol-free` executable if available in PATH; may be an absolute path otherwise. Leave empty to use the bundled `superbol-free`, if available.\n<!-- COBOL -->",
-          "type": "string",
-          "default": "",
-          "scope": "machine",
-          "order": 12
-        },
         "superbol.forceSyntaxDiagnostics": {
           "markdownDescription": "Force reporting of syntax diagnostics for dialects other than ``COBOL85``.",
           "type": "boolean",
@@ -172,10 +176,48 @@
           "order": 21
         },
         "superbol.cacheInGlobalStorage": {
-          "markdownDescription": "Use storage provided by Visual Studio Code for caching. When this setting is set to *false*, the cache related to the contents of a given workspace folder *f* is stored in a file named *f*`/_superbol/lsp-cache`.\n\nNote: cache files are not removed automatically, whatever their location.\n<!-- COBOL -->",
+          "markdownDescription": "Use storage provided by Visual Studio Code for caching. When this setting is set to *false*, the cache related to the contents of a given workspace folder *f* is stored within a directory named *f*`/_superbol/cache`.\n\nSee `#superbol.cache.sizeLimit#` and `#superbol.cache.maxAge#` for how cache files are pruned.\n<!-- COBOL -->",
           "type": "boolean",
           "default": false,
           "order": 22
+        },
+        "superbol.cache.sizeLimit": {
+          "title": "Cache Size Limit",
+          "markdownDescription": "Size under which the language server keeps the cache of each project, by reclaiming the entries that were used least recently whenever it writes the cache out (e.g. when it stops).  A number of bytes, with an optional `k`, `M` or `G` suffix for kibibytes, mebibytes or gibibytes (e.g. `500M`, `20G`); leave empty for no limit.\n<!-- COBOL -->",
+          "type": "string",
+          "default": "20G",
+          "order": 23
+        },
+        "superbol.cache.maxAge": {
+          "title": "Cache Entry Maximum Age",
+          "markdownDescription": "Number of days after which the language server reclaims cache entries that have not been used, whenever it writes the cache out (e.g. when it stops); `0` keeps them indefinitely.\n<!-- COBOL -->",
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "order": 24
+        },
+        "superbol.workspaceAnalysis.maxProcesses": {
+          "title": "Parallel Analysis Processes",
+          "markdownDescription": "Maximum number of processes that the `SuperBOL: Analyze Every COBOL File in the Workspace` command runs at once; `0` stands for one less than the number of available processors.\n<!-- COBOL -->",
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "order": 31
+        },
+        "superbol.workspaceAnalysis.filesPerProcess": {
+          "title": "Files per Analysis Process",
+          "markdownDescription": "Number of COBOL files that each process launched by the `SuperBOL: Analyze Every COBOL File in the Workspace` command analyzes.\n<!-- COBOL -->",
+          "type": "number",
+          "default": 25,
+          "minimum": 1,
+          "order": 32
+        },
+        "superbol.workspaceAnalysis.publishCachedDiagnosticsOnStartup": {
+          "title": "Report Cached Diagnostics on Startup",
+          "markdownDescription": "Whenever the language server starts, report the diagnostics of the COBOL files of the workspace that it finds in its caches (e.g. after the `SuperBOL: Analyze Every COBOL File in the Workspace` command has been run in an earlier session).  Files are not analyzed: those that have changed since, or have never been analyzed, are left out until they are opened.\n<!-- COBOL -->",
+          "type": "boolean",
+          "default": true,
+          "order": 33
         },
         "superbol.debugger.displayVariableAttributes": {
           "title": "Display Variable Attributes",
@@ -183,7 +225,7 @@
           "type": "boolean",
           "default": false,
           "scope": "resource",
-          "order": 31
+          "order": 41
         },
         "superbol.debugger.libcobPath": {
           "title": "GnuCOBOL Runtime Library",
@@ -193,7 +235,7 @@
           ],
           "description": "Path to the GnuCOBOL runtime library file.",
           "scope": "machine-overridable",
-          "order": 32
+          "order": 42
         },
         "superbol.debugger.gdbPath": {
           "title": "GNU Debugger Executable",
@@ -201,7 +243,7 @@
           "type": "string",
           "default": "gdb",
           "scope": "machine-overridable",
-          "order": 33
+          "order": 43
         },
         "superbol.debugger.cobcrunPath": {
           "title": "GnuCOBOL module loader",
@@ -209,7 +251,7 @@
           "type": "string",
           "default": "cobcrun",
           "scope": "machine-overridable",
-          "order": 34
+          "order": 44
         }
       }
     },
@@ -438,7 +480,7 @@
     "tomlValidation": [
       {
         "fileMatch": "superbol.toml",
-        "url": "https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema-0.2.3.json"
+        "url": "https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema-1.2.0.json"
       }
     ],
     "languages": [

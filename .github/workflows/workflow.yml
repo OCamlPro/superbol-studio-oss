@@ -8,6 +8,8 @@ on:
   push:
     branches:
       - master
+  # manual run in actions tab - for all branches
+  workflow_dispatch:
 
 # Cancel runs upon PR updates:
 concurrency:
@@ -78,6 +80,7 @@ jobs:
           fi
           echo "commit=$(git -C import/gnucobol4 rev-parse HEAD)" >> $GITHUB_OUTPUT
           echo "image=${ImageOS:-unknown}-$(uname -m)" >> $GITHUB_OUTPUT
+          echo "$HOME/gnucobol-4.x/bin" >> $GITHUB_PATH
           echo "GNUCOBOL4_COB_CONFIG=$HOME/gnucobol-4.x/bin/cob-config" >> $GITHUB_ENV
           echo "LD_LIBRARY_PATH=$HOME/gnucobol-4.x/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> $GITHUB_ENV
           echo 'HAVE_LIBCOB5=true' >> $GITHUB_ENV
@@ -214,6 +217,11 @@ jobs:
           path: superbol-vscode-oss-*-universal-*.vsix
           compression-level: 0 # no compression (already a zip archive)
         if: ${{ matrix.build_vsix && matrix.os == 'ubuntu-latest' }}
+
+      # Tests of the LSP server compiled into JavaScript, as shipped in
+      # universal VSIXs
+      - run: make test-js
+        if: ${{ matrix.build_vsix && matrix.os == 'ubuntu-latest' && ! matrix.skip_test }}
 
       # Debugger tests, run within VS Code with GnuCOBOL 3.x
       - name: Get the month for the cache of VS Code

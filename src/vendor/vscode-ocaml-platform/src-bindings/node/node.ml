@@ -68,6 +68,8 @@ module Process = struct
 
     val pid : int [@@js.global "process.pid"]
 
+    val execPath : string [@@js.global "process.execPath"]
+
     val kill : int -> ?signal:string -> unit -> unit [@@js.global "process.kill"]]
 
   module Env = struct
@@ -85,7 +87,9 @@ module Os =
   [%js:
   val homedir : unit -> string [@@js.global "__SUPERBOL__.os.homedir"]
 
-  val release : unit -> string [@@js.global "__SUPERBOL__.os.release"]]
+  val release : unit -> string [@@js.global "__SUPERBOL__.os.release"]
+
+  val cpus : unit -> Ojs.t array [@@js.global "__SUPERBOL__.os.cpus"]]
 
 module JsError = struct
   type t = Promise.error [@@js]

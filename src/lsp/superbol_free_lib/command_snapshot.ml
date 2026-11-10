@@ -11,6 +11,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* TODO: these commands are unrelated to the language server, and should
+   eventually be removed from this executable.  They are already hidden from
+   its JavaScript build (see [Main.public_subcommands]). *)
+
 open Ezcmd.V2
 open EZCMD.TYPES
 open Ez_file.V1

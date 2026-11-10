@@ -21,13 +21,6 @@ let non_empy s = if s = "" then None else Some s
 let full ?scope () =
   WS.getConfiguration ?scope ~section ()
 
-let superbol_exe ?scope () =
-  let config = WS.getConfiguration ?scope ~section () in
-  match WS_CONF.get ~section:"lspPath" config with
-  | None -> None
-  | Some o when Ojs.is_null o -> None
-  | Some s -> non_empy (Ojs.string_of_js s)
-
 let cobc_exe ?scope () =
   let config = WS.getConfiguration ?scope ~section () in
   match WS_CONF.get ~section:"cobcPath" config with
@@ -55,6 +48,14 @@ let strings ?scope key =
   | None -> []
   | Some o when Ojs.is_null o -> []
   | Some s -> Ojs.(list_of_js string_of_js) s      (* TODO: how may this fail? *)
+
+(* [default] when unset, or not a positive integer. *)
+let positive_int ?scope key ~default =
+  let config = WS.getConfiguration ?scope ~section () in
+  match WS_CONF.get ~section:key config with
+  | None -> default
+  | Some o when Ojs.is_null o || Ojs.type_of o <> "number" -> default
+  | Some o -> match Ojs.int_of_js o with n when n > 0 -> n | _ -> default
 
 let any ?scope key =
   let config = WS.getConfiguration ?scope ~section () in

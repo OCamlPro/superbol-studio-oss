@@ -8,6 +8,8 @@ on:
   push:
     branches:
       - !(git-main-branch:default:master)
+  # manual run in actions tab - for all branches
+  workflow_dispatch:
 
 # Cancel runs upon PR updates:
 concurrency:

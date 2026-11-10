@@ -1,0 +1,15 @@
+; The tests of the parent directory, run with nodejs.  Only enabled with the
+; "universal" profile, in which the LSP server is compiled into JavaScript:
+; `make test-js` runs them.
+
+(copy_files (files ../*.{ml,mli}) (only_sources true))
+
+(library
+ (name lsp_test_all_js)
+ (enabled_if (= %{profile} "universal"))
+ (preprocess
+  (pps ppx_expect))
+ (inline_tests
+  (modes js))
+ (libraries cobol_lsp lsp superbol_free_lib superbol_testutils superbol_platform superbol_project)
+ )

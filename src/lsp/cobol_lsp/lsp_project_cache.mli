@@ -64,8 +64,8 @@ val save_document
 
 (** {2 Loading a single document} *)
 
-(** [load_document ~project ~params ~doc] attempts to restore the document
-    [doc] that the client has just opened, from the cache of [project].  Returns
+(** [load_document ~project ~params ~doc] attempts to restore the document [doc]
+    that the client has just opened, from the cache of [project].  Returns
     [None] whenever its analysis is missing from the cache, or out-dated.
 
     The analysis may have been stored by another front-end. *)
@@ -74,3 +74,31 @@ val load_document
   -> params: params
   -> doc: Lsp.Types.DidOpenTextDocumentParams.t
   -> Lsp_document.t option
+
+(** {2 Workspace symbols} *)
+
+(** [workspace_symbols ~params ~except project] retrieves the symbols of the
+    source files of [project] (see {!Superbol_project.Walk.source_files}) that
+    are held in its cache, along with their URI, except for files whose
+    (absolute) name satisfies [except] (typically, open documents).  Files are
+    never analyzed: those whose symbols are not cached are left out.
+
+    Results are memoized per file, until the file changes on disk or [project]
+    is replaced: changes to copybooks alone go unnoticed until then. *)
+val workspace_symbols
+  : params: params
+  -> except: (string -> bool)
+  -> Lsp_project.t
+  -> (Lsp.Uri.t * Lsp_workspace_symbols.t) Seq.t
+
+(** {2 Diagnostics} *)
+
+(** [cached_diagnostics ~params project filenames] retrieves the diagnostics of
+    each of the (absolute) [filenames] from the cache of [project], as analyzed
+    without overrides.  Files are never analyzed: [None] is given for those
+    whose diagnostics are not cached, or are out-dated. *)
+val cached_diagnostics
+  : params: params
+  -> Lsp_project.t
+  -> string list
+  -> (string * Superbol_project.Cached_diagnostics.t option) list

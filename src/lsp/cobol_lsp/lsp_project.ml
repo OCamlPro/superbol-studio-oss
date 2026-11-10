@@ -17,6 +17,16 @@ module DIAGS = Cobol_common.Diagnostics
 module TYPES = struct
   include Superbol_project.Config.TYPES
   include Superbol_project.TYPES
+
+  (** How problems met while applying client settings are reported. *)
+  type settings_reporter =
+    {
+      report_dialect_diags:
+        dialect_name:string -> dialect_file:string option ->
+        project -> DIAGS.Set.t -> unit;
+      report_config_error: Superbol_project.Diagnostics.error -> unit;
+      report_invalid_setting: key:string -> string -> unit;
+    }
 end
 
 include TYPES
@@ -60,7 +70,7 @@ let on_project_config_error e ~rootdir ~layout =
 let for_ ~rootdir ~layout =
   try
     show_n_forget_diagnostics @@
-    Superbol_project.for_ ~rootdir ~layout
+    Superbol_project.for_ ~platform:Lsp_platform.record ~rootdir ~layout
   with Superbol_project.Config.ERROR e ->
     on_project_config_error e ~rootdir ~layout
 
@@ -88,22 +98,77 @@ let absolute_path_for =
     mutations on project's configurations. They return [true] if the
     configuration of the given project has changed. *)
 
-let update_source_format { config; _ } str : bool =
+(* Diagnostics about loading a dialect given by client settings have no
+   location, and the project has no configuration file then: they are published
+   on the file of the dialect ([dialect_file]) if any, or else notified and
+   logged once per dialect.  [dialect_files] maps each project root to the URI
+   of that file, so that its diagnostics are withdrawn once no project uses
+   it. *)
+let dialect_files: (string, Lsp.Uri.t) Hashtbl.t = Hashtbl.create 1
+let notified_dialects: (string, unit) Hashtbl.t = Hashtbl.create 1
+
+let report_dialect_diags ~dialect_name ~dialect_file project diags =
+  let rootdir = string_of_rootdir @@ rootdir project in
+  let previous = Hashtbl.find_opt dialect_files rootdir in
+  begin match dialect_file with
+    | Some file ->
+        let file =
+          if Filename.is_relative file
+          then Filename.concat (Lsp_platform.record.getcwd ()) file else file
+        in
+        let uri = Lsp_diagnostics.normalize_uri @@ Lsp.Uri.of_path file in
+        Hashtbl.replace dialect_files rootdir uri;
+        Lsp_diagnostics.publish @@
+        Lsp_diagnostics.translate diags ~uri ~focus_on_main_doc:false
+          ~rootdir:(Filename.dirname file)
+    | None ->
+        Hashtbl.remove dialect_files rootdir;
+        if diags <> DIAGS.Set.none &&
+           not (Hashtbl.mem notified_dialects dialect_name)
+        then begin
+          Hashtbl.replace notified_dialects dialect_name ();
+          Lsp_io.notify_warn "Problems@ in@ the@ configuration@ of@ dialect@ \
+                              `%s'@ (see@ the@ log)" dialect_name;
+          Lsp_io.log_warn "Loading@ dialect@ `%s':@ %a" dialect_name
+            (DIAGS.Set.pp ?platform:None) diags
+        end
+  end;
+  (* Withdraw the diagnostics of the file the project used before, unless
+     another project still uses it. *)
+  Option.iter begin fun previous ->
+    if not (Hashtbl.fold (fun _ uri used -> used || Lsp.Uri.equal uri previous)
+              dialect_files false)
+    then Lsp_io.send_diagnostics ~uri:previous []
+  end previous
+
+(** Reports problems as an LSP server does. *)
+let lsp_settings_reporter =
+  {
+    report_dialect_diags;
+    report_config_error = begin fun e ->
+      Lsp_io.notify_error "%a" Superbol_project.Diagnostics.pp_error e
+    end;
+    report_invalid_setting = begin fun ~key msg ->
+      Lsp_io.log_error "Invalid@ value@ for@ configuration@ item@ %s:@ %s"
+        key msg
+    end;
+  }
+
+let update_source_format ~reporter { config; _ } str : bool =
   try
     let source_format = Cobol_config.Options.format_of_string str in
     if source_format = config.source_format
     then false
     else (config.source_format <- source_format; true)
   with Invalid_argument e ->
-    Lsp_io.notify_error "%a"
-      Superbol_project.Diagnostics.pp_error (Unknown_source_format e);
+    reporter.report_config_error (Unknown_source_format e);
     false
 
-let update_dialect ({ config; _ } as project) str : bool =
+let update_dialect ~platform ~reporter ({ config; _ } as project) str : bool =
   try
-    let { result; diags } =
-      Superbol_project.Config.cobol_config_from_dialect_name str
-        ~verbose:false
+    let { result = result, dialect_file; diags } =
+      Superbol_project.Config.cobol_config_n_file_from_dialect_name str
+        ~platform ~verbose:false
     in
     if result = config.cobol_config &&         (* note: structural comparison *)
        String.equal str config.dialect_name
@@ -111,30 +176,31 @@ let update_dialect ({ config; _ } as project) str : bool =
     else begin
       config.cobol_config <- result;
       config.dialect_name <- str;
-      show_diagnostics project diags;
+      reporter.report_dialect_diags ~dialect_name:str ~dialect_file project
+        diags;
       true
     end
   with Superbol_project.Config.ERROR e ->
-    Lsp_io.notify_error "%a" Superbol_project.Diagnostics.pp_error e;
+    reporter.report_config_error e;
     false
 
 (** Parse a JSON object mapping file extensions to source formats (e.g.
     [{"cbl": "fixed", "cob": "free"}]) into the project config. *)
 let update_source_format_by_extension: t -> Yojson.Safe.t -> bool =
   fun { config; _ } json ->
-    let open Yojson.Safe.Util in
-    try
-      let entries =
-        to_assoc json |> List.map begin fun (ext, v) ->
-          (ext, Cobol_config.Options.format_of_string (to_string v))
-        end
-      in
-      if entries = config.source_format_by_extension
-      then false
-      else (config.source_format_by_extension <- entries; true)
-    with
-      Yojson.Safe.Util.(Type_error _ | Undefined _) as e ->
-        Pretty.invalid_arg "%s: %a" (Yojson.Safe.to_string json) Fmt.exn e
+  let open Yojson.Safe.Util in
+  try
+    let entries =
+      to_assoc json |> List.map begin fun (ext, v) ->
+        (ext, Cobol_config.Options.format_of_string (to_string v))
+      end
+    in
+    if entries = config.source_format_by_extension
+    then false
+    else (config.source_format_by_extension <- entries; true)
+  with
+    Yojson.Safe.Util.(Type_error _ | Undefined _) as e ->
+      Pretty.invalid_arg "%s: %a" (Yojson.Safe.to_string json) Fmt.exn e
 
 let update_copybooks: t -> Yojson.Safe.t -> bool = fun { config; _ } json ->
   let open Yojson.Safe.Util in
@@ -165,10 +231,23 @@ let update_copyexts: t -> Yojson.Safe.t -> bool = fun { config; _ } json ->
     Yojson.Safe.Util.(Type_error _ | Undefined _) as e ->
       Pretty.invalid_arg "%s: %a" (Yojson.Safe.to_string json) Fmt.exn e
 
+let update_exclude_dirs: t -> Yojson.Safe.t -> bool = fun { config; _ } json ->
+  let open Yojson.Safe.Util in
+  try
+    let exclude_dirs = convert_each to_string json in
+    if exclude_dirs = config.exclude_dirs
+    then false
+    else (config.exclude_dirs <- exclude_dirs; true)
+  with
+    Yojson.Safe.Util.(Type_error _ | Undefined _) as e ->
+      Pretty.invalid_arg "%s: %a" (Yojson.Safe.to_string json) Fmt.exn e
+
 (** [update_project_config assoc project] updates the configuration of [project]
     according to key/value paires in [assoc]; returns [true] whenever the
     configuration upon termination differs from the configuration upon call. *)
-let update_project_config assoc project : bool =
+let update_project_config
+    ?(platform = Lsp_platform.record) ?(reporter = lsp_settings_reporter)
+    assoc project : bool =
   let from_string project (s: Yojson.Safe.t) ~f : bool =
     match s with
     | `String "" -> false
@@ -180,25 +259,27 @@ let update_project_config assoc project : bool =
       | None -> false
       | Some v -> update project v
     with Invalid_argument msg ->
-      Lsp_io.log_error "Invalid@ value@ for@ configuration@ item@ %s:@ %s"
-        key msg;
+      reporter.report_invalid_setting ~key msg;
       false
   in
   List.fold_left begin fun u (key, update) ->
     update_config assoc key update project || u
   end false [
-    "dialect", from_string ~f:update_dialect;
-    "sourceFormat", from_string ~f:update_source_format;
+    "dialect", from_string ~f:(update_dialect ~platform ~reporter);
+    "sourceFormat", from_string ~f:(update_source_format ~reporter);
     "sourceFormatByExtension", update_source_format_by_extension;
     "copybooks", update_copybooks;
     "copyexts", update_copyexts;
+    "excludeDirs", update_exclude_dirs;
   ]
 
 
 (** Returns [true] whenever the configuration has changed. *)
 let reload_project_config project =
   try
-    let { result = changed; diags } = Superbol_project.reload_config project in
+    let { result = changed; diags } =
+      Superbol_project.reload_config project ~platform:Lsp_platform.record
+    in
     show_diagnostics ~force:true project diags;
     changed
   with
@@ -246,6 +327,9 @@ let get_project_config ?(flat = true) project : Yojson.Safe.t =
 
       "copyexts",
       `List (List.map (fun s -> `String s) config.libexts);
+
+      "excludeDirs",
+      `List (List.map (fun s -> `String s) config.exclude_dirs);
     ]
   in
   if flat
@@ -262,6 +346,7 @@ let to_cache project =
 let of_cache ~rootdir ~layout cached =
   try
     show_n_forget_diagnostics @@
-    Superbol_project.of_cache ~rootdir ~layout cached
+    Superbol_project.of_cache ~platform:Lsp_platform.record ~rootdir ~layout
+      cached
   with Superbol_project.Config.ERROR e ->
     on_project_config_error e ~rootdir ~layout

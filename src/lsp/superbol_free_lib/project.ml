@@ -30,7 +30,9 @@ let try_load ~f arg =
 let in_ ~dirname ?(layout = Superbol_project.Layout.default) () =
   try_load () ~f:begin fun () ->
     let rootdir = Superbol_project.rootdir_at ~dirname in
-    let project = Superbol_project.for_ ~rootdir ~layout in
+    let project =
+      Superbol_project.for_ ~platform:Superbol_platform.record ~rootdir ~layout
+    in
     DIAGS.show_n_forget project ~platform:Superbol_platform.record
   end
 
@@ -41,7 +43,9 @@ let load ?(dirname = EzFile.current_dir_name) = in_ ~dirname
 let for_ ~filename ?(layout = Superbol_project.Layout.default) () =
   try_load () ~f:begin fun () ->
     let rootdir = Superbol_project.rootdir_for ~filename ~layout in
-    let project = Superbol_project.for_ ~rootdir ~layout in
+    let project =
+      Superbol_project.for_ ~platform:Superbol_platform.record ~rootdir ~layout
+    in
     DIAGS.show_n_forget project ~platform:Superbol_platform.record
   end
 

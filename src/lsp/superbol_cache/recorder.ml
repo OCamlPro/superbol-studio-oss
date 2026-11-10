@@ -105,6 +105,13 @@ let platform t =
       add t (Witness.file ~name:(absolute t file) ~contents);
       contents
     end;
+    read_text_file_in_path = begin fun ~search_path filename ->
+      let found = inner.read_text_file_in_path ~search_path filename in
+      Option.iter begin fun (path, contents) ->
+        add t (Witness.file ~name:(absolute t path) ~contents)
+      end found;
+      found
+    end;
     getenv_opt = begin fun var ->
       let value = inner.getenv_opt var in
       add t (Witness.env ~var ~value);

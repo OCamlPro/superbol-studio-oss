@@ -400,6 +400,20 @@ let configuration =
       ~default:Cobol_common.Copybook.copybook_extensions
       ~order:5;
 
+    Manifest.PROPERTY.strings "superbol.cobol.excludeDirs"
+      ~title:"Excluded Directories"
+      ~markdownDescription:
+        (with_superbol_toml_note
+           "Directories that hold no COBOL source file to consider in \
+            project-wide operations, such as workspace symbol lookups or the \
+            analysis of every COBOL file in the workspace.  Each entry is either \
+            a directory name, that matches at any depth (e.g. `node_modules`), \
+            or a path relative to the project root when it holds a `/` \
+            (e.g. `tests/fixtures`).\n\nNote: files excluded with \
+            `#files.exclude#` are also left out of the workspace analysis.")
+      ~default:Superbol_project.Config.default_exclude_dirs
+      ~order:6;
+
     (* Paths *)
 
     Manifest.PROPERTY.string "superbol.cobcPath"
@@ -408,17 +422,6 @@ let configuration =
       ~scope:"machine-overridable"
       ~description:"Path to the GnuCOBOL compiler executable."
       ~order:11;
-
-    Manifest.PROPERTY.string "superbol.lspPath"
-      ~title:"SuperBOL Executable"
-      ~default:""
-      ~scope:"machine"
-      ~markdownDescription:
-        (with_extra_keyword_commment
-           "Name of the `superbol-free` executable if available in PATH; \
-            may be an absolute path otherwise. Leave empty to use the \
-            bundled `superbol-free`, if available.")
-      ~order:12;
 
     (* Flags *)
 
@@ -433,12 +436,73 @@ let configuration =
       ~default:false
       ~markdownDescription:
         (with_extra_keyword_commment
-           "Use storage provided by Visual Studio Code for caching. When \
-            this setting is set to *false*, the cache related to the \
-            contents of a given workspace folder *f* is stored in a file \
-            named *f*`/_superbol/lsp-cache`.\n\nNote: cache files are not \
-            removed automatically, whatever their location.")
+           "Use storage provided by Visual Studio Code for caching. When this \
+            setting is set to *false*, the cache related to the contents of a \
+            given workspace folder *f* is stored within a directory named \
+            *f*`/_superbol/cache`.\n\nSee `#superbol.cache.sizeLimit#` and \
+            `#superbol.cache.maxAge#` for how cache files are pruned.")
       ~order:22;
+
+    Manifest.PROPERTY.string "superbol.cache.sizeLimit"
+      ~title:"Cache Size Limit"
+      ~default:"20G"
+      ~markdownDescription:
+        (with_extra_keyword_commment
+           "Size under which the language server keeps the cache of each \
+            project, by reclaiming the entries that were used least recently \
+            whenever it writes the cache out (e.g. when it stops).  A number of \
+            bytes, with an optional `k`, `M` or `G` suffix for kibibytes, \
+            mebibytes or gibibytes (e.g. `500M`, `20G`); leave empty for no \
+            limit.")
+      ~order:23;
+
+    Manifest.PROPERTY.int "superbol.cache.maxAge"
+      ~title:"Cache Entry Maximum Age"
+      ~default:0
+      ~minimum:0
+      ~markdownDescription:
+        (with_extra_keyword_commment
+           "Number of days after which the language server reclaims cache \
+            entries that have not been used, whenever it writes the cache out \
+            (e.g. when it stops); `0` keeps them indefinitely.")
+      ~order:24;
+
+    (* Workspace analysis *)
+
+    Manifest.PROPERTY.int "superbol.workspaceAnalysis.maxProcesses"
+      ~title:"Parallel Analysis Processes"
+      ~default:0
+      ~minimum:0
+      ~markdownDescription:
+        (with_extra_keyword_commment
+           "Maximum number of processes that the `SuperBOL: Analyze Every COBOL \
+            File in the Workspace` command runs at once; `0` stands for one \
+            less than the number of available processors.")
+      ~order:31;
+
+    Manifest.PROPERTY.int "superbol.workspaceAnalysis.filesPerProcess"
+      ~title:"Files per Analysis Process"
+      ~default:25
+      ~minimum:1
+      ~markdownDescription:
+        (with_extra_keyword_commment
+           "Number of COBOL files that each process launched by the `SuperBOL: \
+            Analyze Every COBOL File in the Workspace` command analyzes.")
+      ~order:32;
+
+    Manifest.PROPERTY.bool
+      "superbol.workspaceAnalysis.publishCachedDiagnosticsOnStartup"
+      ~title:"Report Cached Diagnostics on Startup"
+      ~default:true
+      ~markdownDescription:
+        (with_extra_keyword_commment
+           "Whenever the language server starts, report the diagnostics of \
+            the COBOL files of the workspace that it finds in its caches \
+            (e.g. after the `SuperBOL: Analyze Every COBOL File in the \
+            Workspace` command has been run in an earlier session).  Files \
+            are not analyzed: those that have changed since, or have never \
+            been analyzed, are left out until they are opened.")
+      ~order:33;
 
     (* Debugger-specific: *)
 
@@ -451,13 +515,13 @@ let configuration =
         (with_extra_keyword_commment
            "Display storage property and field attributes (e.g. size of \
             alphanumerics, digits and scale of numerics).")
-      ~order:31;
+      ~order:41;
 
     Manifest.PROPERTY.null_string "superbol.debugger.libcobPath"
       ~title:"GnuCOBOL Runtime Library"
       ~scope:"machine-overridable"
       ~description:"Path to the GnuCOBOL runtime library file."
-      ~order:32;
+      ~order:42;
 
     Manifest.PROPERTY.string "superbol.debugger.gdbPath"
       ~title:"GNU Debugger Executable"
@@ -466,7 +530,7 @@ let configuration =
       ~markdownDescription:
         (with_extra_keyword_commment
            "Path to the GNU debugger executable.")
-      ~order:33;
+      ~order:43;
 
     Manifest.PROPERTY.string "superbol.debugger.cobcrunPath"
       ~title:"GnuCOBOL module loader"
@@ -475,7 +539,7 @@ let configuration =
       ~markdownDescription:
         (with_extra_keyword_commment
            "Path to `cobcrun`, the GnuCOBOL module loader.")
-      ~order:34;
+      ~order:44;
   ]
 
 let taskDefinitions =
@@ -680,7 +744,7 @@ let contributes =
       Manifest.tomlValidation
         ~fileMatch:"superbol.toml"
         (* TODO: change this address to a more permanent one; also, substitute `master` for a version tag *)
-        ~url:"https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema-0.2.3.json";
+        ~url:"https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema-1.2.0.json";
     ]
     ~menus
 

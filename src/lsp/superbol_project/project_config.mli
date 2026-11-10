@@ -29,6 +29,8 @@ module TYPES: sig
     mutable libpath: path list;
     mutable libexts: string list;
     mutable indent_config: (string * int) list;
+    mutable exclude_dirs: string list;
+    (** See {!excludes_dir}. *)
     toml_handle: Ezr_toml.toml_handle;
   }
 
@@ -45,10 +47,14 @@ type t = config
 
 val new_default: unit -> t
 
+(** Default value of the [exclude-dirs] setting (see {!excludes_dir}). *)
+val default_exclude_dirs: string list
+
 (** [load_file ~verbose config_filename] loads the given project configuration
     file.  Raises {!ERROR} or [Sys_error] in case of failure. *)
 val load_file
-  : ?verbose:bool
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> ?verbose:bool
   -> string
   -> t Cobol_common.Diagnostics.with_diags
 
@@ -61,7 +67,8 @@ val save
 (** [reload ~verbose ~config_filename config] returns [true], possibly along
     diagnostics, if the reloaded configuration has changed. *)
 val reload
-  : ?verbose:bool
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> ?verbose:bool
   -> config_filename:string
   -> t
   -> bool Cobol_common.Diagnostics.with_diags
@@ -75,6 +82,19 @@ val source_format_for
   : filename: string
   -> t
   -> Cobol_config.source_format_spec
+
+(** [excludes_dir ~relative_path config] indicates whether the [exclude-dirs]
+    setting of [config] excludes the directory [relative_path] (relative to the
+    project root, with ['/'] as separator) from project-wide operations, such as
+    looking for source files.
+
+    Entries that hold a ['/'] are paths relative to the project root; others
+    are directory names, that match at any depth.  Leading ["./"] and trailing
+    ['/'] are ignored. *)
+val excludes_dir
+  : relative_path: string
+  -> t
+  -> bool
 
 (** [copybook_lookup_config_for ~filename project] constructs a copybook lookup
     configuration (that notably indicates directory names where copybooks are
@@ -90,8 +110,16 @@ val copybook_lookup_config_for
     Those may also raise {!ERROR}*)
 
 val cobol_config_from_dialect_name
-  : verbose:bool -> string
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> verbose:bool -> string
   -> Cobol_config.t Cobol_common.Diagnostics.with_diags
+
+(** Same as {!cobol_config_from_dialect_name}, also giving the configuration
+    file loaded, if any (see {!Cobol_config.from_dialect_n_file}). *)
+val cobol_config_n_file_from_dialect_name
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> verbose:bool -> string
+  -> (Cobol_config.t * string option) Cobol_common.Diagnostics.with_diags
 
 val cobol_source_format
   : string
@@ -103,4 +131,8 @@ exception BAD_CHECKSUM
 
 type cached
 val to_cache: t -> cached
-val of_cache: config_filename:string -> cached -> t
+val of_cache
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> config_filename:string
+  -> cached
+  -> t
