@@ -120,6 +120,11 @@ github-workflow-after-test = """
           path: superbol-vscode-oss-*-universal-*.vsix
           compression-level: 0 # no compression (already a zip archive)
         if: ${{ matrix.build_vsix && matrix.os == 'ubuntu-latest' }}
+
+      # Tests of the LSP server compiled into JavaScript, as shipped in
+      # universal VSIXs
+      - run: make test-js
+        if: ${{ matrix.build_vsix && matrix.os == 'ubuntu-latest' && ! matrix.skip_test }}
 """
 github-workflow-before-build = """
       - name: Check project files

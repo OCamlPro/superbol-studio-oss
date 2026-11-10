@@ -181,6 +181,11 @@ jobs:
           compression-level: 0 # no compression (already a zip archive)
         if: ${{ matrix.build_vsix && matrix.os == 'ubuntu-latest' }}
 
+      # Tests of the LSP server compiled into JavaScript, as shipped in
+      # universal VSIXs
+      - run: make test-js
+        if: ${{ matrix.build_vsix && matrix.os == 'ubuntu-latest' && ! matrix.skip_test }}
+
       # - name: Check whether source is well formatted
       #   run: make fmt
       #   continue-on-error: true
