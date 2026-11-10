@@ -17,7 +17,9 @@
 //                           weights in `main.ml`, and its output is shown
 //                           once it is done
 //   SUPERBOL_LSP            LSP server to use (default: the one built in
-//                           `_build`, if any)
+//                           `_build`, if any); it is put in the PATH of VS
+//                           Code as `superbol-free`, so the extension runs it
+//                           unless one is bundled in `_dist`
 
 const cp = require("child_process");
 const fs = require("fs");
@@ -67,11 +69,8 @@ function installDependencies(cli, extensionsDir, userDataDir, dependencies) {
 const TEST_SHELL = { path: "bash", args: ["--noprofile", "--norc"] };
 
 /** Settings of the test instance: VS Code must not wait for answers to
- * prompts, and the extension needs its LSP server to resolve tasks defined
- * in `tasks.json`. */
-function writeUserSettings(userDataDir, root) {
-  const lsp = process.env.SUPERBOL_LSP ||
-        path.join(root, "_build/default/src/lsp/superbol-free/main.exe");
+ * prompts. */
+function writeUserSettings(userDataDir) {
   const settings = {
     "debug.onTaskErrors": "abort",
     "task.problemMatchers.neverPrompt": true,
@@ -87,14 +86,51 @@ function writeUserSettings(userDataDir, root) {
     "terminal.integrated.defaultProfile.osx": "superbol-test",
     "terminal.integrated.shellIntegration.enabled": false,
   };
-  if (fs.existsSync(lsp)) {
-    settings["superbol.lspPath"] = lsp;
-  } else {
-    console.warn(`No LSP server at ${lsp}: tasks from tasks.json will not resolve`);
-  }
   const dir = path.join(userDataDir, "User");
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, "settings.json"), JSON.stringify(settings, null, 2));
+}
+
+/** Name of the LSP server the extension looks for in the PATH. */
+const LSP_SERVER_NAME = process.platform === "win32" ? "superbol-free.exe" : "superbol-free";
+
+/** The extension runs the LSP server bundled in `_dist`, or the one found in
+ * the PATH otherwise; it needs that server to read `superbol.toml` and to
+ * resolve tasks defined in `tasks.json`.  Makes the server to test available
+ * as `superbol-free` in `binDir`, which the test instances put first in
+ * their PATH. */
+function installLspServer(binDir, root) {
+  const lsp = path.resolve(process.env.SUPERBOL_LSP ||
+                           path.join(root, "_build/default/src/lsp/superbol-free/main.exe"));
+  const bundled = fs.existsSync(path.join(root, "_dist"))
+        ? fs.readdirSync(path.join(root, "_dist"))
+            .filter((name) => name.startsWith("superbol-free"))
+        : [];
+  if (bundled.length > 0) {
+    console.warn(`The extension will run the LSP server bundled in _dist (${bundled.join(", ")}) `
+                 + `instead of ${lsp}`);
+  }
+  if (!fs.existsSync(lsp)) {
+    console.warn(`No LSP server at ${lsp}: superbol.toml will be ignored, and tasks `
+                 + `from tasks.json will not resolve`);
+    return;
+  }
+  fs.mkdirSync(binDir, { recursive: true });
+  const target = path.join(binDir, LSP_SERVER_NAME);
+  if (process.platform === "win32") {
+    // Symbolic links need privileges on Windows.
+    fs.copyFileSync(lsp, target);
+  } else {
+    fs.symlinkSync(lsp, target);
+  }
+}
+
+/** `env` with `dir` first in its PATH (whose name may differ in case on
+ * Windows). */
+function withDirInPath(env, dir) {
+  const key = Object.keys(env).find((k) => k.toUpperCase() === "PATH") || "PATH";
+  const current = env[key];
+  return { ...env, [key]: current ? `${dir}${path.delimiter}${current}` : dir };
 }
 
 /** Names of VS Code executables within an installation directory (as
@@ -175,8 +211,9 @@ function jobCount() {
 }
 
 /** Creates the isolated profile of a test instance: its user data, the
- * directory where the tests build their programs, and the workspace folder
- * for tests of build tasks and debug configurations. */
+ * directory where the tests build their programs, the workspace folder
+ * for tests of build tasks and debug configurations, and the directory of
+ * the LSP server to put in the PATH. */
 function makeProfile(root) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "superbol-vscode-test-"));
   const profile = {
@@ -184,10 +221,12 @@ function makeProfile(root) {
     userDataDir: path.join(dir, "user-data"),
     workDir: path.join(dir, "work"),
     projectDir: path.join(dir, "project"),
+    binDir: path.join(dir, "bin"),
   };
   fs.mkdirSync(profile.workDir);
   fs.mkdirSync(profile.projectDir);
-  writeUserSettings(profile.userDataDir, root);
+  writeUserSettings(profile.userDataDir);
+  installLspServer(profile.binDir, root);
   return profile;
 }
 
@@ -210,7 +249,7 @@ function runInstance({ executable, root, tests, extensionsDir, profile, env, wri
   return new Promise((resolve) => {
     const child = cp.spawn(executable, args, {
       env: {
-        ...process.env,
+        ...withDirInPath(process.env, profile.binDir),
         ...env,
         SUPERBOL_TEST_WORKDIR: profile.workDir,
         SUPERBOL_TEST_PROJECT: profile.projectDir,
