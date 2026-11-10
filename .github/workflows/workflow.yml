@@ -56,7 +56,7 @@ jobs:
           opam-pin: false
 
       - name: Retrieve cache of local opam switch
-        uses: actions/cache@v5
+        uses: actions/cache/restore@v5
         id: cache-opam
         with:
           path: _opam
@@ -69,27 +69,48 @@ jobs:
 
       - run: git submodule update
 
-      - name: Build and install GnuCOBOL 4.x
+      - name: Prepare installation of GnuCOBOL 4.x
+        id: gnucobol4
         run: |
           if ${{ matrix.os == 'ubuntu-latest' }}; then
             sudo apt-get install -y autoconf automake autopoint flex bison help2man texinfo wget libgmp-dev libdb-dev
-            bash scripts/install-gc4.sh import/gnucobol4 /opt/gnucobol-4.x
           elif ${{ matrix.os == 'macos-latest' }}; then
             brew update
             brew install autoconf automake libtool bison help2man texinfo berkeley-db@5 json-c libiconv
+          fi
+          echo "commit=$(git -C import/gnucobol4 rev-parse HEAD)" >> $GITHUB_OUTPUT
+          echo "image=${ImageOS:-unknown}-$(uname -m)" >> $GITHUB_OUTPUT
+          echo "$HOME/gnucobol-4.x/bin" >> $GITHUB_PATH
+          echo "LD_LIBRARY_PATH=$HOME/gnucobol-4.x/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> $GITHUB_ENV
+          echo 'HAVE_LIBCOB5=true' >> $GITHUB_ENV
+        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest' }}
+
+      - name: Retrieve cache of GnuCOBOL 4.x
+        uses: actions/cache/restore@v5
+        id: cache-gnucobol4
+        with:
+          path: ~/gnucobol-4.x
+          key: gnucobol-4.x-${{ steps.gnucobol4.outputs.image }}-${{ steps.gnucobol4.outputs.commit }}-${{ hashFiles('scripts/install-gc4.sh') }}
+        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest' }}
+
+      - name: Build and install GnuCOBOL 4.x
+        run: |
+          if ${{ matrix.os == 'macos-latest' }}; then
             HOMEBREW_ROOT="$(brew --prefix)/opt"
             export TERM=vt100
             export PATH="$HOMEBREW_ROOT/bison/bin:${PATH}"
             export LDFLAGS="-L$HOMEBREW_ROOT/berkeley-db@5/lib -L$HOMEBREW_ROOT/libiconv/lib ${LDFLAGS}"
             export CPPFLAGS="-I$HOMEBREW_ROOT/berkeley-db@5/include -I$HOMEBREW_ROOT/libiconv/include ${CPPFLAGS}"
-            sudo mkdir -p /opt/gnucobol-4.x
-            sudo chmod a+rwx /opt/gnucobol-4.x
-            bash scripts/install-gc4.sh import/gnucobol4 /opt/gnucobol-4.x
           fi
-          echo '/opt/gnucobol-4.x/bin' >> $GITHUB_PATH
-          echo 'LD_LIBRARY_PATH=/opt/gnucobol-4.x/lib:$LD_LIBRARY_PATH' >> $GITHUB_ENV
-          echo 'HAVE_LIBCOB5=true' >> $GITHUB_ENV
-        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest' }}
+          bash scripts/install-gc4.sh import/gnucobol4 "$HOME/gnucobol-4.x"
+        if: ${{ (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest') && steps.cache-gnucobol4.outputs.cache-hit != 'true' }}
+
+      - name: Save cache of GnuCOBOL 4.x
+        uses: actions/cache/save@v5
+        with:
+          path: ~/gnucobol-4.x
+          key: ${{ steps.cache-gnucobol4.outputs.cache-primary-key }}
+        if: ${{ (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest') && steps.cache-gnucobol4.outputs.cache-hit != 'true' }}
 
       - name: Skip build and install of GnuCOBOL 4.x
         run: |
@@ -107,10 +128,12 @@ jobs:
         if: matrix.build_vsix
 
       - run: make build-deps
-        if: ${{ ! steps.cache-opam.outputs.cache-hit && matrix.skip_test }}
+        id: build-deps
+        if: ${{ steps.cache-opam.outputs.cache-hit != 'true' && matrix.skip_test }}
 
       - run: make dev-deps
-        if: ${{ ! steps.cache-opam.outputs.cache-hit && ! matrix.skip_test }}
+        id: dev-deps
+        if: ${{ steps.cache-opam.outputs.cache-hit != 'true' && ! matrix.skip_test }}
 
       # Use fields.build-scripts to add more scripts to convert here
       - run: dos2unix scripts/*.sh 
@@ -190,4 +213,12 @@ jobs:
           opam pin remove . --yes || true
           opam clean --switch-cleanup --logs
           find _opam -type f -a \( -name '*.cmt' -o -name '*.cmti' \) -delete
-        if: steps.cache-opam.outputs.cache-hit != 'true'
+        # Even when a later step failed, as long as dependencies are installed
+        if: ${{ always() && steps.cache-opam.outputs.cache-hit != 'true' && (steps.build-deps.outcome == 'success' || steps.dev-deps.outcome == 'success') }}
+
+      - name: Save cache of local opam switch
+        uses: actions/cache/save@v5
+        with:
+          path: _opam
+          key: ${{ steps.cache-opam.outputs.cache-primary-key }}
+        if: ${{ always() && steps.cache-opam.outputs.cache-hit != 'true' && (steps.build-deps.outcome == 'success' || steps.dev-deps.outcome == 'success') }}

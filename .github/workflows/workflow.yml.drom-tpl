@@ -61,7 +61,7 @@ jobs:
           opam-pin: false
 
       - name: Retrieve cache of local opam switch
-        uses: actions/cache@v5
+        uses: actions/cache/restore@v5
         id: cache-opam
         with:
           path: _opam
@@ -77,10 +77,12 @@ jobs:
       # Use fields.github-workflow-before-build to add something here
 !(github-workflow-before-opam)
       - run: make build-deps
-        if: ${{ ! steps.cache-opam.outputs.cache-hit && matrix.skip_test }}
+        id: build-deps
+        if: ${{ steps.cache-opam.outputs.cache-hit != 'true' && matrix.skip_test }}
 
       - run: make dev-deps
-        if: ${{ ! steps.cache-opam.outputs.cache-hit && ! matrix.skip_test }}
+        id: dev-deps
+        if: ${{ steps.cache-opam.outputs.cache-hit != 'true' && ! matrix.skip_test }}
 
       # Use fields.build-scripts to add more scripts to convert here
       - run: dos2unix scripts/*.sh !(build-scripts)
@@ -129,4 +131,12 @@ jobs:
           opam pin remove . --yes || true
           opam clean --switch-cleanup --logs
           find _opam -type f -a \( -name '*.cmt' -o -name '*.cmti' \) -delete
-        if: steps.cache-opam.outputs.cache-hit != 'true'
+        # Even when a later step failed, as long as dependencies are installed
+        if: ${{ always() && steps.cache-opam.outputs.cache-hit != 'true' && (steps.build-deps.outcome == 'success' || steps.dev-deps.outcome == 'success') }}
+
+      - name: Save cache of local opam switch
+        uses: actions/cache/save@v5
+        with:
+          path: _opam
+          key: ${{ steps.cache-opam.outputs.cache-primary-key }}
+        if: ${{ always() && steps.cache-opam.outputs.cache-hit != 'true' && (steps.build-deps.outcome == 'success' || steps.dev-deps.outcome == 'success') }}
