@@ -29,47 +29,25 @@ let action { platform; preproc_options; parser_options; pretty_progress; _ }
 let cmd =
   let files = ref [] in
   let ppf = ref Fmt.stderr in
-  let in_project = ref false in
   let common, common_args = Common_args.get () in
-  let project_setup, project_args = Project_args.get () in
 
   EZCMD.sub
     "check syntax"          (* add the corresponding line in Main.subcommands *)
-    begin fun () ->
-      if !in_project
-      then Project_commands.analyze_n_report (common ()) ~for_lsp:false
-             ~setup:(project_setup ()) ~ppf:!ppf !files
-      else action (common ()) ~ppf:!ppf !files
-    end
-    ~args:(common_args @ project_args @ [
+    (fun () -> action (common ()) ~ppf:!ppf !files)
+    ~args:(common_args @ [
         [],
         Arg.Anons (fun list -> files := list),
         EZCMD.info ~docv:"FILE" "Cobol file to check";
 
         [ "stdout" ], Arg.Unit (fun () -> ppf := Fmt.stdout),
         EZCMD.info "Output errors/warnings to stdout";
-
-        [ "project" ], Arg.Set in_project,
-        EZCMD.info "Check each file according to the configuration of its \
-                    project, reusing and filling the project's cache (see \
-                    `superbol cache analyze')";
       ])
     ~doc: "Check the syntax of a Cobol file"
     ~man:[
       `S "DESCRIPTION";
       `Blocks [
-        `P "Preprocess and parse each FILE, and report diagnostics.  By default, \
-            only the options given on the command line are used.";
-        `P "With $(b,--project), each FILE is analyzed as the LSP server would: \
-            according to the configuration of the project it belongs to (which \
-            options given on the command line override), with typechecking, and \
-            leaving out files that appear to be copybooks. Results are looked up \
-            in the cache of that project, which also holds those of the LSP \
-            server and $(b,superbol cache analyze).  On a miss, results are \
-            stored into the cache without the artifacts the LSP server needs, \
-            so they are not reused by the latter (use $(b,superbol cache \
-            analyze) to fill the cache for the LSP server).  \
-            $(b,--project-root) and $(b,--encoding) only apply with \
-            $(b,--project).";
+        `P "Preprocess and parse each FILE with the options given on the \
+            command line only, and report diagnostics.  Use $(b,superbol cache \
+            analyze) to follow the configuration of each file's project.";
       ];
     ]

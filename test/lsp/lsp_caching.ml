@@ -325,6 +325,51 @@ let%expect_test "editing a copybook is a miss for both" =
   cleanup projdir;
   [%expect {| analyzed by the CLI |}];;
 
+(** Analyzes [prog.cob] as `superbol cache analyze' does, adding
+    [--no-lsp-artifacts] unless [lsp_artifacts] holds. *)
+let cli_cache_analyze ?(lsp_artifacts = true) ~projdir () =
+  let setup = Superbol_free_lib.Project_commands.lsp_like_setup () in
+  let common = fst (Superbol_free_lib.Common_args.get ()) () in
+  let filename = projdir // "prog.cob" in
+  let hit =
+    if lsp_artifacts
+    then (Superbol_free_lib.Project_commands.analyze_file_for_lsp ~setup
+            common filename).hit
+    else (Superbol_free_lib.Project_commands.analyze_file ~setup
+            common filename).hit
+  in
+  print_endline (if hit then "found by the CLI" else "analyzed by the CLI")
+
+let%expect_test "`cache analyze --no-lsp-artifacts' stores an analysis the LSP \
+                 does not restore" =
+  let projdir = setup ~copybook_dirs:[".", "       01 X PIC X.\n"] () in
+  ignore [%expect.output];
+  ignore (write ~projdir "prog.cob" (program ^ "      *> edited\n"));
+  cli_cache_analyze ~lsp_artifacts:false ~projdir ();
+  cli_cache_analyze ~lsp_artifacts:false ~projdir ();
+  [%expect {|
+    analyzed by the CLI
+    found by the CLI |}];
+  reopen ~projdir ();
+  report [%expect.output];
+  cleanup projdir;
+  [%expect {| parsed afresh |}];;
+
+let%expect_test "`cache analyze --no-lsp-artifacts' finds analyses stored for \
+                 the LSP" =
+  let projdir = setup ~copybook_dirs:[".", "       01 X PIC X.\n"] () in
+  ignore [%expect.output];
+  (* Stored when the LSP opened it, then by the CLI after the edit. *)
+  cli_cache_analyze ~lsp_artifacts:false ~projdir ();
+  ignore (write ~projdir "prog.cob" (program ^ "      *> edited\n"));
+  cli_cache_analyze ~projdir ();
+  cli_cache_analyze ~lsp_artifacts:false ~projdir ();
+  cleanup projdir;
+  [%expect {|
+    found by the CLI
+    analyzed by the CLI
+    found by the CLI |}];;
+
 (* --- Sharing analyses with the CLI, for projects configured by the client --- *)
 
 (** Settings that differ from the defaults, and take part in cache keys. *)

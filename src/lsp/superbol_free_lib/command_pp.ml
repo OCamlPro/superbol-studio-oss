@@ -38,7 +38,7 @@ let cmd =
     (fun () ->
        match List.rev !files with
        | [] ->
-           failwith "Provide at least one file"
+           Cobol_common.fatal "Provide at least one file"
        | files ->
            List.iter (fun file ->
                let filename = match !output with
@@ -47,12 +47,13 @@ let cmd =
                      begin match files with
                        | [ _ ] -> ()
                        | _ ->
-                           failwith "Option -o conflicts with providing multiple files"
+                           Cobol_common.fatal
+                             "Option -o conflicts with providing multiple files"
                      end;
                      output
                in
                if filename = file then
-                 Pretty.failwith "Source file conflicts with target %s" file;
+                 Cobol_common.fatal "Source file conflicts with target %s" file;
                let common = common_get () in
                let platform = common.platform in
                let pp_diagnostics = Cobol_common.Diagnostics.Set.pp ~platform in

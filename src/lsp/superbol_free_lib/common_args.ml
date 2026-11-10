@@ -20,19 +20,20 @@ module DIAGS = Cobol_common.Diagnostics
 open Cobol_preproc.Options
 open Cobol_parser.Options
 
-type t = {
-  platform: Cobol_common.Platform.TYPES.platform;
-  preproc_options: preproc_options;
-  parser_options: parser_options;
-  pretty_progress: 'a. 'a Pretty.proc;
-  analysis_overrides: Superbol_project.Analysis.overrides;
-}
-
 type progress_display =
   | Hide
   | Show
   | Log
   | Log_stderr
+
+type t = {
+  platform: Cobol_common.Platform.TYPES.platform;
+  preproc_options: preproc_options;
+  parser_options: parser_options;
+  progress_display: progress_display;
+  pretty_progress: 'a. 'a Pretty.proc;
+  analysis_overrides: Superbol_project.Analysis.overrides;
+}
 
 let showable =
   [
@@ -53,11 +54,10 @@ let iter_comma_separated_spec ~showable ~option_name ~f spec =
   end StringSet.empty |>
   fun unknowns ->
   if not (StringSet.is_empty unknowns) then
-    raise @@ Stdlib.Arg.Bad
-      Pretty.(to_string "@[Unknown@ arguments@ for@ `%s':@ %a@]"
-                option_name
-                (list ~fopen:"" ~fsep:",@ " ~fclose:"" string)
-                (StringSet.elements unknowns))
+    Cobol_common.fatal "@[Unknown@ arguments@ for@ `%s':@ %a@]"
+      option_name
+      Pretty.(list ~fopen:"" ~fsep:",@ " ~fclose:"" string)
+      (StringSet.elements unknowns)
 
 (** Departures from project configurations that are explicitly requested on the
     command line, for commands that analyze documents within their projects. *)
@@ -92,9 +92,46 @@ let analysis_overrides ~config ~conf ~dialect ~format ~libpath ~libexts ~env
     override_show = show;
   }
 
-(* At toplevel in the (very unlikely) case where several calls to [get] are
-   performed by a single CLI instance. *)
+(* Length of the progress message shown last, if it is still shown. *)
 let last_progress_msg_len = ref 0
+
+let clear_progress () =
+  if !last_progress_msg_len > 0 then begin
+    Printf.eprintf "%*s\r%!" !last_progress_msg_len "";
+    last_progress_msg_len := 0
+  end
+
+let pretty_progress display fmt =
+  match display with
+  | Hide ->
+      Pretty.sink fmt
+  | Show ->
+      Format.kasprintf begin fun s ->
+        let len = String.length s in
+        let padlen = max 0 (!last_progress_msg_len - len) in
+        last_progress_msg_len := len;
+        Printf.eprintf "%s%*s\r%!" s padlen ""
+      end ("@[<h>" ^^ fmt ^^ "@]")
+  | Log ->
+      Pretty.out ("@[" ^^ fmt ^^ "@]@.")
+  | Log_stderr ->
+      Pretty.error ("@[" ^^ fmt ^^ "@]@.")
+
+let progress_arg () =
+  let display = ref None in
+  (fun () -> match !display with
+     | None -> if Unix.isatty Unix.stderr then Show else Hide
+     | Some d -> d),
+  [["progress"], Arg.Symbol (["hide"; "force"; "log"; "log-err"], function
+     | "hide" -> display := Some Hide
+     | "force" -> display := Some Show
+     | "log" -> display := Some Log
+     | "log-err" -> display := Some Log_stderr
+     | _ -> assert false),
+   EZCMD.info ~docv:"MODE"
+     "Set how to display progress of the command.\n\
+      MODE can be hide, force, log or log-err.
+      By default progress is displayed when stderr is a TTY."]
 
 let get () =
   let conf = ref "" in
@@ -126,7 +163,7 @@ let get () =
     iter_comma_separated_spec ~showable ~option_name:"--silence" spec
       ~f:(fun tag -> show := List.filter ((<>) tag) !show)
   in
-  let progress_display_opt = ref None  in
+  let progress_display, progress_arg = progress_arg () in
 
   let args = [
     ["conf"], Arg.Set_string conf,
@@ -185,18 +222,7 @@ let get () =
       Fmt.(list ~sep:sp @@ fmt "`%s`")
       Cobol_common.Copybook.copybook_extensions;
 
-    ["progress"], Arg.Symbol (["hide"; "force"; "log"; "log-err"], function
-      | "hide" -> progress_display_opt := Some Hide
-      | "force" -> progress_display_opt := Some Show
-      | "log" -> progress_display_opt := Some Log
-      | "log-err" -> progress_display_opt := Some Log_stderr
-      | _ -> assert false),
-    EZCMD.info ~docv:"MODE"
-      "Set how to display progress of the command.\n\
-      MODE can be hide, force, log or log-err.
-      By default progress is displayed when stderr is a TTY.";
-
-  ] in
+  ] @ progress_arg in
 
   let get () =
     let verbose = !Globals.verbosity > 0 in
@@ -214,8 +240,8 @@ let get () =
       | s, None ->
           Cobol_config.from_file ~platform ~verbose ~search_path s
       | _ ->
-          Pretty.failwith "Flags `--conf` and `--dialect` or `--std` cannot be \
-                           used together"
+          Cobol_common.fatal "Flags `--conf` and `--dialect` or `--std` \
+                              cannot be used together"
     in
     let source_format =
       match !format with
@@ -244,13 +270,11 @@ let get () =
             { src_payload = value;
               src = Process_parameter } env
         with Not_found ->
-          Pretty.failwith "Invalid argument `%s' given to flag `-D`" definition
+          Cobol_common.fatal "Invalid argument `%s' given to flag `-D`"
+            definition
       end !definitions Cobol_preproc.Env.empty
     in
-    let progress_display = match !progress_display_opt with
-      | None -> if Unix.isatty Unix.stderr then Show else Hide
-      | Some p -> p
-    in
+    let progress_display = progress_display () in
     let analysis_overrides =
       analysis_overrides ~config ~conf:!conf ~dialect:!dialect
         ~format:(if !explicit_format then Some !format else None)
@@ -270,16 +294,7 @@ let get () =
       analysis_overrides;
       parser_options = { config; recovery; verbose; show = !show;
                          exec_scanners = Superbol_preprocs.exec_scanners };
-      pretty_progress = match progress_display with
-        | Hide -> Pretty.sink
-        | Show -> fun fmt ->
-            Format.kasprintf (fun s ->
-                let len = String.length s in
-                let padlen = max 0 (!last_progress_msg_len - len) in
-                last_progress_msg_len := len;
-                Printf.eprintf "%s%*s\r%!" s padlen "")
-              ("@[<h>" ^^ fmt ^^ "@]")
-        | Log -> fun fmt -> Pretty.out ("@[" ^^ fmt ^^ "@]@.")
-        | Log_stderr -> fun fmt -> Pretty.error ("@[" ^^ fmt ^^ "@]@.") }
+      progress_display;
+      pretty_progress = fun fmt -> pretty_progress progress_display fmt }
   in
   get, args

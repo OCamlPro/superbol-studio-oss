@@ -107,3 +107,38 @@ end
 
 val init_formatters
   : ?style_renderer:Fmt.style_renderer -> ?utf_8:bool -> unit -> unit
+(** Initialization of standard formatters; calls {!Fmt_tty.setup_std_outputs},
+    and, depending on the kind of terminals they are bound to, adapts the
+    margins of {!Fmt.stdout} and {!Fmt.stderr}.  Their styles at that point
+    are the ones {!set_colors} restores with [auto]. *)
+
+(** {2 Colors} *)
+
+(** [set_colors spec] sets whether {!Fmt.stdout} and {!Fmt.stderr} output
+    colors (and other styles), according to [spec]: a comma-separated list of
+    items [WHEN] or [STREAM:WHEN], where [STREAM] is [stdout] or [stderr], and
+    [WHEN] is [always], [never] or [auto] (as decided by {!init_formatters},
+    from the kind of terminal they are bound to).  An item without [STREAM]
+    applies to both, and later items take precedence. *)
+val set_colors: string -> (unit, string) result
+
+(** [colors_spec ()] is a specification for {!set_colors} that gives the same
+    styles as {!Fmt.stdout} and {!Fmt.stderr} currently output, e.g.
+    ["stdout:never,stderr:always"]. *)
+val colors_spec: unit -> string
+
+(** {2 Margins} *)
+
+(** [set_margins spec] sets the margins (and maximum indentations) of
+    {!Fmt.stdout} and {!Fmt.stderr}, according to [spec]: a comma-separated
+    list of items [GEOMETRY] or [STREAM:GEOMETRY], where [STREAM] is [stdout]
+    or [stderr], and [GEOMETRY] is [MARGIN/MAX_INDENT] or [MARGIN] (for a
+    maximum indentation of [MARGIN - 1]), as accepted by
+    {!Format.pp_set_geometry}.  An item without [STREAM] applies to both, and
+    later items take precedence. *)
+val set_margins: string -> (unit, string) result
+
+(** [margins_spec ()] is a specification for {!set_margins} that gives the
+    current margins (and maximum indentations) of {!Fmt.stdout} and
+    {!Fmt.stderr}, e.g. ["stdout:78/68,stderr:180/179"]. *)
+val margins_spec: unit -> string
