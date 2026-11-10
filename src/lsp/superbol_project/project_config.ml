@@ -33,6 +33,7 @@ module TYPES = struct
     mutable libexts: string list;
     mutable indent_config: (string * int) list;
     mutable exclude_dirs: string list;
+    mutable source_encoding: Cobol_common.Text_encoding.t option;
     toml_handle: Ezr_toml.toml_handle;
   }
 
@@ -94,6 +95,7 @@ let default = {
   libexts = default_libexts;
   indent_config = default_indent_config;
   exclude_dirs = default_exclude_dirs;
+  source_encoding = None;
   toml_handle = Ezr_toml.make_empty ();
 }
 
@@ -263,7 +265,8 @@ let load_file ~platform ?(verbose=false) config_filename =
         libpath = get_libpath section;
         libexts = get_libexts section;
         indent_config = get_indent_config section;
-        exclude_dirs = get_exclude_dirs section }
+        exclude_dirs = get_exclude_dirs section;
+        source_encoding = None }
   in
   try
     let toml_handle = Ezr_toml.load ~verbose config_filename in
@@ -413,10 +416,11 @@ type cached =
   }
 
 (* The dialect is cached as configured, so that a configuration read from a
-   file is read from that file again. *)
+   file is read from that file again.  The encoding of source files is not
+   cached, as it does not come from the configuration file. *)
 let to_cache { dialect_name; source_format; source_format_by_extension;
                libpath; libexts; indent_config; exclude_dirs; toml_handle;
-               cobol_config = _ } =
+               cobol_config = _; source_encoding = _ } =
   {
     cached_dialect = dialect_name;
     cached_source_format = source_format;
@@ -445,6 +449,7 @@ let of_cache ~platform ~config_filename
       libexts = cached_libexts;
       indent_config = cached_indent_config;
       exclude_dirs = cached_exclude_dirs;
+      source_encoding = None;                (* set anew by whoever loads it *)
       toml_handle }
   in
   Ezr_toml.add_section_update toml_handle

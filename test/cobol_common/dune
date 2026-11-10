@@ -1,0 +1,8 @@
+(library
+ (name test_cobol_common)
+ (modules test_text_encoding)
+ (preprocess
+  (pps ppx_expect))
+ (inline_tests
+  (modes best))
+ (libraries cobol_common))

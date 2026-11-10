@@ -20,6 +20,9 @@ type job = private
     files: Vscode.Uri.t list;
     project_root: string;          (** the workspace folder the files are in *)
     client_settings: string;        (** [superbol.cobol] section, as JSON *)
+    encoding: string option;
+    (** Encoding VS Code opens COBOL files with (see
+        {!Superbol_config.cobol_files_encoding}) *)
   }
 
 (** [chunks n l] splits [l] into consecutive lists of at most [n] elements. *)

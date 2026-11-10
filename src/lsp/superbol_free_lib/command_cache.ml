@@ -39,7 +39,7 @@ let pp_age ppf seconds =
 (* --- *)
 
 let status ~verbose dir =
-  match Caching_commands.cache_for dir with
+  match Project_commands.cache_for dir with
   | None -> ()
   | Some (root, cache) ->
       match CACHE.stats cache, CACHE.entries cache with
@@ -66,7 +66,7 @@ let status ~verbose dir =
           Pretty.error "Could not read the cache at %s@." root
 
 let trim ~older_than ~max_size dir =
-  match Caching_commands.cache_for dir with
+  match Project_commands.cache_for dir with
   | None -> ()
   | Some (root, cache) ->
       (* Not [Never], even without bounds: that would skip reclaiming the
@@ -139,17 +139,19 @@ let analyze_cmd =
   and storage_directory = ref None and client_settings = ref None
   and error_status = ref true and show_diagnostics = ref true in
   let common, common_args = Common_args.get () in
+  let project_setup, project_args = Project_args.get () in
   EZCMD.sub "cache analyze"
     (fun () ->
        let setup =
-         Caching_commands.lsp_like_setup ()
-           ?storage_directory:!storage_directory
-           ?client_settings:!client_settings
+         project_setup () ~setup:
+           (Project_commands.lsp_like_setup ()
+              ?storage_directory:!storage_directory
+              ?client_settings:!client_settings)
        in
-       Caching_commands.analyze_n_report (common ()) ~for_lsp:true ~setup
+       Project_commands.analyze_n_report (common ()) ~for_lsp:true ~setup
          ~error_status:!error_status ~show_diagnostics:!show_diagnostics
          ~ppf:!ppf !files)
-    ~args:(common_args @
+    ~args:(common_args @ project_args @
            [ [], Arg.Anons (fun list -> files := list),
              EZCMD.info ~docv:"FILE" "Cobol file to analyze";
              ["stdout"], Arg.Unit (fun () -> ppf := Fmt.stdout),
@@ -191,6 +193,11 @@ let analyze_cmd =
                          and $(b,--storage-directory) designates the caches of \
                          an LSP server started with that option, so that \
                          analyses are shared with that server.";
+                     `P "Visual Studio Code decodes files according to its \
+                         $(b,files.encoding) setting before sending them to \
+                         the server: analyses of files that are not plain \
+                         UTF-8 are only shared with the server when \
+                         $(b,--encoding) gives that same encoding.";
                      `P "Options such as $(b,--dialect), $(b,--conf), \
                          $(b,--source-format), $(b,-I), $(b,--ext), $(b,-D), \
                          $(b,--recovery) or $(b,--silence) override the project \

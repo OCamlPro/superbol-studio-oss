@@ -122,6 +122,15 @@ val detect_copybook
   -> t
   -> bool
 
+(** [decode_source ?encoding project contents] decodes the [contents] of a
+    source file of [project] read from disk, with [encoding] if given, or else
+    with the [source_encoding] of its configuration (if any). *)
+val decode_source
+  : ?encoding:Cobol_common.Text_encoding.t
+  -> t
+  -> string
+  -> string
+
 (** {1 Cached representation} *)
 
 type cached

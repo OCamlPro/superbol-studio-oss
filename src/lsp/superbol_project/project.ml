@@ -165,6 +165,11 @@ let detect_copybook ~platform ~filename ?contents project =
    else is_a_copybook_extension ext) ||
   file_contents_looks_like_a_copybook ~platform ~filename ?contents project
 
+let decode_source ?encoding { config = { source_encoding; _ }; _ } contents =
+  match encoding, source_encoding with
+  | None, None -> contents
+  | Some enc, _ | None, Some enc -> Cobol_common.Text_encoding.decode enc contents
+
 let save_config ?verbose { config_filename; config; _ } =
   Project_config.save ?verbose ~config_filename config
 
