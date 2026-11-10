@@ -137,7 +137,8 @@ let client_settings_of_string s =
 let analyze_cmd =
   let files = ref [] and ppf = ref Fmt.stderr
   and storage_directory = ref None and client_settings = ref None
-  and error_status = ref true and show_diagnostics = ref true in
+  and error_status = ref true and show_diagnostics = ref true
+  and for_lsp = ref true in
   let common, common_args = Common_args.get () in
   let parallel, parallel_args = Parallel_batches.args () in
   let project_setup, project_args = Project_args.get () in
@@ -148,7 +149,7 @@ let analyze_cmd =
            ?storage_directory:!storage_directory
            ?client_settings:!client_settings)
     in
-    Project_commands.analyze_n_report (common ()) ~for_lsp:true ~setup
+    Project_commands.analyze_n_report (common ()) ~for_lsp:!for_lsp ~setup
       ~error_status:!error_status ~show_diagnostics:!show_diagnostics
       ~ppf:!ppf files
   in
@@ -171,6 +172,9 @@ let analyze_cmd =
              EZCMD.info "Do not output the diagnostics of analyzed files \
                          (errors that prevent analyzing a file are still \
                          reported)";
+             ["no-lsp-artifacts"], Arg.Clear for_lsp,
+             EZCMD.info "Leave out what only the LSP server needs (it does \
+                         not reuse analyses stored this way)";
              ["storage-directory"],
              Arg.String (fun s -> storage_directory := Some s),
              EZCMD.info ~docv:"DIR"
@@ -205,6 +209,11 @@ let analyze_cmd =
                          server: a file analyzed by either is restored by the \
                          other, for as long as neither the file nor anything it \
                          depends upon (copybooks, project configuration) changes.";
+                     `P "With $(b,--no-lsp-artifacts), what only the LSP \
+                         server needs (e.g. semantic tokens, workspace symbols) \
+                         is neither computed nor stored.  The LSP server does \
+                         not reuse analyses stored this way, whereas analyses \
+                         it stored are reused all the same.";
                      `P "An LSP client such as Visual Studio Code may configure \
                          projects that have no configuration file through its \
                          settings: $(b,--client-settings) gives those settings, \

@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Option `--no-lsp-artifacts` of `superbol cache analyze`, for analyzing files without computing or caching what only the LSP server needs [#720](https://github.com/OCamlPro/superbol-studio-oss/pull/720)
 - Sub-command `superbol parallel`, for running any sub-command on batches of files in parallel processes [#720](https://github.com/OCamlPro/superbol-studio-oss/pull/720)
 - Option `--color` of every `superbol` command, and environment variable `SUPERBOL_COLOR`, for forcing or disabling colors in outputs [#720](https://github.com/OCamlPro/superbol-studio-oss/pull/720)
 - Options `--jobs` and `--batch-size` of `superbol cache analyze`, for analyzing batches of files in parallel processes [#720](https://github.com/OCamlPro/superbol-studio-oss/pull/720)
