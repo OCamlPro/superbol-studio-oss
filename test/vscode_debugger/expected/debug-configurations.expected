@@ -1,0 +1,41 @@
+Debug configurations
+  ok      F5 builds the active file as a module and stops at its breakpoints
+  ok      F5 fills in the default debug configuration
+  ok      Ctrl+F5 builds without debug information and runs the program
+  ok      F5 rebuilds the program after it changed
+  ok      F5 does not start debugging when the build fails
+  ok      F5 debugs a program whose PROGRAM-ID differs from the file name
+  ok      a program can CALL a module built beforehand
+  no bug  breakpoints in a CALLed module are hit
+  BUG?    F5 on a file in a sub-directory
+            -> the program terminated instead of stopping
+               [SuperBOL: build module (debug): cobc -m -ftraceall -g -A -O0 -A -U_FORTIFY_SOURCE -fformat=auto -std=default -ext cpy -ext cbl -ext cob ${relativeFile} -I . (exit code 0)]
+               [started {"gdbargs":["-q","--interpreter=mi2"],"name":"SuperBOL: default debug","type":"superbol-gdb","request":"launch","preLaunchTask":"SuperBOL: build module (debug)","useCobcrun":true,"target":"$PROJECT/src/hello.cbl","arguments":"","group":[],"coverage":false,"gdbtty":false,"sourceDirs":[]}]
+               [terminal "build module (debug)"]
+  BUG?    F5 on a file whose name contains a space
+            -> the program terminated instead of stopping
+               [SuperBOL: build module (debug): cobc -m -ftraceall -g -A -O0 -A -U_FORTIFY_SOURCE -fformat=auto -std=default -ext cpy -ext cbl -ext cob ${relativeFile} -I . (exit code 0)]
+               [started {"gdbargs":["-q","--interpreter=mi2"],"name":"SuperBOL: default debug","type":"superbol-gdb","request":"launch","preLaunchTask":"SuperBOL: build module (debug)","useCobcrun":true,"target":"$PROJECT/my prog.cbl","arguments":"","group":[],"coverage":false,"gdbtty":false,"sourceDirs":[]}]
+               [terminal "build module (debug)"]
+  ok      the launch configuration snippet builds and debugs the active file
+  ok      a launch configuration with only a type and a request gets the defaults
+  ok      a launch configuration can build and debug an executable
+  ok      an executable is debugged without cobcrun when useCobcrun is not given
+  ok      arguments are passed to the program
+  ok      environment variables are passed to the program
+  BUG?    the program runs in a configured working directory
+            -> timed out waiting for run/hello.out to be created
+               [SuperBOL: build module (debug): cobc -m -ftraceall -g -A -O0 -A -U_FORTIFY_SOURCE -fformat=auto -std=default -ext cpy -ext cbl -ext cob ${relativeFile} -I . (exit code 0)]
+               [started {"name":"cwd","type":"superbol-gdb","request":"launch","cwd":"$PROJECT/run","__configurationTarget":6,"gdbargs":["-q","--interpreter=mi2"],"preLaunchTask":"SuperBOL: build module (debug)","useCobcrun":true,"target":"$PROJECT/hello.cbl","arguments":"","group":[],"coverage":false,"gdbtty":false,"sourceDirs":[]}]
+               [terminal "build module (debug)"]
+  ok      Ctrl+F5 with a launch configuration runs the program
+  BUG?    a launch configuration with a fixed target builds that target
+            -> the program terminated instead of stopping
+               [SuperBOL: build module (debug): cobc -m -ftraceall -g -A -O0 -A -U_FORTIFY_SOURCE -fformat=auto -std=default -ext cpy -ext cbl -ext cob ${relativeFile} -I . (exit code 0)]
+               [started {"name":"hello","type":"superbol-gdb","request":"launch","target":"$PROJECT/hello.cbl","__configurationTarget":6,"gdbargs":["-q","--interpreter=mi2"],"preLaunchTask":"SuperBOL: build module (debug)","useCobcrun":true,"arguments":"","group":[],"coverage":false,"gdbtty":false,"sourceDirs":[]}]
+               [terminal "build module (debug)"]
+  BUG?    F5 without a build task nor a built program ends the session
+            -> timed out waiting for the debug session
+               [no task ran]
+               [no debug session started]
+               [no terminal]

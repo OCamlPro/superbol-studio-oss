@@ -81,6 +81,7 @@ jobs:
           echo "commit=$(git -C import/gnucobol4 rev-parse HEAD)" >> $GITHUB_OUTPUT
           echo "image=${ImageOS:-unknown}-$(uname -m)" >> $GITHUB_OUTPUT
           echo "$HOME/gnucobol-4.x/bin" >> $GITHUB_PATH
+          echo "GNUCOBOL4_COB_CONFIG=$HOME/gnucobol-4.x/bin/cob-config" >> $GITHUB_ENV
           echo "LD_LIBRARY_PATH=$HOME/gnucobol-4.x/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> $GITHUB_ENV
           echo 'HAVE_LIBCOB5=true' >> $GITHUB_ENV
         if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest' }}
@@ -90,7 +91,7 @@ jobs:
         id: cache-gnucobol4
         with:
           path: ~/gnucobol-4.x
-          key: gnucobol-4.x-${{ steps.gnucobol4.outputs.image }}-${{ steps.gnucobol4.outputs.commit }}-${{ hashFiles('scripts/install-gc4.sh') }}
+          key: gnucobol-4.x-${{ steps.gnucobol4.outputs.image }}-${{ steps.gnucobol4.outputs.commit }}-${{ hashFiles('scripts/install-gnucobol.sh') }}
         if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest' }}
 
       - name: Build and install GnuCOBOL 4.x
@@ -102,7 +103,7 @@ jobs:
             export LDFLAGS="-L$HOMEBREW_ROOT/berkeley-db@5/lib -L$HOMEBREW_ROOT/libiconv/lib ${LDFLAGS}"
             export CPPFLAGS="-I$HOMEBREW_ROOT/berkeley-db@5/include -I$HOMEBREW_ROOT/libiconv/include ${CPPFLAGS}"
           fi
-          bash scripts/install-gc4.sh import/gnucobol4 "$HOME/gnucobol-4.x"
+          bash scripts/install-gnucobol.sh import/gnucobol4 "$HOME/gnucobol-4.x"
         if: ${{ (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest') && steps.cache-gnucobol4.outputs.cache-hit != 'true' }}
 
       - name: Save cache of GnuCOBOL 4.x
@@ -116,6 +117,42 @@ jobs:
         run: |
           echo 'HAVE_LIBCOB5=false' >> $GITHUB_ENV
         if: ${{ matrix.os != 'ubuntu-latest' && matrix.os != 'macos-latest' }}
+
+      # GnuCOBOL 3.x, for the debugger tests
+      - name: Prepare installation of GnuCOBOL 3.x
+        id: gnucobol3
+        run: |
+          sudo apt-get install -y autoconf automake autopoint flex bison help2man texinfo libgmp-dev libdb-dev gdb xvfb
+          echo "commit=$(git -C import/gnucobol rev-parse HEAD)" >> $GITHUB_OUTPUT
+          # Hardening makes cobc compile programs with -O, which breaks debugging
+          echo "options=--disable-hardening" >> $GITHUB_OUTPUT
+          echo "image=${ImageOS:-unknown}-$(uname -m)" >> $GITHUB_OUTPUT
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.build_vsix }}
+
+      - name: Retrieve cache of GnuCOBOL 3.x
+        uses: actions/cache/restore@v5
+        id: cache-gnucobol3
+        with:
+          path: ~/gnucobol-3.x
+          key: gnucobol-3.x-${{ steps.gnucobol3.outputs.image }}-${{ steps.gnucobol3.outputs.commit }}-${{ hashFiles('scripts/install-gnucobol.sh') }}-${{ steps.gnucobol3.outputs.options }}
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.build_vsix }}
+
+      - name: Build and install GnuCOBOL 3.x
+        run: bash scripts/install-gnucobol.sh import/gnucobol "$HOME/gnucobol-3.x" ${{ steps.gnucobol3.outputs.options }}
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.build_vsix && steps.cache-gnucobol3.outputs.cache-hit != 'true' }}
+
+      - name: Save cache of GnuCOBOL 3.x
+        uses: actions/cache/save@v5
+        with:
+          path: ~/gnucobol-3.x
+          key: ${{ steps.cache-gnucobol3.outputs.cache-primary-key }}
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.build_vsix && steps.cache-gnucobol3.outputs.cache-hit != 'true' }}
+
+      - name: Use GnuCOBOL 3.x
+        run: |
+          echo "$HOME/gnucobol-3.x/bin" >> $GITHUB_PATH
+          echo "LD_LIBRARY_PATH=$HOME/gnucobol-3.x/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> $GITHUB_ENV
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.build_vsix }}
 
       - uses: actions/setup-node@v7
         with:
@@ -185,6 +222,37 @@ jobs:
       # universal VSIXs
       - run: make test-js
         if: ${{ matrix.build_vsix && matrix.os == 'ubuntu-latest' && ! matrix.skip_test }}
+
+      # Debugger tests, run within VS Code with GnuCOBOL 3.x
+      - name: Get the month for the cache of VS Code
+        id: vscode-test
+        run: echo "month=$(date +%Y-%m)" >> $GITHUB_OUTPUT
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.build_vsix }}
+
+      - name: Retrieve cache of VS Code and its extensions for tests
+        uses: actions/cache/restore@v5
+        id: vscode-test-cache
+        with:
+          path: .vscode-test
+          key: ${{ runner.os }}-vscode-test-${{ steps.vscode-test.outputs.month }}-${{ hashFiles('package.json') }}
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.build_vsix }}
+
+      - name: Run debugger tests
+        id: debugger-tests
+        run: xvfb-run -a make test-vscode-debug
+        env:
+          SUPERBOL_TEST_JOBS: 2
+        # On master, failures must not prevent building and deploying documentation
+        continue-on-error: ${{ github.ref == 'refs/heads/master' }}
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.build_vsix }}
+
+      - name: Save cache of VS Code and its extensions for tests
+        uses: actions/cache/save@v5
+        with:
+          path: .vscode-test
+          key: ${{ steps.vscode-test-cache.outputs.cache-primary-key }}
+        # Whether the tests passed or failed
+        if: ${{ always() && steps.vscode-test-cache.outputs.cache-hit != 'true' && (steps.debugger-tests.outcome == 'success' || steps.debugger-tests.outcome == 'failure') }}
 
       # - name: Check whether source is well formatted
       #   run: make fmt

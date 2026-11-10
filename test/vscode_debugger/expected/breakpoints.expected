@@ -1,0 +1,19 @@
+Breakpoints
+  ok      a breakpoint in a loop stops on each iteration
+  ok      breakpoint on STOP RUN
+  ok      breakpoint on the last statement of the program
+  ok      breakpoints added while stopped are hit
+  ok      removed breakpoints are not hit anymore
+  ok      disabled breakpoints are not hit
+  ok      breakpoints outside the procedure division are never hit
+  BUG?    conditional breakpoint with a COBOL condition stops only when it holds
+            -> I at the first stop: expected 3, got 1
+  BUG?    hit-count breakpoint stops on the given hit
+            -> I at the first stop: expected 3, got 1
+  BUG?    breakpoint on a comment line stops at the next statement
+            -> the program terminated instead of stopping
+  no bug  breakpoint on a paragraph header stops at the paragraph
+  BUG?    function breakpoint on the program name stops in the program
+            -> the program terminated instead of stopping
+  BUG?    function breakpoint on a paragraph name stops in the paragraph
+            -> the program terminated instead of stopping

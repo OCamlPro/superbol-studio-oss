@@ -1,0 +1,20 @@
+CALLed programs
+  ok      step over CALL does not enter the called program
+  ok      step into CALL enters the called program
+  ok      step over GOBACK returns to the calling program
+  ok      step over a PERFORM in a called program stays in that program
+  ok      the call stack shows the called program above the calling one
+  BUG?    the call stack shows the CALL statement in the calling program
+            -> frames: callee_ (ADD 10 TO N.)@8, callee@0, caller_@0, caller@0, main@0
+  BUG?    breakpoint on GOBACK is hit
+            -> the program terminated instead of stopping
+  BUG?    step out of a called program returns to the calling program
+            -> the program terminated instead of stopping
+  BUG?    breakpoints in several source files are all hit
+            -> first stop: expected callee.cbl:12, got caller.cbl:9
+  BUG?    changing breakpoints in a file keeps those of other files
+            -> first stop: expected callee.cbl:12, got caller.cbl:9
+  BUG?    LINKAGE items of the called program show the passed data
+            -> no variable N (have: RETURN-CODE)
+  BUG?    the call stack only shows COBOL programs
+            -> non-COBOL frames: callee, caller_, caller, main

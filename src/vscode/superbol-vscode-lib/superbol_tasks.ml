@@ -118,6 +118,14 @@ let cobc_path attributes =
   | path ->
       path
 
+(* Arguments for builds that are to be debugged.  [cobc] passes the flags of
+   its own configuration ([COB_CFLAGS]) to the C compiler, and these may
+   enable optimizations (e.g., GnuCOBOL configured with [--enable-hardening]
+   adds [-O]), which break the mapping between COBOL statements and C code,
+   and therefore stepping.  So disable optimizations ([-A] appends options
+   for the C compiler), along with [_FORTIFY_SOURCE], that requires them. *)
+let debug_args = ["-ftraceall"; "-g"; "-A"; "-O0"; "-A"; "-U_FORTIFY_SOURCE"]
+
 let cobc_execution ?config attributes =
   let config = match config with Some t -> t | None -> Hashtbl.create 0 in
   let args =
@@ -152,7 +160,7 @@ let cobc_execution ?config attributes =
     config_string "cobol.sourceFormat" ~config
       ~append:(fun f -> List.cons ("-fformat=" ^ f)) |>
     attr_bool_flag "forDebug" ~attributes
-      ~ok:(List.append ["-ftraceall"; "-g"]) |>
+      ~ok:(List.append debug_args) |>
     attr_bool_flag "forCoverage" ~attributes
       ~ok:(List.cons "--coverage") |>
     attr_bool_flag "executable" ~attributes

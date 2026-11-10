@@ -23,6 +23,7 @@
 - Workspace analyzis for every COBOL file, that now runs in parallel sub-processes, and reports diagnostics of files that are not open [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
 
 ### Fixed
+- Stepping and breakpoints in programs built by debug build tasks, with GnuCOBOL configured to optimize C code (e.g. with `--enable-hardening`) [#718](https://github.com/OCamlPro/superbol-studio-oss/pull/718)
 - Handling of dialects given as configuration files whose path holds uppercase letters (e.g. `Dialects/My.conf`), that were looked up with a lowercased path [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
 - Lookup of files included by a configuration file given with `--conf`, that are now looked up next to that file first, even when it is found in the search path [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
 - Handling of dialects given as configuration files (e.g. `dialect.conf`) in build tasks [#716](https://github.com/OCamlPro/superbol-studio-oss/pull/716)
