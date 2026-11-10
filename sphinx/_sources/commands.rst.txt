@@ -100,7 +100,11 @@ Preprocess, parse and typecheck each FILE as the LSP server would, according to 
 
 Analysis results are looked up in, or else stored into, the cache of that project, which is shared with the LSP server: a file analyzed by either is restored by the other, for as long as neither the file nor anything it depends upon (copybooks, project configuration) changes.
 
+An LSP client such as Visual Studio Code may configure projects that have no configuration file through its settings: **--client-settings** gives those settings, and **--storage-directory** designates the caches of an LSP server started with that option, so that analyses are shared with that server.
+
 Options such as **--dialect**, **--conf**, **--source-format**, **-I**, **--ext**, **-D**, **--recovery** or **--silence** override the project configuration; analyses obtained with them are cached separately, and are not shared with the LSP server.
+
+A file that cannot be analyzed (e.g. because it cannot be read) is reported, and the remaining files are analyzed all the same.  The exit status is then at least 2; it is odd whenever some analyzed file holds errors, unless **--no-error-status** is given.
 
 Files that appear to be copybooks are not analyzed. With **--progress log-err**, tell whether each analysis was found in the cache.
 
@@ -118,6 +122,8 @@ Where options are:
 
 * :code:`-I DIR`   Add DIR to library search path
 
+* :code:`--client-settings JSON`   Configure projects that have no `superbol.toml' file as an LSP server does when its client sends these settings of the `superbol.cobol' section (e.g. `{"dialect": "ibm"}')
+
 * :code:`--conf CONF_FILE`   Set the configuration file to be used
 
 * :code:`--config-dir DIR`   Add DIR to config search path
@@ -127,6 +133,10 @@ Where options are:
 * :code:`--ext EXT`   Add EXT as a filename extension for copybook resolution (default: `cpy` `cbl` `cob`)
 
 * :code:`--free`   Shorthand for `--source-format FREE`
+
+* :code:`--no-diagnostics`   Do not output the diagnostics of analyzed files (errors that prevent analyzing a file are still reported)
+
+* :code:`--no-error-status`   Exit with status 0 even when analyzed files hold errors (errors that prevent analyzing a file still make the program exit with a non-zero status)
 
 * :code:`--progress MODE`   Set how to display progress of the command.
 MODE can be hide, force, log or log-err.
@@ -142,6 +152,8 @@ MODE can be hide, force, log or log-err.
 Overrides `format` from configuration file if present.
 
 * :code:`--stdout`   Output errors/warnings to stdout
+
+* :code:`--storage-directory DIR`   Use the caches that an LSP server started with the same option uses
 
 
 main.exe cache status
