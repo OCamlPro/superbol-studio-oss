@@ -7,8 +7,8 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sub-commands and Arguments &mdash; superbol-studio-oss master
- (1c176e3
-) (2026/11/10 13:53) documentation</title>
+ (fe9e9df
+) (2026/11/10 14:50) documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=beddf052" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=98b44b8a" />
       <link rel="stylesheet" type="text/css" href="_static/css/fixes.css" />
@@ -16,7 +16,7 @@
   
       <script src="_static/jquery.js?v=958b65b0"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=e935f844"></script>
+      <script src="_static/documentation_options.js?v=74f31bac"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -74,6 +74,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-indent-file">main.exe indent file</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-json-vscode">main.exe json vscode</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-lsp">main.exe lsp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-parallel">main.exe parallel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-pp">main.exe pp</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-project-config">main.exe project config</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-project-init">main.exe project init</a></li>
@@ -133,6 +134,7 @@
 <h1>Sub-commands and Arguments<a class="headerlink" href="#sub-commands-and-arguments" title="Link to this heading"></a></h1>
 <p>Common arguments to all sub-commands:</p>
 <ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">--color</span> <span class="pre">WHEN</span></code>   Whether to color outputs: <strong>always</strong>, <strong>never</strong>, or <strong>auto</strong> (the default) to color those bound to a terminal.  WHEN may also be a comma-separated list of <strong>stdout:WHEN</strong> or <strong>stderr:WHEN</strong>, to color the standard output or error alone.  Overrides the environment variable SUPERBOL_COLOR, that accepts the same values</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">-q</span></code> or <code class="code docutils literal notranslate"><span class="pre">--quiet</span></code>   Set verbosity level to 0</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">-v</span></code> or <code class="code docutils literal notranslate"><span class="pre">--verbose</span></code>   Increase verbosity level</p></li>
 </ul>
@@ -163,6 +165,9 @@
 
 <span class="n">lsp</span>
   <span class="n">run</span> <span class="nc">LSP</span> <span class="n">server</span>
+
+<span class="n">parallel</span>
+  <span class="nc">Run</span> <span class="n">a</span> <span class="n">sub</span><span class="o">-</span><span class="n">command</span> <span class="n">on</span> <span class="n">batches</span> <span class="k">of</span> <span class="n">files</span><span class="o">,</span> <span class="k">in</span> <span class="n">parallel</span> <span class="n">processes</span>
 
 <span class="n">pp</span>
   <span class="nc">Preprocess</span> <span class="n">a</span> <span class="kt">list</span> <span class="k">of</span> <span class="nc">COBOL</span> <span class="n">files</span><span class="o">,</span> <span class="n">generating</span> <span class="n">a</span> <span class="n">preprocessed</span> <span class="n">file</span> <span class="k">with</span> <span class="n">extension</span> <span class="o">.</span><span class="n">i</span> <span class="k">for</span> <span class="n">each</span> <span class="k">of</span> <span class="n">them</span>
@@ -219,11 +224,13 @@
 <p><strong>DESCRIPTION</strong></p>
 <p>Preprocess, parse and typecheck each FILE as the LSP server would, according to the configuration of the project it belongs to, and report diagnostics.</p>
 <p>Analysis results are looked up in, or else stored into, the cache of that project, which is shared with the LSP server: a file analyzed by either is restored by the other, for as long as neither the file nor anything it depends upon (copybooks, project configuration) changes.</p>
+<p>With <strong>–no-lsp-artifacts</strong>, what only the LSP server needs (e.g. semantic tokens, workspace symbols) is neither computed nor stored.  The LSP server does not reuse analyses stored this way, whereas analyses it stored are reused all the same.</p>
 <p>An LSP client such as Visual Studio Code may configure projects that have no configuration file through its settings: <strong>–client-settings</strong> gives those settings, and <strong>–storage-directory</strong> designates the caches of an LSP server started with that option, so that analyses are shared with that server.</p>
 <p>Visual Studio Code decodes files according to its <strong>files.encoding</strong> setting before sending them to the server: analyses of files that are not plain UTF-8 are only shared with the server when <strong>–encoding</strong> gives that same encoding.</p>
 <p>Options such as <strong>–dialect</strong>, <strong>–conf</strong>, <strong>–source-format</strong>, <strong>-I</strong>, <strong>–ext</strong>, <strong>-D</strong>, <strong>–recovery</strong> or <strong>–silence</strong> override the project configuration; analyses obtained with them are cached separately, and are not shared with the LSP server.</p>
 <p>A file that cannot be analyzed (e.g. because it cannot be read) is reported, and the remaining files are analyzed all the same.  The exit status is then at least 2; it is odd whenever some analyzed file holds errors, unless <strong>–no-error-status</strong> is given.</p>
 <p>Files that appear to be copybooks are not analyzed. With <strong>–progress log-err</strong>, tell whether each analysis was found in the cache.</p>
+<p>With <strong>–jobs N</strong>, files are split into batches (see <strong>–batch-size</strong>), each analyzed by a process of its own, with up to N processes running at once.  The output of each process is shown as a whole when it ends, so diagnostics follow the order in which batches end rather than that of the given files.  The exit status is computed over all of them.  Builds of this program into JavaScript analyze files in turn instead.</p>
 <p><strong>USAGE</strong></p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">cache</span> <span class="n">analyze</span> <span class="nc">FILE</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
@@ -233,6 +240,7 @@
 <li><p><code class="code docutils literal notranslate"><span class="pre">FILE</span></code>   Cobol file to analyze</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">-D</span> <span class="pre">VAR=VAL</span></code>   Define a pre-processor variable VAR, with value VAL</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">-I</span> <span class="pre">DIR</span></code>   Add DIR to library search path</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--batch-size</span> <span class="pre">K</span></code> or <code class="code docutils literal notranslate"><span class="pre">-n</span> <span class="pre">K</span></code>   With <strong>–jobs</strong>, process files in batches of K, each in a process of its own (default: the size that splits files into as many batches as there are jobs, up to 25)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--client-settings</span> <span class="pre">JSON</span></code>   Configure projects that have no <a href="#id1"><span class="problematic" id="id2">`</span></a>superbol.toml’ file as an LSP server does when its client sends these settings of the <a href="#id3"><span class="problematic" id="id4">`</span></a>superbol.cobol’ section (e.g. <a href="#id5"><span class="problematic" id="id6">`</span></a>{“dialect”: “ibm”}’)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--conf</span> <span class="pre">CONF_FILE</span></code>   Set the configuration file to be used</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--config-dir</span> <span class="pre">DIR</span></code>   Add DIR to config search path</p></li>
@@ -240,8 +248,10 @@
 <li><p><code class="code docutils literal notranslate"><span class="pre">--encoding</span> <span class="pre">ENCODING</span></code>   Decode files as Visual Studio Code does with this value of its <a href="#id7"><span class="problematic" id="id8">`</span></a>files.encoding’ setting (e.g. <a href="#id9"><span class="problematic" id="id10">`</span></a>windows1252’, <a href="#id11"><span class="problematic" id="id12">`</span></a>cp850’).  Files are read as they are by default, or (with a warning listing the supported encodings) if ENCODING is not supported</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--ext</span> <span class="pre">EXT</span></code>   Add EXT as a filename extension for copybook resolution (default: <cite>cpy</cite> <cite>cbl</cite> <cite>cob</cite>)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--free</span></code>   Shorthand for <cite>–source-format FREE</cite></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--jobs</span> <span class="pre">N</span></code> or <code class="code docutils literal notranslate"><span class="pre">-j</span> <span class="pre">N</span></code>   Process files in up to N processes at once (default: 1)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--no-diagnostics</span></code>   Do not output the diagnostics of analyzed files (errors that prevent analyzing a file are still reported)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--no-error-status</span></code>   Exit with status 0 even when analyzed files hold errors (errors that prevent analyzing a file still make the program exit with a non-zero status)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--no-lsp-artifacts</span></code>   Leave out what only the LSP server needs (it does not reuse analyses stored this way)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--progress</span> <span class="pre">MODE</span></code>   Set how to display progress of the command.</p></li>
 </ul>
 <dl class="simple">
@@ -296,8 +306,7 @@
 <h2>main.exe check syntax<a class="headerlink" href="#main-exe-check-syntax" title="Link to this heading"></a></h2>
 <p>Check the syntax of a Cobol file</p>
 <p><strong>DESCRIPTION</strong></p>
-<p>Preprocess and parse each FILE, and report diagnostics.  By default, only the options given on the command line are used.</p>
-<p>With <strong>–project</strong>, each FILE is analyzed as the LSP server would: according to the configuration of the project it belongs to (which options given on the command line override), with typechecking, and leaving out files that appear to be copybooks. Results are looked up in the cache of that project, which also holds those of the LSP server and <strong>superbol cache analyze</strong>.  On a miss, results are stored into the cache without the artifacts the LSP server needs, so they are not reused by the latter (use <strong>superbol cache analyze</strong> to fill the cache for the LSP server).  <strong>–project-root</strong> and <strong>–encoding</strong> only apply with <strong>–project</strong>.</p>
+<p>Preprocess and parse each FILE with the options given on the command line only, and report diagnostics.  Use <strong>superbol cache analyze</strong> to follow the configuration of each file’s project.</p>
 <p><strong>USAGE</strong></p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">check</span> <span class="n">syntax</span> <span class="nc">FILE</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
 </pre></div>
@@ -310,7 +319,6 @@
 <li><p><code class="code docutils literal notranslate"><span class="pre">--conf</span> <span class="pre">CONF_FILE</span></code>   Set the configuration file to be used</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--config-dir</span> <span class="pre">DIR</span></code>   Add DIR to config search path</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--dialect</span> <span class="pre">DIALECT</span></code> or <code class="code docutils literal notranslate"><span class="pre">--std</span> <span class="pre">DIALECT</span></code>   Set the dialect to bu used (overriden by <cite>–conf</cite> if used)</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">--encoding</span> <span class="pre">ENCODING</span></code>   Decode files as Visual Studio Code does with this value of its <a href="#id17"><span class="problematic" id="id18">`</span></a>files.encoding’ setting (e.g. <a href="#id19"><span class="problematic" id="id20">`</span></a>windows1252’, <a href="#id21"><span class="problematic" id="id22">`</span></a>cp850’).  Files are read as they are by default, or (with a warning listing the supported encodings) if ENCODING is not supported</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--ext</span> <span class="pre">EXT</span></code>   Add EXT as a filename extension for copybook resolution (default: <cite>cpy</cite> <cite>cbl</cite> <cite>cob</cite>)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--free</span></code>   Shorthand for <cite>–source-format FREE</cite></p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--progress</span> <span class="pre">MODE</span></code>   Set how to display progress of the command.</p></li>
@@ -320,8 +328,6 @@
 </dd>
 </dl>
 <ul class="simple">
-<li><p><code class="code docutils literal notranslate"><span class="pre">--project</span></code>   Check each file according to the configuration of its project, reusing and filling the project’s cache (see <a href="#id23"><span class="problematic" id="id24">`</span></a>superbol cache analyze’)</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">--project-root</span> <span class="pre">DIR</span></code> or <code class="code docutils literal notranslate"><span class="pre">--root</span> <span class="pre">DIR</span></code>   Set the root of the project (autodetected on a per-file basis otherwise)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--recovery</span> <span class="pre">BOOL</span></code>   Enable/disable parser recovery after syntax errors (default: true)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--silence</span> <span class="pre">STRING</span></code>   Silence specific messages</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--source-format</span> <span class="pre">SOURCE_FORMAT</span></code>   Set the format of source code; allowed values are: { FIXED (the default), FREE}</p></li>
@@ -461,10 +467,10 @@ Set the current default switch</p></li>
 <ul class="simple">
 <li><p><code class="code docutils literal notranslate"><span class="pre">FILES</span></code>   JSON Files to parse</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--gen</span> <span class="pre">FILE</span></code>   Generate FILE from current configuration</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">--grammar</span></code>   Parse files as syntaxes/<a href="#id25"><span class="problematic" id="id26">*</span></a>.json files</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">--language</span></code>   Parse files as language/configuration <a href="#id27"><span class="problematic" id="id28">*</span></a>.json files</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--grammar</span></code>   Parse files as syntaxes/<a href="#id17"><span class="problematic" id="id18">*</span></a>.json files</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--language</span></code>   Parse files as language/configuration <a href="#id19"><span class="problematic" id="id20">*</span></a>.json files</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--manifest</span></code>   Parse files as package.json files</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">--snippets</span></code>   Parse files as snippets/<a href="#id29"><span class="problematic" id="id30">*</span></a>.json files</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--snippets</span></code>   Parse files as snippets/<a href="#id21"><span class="problematic" id="id22">*</span></a>.json files</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--tasks</span></code>   Parse files as .vscode/tasks.json files</p></li>
 </ul>
 </section>
@@ -486,6 +492,37 @@ Set the current default switch</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--no-caching</span></code>   Disable caching (enabled by default)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--storage-directory</span> <span class="pre">DIR</span></code>   Directory under which to store cache data — prevents the creation of a “_superbol” storage directory at the root of project trees.</p></li>
 </ul>
+</section>
+<section id="main-exe-parallel">
+<h2>main.exe parallel<a class="headerlink" href="#main-exe-parallel" title="Link to this heading"></a></h2>
+<p>Run a sub-command on batches of files, in parallel processes</p>
+<p><strong>SYNOPSIS</strong></p>
+<p><strong>superbol parallel</strong> [<strong>-j</strong> N] [<strong>-n</strong> K] <strong>–</strong> SUB-COMMAND [OPTION]… [<strong>–</strong> FILE…]</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>Split the files into batches (see <strong>–batch-size</strong>), and run <strong>superbol</strong> SUB-COMMAND with its OPTIONs on each batch, in a process of its own, with up to N processes running at once (see <strong>–jobs</strong>).  This is akin to <strong>xargs -P N -n K superbol</strong> SUB-COMMAND [OPTION]…, except that outputs of processes never interleave, and that the exit status is computed over all of them, as if SUB-COMMAND had been run on every file at once.</p>
+<p>The first <strong>–</strong> ends the options of this command; files follow the second one.  Without a second <strong>–</strong>, files are read from the standard input, one per line.</p>
+<p>The output of each process is shown as a whole when it ends, so outputs follow the order in which batches end rather than that of the given files.  Outputs are colored as those of this command, and laid out with the same margins.</p>
+<p>With a single job, or in builds of this program into JavaScript, SUB-COMMAND is run on every file at once, within the same process.</p>
+<p><strong>EXAMPLES</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">superbol</span> <span class="n">parallel</span> <span class="o">-</span><span class="n">j</span> <span class="mi">8</span> <span class="o">--</span> <span class="n">cache</span> <span class="n">analyze</span> <span class="o">--</span><span class="n">stdout</span> <span class="o">--</span> <span class="o">*.</span><span class="n">cbl</span>
+<span class="n">find</span> <span class="o">.</span> <span class="o">-</span><span class="n">name</span> <span class="k">&#39;</span><span class="o">*.</span><span class="n">cbl&#39;</span> <span class="o">|</span> <span class="n">superbol</span> <span class="n">parallel</span> <span class="o">-</span><span class="n">j</span> <span class="mi">8</span> <span class="o">--</span> <span class="n">check</span> <span class="n">syntax</span>
+</pre></div>
+</div>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">parallel</span> <span class="nc">SUB</span><span class="o">-</span><span class="nc">COMMAND</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">SUB-COMMAND</span></code>   Sub-command to run, with its options, followed by <strong>–</strong> and the files to give it</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--batch-size</span> <span class="pre">K</span></code> or <code class="code docutils literal notranslate"><span class="pre">-n</span> <span class="pre">K</span></code>   With <strong>–jobs</strong>, process files in batches of K, each in a process of its own (default: the size that splits files into as many batches as there are jobs, up to 25)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--jobs</span> <span class="pre">N</span></code> or <code class="code docutils literal notranslate"><span class="pre">-j</span> <span class="pre">N</span></code>   Process files in up to N processes at once (default: 1)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--progress</span> <span class="pre">MODE</span></code>   Set how to display progress of the command.</p></li>
+</ul>
+<dl class="simple">
+<dt>MODE can be hide, force, log or log-err.</dt><dd><p>By default progress is displayed when stderr is a TTY.</p>
+</dd>
+</dl>
 </section>
 <section id="main-exe-pp">
 <h2>main.exe pp<a class="headerlink" href="#main-exe-pp" title="Link to this heading"></a></h2>
@@ -643,7 +680,7 @@ Set the current default switch</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--config-dir</span> <span class="pre">DIR</span></code>   Add DIR to config search path</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--copybooks</span></code>   Preprocess copybooks also (without REPLACING)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--dialect</span> <span class="pre">DIALECT</span></code> or <code class="code docutils literal notranslate"><span class="pre">--std</span> <span class="pre">DIALECT</span></code>   Set the dialect to bu used (overriden by <cite>–conf</cite> if used)</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">--encoding</span> <span class="pre">ENCODING</span></code>   Decode files as Visual Studio Code does with this value of its <a href="#id31"><span class="problematic" id="id32">`</span></a>files.encoding’ setting (e.g. <a href="#id33"><span class="problematic" id="id34">`</span></a>windows1252’, <a href="#id35"><span class="problematic" id="id36">`</span></a>cp850’).  Files are read as they are by default, or (with a warning listing the supported encodings) if ENCODING is not supported</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--encoding</span> <span class="pre">ENCODING</span></code>   Decode files as Visual Studio Code does with this value of its <a href="#id23"><span class="problematic" id="id24">`</span></a>files.encoding’ setting (e.g. <a href="#id25"><span class="problematic" id="id26">`</span></a>windows1252’, <a href="#id27"><span class="problematic" id="id28">`</span></a>cp850’).  Files are read as they are by default, or (with a warning listing the supported encodings) if ENCODING is not supported</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--ext</span> <span class="pre">EXT</span></code>   Add EXT as a filename extension for copybook resolution (default: <cite>cpy</cite> <cite>cbl</cite> <cite>cob</cite>)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--free</span></code>   Shorthand for <cite>–source-format FREE</cite></p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--progress</span> <span class="pre">MODE</span></code>   Set how to display progress of the command.</p></li>

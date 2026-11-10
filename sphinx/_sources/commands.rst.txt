@@ -4,6 +4,8 @@ Sub-commands and Arguments
 Common arguments to all sub-commands:
 
 
+* :code:`--color WHEN`   Whether to color outputs: **always**, **never**, or **auto** (the default) to color those bound to a terminal.  WHEN may also be a comma-separated list of **stdout:WHEN** or **stderr:WHEN**, to color the standard output or error alone.  Overrides the environment variable SUPERBOL_COLOR, that accepts the same values
+
 * :code:`-q` or :code:`--quiet`   Set verbosity level to 0
 
 * :code:`-v` or :code:`--verbose`   Increase verbosity level
@@ -36,6 +38,9 @@ Overview of sub-commands::
   
   lsp
     run LSP server
+  
+  parallel
+    Run a sub-command on batches of files, in parallel processes
   
   pp
     Preprocess a list of COBOL files, generating a preprocessed file with extension .i for each of them
@@ -100,6 +105,8 @@ Preprocess, parse and typecheck each FILE as the LSP server would, according to 
 
 Analysis results are looked up in, or else stored into, the cache of that project, which is shared with the LSP server: a file analyzed by either is restored by the other, for as long as neither the file nor anything it depends upon (copybooks, project configuration) changes.
 
+With **--no-lsp-artifacts**, what only the LSP server needs (e.g. semantic tokens, workspace symbols) is neither computed nor stored.  The LSP server does not reuse analyses stored this way, whereas analyses it stored are reused all the same.
+
 An LSP client such as Visual Studio Code may configure projects that have no configuration file through its settings: **--client-settings** gives those settings, and **--storage-directory** designates the caches of an LSP server started with that option, so that analyses are shared with that server.
 
 Visual Studio Code decodes files according to its **files.encoding** setting before sending them to the server: analyses of files that are not plain UTF-8 are only shared with the server when **--encoding** gives that same encoding.
@@ -109,6 +116,8 @@ Options such as **--dialect**, **--conf**, **--source-format**, **-I**, **--ext*
 A file that cannot be analyzed (e.g. because it cannot be read) is reported, and the remaining files are analyzed all the same.  The exit status is then at least 2; it is odd whenever some analyzed file holds errors, unless **--no-error-status** is given.
 
 Files that appear to be copybooks are not analyzed. With **--progress log-err**, tell whether each analysis was found in the cache.
+
+With **--jobs N**, files are split into batches (see **--batch-size**), each analyzed by a process of its own, with up to N processes running at once.  The output of each process is shown as a whole when it ends, so diagnostics follow the order in which batches end rather than that of the given files.  The exit status is computed over all of them.  Builds of this program into JavaScript analyze files in turn instead.
 
 **USAGE**
 ::
@@ -124,6 +133,8 @@ Where options are:
 
 * :code:`-I DIR`   Add DIR to library search path
 
+* :code:`--batch-size K` or :code:`-n K`   With **--jobs**, process files in batches of K, each in a process of its own (default: the size that splits files into as many batches as there are jobs, up to 25)
+
 * :code:`--client-settings JSON`   Configure projects that have no `superbol.toml' file as an LSP server does when its client sends these settings of the `superbol.cobol' section (e.g. `{"dialect": "ibm"}')
 
 * :code:`--conf CONF_FILE`   Set the configuration file to be used
@@ -138,9 +149,13 @@ Where options are:
 
 * :code:`--free`   Shorthand for `--source-format FREE`
 
+* :code:`--jobs N` or :code:`-j N`   Process files in up to N processes at once (default: 1)
+
 * :code:`--no-diagnostics`   Do not output the diagnostics of analyzed files (errors that prevent analyzing a file are still reported)
 
 * :code:`--no-error-status`   Exit with status 0 even when analyzed files hold errors (errors that prevent analyzing a file still make the program exit with a non-zero status)
+
+* :code:`--no-lsp-artifacts`   Leave out what only the LSP server needs (it does not reuse analyses stored this way)
 
 * :code:`--progress MODE`   Set how to display progress of the command.
 MODE can be hide, force, log or log-err.
@@ -224,9 +239,7 @@ Check the syntax of a Cobol file
 **DESCRIPTION**
 
 
-Preprocess and parse each FILE, and report diagnostics.  By default, only the options given on the command line are used.
-
-With **--project**, each FILE is analyzed as the LSP server would: according to the configuration of the project it belongs to (which options given on the command line override), with typechecking, and leaving out files that appear to be copybooks. Results are looked up in the cache of that project, which also holds those of the LSP server and **superbol cache analyze**.  On a miss, results are stored into the cache without the artifacts the LSP server needs, so they are not reused by the latter (use **superbol cache analyze** to fill the cache for the LSP server).  **--project-root** and **--encoding** only apply with **--project**.
+Preprocess and parse each FILE with the options given on the command line only, and report diagnostics.  Use **superbol cache analyze** to follow the configuration of each file's project.
 
 **USAGE**
 ::
@@ -248,8 +261,6 @@ Where options are:
 
 * :code:`--dialect DIALECT` or :code:`--std DIALECT`   Set the dialect to bu used (overriden by `--conf` if used)
 
-* :code:`--encoding ENCODING`   Decode files as Visual Studio Code does with this value of its `files.encoding' setting (e.g. `windows1252', `cp850').  Files are read as they are by default, or (with a warning listing the supported encodings) if ENCODING is not supported
-
 * :code:`--ext EXT`   Add EXT as a filename extension for copybook resolution (default: `cpy` `cbl` `cob`)
 
 * :code:`--free`   Shorthand for `--source-format FREE`
@@ -257,10 +268,6 @@ Where options are:
 * :code:`--progress MODE`   Set how to display progress of the command.
 MODE can be hide, force, log or log-err.
       By default progress is displayed when stderr is a TTY.
-
-* :code:`--project`   Check each file according to the configuration of its project, reusing and filling the project's cache (see `superbol cache analyze')
-
-* :code:`--project-root DIR` or :code:`--root DIR`   Set the root of the project (autodetected on a per-file basis otherwise)
 
 * :code:`--recovery BOOL`   Enable/disable parser recovery after syntax errors (default: true)
 
@@ -503,6 +510,58 @@ Where options are:
 * :code:`--no-caching`   Disable caching (enabled by default)
 
 * :code:`--storage-directory DIR`   Directory under which to store cache data --- prevents the creation of a "_superbol" storage directory at the root of project trees.
+
+
+main.exe parallel
+~~~~~~~~~~~~~~~~~~~
+
+Run a sub-command on batches of files, in parallel processes
+
+
+
+**SYNOPSIS**
+
+
+**superbol parallel** [**-j** N] [**-n** K] **--** SUB-COMMAND [OPTION]... [**--** FILE...]
+
+
+**DESCRIPTION**
+
+
+Split the files into batches (see **--batch-size**), and run **superbol** SUB-COMMAND with its OPTIONs on each batch, in a process of its own, with up to N processes running at once (see **--jobs**).  This is akin to **xargs -P N -n K superbol** SUB-COMMAND [OPTION]..., except that outputs of processes never interleave, and that the exit status is computed over all of them, as if SUB-COMMAND had been run on every file at once.
+
+The first **--** ends the options of this command; files follow the second one.  Without a second **--**, files are read from the standard input, one per line.
+
+The output of each process is shown as a whole when it ends, so outputs follow the order in which batches end rather than that of the given files.  Outputs are colored as those of this command, and laid out with the same margins.
+
+With a single job, or in builds of this program into JavaScript, SUB-COMMAND is run on every file at once, within the same process.
+
+
+**EXAMPLES**
+
+::
+
+  superbol parallel -j 8 -- cache analyze --stdout -- *.cbl
+  find . -name '*.cbl' | superbol parallel -j 8 -- check syntax
+
+
+**USAGE**
+::
+  
+  main.exe parallel SUB-COMMAND [OPTIONS]
+
+Where options are:
+
+
+* :code:`SUB-COMMAND`   Sub-command to run, with its options, followed by **--** and the files to give it
+
+* :code:`--batch-size K` or :code:`-n K`   With **--jobs**, process files in batches of K, each in a process of its own (default: the size that splits files into as many batches as there are jobs, up to 25)
+
+* :code:`--jobs N` or :code:`-j N`   Process files in up to N processes at once (default: 1)
+
+* :code:`--progress MODE`   Set how to display progress of the command.
+MODE can be hide, force, log or log-err.
+      By default progress is displayed when stderr is a TTY.
 
 
 main.exe pp
