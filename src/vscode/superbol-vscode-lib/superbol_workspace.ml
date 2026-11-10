@@ -18,8 +18,6 @@ let plural n one many = if n = 1 then one else many
 
 (** {2 Workspace-wide analysis} *)
 
-(* Diagnostics stay in the Problems view once the document is closed. *)
-
 (* Same extensions as the `cobol' language contribution. *)
 let cobol_file_patterns =
   [
@@ -27,283 +25,268 @@ let cobol_file_patterns =
     "**/*.[pP]{co,CO}";
   ]
 
-let find_cobol_files ~token =
+let exclude_dirs_setting = "cobol.excludeDirs"
+
+(* As `excludes_dir' in `superbol_project/project_config.ml'. *)
+let trim_dir s =
+  let s =
+    if String.starts_with ~prefix:"./" s
+    then String.sub s 2 (String.length s - 2) else s
+  in
+  if String.length s > 1 && String.ends_with ~suffix:"/" s
+  then String.sub s 0 (String.length s - 1) else s
+
+(* [relative_path] is that of a file, with "/" as separator.  Entries that hold
+   a "/" are directory paths relative to the root; others are directory names
+   that match at any depth. *)
+let excluded_by entries ~relative_path =
+  let entries = List.map trim_dir entries in
+  let paths, names = List.partition (fun e -> String.contains e '/') entries in
+  let rec check prefix = function
+    | [] | [_] ->                                     (* the file name itself *)
+        false
+    | dir :: rest ->
+        let path = if prefix = "" then dir else prefix ^ "/" ^ dir in
+        List.mem dir names || List.mem path paths || check path rest
+  in
+  check "" (String.split_on_char '/' relative_path)
+
+(* Exclusions come from the setting of each workspace folder, as for the server
+   with projects that have no `superbol.toml'.  Files are filtered after the
+   search: an `excludes' glob given to `findFiles' would override the
+   `files.exclude' setting. *)
+let not_excluded uris =
+  let entries_by_folder = Hashtbl.create 1 in
+  let entries_for folder =
+    let key = Uri.toString (WorkspaceFolder.uri folder) () in
+    match Hashtbl.find_opt entries_by_folder key with
+    | Some entries -> entries
+    | None ->
+        let entries =
+          Superbol_config.strings exclude_dirs_setting
+            ~scope:(`WorkspaceFolder folder)
+        in
+        Hashtbl.add entries_by_folder key entries;
+        entries
+  in
+  List.filter begin fun uri ->
+    match Workspace.getWorkspaceFolder ~uri with
+    | None ->
+        true
+    | Some folder ->
+        not @@ excluded_by (entries_for folder) ~relative_path:
+          (Workspace.asRelativePath () ~pathOrUri:(`Uri uri)
+             ~includeWorkspaceFolder:false)
+  end uris
+
+let find_cobol_files ?token () =
   let open Promise.Syntax in
   let rec aux acc = function
     | [] ->
-        Promise.return (List.rev acc)
+        Promise.return (not_excluded @@ List.rev acc)
     | pattern :: patterns ->
-        let* uris = Workspace.findFiles () ~includes:(`String pattern) ~token in
+        let* uris = Workspace.findFiles () ~includes:(`String pattern) ?token in
         aux (List.rev_append uris acc) patterns
   in
   aux [] cobol_file_patterns
 
-type report = {
-  file: string;              (* the report file, in [root]/_superbol *)
-  root: string;              (* the workspace folder it was made for *)
-}
+(* Files are analyzed by `superbol cache analyze' processes (see
+   {!Superbol_jobs}) that fill the caches of the server, without being opened
+   in the server.  After each batch, the server is asked to publish their
+   diagnostics from its caches. *)
 
-(* Written while the analysis runs, so a crash keeps the results found so far. *)
-let create_report () =
-  match Workspace.workspaceFolders () with
-  | [] -> None
-  | folder :: _ ->
-      let root = Uri.fsPath (WorkspaceFolder.uri folder) in
-      let dir = Node.Path.join [root; "_superbol"] in
-      let file = Node.Path.join [dir; "analysis-report.md"] in
-      try
-        Node.Fs.mkdirSync dir ~recursive:true;
-        Node.Fs.writeFileSync file "";
-        Some { file; root }
-      with e ->
-        Superbol_printer.log_error
-          "SuperBOL: cannot create %s: %s" file (Printexc.to_string e);
-        None
-
-let append_to_report report text =
-  match report with
-  | None -> ()
-  | Some { file; _ } ->
-      try Node.Fs.appendFileSync file text with e ->
-        Superbol_printer.log_error
-          "SuperBOL: cannot write %s: %s" file (Printexc.to_string e)
-
-let text_document_id uri =
-  Jsonoo.Encode.(object_ ["uri", string @@ Uri.toString uri ()])
-
-(* The reply only comes once the server has handled the `didOpen' for [uri], so
-   waiting for it paces the loop on real work. *)
-let await_analysis_of ~uri instance =
-  Superbol_instance.lsp_request instance
-    ~meth:"textDocument/documentSymbol"
-    ~data:Jsonoo.Encode.(object_ ["textDocument", text_document_id uri]) |>
-  Promise.then_
-    ~fulfilled:(fun _ -> Promise.return ())
-    ~rejected:(fun _ -> Promise.return ())
-
-(* VS Code cannot close a document opened with `openTextDocument', so we
-   notify the server ourselves and keep one document in memory at a time. *)
-let notify_did_open ~uri ~text instance =
-  Superbol_instance.lsp_notification instance
-    ~meth:"textDocument/didOpen"
-    ~data:Jsonoo.Encode.(object_ [
-        "textDocument", object_ [
-          "uri", string @@ Uri.toString uri ();
-          "languageId", string "cobol";
-          "version", int 1;
-          "text", string text;
-        ];
+(* [request_publication client uris] asks the server to publish the cached
+   diagnostics of [uris], and gives the number of files it missed, or the error
+   message of the request. *)
+let request_publication client uris =
+  let data =
+    Jsonoo.Encode.(object_ [
+        "uris", list (fun uri -> string @@ Uri.toString uri ()) uris
       ])
+  in
+  Vscode_languageclient.LanguageClient.sendRequest client ()
+    ~meth:"superbol/publishCachedDiagnostics" ~data |>
+  Promise.then_
+    ~fulfilled:begin fun reply ->
+      Promise.return @@ Ok begin
+        try List.length Jsonoo.Decode.(field "missed" (list id) reply)
+        with Jsonoo.Decode_error _ -> 0
+      end
+    end
+    ~rejected:begin fun err ->
+      let err_js = Promise.error_to_js err in
+      Promise.return @@
+      Error (Ojs.string_of_js (Ojs.get_prop_ascii err_js "message"))
+    end
 
-let notify_did_close ~uri instance =
-  Superbol_instance.lsp_notification instance
-    ~meth:"textDocument/didClose"
-    ~data:Jsonoo.Encode.(object_ ["textDocument", text_document_id uri])
+let log_publication_error ~uris msg =
+  Superbol_printer.log_error
+    "SuperBOL: could not publish diagnostics of %u file%s: %s"
+    (List.length uris) (plural (List.length uris) "" "s") msg
 
-(* Documents already open are synced by the client: do not close them. *)
-let is_already_open uri =
-  let uri = Uri.toString uri () in
-  List.exists
-    (fun doc -> Uri.toString (TextDocument.uri doc) () = uri)
-    (Workspace.textDocuments ())
+(* Same as [request_publication], with failures logged and counted as misses
+   of every file. *)
+let publish_cached_diagnostics client uris =
+  Promise.then_ (request_publication client uris) ~fulfilled:begin function
+    | Ok missed -> Promise.return missed
+    | Error msg ->
+        log_publication_error ~uris msg;
+        Promise.return (List.length uris)
+  end
 
-(* [false] when the file could not be read, so it was never analyzed. *)
-let analyze_document ~uri ~report instance =
-  let open Promise.Syntax in
-  Promise.catch
-    ~rejected:begin fun error ->
-      let value =
-        Printf.sprintf "%s: skipped, %s"
-          (Workspace.asRelativePath () ~pathOrUri:(`Uri uri))
-          (Node.JsError.message error)
-      in
-      Superbol_printer.log_error "SuperBOL: %s" value;
-      append_to_report report ("- " ^ value ^ "\n");
-      Promise.return false
-    end @@
-  if is_already_open uri then
-    let+ () = await_analysis_of ~uri instance in
-    true
-  else
-    let* text = Node.Fs.readFile (Uri.fsPath uri) in
-    notify_did_open ~uri ~text instance;
-    let+ () = await_analysis_of ~uri instance in
-    notify_did_close ~uri instance;
-    true
-
-let severity_name = function
-  | DiagnosticSeverity.Error -> "error"
-  | DiagnosticSeverity.Warning -> "warning"
-  | DiagnosticSeverity.Information -> "note"
-  | DiagnosticSeverity.Hint -> "hint"
-
-(* The report is in [root]/_superbol, so a file in [root] is one "../" away.
-   Other roots are outside [root]: link those by URI. *)
-let report_target ~root uri =
-  let path = Uri.fsPath uri in
-  let prefix = root ^ String.make 1 Node.Path.sep in
-  if String.starts_with ~prefix path then
-    let rest =
-      String.sub path (String.length prefix)
-        (String.length path - String.length prefix)
-    in
-    (* Markdown wants "/", even on Windows. *)
-    "../" ^ String.concat "/" (String.split_on_char Node.Path.sep rest)
-  else
-    Uri.toString uri ()
-
-(* Markdown link, so that a click jumps to the reported line. *)
-let report_link ~path ~target ~line ~char =
-  Printf.sprintf "[%s:%u:%u](<%s#L%u>)" path line char target line
-
-let report_line ~path ~target diag =
-  let pos = Range.start @@ Diagnostic.range diag in
-  Printf.sprintf "- %s: %s: %s\n"
-    (report_link ~path ~target
-       ~line:(succ @@ Position.line pos)
-       ~char:(succ @@ Position.character pos))
-    (severity_name @@ Diagnostic.severity diag)
-    (Diagnostic.message diag)
-
-let report_diagnostics_of ~uri report =
-  match report, Languages.getDiagnostics uri with
-  | None, _ | _, [] -> ()
-  | Some { root; _ }, diags ->
-      let path = Workspace.asRelativePath () ~pathOrUri:(`Uri uri) in
-      let target = report_target ~root uri in
-      append_to_report report @@
-      String.concat "" @@ List.map (report_line ~path ~target) diags
-
-let report_completion report ~analyzed ~skipped ~missed =
+let report_processes_completion ~analyzed ~failed ~missed ~undiagnosed =
+  let total = analyzed + failed + missed in
   let outcome =
     if missed = 0 then
       Printf.sprintf "SuperBOL: analyzed %u file%s"
         analyzed (plural analyzed "" "s")
     else
-      let scanned = analyzed + skipped in
-      let total = scanned + missed in
       Printf.sprintf "SuperBOL: analysis interrupted after %u of %u file%s"
-        scanned total (plural total "" "s")
-  and unread =
-    if skipped = 0 then ""
-    else Printf.sprintf "; %u file%s could not be read"
-        skipped (plural skipped "" "s")
-  and where =
-    match report with
-    | None ->
-        "; diagnostics are listed in the Problems view"
-    | Some { file; _ } ->
-        Printf.sprintf "; diagnostics are listed in the Problems view and in %s"
-          (Workspace.asRelativePath () ~pathOrUri:(`Uri (Uri.file file)))
-  in
-  let message = outcome ^ unread ^ where in
-  append_to_report report (Printf.sprintf "\n%s%s\n" outcome unread);
-  let _ =
-    match report with
-    | None ->
-        Window.showInformationMessage () ~message |>
-        Promise.then_ ~fulfilled:(fun (_: unit option) -> Promise.return ())
-    | Some { file; _ } ->
-        Window.showInformationMessage () ~message
-          ~choices:["Show Report", ()] |>
-        Promise.then_ ~fulfilled:begin function
-          | Some () ->
-              let _ =
-                Window.showTextDocument ~document:(`Uri (Uri.file file)) ()
-              in
-              Promise.return ()
-          | None ->
-              Promise.return ()
-        end
-  in
-  Promise.return ()
-
-let analyze_workspace instance ~progress ~token =
-  let open Promise.Syntax in
-  let* uris = find_cobol_files ~token in
-  let report = create_report () in
-  let total = List.length uris in
-  let percent i = i * 100 / max 1 total in
-  let rec loop i skipped = function
-    | remaining when CancellationToken.isCancellationRequested token ->
-        report_completion report ~analyzed:(i - skipped) ~skipped
-          ~missed:(List.length remaining)
-    | [] ->
-        report_completion report ~analyzed:(i - skipped) ~skipped ~missed:0
-    | uri :: remaining ->
-        Progress.report progress ~value:Progress.{
-            message = Some (Printf.sprintf "%u/%u: %s" (succ i) total @@
-                            Workspace.asRelativePath () ~pathOrUri:(`Uri uri));
-            increment = Some (percent (succ i) - percent i);
-          };
-        let* analyzed = analyze_document ~uri ~report instance in
-        if analyzed then report_diagnostics_of ~uri report;
-        loop (succ i) (if analyzed then skipped else succ skipped) remaining
-  in
-  loop 0 0 uris
-
-(* The server drops all diagnostics unless `forceSyntaxDiagnostics' is set or
-   the dialect is COBOL85 (see `dispatch_diagnostics' in `lsp_server.ml').  The
-   dialect is per project, so we warn instead of refusing. *)
-let check_diagnostics_reported () =
-  if Superbol_config.bool "forceSyntaxDiagnostics" ||
-     Superbol_config.string "cobol.dialect" = "cobol85" then
-    Promise.return `Scan
-  else
-    let open Promise.Syntax in
-    let+ choice =
-      Window.showWarningMessage ()
-        ~message:"SuperBOL only reports diagnostics for projects that use the \
-                  COBOL85 dialect, unless `superbol.forceSyntaxDiagnostics' is \
-                  enabled.  The scan may find nothing to report."
-        ~choices:["Enable and Restart Server", `Enable;
-                  "Scan Anyway", `Scan]
-    in
-    Option.value choice ~default:`Abort
-
-(* Writing the setting restarts the server.  We cannot await that, so we ask
-   for a new run. *)
-let enable_syntax_diagnostics () =
-  let open Promise.Syntax in
-  let target =
-    if Workspace.workspaceFolders () = []
-    then ConfigurationTarget.Global
-    else ConfigurationTarget.Workspace
-  in
-  let+ () =
-    WorkspaceConfiguration.update
-      (Superbol_config.full ())
-      ~section:"forceSyntaxDiagnostics"
-      ~value:(Ojs.bool_to_js true)
-      ~configurationTarget:(`ConfigurationTarget target) ()
+        (analyzed + failed) total (plural total "" "s")
+  and failures =
+    if failed = 0 then ""
+    else Printf.sprintf "; %u file%s could not be analyzed (see the log)"
+        failed (plural failed "" "s")
+  and diagnostics =
+    if undiagnosed = 0 then ""
+    else Printf.sprintf "; diagnostics of %u file%s are reported upon \
+                         opening %s"
+        undiagnosed (plural undiagnosed "" "s")
+        (plural undiagnosed "it" "them")
   in
   let _ =
     Window.showInformationMessage ()
-      ~message:"Diagnostics enabled.  The language server is restarting; \
-                please run the analysis again."
+      ~message:(outcome ^ failures ^ diagnostics) |>
+    Promise.then_ ~fulfilled:(fun (_: unit option) -> Promise.return ())
   in
-  ()
+  Promise.return ()
 
-let scan_workspace instance =
-  Window.withProgress (module Interop.Js.Unit)
+let analyze_workspace_in_processes ~client cli ~progress ~token =
+  let open Promise.Syntax in
+  let* uris = find_cobol_files ~token () in
+  let total = List.length uris in
+  let percent i = i * 100 / max 1 total in
+  let analyzed = ref 0 and failed = ref 0 in
+  let publications = ref [] in
+  let on_start ~processes =
+    Progress.report progress ~value:Progress.{
+        message = Some (Printf.sprintf "analyzing %u file%s in %u process%s"
+                          total (plural total "" "s")
+                          processes (plural processes "" "es"));
+        increment = None;
+      }
+  and on_completion (job: Superbol_jobs.job) ~ok =
+    let before = !analyzed + !failed and n = List.length job.files in
+    if ok then begin
+      analyzed := !analyzed + n;
+      publications :=
+        publish_cached_diagnostics client job.files :: !publications
+    end else
+      failed := !failed + n;
+    let after = before + n in
+    Progress.report progress ~value:Progress.{
+        message = Some (Printf.sprintf "%u/%u files" after total);
+        increment = Some (percent after - percent before);
+      }
+  in
+  let* () =
+    Superbol_jobs.run cli ~token ~on_start ~on_completion
+      (Superbol_jobs.make uris)
+  in
+  let* undiagnosed = Promise.all (Array.of_list !publications) in
+  report_processes_completion ~analyzed:!analyzed ~failed:!failed
+    ~missed:(total - !analyzed - !failed)
+    ~undiagnosed:(Array.fold_left (+) 0 undiagnosed)
+
+let with_analysis_progress task =
+  Window.withProgress (module Interop.Js.Unit) ~task
     ~options:(ProgressOptions.create
                 ~location:(`ProgressLocation ProgressLocation.Notification)
                 ~title:"SuperBOL: analyzing COBOL files"
                 ~cancellable:true ())
-    ~task:(analyze_workspace instance)
 
 let run_analysis instance =
   match Superbol_instance.client instance with
   | None ->
       Superbol_printer.show_error_message @@
       Error Superbol_types.Client_not_running
-  | Some _ ->
-      let open Promise.Syntax in
-      let* decision = check_diagnostics_reported () in
-      match decision with
-      | `Abort -> Promise.return ()
-      | `Enable -> enable_syntax_diagnostics ()
-      | `Scan -> scan_workspace instance
+  | Some client ->
+      with_analysis_progress @@
+      analyze_workspace_in_processes ~client
+        (Superbol_instance.cli_invocation instance)
+
+(** {2 Diagnostics of files analyzed in earlier sessions} *)
+
+let publish_on_start_setting =
+  "workspaceAnalysis.publishCachedDiagnosticsOnStartup"
+
+(* The server handles one request at a time, and reads every file it is given:
+   small batches let other requests through in between. *)
+let files_per_publication = 50
+
+let with_publication_progress task =
+  Window.withProgress (module Interop.Js.Unit) ~task
+    ~options:(ProgressOptions.create
+                ~location:(`ProgressLocation ProgressLocation.Notification)
+                ~title:"SuperBOL: reporting diagnostics of analyzed files"
+                ~cancellable:true ())
+
+(* Diagnostics of documents that are not open do not survive the language
+   client, so the server is asked to publish those it holds in its caches
+   (e.g. from a workspace analysis in an earlier session) whenever it starts.
+   Files are never analyzed: those that changed since, or were never analyzed,
+   are just missed.
+
+   Batches are sent one after another, until the progress notification is
+   cancelled, the server restarts (the new one starts over), or a request fails
+   (e.g. if the server does not support it). *)
+let publish_cached_diagnostics_on_start instance client =
+  if Superbol_config.bool publish_on_start_setting then
+    let open Promise.Syntax in
+    let current () = match Superbol_instance.client instance with
+      | Some c -> c == client
+      | None -> false
+    in
+    let publish uris ~progress ~token =
+      let total = List.length uris in
+      let percent i = i * 100 / max 1 total in
+      let stopped () =
+        not (current ()) || CancellationToken.isCancellationRequested token
+      in
+      let rec aux ~published ~missed = function
+        | [] ->
+            Superbol_printer.log
+              "SuperBOL: published cached diagnostics of %u file%s \
+               (%u without)" published (plural published "" "s") missed;
+            Promise.return ()
+        | _ when stopped () ->
+            Promise.return ()
+        | uris :: batches ->
+            let* res = request_publication client uris in
+            match res with
+            | Ok m ->
+                let before = published + missed in
+                let after = before + List.length uris in
+                Progress.report progress ~value:Progress.{
+                    message = Some (Printf.sprintf "%u/%u files" after total);
+                    increment = Some (percent after - percent before);
+                  };
+                aux batches ~published:(published + List.length uris - m)
+                  ~missed:(missed + m)
+            | Error msg ->
+                if current () then log_publication_error ~uris msg;
+                Promise.return ()
+      in
+      aux ~published:0 ~missed:0 @@
+      Superbol_jobs.chunks files_per_publication uris
+    in
+    let _: unit Promise.t =
+      let* uris = find_cobol_files () in
+      if uris = [] || not (current ())
+      then Promise.return ()
+      else with_publication_progress (publish uris)
+    in
+    ()
 
 (** {2 Copybook directory retrieval} *)
 

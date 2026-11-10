@@ -207,15 +207,18 @@ let get () =
   let get () =
     let verbose = !Globals.verbosity > 0 in
     let search_path = !search_path in
+    let platform =
+      { Superbol_platform.record with verbosity = !Globals.verbosity }
+    in
     let config =
       DIAGS.show_n_forget ~platform:Superbol_platform.record @@
       match !conf, !dialect with
       | "", None ->
           DIAGS.result Cobol_config.default
       | "", Some d ->
-          Cobol_config.from_dialect ~verbose ~search_path d
+          Cobol_config.from_dialect ~platform ~verbose ~search_path d
       | s, None ->
-          Cobol_config.from_file ~verbose ~search_path s
+          Cobol_config.from_file ~platform ~verbose ~search_path s
       | _ ->
           Pretty.failwith "Flags `--conf` and `--dialect` or `--std` cannot be \
                            used together"
@@ -249,9 +252,6 @@ let get () =
         with Not_found ->
           Pretty.failwith "Invalid argument `%s' given to flag `-D`" definition
       end !definitions Cobol_preproc.Env.empty
-    in
-    let platform =
-      { Superbol_platform.record with verbosity = !Globals.verbosity }
     in
     let progress_display = match !progress_display_opt with
       | None -> if Unix.isatty Unix.stderr then Show else Hide

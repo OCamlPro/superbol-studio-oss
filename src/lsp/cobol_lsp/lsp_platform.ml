@@ -13,4 +13,7 @@
 
 (** Note: fields of this record are further initialized when entering
     `Lsp_server_loop.run` *)
-let record = Cobol_common.Platform.innocuous
+let record =
+  (* A copy: its fields are set when the server starts, which must leave the
+     innocuous platform as is. *)
+  Cobol_common.Platform.{ innocuous with verbosity = innocuous.verbosity }

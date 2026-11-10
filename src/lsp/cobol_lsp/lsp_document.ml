@@ -29,7 +29,7 @@ module TYPES = struct
          of [artifacts] are not cached: they are empty on a document restored
          from cache, and its semantic tokens come from the cache instead, if
          they were there ([None] otherwise, and on copybooks). *)
-      semtoks: Superbol_project.Analysis.semantic_tokens Lazy.t option;
+      semtoks: Superbol_project.Semantic_tokens.t Lazy.t option;
       checked: checked_doc option;
       rewinder: rewinder option;
       (* Records what preprocessing observed of the outside world -- copybooks

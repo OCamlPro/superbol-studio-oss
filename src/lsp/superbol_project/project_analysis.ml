@@ -44,8 +44,6 @@ let diagnostics { parsing_diags; typeck_diags; _ } =
 
 (* --- Results for the LSP --- *)
 
-type semantic_tokens = int array
-
 type for_lsp =
   {
     lsp_copybook: bool;
@@ -59,7 +57,8 @@ type for_lsp =
 
 (* Tokens are not kept: they are the largest part of the artifacts by far, and
    they are only ever needed to compute the semantic tokens, which are much
-   smaller and are cached on their own instead. *)
+   smaller and are cached on their own instead (see
+   {!Project_semantic_tokens}). *)
 let of_artifacts_for_lsp ~checked ~parsing_diags ~typeck_diags
     ~parsing_artifacts:Cobol_parser.Outputs.{ pplog; rev_comments; rev_ignored;
                                               tokens = _ } =
@@ -226,9 +225,9 @@ let analyze ~platform ?overrides ~filename ~contents project =
     { copybook = false; checked = Some checked; parsing_diags; typeck_diags }
 
 (* Same as [analyze], with a parse that collects artifacts, and that also
-   computes semantic tokens if [semantic_tokens] is given (and the document is
-   not a copybook). *)
-let analyze_for_lsp_n_semtoks ~platform ?overrides ?semantic_tokens
+   applies [with_artifacts] to them if it is given (and the document is not a
+   copybook). *)
+let analyze_for_lsp_with ~platform ?overrides ?with_artifacts
     ~filename ~contents project =
   if detect_copybook ~platform ?overrides ~filename ~contents project
   then copybook_for_lsp, None
@@ -243,11 +242,11 @@ let analyze_for_lsp_n_semtoks ~platform ?overrides ?semantic_tokens
     let parsing_artifacts = Cobol_parser.artifacts parsed in
     of_artifacts_for_lsp ~checked:(Some checked) ~parsing_diags ~typeck_diags
       ~parsing_artifacts,
-    Option.map (fun f -> f ~filename parsing_artifacts checked) semantic_tokens
+    Option.map (fun f -> f ~filename parsing_artifacts checked) with_artifacts
 
 let analyze_for_lsp ~platform ?overrides ~filename ~contents project =
   fst @@
-  analyze_for_lsp_n_semtoks ~platform ?overrides ~filename ~contents project
+  analyze_for_lsp_with ~platform ?overrides ~filename ~contents project
 
 (* --- Caching --- *)
 
@@ -329,18 +328,6 @@ let store_for_lsp cache ~key ~label ~witnesses (a: for_lsp) =
 let lookup_for_lsp cache ~key ~resolve : for_lsp option =
   lookup_any cache ~key ~resolve
 
-(* Semantic tokens depend on the analysis for the LSP they are computed from,
-   so that any miss on the latter entails a miss on the former. *)
-let semantic_tokens_key { inputs; _ } =
-  CACHE.shallow_key ~label:"semantic-tokens" ~inputs
-
-let store_semantic_tokens cache ~keys ~label (s: semantic_tokens) =
-  store_any cache ~key:(semantic_tokens_key keys) ~label
-    ~witnesses:[WITNESS.sub (key_for_lsp keys)] s
-
-let lookup_semantic_tokens cache ~keys ~resolve : semantic_tokens option =
-  lookup_any cache ~key:(semantic_tokens_key keys) ~resolve
-
 (* Looks [key] up, or else performs [analyze] while recording what [platform]
    is asked, and stores the result under [key], superseding whatever entry
    [slot] recorded for another version of the document. *)
@@ -383,34 +370,27 @@ let cached_analysis cache ~platform ?overrides ~keys ~filename ~contents
   in
   v, hit
 
-(* Same as [lookup_or_analyze] for analyses for the LSP, also storing the
-   semantic tokens that are computed along with the analysis, in the same
-   slot. *)
-let cached_analysis_for_lsp cache ~platform ?overrides ~semantic_tokens
+(* Same as [lookup_or_analyze] for analyses for the LSP, also giving what
+   [with_artifacts] computes from the parsing artifacts on a miss. *)
+let cached_analysis_for_lsp cache ~platform ?overrides ~with_artifacts
     ~keys:({ key_for_lsp = key; _ } as keys) ~filename ~contents project =
   match lookup_for_lsp cache ~key ~resolve:(RECORDER.resolver ~platform ()) with
   | Some v ->
-      v, true
+      v, true, None
   | None ->
       let recorder = RECORDER.create ~platform in
-      let v, semtoks =
-        analyze_for_lsp_n_semtoks ~platform:(RECORDER.platform recorder)
-          ?overrides ~semantic_tokens ~filename ~contents project
+      let v, extra =
+        analyze_for_lsp_with ~platform:(RECORDER.platform recorder)
+          ?overrides ~with_artifacts ~filename ~contents project
       in
       let label = Project.relative_path_for ~filename project in
-      match
-        store_for_lsp cache ~key ~label ~witnesses:(RECORDER.witnesses recorder) v
-      with
-      | Ok () ->
-          let stored =
-            match
-              Option.map (store_semantic_tokens cache ~keys ~label) semtoks
-            with
-            | Some Ok () -> [semantic_tokens_key keys]
-            | Some Error _ | None -> []
-          in
-          ignore @@ CACHE.supersede cache (key :: stored)
-            ~slot:(slot ~label:"analysis-for-lsp" keys);
-          v, false
-      | Error _ ->
-          v, false
+      (match
+         store_for_lsp cache ~key ~label
+           ~witnesses:(RECORDER.witnesses recorder) v
+       with
+       | Ok () ->
+           ignore @@ CACHE.supersede cache [key]
+             ~slot:(slot ~label:"analysis-for-lsp" keys)
+       | Error _ ->
+           ());
+      v, false, extra

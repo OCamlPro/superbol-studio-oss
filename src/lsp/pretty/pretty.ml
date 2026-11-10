@@ -85,6 +85,12 @@ let failwith fmt =
 let invalid_arg fmt =
   string_to (fun s -> raise @@ Invalid_argument s) fmt
 
+(** [failure ppf exn] prints [exn] using [ppf]; only its message for
+    [Sys_error]. *)
+let failure ppf = function
+  | Sys_error msg -> Fmt.string ppf msg
+  | e -> Fmt.exn ppf e
+
 (** [styles [s1, ... , sn]] is a shorthand equivalent of [Fmt.styled s1 @@
     Fmt.styled ... @@ Fmt.styled sn]. *)
 let styles styles pp =

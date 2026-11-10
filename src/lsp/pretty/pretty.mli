@@ -36,6 +36,7 @@ val to_string: ('a, string) func
 val string_to: (string -> 'b) -> ('a, 'b) func
 val failwith: ('a, 'b) func
 val invalid_arg: ('a, 'b) func
+val failure: exn printer
 val styles: Fmt.style list -> 'a printer -> 'a printer
 
 val char: char printer

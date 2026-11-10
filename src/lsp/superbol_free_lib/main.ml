@@ -19,17 +19,14 @@ open EZCMD.TYPES
 open Ez_file.V1
 open EzFile.OP
 
-let public_subcommands = [
-  Command_sql.preproc_cmd ;
-  Command_pp.cmd ;
-  Command_lsp.cmd;
-  Command_texi2rst.cmd ;
-  Command_indent_file.cmd;
-  Command_check_syntax.cmd;
-  Command_json_vscode.cmd;
-  Command_snapshot.cmd;
+(* Commands that run other programs, or change the working directory or the
+   environment of the process, which the JavaScript build (as run by node)
+   cannot do: they are hidden from that build.
 
-  Command_ebcdic.ebcdic_translate_cmd ;
+   TODO: these have nothing to do with the language server, and should
+   eventually be removed from this executable altogether. *)
+let process_subcommands = [
+  Command_snapshot.cmd;
 
   Command_switch.env_cmd; (* env *)
   Command_switch.switch_cmd;
@@ -40,6 +37,18 @@ let public_subcommands = [
   Command_switch.switch_add_cmd;
   Command_switch.switch_build_cmd;
   Command_switch.switch_config_cmd;
+]
+
+let public_subcommands = [
+  Command_sql.preproc_cmd ;
+  Command_pp.cmd ;
+  Command_lsp.cmd;
+  Command_texi2rst.cmd ;
+  Command_indent_file.cmd;
+  Command_check_syntax.cmd;
+  Command_json_vscode.cmd;
+
+  Command_ebcdic.ebcdic_translate_cmd ;
 
   Command_project.init_cmd;
   Command_project.config_cmd;
@@ -50,7 +59,9 @@ let public_subcommands = [
 
   Command_util.util_detect_cycle_cmd;
   Command_util.util_wc_cmd;
-]
+] @ (match Sys.backend_type with
+    | Other "js_of_ocaml" -> []
+    | Native | Bytecode | Other _ -> process_subcommands)
 
 let () =
   Cobol_common.init_default_exn_printers ()

@@ -134,7 +134,8 @@ let%expect_test "a shared directory is left writable by the group" =
   let root = root () in
   let cache = Cache.create ~store:(Superbol_platform.Cache_store.create ~root ()) () in
   ignore (put cache ~key:(key "a") "parsed a");
-  let mode path = (Unix.stat (Filename.concat root path)).st_perm in
+  (* Masked, as js_of_ocaml leaves the type of file in. *)
+  let mode path = (Unix.stat (Filename.concat root path)).st_perm land 0o7777 in
   (* Group-writable so that everyone sharing the cache can publish and prune,
      and set-group-ID so that what they create stays in the group.  No sticky
      bit: pruning has to reach entries it does not own. *)

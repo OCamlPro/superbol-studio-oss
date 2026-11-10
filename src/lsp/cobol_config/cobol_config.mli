@@ -29,32 +29,48 @@ val print_options: Format.formatter -> unit
 
 val default: (module T)
 
-(** Search path (suspension).
+(** [default_search_path ~platform] is where configuration files are looked
+    up after any search path given to the functions below: the current working
+    directory, [$COB_CONFIG_DIR], [$XDG_CONFIG_HOME/superbol/gnucobol-config],
+    some system-specific directories, and [$COB_CONFIG_DIR_FALLBACK], as
+    [platform] gives them.
 
-    {e When evaluated} (via {!Lazy.force}), [default_search_path] is a path that
-    is equivalent to {v ".:$XDG_CONFIG_HOME/superbol:$COB_CONFIG_DIR" v}.
+    The functions below access the file system and the environment through
+    [platform] only, so that what they read may be recorded. *)
+val default_search_path
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> string list
 
-    Changing environment variables or the current working directory has no
-    impact on the resulting path when done {e after} evaluation.  *)
-val default_search_path: string list Lazy.t
-
-(** [from_file ~search_path filename] loads a configuration module from the
-    given filename.  Note: the evaluation of {!default_search_path} is forces in
-    case [search_path] is not provided. *)
+(** [from_file ~platform ~search_path filename] loads a configuration module
+    from [filename], looked up in its directory, then [search_path], then
+    {!default_search_path}.  Files it includes are looked up likewise, starting
+    with the directory of the file found. *)
 val from_file
-  : ?search_path: string list
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> ?search_path: string list
   -> ?verbose:bool
   -> string
   -> (module T) Cobol_common.Diagnostics.with_diags
 
-(** [from_dialect ~search_path dialect] returns the configuration module
-    according to the dialect defaults.  The caveat about {!default_search_path}
-    given for {!from_file} applies here as well. *)
+(** [from_dialect ~platform ~search_path dialect] returns the configuration
+    module according to the dialect defaults, looking its file up as
+    {!from_file} does. *)
 val from_dialect
-  : ?search_path: string list
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> ?search_path: string list
   -> ?verbose:bool
   -> Types.DIALECT.t
   -> (module T) Cobol_common.Diagnostics.with_diags
+
+(** [from_dialect_n_file ~platform ~search_path dialect] is like
+    {!from_dialect}, also giving the configuration file loaded ([None] for
+    {!DIALECT.Default}). *)
+val from_dialect_n_file
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> ?search_path: string list
+  -> ?verbose:bool
+  -> Types.DIALECT.t
+  -> ((module T) * string option) Cobol_common.Diagnostics.with_diags
 
 val dialect: t -> dialect
 

@@ -491,7 +491,9 @@ module DIALECT = struct
         | "mvs"               -> MVS { strict }
         | "realia"            -> Realia { strict }
         | "rm"                -> RM { strict }
-        | s                   -> Custom (s, { strict })
+        | _ ->
+            (* A file name: keep its case. *)
+            Custom (String.sub s 0 (String.length prefix), { strict })
 
   let all_canonical_names =
     [

@@ -10,7 +10,8 @@
   (flags (:standard))
   ; use field 'dune-stanzas' to add more stanzas here
   
-  
+    (js_of_ocaml (javascript_files cache_store_stubs.js))
+
   )
 
 

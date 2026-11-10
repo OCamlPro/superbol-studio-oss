@@ -16,6 +16,7 @@ open Lsp.Types
 open Lsp_types
 
 module DIAGS = Cobol_common.Diagnostics
+module CACHED_DIAGS = Superbol_project.Cached_diagnostics
 module IMap = Map.Make (Int)
 
 module TYPES = struct
@@ -179,8 +180,15 @@ let on_client_error id ({ pending_tasks = { delayed; _ }; _ } as registry) =
 (** {2 Handling of diagnostics for non-opened documents} *)
 
 
+(** [publishes_diagnostics ~project registry] tells whether diagnostics of
+    documents of [project] are to be published. *)
+let publishes_diagnostics ~project registry =
+  registry.params.config.force_syntax_diagnostics ||
+  Cobol_config.dialect (Lsp_project.config project).cobol_config = COBOL85
+
+
 let dispatch_diagnostics (Lsp_document.{ project; _ } as doc) registry =
-  let uri = Lsp_document.uri doc in
+  let uri = Lsp_diagnostics.normalize_uri (Lsp_document.uri doc) in
   let diags = Lsp_document.diagnostics doc in
   let rootdir = Lsp_project.rootdir project in
   let indirect4uri =
@@ -197,8 +205,7 @@ let dispatch_diagnostics (Lsp_document.{ project; _ } as doc) registry =
     (* Note here we may publish diagnostics for non-opened documents.  LSP
        protocol does not seem to forbid that (but some editors just ignore
        those).  *)
-    if registry.params.config.force_syntax_diagnostics ||
-       Cobol_config.dialect (Lsp_project.config project).cobol_config = COBOL85
+    if publishes_diagnostics ~project registry
     then Lsp_diagnostics.publish all_diags;
     { registry with
       indirect_diags =
@@ -212,8 +219,7 @@ let dispatch_diagnostics (Lsp_document.{ project; _ } as doc) registry =
         URIMap.union (fun _ a b -> Some (List.rev_append a b))
       end indirect4uri URIMap.empty
     in
-    if registry.params.config.force_syntax_diagnostics ||
-       Cobol_config.dialect (Lsp_project.config project).cobol_config = COBOL85
+    if publishes_diagnostics ~project registry
     then Lsp_diagnostics.publish all_diags;
     registry
   end
@@ -516,6 +522,135 @@ let retrieve_project_for ~uri registry =
     else load_project_cache ~rootdir registry
 
 
+(** {3 Diagnostics of documents that are not open} *)
+
+
+(** [indirect_diags_for ~uri registry] gathers the diagnostics of [uri] that
+    the documents registered in [registry.indirect_diags] report. *)
+let indirect_diags_for ~uri registry =
+  URIMap.fold begin fun _ indirect acc ->
+    match URIMap.find_opt uri indirect with
+    | Some diags -> List.rev_append diags acc
+    | None -> acc
+  end registry.indirect_diags []
+
+
+(** [group_closed_by_project uris registry] groups the [uris] of documents that
+    are not open by project, retrieving projects as needed.  Also returns the
+    URIs of documents that belong to no known project. *)
+let group_closed_by_project uris registry =
+  (* Open documents are told apart by their canonical paths, as for workspace
+     symbols. *)
+  let module StringSet = EzCompat.StringSet in
+  let canonical_path uri =
+    Superbol_cache.Witness.canonical_path @@ Lsp.Uri.to_path uri in
+  let open_files =
+    URIMap.fold (fun uri _ -> StringSet.add (canonical_path uri))
+      registry.docs StringSet.empty
+  in
+  List.fold_left begin fun (registry, by_project, missed) uri ->
+    if StringSet.mem (canonical_path uri) open_files
+    then registry, by_project, missed
+    else
+      let registry = retrieve_project_for ~uri registry in
+      match Lsp_project.SET.for_ ~uri registry.projects with
+      | project ->
+          let add = function None -> Some [uri] | Some l -> Some (uri :: l) in
+          registry, Lsp_project.MAP.update project add by_project, missed
+      | exception Not_found ->
+          registry, by_project, uri :: missed
+  end (registry, Lsp_project.MAP.empty, []) uris
+
+
+(** [register_cached_diagnostics ~rootdir ~publish ~uri cached (registry,
+    mains, others)] registers in [registry.indirect_diags] the diagnostics that
+    the document at (normalized) [uri] reports for other documents.  When
+    [publish] holds, also records in [mains] the diagnostics that the document
+    reports for itself, if any, and adds to [others] the URIs of the documents
+    for which the diagnostics reported indirectly may have changed. *)
+let register_cached_diagnostics ~rootdir ~publish ~uri cached
+    (registry, mains, others) =
+  let touch uri _ = URIMap.add uri () in
+  if cached.CACHED_DIAGS.copybook then     (* copybooks only show what other *)
+    registry, mains, (if publish then touch uri () others else others)
+  else                                                 (* documents report *)
+    let diags = CACHED_DIAGS.diagnostics cached in
+    let all_diags =
+      Lsp_diagnostics.translate diags ~uri ~rootdir ~focus_on_main_doc:false in
+    let indirect = URIMap.remove uri all_diags in
+    let previous = URIMap.find_opt uri registry.indirect_diags in
+    let registry =
+      { registry with
+        indirect_diags = URIMap.add uri indirect registry.indirect_diags } in
+    if not publish then
+      registry, mains, others
+    else
+      let own =
+        if diags = DIAGS.Set.none then None
+        else Some (Option.value ~default:[] @@ URIMap.find_opt uri all_diags)
+      in
+      registry,
+      URIMap.add uri own mains,
+      (URIMap.fold touch indirect others |>
+       URIMap.fold touch (Option.value ~default:URIMap.empty previous))
+
+
+(** [send_cached_diagnostics mains others registry] sends the diagnostics of
+    every document in [mains], and then of those in [others].  As in
+    [dispatch_diagnostics], a document that reports no diagnostic of its own
+    shows those that other documents report; open documents that show their
+    own are left untouched. *)
+let send_cached_diagnostics mains others registry =
+  let send_indirect uri =
+    Lsp_io.send_diagnostics ~uri (indirect_diags_for ~uri registry) in
+  URIMap.iter begin fun uri -> function
+    | Some own -> Lsp_io.send_diagnostics ~uri own
+    | None -> send_indirect uri
+  end mains;
+  let open_docs =
+    URIMap.fold (fun uri -> URIMap.add (Lsp_diagnostics.normalize_uri uri))
+      registry.docs URIMap.empty
+  in
+  URIMap.iter begin fun uri () ->
+    if not (URIMap.mem uri mains) then
+      match URIMap.find_opt uri open_docs with
+      | Some doc when Lsp_document.diagnostics doc <> DIAGS.Set.none -> ()
+      | _ -> send_indirect uri
+  end others
+
+
+(** [publish_cached_diagnostics uris registry]: see the interface.  As
+    [dispatch_diagnostics] does, diagnostics that the documents at [uris] report
+    for other documents (typically copybooks) are registered in
+    [registry.indirect_diags], and other documents that these used to report
+    diagnostics for are updated.  URIs are normalized (see
+    {!Lsp_diagnostics.normalize_uri}), as are the keys of
+    [registry.indirect_diags]; missed URIs are given back as in [uris]. *)
+let publish_cached_diagnostics uris registry =
+  let registry, by_project, missed = group_closed_by_project uris registry in
+  let registry, mains, others, missed =
+    Lsp_project.MAP.fold begin fun project uris acc ->
+      let uris = List.rev uris in                        (* keep input order *)
+      let rootdir = Lsp_project.(string_of_rootdir @@ rootdir project) in
+      let publish = publishes_diagnostics ~project registry in
+      Lsp_project_cache.cached_diagnostics ~params:registry.params project
+        (List.map Lsp.Uri.to_path uris) |>
+      List.fold_left2 begin fun (registry, mains, others, missed) uri -> function
+        | _, None ->
+            registry, mains, others, uri :: missed
+        | _, Some cached ->
+            let uri = Lsp_diagnostics.normalize_uri uri in
+            let registry, mains, others =
+              register_cached_diagnostics ~rootdir ~publish ~uri cached
+                (registry, mains, others) in
+            registry, mains, others, missed
+      end acc uris
+    end by_project (registry, URIMap.empty, URIMap.empty, missed)
+  in
+  send_cached_diagnostics mains others registry;
+  registry, List.rev missed
+
+
 let create_or_retrieve_project_promise ~rootdir registry =    (* from rootdir *)
   try
     now (Lsp_project.SET.for_rootdir ~rootdir registry.projects) registry
@@ -718,9 +853,10 @@ let did_save DidSaveTextDocumentParams.{ textDocument = { uri }; _ } registry =
 
 let did_close DidCloseTextDocumentParams.{ textDocument = { uri } } registry =
   Option.iter Lsp_document.unload @@ URIMap.find_opt uri registry.docs;
+  let indirect_uri = Lsp_diagnostics.normalize_uri uri in
   { registry with
     docs = URIMap.remove uri registry.docs;
-    indirect_diags = URIMap.remove uri registry.indirect_diags }
+    indirect_diags = URIMap.remove indirect_uri registry.indirect_diags }
 
 
 (** {2 Miscellaneous} *)

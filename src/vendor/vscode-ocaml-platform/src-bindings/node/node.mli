@@ -58,6 +58,8 @@ module Process : sig
 
   val pid : int
 
+  val execPath : string
+
   val kill : int -> ?signal:string -> unit -> unit
 
   module Env : sig
@@ -168,6 +170,8 @@ module Os : sig
   val homedir : unit -> string
 
   val release : unit -> string
+
+  val cpus : unit -> Ojs.t array
 end
 
 module Fs : sig

@@ -40,14 +40,44 @@ module TYPES = struct
     | SFTrm
     | SFCOBOLX
 
+  type file_kind =
+    | Regular_file
+    | Directory
+    | Symbolic_link             (** only reported when links are not followed *)
+    | Other_file
+
+  (** What {!platform.stat_file} gives about a file. *)
+  type file_stat =
+    {
+      file_kind: file_kind;
+      file_mtime: float;               (** last modification time, in seconds *)
+      file_size: int;
+    }
+
   type platform = {
     mutable verbosity : int ;
 
     mutable eprintf :  'a. ('a, out_channel, unit) format -> 'a ;
     mutable error :  'a. ('a, Format.formatter, unit) format -> 'a ;
     mutable getcwd: unit -> string;
+    (** [now ()] is the current time, in seconds since the epoch. *)
+    mutable now: unit -> float;
     mutable read_text_file : string -> string ;
+    (** [read_text_file_in_path ~search_path filename] gives the path and
+        contents of the first file named [filename] in [search_path] (or of
+        [filename] itself if it is not implicit); [None] if there is none.
+        Raises [Sys_error] if a file is found but cannot be read.  Looking up
+        and reading at once ensures the contents are those of the path given.
+
+        A platform that overrides [read_text_file] should override this field
+        too (see {!FS.read_text_file_in_path}). *)
+    mutable read_text_file_in_path:
+      search_path:string list -> string -> (string * string) option;
     mutable list_dir : string -> string list ;
+    (** [stat_file ?follow path] describes [path], following symbolic links
+        unless [follow] is [false] (defaults to [true]); [None] if [path] cannot
+        be reached. *)
+    mutable stat_file: ?follow:bool -> string -> file_stat option;
     mutable with_stdin: 'a. f:(in_channel -> 'a) -> 'a;
     mutable peek_channel_prefix: in_channel -> len:int -> string;
     mutable getenv_opt : string -> string option ;
@@ -58,6 +88,14 @@ module TYPES = struct
       source_contents:string ->
       filename:string ->                                           (* filename *)
       source_format_id;
+    (** [is_source_file ~filename] indicates whether [filename] may hold COBOL
+        programs (as opposed to only copybooks), judging from its name alone.
+        Used to find the programs of a project. *)
+    mutable is_source_file: filename:string -> bool;
+    (** [is_hidden_file ~filename] indicates whether [filename] (a file or a
+        directory) is hidden, and should be skipped when looking for source
+        files. *)
+    mutable is_hidden_file: filename:string -> bool;
     mutable find_lib:
       lookup_config:Copybook.TYPES.lookup_config ->
       ?fromfile:string ->
@@ -76,7 +114,8 @@ let innocuous = {
   verbosity = 0;
   eprintf = Printf.eprintf;
   error = Pretty.error;
-  getcwd = Sys.getcwd;                                             (* CHECKME *)
+  getcwd = Sys.getcwd;            (* CHECKME *)
+  now = (fun () -> 0.);                     (* a clock that never moves *)
   read_text_file = begin fun file ->
     Pretty.string_to (fun msg -> raise (Sys_error msg))
       "%s: Filesystem operations are unavailable" file
@@ -84,6 +123,8 @@ let innocuous = {
   (* Listing a directory that cannot be reached is not an error: a caller that
      records what a lookup path held simply records that it held nothing. *)
   list_dir = (fun _dir -> []);
+  stat_file = (fun ?follow:_ _path -> None);
+  read_text_file_in_path = (fun ~search_path:_ _filename -> None);
   with_stdin = begin fun ~f:_ ->
     Pretty.string_to (fun msg -> raise (Sys_error msg))
       "with_stdin: Filesystem operations are unavailable"
@@ -101,6 +142,8 @@ let innocuous = {
       "%s: Filesystem operations are unavailable" dir
   end;
   autodetect_format = (fun ~source_contents:_ ~filename:_ -> SFFixed);
+  is_source_file = (fun ~filename:_ -> false);
+  is_hidden_file = (fun ~filename:_ -> false);
   find_lib = begin fun ~lookup_config ?fromfile:_ ?libname:_ (`Alphanum w |
                                                               `Word w) ->
     Error { lookup_libname = w; lookup_config }
@@ -108,22 +151,30 @@ let innocuous = {
   getenv_opt = (fun _variable -> None);
 }
 
-let copy ~dst ~src:{ verbosity; eprintf; error; getcwd; with_stdin;
-                     read_text_file; list_dir;
+let copy ~dst ~src:{ verbosity; eprintf; error; getcwd; now; with_stdin;
+                     read_text_file; read_text_file_in_path;
+                     list_dir; stat_file;
                      peek_channel_prefix;
                      mk_temp_dir; remove_dir;
-                     autodetect_format; find_lib; getenv_opt }  =
+                     autodetect_format; is_source_file; is_hidden_file;
+                     find_lib;
+                     getenv_opt }  =
   dst.verbosity <- verbosity;
   dst.eprintf <- eprintf;
   dst.error <- error;
   dst.getcwd <- getcwd;
+  dst.now <- now;
   dst.read_text_file <- read_text_file;
+  dst.read_text_file_in_path <- read_text_file_in_path;
   dst.list_dir <- list_dir;
+  dst.stat_file <- stat_file;
   dst.with_stdin <- with_stdin;
   dst.peek_channel_prefix <- peek_channel_prefix;
   dst.mk_temp_dir <- mk_temp_dir;
   dst.remove_dir <- remove_dir;
   dst.autodetect_format <- autodetect_format;
+  dst.is_source_file <- is_source_file;
+  dst.is_hidden_file <- is_hidden_file;
   dst.find_lib <- find_lib;
   dst.getenv_opt <- getenv_opt
 
@@ -131,6 +182,24 @@ let copy ~dst ~src:{ verbosity; eprintf; error; getcwd; with_stdin;
 
 (** High-level filesystem operations *)
 module FS = struct
+
+  (** [read_text_file_in_path ~concat ~read_text_file ~stat_file] implements
+      [platform.read_text_file_in_path], naming candidates [concat dir
+      filename].  A candidate that cannot be read is skipped if [stat_file]
+      tells it does not exist. *)
+  let read_text_file_in_path ~concat ~read_text_file ~stat_file
+      ~search_path filename =
+    let try_read path =
+      match read_text_file path with
+      | contents ->
+          Some (path, contents)
+      | exception Sys_error _ when Option.is_none (stat_file path) ->
+          None
+    in
+    if not (Filename.is_implicit filename)
+    then try_read filename
+    else List.find_map (fun dir -> try_read (concat dir filename))
+        search_path
 
   (** [with_temp_dir ~platform ?given_temp_dir f] creates a temporary directory
       [temp_dir] and executes [f ~temp_dir] if [given_temp_dir] is [None], or
