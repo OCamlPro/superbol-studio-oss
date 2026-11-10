@@ -24,6 +24,7 @@ let files =
     "/conf/inc.conf", "tab-width: 4\n";
     (* Comes earlier in the search path, but is not next to [my.conf]: *)
     "/elsewhere/inc.conf", "tab-width: 2\n";
+    "/conf/Mixed-Case.conf", "include \"inc.conf\"\nname: \"mixed\"\n";
   ]
 
 (* Can be found, but not read. *)
@@ -89,3 +90,9 @@ let%expect_test "configuration files read are recorded" =
   [%expect {|
     /conf/inc.conf
     /conf/my.conf |}];;
+
+let%expect_test "custom dialects keep the case of their file name" =
+  let { result = _, file; _ }: _ Cobol_common.Diagnostics.with_diags =
+    load ~platform "/conf/Mixed-Case.conf" in
+  Printf.printf "loaded: %s\n" (Option.value file ~default:"none");
+  [%expect {| loaded: /conf/Mixed-Case.conf |}];;
