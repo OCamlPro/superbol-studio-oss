@@ -55,6 +55,12 @@ let handle json_notif state =
           Lsp_io.log_error "Document@ %s@ is@ not@ opened@ yet"
             (Lsp.Types.DocumentUri.to_string uri);
           state
+      | Jsonrpc.Response.Error.E { message; _ } ->
+          Lsp_io.log_error "While@ handling@ notification@ %s:@ %s"
+            (Yojson.Safe.to_string @@
+             Jsonrpc.Notification.yojson_of_t json_notif)
+            message;
+          state
       | e ->
           Lsp_io.log_error "While@ handling@ notification@ %s:@ %a"
             (Yojson.Safe.to_string @@

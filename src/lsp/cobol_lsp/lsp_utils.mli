@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val relative_path: uri:Lsp.Uri.t -> string -> string
+val path_of_uri: Lsp.Uri.t -> string
 val is_file: string -> bool
 val read_from: string -> (in_channel -> 'a) -> 'a
 val write_to: string -> (out_channel -> unit) -> unit

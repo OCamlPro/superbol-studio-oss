@@ -87,7 +87,7 @@ let initialize ~config (params: InitializeParams.t) =
   log_initialization_info ();
   Lsp_io.log_info "Initial workspace folders: %a"
     Pretty.(list ~fopen:"" ~fclose:"" string)
-    (List.map (fun x -> DocumentUri.to_path x) workspace_folders);
+    (List.map (fun x -> Lsp_utils.path_of_uri x) workspace_folders);
   let capabilities = Lsp_capabilities.reply params.capabilities in
   let with_semantic_tokens =
     capabilities.semanticTokensProvider <> None
@@ -201,7 +201,7 @@ let handle_get_cfg registry params =
   try_with_checked_doc registry textDoc
     ~f:begin fun ~doc:_ checked_doc ->
       let jsoono =
-        Lsp_cfg.doc_to_cfg_jsoono ~filename:(DocumentUri.to_path uri) ~name ~options checked_doc
+        Lsp_cfg.doc_to_cfg_jsoono ~filename:(Lsp_utils.path_of_uri uri) ~name ~options checked_doc
       in Some jsoono
     end |>
   Option.get
@@ -338,7 +338,7 @@ let lookup_definition_in_doc position ~(doc: Lsp_document.t)
   let rootdir = Lsp_project.(string_of_rootdir @@ rootdir doc.project)
   and uri = Lsp_document.uri doc
   and artifacts = doc.artifacts in
-  let filename = Lsp.Uri.to_path uri in
+  let filename = Lsp_utils.path_of_uri uri in
   match Lsp_lookup.element_at_position ~filename position group artifacts with
   | { element_at_position = None; _ } ->
       None
@@ -400,7 +400,7 @@ let lookup_references_in_doc position ~with_declaration ~(doc: Lsp_document.t)
   let rootdir = Lsp_project.(string_of_rootdir @@ rootdir doc.project)
   and uri = Lsp_document.uri doc
   and artifacts = doc.artifacts in
-  let filename = Lsp.Uri.to_path uri in
+  let filename = Lsp_utils.path_of_uri uri in
   match Lsp_lookup.element_at_position ~filename position group artifacts with
   | { element_at_position = None; _ } ->
       Lsp_debug.message "Lsp_request.lookup_references_in_doc: \
@@ -550,7 +550,7 @@ let handle_range_formatting registry params =
     }
   in
   let _edit_list, edit_ops =
-    let filename = Lsp.Uri.to_path doc.uri in
+    let filename = Lsp_utils.path_of_uri doc.uri in
     Cobol_indent.Main.indent
       ~platform:Lsp_platform.record
       ~dialect:(Cobol_config.dialect project.config.cobol_config)
@@ -571,7 +571,7 @@ let handle_formatting registry params =
   let Lsp_document.{ project; textdoc; _ } =
     Lsp_server.find_document doc registry in
   try
-    let filename = Lsp.Uri.to_path doc.uri in
+    let filename = Lsp_utils.path_of_uri doc.uri in
     let _editList, edit_ops =
       Cobol_indent.Main.indent
         ~platform:Lsp_platform.record
@@ -703,7 +703,7 @@ let describe_data_definition_for_element_at_pos
     ~(doc: Lsp_document.t) ~(checked_doc: Cobol_typeck.Outputs.t) position
   =
   let Cobol_typeck.Outputs.{ group; _ } = checked_doc in
-  let filename = Lsp.Uri.to_path @@ Lsp_document.uri doc
+  let filename = Lsp_utils.path_of_uri @@ Lsp_document.uri doc
   and artifacts = doc.artifacts in
   match Lsp_lookup.element_at_position ~filename position group artifacts with
   | { element_at_position = None; _ } ->
@@ -796,7 +796,7 @@ let preproc_info_on_hover ~filename position pplog =
 
 let handle_hover ?show_data_description_on_definitions
     registry HoverParams.{ textDocument; position; _ } =
-  let filename = Lsp.Uri.to_path textDocument.uri in
+  let filename = Lsp_utils.path_of_uri textDocument.uri in
   try_with_checked_doc registry textDocument
     ~f:begin fun ~doc checked_doc ->
       match
@@ -840,7 +840,7 @@ let handle_completion ?(eager=true) registry (params: CompletionParams.t) =
 let handle_folding_range registry (params: FoldingRangeParams.t) =
   try_with_checked_doc registry params.textDocument
     ~f:begin fun ~doc:_ { ptree; group; _ } ->
-      let filename = Lsp.Uri.to_path params.textDocument.uri in
+      let filename = Lsp_utils.path_of_uri params.textDocument.uri in
       Some (Lsp_folding.ranges_in ~filename ptree group)
     end
 
@@ -868,7 +868,7 @@ let handle_workspace_symbol
     URIMap.fold begin fun uri doc acc ->
       match Lsp_document.checked doc with
       | { ptree; _ } ->
-          let filename = Lsp.Uri.to_path uri in
+          let filename = Lsp_utils.path_of_uri uri in
           (uri, Lsp_workspace_symbols.of_ptree ~filename ptree) :: acc
       | exception Lsp_document.(Unparseable _ | Copybook _) ->
           acc
@@ -876,11 +876,11 @@ let handle_workspace_symbol
   in
   (* Open documents are told apart from walked files by their canonical paths,
      as both may spell the same file differently (e.g. the case of a Windows
-     drive letter, that [Lsp.Uri.to_path] lowercases). *)
+     drive letter, that [Lsp_utils.path_of_uri] lowercases). *)
   let canonical_path = Superbol_cache.Witness.canonical_path in
   let open_files =
     URIMap.fold (fun uri _ acc -> StringSet.add (canonical_path @@
-                                                 Lsp.Uri.to_path uri) acc)
+                                                 Lsp_utils.path_of_uri uri) acc)
       docs StringSet.empty
   in
   let is_open filename = StringSet.mem (canonical_path filename) open_files in

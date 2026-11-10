@@ -34,7 +34,7 @@ type t = project
 
 module SET = struct
   include Superbol_project.SET
-  let for_ ~uri = for_ ~filename:(Lsp.Uri.to_path uri)
+  let for_ ~uri = for_ ~filename:(Lsp_utils.path_of_uri uri)
 end
 module MAP = Superbol_project.MAP
 
@@ -46,7 +46,7 @@ let string_of_rootdir = Superbol_project.string_of_rootdir
 let rooturi project = Lsp.Uri.of_path @@ string_of_rootdir @@ rootdir project
 
 let rootdir_for ~uri ~layout =
-  Superbol_project.rootdir_for ~filename:(Lsp.Uri.to_path uri) ~layout
+  Superbol_project.rootdir_for ~filename:(Lsp_utils.path_of_uri uri) ~layout
 
 let show_diagnostics ?(force = false) project diags : unit =
   if force || diags <> DIAGS.Set.none then
@@ -78,16 +78,16 @@ let in_existing_dir dirname ~layout =
   for_ ~rootdir:(Superbol_project.rootdir_at ~dirname) ~layout
 
 let copybook_lookup_config_for ~uri project =
-  Superbol_project.copybook_lookup_config_for ~filename:(Lsp.Uri.to_path uri)
+  Superbol_project.copybook_lookup_config_for ~filename:(Lsp_utils.path_of_uri uri)
     project
 
 let detect_copybook ~uri ?contents project =
-  Superbol_project.detect_copybook ~filename:(Lsp.Uri.to_path uri)
+  Superbol_project.detect_copybook ~filename:(Lsp_utils.path_of_uri uri)
     ?contents project
     ~platform:Lsp_platform.record
 
 let relative_path_for ~uri project =
-  Superbol_project.relative_path_for ~filename:(Lsp.Uri.to_path uri) project
+  Superbol_project.relative_path_for ~filename:(Lsp_utils.path_of_uri uri) project
 
 let absolute_path_for =
   Superbol_project.absolute_path_for

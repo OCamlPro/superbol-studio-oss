@@ -217,7 +217,7 @@ let get_source_format_by_extension toml =
   with Not_found -> default_source_format_by_extension
 
 let get_path_entry toml =
-  let dir = TOML.get_string toml ["dir"] in
+  let dir = Slashifier.slashify @@ TOML.get_string toml ["dir"] in
   if TOML.get_bool toml ["file-relative"] ~default:false
   then RelativeToFileDir dir
   else RelativeToProjectRoot dir

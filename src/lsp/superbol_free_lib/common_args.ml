@@ -64,6 +64,7 @@ let iter_comma_separated_spec ~showable ~option_name ~f spec =
 let analysis_overrides ~config ~conf ~dialect ~format ~libpath ~libexts ~env
     ~recovery ~show : Superbol_project.Analysis.overrides =
   let absolute dir =
+    Ez_file.V1.Slashifier.slashify @@
     if Ez_file.V1.EzFile.is_absolute dir then dir
     else Ez_file.V1.EzFile.concat (Sys.getcwd ()) dir
   in
@@ -210,7 +211,8 @@ let get () =
         search_path := !search_path @ [s]),
     EZCMD.info ~docv:"DIR" "Add DIR to config search path";
 
-    ["I"], Arg.String (fun s -> libpath := !libpath @ [s];
+    ["I"], Arg.String (fun s -> let s = Ez_file.V1.Slashifier.slashify s in
+                        libpath := !libpath @ [s];
                         extra_libpath := !extra_libpath @ [s]),
     EZCMD.info ~docv:"DIR" "Add DIR to library search path";
 

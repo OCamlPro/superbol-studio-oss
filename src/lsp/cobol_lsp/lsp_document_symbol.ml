@@ -270,7 +270,7 @@ let _every_symbol_kind _ =
   ]
 
 let from_ptree_at ~uri ptree : DocumentSymbol.t list =
-  let filename = Lsp.Uri.to_path uri in
+  let filename = Lsp_utils.path_of_uri uri in
   let range_from ~loc = Lsp_position.range_of_srcloc_in ~filename loc in
   let string_of_name_or_lit (name_or_lit: name_or_literal) =
     let s = Pretty.to_string "%a" pp_term name_or_lit in s

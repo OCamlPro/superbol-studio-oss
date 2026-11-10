@@ -21,10 +21,10 @@ end
 include TYPES
 type t = diagnostics
 
-(* [Lsp.Uri.to_path] spells every path a single way (e.g. with a lowercase
+(* [Lsp_utils.path_of_uri] spells every path a single way (e.g. with a lowercase
    Windows drive letter), whereas URIs built from paths keep them as given. *)
 let normalize_uri uri =
-  Lsp.Uri.of_path (Lsp.Uri.to_path uri)
+  Lsp.Uri.of_path (Lsp_utils.path_of_uri uri)
 
 let translate_one ?focus_on_main_doc ~rootdir ~uri (diag: DIAG.t) =
   let uri, range = match DIAG.location diag with

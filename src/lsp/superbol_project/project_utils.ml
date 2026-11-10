@@ -15,8 +15,14 @@ open Ez_file.V1
 
 (** [relative_path ~filename absolute_path] returns the relative path of
     [filename] {i w.r.t} [absolute_path] if [absolute_path] is a prefix of
-    [filename], and raises {!Invalid_argument} otherwise. *)
+    [filename], and raises {!Invalid_argument} otherwise.
+
+    [absolute_path] is expected to be slashified already; [filename] is
+    slashified here, as on Windows it may be given with backslashes (e.g. when
+    obtained from a URI) whereas the expected directory separator is a
+    slash. *)
 let relative_path ~filename:path absolute_path =
+  let path = Slashifier.slashify path in
   match EzString.chop_prefix ~prefix:absolute_path path with
   | Some "" -> "."
   | Some path ->

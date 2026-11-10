@@ -146,10 +146,11 @@ let expand_caret_with_tabs lines =
   in
   List.rev lines
 
+(* Filenames are spelled as the server spells them (see
+   {!Cobol_lsp.Utils.path_of_uri}): slashified, with lowercase drive letters
+   on Windows. *)
 let normalize_filename filename =
-  if Sys.win32
-  then Lsp.Uri.to_path @@ Lsp.Uri.of_path @@ Slashifier.slashify filename
-  else Slashifier.slashify filename
+  Cobol_lsp.Utils.path_of_uri @@ Lsp.Uri.of_path @@ Slashifier.slashify filename
 
 let make_lsp_project ?toml () =
   let projdir = normalize_filename @@ init_temp_project ?toml () in
@@ -236,7 +237,7 @@ let extract_position_markers text =
 (** {1 Helpers to reconstruct and print source locations} *)
 
 let srcloc_of_range ~uri : Range.t -> srcloc =
-  let pos_fname = Lsp.Uri.to_path uri in
+  let pos_fname = Cobol_lsp.Utils.path_of_uri uri in
   let lines = EzFile.read_lines pos_fname in
   let char_count =
     Array.init (Array.length lines) (fun i -> String.length lines.(i)) in

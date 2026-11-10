@@ -153,6 +153,7 @@ let locate ?(setup = default_setup)
     Common_args.{ platform; analysis_overrides = overrides; _ }
     given_filename =
   let filename =                               (* filenames take part in keys *)
+    Slashifier.slashify @@                      (* ... as the LSP gives them *)
     if EzFile.is_absolute given_filename
     then given_filename
     else platform.getcwd () // given_filename

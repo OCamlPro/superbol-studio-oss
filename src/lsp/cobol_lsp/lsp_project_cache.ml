@@ -170,7 +170,9 @@ let save_document ~params:{ config; with_semantic_tokens; _ } doc =
         Lsp_io.log_debug "While@ saving@ document@ cache:@ %s %s:@ %s"
           op args (Unix.error_message e)
   | e ->
-      Lsp_error.internal
+      (* Failing to save the cache must not prevent the document from being
+         opened or saved: only report. *)
+      Lsp_io.log_error
         "Exception@ caught@ while@ saving@ document@ cache:@ %a@." Fmt.exn e
 
 let save ~params:{ config; _ } docs =
@@ -196,7 +198,7 @@ let load_document ~project ~params
     ~doc:(Lsp.Types.DidOpenTextDocumentParams.{ textDocument; _ } as doc) =
   let Lsp_project.{ rootdir; _ } = project in
   let cache = cache_for ~config:params.config ~rootdir in
-  let filename = Lsp.Uri.to_path textDocument.uri in
+  let filename = Lsp_utils.path_of_uri textDocument.uri in
   let resolve =
     Superbol_cache.Recorder.resolver ~platform:Lsp_platform.record ()
   in
