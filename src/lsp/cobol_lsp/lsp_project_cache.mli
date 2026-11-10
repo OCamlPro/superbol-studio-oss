@@ -102,3 +102,15 @@ val cached_diagnostics
   -> Lsp_project.t
   -> string list
   -> (string * Superbol_project.Cached_diagnostics.t option) list
+
+(** {2 Encoding of files} *)
+
+(** [set_file_encoding project encoding] records the encoding the client decodes
+    the files of [project] with ([None] if it sends them as they are).  The
+    files that {!workspace_symbols} and {!cached_diagnostics} read from disk are
+    decoded with it, so that their keys agree with those of the documents the
+    client sends. *)
+val set_file_encoding
+  : Lsp_project.t
+  -> Cobol_common.Text_encoding.t option
+  -> unit

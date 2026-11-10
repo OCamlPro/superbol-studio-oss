@@ -39,7 +39,7 @@ let pp_age ppf seconds =
 (* --- *)
 
 let status ~verbose dir =
-  match Caching_commands.cache_for dir with
+  match Project_commands.cache_for dir with
   | None -> ()
   | Some (root, cache) ->
       match CACHE.stats cache, CACHE.entries cache with
@@ -66,7 +66,7 @@ let status ~verbose dir =
           Pretty.error "Could not read the cache at %s@." root
 
 let trim ~older_than ~max_size dir =
-  match Caching_commands.cache_for dir with
+  match Project_commands.cache_for dir with
   | None -> ()
   | Some (root, cache) ->
       (* Not [Never], even without bounds: that would skip reclaiming the
@@ -111,7 +111,7 @@ let trim_cmd =
              ["max-size"],
              Arg.String begin fun s -> match Arg_utils.size_of_string s with
                | Ok size -> max_size := Some size
-               | Error () -> Pretty.failwith "Not a size: %s" s
+               | Error () -> Cobol_common.fatal "Not a size: %s" s
              end,
              EZCMD.info ~docv:"SIZE"
                "Keep the cache under that size, reclaiming the entries least \
@@ -132,26 +132,36 @@ let client_settings_of_string s =
   | `Assoc assoc -> assoc
   | `Null -> []
   | _ | exception Yojson.Json_error _ ->
-      Pretty.failwith "Expected a JSON object: %s" s
+      Cobol_common.fatal "Expected a JSON object: %s" s
 
 let analyze_cmd =
   let files = ref [] and ppf = ref Fmt.stderr
   and storage_directory = ref None and client_settings = ref None
-  and error_status = ref true and show_diagnostics = ref true in
+  and error_status = ref true and show_diagnostics = ref true
+  and for_lsp = ref true in
   let common, common_args = Common_args.get () in
-  EZCMD.sub "cache analyze"
-    (fun () ->
-       let setup =
-         Caching_commands.lsp_like_setup ()
+  let parallel, parallel_args = Parallel_batches.args () in
+  let project_setup, project_args = Project_args.get () in
+  let analyze files =
+    let setup =
+      project_setup () ~setup:
+        (Project_commands.lsp_like_setup ()
            ?storage_directory:!storage_directory
-           ?client_settings:!client_settings
-       in
-       Caching_commands.analyze_n_report (common ()) ~for_lsp:true ~setup
-         ~error_status:!error_status ~show_diagnostics:!show_diagnostics
-         ~ppf:!ppf !files)
-    ~args:(common_args @
-           [ [], Arg.Anons (fun list -> files := list),
-             EZCMD.info ~docv:"FILE" "Cobol file to analyze";
+           ?client_settings:!client_settings)
+    in
+    Project_commands.analyze_n_report (common ()) ~for_lsp:!for_lsp ~setup
+      ~error_status:!error_status ~show_diagnostics:!show_diagnostics
+      ~ppf:!ppf files
+  in
+  (* Processes that analyze batches of files are given every option that was
+     given to this one, except [--jobs] and [--batch-size]; {!Parallel_batches}
+     passes the verbosity on with [-v], and colors and margins through the
+     environment. *)
+  let given_args, args =
+    Arg_utils.recording @@
+    common_args @ project_args @
+    [ [], Arg.Anons (fun list -> files := list),
+      EZCMD.info ~docv:"FILE" "Cobol file to analyze";
              ["stdout"], Arg.Unit (fun () -> ppf := Fmt.stdout),
              EZCMD.info "Output errors/warnings to stdout";
              ["no-error-status"], Arg.Clear error_status,
@@ -162,6 +172,9 @@ let analyze_cmd =
              EZCMD.info "Do not output the diagnostics of analyzed files \
                          (errors that prevent analyzing a file are still \
                          reported)";
+             ["no-lsp-artifacts"], Arg.Clear for_lsp,
+             EZCMD.info "Leave out what only the LSP server needs (it does \
+                         not reuse analyses stored this way)";
              ["storage-directory"],
              Arg.String (fun s -> storage_directory := Some s),
              EZCMD.info ~docv:"DIR"
@@ -174,7 +187,18 @@ let analyze_cmd =
              EZCMD.info ~docv:"JSON"
                "Configure projects that have no `superbol.toml' file as an LSP \
                 server does when its client sends these settings of the \
-                `superbol.cobol' section (e.g. `{\"dialect\": \"ibm\"}')" ])
+                `superbol.cobol' section (e.g. `{\"dialect\": \"ibm\"}')" ]
+  in
+  EZCMD.sub "cache analyze"
+    (fun () ->
+       let jobs, batch_size = parallel () in
+       (* Processes report progress on the files they analyze as asked, except
+          on a line of their own, as their outputs are copied when they end. *)
+       let args = List.filter ((<>) "--progress=force") (given_args ()) in
+       Parallel_batches.run ~jobs ?batch_size ~command:["cache"; "analyze"]
+         ~progress:(common ()).progress_display ~args
+         ~sequential:analyze !files)
+    ~args:(args @ parallel_args)
     ~doc:"Analyze files, reusing and filling the cache of their project"
     ~man:[ `S "DESCRIPTION";
            `Blocks [ `P "Preprocess, parse and typecheck each FILE as the LSP \
@@ -185,12 +209,22 @@ let analyze_cmd =
                          server: a file analyzed by either is restored by the \
                          other, for as long as neither the file nor anything it \
                          depends upon (copybooks, project configuration) changes.";
+                     `P "With $(b,--no-lsp-artifacts), what only the LSP \
+                         server needs (e.g. semantic tokens, workspace symbols) \
+                         is neither computed nor stored.  The LSP server does \
+                         not reuse analyses stored this way, whereas analyses \
+                         it stored are reused all the same.";
                      `P "An LSP client such as Visual Studio Code may configure \
                          projects that have no configuration file through its \
                          settings: $(b,--client-settings) gives those settings, \
                          and $(b,--storage-directory) designates the caches of \
                          an LSP server started with that option, so that \
                          analyses are shared with that server.";
+                     `P "Visual Studio Code decodes files according to its \
+                         $(b,files.encoding) setting before sending them to \
+                         the server: analyses of files that are not plain \
+                         UTF-8 are only shared with the server when \
+                         $(b,--encoding) gives that same encoding.";
                      `P "Options such as $(b,--dialect), $(b,--conf), \
                          $(b,--source-format), $(b,-I), $(b,--ext), $(b,-D), \
                          $(b,--recovery) or $(b,--silence) override the project \
@@ -203,4 +237,13 @@ let analyze_cmd =
                          errors, unless $(b,--no-error-status) is given.";
                      `P "Files that appear to be copybooks are not \
                          analyzed. With $(b,--progress log-err), tell whether \
-                         each analysis was found in the cache." ]]
+                         each analysis was found in the cache.";
+                     `P "With $(b,--jobs N), files are split into batches \
+                         (see $(b,--batch-size)), each analyzed by a process \
+                         of its own, with up to N processes running at once.  \
+                         The output of each process is shown as a whole when \
+                         it ends, so diagnostics follow the order in which \
+                         batches end rather than that of the given files.  The \
+                         exit status is computed over all of them.  Builds of \
+                         this program into JavaScript analyze files in turn \
+                         instead." ]]

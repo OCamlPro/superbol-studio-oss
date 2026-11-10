@@ -23,12 +23,14 @@ module Tokenizing = Tokenizing
 module Symbolic = Symbolic           (* for now; may be moved elsewhere later *)
 module Platform = Platform
 module Tab_stops = Tab_stops
+module Text_encoding = Text_encoding
 
 exception FatalError of string
 let fatal fmt = Pretty.string_to (fun s -> raise @@ FatalError s) fmt
 
 include Exit_status
 let record_failure = Exit_status.fail
+let record_errors = Exit_status.raise
 
 (* Register a printer for some common exceptions. *)
 let init_default_exn_printers () =

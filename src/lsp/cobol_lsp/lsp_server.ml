@@ -42,6 +42,12 @@ module TYPES = struct
          directly afterwards.  We want to ignore that one, as client
          configurations are pulled on an on-demand and per-project basis.  *)
       ignore_next_client_config_changes: bool;
+
+      (* The "superbol.cobol" section of the last
+         "workspace/didChangeConfiguration" notification, to tell whether it
+         changed, as other sections are watched too (see
+         {!client_config_sections}). *)
+      last_client_cobol_settings: Yojson.Safe.t option;
     }
 
   and pending_tasks = {
@@ -297,10 +303,13 @@ let maybe_stop_watching_config_of ~project registry =
   else registry
 
 
+let client_config_sections =
+  ["superbol.cobol"; "files.encoding"; "[cobol]"]
+
 let start_watching_client_config registry =
   let registration =
     RegistrationParams.create ~registrations:[
-      let section = `String "superbol.cobol" in
+      let section = `List client_config_sections in
       Registration.create ()
         ~id:"watch-client-settings"
         ~method_:"workspace/didChangeConfiguration"
@@ -429,6 +438,61 @@ let use_client_config_for ~project (configs: Yojson.Safe.t list) registry =
   end
 
 
+(** {3 Encoding of files} *)
+
+(* The client decodes files according to [files.encoding], unless the [[cobol]]
+   section overrides it.  The client applies language-specific settings only
+   when given a language, which it is not when answering
+   "workspace/configuration" requests: so the [[cobol]] section is requested
+   as a whole, and takes precedence, as in VS Code. *)
+let file_encoding_sections = ["files.encoding"; "[cobol]"]
+
+let file_encoding_in_client_config (configs: Yojson.Safe.t list) =
+  let encoding_in_overrides = function
+    | `Assoc overrides ->
+        begin match List.assoc_opt "files.encoding" overrides,
+                    List.assoc_opt "files" overrides with
+        | Some (`String name), _ -> Some name
+        | _, Some (`Assoc files) ->
+            (match List.assoc_opt "encoding" files with
+             | Some (`String name) -> Some name
+             | _ -> None)
+        | _ -> None
+        end
+    | _ ->
+        None
+  in
+  match configs with
+  | [encoding; cobol_overrides] ->
+      begin match encoding_in_overrides cobol_overrides, encoding with
+        | Some name, _ | None, `String name -> Some name
+        | None, _ -> None
+      end
+  | _ ->
+      None
+
+let use_file_encoding_for ~project configs =
+  Lsp_project_cache.set_file_encoding project @@
+  match file_encoding_in_client_config configs with
+  | None ->
+      None
+  | Some name ->
+      match Cobol_common.Text_encoding.of_name name with
+      | Ok encoding ->
+          Some encoding
+      | Error msg ->
+          Lsp_io.log_warn "%s;@ files@ that@ are@ not@ open@ are@ read@ as@ \
+                           they@ are" msg;
+          None
+
+let client_config_items ~project sections =
+  let scopeUri = Lsp.Uri.to_string @@ Lsp_project.rooturi project in
+  List.map (fun section -> ConfigurationItem.create () ~scopeUri ~section)
+    sections
+
+
+(** {3 Client configuration} *)
+
 let request_n_use_client_config_for ~project
     ?(silence_ignored_settings_warning = false) registry =
   (* Every call to this function should be guarded with this flag: *)
@@ -443,19 +507,43 @@ let request_n_use_client_config_for ~project
       Lsp_io.notify_warn "New@ settings@ overriden@ by@ existing@ project@ \
                           configuration@ file@ at@ %s.@\n@\nPlease@ edit@ this@ \
                           file@ instead." project.config_filename;
-    now project registry
+    (* The encoding of files does not affect the project or its open documents:
+       carry on without waiting for it. *)
+    now project @@
+    delay registry
+      ~request:(WorkspaceConfiguration
+                  { items = client_config_items ~project
+                        file_encoding_sections })
+      ~f:(fun configs registry -> use_file_encoding_for ~project configs;
+           registry)
   end else begin
-    let uri = Lsp_project.rooturi project in
     await_response registry
       ~request:(WorkspaceConfiguration
-                  { items = [ ConfigurationItem.create ()
-                                ~scopeUri:(Lsp.Uri.to_string uri)
-                                ~section:"superbol.cobol" ] })
-      ~f:(use_client_config_for ~project)
+                  { items = client_config_items ~project
+                        ("superbol.cobol" :: file_encoding_sections) })
+      ~f:begin fun configs registry ->
+        match configs with
+        | config :: encoding_configs ->
+            use_file_encoding_for ~project encoding_configs;
+            use_client_config_for ~project [config] registry
+        | [] ->
+            use_client_config_for ~project configs registry
+      end
   end
 
 
+let cobol_settings_in (changes: Yojson.Safe.t option) =
+  match changes with
+  | Some (`Assoc settings) ->
+      begin match List.assoc_opt "superbol" settings with
+        | Some (`Assoc superbol) -> List.assoc_opt "cobol" superbol
+        | _ -> None
+      end
+  | _ ->
+      None
+
 let on_client_config_changes ?changes registry =
+  let cobol_settings = cobol_settings_in changes in
   if not registry.params.config.enable_client_configs
   then registry
   else if registry.sub_state.ignore_next_client_config_changes
@@ -463,15 +551,27 @@ let on_client_config_changes ?changes registry =
     (* Skip the first notification that is automatically sent after registration
        to "workspace/didChangeConfiguration" *)
     { registry with
-      sub_state = { ignore_next_client_config_changes = false } }
+      sub_state = { ignore_next_client_config_changes = false;
+                    last_client_cobol_settings = cobol_settings } }
   end
   else begin
     (* Note we ignore the provided changes as they are not project-specific.
-       Instead, we re-request them manually on a per-project basis. *)
-    ignore changes;
+       Instead, we re-request them manually on a per-project basis.  They only
+       tell whether the "superbol.cobol" section changed, which projects with a
+       configuration file warn they ignore. *)
+    let silence_ignored_settings_warning =
+      Option.is_some cobol_settings &&
+      cobol_settings = registry.sub_state.last_client_cobol_settings
+    in
+    let registry =
+      { registry with
+        sub_state = { registry.sub_state with
+                      last_client_cobol_settings = cobol_settings } }
+    in
     Lsp_project.SET.fold begin fun project registry ->
       ignore_promise_result @@
       request_n_use_client_config_for ~project registry
+        ~silence_ignored_settings_warning
     end registry.projects registry
   end
 
@@ -744,7 +844,8 @@ let init ~params : registry =
     docs = URIMap.empty;
     indirect_diags = URIMap.empty;
     pending_tasks = { delayed_id = 0; delayed = IMap.empty };
-    sub_state = { ignore_next_client_config_changes = true } } |>
+    sub_state = { ignore_next_client_config_changes = true;
+                  last_client_cobol_settings = None } } |>
   add_workspace_folders params.workspace_folders |>
   maybe_start_watching_client_config
 

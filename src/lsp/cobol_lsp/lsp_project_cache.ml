@@ -260,6 +260,14 @@ let load ~rootdir ~layout ~params =
       | exception _ ->                                     (* TODO: avoid this *)
           None
 
+(* --- Documents that are not open --- *)
+
+(** [read_source_file project filename] reads [filename] from disk, decoded as
+    the client would send it (see {!set_file_encoding}). *)
+let read_source_file project filename =
+  Superbol_project.decode_source project @@
+  Lsp_platform.record.read_text_file filename
+
 (* --- Workspace symbols --- *)
 
 (* Symbols retrieved for files that are not open, by absolute filename.  Each is
@@ -295,8 +303,7 @@ let lookup_symbols ~cache ~config ~resolve ~now project filename =
           memo_symbols
       | _ ->
           let symbols =
-            (* Read as the CLI does, so that keys agree. *)
-            match platform.read_text_file filename with
+            match read_source_file project filename with
             | exception Sys_error _ ->
                 None
             | contents ->
@@ -344,10 +351,28 @@ let cached_diagnostics ~params project filenames =
       let resolve = Superbol_cache.Recorder.resolver ~platform () in
       List.map begin fun filename ->
         filename,
-        match platform.read_text_file filename with
+        match read_source_file project filename with
         | exception Sys_error _ ->
             None
-        | contents ->                (* read as the CLI does, so keys agree *)
+        | contents ->
             let keys = ANALYSIS.document_keys config ~filename ~contents in
             CACHED_DIAGS.lookup cache ~keys ~resolve
       end filenames
+
+(* --- *)
+
+let set_file_encoding (project: Lsp_project.t) encoding =
+  let same = match project.config.source_encoding, encoding with
+    | None, None -> true
+    | Some p, Some e -> Cobol_common.Text_encoding.(name p = name e)
+    | _ -> false
+  in
+  if not same then begin
+    project.config.source_encoding <- encoding;
+    (* Symbols memoized for files of the project were looked up with keys of
+       contents decoded otherwise. *)
+    Hashtbl.filter_map_inplace begin fun _ memo ->
+      if Superbol_project.have_same_rootdirs memo.memo_project project
+      then None else Some memo
+    end symbols_memo
+  end

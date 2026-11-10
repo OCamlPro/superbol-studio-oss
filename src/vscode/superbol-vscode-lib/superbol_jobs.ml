@@ -28,6 +28,7 @@ type job =
     files: Uri.t list;
     project_root: string;
     client_settings: string;           (* `superbol.cobol' section, as JSON *)
+    encoding: string option;  (* encoding VS Code opens COBOL files with *)
   }
 
 (* The server asks for the `superbol.cobol' section with the root directory of
@@ -64,11 +65,19 @@ let make uris =
     Superbol_config.positive_int files_per_process_setting ~default:25 in
   Hashtbl.fold begin fun _ (folder, uris) jobs ->
     let client_settings = client_settings_for folder
-    and project_root = Uri.fsPath (WorkspaceFolder.uri folder) in
+    and project_root = Uri.fsPath (WorkspaceFolder.uri folder)
+    and encoding =
+      Superbol_config.cobol_files_encoding ~scope:(`WorkspaceFolder folder) in
+    if Superbol_config.guesses_encoding ~scope:(`WorkspaceFolder folder) then
+      Superbol_printer.log_error
+        "SuperBOL: files.autoGuessEncoding is enabled in %s: files whose \
+         guessed encoding differs from %s are analyzed again when opened"
+        (WorkspaceFolder.name folder)
+        (Option.value encoding ~default:"the configured one");
     let uris =
       List.sort (fun a b -> String.compare (Uri.fsPath a) (Uri.fsPath b)) uris
     in
-    List.map (fun files -> { files; project_root; client_settings })
+    List.map (fun files -> { files; project_root; client_settings; encoding })
       (chunks files_per_process uris) @ jobs
   end per_folder []
 
@@ -98,6 +107,8 @@ let run_one (cli: Superbol_languageclient.cli_invocation) ~token job =
      (* Diagnostics are reported by the server: only failures to analyze a file
         are output, or give a non-zero status. *)
      "--no-error-status"; "--no-diagnostics"] @
+    (* Decode files as VS Code does when it opens them. *)
+    Option.fold job.encoding ~none:[] ~some:(fun e -> ["--encoding"; e]) @
     List.map Uri.fsPath job.files
   in
   let settled = ref false in

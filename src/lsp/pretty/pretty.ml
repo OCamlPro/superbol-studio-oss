@@ -224,6 +224,10 @@ let straighten_if_tty oc fo cols =
   if Unix.isatty (Unix.descr_of_out_channel oc) then
     pp_set_margin fo cols
 
+(* Renderers of [Fmt.stdout] and [Fmt.stderr] chosen by {!init_formatters},
+   from the kind of terminal they are bound to. *)
+let auto_renderers = ref None
+
 (** Initialization of standard formatters; calls {!Fmt_tty.setup_std_outputs},
     and, depending on the kind of terminals they are bound to, adapts the
     margins of {!Fmt.stdout} and {!Fmt.stderr}.  The width of the terminal
@@ -237,4 +241,112 @@ let init_formatters ?style_renderer ?utf_8 () =
   in
   let columns = if columns < 2 then 180 else columns in
   straighten_if_tty Stdlib.stderr Fmt.stderr columns;
-  straighten_if_tty Stdlib.stdout Fmt.stdout columns
+  straighten_if_tty Stdlib.stdout Fmt.stdout columns;
+  auto_renderers :=
+    Some (Fmt.style_renderer Fmt.stdout, Fmt.style_renderer Fmt.stderr)
+
+(** {2 Colors} *)
+
+let auto_renderer stream =
+  let out, err = match !auto_renderers with
+    | Some renderers -> renderers
+    | None -> Fmt.style_renderer Fmt.stdout, Fmt.style_renderer Fmt.stderr
+  in
+  match stream with `Stdout -> out | `Stderr -> err
+
+let formatter_of_stream = function
+  | `Stdout -> Fmt.stdout
+  | `Stderr -> Fmt.stderr
+
+let streams = [`Stdout; `Stderr]
+
+let string_of_stream = function `Stdout -> "stdout" | `Stderr -> "stderr"
+
+(* [set_per_stream ~parse ~set spec] parses [spec] as a comma-separated list of
+   items [VALUE] or [STREAM:VALUE], and then calls [set stream value] for each
+   stream of each item in turn; it calls nothing if any item is invalid. *)
+let set_per_stream ~parse ~set spec =
+  let parse_item item =
+    match String.index_opt item ':' with
+    | None ->
+        Result.map (fun v -> streams, v) (parse item)
+    | Some i ->
+        let stream = String.sub item 0 i
+        and v = String.sub item (i + 1) (String.length item - i - 1) in
+        match List.find_opt (fun s -> string_of_stream s = stream) streams with
+        | None -> Error (Printf.sprintf "Expected stdout or stderr: %s" stream)
+        | Some s -> Result.map (fun v -> [s], v) (parse v)
+  in
+  let items = List.map (fun s -> parse_item (String.trim s)) @@
+    String.split_on_char ',' spec
+  in
+  match List.find_map (function Error e -> Some e | Ok _ -> None) items with
+  | Some e ->
+      Error e
+  | None ->
+      List.iter begin function
+        | Error _ -> ()
+        | Ok (streams, v) -> List.iter (fun stream -> set stream v) streams
+      end items;
+      Ok ()
+
+let per_stream_spec value_of_formatter =
+  String.concat "," @@ List.map begin fun stream ->
+    Printf.sprintf "%s:%s" (string_of_stream stream) @@
+    value_of_formatter (formatter_of_stream stream)
+  end streams
+
+let set_colors =
+  set_per_stream
+    ~parse:begin function
+      | "always" -> Ok `Always
+      | "never" -> Ok `Never
+      | "auto" -> Ok `Auto
+      | s -> Error (Printf.sprintf "Expected always, never or auto: %s" s)
+    end
+    ~set:begin fun stream w ->
+      Fmt.set_style_renderer (formatter_of_stream stream) @@
+      match w with
+      | `Always -> `Ansi_tty
+      | `Never -> `None
+      | `Auto -> auto_renderer stream
+    end
+
+let colors_spec () =
+  per_stream_spec begin fun ppf ->
+    match Fmt.style_renderer ppf with
+    | `Ansi_tty -> "always"
+    | `None -> "never"
+  end
+
+(** {2 Margins} *)
+
+let set_margins =
+  set_per_stream
+    ~parse:begin fun s ->
+      let error () =
+        Error (Printf.sprintf "Expected MARGIN or MARGIN/MAX_INDENT: %s" s) in
+      match String.split_on_char '/' s with
+      | [m] ->
+          begin match int_of_string_opt m with
+            | Some margin when margin > 2 -> Ok (margin, pred margin)
+            | _ -> error ()
+          end
+      | [m; i] ->
+          begin match int_of_string_opt m, int_of_string_opt i with
+            | Some margin, Some max_indent
+              when Format.check_geometry { max_indent; margin } ->
+                Ok (margin, max_indent)
+            | _ -> error ()
+          end
+      | _ -> error ()
+    end
+    ~set:begin fun stream (margin, max_indent) ->
+      Format.pp_set_geometry (formatter_of_stream stream) ~max_indent ~margin
+    end
+
+let margins_spec () =
+  per_stream_spec begin fun ppf ->
+    let { Format.margin; max_indent } = Format.pp_get_geometry ppf () in
+    Printf.sprintf "%d/%d" margin max_indent
+  end

@@ -93,7 +93,7 @@ let make_cmd ?extensions () =
         ["cache-size-limit"],
         Arg.String begin fun s -> match Arg_utils.size_of_string s with
           | Ok size -> cache_max_size := Some size
-          | Error () -> Pretty.failwith "Not a size: %s" s
+          | Error () -> Cobol_common.fatal "Not a size: %s" s
         end,
         EZCMD.info ~docv:"SIZE"
           "Keep each project's cache under that size, reclaiming the entries \

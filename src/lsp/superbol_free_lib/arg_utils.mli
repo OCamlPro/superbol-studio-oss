@@ -27,3 +27,12 @@ val switch
 (** Accepts a plain number of bytes, or one with the usual suffix: [500M],
     [2G], [64k].  Powers of 1024, as the sizes this reports are. *)
 val size_of_string: string -> (int64, unit) result
+
+(** [recording args] is [args], along with a function that lists the arguments
+    among them that were given, as they would be given on the command line
+    (anonymous arguments excepted): long options are listed as
+    [--name=VALUE], and single-letter ones as [-nVALUE].  Arguments are listed
+    in the order they were parsed. *)
+val recording
+  : Ezcmd.V2.EZCMD.TYPES.arg_list
+  -> (unit -> string list) * Ezcmd.V2.EZCMD.TYPES.arg_list
