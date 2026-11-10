@@ -64,9 +64,12 @@ module TABLE =
 
 let table = TABLE.create 1
 
+(* Root directories are slashified once and for all upon creation, so that
+   they can be compared, and used as prefixes of slashified filenames (see
+   {!Project_utils.relative_path}). *)
 let rootdir_at ~dirname : rootdir =
   if EzFile.is_directory dirname
-  then dirname
+  then Slashifier.slashify dirname
   else Fmt.invalid_arg "Expected existing directory: %s" dirname
 
 let find_first_in_parent_dirs ~f dir =
@@ -80,7 +83,8 @@ let find_first_in_parent_dirs ~f dir =
   try_dir dir
 
 let rootdir_for ~filename
-    ~layout:{ project_config_filename; rootdir_fallback_policy; _ } =
+    ~layout:{ project_config_filename; rootdir_fallback_policy; _ } : rootdir =
+  Slashifier.slashify @@
   let dirname = EzFile.dirname filename in
   try
     find_first_in_parent_dirs dirname

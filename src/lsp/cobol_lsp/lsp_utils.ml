@@ -13,20 +13,12 @@
 
 open Ez_file.V1
 
-let () =
-  (* There is no need backslashify path names on windows. *)
-  Lsp.Uri.Private.win32 := false
-
-(** [relative_path uri absolute_path] returns the relative path of [uri] {i
-    w.r.t} [absolute_path] if [absolute_path] is a prefix of [uri], and raises
-    {!Invalid_argument} otherwise. *)
-let relative_path ~uri absolute_path =
-  let path = Lsp.Uri.to_path uri in
-  match EzString.chop_prefix ~prefix:absolute_path path with
-  | Some "" -> "."
-  | Some path when path.[0] = FileOS.dir_separator -> EzString.after path 0
-  | Some path -> path
-  | None -> Fmt.invalid_arg "%s is not contained within %s" path absolute_path
+(** [path_of_uri uri] returns the file path of [uri], slashified: on Windows,
+    {!Lsp.Uri.to_path} gives paths with backslashes, whereas every path
+    handled by the server (and the CLI) uses slashes as directory separators,
+    so that paths can be compared and used as cache keys. *)
+let path_of_uri uri =
+  Slashifier.slashify @@ Lsp.Uri.to_path uri
 
 let is_file path = EzFile.exists path && not (EzFile.is_directory path)
 

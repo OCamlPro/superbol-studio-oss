@@ -31,7 +31,7 @@ let enter_context context (prev_context, acc) =
     (fun (_, acc) -> prev_context, acc)
 
 let positions ~uri group artifacts =
-  let filename = Lsp.Uri.to_path uri in
+  let filename = Lsp_utils.path_of_uri uri in
   let take_when_in context { loc; _ } (current_context, acc) =
     if context <> current_context then
       Cobol_common.Visitor.skip (current_context, acc)

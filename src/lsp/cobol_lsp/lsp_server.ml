@@ -256,7 +256,7 @@ let start_watching_config_of ~project registry ~pattern_kind =
                                   ~pattern:"**/superbol.toml"
                                   ~baseUri:(`URI rooturi))
           | `absolute ->                (* assume root path is ok as a pattern *)
-              `Pattern (DocumentUri.to_path rooturi ^ "/superbol.toml")
+              `Pattern (Lsp_utils.path_of_uri rooturi ^ "/superbol.toml")
         in
         FileSystemWatcher.[
           create () ~globPattern ~kind:Create;
@@ -643,7 +643,7 @@ let group_closed_by_project uris registry =
      symbols. *)
   let module StringSet = EzCompat.StringSet in
   let canonical_path uri =
-    Superbol_cache.Witness.canonical_path @@ Lsp.Uri.to_path uri in
+    Superbol_cache.Witness.canonical_path @@ Lsp_utils.path_of_uri uri in
   let open_files =
     URIMap.fold (fun uri _ -> StringSet.add (canonical_path uri))
       registry.docs StringSet.empty
@@ -734,7 +734,7 @@ let publish_cached_diagnostics uris registry =
       let rootdir = Lsp_project.(string_of_rootdir @@ rootdir project) in
       let publish = publishes_diagnostics ~project registry in
       Lsp_project_cache.cached_diagnostics ~params:registry.params project
-        (List.map Lsp.Uri.to_path uris) |>
+        (List.map Lsp_utils.path_of_uri uris) |>
       List.fold_left2 begin fun (registry, mains, others, missed) uri -> function
         | _, None ->
             registry, mains, others, uri :: missed
@@ -786,12 +786,12 @@ let on_write_project_config_command ?uri registry =
   | None ->
       Lsp_project.SET.fold write_project_config registry.projects registry
   | Some uri
-    when not (Sys.is_directory (Lsp.Uri.to_path uri)) ->
+    when not (Sys.is_directory (Lsp_utils.path_of_uri uri)) ->
       perform write_project_config
         ~after:(create_or_retrieve_doc_project_promise ~uri registry)
   | Some uri ->
       try
-        let dirname = Lsp.Uri.to_path uri in
+        let dirname = Lsp_utils.path_of_uri uri in
         let rootdir = Superbol_project.rootdir_at ~dirname in   (* may invalid. *)
         let project = Lsp_project.SET.for_rootdir ~rootdir registry.projects in
         write_project_config project registry
@@ -832,7 +832,7 @@ let load_project_in ~dir registry =
 
 let add_workspace_folders folders registry =
   List.fold_left begin fun registry workspace_folder_uri ->
-    load_project_in ~dir:(Lsp.Uri.to_path workspace_folder_uri) registry
+    load_project_in ~dir:(Lsp_utils.path_of_uri workspace_folder_uri) registry
   end registry folders |>
   dispatch_all_diagnostics
 
@@ -863,7 +863,7 @@ let unload_project project registry =
 let remove_workspace_folders folders registry =
   List.fold_left begin fun registry workspace_folder_uri ->
     try
-      let dirname = Lsp.Uri.to_path workspace_folder_uri in
+      let dirname = Lsp_utils.path_of_uri workspace_folder_uri in
       let rootdir = Superbol_project.rootdir_at ~dirname in   (* may invalid. *)
       let project = Lsp_project.SET.for_rootdir ~rootdir registry.projects in
       unload_project project registry

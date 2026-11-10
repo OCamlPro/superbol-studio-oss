@@ -19,7 +19,7 @@ let print_procedures (doc, positions) =
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let checked_doc =
     LSP.Document.checked @@ LSP.Server.find_document prog server in
-  let filename = Lsp.Uri.to_path prog.uri in
+  let filename = Cobol_lsp.Utils.path_of_uri prog.uri in
   StringMap.iter begin fun position_name (position: Lsp.Types.Position.t) ->
     let { proc_name; _ }: LSP.Lookup.TYPES.procedure_at_position =
       LSP.Lookup.proc_at_pos ~filename position checked_doc.group in

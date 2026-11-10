@@ -94,7 +94,7 @@ let analysis_overrides_for doc =
   analysis_overrides ~language_id:(language_id doc)
 
 let rewindable_parse ~platform ({ project; textdoc; _ } as doc) =
-  let filename = Lsp.Uri.to_path (uri doc) in
+  let filename = Lsp_utils.path_of_uri (uri doc) in
   let overrides = analysis_overrides_for doc in
   Cobol_parser.rewindable_parse_with_artifacts
     ~options:(ANALYSIS.parser_options ~overrides project) @@
@@ -120,7 +120,7 @@ let check doc ptree =
   let artifacts = Cobol_parser.artifacts ptree in
   let semtoks =
     (* Not capturing [doc], which holds the artifacts of the previous parse *)
-    let filename = Lsp.Uri.to_path (uri doc) in
+    let filename = Lsp_utils.path_of_uri (uri doc) in
     Some (lazy (Lsp_semtoks.whole ~filename artifacts checked))
   in
   { doc with artifacts;
@@ -197,7 +197,7 @@ let blank ~project textdoc =
   let uri = Lsp.Text_document.documentUri textdoc in
   let copybook =
     ANALYSIS.detect_copybook project ~platform:Lsp_platform.record
-      ~filename:(Lsp.Uri.to_path uri)
+      ~filename:(Lsp_utils.path_of_uri uri)
       ~contents:(Lsp.Text_document.text textdoc)
   in
   if copybook then

@@ -132,7 +132,7 @@ let pseudo_normalized_uri ~rootdir filename =
 let location_of_srcloc ?(focus_on_main_doc = false) ~rootdir ~uri loc =
   let project_srcloc =
     if focus_on_main_doc
-    then Srcloc.lexloc_in ~filename:(Lsp.Uri.to_path uri)
+    then Srcloc.lexloc_in ~filename:(Lsp_utils.path_of_uri uri)
     else Srcloc.as_lexloc                       (* rely on default projection *)
   in
   let uri, range =

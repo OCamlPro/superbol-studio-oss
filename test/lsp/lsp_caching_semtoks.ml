@@ -86,7 +86,7 @@ let check_ranges server ~projdir all =
   let Cobol_typeck.Outputs.{ ptree; _ } = LSP.Document.checked doc in
   (* Same filename as the server's, which may differ from the raw path on
      Windows (drive letter case, path separators). *)
-  let filename = Lsp.Uri.to_path (LSP.Document.uri doc) in
+  let filename = Cobol_lsp.Utils.path_of_uri (LSP.Document.uri doc) in
   List.for_all2 begin fun range restricted ->
     LSP.Semtoks.data ~filename ~range:(Some range)
       ~tokens:(Lazy.force tokens) ~pplog ~ptree ~rev_ignored
