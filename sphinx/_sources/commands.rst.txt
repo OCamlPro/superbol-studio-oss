@@ -102,6 +102,8 @@ Analysis results are looked up in, or else stored into, the cache of that projec
 
 An LSP client such as Visual Studio Code may configure projects that have no configuration file through its settings: **--client-settings** gives those settings, and **--storage-directory** designates the caches of an LSP server started with that option, so that analyses are shared with that server.
 
+Visual Studio Code decodes files according to its **files.encoding** setting before sending them to the server: analyses of files that are not plain UTF-8 are only shared with the server when **--encoding** gives that same encoding.
+
 Options such as **--dialect**, **--conf**, **--source-format**, **-I**, **--ext**, **-D**, **--recovery** or **--silence** override the project configuration; analyses obtained with them are cached separately, and are not shared with the LSP server.
 
 A file that cannot be analyzed (e.g. because it cannot be read) is reported, and the remaining files are analyzed all the same.  The exit status is then at least 2; it is odd whenever some analyzed file holds errors, unless **--no-error-status** is given.
@@ -129,6 +131,8 @@ Where options are:
 * :code:`--config-dir DIR`   Add DIR to config search path
 
 * :code:`--dialect DIALECT` or :code:`--std DIALECT`   Set the dialect to bu used (overriden by `--conf` if used)
+
+* :code:`--encoding ENCODING`   Decode files as Visual Studio Code does with this value of its `files.encoding' setting (e.g. `windows1252', `cp850').  Files are read as they are by default, or (with a warning listing the supported encodings) if ENCODING is not supported
 
 * :code:`--ext EXT`   Add EXT as a filename extension for copybook resolution (default: `cpy` `cbl` `cob`)
 
@@ -222,7 +226,7 @@ Check the syntax of a Cobol file
 
 Preprocess and parse each FILE, and report diagnostics.  By default, only the options given on the command line are used.
 
-With **--project**, each FILE is analyzed as the LSP server would: according to the configuration of the project it belongs to (which options given on the command line override), with typechecking, and leaving out files that appear to be copybooks. Results are looked up in the cache of that project, which also holds those of the LSP server and **superbol cache analyze**.  On a miss, results are stored into the cache without the artifacts the LSP server needs, so they are not reused by the latter (use **superbol cache analyze** to fill the cache for the LSP server).
+With **--project**, each FILE is analyzed as the LSP server would: according to the configuration of the project it belongs to (which options given on the command line override), with typechecking, and leaving out files that appear to be copybooks. Results are looked up in the cache of that project, which also holds those of the LSP server and **superbol cache analyze**.  On a miss, results are stored into the cache without the artifacts the LSP server needs, so they are not reused by the latter (use **superbol cache analyze** to fill the cache for the LSP server).  **--project-root** and **--encoding** only apply with **--project**.
 
 **USAGE**
 ::
@@ -243,6 +247,8 @@ Where options are:
 * :code:`--config-dir DIR`   Add DIR to config search path
 
 * :code:`--dialect DIALECT` or :code:`--std DIALECT`   Set the dialect to bu used (overriden by `--conf` if used)
+
+* :code:`--encoding ENCODING`   Decode files as Visual Studio Code does with this value of its `files.encoding' setting (e.g. `windows1252', `cp850').  Files are read as they are by default, or (with a warning listing the supported encodings) if ENCODING is not supported
 
 * :code:`--ext EXT`   Add EXT as a filename extension for copybook resolution (default: `cpy` `cbl` `cob`)
 
@@ -421,8 +427,6 @@ Where options are:
 MODE can be hide, force, log or log-err.
       By default progress is displayed when stderr is a TTY.
 
-* :code:`--project-root DIR` or :code:`--root DIR`   Set the root of the project (autodetected on a per-file basis otherwise)
-
 * :code:`--recovery BOOL`   Enable/disable parser recovery after syntax errors (default: true)
 
 * :code:`--silence STRING`   Silence specific messages
@@ -548,8 +552,6 @@ Where options are:
 * :code:`--progress MODE`   Set how to display progress of the command.
 MODE can be hide, force, log or log-err.
       By default progress is displayed when stderr is a TTY.
-
-* :code:`--project-root DIR` or :code:`--root DIR`   Set the root of the project (autodetected on a per-file basis otherwise)
 
 * :code:`--recovery BOOL`   Enable/disable parser recovery after syntax errors (default: true)
 
@@ -729,6 +731,8 @@ Where options are:
 * :code:`--copybooks`   Preprocess copybooks also (without REPLACING)
 
 * :code:`--dialect DIALECT` or :code:`--std DIALECT`   Set the dialect to bu used (overriden by `--conf` if used)
+
+* :code:`--encoding ENCODING`   Decode files as Visual Studio Code does with this value of its `files.encoding' setting (e.g. `windows1252', `cp850').  Files are read as they are by default, or (with a warning listing the supported encodings) if ENCODING is not supported
 
 * :code:`--ext EXT`   Add EXT as a filename extension for copybook resolution (default: `cpy` `cbl` `cob`)
 
