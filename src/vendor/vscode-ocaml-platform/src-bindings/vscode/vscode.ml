@@ -929,9 +929,13 @@ module StatusBarItem = struct
 
   include
     [%js:
+    val id : t -> string [@@js.get]
+
     val alignment : t -> StatusBarAlignment.t [@@js.get]
 
     val priority : t -> int or_undefined [@@js.get]
+
+    val name : t -> string or_undefined [@@js.get]
 
     val text : t -> string [@@js.get]
 
@@ -950,13 +954,15 @@ module StatusBarItem = struct
 
     val set_priority : t -> int -> unit [@@js.set]
 
+    val set_name : t -> string -> unit [@@js.set]
+
     val set_text : t -> string -> unit [@@js.set]
 
     val set_tooltip : t -> string -> unit [@@js.set]
 
     val set_color : t -> color -> unit [@@js.set]
 
-    val set_backgroundColor : t -> ThemeColor.t -> unit [@@js.set]
+    val set_backgroundColor : t -> ThemeColor.t or_undefined -> unit [@@js.set]
 
     val set_command : t -> command -> unit [@@js.set]
 
@@ -3323,10 +3329,18 @@ module Window = struct
     val withProgress : options:ProgressOptions.t -> task:Ojs.t -> Ojs.t
       [@@js.global "__SUPERBOL__.vscode.window.withProgress"]
 
-    val createStatusBarItem :
-         ?alignment:StatusBarAlignment.t
-      -> ?priority:int
-      -> unit
+    (* Arguments are given in position, as VS Code tells both forms apart by
+       the type of the first one. *)
+    val createStatusBarItem_ :
+         StatusBarAlignment.t or_undefined
+      -> int or_undefined
+      -> StatusBarItem.t
+      [@@js.global "__SUPERBOL__.vscode.window.createStatusBarItem"]
+
+    val createStatusBarItem_with_id :
+         string
+      -> StatusBarAlignment.t or_undefined
+      -> int or_undefined
       -> StatusBarItem.t
       [@@js.global "__SUPERBOL__.vscode.window.createStatusBarItem"]
 
@@ -3432,6 +3446,11 @@ module Window = struct
         task
     in
     [%js.to: T.t Promise.t] (withProgress ~options ~task)
+
+  let createStatusBarItem ?id ?alignment ?priority () =
+    match id with
+    | None -> createStatusBarItem_ alignment priority
+    | Some id -> createStatusBarItem_with_id id alignment priority
 
   let registerTreeDataProvider (type a) (module T : Js.T with type t = a)
       ~(viewId : string) ~(treeDataProvider : a TreeDataProvider.t) :

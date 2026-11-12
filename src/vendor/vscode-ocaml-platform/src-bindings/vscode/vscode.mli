@@ -723,9 +723,13 @@ module StatusBarItem : sig
     | `Command of Command.t
     ]
 
+  val id : t -> string
+
   val alignment : t -> StatusBarAlignment.t
 
   val priority : t -> int option
+
+  val name : t -> string option
 
   val text : t -> string
 
@@ -743,13 +747,16 @@ module StatusBarItem : sig
 
   val set_priority : t -> int -> unit
 
+  val set_name : t -> string -> unit
+
   val set_text : t -> string -> unit
 
   val set_tooltip : t -> string -> unit
 
   val set_color : t -> color -> unit
 
-  val set_backgroundColor : t -> ThemeColor.t -> unit
+  (** [None] unsets it. *)
+  val set_backgroundColor : t -> ThemeColor.t option -> unit
 
   val set_command : t -> command -> unit
 
@@ -2554,8 +2561,15 @@ module Window : sig
     -> task:(progress:Progress.t -> token:CancellationToken.t -> 'a Promise.t)
     -> 'a Promise.t
 
+  (** [createStatusBarItem ?id ?alignment ?priority ()] creates a status bar
+      item; one without [id] shares the identifier of the extension with every
+      other such item. *)
   val createStatusBarItem :
-    ?alignment:StatusBarAlignment.t -> ?priority:int -> unit -> StatusBarItem.t
+       ?id:string
+    -> ?alignment:StatusBarAlignment.t
+    -> ?priority:int
+    -> unit
+    -> StatusBarItem.t
 
   val createInputBox : unit -> InputBox.t
 
