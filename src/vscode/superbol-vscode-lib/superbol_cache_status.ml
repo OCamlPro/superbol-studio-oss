@@ -17,8 +17,6 @@ open Vscode
 
 module MONITOR = Superbol_cache_monitor
 
-let refresh_command = "superbol.cache.refreshStatus"
-
 type state =
   {
     instance: Superbol_instance.t;
@@ -75,7 +73,7 @@ let show_statuses { item; _ } statuses =
                else "")]
        | None ->
            []) @
-      ["Click to refresh."];
+      ["Click to show their contents."];
       StatusBarItem.set_backgroundColor item
         (if any_over_limit
          then Some (ThemeColor.make ~id:"statusBarItem.warningBackground")
@@ -134,15 +132,15 @@ let affects_status config_change =
     ConfigurationChangeEvent.affectsConfiguration config_change ~section ()
   end ["superbol.cacheInGlobalStorage"; "superbol.cache.sizeLimit"]
 
-let start instance =
-  (* On the left, below the views of the side bar. *)
+let start instance ~click_command =
+  (* On the left, below the side bar. *)
   let item =
     Window.createStatusBarItem ~id:"superbol.cacheStatus" ~alignment:Left ()
   in
   (* Named in menus (e.g. to hide it) on its own, rather than after the
      extension. *)
   StatusBarItem.set_name item "SuperBOL Caches";
-  StatusBarItem.set_command item (`String refresh_command);
+  StatusBarItem.set_command item (`String click_command);
   let s = { instance; item; refreshing = false; pending = false;
             delayed = None } in
   state := Some s;

@@ -20,13 +20,11 @@
     is shown whenever one of them has a cache, and highlighted whenever one of
     them exceeds the size limit. *)
 
-(** Command that refreshes the item, run when it is clicked. *)
-val refresh_command: string
-
-(** [start instance] creates the item, and has it refreshed whenever a document
-    of a workspace folder is saved, workspace folders change, a setting about
-    caches changes, or the language server (re)starts. *)
-val start: Superbol_instance.t -> unit
+(** [start instance ~click_command] creates the item, that runs [click_command]
+    when clicked, and has it refreshed whenever a document of a workspace folder
+    is saved, workspace folders change, a setting about caches changes, or the
+    language server (re)starts. *)
+val start: Superbol_instance.t -> click_command: string -> unit
 
 (** [refresh ()] has the item refreshed, e.g. once a workspace analysis is
     over. *)

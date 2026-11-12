@@ -185,9 +185,12 @@ type command_icon = {
 [@@deriving json_encoding,show]
 
 
+(* A single string stands for the same icon in light and dark themes, which may
+   be a product icon such as `$(refresh)`. *)
 let command_icon_enc = Json_encoding.union [
     Json_encoding.case Json_encoding.string
-      (fun _icon -> None)
+      (fun icon ->
+         if icon.icon_light = icon.icon_dark then Some icon.icon_light else None)
       (fun url -> { icon_light = url ;icon_dark = url })
     ;
     Json_encoding.case command_icon_enc
@@ -730,15 +733,17 @@ type view = {
   view_when : string option;
   view_icon : string option;
   view_contextualTitle : string option;
+  view_visibility : string option;   (* "visible", "collapsed" or "hidden" *)
 }
 [@@deriving json_encoding,show]
-let view ~id ~name ?when_ ?icon ?contextualTitle () =
+let view ~id ~name ?when_ ?icon ?contextualTitle ?visibility () =
   {
     view_id = id ;
     view_name = name ;
     view_when = when_ ;
     view_icon = icon ;
     view_contextualTitle = contextualTitle ;
+    view_visibility = visibility ;
   }
 
 type viewsContainer = {

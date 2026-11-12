@@ -22,6 +22,32 @@ type status =
     disk_usage: float;
   }
 
+type entry =
+  {
+    key: string;
+    label: string;
+    dependencies: int;
+    disk_usage: float;
+    last_used: float;
+    value: string;
+    value_size: float;
+  }
+
+type listing =
+  {
+    totals: status;
+    now: float;
+    items: entry list;
+  }
+
+type trimmed =
+  {
+    reclaimed: int;
+    remaining: status;
+  }
+
+let now () = Node.Date.now () /. 1000.
+
 (* Length of the tail of the error output that is reported when a command
    fails. *)
 let stderr_tail_length = 2048
@@ -72,6 +98,27 @@ let decode_status json =
     values = count "values";
     disk_usage = try_default 0. (field "disk_usage" float) json }
 
+let decode_entry json =
+  let open Jsonoo.Decode in
+  { key = field "key" string json;
+    label = field "label" string json;
+    dependencies = try_default 0 (field "dependencies" int) json;
+    disk_usage = try_default 0. (field "disk_usage" float) json;
+    last_used = try_default 0. (field "last_used" float) json;
+    value = field "value" string json;
+    value_size = try_default 0. (field "value_size" float) json }
+
+let decode_listing json =
+  let open Jsonoo.Decode in
+  { totals = decode_status json;
+    now = try_default (now ()) (field "now" float) json;
+    items = try_default [] (field "items" (list decode_entry)) json }
+
+let decode_trimmed json =
+  let open Jsonoo.Decode in
+  { reclaimed = try_default 0 (field "reclaimed" int) json;
+    remaining = decode_status json }
+
 let decode decoder output =
   match Jsonoo.try_parse_opt output with
   | None ->
@@ -88,6 +135,47 @@ let status cli ~project_root =
   in
   Result.bind output (decode decode_status)
 
+let listing cli ~project_root =
+  let open Promise.Syntax in
+  let+ output =
+    run cli @@
+    ["cache"; "status"; "--json"; "--list-entries";
+     "--project-root"; project_root] @
+    cli.cli_storage_args
+  in
+  Result.bind output (decode decode_listing)
+
+let trim cli ~project_root ?older_than ?max_size () =
+  let open Promise.Syntax in
+  let+ output =
+    run cli @@
+    ["cache"; "trim"; "--json"; "--project-root"; project_root] @
+    Option.fold older_than ~none:[]
+      ~some:(fun days -> ["--older-than"; Printf.sprintf "%g" days]) @
+    Option.fold max_size ~none:[] ~some:(fun size -> ["--max-size"; size]) @
+    cli.cli_storage_args
+  in
+  Result.bind output (decode decode_trimmed)
+
+(* --- *)
+
+let removed_by_age_bound ~now ~older_than items =
+  let removed, kept =
+    List.partition (fun e -> now -. e.last_used > older_than *. 86400.) items
+  in
+  let held = Hashtbl.create (List.length kept) in
+  List.iter (fun e -> Hashtbl.replace held e.value ()) kept;
+  let freed_values = Hashtbl.create 17 in
+  let manifests =
+    List.fold_left begin fun total e ->
+      if not (Hashtbl.mem held e.value) then
+        Hashtbl.replace freed_values e.value e.value_size;
+      total +. (e.disk_usage -. e.value_size)
+    end 0. removed
+  in
+  List.length removed,
+  Hashtbl.fold (fun _ size total -> total +. size) freed_values manifests
+
 let workspace_folders () =
   List.filter (fun f -> Vscode.(Uri.scheme (WorkspaceFolder.uri f)) = "file")
     (Vscode.Workspace.workspaceFolders ())
@@ -95,7 +183,7 @@ let workspace_folders () =
 let pp_size ppf bytes =
   let rec pick n = function
     | _ :: (_ :: _ as units) when n >= 1024. -> pick (n /. 1024.) units
-    | [unit] when unit = "B" -> Format.fprintf ppf "%.0f %s" n unit
+    | "B" :: _ -> Format.fprintf ppf "%.0f B" n
     | unit :: _ -> Format.fprintf ppf "%.1f %s" n unit
     | [] -> Format.fprintf ppf "%.0f B" n
   in
