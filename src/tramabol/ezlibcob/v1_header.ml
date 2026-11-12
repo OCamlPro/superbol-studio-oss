@@ -15,5 +15,10 @@
 external resolve_cobol_and_call: string -> int =
   "ml_cob_resolve_cobol_and_call"
 
+external cob_get_exception_code: unit -> int =
+  "ml_cob_get_exception_code" [@@noalloc]
+external cob_reset_exception_code: unit -> unit =
+  "ml_cob_reset_exception_code" [@@noalloc]
+
 (* The following line should be specified with an offset of +2 *)
-#21 "_build/default/src/tramabol/ezlibcob/v1.ml"
+#26 "_build/default/src/tramabol/ezlibcob/v1.ml"

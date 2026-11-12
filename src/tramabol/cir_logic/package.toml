@@ -10,7 +10,7 @@ skeleton = "library"
 # synopsis = ...
 
 # description if different from project description
-description = "Intermediate representation for COBOL programs (semantics)"
+description = "Intermediate representation for COBOL programs (small-step semantics)"
 
 # kind is either "library", "program" or "virtual"
 kind = "library"

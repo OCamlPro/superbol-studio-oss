@@ -31,11 +31,16 @@ let parse_n_typeck { preproc_options; parser_options; platform; _ } filename =
         ~fold_exec_block':Superbol_preprocs.Esql.fold_exec_block' |>
       Cobol_typeck.Results.translate_diags
     end |>
-    Cobol_common.Diagnostics.show_diags ~platform
+    Cobol_common.Diagnostics.show_diags ~platform ~exit_on_error:true
   end
 
-let run (typeck_outputs: Cobol_typeck.Outputs.t) =
-  match Cobol_interp.Main.run_group typeck_outputs.group with
+let run ~max_steps (typeck_outputs: Cobol_typeck.Outputs.t) =
+  let options =
+    Cobol_interp.Main.{
+      default_options with
+      run_options = { default_options.run_options with max_steps } }
+  in
+  match Cobol_interp.Main.run_group ~options typeck_outputs.group with
   | Ok status ->
       Pretty.error "Terminated with status: %d@." status;
       Cobol_common.exit ~status ()
@@ -58,7 +63,8 @@ let main ?style_renderer ?utf_8 () =
   Printexc.record_backtrace true;
   let file = ref None
   and common, common_args = Superbol_free_lib.Common_args.get ()
-  and show_only = ref false in
+  and show_only = ref false
+  and max_steps = ref None in
   let args =
     common_args @ [
       [],
@@ -66,7 +72,11 @@ let main ?style_renderer ?utf_8 () =
       EZCMD.info ~docv:"FILE" "COBOL file to interpret";
 
       ["show"], Arg.Set show_only,
-      EZCMD.info ~docv:"BOOL" "";
+      EZCMD.info ~docv:"BOOL" "Dump TramaBOL's internal representation, and then \
+                               exit";
+
+      ["max-steps"], Arg.Int (fun n -> max_steps := Some n),
+      EZCMD.info ~docv:"N" "Abort execution after $(docv) steps";
     ]
   in
   EZCMD.main ~version:Version.version @@
@@ -75,5 +85,5 @@ let main ?style_renderer ?utf_8 () =
     let parser_outputs = parse_n_typeck (common ()) !file in
     if !show_only
     then show parser_outputs
-    else run parser_outputs
+    else run ~max_steps:!max_steps parser_outputs
   end

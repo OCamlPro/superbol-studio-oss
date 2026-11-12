@@ -19,7 +19,8 @@
    - ['s] to denote the type of runtime states; a concrete imperative
      interpreter will typically use ['s = unit];
 
-   - ['branch] to denote control-flow branching behaviors. *)
+   - ['k] to denote the mode of an interpreter, that is either {!det} or
+     {!nondet}. *)
 
 open Cir_types
 
@@ -39,6 +40,14 @@ type runtime_error = ..
    adjusting this type. *)
 type runtime_error +=
   | Unsupported_runtime_operation of runtime_operation
+  | Step_budget_exhausted of
+      {
+        max_steps: int;
+      }
+  | Perform_stack_overflow of
+      {
+        perform_stack_size: int;
+      }
 
 type localized_runtime_errors = localized_runtime_error NEL.t
 and localized_runtime_error =
@@ -49,25 +58,72 @@ and localized_runtime_error =
 
 (* --- *)
 
-(** Type of {b concrete} branches. *)
-type ('s, 'code_target) branch =
-  | Continue of 's
-  | Stop of 's * int
-  | Perform of 's * 'code_target
+(** The outcome of executing a step of the semantics. *)
+type ('f, 's) step_outcome =
+  | Running of 's runtime_configuration
+  | Halted of
+      {
+        state: 's;
+        status: 'f;
+      }
+
+(** Runtime configuration: the control stack part is kept apart from the state
+    so that it remains concrete, even when the state is symbolic. *)
+and 's runtime_configuration =
+  {
+    stack: activation NEL.t;                                 (* control state *)
+    state: 's;                                                (* data state *)
+  }
+
+(** State of an active COBOL unit (i.e, not terminated call to a unit). *)
+and activation =
+  {
+    act_pc: pc;                                          (* procedure-wise *)
+    act_performs: perform_frame list;                    (* stack of PERFORMs *)
+  }
+
+(** Position of the next instruction to execute in a procedure. *)
+and pc =
+  {
+    pc_block: label;                                       (* block reference *)
+    pc_offset: int;                                        (* offset in block *)
+  }
+
+and perform_frame =
+  {
+    frame_exit: exit_point;
+    frame_return: label;
+  }
+
+(* --- *)
+
+type run_options =
+  {
+    max_steps: int option;
+    perform_stack_size: int;
+  }
+
+(* --- *)
+
+type det = Deterministic_mode
+type nondet = Nondeterministic_mode
 
 (** COBOL exceptions... not represented for now.  May need to be part of
     Cir_type if this kind of data needs to be manipulated explicitly by COBOL
     operations... *)
 type cobol_exception = |
 
-type ('f, 'bool, 'r, 'm, 's, 'branch) manager =
+type ('f, 'bool, 'r, 'm, 's, 'k) manager =
   {
+    mode:
+      ('f, 's, 'k) mode;
+
     enter_module:
-      'm -> params: 'f array -> unit;
+      'm -> params: 'f array -> 's -> 's evaluation_result;
     leave_module:
-      'm -> unit;
-    module_ws_needs_initialization:
-      'm -> bool;
+      'm -> 's -> 's evaluation_result;
+    module_ws_initialized:
+      'm -> 's -> ('s * bool) evaluation_result;
     module_ws_initialization_done:
       'm -> 's -> 's evaluation_result;
 
@@ -81,16 +137,49 @@ type ('f, 'bool, 'r, 'm, 's, 'branch) manager =
     eval_condition:
       vm: 'vm -> 'f condition -> 's -> ('s * 'bool) evaluation_result;
 
-    display_fields:
-      vm: 'vm -> advancing: bool -> 'f array -> 's -> 'branch evaluation_result;
-    stop:
-      vm: 'vm -> ?status: 'f -> 's -> 'branch evaluation_result;
-    conditional:
-      vm: 'vm -> 'bool -> 'f code_block -> 'f code_block -> 's -> 'branch evaluation_result;
+    decide:
+      vm: 'vm -> 'bool -> 's -> ('s * bool, 'k) branches evaluation_result;
+    decide_int_value:         (* [None] if [f] is not within the given bounds *)
+      vm: 'vm -> 'f -> bounds: int * int -> 's ->
+      ('s * int option, 'k) branches evaluation_result;
+    set_counter:                    (* the counter then holds the given value *)
+      vm: 'vm -> counter -> 'f -> 's -> 's evaluation_result;
+    count_down:            (* decrements the counter if positive, and says so *)
+      vm: 'vm -> counter -> 's -> ('s * bool, 'k) branches evaluation_result;
+    stop:   (* gives the exit status, [status] if provided (0 field otherise) *)
+      vm: 'vm -> ?status: 'f -> 's -> ('s * 'f) evaluation_result;
 
-    proceed:
-      'branch -> ('s, 'f code_block) branch evaluation_result;
+    display_fields:
+      vm: 'vm -> advancing: bool -> 'f array -> 's -> 's evaluation_result;
+    move:
+      vm: 'vm -> 'f -> into: 'f -> 's -> 's evaluation_result;
+
+    arithmetic:
+      vm: 'vm -> arithmetic_operator -> 'f -> target: 'f -> rounded: bool ->
+      checked: bool -> 's -> 's evaluation_result;
+    clear_size_error:
+      vm: 'vm -> 's -> 's evaluation_result;
+    size_error:
+      vm: 'vm -> 's -> ('s * 'bool) evaluation_result;
   }
-  constraint 'vm = ('f, 'bool, 'r, 'm, 's, 'branch) manager
+  constraint 'vm = ('f, 'bool, 'r, 'm, 's, 'k) manager
+
+and ('f, 's, 'k) mode =
+  | Det_mode:
+      ('f, 's, det) mode
+  | Nondet_mode:
+      {
+        merge_outcomes:
+          (* how a set of step outcomes are merged into results and pending
+             configs; the latter are explored in the order they are returned. *)
+          ('f, 's) step_outcome NEL.t ->
+          (('s * 'f) evaluation_result list as 'results) ->
+          ('s runtime_configuration list as 'runtime_configs) ->
+          'results * 'runtime_configs;
+      } -> ('f, 's, nondet) mode
 
 and 's evaluation_result = ('s, localized_runtime_errors) result
+
+and ('a, 'k) branches =
+  | Det: 'a -> ('a, det) branches
+  | Nondet: 'a NEL.t -> ('a, nondet) branches

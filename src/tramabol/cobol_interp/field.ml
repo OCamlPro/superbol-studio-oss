@@ -116,6 +116,14 @@ let alphanum_attrs ~constant ~pic =
     ~flags
     ~pic:(pic_symbols pic)
 
+let figurative_attrs =
+  CobFieldAttr.create
+    ~type_:CobFieldType.(to_u16 (enc COB_TYPE_ALPHANUMERIC_ALL))
+    ~digits:U16.zero
+    ~scale:S16.zero
+    ~flags:CobFieldFlag.(to_u16 @@ enc COB_FLAG_CONSTANT)
+    ~pic:(CobPicSymbol.null ())
+
 let group_attrs =
   CobFieldAttr.create
     ~type_:(CobFieldType.(to_u16 (enc COB_TYPE_GROUP)))
@@ -148,17 +156,32 @@ let int64_field ~digits i =
   binary_field ~digits ~sign:Int64.(compare i zero < 0) ~byte_size:8 @@
   CPtr.create ~default:(S64.of_int64 i) SInt64
 
-let numeric_display_field ~digits i_str =
+let numeric_display_field ?(scale = 0) ~digits i_str =
   let sign, with_sign =
     if i_str.[0] = '-'
     then Display_signed { sign_position = Leading; sign_separate = true }, true
     else Display_unsigned, false
   in
-  let pic = Cobol_data.Picture.fixed_numeric ~sign:with_sign digits 0 in
+  let pic = Cobol_data.Picture.fixed_numeric ~sign:with_sign digits scale in
   let data = CPtr.cast UInt8 @@ CArray.to_ptr @@ CArray.of_string i_str in
-  let* attr = fixednum_attrs ~constant:true ~pic ~digits ~scale:0 ~sign
+  let* attr = fixednum_attrs ~constant:true ~pic ~digits ~scale ~sign
   and* size = Status.lift_ezlibcob_build_error @@ U64.of_int digits in
   Ok (CobField.create ~attr ~data ~size)
+
+(** Gives the integer [n] and the smallest [scale] such that [q] equals
+    [n / 10{^scale}]; [q] must be a decimal number. *)
+let decimal_of_fixed q =
+  let rec aux scale q =
+    if Z.equal (Q.den q) Z.one
+    then Q.num q, scale
+    else aux (succ scale) (Q.mul q (Q.of_int 10))
+  in
+  aux 0 q
+
+let figurative_field str =
+  let data = CPtr.cast UInt8 @@ CArray.to_ptr @@ CArray.of_string str in
+  CobField.create ~attr:figurative_attrs ~data
+    ~size:(U64.of_int_unsafe @@ String.length str)
 
 let from_literal_value ~options lit =
   match ~&lit with
@@ -179,6 +202,23 @@ let from_literal_value ~options lit =
       else if binary && Z.fits_int64 i                         (* BINARY/int64 *)
       then int64_field ~digits (Z.to_int64 i)
       else numeric_display_field ~digits i_str                     (* DISPLAY *)
+  | Fixed_value q ->
+      let n, scale = decimal_of_fixed q in
+      let n_str = Z.to_string n in
+      let digits = String.length n_str - if Z.sign n < 0 then 1 else 0 in
+      numeric_display_field ~digits ~scale n_str
+  | Zero_value ->
+      Ok (figurative_field "0")
+  | Space_value ->
+      Ok (figurative_field " ")
+  | Quote_value ->
+      Ok (figurative_field "\"")
+  | Low_value ->
+      Ok (figurative_field "\x00")
+  | High_value ->
+      Ok (figurative_field "\xff")
+  | All_alphanum_value str ->
+      Ok (figurative_field str)
   | _ ->
       Status.build_error @@ Unsupported { stuff = Literal ~&lit; loc = ~@lit }
 
@@ -226,6 +266,10 @@ let as_int ?loc f =
       (Invalid_field_type { got = f; expected_descr = "integer" })
   else
     Status.lift_ezlibcob_runtime_error ?loc @@ S32.to_int @@ cob_get_int f
+
+let int_value ~vm:_ f ~bounds:(lower_bound, upper_bound) state =
+  let+ i = as_int f in
+  state, if i >= lower_bound && i <= upper_bound then Some i else None
 
 (* Fills data_array with the contents of its first cell *)
 let fill_carray ~data_array ~data_size ~cell_size =

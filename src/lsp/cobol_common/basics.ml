@@ -157,6 +157,15 @@ module NEL = struct
   let hd = function
     | One x
     | x :: _ -> x
+  let map_hd ~f = function
+    | One x -> One (f x)
+    | x :: tl -> f x :: tl
+  let rec nth l i =
+    match l with
+    | One x when i = 0 -> x
+    | x :: _ when i = 0 -> x
+    | _ :: tl when i > 0 -> nth tl (pred i)
+    | _ -> Pretty.invalid_arg "nth"
   let rec last = function
     | One x -> x
     | _ :: tl -> last tl

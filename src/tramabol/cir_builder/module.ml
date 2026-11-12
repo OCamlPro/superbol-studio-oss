@@ -32,7 +32,7 @@ let of_cobol_unit ~builder (unit: Cobol_unit.Types.t) =
   in
   let* module_data = Storage.create ~builder ~&unit.unit_data in
   let env = { named_fields = module_data.map; builder } in
-  let* proc = Procedure.translate env ~&unit.unit_procedure in
+  let* proc = Procedure.translate env ~loc:~@unit ~&unit.unit_procedure in
   Ok {
     module_memory;
     module_unit = unit;

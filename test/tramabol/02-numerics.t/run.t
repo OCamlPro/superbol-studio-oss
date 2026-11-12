@@ -20,83 +20,88 @@
       working_storage = { storage_records = []; storage_fields = [] };
       local_storage = { storage_records = []; storage_fields = [] } };
     module_proc =
-    [IR_display {
-       data_refs =
-       [|{ data_field = (Constant_field 0/int32); data_ref_loc = <opaque>;
-           data_refmod = None }
-         |];
-       advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field = (Constant_field 1/int32); data_ref_loc = <opaque>;
-            data_refmod = None }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field = (Constant_field 2/int32); data_ref_loc = <opaque>;
-            data_refmod = None }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field = (Constant_field -1/int32); data_ref_loc = <opaque>;
-            data_refmod = None }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field = (Constant_field -2/int32); data_ref_loc = <opaque>;
-            data_refmod = None }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field = (Constant_field 2147483647/int32);
-            data_ref_loc = <opaque>; data_refmod = None }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field = (Constant_field -2147483648/int32);
-            data_ref_loc = <opaque>; data_refmod = None }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field = (Constant_field 2147483648/int64);
-            data_ref_loc = <opaque>; data_refmod = None }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field = (Constant_field -2147483649/int64);
-            data_ref_loc = <opaque>; data_refmod = None }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field = (Constant_field 9223372036854775807/int64);
-            data_ref_loc = <opaque>; data_refmod = None }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field = (Constant_field -9223372036854775808/int64);
-            data_ref_loc = <opaque>; data_refmod = None }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field = (Constant_field "9223372036854775808");
-            data_ref_loc = <opaque>; data_refmod = None }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field = (Constant_field "-922337203685477580");
-            data_ref_loc = <opaque>; data_refmod = None }
-          |];
-        advancing = true};
-      IR_stop {optional_status = None}]
+    { proc_blocks =
+      [|{ block_stmts =
+          [|IR_display {
+              data_refs =
+              [|{ data_field = (Constant_field 0/int32);
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field = (Constant_field 1/int32);
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field = (Constant_field 2/int32);
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field = (Constant_field -1/int32);
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field = (Constant_field -2/int32);
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field = (Constant_field 2147483647/int32);
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field = (Constant_field -2147483648/int32);
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field = (Constant_field 2147483648/int64);
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field = (Constant_field -2147483649/int64);
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field = (Constant_field 9223372036854775807/int64);
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field = (Constant_field -9223372036854775808/int64);
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field = (Constant_field "9223372036854775808");
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field = (Constant_field "-922337203685477580");
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true}
+            |];
+          block_term = IR_stop {optional_status = None} }
+        |];
+      proc_entry = 0 }
     }
