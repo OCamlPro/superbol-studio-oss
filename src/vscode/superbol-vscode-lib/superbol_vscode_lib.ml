@@ -34,6 +34,7 @@ let activate ~lsp_server_prefix (extension: Vscode.ExtensionContext.t) =
   Superbol_instance.start_autorestarter instance;
 
   Superbol_commands.register_all extension instance;
+  Superbol_cache_status.start instance;
   Superbol_instance.on_language_server_start instance
     (Superbol_workspace.publish_cached_diagnostics_on_start instance);
   let* () = Superbol_instance.start_language_server instance in

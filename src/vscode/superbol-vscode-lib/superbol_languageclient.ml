@@ -57,15 +57,6 @@ let superbol_command ~server_prefix ~context =
   in
   { kind; command; env; storage_args }
 
-(* Sizes as the server accepts them (see `Arg_utils.size_of_string'). *)
-let is_size s =
-  let digits =
-    match s.[String.length s - 1] with
-    | 'k' | 'K' | 'm' | 'M' | 'g' | 'G' -> String.sub s 0 (String.length s - 1)
-    | _ -> s
-  in
-  digits <> "" && String.for_all (function '0'..'9' -> true | _ -> false) digits
-
 (* An invalid size limit is ignored with a warning: the server would refuse to
    start otherwise. *)
 let cache_pruning_args () =
@@ -73,7 +64,7 @@ let cache_pruning_args () =
     match String.trim @@ Superbol_config.string "cache.sizeLimit" with
     | "" ->
         []
-    | s when is_size s ->
+    | s when Superbol_config.is_size s ->
         ["--cache-size-limit"; s]
     | s ->
         let _ =
@@ -85,9 +76,9 @@ let cache_pruning_args () =
         in
         []
   and max_age =
-    match Superbol_config.positive_int "cache.maxAge" ~default:0 with
-    | 0 -> []
-    | days -> ["--cache-max-age"; string_of_int days]
+    match Superbol_config.cache_max_age () with
+    | None -> []
+    | Some days -> ["--cache-max-age"; string_of_int days]
   in
   size_limit @ max_age
 

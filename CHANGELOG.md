@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Status bar item showing how much room the caches of the language server take, highlighted when one of them exceeds `superbol.cache.sizeLimit`
 - Option `--no-lsp-artifacts` of `superbol cache analyze`, for analyzing files without computing or caching what only the LSP server needs [#720](https://github.com/OCamlPro/superbol-studio-oss/pull/720)
 - Sub-command `superbol parallel`, for running any sub-command on batches of files in parallel processes [#720](https://github.com/OCamlPro/superbol-studio-oss/pull/720)
 - Option `--color` of every `superbol` command, and environment variable `SUPERBOL_COLOR`, for forcing or disabling colors in outputs [#720](https://github.com/OCamlPro/superbol-studio-oss/pull/720)

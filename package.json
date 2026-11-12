@@ -31,6 +31,11 @@
         "category": "SuperBOL"
       },
       {
+        "command": "superbol.cache.refreshStatus",
+        "title": "Refresh Cache Status",
+        "category": "SuperBOL"
+      },
+      {
         "command": "superbol.copybooks.retrieve",
         "title": "Retrieve Copybook Directories",
         "category": "SuperBOL"

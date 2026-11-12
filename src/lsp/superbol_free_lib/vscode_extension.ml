@@ -681,6 +681,10 @@ let commands =
       ~title:"Analyze Every COBOL File in the Workspace"
       ~category:"SuperBOL";
     Manifest.command ()
+      ~command:"superbol.cache.refreshStatus"
+      ~title:"Refresh Cache Status"
+      ~category:"SuperBOL";
+    Manifest.command ()
       ~command:"superbol.copybooks.retrieve"
       ~title:"Retrieve Copybook Directories"
       ~category:"SuperBOL";
