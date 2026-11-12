@@ -606,3 +606,67 @@ let%expect_test "the CLI supersedes the analyses it stored for earlier versions"
     analyzed by the CLI
     analyzed by the CLI
     analyzed by the CLI |}];;
+
+(* --- Monitoring and pruning from the CLI --- *)
+
+let location ?(is_root = false) dir =
+  Superbol_free_lib.Command_cache.{ dir; is_root; storage_directory = None }
+
+(** Shows some of the [output] of `superbol cache status/trim --json'. *)
+let show_cache_json ~projdir output =
+  let json = Yojson.Safe.from_string output in
+  let field f = Yojson.Safe.Util.member f json in
+  let int f = match field f with
+    | `Int i -> string_of_int i
+    | `Intlit i -> i
+    | `Null -> "-"
+    | _ -> "?"
+  in
+  Printf.printf "root is project: %b, cache: %b, entries: %s, values: %s, \
+                 non-empty: %b"
+    (field "project_root" = `String projdir)
+    (field "cache" <> `Null) (int "entries") (int "values")
+    (int "disk_usage" <> "0");
+  begin match field "reclaimed" with
+    | `Int n -> Printf.printf ", reclaimed: %d" n
+    | _ -> ()
+  end;
+  begin match field "items" with
+    | `List items ->
+        let labels =
+          List.sort_uniq compare @@ List.map (fun i ->
+              Yojson.Safe.Util.(to_string @@ member "label" i)) items
+        in
+        Printf.printf ", items: %d (%s)" (List.length items)
+          (String.concat ", " labels)
+    | _ -> ()
+  end;
+  print_newline ()
+
+let%expect_test "`cache status --json' and `cache trim --json' report on the \
+                 cache of the LSP" =
+  let projdir = setup ~copybook_dirs:[".", "       01 X PIC X.\n"] () in
+  ignore [%expect.output];
+  ignore (EzFile.make_dir ~p:true (projdir // "sub"));
+  let status ~verbose =
+    Superbol_free_lib.Command_cache.status ~json:true ~verbose in
+  (* [%expect.output] takes everything output so far: take each output before
+     showing any. *)
+  status ~verbose:false (location projdir);
+  let at_root = [%expect.output] in
+  (* [sub] holds no configuration file: it belongs to [projdir]... *)
+  status ~verbose:true (location (projdir // "sub"));
+  let within = [%expect.output] in
+  (* ... unless designated as a root. *)
+  status ~verbose:false (location ~is_root:true (projdir // "sub"));
+  let as_root = [%expect.output] in
+  Superbol_free_lib.Command_cache.trim ~json:true ~older_than:(Some 0.)
+    ~max_size:None (location ~is_root:true projdir);
+  let trimmed = [%expect.output] in
+  List.iter (show_cache_json ~projdir) [at_root; within; as_root; trimmed];
+  cleanup projdir;
+  [%expect {|
+    root is project: true, cache: true, entries: 5, values: 5, non-empty: true
+    root is project: true, cache: true, entries: 5, values: 5, non-empty: true, items: 5 (prog.cob, project)
+    root is project: false, cache: true, entries: 0, values: 0, non-empty: false
+    root is project: true, cache: true, entries: 0, values: 0, non-empty: false, reclaimed: 5 |}];;

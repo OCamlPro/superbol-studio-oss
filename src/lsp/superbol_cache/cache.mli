@@ -140,7 +140,9 @@ val supersede
     producers sharing the same on-disk format. *)
 val entries: t -> (Types.entry_info list, Types.error) result
 
-(** [stats t] aggregates {!entries} and adds the identities [t] runs under. *)
+(** [stats t] gives the totals of what [t] holds, and the identities [t] runs
+    under.  It only lists and measures items, so it is cheap; unlike {!entries},
+    it also counts entries that fail to decode. *)
 val stats: t -> (Types.stats, Types.error) result
 
 (** [prune t ~policy] reclaims what [policy] allows, and is the number of

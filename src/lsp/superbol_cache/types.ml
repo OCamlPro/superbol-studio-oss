@@ -114,12 +114,17 @@ type entry_info =
     info_witnesses: witness list;
     info_disk_usage: int64;     (** manifest and value, in bytes *)
     info_last_hit: float;       (** seconds since the epoch *)
+    info_object: digest;        (** digest of the value the entry holds *)
+    info_object_size: int64;
+    (** size of that value alone, in bytes; values may be shared between
+        entries, so these do not add up across entries *)
   }
 
 (** Aggregate figures reported by the monitoring API. *)
 type stats =
   {
     stats_entries: int;
+    (** number of manifests held, whether or not they could be decoded *)
     stats_objects: int;
     stats_disk_usage: int64;
     stats_format_version: string;
