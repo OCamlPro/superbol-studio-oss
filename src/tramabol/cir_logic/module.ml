@@ -32,7 +32,8 @@ let init ~vm (m: _ module_handle) state =
   let* state =
     if ws_init
     then Ok state
-    else init_storage ~vm m.module_data.working_storage state
+    else
+      let* state = init_storage ~vm m.module_data.working_storage state in
+      vm.module_ws_initialization_done m.module_memory state
   in
-  let* state = init_storage ~vm m.module_data.local_storage state in
-  vm.module_ws_initialization_done m.module_memory state
+  init_storage ~vm m.module_data.local_storage state
