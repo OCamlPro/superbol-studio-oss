@@ -507,11 +507,11 @@ let typeck_move_stmt (m : Cobol_ptree.move_stmt with_loc)
   match ~&m with
   | MoveSimple { from; to_ } ->
       let+ from = typeck_scalar (from &@<- m)
-      and+ to_ = map_list typeck_ident to_ in
+      and+ to_ = map_list typeck_ident to_ in (* TODO: check to_ is not empty *)
       MoveSimple { from; to_ }
   | MoveCorresponding { from; to_ } ->
       let+ from = typeck_ident from
-      and+ to_ = map_list typeck_ident to_ in
+      and+ to_ = map_list typeck_ident to_ in                  (* TODO: ditto *)
       MoveCorresponding { from; to_ }
 
 let typeck_open_stmt (o : Cobol_ptree.open_stmt)
@@ -1412,4 +1412,3 @@ let typeck_sentences (paragraph_sentences: Cobol_ptree.statements with_loc list)
       s' &@<- s
     )
     paragraph_sentences
-

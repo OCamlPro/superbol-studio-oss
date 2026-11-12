@@ -126,16 +126,19 @@ val forget_diags: 'a with_diags -> 'a
 (* val merge_results: f:('a -> 'b -> 'c) -> 'a with_diags -> 'b with_diags -> 'c with_diags *)
 val show_n_forget
   : ?set_status:bool
+  -> ?exit_on_error:bool
   -> ?min_level:severity
   -> ?platform:platform
   -> ?ppf:Format.formatter -> 'a with_diags -> 'a
 val show_diags
   : ?set_status:bool
+  -> ?exit_on_error:bool
   -> ?min_level:severity
   -> ?platform:platform
   -> ?ppf:Format.formatter -> 'a with_diags -> 'a
 val sink_result
   : ?set_status:bool
+  -> ?exit_on_error:bool
   -> ?platform:platform
   -> ?ppf:Format.formatter -> _ with_diags -> unit
 

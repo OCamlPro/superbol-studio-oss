@@ -103,7 +103,7 @@ module Now = struct
   (** Reporting module where each value is a procedure that prints a single
       diagnostic on a given formatter. *)
   let diag severity ppf ?platform ?tags ?loc fmt =
-    Pretty.delayed_to (fun message -> 
+    Pretty.delayed_to (fun message ->
         pp ?platform ppf (mk severity ?tags loc message)) (fmt^^"@.")
   let hint ppf = diag Hint ppf
   and note ppf = diag Note ppf
@@ -235,14 +235,17 @@ let forget_result { diags; _ } = diags
 let forget_diags = result_only
 (* let merge_results ~f r1 r2 = *)
 (*   result (f r1.result r2.result) ~diags:(Set.union r1.diags r2.diags) *)
-let show_n_forget ?(set_status = true) ?(min_level = Hint)
-    ?platform ?(ppf = Fmt.stderr) { result; diags } =
+let show_n_forget ?(set_status = true) ?(exit_on_error = false)
+    ?(min_level = Hint) ?platform ?(ppf = Fmt.stderr) { result; diags } =
   Set.pp_above ~level:min_level ?platform ppf diags;
-  if set_status && Set.has_errors diags then Exit_status.raise ();
+  if set_status && Set.has_errors diags then begin
+    Exit_status.raise ();
+    if exit_on_error then Exit_status.exit ();
+  end;
   result
 let show_diags = show_n_forget
-let sink_result ?set_status ?platform ?ppf r =
-  ignore @@ show_n_forget ?set_status ?platform ?ppf r
+let sink_result ?set_status ?exit_on_error ?platform ?ppf r =
+  ignore @@ show_n_forget ?set_status ?exit_on_error ?platform ?ppf r
 
 
 let hint_result r = Cont.khint (with_diag r)

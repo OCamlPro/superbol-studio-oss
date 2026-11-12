@@ -184,7 +184,7 @@ let add_record ~builder record_definition acc =
     acc
 
 let create ~builder (unit_data_defs: data_definitions)
-  : (_ data, error NEL.t) result =
+  : (_ data, errors) result =
   let empty_data =
     let empty_storage = { storage_records = []; storage_fields = [] } in
     { map = FIELDS_MAP.empty;

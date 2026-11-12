@@ -57,6 +57,12 @@ let register_printers () =
     | Unsupported_runtime_operation o ->
         Pretty.print ppf "Unsupported@ runtime@ operation:@;%a"
           pp_runtime_operation o
+    | Perform_stack_overflow { perform_stack_size } ->
+        Pretty.print ppf "Stack@ overflow,@ possible@ PERFORM@ depth@ exceeded@ \
+                          (stack@ size@ is@ %u)" perform_stack_size
+    | Step_budget_exhausted { max_steps } ->
+        Pretty.print ppf "Step@ budget@ exhausted@ (%u@ steps@ executed)"
+          max_steps
     | _ ->
         raise Exit
   end

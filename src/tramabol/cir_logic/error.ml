@@ -40,7 +40,9 @@ let register_runtime_error_loc_retriever, loc =
 let register_loc_retrievers () =
 
   register_runtime_error_loc_retriever begin function
-    | Unsupported_runtime_operation _ ->
+    | Unsupported_runtime_operation _
+    | Step_budget_exhausted _
+    | Perform_stack_overflow _ ->
         None
     | _ ->
         None

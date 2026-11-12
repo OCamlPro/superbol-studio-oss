@@ -20,6 +20,7 @@ module NEL = Cobol_common.Basics.NEL
 
 type ambiguous_stuff =
   | Data_reference of Cobol_ptree.qualname
+  | Procedure_name of Cobol_ptree.qualname
 
 type extraneous_stuff =
   | Data_reference_subscripts of
@@ -44,6 +45,7 @@ type unexpected_stuff = ..
 type unexpected_stuff +=
   | Item_used_in_depending_clause
   | Reference_modification
+  | Exit_perform_outside_inline_perform
 
 (* Note: call `Printer.register_unsupported_stuff_printer` when extending this
    type. *)
@@ -65,6 +67,7 @@ type unsupported_stuff +=
 
 type undefined_stuff =
   | Data_reference of Cobol_ptree.qualname
+  | Procedure_name of Cobol_ptree.qualname
 
 (* Note: call `Printer.register_error_printer` and
    `Error.register_error_loc_retriever` when extending this type. *)

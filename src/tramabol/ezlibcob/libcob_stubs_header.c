@@ -45,5 +45,18 @@ CAMLprim value ml_cob_resolve_cobol_and_call (value function_v)
         CAMLreturn( Val_int( unifunc.funcint()) );
 }
 
+/* Access to the current exception code, as done by cobc-generated code via
+   COB_RESET_EXCEPTION and cob_glob_ptr->cob_exception_code. */
+CAMLprim value ml_cob_get_exception_code (value unit)
+{
+	return Val_int (cob_get_global_ptr ()->cob_exception_code);
+}
+
+CAMLprim value ml_cob_reset_exception_code (value unit)
+{
+	cob_get_global_ptr ()->cob_exception_code = 0;
+	return Val_unit;
+}
+
 /* The following line number should be offset +2 to its line number */
-#line 51 "_build/default/src/tramabol/ezlibcob/libcob_stubs.c"
+#line 64 "_build/default/src/tramabol/ezlibcob/libcob_stubs.c"

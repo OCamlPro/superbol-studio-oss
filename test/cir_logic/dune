@@ -1,0 +1,8 @@
+(library
+ (name test_cir_logic)
+ (modules explore_testing explore_basic)
+ (preprocess (pps ppx_expect))
+ (inline_tests (modes best))
+ (libraries cir_builder cir_logic cir_types cobol_common cobol_data
+            cobol_ptree cobol_unit pretty testing_utils)
+ )
