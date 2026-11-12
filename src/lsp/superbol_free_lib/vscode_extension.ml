@@ -75,7 +75,7 @@ let package =
     ~devDependencies: [
       "@types/node", "^20.3.2";
       "@types/vscode", "^" ^ vscode_engine;
-      "@vscode/test-electron", "^1.6.1";
+      "@vscode/test-electron", "^3.1.0";
       "@vscode/vsce", "^2.15.0";
       "esbuild", "^0.15.16";
       "ovsx", "^1.0.2";
