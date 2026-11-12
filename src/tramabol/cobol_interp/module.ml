@@ -104,7 +104,7 @@ let ws_needs_initialization (m: cob_module_memory) =
 let ws_initialization_done (m: cob_module_memory) () =
   if m.module_initialized
   then Status.runtime_error @@ Module_reinitialzation { module_name = "" }
-  else Status.ok ()
+  else (m.module_initialized <- true; Status.ok ())
 
 
 let cancel (_m: cob_module_memory) =                               (* CHECKME *)
