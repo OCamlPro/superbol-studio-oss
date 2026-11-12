@@ -102,8 +102,8 @@ let fixednum_attrs ~constant ~digits ~scale ~sign ~pic =
 let alphanum_attrs ~constant ~pic =
   let type_ =
     if Cobol_data.Picture.is_edited pic
-    then CobFieldType.COB_TYPE_ALPHANUMERIC
-    else CobFieldType.COB_TYPE_ALPHANUMERIC_EDITED
+    then CobFieldType.COB_TYPE_ALPHANUMERIC_EDITED
+    else CobFieldType.COB_TYPE_ALPHANUMERIC
   and flags =
     if constant
     then CobFieldFlag.(to_u16 @@ enc COB_FLAG_CONSTANT)
