@@ -216,10 +216,10 @@ let field_size f =
   Status.lift_ezlibcob_runtime_error @@ U64.to_int @@ CobField.get_size f
 
 let is_numeric f =
-  S32.(compare (cob_is_numeric f) zero) = 0
+  S32.(compare (cob_is_numeric f) zero) <> 0
 
 let as_int ?loc f =
-  if is_numeric f then
+  if not (is_numeric f) then
     (* TODO: some of those invalid types can easily be detected during typeck or
        CIR construction. *)
     Status.runtime_error ?loc
