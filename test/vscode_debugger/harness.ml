@@ -273,15 +273,28 @@ let on_adapter_message message =
 (* Debug sessions started since the last [stop_debugging], latest first. *)
 let started_sessions : Vscode.DebugSession.t list ref = ref []
 
+(* Identifiers of the debug sessions that have started and not terminated
+   yet, including those started before the last [stop_debugging]. *)
+let live_sessions : string list ref = ref []
+
 let record_sessions () =
   let tracker _session = DebugAdapterTracker.create ~onDidSendMessage:on_adapter_message () in
   ignore @@ Debug.registerDebugAdapterTrackerFactory ~debugType:debug_type
     ~factory:(DebugAdapterTrackerFactory.create ~createDebugAdapterTracker:tracker ());
   ignore @@ Debug.onDidTerminateDebugSession () ~listener:(fun session ->
-      if Vscode.DebugSession.type_ session = debug_type then push Terminated);
+      if Vscode.DebugSession.type_ session = debug_type then begin
+        let id = Vscode.DebugSession.id session in
+        live_sessions := List.filter (( <> ) id) !live_sessions;
+        (* VS Code may report that a session terminated after it stopped
+           being the active one: ignore sessions of previous tests. *)
+        if List.exists (fun s -> Vscode.DebugSession.id s = id) !started_sessions then
+          push Terminated
+      end);
   ignore @@ Debug.onDidStartDebugSession () ~listener:(fun session ->
-      if Vscode.DebugSession.type_ session = debug_type then
-        started_sessions := session :: !started_sessions)
+      if Vscode.DebugSession.type_ session = debug_type then begin
+        started_sessions := session :: !started_sessions;
+        live_sessions := Vscode.DebugSession.id session :: !live_sessions
+      end)
 
 let rec next_event ~deadline : event res =
   match Queue.take_opt events with
@@ -400,12 +413,14 @@ let pause () = then_stop (command "pause")
 (** Runs a command that should end the session. *)
 let to_end name = let open Syntax in let* () = command name in terminated ()
 
-(** Waits for the session to end after [stop_debugging] or termination. *)
+(** Waits for the sessions to end after [stop_debugging] or termination:
+    VS Code may deactivate a session before reporting its termination, so
+    wait for both. *)
 let rec session_gone ~deadline =
-  match Debug.activeDebugSession () with
-  | None -> Promise.return ()
-  | Some _ when Node.Date.now () > deadline -> Promise.return ()
-  | Some _ -> Promise.bind (fun () -> session_gone ~deadline) (sleep 100)
+  match Debug.activeDebugSession (), !live_sessions with
+  | None, [] -> Promise.return ()
+  | _ when Node.Date.now () > deadline -> Promise.return ()
+  | _ -> Promise.bind (fun () -> session_gone ~deadline) (sleep 100)
 
 let stop_debugging () =
   let open Promise.Syntax in
