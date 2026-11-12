@@ -197,6 +197,17 @@ module Uri : sig
 
   val toString : t -> ?skipEncoding:bool -> unit -> string
 
+  (** [from ~scheme ?authority ?path ?query ?fragment ()] is the URI with these
+      components, whatever its scheme. *)
+  val from :
+       scheme:string
+    -> ?authority:string
+    -> ?path:string
+    -> ?query:string
+    -> ?fragment:string
+    -> unit
+    -> t
+
   val toJson : t -> Jsonoo.t
 
   val equal : t -> t -> bool
@@ -2110,6 +2121,43 @@ module TreeDataProvider : sig
   end
 end
 
+module FileDecoration : sig
+  include Js.T
+
+  val badge : t -> string option
+
+  val tooltip : t -> string option
+
+  val color : t -> ThemeColor.t option
+
+  val propagate : t -> bool
+
+  val set_propagate : t -> bool -> unit
+
+  val make : ?badge:string -> ?tooltip:string -> ?color:ThemeColor.t -> unit -> t
+end
+
+module FileDecorationProvider : sig
+  include Js.T
+
+  val onDidChangeFileDecorations : t -> Uri.t list option Event.t option
+
+  val provideFileDecoration :
+       t
+    -> uri:Uri.t
+    -> token:CancellationToken.t
+    -> FileDecoration.t ProviderResult.t
+
+  val create :
+       ?onDidChangeFileDecorations:Uri.t list option Event.t
+    -> provideFileDecoration:
+         (   uri:Uri.t
+          -> token:CancellationToken.t
+          -> FileDecoration.t ProviderResult.t)
+    -> unit
+    -> t
+end
+
 module TreeViewOptions : sig
   type 'a t
 
@@ -2527,6 +2575,9 @@ module Window : sig
          | `ExtensionTerminalOptions of ExtensionTerminalOptions.t
          ]
     -> Terminal.t
+
+  val registerFileDecorationProvider :
+    provider:FileDecorationProvider.t -> Disposable.t
 
   val registerTreeDataProvider :
        'a Js.t

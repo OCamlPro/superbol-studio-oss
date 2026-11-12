@@ -223,7 +223,17 @@ module Uri = struct
 
     val toString : t -> ?skipEncoding:bool -> unit -> string [@@js.call]
 
-    val toJson : t -> Jsonoo.t [@@js.call]]
+    val toJson : t -> Jsonoo.t [@@js.call]
+
+    val from : Ojs.t -> t [@@js.global "__SUPERBOL__.vscode.Uri.from"]]
+
+  let from ~scheme ?authority ?path ?query ?fragment () =
+    let components = Ojs.obj [| "scheme", [%js.of: string] scheme |] in
+    iter_set components "authority" [%js.of: string] authority;
+    iter_set components "path" [%js.of: string] path;
+    iter_set components "query" [%js.of: string] query;
+    iter_set components "fragment" [%js.of: string] fragment;
+    from components
 
   let with_ this ?scheme ?authority ?path ?query ?fragment () =
     let change = Ojs.obj [||] in
@@ -2753,6 +2763,64 @@ module TreeDataProvider = struct
   end
 end
 
+module FileDecoration = struct
+  include Class.Make ()
+
+  include
+    [%js:
+    val badge : t -> string or_undefined [@@js.get]
+
+    val tooltip : t -> string or_undefined [@@js.get]
+
+    val color : t -> ThemeColor.t or_undefined [@@js.get]
+
+    val propagate : t -> bool [@@js.get]
+
+    val set_propagate : t -> bool -> unit [@@js.set]
+
+    val make :
+         string or_undefined
+      -> string or_undefined
+      -> ThemeColor.t or_undefined
+      -> t
+      [@@js.new "__SUPERBOL__.vscode.FileDecoration"]]
+
+  (* Absent optional arguments would be left out, rather than passed as
+     [undefined] in their position. *)
+  let make ?badge ?tooltip ?color () = make badge tooltip color
+end
+
+module FileDecorationProvider = struct
+  include Interface.Make ()
+
+  module OnDidChangeFileDecorations = Event.Make (struct
+    type t = Uri.t list or_undefined [@@js]
+  end)
+
+  include
+    [%js:
+    val onDidChangeFileDecorations :
+      t -> OnDidChangeFileDecorations.t or_undefined
+      [@@js.get]
+
+    val provideFileDecoration :
+         t
+      -> uri:Uri.t
+      -> token:CancellationToken.t
+      -> FileDecoration.t ProviderResult.t
+      [@@js.call]
+
+    val create :
+         ?onDidChangeFileDecorations:OnDidChangeFileDecorations.t
+      -> provideFileDecoration:
+           (   uri:Uri.t
+            -> token:CancellationToken.t
+            -> FileDecoration.t ProviderResult.t)
+      -> unit
+      -> t
+      [@@js.builder]]
+end
+
 module TreeViewOptions = struct
   include Class.Generic (Ojs) ()
 
@@ -3286,6 +3354,10 @@ module Window = struct
            [@js.union])
       -> Terminal.t
       [@@js.global "__SUPERBOL__.vscode.window.createTerminal"]
+
+    val registerFileDecorationProvider :
+      provider:FileDecorationProvider.t -> Disposable.t
+      [@@js.global "__SUPERBOL__.vscode.window.registerFileDecorationProvider"]
 
     val registerTreeDataProvider :
       viewId:string -> treeDataProvider:Ojs.t -> Disposable.t
