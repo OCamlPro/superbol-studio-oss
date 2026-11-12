@@ -83,22 +83,24 @@ let create ~name ~source_file : cob_module_memory =
     module_initialized = false }
 
 
-let enter (m: cob_module_memory) ~(params: cob_field array) =
+let enter (m: cob_module_memory) ~(params: cob_field array) () =
   CobModule.set_cob_procedure_params m.module_ptr
     (Field.cptr_of_array params);
   cob_set_cancel m.module_ptr;
   CobModule.set_module_active m.module_ptr
-    (U32.succ_unsafe (CobModule.get_module_active m.module_ptr))
+    (U32.succ_unsafe (CobModule.get_module_active m.module_ptr));
+  Status.ok ()
 
 
-let leave (m: cob_module_memory) =
+let leave (m: cob_module_memory) () =
   CobModule.set_module_active m.module_ptr
     (U32.pred_unsafe (CobModule.get_module_active m.module_ptr));
-  cob_module_leave m.module_ptr
+  cob_module_leave m.module_ptr;
+  Status.ok ()
 
 
-let ws_needs_initialization (m: cob_module_memory) =
-  m.module_initialized
+let ws_initialized (m: cob_module_memory) () =
+  Ok ((), m.module_initialized)
 
 
 let ws_initialization_done (m: cob_module_memory) () =

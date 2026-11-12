@@ -36,6 +36,8 @@ let register_error_printer, pp_error =
 let pp_ambiguous_stuff: ambiguous_stuff Pretty.printer = fun ppf -> function
   | Data_reference qn ->
       Pretty.print ppf "data-name@ '%a'" Cobol_ptree.pp_qualname qn
+  | Procedure_name qn ->
+      Pretty.print ppf "procedure-name@ '%a'" Cobol_ptree.pp_qualname qn
 
 let pp_extraneous_stuff: extraneous_stuff Pretty.printer = fun ppf -> function
   | Data_reference_subscripts { qn; amount } ->
@@ -50,6 +52,8 @@ let pp_missing_stuff: missing_stuff Pretty.printer = fun ppf -> function
 let pp_undefined_stuff: undefined_stuff Pretty.printer = fun ppf -> function
   | Data_reference qn ->
       Pretty.print ppf "data-name@ '%a'" Cobol_ptree.pp_qualname qn
+  | Procedure_name qn ->
+      Pretty.print ppf "procedure-name@ '%a'" Cobol_ptree.pp_qualname qn
 
 let pp_errors ?platform ppf errors =
   NEL.iter ~f:begin fun e ->
@@ -68,6 +72,8 @@ let register_printers () =
         Pretty.print ppf "item@ used@ in@ DEPENDING@ clause"
     | Reference_modification ->
         Pretty.print ppf "reference@ modification"
+    | Exit_perform_outside_inline_perform ->
+        Pretty.print ppf "EXIT@ PERFORM@ outside@ of@ any@ inline@ PERFORM"
     | _ ->
         raise Exit
   end;

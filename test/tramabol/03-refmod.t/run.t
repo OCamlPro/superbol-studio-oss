@@ -205,156 +205,316 @@
         };
       local_storage = { storage_records = []; storage_fields = [] } };
     module_proc =
-    [IR_display {
-       data_refs =
-       [|{ data_field =
-           Field_in_memory {field = (Fixed_field "      ");
-             field_info =
-             { field_definition = {
-                 qualname: X
-                 offset: 0
-                 size: 48
-                 size-max: 48
-                 layout: {
-                   elementary
-                   usage: {
-                     display
-                     category: ALPHANUMERIC(6)
-                   }
-                   value: "ABCDEF"
-                 }
-               }; field_initial_value = (Some "ABCDEF") }};
-           data_ref_loc = <opaque>;
-           data_refmod =
-           (Some { refmod_left =
-                   { field_ref = (Constant_field 1/int32);
-                     field_ref_loc = <opaque> };
-                   refmod_length =
-                   (Some { field_ref = (Constant_field 2/int32);
-                           field_ref_loc = <opaque> })
-                   })
-           }
-         |];
-       advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {field = (Fixed_field "      ");
-              field_info =
-              { field_definition = {
-                  qualname: X
-                  offset: 0
-                  size: 48
-                  size-max: 48
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: ALPHANUMERIC(6)
-                    }
-                    value: "ABCDEF"
+    { proc_blocks =
+      [|{ block_stmts =
+          [|IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {field = (Fixed_field "      ");
+                    field_info =
+                    { field_definition = {
+                        qualname: X
+                        offset: 0
+                        size: 48
+                        size-max: 48
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category: ALPHANUMERIC(6)
+                          }
+                          value: "ABCDEF"
+                        }
+                      }; field_initial_value = (Some "ABCDEF") }};
+                  data_ref_loc = <opaque>;
+                  data_refmod =
+                  (Some { refmod_left =
+                          { field_ref = (Constant_field 1/int32);
+                            field_ref_loc = <opaque> };
+                          refmod_length =
+                          (Some { field_ref = (Constant_field 2/int32);
+                                  field_ref_loc = <opaque> })
+                          })
                   }
-                }; field_initial_value = (Some "ABCDEF") }};
-            data_ref_loc = <opaque>;
-            data_refmod =
-            (Some { refmod_left =
-                    { field_ref = (Constant_field 3/int32);
-                      field_ref_loc = <opaque> };
-                    refmod_length =
-                    (Some { field_ref = (Constant_field 1/int32);
-                            field_ref_loc = <opaque> })
-                    })
-            }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {field = (Fixed_field "      ");
-              field_info =
-              { field_definition = {
-                  qualname: X
-                  offset: 0
-                  size: 48
-                  size-max: 48
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: ALPHANUMERIC(6)
-                    }
-                    value: "ABCDEF"
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {field = (Fixed_field "      ");
+                    field_info =
+                    { field_definition = {
+                        qualname: X
+                        offset: 0
+                        size: 48
+                        size-max: 48
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category: ALPHANUMERIC(6)
+                          }
+                          value: "ABCDEF"
+                        }
+                      }; field_initial_value = (Some "ABCDEF") }};
+                  data_ref_loc = <opaque>;
+                  data_refmod =
+                  (Some { refmod_left =
+                          { field_ref = (Constant_field 3/int32);
+                            field_ref_loc = <opaque> };
+                          refmod_length =
+                          (Some { field_ref = (Constant_field 1/int32);
+                                  field_ref_loc = <opaque> })
+                          })
                   }
-                }; field_initial_value = (Some "ABCDEF") }};
-            data_ref_loc = <opaque>;
-            data_refmod =
-            (Some { refmod_left =
-                    { field_ref = (Constant_field 4/int32);
-                      field_ref_loc = <opaque> };
-                    refmod_length =
-                    (Some { field_ref = (Constant_field 3/int32);
-                            field_ref_loc = <opaque> })
-                    })
-            }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {field = (Fixed_field "      ");
-              field_info =
-              { field_definition = {
-                  qualname: X
-                  offset: 0
-                  size: 48
-                  size-max: 48
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: ALPHANUMERIC(6)
-                    }
-                    value: "ABCDEF"
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {field = (Fixed_field "      ");
+                    field_info =
+                    { field_definition = {
+                        qualname: X
+                        offset: 0
+                        size: 48
+                        size-max: 48
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category: ALPHANUMERIC(6)
+                          }
+                          value: "ABCDEF"
+                        }
+                      }; field_initial_value = (Some "ABCDEF") }};
+                  data_ref_loc = <opaque>;
+                  data_refmod =
+                  (Some { refmod_left =
+                          { field_ref = (Constant_field 4/int32);
+                            field_ref_loc = <opaque> };
+                          refmod_length =
+                          (Some { field_ref = (Constant_field 3/int32);
+                                  field_ref_loc = <opaque> })
+                          })
                   }
-                }; field_initial_value = (Some "ABCDEF") }};
-            data_ref_loc = <opaque>;
-            data_refmod =
-            (Some { refmod_left =
-                    { field_ref = (Constant_field 6/int32);
-                      field_ref_loc = <opaque> };
-                    refmod_length =
-                    (Some { field_ref = (Constant_field 1/int32);
-                            field_ref_loc = <opaque> })
-                    })
-            }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {field = (Fixed_field "      ");
-              field_info =
-              { field_definition = {
-                  qualname: X
-                  offset: 0
-                  size: 48
-                  size-max: 48
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: ALPHANUMERIC(6)
-                    }
-                    value: "ABCDEF"
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {field = (Fixed_field "      ");
+                    field_info =
+                    { field_definition = {
+                        qualname: X
+                        offset: 0
+                        size: 48
+                        size-max: 48
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category: ALPHANUMERIC(6)
+                          }
+                          value: "ABCDEF"
+                        }
+                      }; field_initial_value = (Some "ABCDEF") }};
+                  data_ref_loc = <opaque>;
+                  data_refmod =
+                  (Some { refmod_left =
+                          { field_ref = (Constant_field 6/int32);
+                            field_ref_loc = <opaque> };
+                          refmod_length =
+                          (Some { field_ref = (Constant_field 1/int32);
+                                  field_ref_loc = <opaque> })
+                          })
                   }
-                }; field_initial_value = (Some "ABCDEF") }};
-            data_ref_loc = <opaque>;
-            data_refmod =
-            (Some { refmod_left =
-                    { field_ref = (Constant_field 6/int32);
-                      field_ref_loc = <opaque> };
-                    refmod_length =
-                    (Some { field_ref =
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {field = (Fixed_field "      ");
+                    field_info =
+                    { field_definition = {
+                        qualname: X
+                        offset: 0
+                        size: 48
+                        size-max: 48
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category: ALPHANUMERIC(6)
+                          }
+                          value: "ABCDEF"
+                        }
+                      }; field_initial_value = (Some "ABCDEF") }};
+                  data_ref_loc = <opaque>;
+                  data_refmod =
+                  (Some { refmod_left =
+                          { field_ref = (Constant_field 6/int32);
+                            field_ref_loc = <opaque> };
+                          refmod_length =
+                          (Some { field_ref =
+                                  Field_in_memory {field = (Fixed_field " ");
+                                    field_info =
+                                    { field_definition = {
+                                        qualname: ONE
+                                        offset: 0
+                                        size: 8
+                                        size-max: 8
+                                        layout: {
+                                          elementary
+                                          usage: {
+                                            display
+                                            category:
+                                             NUMERIC(digits = 1, scale = 0,
+                                                     signed = false)
+                                          }
+                                          value: 1
+                                        }
+                                      }; field_initial_value = (Some 1/int32) }};
+                                  field_ref_loc = <opaque> })
+                          })
+                  }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {field = (Fixed_field "      ");
+                    field_info =
+                    { field_definition = {
+                        qualname: X
+                        offset: 0
+                        size: 48
+                        size-max: 48
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category: ALPHANUMERIC(6)
+                          }
+                          value: "ABCDEF"
+                        }
+                      }; field_initial_value = (Some "ABCDEF") }};
+                  data_ref_loc = <opaque>;
+                  data_refmod =
+                  (Some { refmod_left =
+                          { field_ref = (Constant_field 1/int32);
+                            field_ref_loc = <opaque> };
+                          refmod_length = None })
+                  }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {field = (Fixed_field "      ");
+                    field_info =
+                    { field_definition = {
+                        qualname: X
+                        offset: 0
+                        size: 48
+                        size-max: 48
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category: ALPHANUMERIC(6)
+                          }
+                          value: "ABCDEF"
+                        }
+                      }; field_initial_value = (Some "ABCDEF") }};
+                  data_ref_loc = <opaque>;
+                  data_refmod =
+                  (Some { refmod_left =
+                          { field_ref = (Constant_field 3/int32);
+                            field_ref_loc = <opaque> };
+                          refmod_length = None })
+                  }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {field = (Fixed_field "      ");
+                    field_info =
+                    { field_definition = {
+                        qualname: X
+                        offset: 0
+                        size: 48
+                        size-max: 48
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category: ALPHANUMERIC(6)
+                          }
+                          value: "ABCDEF"
+                        }
+                      }; field_initial_value = (Some "ABCDEF") }};
+                  data_ref_loc = <opaque>;
+                  data_refmod =
+                  (Some { refmod_left =
+                          { field_ref = (Constant_field 4/int32);
+                            field_ref_loc = <opaque> };
+                          refmod_length = None })
+                  }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {field = (Fixed_field "      ");
+                    field_info =
+                    { field_definition = {
+                        qualname: X
+                        offset: 0
+                        size: 48
+                        size-max: 48
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category: ALPHANUMERIC(6)
+                          }
+                          value: "ABCDEF"
+                        }
+                      }; field_initial_value = (Some "ABCDEF") }};
+                  data_ref_loc = <opaque>;
+                  data_refmod =
+                  (Some { refmod_left =
+                          { field_ref = (Constant_field 6/int32);
+                            field_ref_loc = <opaque> };
+                          refmod_length = None })
+                  }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {field = (Fixed_field "      ");
+                    field_info =
+                    { field_definition = {
+                        qualname: X
+                        offset: 0
+                        size: 48
+                        size-max: 48
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category: ALPHANUMERIC(6)
+                          }
+                          value: "ABCDEF"
+                        }
+                      }; field_initial_value = (Some "ABCDEF") }};
+                  data_ref_loc = <opaque>;
+                  data_refmod =
+                  (Some { refmod_left =
+                          { field_ref =
                             Field_in_memory {field = (Fixed_field " ");
                               field_info =
                               { field_definition = {
@@ -373,346 +533,198 @@
                                     value: 1
                                   }
                                 }; field_initial_value = (Some 1/int32) }};
-                            field_ref_loc = <opaque> })
-                    })
-            }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {field = (Fixed_field "      ");
-              field_info =
-              { field_definition = {
-                  qualname: X
-                  offset: 0
-                  size: 48
-                  size-max: 48
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: ALPHANUMERIC(6)
-                    }
-                    value: "ABCDEF"
+                            field_ref_loc = <opaque> };
+                          refmod_length = None })
                   }
-                }; field_initial_value = (Some "ABCDEF") }};
-            data_ref_loc = <opaque>;
-            data_refmod =
-            (Some { refmod_left =
-                    { field_ref = (Constant_field 1/int32);
-                      field_ref_loc = <opaque> };
-                    refmod_length = None })
-            }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {field = (Fixed_field "      ");
-              field_info =
-              { field_definition = {
-                  qualname: X
-                  offset: 0
-                  size: 48
-                  size-max: 48
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: ALPHANUMERIC(6)
-                    }
-                    value: "ABCDEF"
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {field = (Fixed_field "   ");
+                    field_info =
+                    { field_definition = {
+                        qualname: Y
+                        offset: 0
+                        size: 24
+                        size-max: 24
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category:
+                             NUMERIC(digits = 3, scale = 0, signed = false)
+                          }
+                          value: 123
+                        }
+                      }; field_initial_value = (Some 123/int32) }};
+                  data_ref_loc = <opaque>;
+                  data_refmod =
+                  (Some { refmod_left =
+                          { field_ref = (Constant_field 1/int32);
+                            field_ref_loc = <opaque> };
+                          refmod_length =
+                          (Some { field_ref = (Constant_field 3/int32);
+                                  field_ref_loc = <opaque> })
+                          })
                   }
-                }; field_initial_value = (Some "ABCDEF") }};
-            data_ref_loc = <opaque>;
-            data_refmod =
-            (Some { refmod_left =
-                    { field_ref = (Constant_field 3/int32);
-                      field_ref_loc = <opaque> };
-                    refmod_length = None })
-            }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {field = (Fixed_field "      ");
-              field_info =
-              { field_definition = {
-                  qualname: X
-                  offset: 0
-                  size: 48
-                  size-max: 48
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: ALPHANUMERIC(6)
-                    }
-                    value: "ABCDEF"
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {field = (Fixed_field "   ");
+                    field_info =
+                    { field_definition = {
+                        qualname: Y
+                        offset: 0
+                        size: 24
+                        size-max: 24
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category:
+                             NUMERIC(digits = 3, scale = 0, signed = false)
+                          }
+                          value: 123
+                        }
+                      }; field_initial_value = (Some 123/int32) }};
+                  data_ref_loc = <opaque>;
+                  data_refmod =
+                  (Some { refmod_left =
+                          { field_ref = (Constant_field 2/int32);
+                            field_ref_loc = <opaque> };
+                          refmod_length =
+                          (Some { field_ref = (Constant_field 2/int32);
+                                  field_ref_loc = <opaque> })
+                          })
                   }
-                }; field_initial_value = (Some "ABCDEF") }};
-            data_ref_loc = <opaque>;
-            data_refmod =
-            (Some { refmod_left =
-                    { field_ref = (Constant_field 4/int32);
-                      field_ref_loc = <opaque> };
-                    refmod_length = None })
-            }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {field = (Fixed_field "      ");
-              field_info =
-              { field_definition = {
-                  qualname: X
-                  offset: 0
-                  size: 48
-                  size-max: 48
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: ALPHANUMERIC(6)
-                    }
-                    value: "ABCDEF"
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {field = (Fixed_field "   ");
+                    field_info =
+                    { field_definition = {
+                        qualname: Y
+                        offset: 0
+                        size: 24
+                        size-max: 24
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category:
+                             NUMERIC(digits = 3, scale = 0, signed = false)
+                          }
+                          value: 123
+                        }
+                      }; field_initial_value = (Some 123/int32) }};
+                  data_ref_loc = <opaque>;
+                  data_refmod =
+                  (Some { refmod_left =
+                          { field_ref = (Constant_field 3/int32);
+                            field_ref_loc = <opaque> };
+                          refmod_length =
+                          (Some { field_ref = (Constant_field 1/int32);
+                                  field_ref_loc = <opaque> })
+                          })
                   }
-                }; field_initial_value = (Some "ABCDEF") }};
-            data_ref_loc = <opaque>;
-            data_refmod =
-            (Some { refmod_left =
-                    { field_ref = (Constant_field 6/int32);
-                      field_ref_loc = <opaque> };
-                    refmod_length = None })
-            }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {field = (Fixed_field "      ");
-              field_info =
-              { field_definition = {
-                  qualname: X
-                  offset: 0
-                  size: 48
-                  size-max: 48
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: ALPHANUMERIC(6)
-                    }
-                    value: "ABCDEF"
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {field = (Fixed_field "   ");
+                    field_info =
+                    { field_definition = {
+                        qualname: Y
+                        offset: 0
+                        size: 24
+                        size-max: 24
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category:
+                             NUMERIC(digits = 3, scale = 0, signed = false)
+                          }
+                          value: 123
+                        }
+                      }; field_initial_value = (Some 123/int32) }};
+                  data_ref_loc = <opaque>;
+                  data_refmod =
+                  (Some { refmod_left =
+                          { field_ref = (Constant_field 1/int32);
+                            field_ref_loc = <opaque> };
+                          refmod_length = None })
                   }
-                }; field_initial_value = (Some "ABCDEF") }};
-            data_ref_loc = <opaque>;
-            data_refmod =
-            (Some { refmod_left =
-                    { field_ref =
-                      Field_in_memory {field = (Fixed_field " ");
-                        field_info =
-                        { field_definition = {
-                            qualname: ONE
-                            offset: 0
-                            size: 8
-                            size-max: 8
-                            layout: {
-                              elementary
-                              usage: {
-                                display
-                                category:
-                                 NUMERIC(digits = 1, scale = 0, signed = false)
-                              }
-                              value: 1
-                            }
-                          }; field_initial_value = (Some 1/int32) }};
-                      field_ref_loc = <opaque> };
-                    refmod_length = None })
-            }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {field = (Fixed_field "   ");
-              field_info =
-              { field_definition = {
-                  qualname: Y
-                  offset: 0
-                  size: 24
-                  size-max: 24
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: NUMERIC(digits = 3, scale = 0, signed = false)
-                    }
-                    value: 123
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {field = (Fixed_field "   ");
+                    field_info =
+                    { field_definition = {
+                        qualname: Y
+                        offset: 0
+                        size: 24
+                        size-max: 24
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category:
+                             NUMERIC(digits = 3, scale = 0, signed = false)
+                          }
+                          value: 123
+                        }
+                      }; field_initial_value = (Some 123/int32) }};
+                  data_ref_loc = <opaque>;
+                  data_refmod =
+                  (Some { refmod_left =
+                          { field_ref = (Constant_field 2/int32);
+                            field_ref_loc = <opaque> };
+                          refmod_length = None })
                   }
-                }; field_initial_value = (Some 123/int32) }};
-            data_ref_loc = <opaque>;
-            data_refmod =
-            (Some { refmod_left =
-                    { field_ref = (Constant_field 1/int32);
-                      field_ref_loc = <opaque> };
-                    refmod_length =
-                    (Some { field_ref = (Constant_field 3/int32);
-                            field_ref_loc = <opaque> })
-                    })
-            }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {field = (Fixed_field "   ");
-              field_info =
-              { field_definition = {
-                  qualname: Y
-                  offset: 0
-                  size: 24
-                  size-max: 24
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: NUMERIC(digits = 3, scale = 0, signed = false)
-                    }
-                    value: 123
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {field = (Fixed_field "   ");
+                    field_info =
+                    { field_definition = {
+                        qualname: Y
+                        offset: 0
+                        size: 24
+                        size-max: 24
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category:
+                             NUMERIC(digits = 3, scale = 0, signed = false)
+                          }
+                          value: 123
+                        }
+                      }; field_initial_value = (Some 123/int32) }};
+                  data_ref_loc = <opaque>;
+                  data_refmod =
+                  (Some { refmod_left =
+                          { field_ref = (Constant_field 3/int32);
+                            field_ref_loc = <opaque> };
+                          refmod_length = None })
                   }
-                }; field_initial_value = (Some 123/int32) }};
-            data_ref_loc = <opaque>;
-            data_refmod =
-            (Some { refmod_left =
-                    { field_ref = (Constant_field 2/int32);
-                      field_ref_loc = <opaque> };
-                    refmod_length =
-                    (Some { field_ref = (Constant_field 2/int32);
-                            field_ref_loc = <opaque> })
-                    })
-            }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {field = (Fixed_field "   ");
-              field_info =
-              { field_definition = {
-                  qualname: Y
-                  offset: 0
-                  size: 24
-                  size-max: 24
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: NUMERIC(digits = 3, scale = 0, signed = false)
-                    }
-                    value: 123
-                  }
-                }; field_initial_value = (Some 123/int32) }};
-            data_ref_loc = <opaque>;
-            data_refmod =
-            (Some { refmod_left =
-                    { field_ref = (Constant_field 3/int32);
-                      field_ref_loc = <opaque> };
-                    refmod_length =
-                    (Some { field_ref = (Constant_field 1/int32);
-                            field_ref_loc = <opaque> })
-                    })
-            }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {field = (Fixed_field "   ");
-              field_info =
-              { field_definition = {
-                  qualname: Y
-                  offset: 0
-                  size: 24
-                  size-max: 24
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: NUMERIC(digits = 3, scale = 0, signed = false)
-                    }
-                    value: 123
-                  }
-                }; field_initial_value = (Some 123/int32) }};
-            data_ref_loc = <opaque>;
-            data_refmod =
-            (Some { refmod_left =
-                    { field_ref = (Constant_field 1/int32);
-                      field_ref_loc = <opaque> };
-                    refmod_length = None })
-            }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {field = (Fixed_field "   ");
-              field_info =
-              { field_definition = {
-                  qualname: Y
-                  offset: 0
-                  size: 24
-                  size-max: 24
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: NUMERIC(digits = 3, scale = 0, signed = false)
-                    }
-                    value: 123
-                  }
-                }; field_initial_value = (Some 123/int32) }};
-            data_ref_loc = <opaque>;
-            data_refmod =
-            (Some { refmod_left =
-                    { field_ref = (Constant_field 2/int32);
-                      field_ref_loc = <opaque> };
-                    refmod_length = None })
-            }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {field = (Fixed_field "   ");
-              field_info =
-              { field_definition = {
-                  qualname: Y
-                  offset: 0
-                  size: 24
-                  size-max: 24
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: NUMERIC(digits = 3, scale = 0, signed = false)
-                    }
-                    value: 123
-                  }
-                }; field_initial_value = (Some 123/int32) }};
-            data_ref_loc = <opaque>;
-            data_refmod =
-            (Some { refmod_left =
-                    { field_ref = (Constant_field 3/int32);
-                      field_ref_loc = <opaque> };
-                    refmod_length = None })
-            }
-          |];
-        advancing = true};
-      IR_stop {optional_status = None}]
+                |];
+              advancing = true}
+            |];
+          block_term = IR_stop {optional_status = None} }
+        |];
+      proc_entry = 0 }
     }
 
   $ tramabol prog.cob

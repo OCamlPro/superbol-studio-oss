@@ -26,22 +26,29 @@ let builder ~options : builder =
 
 let manager: manager =
   Cir_logic.Types.{
+    mode = Det_mode;
+
     enter_module = Module.enter;
     leave_module = Module.leave;
-    module_ws_needs_initialization = Module.ws_needs_initialization;
+    module_ws_initialized = Module.ws_initialized;
     module_ws_initialization_done = Module.ws_initialization_done;
 
     init_field = Field.init;
     field_value = Field.access_field_reference;
     data_value = Field.access_data_reference;
 
-    display_fields = Termio.display_fields;
-
-    stop = Control.stop;
-    conditional = Control.conditional;
-
     eval_condition = Eval.condition;
 
-    proceed = Result.ok; (* always proceed; "our" branch type is the same as in
-                            Cir_logic. *)
+    decide = Control.decide;
+    decide_int_value = Control.decide_int_value;
+    set_counter = Control.set_counter;
+    count_down = Control.count_down;
+    stop = Control.stop;
+
+    display_fields = Termio.display_fields;
+    move = Update.move;
+
+    arithmetic = Update.arithmetic;
+    clear_size_error = Update.clear_size_error;
+    size_error = Update.size_error;
   }

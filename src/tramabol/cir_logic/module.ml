@@ -28,9 +28,9 @@ let init_storage ~vm storage state =
   end (Ok state) storage.storage_fields
 
 let init ~vm (m: _ module_handle) state =
-  let ws_init = vm.module_ws_needs_initialization m.module_memory in
+  let* state, ws_initialized = vm.module_ws_initialized m.module_memory state in
   let* state =
-    if ws_init
+    if ws_initialized
     then Ok state
     else
       let* state = init_storage ~vm m.module_data.working_storage state in
