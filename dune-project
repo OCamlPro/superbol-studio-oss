@@ -262,7 +262,6 @@
    (superbol_cache (= :version))
    (sql_preproc (= :version))
    (lwt (and ( >= 5 )( < 5.9 )))
-   (ez_toml (= :version))
    (ez_file ( >= 0.4 ))
    (ez_cmdliner (and (>= 0.3.0) (< 1.0.0)))
    (ez_api ( >= 2.0 ))
