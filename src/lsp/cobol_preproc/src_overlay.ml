@@ -170,30 +170,44 @@ let pointwise ctx l =
 let join_limits: manager -> limit * limit -> srcloc = fun ctx (s, e) ->
   let try_limits (s, e: limit * limit) =
 
-    let rec proceed_from ?loc s =         (* start search from left limit [s] *)
-      check ?loc @@ HLnks.find ctx.right_of s
+    (* Note: all calls below are tail calls, to avoid stack overflows on very
+       large inputs (notably in JS); [alts] holds the alternatives to try upon
+       failure of a search that started from a cache hit. *)
 
-    and check ?loc (loc', e') =
+    let rec proceed_from ?loc s alts =  (* start search from left limit [s] *)
+      match HLnks.find_opt ctx.right_of s with
+      | Some hit -> check ?loc hit alts
+      | None -> backtrack alts
+
+    and check ?loc (loc', e') alts =
       (* continue search with ([loc] concatenated with) [loc'] if [e'] is not
-         the sought after right limit; raises {!Not_found} when reaching an
-         unknown gap or limit *)
+         the sought after right limit; backtracks when reaching an unknown gap
+         or limit *)
       let loc = match loc with
         | None -> loc'
         | Some loc -> Cobol_common.Srcloc.concat loc loc'
       in
       if Limit.equal e e'
       then (WLnks.replace ctx.cache s (loc, e); loc)
-      else try_cache_from ~loc @@ HLnks.find ctx.over_right_gap e'
+      else match HLnks.find_opt ctx.over_right_gap e' with
+        | Some s' -> try_cache_from ~loc s' alts
+        | None -> backtrack alts
 
-    and try_cache_from ?loc s =
+    and try_cache_from ?loc s alts =
       (* attempt with cache first; proceed via small-step upon miss or
          failure *)
       match WLnks.find_opt ctx.cache s with
       | Some ((_, e') as hit) when Limit.surely_predates e' e ->
-          (try check ?loc hit with Not_found -> proceed_from ?loc s)
+          check ?loc hit ((loc, s) :: alts)
       | Some _ | None ->
-          proceed_from ?loc s
+          proceed_from ?loc s alts
+
+    and backtrack = function           (* raises {!Not_found} when exhausted *)
+      | [] -> raise Not_found
+      | (loc, s) :: alts -> proceed_from ?loc s alts
     in
+
+    let try_cache_from s = try_cache_from s [] in
 
     if Limit.equal s e
     then pointwise ctx s
