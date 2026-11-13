@@ -16,6 +16,7 @@ open Cobol_common.Srcloc.INFIX
 open Lsp.Types.DocumentSymbol
 open Cobol_ptree
 module Visitor = Cobol_common.Visitor
+module LIST = Cobol_common.Basics.LIST
 type range = Range.t
 type doc_symbol = t
 
@@ -39,7 +40,7 @@ let proc_init_acc = { result = []; prev_section = None; buffer = [] }
 
 let complete_section { result; prev_section; buffer=children } =
   match prev_section with
-  | None -> children @ result
+  | None -> LIST.append children result
   | Some (range, name) ->
     let range = enclosing_range range children in
     create ~kind:Function ~name ~range ~children ()
@@ -326,11 +327,11 @@ let from_ptree_at ~uri ptree : DocumentSymbol.t list =
       parent_folder ~kind:Object @@ Fun.const "OBJECT."
 
     method! fold_environment_division' div acc =
-      Visitor.skip (fold_env_div range_from div @ acc)
+      Visitor.skip (LIST.append (fold_env_div range_from div) acc)
 
     method! fold_data_division' div acc =
-      Visitor.skip (fold_data_div range_from div @ acc)
+      Visitor.skip (LIST.append (fold_data_div range_from div) acc)
 
     method! fold_procedure_division' div acc =
-      Visitor.skip (fold_proc_div range_from div @ acc)
+      Visitor.skip (LIST.append (fold_proc_div range_from div) acc)
   end ptree []

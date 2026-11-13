@@ -3,7 +3,7 @@
 ## [_] Next release
 
 ### Added
-- `SuperBOL Caches` view in the explorer, and status bar item, for keeping an eye on how much room the caches of the language server take, seeing what they hold, and pruning them
+- `SuperBOL Caches` view in the explorer, and status bar item, for keeping an eye on how much room the caches of the language server take, seeing what they hold, and pruning them [#725](https://github.com/OCamlPro/superbol-studio-oss/pull/725)
 - Option `--no-lsp-artifacts` of `superbol cache analyze`, for analyzing files without computing or caching what only the LSP server needs [#720](https://github.com/OCamlPro/superbol-studio-oss/pull/720)
 - Sub-command `superbol parallel`, for running any sub-command on batches of files in parallel processes [#720](https://github.com/OCamlPro/superbol-studio-oss/pull/720)
 - Option `--color` of every `superbol` command, and environment variable `SUPERBOL_COLOR`, for forcing or disabling colors in outputs [#720](https://github.com/OCamlPro/superbol-studio-oss/pull/720)
@@ -24,6 +24,7 @@
 - Workspace analyzis for every COBOL file, that now runs in parallel sub-processes, and reports diagnostics of files that are not open [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
 
 ### Fixed
+- Stack overflows of the LSP server compiled to JavaScript (shipped in universal VSIXs) on very large programs, slow code lenses on programs with many data items or paragraphs, and slow analysis with high memory usage on deeply nested statements (e.g. `IF`s) [#727](https://github.com/OCamlPro/superbol-studio-oss/pull/727)
 - Stepping and breakpoints in programs built by debug build tasks, with GnuCOBOL configured to optimize C code (e.g. with `--enable-hardening`) [#718](https://github.com/OCamlPro/superbol-studio-oss/pull/718)
 - Handling of dialects given as configuration files whose path holds uppercase letters (e.g. `Dialects/My.conf`), that were looked up with a lowercased path [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
 - Lookup of files included by a configuration file given with `--conf`, that are now looked up next to that file first, even when it is found in the search path [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)

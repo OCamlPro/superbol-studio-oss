@@ -389,3 +389,106 @@ let%expect_test "codelens-preproc-directives-numeric" =
       17          >>END-IF
       18          PROCEDURE DIVISION.
     1 reference |}];;
+
+let%expect_test "codelens-paragraphs-with-same-name-in-sections" =
+  let end_with_postproc = codelens {cobol|
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. prog.
+        PROCEDURE DIVISION.
+            S1 SECTION.
+            P.
+            PERFORM P.
+            PERFORM P IN S2.
+            S2 SECTION.
+            P.
+            PERFORM P IN S1.
+            PERFORM P IN S2.
+            PERFORM P.
+            STOP RUN.
+    |cobol} in
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    __rootdir__/prog.cob:5.12:
+       2           IDENTIFICATION DIVISION.
+       3           PROGRAM-ID. prog.
+       4           PROCEDURE DIVISION.
+       5 >             S1 SECTION.
+    ----               ^
+       6               P.
+       7               PERFORM P.
+    1 reference
+    __rootdir__/prog.cob:6.12:
+       3           PROGRAM-ID. prog.
+       4           PROCEDURE DIVISION.
+       5               S1 SECTION.
+       6 >             P.
+    ----               ^
+       7               PERFORM P.
+       8               PERFORM P IN S2.
+    2 references
+    __rootdir__/prog.cob:9.12:
+       6               P.
+       7               PERFORM P.
+       8               PERFORM P IN S2.
+       9 >             S2 SECTION.
+    ----               ^
+      10               P.
+      11               PERFORM P IN S1.
+    2 references
+    __rootdir__/prog.cob:10.12:
+       7               PERFORM P.
+       8               PERFORM P IN S2.
+       9               S2 SECTION.
+      10 >             P.
+    ----               ^
+      11               PERFORM P IN S1.
+      12               PERFORM P IN S2.
+    3 references |}];;
+
+let%expect_test "codelens-nested-programs" =
+  let end_with_postproc = codelens {cobol|
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. outer.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 X PIC 9.
+        PROCEDURE DIVISION.
+            P.
+            MOVE 1 TO X.
+            PERFORM P.
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. inner.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 X PIC 9.
+        PROCEDURE DIVISION.
+            P.
+            MOVE 1 TO X.
+            MOVE 2 TO X.
+            PERFORM P.
+            PERFORM P.
+        END PROGRAM inner.
+        END PROGRAM outer.
+    |cobol} in
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    __rootdir__/prog.cob:6.11:
+       3           PROGRAM-ID. outer.
+       4           DATA DIVISION.
+       5           WORKING-STORAGE SECTION.
+       6 >         01 X PIC 9.
+    ----              ^
+       7           PROCEDURE DIVISION.
+       8               P.
+    1 reference
+    __rootdir__/prog.cob:8.12:
+       5           WORKING-STORAGE SECTION.
+       6           01 X PIC 9.
+       7           PROCEDURE DIVISION.
+       8 >             P.
+    ----               ^
+       9               MOVE 1 TO X.
+      10               PERFORM P.
+    1 reference |}];;

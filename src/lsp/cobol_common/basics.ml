@@ -56,19 +56,18 @@ module LIST = struct
 
   let append ?loc a b =
     match a,b with
-    | [], _
-    | [_], _
-    | _, [] -> a @ b
+    | [], l | l, [] -> l
+    | [x], l -> x :: l
     | _ ->
       check_10 "append" ~loc a;
-      a @ b
+      List.rev_append (List.rev a) b
 
   let rev_map ?loc f list =
     check_10 "rev_map" ~loc list;
     List.rev_map f list
   let map ?loc f list =
     check_10 "map" ~loc list;
-    List.map f list
+    EzList.tail_map f list
   let rev_append ?loc list b =
     check_10 "rev_append" ~loc list;
     List.rev_append list b
@@ -97,6 +96,9 @@ module LIST = struct
   let tail_map ?loc f l =
     check_10 "tail_map" ~loc l;
     EzList.tail_map f l
+  let flatten ?loc l =
+    check_10 "flatten" ~loc l;
+    List.rev @@ List.fold_left (fun acc l -> List.rev_append l acc) [] l
 
   (** Tail-recursive version of [List.merge]. *)
   let tail_merge ?loc compare l1 l2 =
@@ -172,11 +174,6 @@ module NEL = struct
       | x :: tl -> aux (f acc x) tl
     in
     aux acc l
-  let rec of_list = function
-    | [] -> Pretty.invalid_arg "of_list"
-    | [x] -> One x
-    | [x; y] -> x :: One y
-    | x :: tl -> x :: of_list tl
   let to_list l =
     let rec aux acc = function
       | One x -> List.rev_append acc [x]
@@ -190,11 +187,6 @@ module NEL = struct
         | One x -> x :: acc
         | x :: tl -> aux (x::acc) tl
       in aux (One hd) tl
-  let append a b =
-    let rec aux b = function
-      | One x -> x :: b
-      | x :: tl -> x :: aux b tl
-    in aux b a
   let rev_to_list l =
     let rec aux acc = function
       | One x -> List.cons x acc
@@ -209,6 +201,11 @@ module NEL = struct
     function
     | [] -> Pretty.invalid_arg "of_rev_list"
     | last :: tl -> aux (One last) tl
+  let of_list = function           (* note: tail-recursive, for long lists *)
+    | [] -> Pretty.invalid_arg "of_list"
+    | l -> of_rev_list (List.rev l)
+  let append a b =                  (* note: tail-recursive, for long lists *)
+    List.fold_left (fun b x -> x :: b) b (rev_to_list a)
   let rec iter ~f = function
     | One x -> f x
     | x :: l -> f x; iter ~f l

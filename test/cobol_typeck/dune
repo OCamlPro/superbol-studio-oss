@@ -15,7 +15,8 @@
                   ko_proc_names
                   ko_syntax
     ok_fd
-    ok_78         ko_78)
+    ok_78         ko_78
+    chain_visitors)
  (preprocess
   (pps ppx_expect))
  (inline_tests

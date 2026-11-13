@@ -193,11 +193,30 @@ let shallow_multiline_lexloc_in ~filename loc =
   let rec aux: type t. t slt -> lexloc option = function
     | Raw { fname; _ } as loc when fname = filename -> Some (raw_lexloc loc)
     | Raw _ | Cpy _ | Rpl _ -> None
-    | Cat { left; right } -> match aux left, aux right with
-      | Some (s, _), Some (_, e)
-      | Some (s, e), None
-      | None, Some (s, e) -> Some (s, e)
-      | None, None -> None
+    | Cat { left; right } ->
+        (* Note: [Cat] chains may be very deep, so we iterate over their left
+           spine.  Fast path: when the left-most leaf belongs to [filename],
+           the end is that of the right-most leaf that also does. *)
+        match leftmost left with
+        | Some (s, e) -> Some (s, last_end ~default:e right left)
+        | None -> cat [right] left
+  and leftmost: left_ slt -> _ = function
+    | Cat { left; _ } -> leftmost left
+    | l -> aux l
+  and last_end ~default right left =
+    match aux right, left with
+    | Some (_, e), _ -> e
+    | None, Cat { left; right } -> last_end ~default right left
+    | None, _ -> default
+  and cat: right_ slt list -> left_ slt -> lexloc option = fun rights ->
+    function
+    | Cat { left; right } -> cat (right :: rights) left
+    | l -> List.fold_left (fun acc r -> join acc (aux r)) (aux l) rights
+  and join a b = match a, b with
+    | Some (s, _), Some (_, e)
+    | Some (s, e), None
+    | None, Some (s, e) -> Some (s, e)
+    | None, None -> None
   in
   aux loc
 
@@ -212,12 +231,24 @@ let start_pos_in ~filename ~traverse_replaces =
   let rec aux: type t. t slt -> Lexing.position option = function
     | Raw { fname; _ } as loc when fname = filename -> Some (raw_start loc)
     | Raw _ -> None
-    | Cat { left; right } -> or_else left right
+    | Cat { left; right } ->
+        (* Note: [Cat] chains may be very deep, so we iterate over their left
+           spine.  Fast path: the left-most leaf belongs to [filename]. *)
+        (match leftmost left with None -> cat [right] left | res -> res)
     | Cpy { copied; copyloc = { copyloc; _ } } -> or_else copied copyloc
     | Rpl { old; new_; _ } ->
         aux (if traverse_replaces then new_ else old)
   and or_else: type t u. t slt -> u slt -> _ = fun a b ->
     match aux a with None -> aux b | res -> res
+  and leftmost: left_ slt -> _ = function
+    | Cat { left; _ } -> leftmost left
+    | l -> aux l
+  and cat: right_ slt list -> left_ slt -> _ = fun rights -> function
+    | Cat { left; right } -> cat (right :: rights) left
+    | l -> match aux l with None -> first_in rights | res -> res
+  and first_in = function
+    | [] -> None
+    | r :: rights -> match aux r with None -> first_in rights | res -> res
   in
   aux
 
@@ -225,7 +256,8 @@ let end_pos_in ~filename ~traverse_replaces =
   let rec aux: type t. t slt -> Lexing.position option = function
     | Raw { fname; _ } as loc when fname = filename -> Some (raw_end loc)
     | Raw _ -> None
-    | Cat { left; right } -> or_else right left
+    | Cat { left; right } ->                   (* note: tail call on [left] *)
+        (match aux right with None -> aux left | res -> res)
     | Cpy { copied; copyloc = { copyloc; _ } } -> or_else copied copyloc
     | Rpl { old; new_; _ } ->
         aux (if traverse_replaces then new_ else old)
@@ -270,11 +302,22 @@ let forget_preproc
     | Cat { left; right } ->
         match favor_direction with
         | `Left ->
-            let (Lexing.{ pos_fname = filename; _ } as s), e = aux left in
-            s, Option.value (end_pos_in ~filename right) ~default:e
+            (* Note: [Cat] chains may be very deep, so we iterate over their
+               left spine: first to find the start in the left-most leaf, then
+               to find the right-most end in the same file. *)
+            let (Lexing.{ pos_fname = filename; _ } as s), e = leftmost left in
+            s, last_end ~filename ~default:e right left
         | `Right ->
             let s, (Lexing.{ pos_fname = filename; _ } as e) = aux right in
             Option.value (start_pos_in ~filename left) ~default:s, e
+  and leftmost: left_ slt -> lexloc = function
+    | Cat { left; _ } -> leftmost left
+    | l -> aux l
+  and last_end ~filename ~default right left =
+    match end_pos_in ~filename right, left with
+    | Some e, _ -> e
+    | None, Cat { left; right } -> last_end ~filename ~default right left
+    | None, _ -> default
   in
   aux
 
@@ -311,10 +354,11 @@ let shallow_single_line_lexloc_in =
 
 let shallow_single_line_lexlocs_in
     ?(ignore_invalid_filename = false) ~filename loc =
-  let rec aux: type t. t slt -> (lexloc list as 'a) -> 'a = function
-    | Raw { fname; _ } as loc when fname = filename -> List.cons (raw_lexloc loc)
-    | Raw _ | Cpy _ | Rpl _ -> Fun.id
-    | Cat { left; right } -> fun acc -> acc |> aux right |> aux left
+  let rec aux: type t. t slt -> (lexloc list as 'a) -> 'a = fun loc acc ->
+    match loc with
+    | Raw { fname; _ } as loc when fname = filename -> raw_lexloc loc :: acc
+    | Raw _ | Cpy _ | Rpl _ -> acc
+    | Cat { left; right } -> aux left (aux right acc)   (* tail call on [left] *)
   in
   match aux loc [] with
   | l when ignore_invalid_filename -> l
@@ -372,7 +416,11 @@ let scan ?(kind: [`TopDown | `BottomUp] = `TopDown) ~cpy ~rpl =
       ,             `TopDown ) -> fun acc -> acc |> rpl replloc |> aux old
     | (Rpl { old; replloc; _ }
       ,             `BottomUp) -> fun acc -> acc |> aux old |> rpl replloc
-    | (Cat { left; right }, _) -> fun acc -> acc |> aux left |> aux right
+    | (Cat { left; right }, _) -> cat [right] left
+  and cat: right_ slt list -> left_ slt -> 'a -> 'a = fun rights ->
+    function            (* iterate over the left spine to avoid deep recursions *)
+    | Cat { left; right } -> cat (right :: rights) left
+    | l -> fun acc -> List.fold_left (fun acc r -> aux r acc) (aux l acc) rights
   in
   aux
 
@@ -618,13 +666,16 @@ let dummy =
 
 (** {2 Composition & truncation} *)
 
-(** [may_join_as_single_raw l1 l2] checks whether two raw locations [l1] and
-    [l2] may be joined to form a single raw source location. *)
-let may_join_as_single_raw: raw -> raw -> bool = fun (Raw r1) (Raw r2) ->
+(** [may_join_as_single_raw ~multiline l1 l2] checks whether two raw locations
+    [l1] and [l2] may be joined to form a single raw source location, that may
+    span several lines if [multiline] holds. *)
+let may_join_as_single_raw ~multiline : raw -> raw -> bool =
+  fun (Raw r1) (Raw r2) ->
   r1.fname = r2.fname &&
-  r1.lnum + (r1.lines_n_a asr 1) == r2.lnum &&   (* ensure we are stay on a single
-                                                  line *)
-  r1.cnum + r1.len >= r2.cnum - 1
+  if multiline
+  then r1.cnum <= r2.cnum && r1.cnum + r1.len <= r2.cnum + r2.len
+  else r1.lnum + (r1.lines_n_a asr 1) == r2.lnum &&
+       r1.cnum + r1.len >= r2.cnum - 1
 
 let join_raws: raw -> raw -> [>raw_] slt = fun (Raw r1) (Raw r2) ->
   let end_lnum = r2.lnum + (r2.lines_n_a asr 1) in
@@ -633,14 +684,15 @@ let join_raws: raw -> raw -> [>raw_] slt = fun (Raw r1) (Raw r2) ->
         lines_n_a = (end_lnum - r1.lnum) * 2 + (r1.lines_n_a land 1);
         ecol = r2.ecol }
 
-(** [concat l1 l2] concatenates two adjacent source locations [l1] and [l2]. *)
-let rec concat: srcloc -> srcloc -> srcloc = fun l1 l2 -> match l1, l2 with
+let rec concat_ ~multiline : srcloc -> srcloc -> srcloc = fun l1 l2 ->
+  let concat = concat_ ~multiline in
+  match l1, l2 with
   | (Raw _ as l1), (Raw _ as l2)
-    when may_join_as_single_raw l1 l2 ->
+    when may_join_as_single_raw ~multiline l1 l2 ->
       join_raws l1 l2
 
   | Cat { left; right = Raw _ as l1 }, (Raw _ as l2)
-    when may_join_as_single_raw l1 l2 ->
+    when may_join_as_single_raw ~multiline l1 l2 ->
       Cat { left; right = join_raws l1 l2 }
 
   | Cpy { copied = l1; copyloc = c1 },
@@ -669,8 +721,22 @@ let rec concat: srcloc -> srcloc -> srcloc = fun l1 l2 -> match l1, l2 with
       Cat { left; right }
 
   | (Raw _ | Cpy _ | Rpl _ | Cat _ as l1),
-    (Cat { left = l2; right }) ->
-      Cat { left = concat l1 l2; right }
+    (Cat _ as l2) ->
+      (* iterate over the left spine of [l2] to avoid deep recursions *)
+      let rec spine (acc: right_ slt list) : srcloc -> srcloc * _ = function
+        | Cat { left; right } -> spine (right :: acc) left
+        | l -> l, acc
+      in
+      let first, rights = spine [] l2 in
+      List.fold_left (fun left right -> Cat { left; right })
+        (concat l1 first) rights
+
+(** [concat ?multiline l1 l2] concatenates two adjacent source locations [l1]
+    and [l2].  With [multiline] (default [false]), raw locations of the same
+    file are joined even across lines, so the result also covers what lies in
+    between. *)
+let concat ?(multiline = false) l1 l2 =
+  concat_ ~multiline l1 l2
 
 let concat_srclocs: srcloc list -> srcloc option = fun l ->
   List.fold_left begin fun acc loc -> match acc with

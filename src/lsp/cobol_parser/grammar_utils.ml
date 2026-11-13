@@ -22,6 +22,7 @@ open Cobol_common.Srcloc.INFIX
 module Srcloc_overlay =
   Cobol_preproc.Src_overlay.New_manager (struct
     let name = __MODULE__
+    let approximate_srclocs = true
   end) ()
 
 

@@ -169,8 +169,11 @@ let preprocessor input = function
   | `WithOptions { platform; source_format; env;
                    exec_preprocs; config = (module Config);
                    copybook_lookup_config } ->
-      let module Om_name = struct let name = __MODULE__ end in
-      let module Om = Src_overlay.New_manager (Om_name) () in
+      let module Om_config = struct
+        let name = __MODULE__
+        let approximate_srclocs = false
+      end in
+      let module Om = Src_overlay.New_manager (Om_config) () in
       let module Pp = Preproc_grammar.Make (Config) (Om) in
       let source_format = source_format_config source_format in
       let tab_stops = Config.tab_stops#value in

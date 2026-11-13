@@ -79,6 +79,13 @@ module type MANAGER = sig
 end
 
 (** Manager module instantiation *)
-module New_manager: functor (Id: sig val name: string end) () -> MANAGER
+module New_manager: functor (Config: sig
+    val name: string
+
+    (** Whether [join_limits] may join locations across lines (see
+        {!Cobol_common.Srcloc.concat}): results are smaller, but also cover
+        what lies in between, so they should not be split back into lines. *)
+    val approximate_srclocs: bool
+  end) () -> MANAGER
 
 val debug_oc : out_channel option ref

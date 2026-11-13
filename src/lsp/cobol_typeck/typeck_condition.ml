@@ -158,9 +158,18 @@ let rec expand_abbrev_cond (abbrev_cond: Cobol_ptree.condition with_loc) state
       let+ exp_cond, state = expand_abbrev_cond c state in
       Ok (Not exp_cond) &@<- abbrev_cond, state
   | CondCombined (a, o, b) ->
-      let* exp_a, state = expand_abbrev_cond a state in
-      let+ exp_b, state = expand_abbrev_cond b state in
-      Ok (Combined (exp_a, o, exp_b)) &@<- abbrev_cond, state
+      (* Long chains of combined conditions are left-nested: iterate over the
+         left spine to avoid deep recursions. *)
+      let rec spine rights a = match ~&a with
+        | CondCombined (a', o, b) -> spine ((a, o, b) :: rights) a'
+        | _ -> a, rights
+      in
+      let first, rights = spine [abbrev_cond, o, b] a in
+      let* first = expand_abbrev_cond first state in
+      fold_list begin fun (exp_a, state) (node, o, b) ->
+        let+ exp_b, state = expand_abbrev_cond b state in
+        Ok (Combined (exp_a, o, exp_b)) &@<- node, state
+      end first rights
   | CondClass cl ->
       use_and_reset_subject state
         ~f:(fun subj -> Ok (ClassCond (subj, cl)) &@<- abbrev_cond)
