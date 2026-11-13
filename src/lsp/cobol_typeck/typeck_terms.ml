@@ -273,7 +273,17 @@ and typeck_expr' (e : Cobol_ptree.expr with_loc)
         let+ e = typeck_expr' e in
         Unop (o, e)
     | Binop (a, o, b) ->
-        let+ a = typeck_expr' a
+        (* Chains of binary operations are left-nested, and may be very long. *)
+        let rec spine rights a = match ~&a with
+          | Cobol_ptree.Binop (a', o, b) -> spine ((a, o, b) :: rights) a'
+          | _ -> a, rights
+        in
+        let first, rights = spine [] a in
+        let* first = typeck_expr' first in
+        let+ a = fold_list begin fun a (node, o, b) ->
+            let+ b = typeck_expr' b in
+            Binop (a, o, b) &@<- node
+          end first rights
         and+ b = typeck_expr' b in
         Binop (a, o, b)
   in

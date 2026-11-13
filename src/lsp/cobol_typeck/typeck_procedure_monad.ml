@@ -50,21 +50,34 @@ let ( let* ) (m : _ t) (f : _ -> _ t) : _ t =
   let x, acc = m env acc in
   f x env acc
 
-let rec map_list f = function
-  | [] -> return []
-  | x :: l ->
-      let+ y = f x
-      and+ l = map_list f l in
-      y :: l
+(** {2 Iterators}
 
-let rec map_nel f : _ NEL.t -> _ t = function
-  | One x ->
-      let+ y = f x in
-      NEL.One y
-  | x :: l ->
-      let+ y = f x
-      and+ l = map_nel f l in
-      NEL.(y :: l)
+    Note: the folds below are written with explicit monadic state on purpose:
+    iterating with a recursive function and [let*] instead (e.g., [let* v = f
+    v x in aux v l]) is stack-safe with native code, but not once compiled
+    into JavaScript, where tail-calls to unknown functions (here, closures
+    built by [aux v l]) are not optimized.  Use these folds to iterate over
+    potentially long sequences. *)
+
+(** [fold_list f init l] folds [f] over the elements of [l], from left to
+    right. *)
+let fold_list f init l : _ t =
+  fun env acc ->
+  List.fold_left (fun (v, acc) x -> f v x env acc) (init, acc) l
+
+(** [fold_nel f init l] folds [f] over the elements of [l], from left to
+    right. *)
+let fold_nel f init l : _ t =
+  fun env acc ->
+  NEL.fold_left ~f:(fun (v, acc) x -> f v x env acc) (init, acc) l
+
+let map_list f l =
+  let+ rev = fold_list (fun rev x -> let+ y = f x in y :: rev) [] l in
+  List.rev rev
+
+let map_nel f l =
+  let+ rev = fold_nel (fun rev x -> let+ y = f x in y :: rev) [] l in
+  NEL.of_rev_list rev
 
 let map_option f = function
   | None -> return None
