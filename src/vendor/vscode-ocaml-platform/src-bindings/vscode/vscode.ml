@@ -223,7 +223,17 @@ module Uri = struct
 
     val toString : t -> ?skipEncoding:bool -> unit -> string [@@js.call]
 
-    val toJson : t -> Jsonoo.t [@@js.call]]
+    val toJson : t -> Jsonoo.t [@@js.call]
+
+    val from : Ojs.t -> t [@@js.global "__SUPERBOL__.vscode.Uri.from"]]
+
+  let from ~scheme ?authority ?path ?query ?fragment () =
+    let components = Ojs.obj [| "scheme", [%js.of: string] scheme |] in
+    iter_set components "authority" [%js.of: string] authority;
+    iter_set components "path" [%js.of: string] path;
+    iter_set components "query" [%js.of: string] query;
+    iter_set components "fragment" [%js.of: string] fragment;
+    from components
 
   let with_ this ?scheme ?authority ?path ?query ?fragment () =
     let change = Ojs.obj [||] in
@@ -919,9 +929,13 @@ module StatusBarItem = struct
 
   include
     [%js:
+    val id : t -> string [@@js.get]
+
     val alignment : t -> StatusBarAlignment.t [@@js.get]
 
     val priority : t -> int or_undefined [@@js.get]
+
+    val name : t -> string or_undefined [@@js.get]
 
     val text : t -> string [@@js.get]
 
@@ -940,13 +954,15 @@ module StatusBarItem = struct
 
     val set_priority : t -> int -> unit [@@js.set]
 
+    val set_name : t -> string -> unit [@@js.set]
+
     val set_text : t -> string -> unit [@@js.set]
 
     val set_tooltip : t -> string -> unit [@@js.set]
 
     val set_color : t -> color -> unit [@@js.set]
 
-    val set_backgroundColor : t -> ThemeColor.t -> unit [@@js.set]
+    val set_backgroundColor : t -> ThemeColor.t or_undefined -> unit [@@js.set]
 
     val set_command : t -> command -> unit [@@js.set]
 
@@ -2753,6 +2769,64 @@ module TreeDataProvider = struct
   end
 end
 
+module FileDecoration = struct
+  include Class.Make ()
+
+  include
+    [%js:
+    val badge : t -> string or_undefined [@@js.get]
+
+    val tooltip : t -> string or_undefined [@@js.get]
+
+    val color : t -> ThemeColor.t or_undefined [@@js.get]
+
+    val propagate : t -> bool [@@js.get]
+
+    val set_propagate : t -> bool -> unit [@@js.set]
+
+    val make :
+         string or_undefined
+      -> string or_undefined
+      -> ThemeColor.t or_undefined
+      -> t
+      [@@js.new "__SUPERBOL__.vscode.FileDecoration"]]
+
+  (* Absent optional arguments would be left out, rather than passed as
+     [undefined] in their position. *)
+  let make ?badge ?tooltip ?color () = make badge tooltip color
+end
+
+module FileDecorationProvider = struct
+  include Interface.Make ()
+
+  module OnDidChangeFileDecorations = Event.Make (struct
+    type t = Uri.t list or_undefined [@@js]
+  end)
+
+  include
+    [%js:
+    val onDidChangeFileDecorations :
+      t -> OnDidChangeFileDecorations.t or_undefined
+      [@@js.get]
+
+    val provideFileDecoration :
+         t
+      -> uri:Uri.t
+      -> token:CancellationToken.t
+      -> FileDecoration.t ProviderResult.t
+      [@@js.call]
+
+    val create :
+         ?onDidChangeFileDecorations:OnDidChangeFileDecorations.t
+      -> provideFileDecoration:
+           (   uri:Uri.t
+            -> token:CancellationToken.t
+            -> FileDecoration.t ProviderResult.t)
+      -> unit
+      -> t
+      [@@js.builder]]
+end
+
 module TreeViewOptions = struct
   include Class.Generic (Ojs) ()
 
@@ -3255,10 +3329,18 @@ module Window = struct
     val withProgress : options:ProgressOptions.t -> task:Ojs.t -> Ojs.t
       [@@js.global "__SUPERBOL__.vscode.window.withProgress"]
 
-    val createStatusBarItem :
-         ?alignment:StatusBarAlignment.t
-      -> ?priority:int
-      -> unit
+    (* Arguments are given in position, as VS Code tells both forms apart by
+       the type of the first one. *)
+    val createStatusBarItem_ :
+         StatusBarAlignment.t or_undefined
+      -> int or_undefined
+      -> StatusBarItem.t
+      [@@js.global "__SUPERBOL__.vscode.window.createStatusBarItem"]
+
+    val createStatusBarItem_with_id :
+         string
+      -> StatusBarAlignment.t or_undefined
+      -> int or_undefined
       -> StatusBarItem.t
       [@@js.global "__SUPERBOL__.vscode.window.createStatusBarItem"]
 
@@ -3286,6 +3368,10 @@ module Window = struct
            [@js.union])
       -> Terminal.t
       [@@js.global "__SUPERBOL__.vscode.window.createTerminal"]
+
+    val registerFileDecorationProvider :
+      provider:FileDecorationProvider.t -> Disposable.t
+      [@@js.global "__SUPERBOL__.vscode.window.registerFileDecorationProvider"]
 
     val registerTreeDataProvider :
       viewId:string -> treeDataProvider:Ojs.t -> Disposable.t
@@ -3360,6 +3446,11 @@ module Window = struct
         task
     in
     [%js.to: T.t Promise.t] (withProgress ~options ~task)
+
+  let createStatusBarItem ?id ?alignment ?priority () =
+    match id with
+    | None -> createStatusBarItem_ alignment priority
+    | Some id -> createStatusBarItem_with_id id alignment priority
 
   let registerTreeDataProvider (type a) (module T : Js.T with type t = a)
       ~(viewId : string) ~(treeDataProvider : a TreeDataProvider.t) :

@@ -115,3 +115,40 @@ let guesses_encoding ~scope =
   match WS_CONF.get ~section:"autoGuessEncoding" files with
   | Some o when Ojs.type_of o = "boolean" -> Ojs.bool_of_js o
   | _ -> false
+
+(** {2 Caches} *)
+
+(** Whether [s] is a size as the server accepts it (see
+    `Arg_utils.size_of_string'): a number of bytes, with an optional [k], [M]
+    or [G] suffix. *)
+let is_size s =
+  s <> "" &&
+  let digits =
+    match s.[String.length s - 1] with
+    | 'k' | 'K' | 'm' | 'M' | 'g' | 'G' -> String.sub s 0 (String.length s - 1)
+    | _ -> s
+  in
+  digits <> "" && String.for_all (function '0'..'9' -> true | _ -> false) digits
+
+(** [bytes_of_size s] is the number of bytes size [s] stands for. *)
+let bytes_of_size s =
+  let n = String.length s - 1 in
+  match s.[n] with
+  | 'k' | 'K' -> float_of_string (String.sub s 0 n) *. 1024.
+  | 'm' | 'M' -> float_of_string (String.sub s 0 n) *. 1024. ** 2.
+  | 'g' | 'G' -> float_of_string (String.sub s 0 n) *. 1024. ** 3.
+  | _ -> float_of_string s
+
+(** Size under which the server keeps the cache of each project (setting
+    [cache.sizeLimit]); [None] if empty or invalid. *)
+let cache_size_limit () =
+  match String.trim @@ string "cache.sizeLimit" with
+  | s when is_size s -> Some s
+  | _ -> None
+
+(** Number of days after which the server reclaims cache entries that have not
+    been used (setting [cache.maxAge]); [None] for no limit. *)
+let cache_max_age () =
+  match positive_int "cache.maxAge" ~default:0 with
+  | 0 -> None
+  | days -> Some days

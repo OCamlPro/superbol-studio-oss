@@ -75,9 +75,31 @@ let _editor_action_findReferences =
 let _analyze_workspace =
   command "superbol.analyze.workspace" @@ Instance
     begin fun instance ~args:_ ->
-      let _: unit Promise.t = Superbol_workspace.run_analysis instance in
+      let _: unit Promise.t =
+        Promise.then_ (Superbol_workspace.run_analysis instance)
+          ~fulfilled:begin fun () ->
+            Superbol_cache_view.refresh ();       (* the cache has grown *)
+            Promise.return ()
+          end
+      in
       ()
     end
+
+let _show_cache =
+  command Superbol_cache_view.show_command @@ Instance
+    (fun _instance ~args:_ -> Superbol_cache_view.show ())
+
+let _refresh_cache =
+  command Superbol_cache_view.refresh_command @@ Instance
+    (fun _instance ~args:_ -> Superbol_cache_view.refresh ())
+
+let _prune_cache =
+  command Superbol_cache_view.prune_command @@ Instance
+    (fun _instance ~args -> Superbol_cache_view.prune ~args)
+
+let _prune_cache_unused_since =
+  command Superbol_cache_view.prune_unused_since_command @@ Instance
+    (fun _instance ~args -> Superbol_cache_view.prune_unused_since ~args)
 
 let _retrieve_copybooks =
   command "superbol.copybooks.retrieve" @@ Instance

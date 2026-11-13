@@ -665,6 +665,11 @@ let problemMatchers =
   ]
 
 
+(* A product icon, the same in light and dark themes. *)
+let codicon name =
+  let icon = "$(" ^ name ^ ")" in
+  Manifest.{ icon_light = icon; icon_dark = icon }
+
 let commands =
   [
     Manifest.command ()
@@ -680,6 +685,25 @@ let commands =
       ~command:"superbol.analyze.workspace"
       ~title:"Analyze Every COBOL File in the Workspace"
       ~category:"SuperBOL";
+    Manifest.command ()
+      ~command:"superbol.cache.show"
+      ~title:"Show Caches"
+      ~category:"SuperBOL";
+    Manifest.command ()
+      ~command:"superbol.cache.refresh"
+      ~title:"Refresh Caches"
+      ~category:"SuperBOL"
+      ~icon:(codicon "refresh");
+    Manifest.command ()
+      ~command:"superbol.cache.prune"
+      ~title:"Prune Cache…"
+      ~category:"SuperBOL"
+      ~icon:(codicon "trash");
+    Manifest.command ()
+      ~command:"superbol.cache.pruneUnusedSince"
+      ~title:"Remove These Entries and Older Ones…"
+      ~category:"SuperBOL"
+      ~icon:(codicon "trash");
     Manifest.command ()
       ~command:"superbol.copybooks.retrieve"
       ~title:"Retrieve Copybook Directories"
@@ -712,7 +736,30 @@ let menus =
     [menu ~command:"superbol.cfg.open" ~group:"superbol"
        ~when_:"editorTextFocus && editorLangId == 'cobol'" ();
      menu ~command:"superbol.cfg.open.arc" ~group:"superbol"
-       ~when_:"editorTextFocus && editorLangId == 'cobol'" ()]
+       ~when_:"editorTextFocus && editorLangId == 'cobol'" ()];
+    "view/title",
+    [menu ~command:"superbol.cache.refresh" ~group:"navigation"
+       ~when_:"view == superbol.cacheView" ();
+     menu ~command:"superbol.cache.prune" ~group:"navigation"
+       ~when_:"view == superbol.cacheView" ()];
+    "view/item/context",
+    [menu ~command:"superbol.cache.prune" ~group:"inline"
+       ~when_:"view == superbol.cacheView && \
+               viewItem == superbolCacheFolder" ();
+     menu ~command:"superbol.cache.pruneUnusedSince" ~group:"inline"
+       ~when_:"view == superbol.cacheView && \
+               viewItem == superbolCacheBucket" ()];
+    "commandPalette",
+    (* Only from the view, as it takes one of its elements *)
+    [menu ~command:"superbol.cache.pruneUnusedSince" ~when_:"false" ()];
+  ]
+
+let views =
+  [
+    "explorer",
+    [Manifest.view () ~id:"superbol.cacheView" ~name:"SuperBOL Caches"
+       ~icon:"$(database)" ~visibility:"collapsed"
+       ~when_:"workbenchState != empty"];
   ]
 
 let contributes =
@@ -747,6 +794,7 @@ let contributes =
         ~url:"https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema-1.2.0.json";
     ]
     ~menus
+    ~views
 
 let manifest =
   Manifest.vscode

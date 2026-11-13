@@ -14,6 +14,8 @@
 
 (** Inspecting, filling and reclaiming the caches the LSP server writes. *)
 
+open Ez_file.V1
+open EzFile.OP
 open Ezcmd.V2
 open EZCMD.TYPES
 open Superbol_cache.Types
@@ -28,6 +30,9 @@ let size_n_unit bytes =
   in
   pick (Int64.to_float bytes) ["B"; "kiB"; "MiB"; "GiB"]
 
+let pp_size =
+  Fmt.(using size_n_unit @@ pair ~sep:(any " ") (fmt "%.1f") string)
+
 let pp_age ppf seconds =
   let days = seconds /. 86400. in
   if days >= 1.
@@ -36,74 +41,213 @@ let pp_age ppf seconds =
   then Pretty.print ppf "%.0f hour(s)" (seconds /. 3600.)
   else Pretty.print ppf "%.0f minute(s)" (seconds /. 60.)
 
+(* --- Locating the cache --- *)
+
+(** Where to look for a cache: [dir], and whether it was given as the root of
+    the project, rather than as some directory within it. *)
+type location =
+  {
+    dir: string;
+    is_root: bool;
+    storage_directory: string option;
+  }
+
+(* The root of a project is spelled as the LSP server spells it, as the location
+   of a cache held in a shared storage directory is derived from it. *)
+let rootdir_of ~layout { dir; is_root; _ } =
+  let dirname = Project.absolute_dirname dir in
+  if is_root
+  then Superbol_project.rootdir_at ~dirname
+  else Superbol_project.rootdir_for ~layout
+      ~filename:(dirname // "_")    (* the project of anything held in [dir] *)
+
+(** [with_cache location f] is [f ~rootdir cache], where [rootdir] is the root
+    of the project at [location], and [cache] the location and handle of its
+    cache, if any. *)
+let with_cache ({ storage_directory; _ } as location) f =
+  let setup = Project_commands.lsp_like_setup ?storage_directory () in
+  let rootdir =
+    try
+      Superbol_project.string_of_rootdir @@
+      rootdir_of ~layout:setup.layout location
+    with Invalid_argument msg ->
+      Cobol_common.fatal "%s" msg
+  in
+  f ~rootdir (Project_commands.cache_for ~setup rootdir)
+
+(* --- JSON --- *)
+
+(* Sizes may exceed what an [int] holds in builds into JavaScript. *)
+let json_int64 i = `Intlit (Int64.to_string i)
+
+let json_of_stats stats =
+  [ "format", `String stats.stats_format_version;
+    "producer", `String stats.stats_producer;
+    "entries", `Int stats.stats_entries;
+    "values", `Int stats.stats_objects;
+    "disk_usage", json_int64 stats.stats_disk_usage ]
+
+let json_of_entry_info e =
+  `Assoc [ "key", `String e.info_key;
+           "label", `String e.info_label;
+           "dependencies", `Int (List.length e.info_witnesses);
+           "disk_usage", json_int64 e.info_disk_usage;
+           "last_used", `Float e.info_last_hit;
+           "value", `String (Digest.to_hex e.info_object);
+           "value_size", json_int64 e.info_object_size ]
+
+let output_json ~rootdir ~cache_root fields =
+  print_endline @@ Yojson.Safe.to_string @@
+  `Assoc ([ "project_root", `String rootdir;
+            "cache", Option.fold cache_root ~none:`Null
+              ~some:(fun s -> `String s) ] @ fields)
+
 (* --- *)
 
-let status ~verbose dir =
-  match Project_commands.cache_for dir with
-  | None -> ()
-  | Some (root, cache) ->
-      match CACHE.stats cache, CACHE.entries cache with
-      | Ok stats, Ok entries ->
-          Pretty.out "Cache: %s@." root;
-          Pretty.out "Format: %s, producer: %s@."
-            stats.stats_format_version stats.stats_producer;
-          Pretty.out "%d entries, %d values, %a@."
-            stats.stats_entries stats.stats_objects
-            Fmt.(pair ~sep:(any " ") (fmt "%.1f") string)
-            (size_n_unit stats.stats_disk_usage);
-          if verbose then begin
-            let now = Unix.gettimeofday () in
-            List.iter begin fun e ->
-              Pretty.out "  %-40s %a  %d dependencies, used %a ago@."
-                e.info_label
-                Fmt.(pair ~sep:(any " ") (fmt "%6.1f") (fmt "%3s"))
-                (size_n_unit e.info_disk_usage)
-                (List.length e.info_witnesses)
-                pp_age (now -. e.info_last_hit)
-            end entries
-          end
-      | _ ->
-          Pretty.error "Could not read the cache at %s@." root
+let stats cache ~cache_root =
+  match CACHE.stats cache with
+  | Ok stats -> stats
+  | Error _ -> Cobol_common.fatal "Could not read the cache at %s" cache_root
 
-let trim ~older_than ~max_size dir =
-  match Project_commands.cache_for dir with
-  | None -> ()
-  | Some (root, cache) ->
+let status ~json ~verbose location =
+  with_cache location @@ fun ~rootdir -> function
+  | None when json ->
+      output_json ~rootdir ~cache_root:None []
+  | None ->
+      Pretty.out "Project %s has no cache@." rootdir
+  | Some (cache_root, cache) ->
+      let stats = stats cache ~cache_root in
+      let entries () =
+        match CACHE.entries cache with
+        | Ok entries -> entries
+        | Error _ ->
+            Cobol_common.fatal "Could not read the cache at %s" cache_root
+      in
+      let now = Unix.gettimeofday () in
+      if json then
+        output_json ~rootdir ~cache_root:(Some cache_root) @@
+        json_of_stats stats @
+        [ "now", `Float now ] @
+        if verbose
+        then
+          (* Tail-recursively, as caches may hold tens of thousands of entries,
+             and the stack is limited in builds into JavaScript. *)
+          [ "items", `List (List.rev @@
+                            List.rev_map json_of_entry_info (entries ())) ]
+        else []
+      else begin
+        Pretty.out "Project: %s@." rootdir;
+        Pretty.out "Cache: %s@." cache_root;
+        Pretty.out "Format: %s, producer: %s@."
+          stats.stats_format_version stats.stats_producer;
+        Pretty.out "%d entries, %d values, %a@."
+          stats.stats_entries stats.stats_objects pp_size
+          stats.stats_disk_usage;
+        if verbose then
+          List.iter begin fun e ->
+            Pretty.out "  %-40s %a  %d dependencies, used %a ago@."
+              e.info_label
+              Fmt.(using size_n_unit @@
+                   pair ~sep:(any " ") (fmt "%6.1f") (fmt "%3s"))
+              e.info_disk_usage
+              (List.length e.info_witnesses)
+              pp_age (now -. e.info_last_hit)
+          end (entries ())
+      end
+
+let trim ~json ~older_than ~max_size location =
+  with_cache location @@ fun ~rootdir -> function
+  | None when json ->
+      output_json ~rootdir ~cache_root:None []
+  | None ->
+      Pretty.out "Project %s has no cache@." rootdir
+  | Some (cache_root, cache) ->
       (* Not [Never], even without bounds: that would skip reclaiming the
          leftovers of instances that died mid-write. *)
       let policy =
         Bounded { max_age = Option.map (( *. ) 86400.) older_than; max_size }
       in
       match CACHE.prune cache ~policy with
+      | Ok removed when json ->
+          output_json ~rootdir ~cache_root:(Some cache_root) @@
+          [ "reclaimed", `Int removed ] @
+          json_of_stats (stats cache ~cache_root)
       | Ok removed ->
-          Pretty.out "Reclaimed %d entries in %s@." removed root
+          Pretty.out "Reclaimed %d entries in %s@." removed cache_root
       | Error _ ->
-          Pretty.error "Could not prune the cache at %s@." root
+          Cobol_common.fatal "Could not prune the cache at %s" cache_root
 
 (* --- *)
 
-let dir_arg dir =
-  [ [], Arg.Anon (0, fun s -> dir := s),
-    EZCMD.info ~docv:"DIR" "Directory within the project (default: `.')" ]
+let location_args () =
+  let dir = ref "." and project_root = ref None
+  and storage_directory = ref None in
+  let args =
+    [ [], Arg.Anon (0, fun s -> dir := s),
+      EZCMD.info ~docv:"DIR" "Directory within the project (default: `.')";
+      ["project-root"; "root"], Arg.String (fun s -> project_root := Some s),
+      EZCMD.info ~docv:"DIR"
+        "Designate the project whose root is DIR, rather than the one the \
+         positional DIR belongs to";
+      ["storage-directory"],
+      Arg.String (fun s -> storage_directory := Some s),
+      EZCMD.info ~docv:"DIR"
+        "Use the caches that an LSP server started with the same option uses";
+    ]
+  in
+  (fun () ->
+     let dir, is_root = match !project_root with
+       | Some root -> root, true
+       | None -> !dir, false
+     in
+     { dir; is_root; storage_directory = !storage_directory }),
+  args
+
+let json_arg json =
+  ["json"], Arg.Set json,
+  EZCMD.info "Output a single JSON object, for use by other programs"
+
+let location_man =
+  `P "The project containing DIR is the one whose root is the closest parent \
+      directory of DIR that holds a `superbol.toml' file, or else DIR itself.  \
+      $(b,--project-root) designates a project by its root instead: Visual \
+      Studio Code puts every file of a workspace folder in the project of that \
+      folder.  With $(b,--storage-directory), the cache is that of an LSP \
+      server started with the same option."
 
 let status_cmd =
-  let dir = ref "." and verbose = ref false in
+  let json = ref false and verbose = ref false in
+  let location, location_args = location_args () in
   EZCMD.sub "cache status"
-    (fun () -> status ~verbose:!verbose !dir)
-    ~args:(dir_arg dir @
+    (fun () -> status ~json:!json ~verbose:!verbose (location ()))
+    ~args:(location_args @
            [ ["list-entries"; "l"], Arg.Set verbose,
-             EZCMD.info "List every entry, not just the totals" ])
+             EZCMD.info "List every entry, not just the totals";
+             json_arg json ])
     ~doc:"Report on the cache of a project"
     ~man:[ `S "DESCRIPTION";
            `Blocks [ `P "Show where the cache of the project containing DIR \
                          lives, how much room it takes, and -- with $(b,-l) -- \
-                         what each entry holds and when it was last used." ]]
+                         what each entry holds and when it was last used.";
+                     location_man;
+                     `P "With $(b,--json), the totals are given as fields \
+                         $(b,entries), $(b,values) and $(b,disk_usage) (in \
+                         bytes), along with $(b,now) (in seconds since the \
+                         epoch); and with $(b,-l), field $(b,items) lists \
+                         every entry, with the date it was $(b,last_used), \
+                         and the digest ($(b,value)) and size \
+                         ($(b,value_size)) of the value it holds --- values \
+                         may be shared between entries.  Field $(b,cache) is \
+                         $(b,null) for a project that has no cache." ]]
 
 let trim_cmd =
-  let dir = ref "." and older_than = ref None and max_size = ref None in
+  let json = ref false and older_than = ref None and max_size = ref None in
+  let location, location_args = location_args () in
   EZCMD.sub "cache trim"
-    (fun () -> trim ~older_than:!older_than ~max_size:!max_size !dir)
-    ~args:(dir_arg dir @
+    (fun () ->
+       trim ~json:!json ~older_than:!older_than ~max_size:!max_size
+         (location ()))
+    ~args:(location_args @
            [ ["older-than"],
              Arg.Float (fun d -> older_than := Some d),
              EZCMD.info ~docv:"DAYS"
@@ -115,7 +259,8 @@ let trim_cmd =
              end,
              EZCMD.info ~docv:"SIZE"
                "Keep the cache under that size, reclaiming the entries least \
-                recently used.  Accepts a suffix: 500M, 2G, 64k" ])
+                recently used.  Accepts a suffix: 500M, 2G, 64k";
+             json_arg json ])
     ~doc:"Reclaim entries a project's cache no longer needs"
     ~man:[ `S "DESCRIPTION";
            `Blocks [ `P "Reclaim entries of the project containing DIR, along \
@@ -125,7 +270,13 @@ let trim_cmd =
                          until the cache fits.  Both may be given, and with \
                          neither nothing is reclaimed but the leftovers of \
                          instances that died mid-write.  $(b,--older-than 0) \
-                         empties the cache." ]]
+                         empties the cache.";
+                     `P "Nothing is reclaimed while another process is \
+                         pruning the same cache.";
+                     location_man;
+                     `P "With $(b,--json), the number of entries reclaimed is \
+                         given as field $(b,reclaimed), along with the totals \
+                         that $(b,cache status --json) gives." ]]
 
 let client_settings_of_string s =
   match Yojson.Safe.from_string s with

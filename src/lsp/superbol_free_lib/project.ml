@@ -27,8 +27,28 @@ let try_load ~f arg =
 
 (* Direct loading (based on directory name) *)
 
+let absolute_dirname dirname =
+  let dirname = Slashifier.slashify dirname in
+  let dirname =
+    if EzFile.is_absolute dirname then dirname
+    else Slashifier.slashify (Sys.getcwd ()) ^ "/" ^ dirname
+  in
+  (* Spelled without `.' components nor trailing separators, as the LSP server
+     spells the directories it gets from its client. *)
+  let prefix =                        (* `//' starts UNC paths: `//host/a' *)
+    if String.starts_with ~prefix:"//" dirname then "//"
+    else if String.starts_with ~prefix:"/" dirname then "/"
+    else ""                         (* drive letter first, as in `C:/foo' *)
+  in
+  let parts =
+    List.filter (fun p -> p <> "" && p <> ".") @@
+    String.split_on_char '/' dirname
+  in
+  prefix ^ String.concat "/" parts
+
 let in_ ~dirname ?(layout = Superbol_project.Layout.default) () =
   try_load () ~f:begin fun () ->
+    let dirname = absolute_dirname dirname in
     let rootdir = Superbol_project.rootdir_at ~dirname in
     let project =
       Superbol_project.for_ ~platform:Superbol_platform.record ~rootdir ~layout

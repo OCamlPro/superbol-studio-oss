@@ -31,6 +31,29 @@
         "category": "SuperBOL"
       },
       {
+        "command": "superbol.cache.show",
+        "title": "Show Caches",
+        "category": "SuperBOL"
+      },
+      {
+        "command": "superbol.cache.refresh",
+        "title": "Refresh Caches",
+        "category": "SuperBOL",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "superbol.cache.prune",
+        "title": "Prune Cache…",
+        "category": "SuperBOL",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "superbol.cache.pruneUnusedSince",
+        "title": "Remove These Entries and Older Ones…",
+        "category": "SuperBOL",
+        "icon": "$(trash)"
+      },
+      {
         "command": "superbol.copybooks.retrieve",
         "title": "Retrieve Copybook Directories",
         "category": "SuperBOL"
@@ -528,6 +551,36 @@
           "group": "superbol",
           "when": "editorTextFocus && editorLangId == 'cobol'"
         }
+      ],
+      "view/title": [
+        {
+          "command": "superbol.cache.refresh",
+          "group": "navigation",
+          "when": "view == superbol.cacheView"
+        },
+        {
+          "command": "superbol.cache.prune",
+          "group": "navigation",
+          "when": "view == superbol.cacheView"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "superbol.cache.prune",
+          "group": "inline",
+          "when": "view == superbol.cacheView && viewItem == superbolCacheFolder"
+        },
+        {
+          "command": "superbol.cache.pruneUnusedSince",
+          "group": "inline",
+          "when": "view == superbol.cacheView && viewItem == superbolCacheBucket"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "superbol.cache.pruneUnusedSince",
+          "when": "false"
+        }
       ]
     },
     "problemMatchers": [
@@ -638,6 +691,17 @@
         }
       }
     ],
+    "views": {
+      "explorer": [
+        {
+          "id": "superbol.cacheView",
+          "name": "SuperBOL Caches",
+          "when": "workbenchState != empty",
+          "icon": "$(database)",
+          "visibility": "collapsed"
+        }
+      ]
+    },
     "semanticTokenScopes": [
       {
         "language": "cobol",

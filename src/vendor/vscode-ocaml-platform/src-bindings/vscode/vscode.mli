@@ -197,6 +197,17 @@ module Uri : sig
 
   val toString : t -> ?skipEncoding:bool -> unit -> string
 
+  (** [from ~scheme ?authority ?path ?query ?fragment ()] is the URI with these
+      components, whatever its scheme. *)
+  val from :
+       scheme:string
+    -> ?authority:string
+    -> ?path:string
+    -> ?query:string
+    -> ?fragment:string
+    -> unit
+    -> t
+
   val toJson : t -> Jsonoo.t
 
   val equal : t -> t -> bool
@@ -712,9 +723,13 @@ module StatusBarItem : sig
     | `Command of Command.t
     ]
 
+  val id : t -> string
+
   val alignment : t -> StatusBarAlignment.t
 
   val priority : t -> int option
+
+  val name : t -> string option
 
   val text : t -> string
 
@@ -732,13 +747,16 @@ module StatusBarItem : sig
 
   val set_priority : t -> int -> unit
 
+  val set_name : t -> string -> unit
+
   val set_text : t -> string -> unit
 
   val set_tooltip : t -> string -> unit
 
   val set_color : t -> color -> unit
 
-  val set_backgroundColor : t -> ThemeColor.t -> unit
+  (** [None] unsets it. *)
+  val set_backgroundColor : t -> ThemeColor.t option -> unit
 
   val set_command : t -> command -> unit
 
@@ -2110,6 +2128,43 @@ module TreeDataProvider : sig
   end
 end
 
+module FileDecoration : sig
+  include Js.T
+
+  val badge : t -> string option
+
+  val tooltip : t -> string option
+
+  val color : t -> ThemeColor.t option
+
+  val propagate : t -> bool
+
+  val set_propagate : t -> bool -> unit
+
+  val make : ?badge:string -> ?tooltip:string -> ?color:ThemeColor.t -> unit -> t
+end
+
+module FileDecorationProvider : sig
+  include Js.T
+
+  val onDidChangeFileDecorations : t -> Uri.t list option Event.t option
+
+  val provideFileDecoration :
+       t
+    -> uri:Uri.t
+    -> token:CancellationToken.t
+    -> FileDecoration.t ProviderResult.t
+
+  val create :
+       ?onDidChangeFileDecorations:Uri.t list option Event.t
+    -> provideFileDecoration:
+         (   uri:Uri.t
+          -> token:CancellationToken.t
+          -> FileDecoration.t ProviderResult.t)
+    -> unit
+    -> t
+end
+
 module TreeViewOptions : sig
   type 'a t
 
@@ -2506,8 +2561,15 @@ module Window : sig
     -> task:(progress:Progress.t -> token:CancellationToken.t -> 'a Promise.t)
     -> 'a Promise.t
 
+  (** [createStatusBarItem ?id ?alignment ?priority ()] creates a status bar
+      item; one without [id] shares the identifier of the extension with every
+      other such item. *)
   val createStatusBarItem :
-    ?alignment:StatusBarAlignment.t -> ?priority:int -> unit -> StatusBarItem.t
+       ?id:string
+    -> ?alignment:StatusBarAlignment.t
+    -> ?priority:int
+    -> unit
+    -> StatusBarItem.t
 
   val createInputBox : unit -> InputBox.t
 
@@ -2527,6 +2589,9 @@ module Window : sig
          | `ExtensionTerminalOptions of ExtensionTerminalOptions.t
          ]
     -> Terminal.t
+
+  val registerFileDecorationProvider :
+    provider:FileDecorationProvider.t -> Disposable.t
 
   val registerTreeDataProvider :
        'a Js.t

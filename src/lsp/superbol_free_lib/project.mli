@@ -21,7 +21,15 @@
 
 (** {2 Direct (using the intended root directory)} *)
 
-(** [in_ ~dirname] loads or creates a project with root directory [dirname]. *)
+(** [absolute_dirname dirname] is the absolute name of directory [dirname],
+    spelled as the LSP server spells directories: with [/] as separator, and
+    without [.] components nor trailing separators.  Projects are designated by
+    their root directory, and the location of their cache may depend on how it
+    is spelled. *)
+val absolute_dirname: string -> string
+
+(** [in_ ~dirname] loads or creates a project with root directory [dirname]
+    (made absolute with {!absolute_dirname}). *)
 val in_: dirname: string -> ?layout:Superbol_project.layout -> unit -> Superbol_project.t
 
 (** [load ~dirname ()] is an alias for [in_ ~dirname], and [load ()] is

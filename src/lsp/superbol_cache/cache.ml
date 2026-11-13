@@ -241,31 +241,33 @@ let entries { cache_store; _ } =
               | Ok (Some { item_last_hit; _ }) -> item_last_hit
               | Ok None | Error _ -> 0.
             in
+            let info_object_size =
+              size_of cache_store (Layout.object_ manifest_object)
+            in
             Some { info_key = key;
                    info_label = manifest_label;
                    info_witnesses = manifest_witnesses;
                    info_disk_usage =
-                     Int64.add (size_of cache_store path)
-                       (size_of cache_store (Layout.object_ manifest_object));
-                   info_last_hit }
+                     Int64.add (size_of cache_store path) info_object_size;
+                   info_last_hit;
+                   info_object = manifest_object;
+                   info_object_size }
   end (Store.entries_under cache_store Layout.manifests) |>
   Result.ok
 
-let total_size store dir =
-  List.fold_left (fun total (_, path) -> Int64.add total (size_of store path))
-    0L (Store.entries_under store dir)
-
-let stats ({ cache_store; _ } as t) =
-  Result.map begin fun entries ->
-    { stats_entries = List.length entries;
-      stats_objects =
-        List.length (Store.entries_under cache_store Layout.objects);
-      stats_disk_usage =
-        Int64.add (total_size cache_store Layout.manifests)
-          (total_size cache_store Layout.objects);
-      stats_format_version = Layout.version_dir;
-      stats_producer = Producer.tag }
-  end (entries t)
+(* Unlike {!entries}, never reads manifests. *)
+let stats { cache_store; _ } =
+  let manifests = Store.entries_under cache_store Layout.manifests
+  and objects = Store.entries_under cache_store Layout.objects in
+  let total_size items =
+    List.fold_left (fun total (_, path) ->
+        Int64.add total (size_of cache_store path)) 0L items
+  in
+  Ok { stats_entries = List.length manifests;
+       stats_objects = List.length objects;
+       stats_disk_usage = Int64.add (total_size manifests) (total_size objects);
+       stats_format_version = Layout.version_dir;
+       stats_producer = Producer.tag }
 
 let prune { cache_store; _ } ~policy =
   Prune.run ~store:cache_store ~policy
