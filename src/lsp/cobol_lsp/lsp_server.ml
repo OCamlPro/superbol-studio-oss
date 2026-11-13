@@ -303,8 +303,11 @@ let maybe_stop_watching_config_of ~project registry =
   else registry
 
 
+(* Changes to [files.encoding] in the [[cobol]] section count as changes to
+   [files.encoding] in VS Code.  Watching [[cobol]] as a whole would make the
+   client read it without a resource, which VS Code warns about. *)
 let client_config_sections =
-  ["superbol.cobol"; "files.encoding"; "[cobol]"]
+  ["superbol.cobol"; "files.encoding"]
 
 let start_watching_client_config registry =
   let registration =
