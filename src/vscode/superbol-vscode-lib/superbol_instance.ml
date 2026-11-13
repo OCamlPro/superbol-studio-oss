@@ -153,11 +153,15 @@ let lsp_notification ~meth ~data instance =
         (Jsonoo.t_to_js data)
 
 let get_project_config instance =
+  (* The active editor may show something else than a file, like an output
+     channel (e.g, with URI [output:tasks]), that belongs to no project. *)
   match Vscode.Window.activeTextEditor () with
-  | None ->
-      Promise.return @@ Error No_active_text_editor
-  | Some text_editor ->
+  | Some text_editor
+    when Vscode.(Uri.scheme @@ TextDocument.uri @@
+                 TextEditor.document text_editor) = "file" ->
       lsp_request instance
         ~meth:"superbol/getProjectConfiguration"
         ~data:(JSON.current_text_document_id text_editor) |>
       Promise.Result.map Jsonoo.Decode.(dict id)
+  | _ ->
+      Promise.return @@ Error No_active_text_editor
