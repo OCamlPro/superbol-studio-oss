@@ -20,6 +20,8 @@ open Lsp.Types
 open Lsp_lookup.TYPES
 open Cobol_data.Types
 
+module LIST = Cobol_common.Basics.LIST
+
 module Menhir = Cobol_parser.Grammar_interpr
 module Expect = Cobol_parser.Expect
 
@@ -157,7 +159,7 @@ let qualnames_proposal ~filename pos ~ptree group : typed_qualname list =
       end
       |> List.rev_map begin fun (qn, typ, is_valid) ->
         List.map (fun name -> { name; typ; is_valid; }) @@ to_string qn end
-      |> List.flatten
+      |> LIST.flatten
 
 let procedures_proposal ~filename pos group =
   let open Cobol_unit.Types in
@@ -167,19 +169,19 @@ let procedures_proposal ~filename pos group =
       cu.unit_procedure.procedure_sections
       |> List.rev_map (fun section ->
           let paragraph_names =
-            List.map (fun paragraph ->
+            LIST.map (fun paragraph ->
                 match ~&paragraph with
                 | { paragraph_name = Some { payload = qn; _ }; _ } ->
                     List.map (fun s -> "Paragraph", s) @@ to_string qn
                 | _ -> [])
               ~&section.section_paragraphs.list |>
-            List.flatten
+            LIST.flatten
           in
           match ~&section.section_name with
           | Some sn -> ("Section", ~&sn) :: paragraph_names
           | None -> paragraph_names
         )
-      |> List.flatten
+      |> LIST.flatten
 
 let all_intrinsic_function_name =
   List.map fst Cobol_parser.Keywords.intrinsic_functions
@@ -247,7 +249,7 @@ let string_of_K tokens =
 
 let map_completion_items ~(range:Range.t) ~case ~ptree ~group ~filename comp_entries =
   let pos = range.end_ in
-  List.flatten @@ EzList.tail_map (function
+  LIST.flatten @@ EzList.tail_map (function
       | Expect.Completion_entry.QualifiedRef ->
           qualnames_proposal ~filename pos ~ptree group
           |> List.rev_map begin fun { name; typ; is_valid } ->
