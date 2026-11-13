@@ -187,6 +187,10 @@ Report on the cache of a project
 
 Show where the cache of the project containing DIR lives, how much room it takes, and -- with **-l** -- what each entry holds and when it was last used.
 
+The project containing DIR is the one whose root is the closest parent directory of DIR that holds a `superbol.toml' file, or else DIR itself.  **--project-root** designates a project by its root instead: Visual Studio Code puts every file of a workspace folder in the project of that folder.  With **--storage-directory**, the cache is that of an LSP server started with the same option.
+
+With **--json**, the totals are given as fields **entries**, **values** and **disk_usage** (in bytes), along with **now** (in seconds since the epoch); and with **-l**, field **items** lists every entry, with the date it was **last_used**, and the digest (**value**) and size (**value_size**) of the value it holds --- values may be shared between entries.  Field **cache** is **null** for a project that has no cache.
+
 **USAGE**
 ::
   
@@ -197,7 +201,13 @@ Where options are:
 
 * :code:`DIR`   Directory within the project (default: `.')
 
+* :code:`--json`   Output a single JSON object, for use by other programs
+
 * :code:`--list-entries` or :code:`-l`   List every entry, not just the totals
+
+* :code:`--project-root DIR` or :code:`--root DIR`   Designate the project whose root is DIR, rather than the one the positional DIR belongs to
+
+* :code:`--storage-directory DIR`   Use the caches that an LSP server started with the same option uses
 
 
 main.exe cache trim
@@ -214,6 +224,12 @@ Reclaim entries of the project containing DIR, along with every value they alone
 
 **--older-than** removes those unused for that many days; **--max-size** removes the least recently used until the cache fits.  Both may be given, and with neither nothing is reclaimed but the leftovers of instances that died mid-write.  **--older-than 0** empties the cache.
 
+Nothing is reclaimed while another process is pruning the same cache.
+
+The project containing DIR is the one whose root is the closest parent directory of DIR that holds a `superbol.toml' file, or else DIR itself.  **--project-root** designates a project by its root instead: Visual Studio Code puts every file of a workspace folder in the project of that folder.  With **--storage-directory**, the cache is that of an LSP server started with the same option.
+
+With **--json**, the number of entries reclaimed is given as field **reclaimed**, along with the totals that **cache status --json** gives.
+
 **USAGE**
 ::
   
@@ -224,9 +240,15 @@ Where options are:
 
 * :code:`DIR`   Directory within the project (default: `.')
 
+* :code:`--json`   Output a single JSON object, for use by other programs
+
 * :code:`--max-size SIZE`   Keep the cache under that size, reclaiming the entries least recently used.  Accepts a suffix: 500M, 2G, 64k
 
 * :code:`--older-than DAYS`   Reclaim entries unused for that many days
+
+* :code:`--project-root DIR` or :code:`--root DIR`   Designate the project whose root is DIR, rather than the one the positional DIR belongs to
+
+* :code:`--storage-directory DIR`   Use the caches that an LSP server started with the same option uses
 
 
 main.exe check syntax
