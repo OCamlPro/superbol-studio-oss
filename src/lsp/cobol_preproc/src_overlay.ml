@@ -90,19 +90,21 @@ type manager =
     over_right_gap: limit HLnks.t;  (** associates the right limit of a token to
                                         the left limit of the next *)
     cache: (srcloc * limit) WLnks.t;
+    approximate_srclocs: bool;
     id: string;                (** manager identifier (for logging/debugging) *)
     limit_manager: Limit.manager;
   }
 
 (** Manager initialization *)
-let new_manager: string -> manager =
+let new_manager: approximate_srclocs: bool -> string -> manager =
   let id = ref 0 in
-  fun manager_name ->
+  fun ~approximate_srclocs manager_name ->
     incr id;
     {
       right_of = HLnks.create 42;
       over_right_gap = HLnks.create 42;
       cache = WLnks.create 42;
+      approximate_srclocs;
       id = Pretty.to_string "%s-%u" manager_name !id;
       limit_manager = Limit.new_manager ();
     }
@@ -185,7 +187,9 @@ let join_limits: manager -> limit * limit -> srcloc = fun ctx (s, e) ->
          or limit *)
       let loc = match loc with
         | None -> loc'
-        | Some loc -> Cobol_common.Srcloc.concat loc loc'
+        | Some loc ->
+            Cobol_common.Srcloc.concat ~multiline:ctx.approximate_srclocs
+              loc loc'
       in
       if Limit.equal e e'
       then (WLnks.replace ctx.cache s (loc, e); loc)
@@ -285,8 +289,11 @@ let with_temporary_copy ~f ctx a =
   in
   restore (); res
 
-module New_manager (Id: sig val name: string end) () : MANAGER = struct
-  let ctx = new_manager Id.name
+module New_manager
+    (Config: sig val name: string val approximate_srclocs: bool end) ()
+  : MANAGER = struct
+  let ctx =
+    new_manager ~approximate_srclocs:Config.approximate_srclocs Config.name
   let id = ctx.id
   let limits = limits ctx
   let link_limits = link_limits ctx

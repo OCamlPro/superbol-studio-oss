@@ -123,7 +123,7 @@ val shallow_start_pos: srcloc -> Lexing.position option
     (typically, absolute) with a given filename (e.g, relative). *)
 val start_filename: srcloc -> string
 
-val concat: srcloc -> srcloc -> srcloc
+val concat: ?multiline:bool -> srcloc -> srcloc -> srcloc
 val concat_srclocs: srcloc list -> srcloc option
 val append_srclocs: srcloc -> srcloc list -> srcloc
 val prefix: int -> srcloc -> srcloc

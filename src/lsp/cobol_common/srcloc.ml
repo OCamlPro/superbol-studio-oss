@@ -666,13 +666,16 @@ let dummy =
 
 (** {2 Composition & truncation} *)
 
-(** [may_join_as_single_raw l1 l2] checks whether two raw locations [l1] and
-    [l2] may be joined to form a single raw source location. *)
-let may_join_as_single_raw: raw -> raw -> bool = fun (Raw r1) (Raw r2) ->
+(** [may_join_as_single_raw ~multiline l1 l2] checks whether two raw locations
+    [l1] and [l2] may be joined to form a single raw source location, that may
+    span several lines if [multiline] holds. *)
+let may_join_as_single_raw ~multiline : raw -> raw -> bool =
+  fun (Raw r1) (Raw r2) ->
   r1.fname = r2.fname &&
-  r1.lnum + (r1.lines_n_a asr 1) == r2.lnum &&   (* ensure we are stay on a single
-                                                  line *)
-  r1.cnum + r1.len >= r2.cnum - 1
+  if multiline
+  then r1.cnum <= r2.cnum && r1.cnum + r1.len <= r2.cnum + r2.len
+  else r1.lnum + (r1.lines_n_a asr 1) == r2.lnum &&
+       r1.cnum + r1.len >= r2.cnum - 1
 
 let join_raws: raw -> raw -> [>raw_] slt = fun (Raw r1) (Raw r2) ->
   let end_lnum = r2.lnum + (r2.lines_n_a asr 1) in
@@ -681,14 +684,15 @@ let join_raws: raw -> raw -> [>raw_] slt = fun (Raw r1) (Raw r2) ->
         lines_n_a = (end_lnum - r1.lnum) * 2 + (r1.lines_n_a land 1);
         ecol = r2.ecol }
 
-(** [concat l1 l2] concatenates two adjacent source locations [l1] and [l2]. *)
-let rec concat: srcloc -> srcloc -> srcloc = fun l1 l2 -> match l1, l2 with
+let rec concat_ ~multiline : srcloc -> srcloc -> srcloc = fun l1 l2 ->
+  let concat = concat_ ~multiline in
+  match l1, l2 with
   | (Raw _ as l1), (Raw _ as l2)
-    when may_join_as_single_raw l1 l2 ->
+    when may_join_as_single_raw ~multiline l1 l2 ->
       join_raws l1 l2
 
   | Cat { left; right = Raw _ as l1 }, (Raw _ as l2)
-    when may_join_as_single_raw l1 l2 ->
+    when may_join_as_single_raw ~multiline l1 l2 ->
       Cat { left; right = join_raws l1 l2 }
 
   | Cpy { copied = l1; copyloc = c1 },
@@ -726,6 +730,13 @@ let rec concat: srcloc -> srcloc -> srcloc = fun l1 l2 -> match l1, l2 with
       let first, rights = spine [] l2 in
       List.fold_left (fun left right -> Cat { left; right })
         (concat l1 first) rights
+
+(** [concat ?multiline l1 l2] concatenates two adjacent source locations [l1]
+    and [l2].  With [multiline] (default [false]), raw locations of the same
+    file are joined even across lines, so the result also covers what lies in
+    between. *)
+let concat ?(multiline = false) l1 l2 =
+  concat_ ~multiline l1 l2
 
 let concat_srclocs: srcloc list -> srcloc option = fun l ->
   List.fold_left begin fun acc loc -> match acc with
