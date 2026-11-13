@@ -12,48 +12,96 @@
 (**************************************************************************)
 
 open Cobol_common.Srcloc.TYPES
+open Cobol_common.Srcloc.INFIX
 open Lsp.Types
 
-module Positions = Set.Make (struct
+module Visitor = Cobol_common.Visitor
+
+module Positions = Map.Make (struct
     type t = Position.t
     let compare (p1: t) (p2: t) =
-      let c = p2.line - p1.line in
-      if c <> 0 then c else p2.character - p1.character
+      let c = p1.line - p2.line in
+      if c <> 0 then c else p1.character - p2.character
   end)
+
+(** A code lens, at [position], for the given [element].  [element] and
+    [cu_name] are those {!Lsp_lookup.element_at_position} would give at
+    [position]. *)
+type lens =
+  {
+    position: Position.t;
+    element: Lsp_lookup.TYPES.element_in_context;
+    cu_name: string option;            (* name of enclosing compilation unit *)
+  }
 
 type context =
   | Procedure_division
   | Data_division
   | Global_context
 
-let enter_context context (prev_context, acc) =
-  Cobol_common.Visitor.do_children_and_then (context, acc)
-    (fun (_, acc) -> prev_context, acc)
+type acc =
+  {
+    context: context;
+    cu_name: string option;
+    section: Cobol_unit.Types.section option;
+    lenses: lens Positions.t;
+  }
 
-let positions ~uri group artifacts =
+(** [lenses ~uri group artifacts] computes the code lenses of the document
+    [uri], along with the element each lens is about.  This is done in a single
+    traversal of [group], so that code lenses do not need to lookup elements by
+    position.  Lenses are given in reverse order of their positions. *)
+let lenses ~uri group artifacts =
   let filename = Lsp_utils.path_of_uri uri in
-  let take_when_in context { loc; _ } (current_context, acc) =
-    if context <> current_context then
-      Cobol_common.Visitor.skip (current_context, acc)
+  let add_lens ~cu_name position element lenses =
+    Positions.add position { position; element; cu_name } lenses
+  in
+  let with_children_and_then f acc =
+    Visitor.do_children_and_then (f acc)
+      (fun acc' -> { acc' with context = acc.context; cu_name = acc.cu_name;
+                               section = acc.section })
+  in
+  let enter_context context =
+    with_children_and_then (fun acc -> { acc with context; section = None })
+  in
+  let take_when_in context ~element ({ loc; _ } as x) acc =
+    if context <> acc.context then
+      Visitor.skip acc
     else
       let range = Lsp_position.range_of_srcloc_in ~filename loc in
-      Cobol_common.Visitor.skip (context, Positions.add range.start acc)
+      Visitor.skip
+        { acc with lenses = add_lens ~cu_name:acc.cu_name range.start
+                       (element acc x) acc.lenses }
+  in
+  let take_data_name =
+    take_when_in Data_division
+      ~element:(fun _ qn -> Lsp_lookup.TYPES.Data_full_name ~&qn)
+  and take_proc_name =
+    take_when_in Procedure_division
+      ~element:begin fun { section; _ } qn ->
+        Lsp_lookup.TYPES.Proc_name { qn = ~&qn; enclosing_section = section }
+      end
   in
   Cobol_unit.Visitor.fold_unit_group object (v)
     inherit [_] Cobol_unit.Visitor.folder
     inherit! [_] Lsp_position.shallow_sieve ~filename
+    method! fold_cobol_unit' cu =
+      with_children_and_then
+        (fun acc -> { acc with cu_name = Some ~&(~&cu.unit_name) })
     method! fold_procedure _ =
       enter_context Procedure_division
+    method! fold_section s =
+      with_children_and_then (fun acc -> { acc with section = Some s })
     method! fold_data_definitions _ =
       enter_context Data_division
     method! fold_statements' _ =
-      Cobol_common.Visitor.skip
+      Visitor.skip
     method! fold_procedure_name' =
-      take_when_in Procedure_division
+      take_proc_name
     method! fold_qualname' =
-      take_when_in Data_division
+      take_data_name
     method! fold_record_renaming { renaming_name; _ } =
-      take_when_in Data_division renaming_name
+      take_data_name renaming_name
     method! fold_field_definition { field_qualname; field_redefines;
                                     field_leading_ranges;
                                     field_offset; field_size; field_size_max;
@@ -83,19 +131,28 @@ let positions ~uri group artifacts =
         |> Cobol_data.Visitor.fold_table_range v table_range
         |> Cobol_data.Visitor.fold_item_redefinitions v table_redefinitions
       end
-  end group (Global_context, Positions.empty) |>
-  snd |>
+  end group { context = Global_context; cu_name = None; section = None;
+              lenses = Positions.empty } |>
+  (fun { lenses; _ } -> lenses) |>
+  (* Note: pre-processor elements take priority over those of the parse-tree,
+     as in {!Lsp_lookup.element_at_position}. *)
   Cobol_preproc.Trace.fold artifacts.Cobol_parser.Outputs.pplog
-    ~f:begin fun event positions ->
+    ~f:begin fun event lenses ->
       try match event with    (* Some locations in the pre-processor log may not
                                  involve [filename], so we need to catch those
                                  cases. *)
-        | Cobol_preproc.Trace.Variable_definition { loc; _ } ->
+        | Cobol_preproc.Trace.Variable_definition { def; loc; _ } ->
             (match Lsp_position.shallow_start_position_in ~filename loc with
-             | None -> positions
-             | Some pos -> Positions.add pos positions)
+             | None -> lenses
+             | Some pos ->
+                 add_lens ~cu_name:None pos
+                   (Lsp_lookup.TYPES.Preproc_or_compilation_variable_ref
+                      { def; use = `Definition; loc }) lenses)
         | _ ->
-            positions
-      with Invalid_argument _ -> positions
+            lenses
+      with Invalid_argument _ -> lenses
     end |>
-  Positions.elements
+  fun lenses ->
+  (* Note: gives lenses in reverse order of positions; avoids non-tail-recursive
+     [List.map] on potentially long lists. *)
+  Positions.fold (fun _ lens acc -> lens :: acc) lenses []

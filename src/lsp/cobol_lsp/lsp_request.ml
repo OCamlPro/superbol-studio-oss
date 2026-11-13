@@ -353,47 +353,6 @@ let handle_definition registry (params: DefinitionParams.t) =
 
 (** {3 References} *)
 
-let lookup_qn ~kind ~lookup qn =
-  try Some (lookup qn) with
-  | Not_found ->
-      Lsp_notify.unknown kind qn;
-      None
-  | Cobol_unit.Resolver_map.Ambiguous (lazy matching_qualnames) ->
-      Lsp_notify.ambiguous kind qn ~matching_qualnames;
-      None
-
-let find_full_qn ~kind qn qmap =
-  lookup_qn ~kind qn
-    ~lookup:(fun qn -> (Cobol_unit.Resolver_map.find_binding qn qmap).full_qn)
-
-let find_proc_qn ~kind qn ?enclosing_section cu =
-  lookup_qn ~kind qn
-    ~lookup:begin fun qn ->
-      Cobol_unit.Procedure.full_qn ?enclosing_section qn
-        cu.Cobol_unit.Types.unit_procedure
-    end
-
-let ppenv_var_reference_locs (loc_translator: Lsp_position.translator)
-    ~(doc: Lsp_document.t)
-    (ppvar_def: Cobol_preproc.Env.var_definition) =
-  List.filter_map begin fun (event: Cobol_preproc.Trace.log_entry) ->
-    match ppvar_def, event with
-    | Compilation_var compvar_def,
-      (* | Variable_definition _ / filter out definition locs *)
-      (Variable_substitution { loc; def; _ } |
-       Variable_evaluation { loc; def = Some Compilation_var def; _ }) ->
-        if def == compvar_def (* Note: assumes sharing btw map and log entries *)
-        then Some (loc_translator.location_of_srcloc loc)
-        else None
-    | Preproc_var ppvar_def,
-      Variable_evaluation { loc; def = Some Preproc_var def; _ } ->
-        if def == ppvar_def   (* Note: assumes sharing btw map and log entries *)
-        then Some (loc_translator.location_of_srcloc loc)
-        else None
-    | _ ->
-        None
-  end (Cobol_preproc.Trace.events doc.artifacts.pplog)
-
 let lookup_references_in_doc position ~with_declaration ~(doc: Lsp_document.t)
     Cobol_typeck.Outputs.{ group; artifacts = { references }; _ }
   =
@@ -408,56 +367,16 @@ let lookup_references_in_doc position ~with_declaration ~(doc: Lsp_document.t)
       None
   | { element_at_position = Some element;
       enclosing_compilation_unit_name = cu_name } ->
-      let Lsp_position.{ location_of_srcloc; _ } as loc_translator
-        = Lsp_position.loc_translator ~rootdir uri in
-      let data_refs (cu_refs: Cobol_typeck.Outputs.references_in_unit) qn =
-        List.rev_map location_of_srcloc
-          (Cobol_unit.Qual.MAP.find qn cu_refs.data_refs)
-      and proc_refs (cu_refs: Cobol_typeck.Outputs.references_in_unit) qn =
-        List.rev_map location_of_srcloc
-          (Cobol_unit.Qual.MAP.find qn cu_refs.proc_refs)
-      and def_locs =
+      let loc_translator = Lsp_position.loc_translator ~rootdir uri in
+      let def_locs =
         if with_declaration then
           find_definitions ~allow_notifications:false loc_translator
             ?cu_name element group
         else []
+      and ref_locs =
+        Lsp_references.locations ~doc loc_translator ?cu_name element references
       in
-      let[@local] with_cu_n_refs f =
-        match cu_name with
-        | None ->
-            []
-        | Some cu_name ->
-            try f @@ CUMap.find_by_name cu_name references
-            with Not_found -> []
-      in
-      let ref_locs =
-        match element with
-        | Data_full_name qn
-        | Data_item { full_qn = Some qn; _ } ->
-            Lsp_debug.message "Lsp_request.lookup_references_in_doc: \
-                               Data_full_name...";
-            with_cu_n_refs @@ fun (_cu, cu_refs) ->
-            data_refs cu_refs qn
-        | Data_item { full_qn = None; _ } ->
-            Lsp_debug.message "Lsp_request.lookup_references_in_doc: \
-                               Data_item...";
-            []
-        | Data_name qn ->
-            Lsp_debug.message "Lsp_request.lookup_references_in_doc: \
-                               Data_name...";
-            with_cu_n_refs @@ fun (cu, cu_refs) ->
-            Option.fold ~none:[] ~some:(data_refs cu_refs) @@
-            find_full_qn qn ~&cu.unit_data.data_items.named ~kind:"data-name"
-        | Proc_name { qn; enclosing_section } ->
-            Lsp_debug.message "Lsp_request.lookup_references_in_doc: \
-                               Proc_name...";
-            with_cu_n_refs @@ fun (cu, cu_refs) ->
-            Option.fold ~none:[] ~some:(proc_refs cu_refs) @@
-            find_proc_qn qn ?enclosing_section ~&cu ~kind:"procedure-name"
-        | Preproc_or_compilation_variable_ref { def; _ } ->
-            ppenv_var_reference_locs ~doc loc_translator def
-      in
-      Some (def_locs @ ref_locs)
+      Some (Cobol_common.Basics.LIST.append def_locs ref_locs)
 
 let handle_references state (params: ReferenceParams.t) =
   try_with_checked_doc state params.textDocument
@@ -899,14 +818,17 @@ let handle_workspace_symbol
 
 let handle_codelens registry ({ textDocument; _ }: CodeLensParams.t) =
   try_with_checked_doc registry textDocument
-    ~f:begin fun ~doc checked_doc ->
-      Lsp_lens.positions ~uri:textDocument.uri
+    ~f:begin fun ~doc (checked_doc: Cobol_typeck.Outputs.t) ->
+      let rootdir = Lsp_project.(string_of_rootdir @@ rootdir doc.project) in
+      let loc_translator =
+        Lsp_position.loc_translator ~rootdir textDocument.uri in
+      Lsp_lens.lenses ~uri:textDocument.uri
         checked_doc.group doc.artifacts |>
-      List.rev_map begin fun position ->
+      List.rev_map begin fun Lsp_lens.{ position; element; cu_name } ->
         let ref_count =
-          Option.fold ~none:0 ~some:List.length @@
-          lookup_references_in_doc position ~doc checked_doc
-            ~with_declaration:false
+          List.length @@
+          Lsp_references.locations ~doc loc_translator ?cu_name element
+            checked_doc.artifacts.references
         in
         let range = Range.create ~end_:position ~start:position in
         let uri = DocumentUri.yojson_of_t textDocument.uri in
