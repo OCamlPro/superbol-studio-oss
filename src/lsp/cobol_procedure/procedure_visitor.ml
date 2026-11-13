@@ -351,19 +351,30 @@ and fold_object_view (v: _ #folder) =
                 >> P.fold_object_view_spec v object_view_spec)
 
 and fold_expr (v: _ #folder) =
-  handle v#fold_expr
-    ~continue:(fun e x -> match e with
-        | Atom a -> x
-            >> fold_scalar v a
-        | Unop (o, e) -> x
-            >> P.fold_unop v o
-            >> fold_expr' v e
-        | Binop (e, o, e') -> x
-            >> fold_expr' v e
-            >> P.fold_binop v o
-            >> fold_expr' v e')
+  handle v#fold_expr ~continue:(fold_expr_children v)
 
-and fold_expr' (v: _ #folder) = handle' v#fold_expr' ~fold:fold_expr v
+and fold_expr_children (v: _ #folder) e x =
+  match e with
+  | Atom a -> x
+      >> fold_scalar v a
+  | Unop (o, e) -> x
+      >> P.fold_unop v o
+      >> fold_expr' v e
+  | Binop (e, o, e') ->
+      fold_expr_chain v ~rights:[o, e'] e x
+
+(* Chains of binary operations are left-nested, and may be very long. *)
+and fold_expr_chain (v: _ #folder) ?rights e x =
+  fold_left_spine e x ?rights
+    ~pre:(fun e -> pre_actions [v#fold' e; v#fold_expr' e; v#fold_expr ~&e])
+    ~split:(fun e -> match ~&e with
+        | Binop (e, o, e') -> Some (e, (o, e'))
+        | _ -> None)
+    ~children:(fun e -> fold_expr_children v ~&e)
+    ~right:(fun (o, e') x -> x >> P.fold_binop v o >> fold_expr' v e')
+
+and fold_expr' (v: _ #folder) e x =
+  fold_expr_chain v e x
 
 and fold_ident_or_literal (v: _ #folder) : ident_or_literal -> 'a -> 'a =
   function
@@ -411,35 +422,51 @@ let fold_ident_or_nonnum' (v: _ #folder) = fold' ~fold:fold_ident_or_nonnum v
 let fold_ident_or_intlit' (v: _ #folder) = fold' ~fold:fold_ident_or_intlit v
 
 let rec fold_condition (v: _ #folder) =
-  handle v#fold_condition
-    ~continue:(fun c x -> match c with
-        | Expr e -> x
-            >> fold_expr' v e
-        | Relation (e, r, e') -> x
-            >> fold_expr' v e
-            >> P.fold_relop v r
-            >> fold_expr' v e'
-        | ClassCond (e, c) -> x
-            >> fold_expr' v e
-            >> P.fold_class v c
-        | SignCond (e, s) -> x
-            >> fold_expr' v e
-            >> P.fold_signz v s
-        | Omitted e -> x
-            >> fold_expr' v e
-        | Not c -> x
-            >> fold_condition_or_error' v c
-        | Combined (c, o, c') -> x
-            >> fold_condition_or_error' v c
-            >> P.fold_logop v o
-            >> fold_condition_or_error' v c')
+  handle v#fold_condition ~continue:(fold_condition_children v)
+
+and fold_condition_children (v: _ #folder) c x =
+  match c with
+  | Expr e -> x
+      >> fold_expr' v e
+  | Relation (e, r, e') -> x
+      >> fold_expr' v e
+      >> P.fold_relop v r
+      >> fold_expr' v e'
+  | ClassCond (e, c) -> x
+      >> fold_expr' v e
+      >> P.fold_class v c
+  | SignCond (e, s) -> x
+      >> fold_expr' v e
+      >> P.fold_signz v s
+  | Omitted e -> x
+      >> fold_expr' v e
+  | Not c -> x
+      >> fold_condition_or_error' v c
+  | Combined (c, o, c') ->
+      fold_condition_chain v ~rights:[o, c'] c x
+
+(* Chains of combined conditions are left-nested, and may be very long. *)
+and fold_condition_chain (v: _ #folder) ?rights c x =
+  fold_left_spine c x ?rights
+    ~pre:(fun ({ payload; loc } as c) ->
+        pre_actions @@ v#fold_condition_or_error' c :: match payload with
+        | Ok c -> let c' = c &@ loc in
+            [v#fold' c'; v#fold_condition' c'; v#fold_condition c]
+        | Error () -> [])
+    ~split:(fun c -> match ~&c with
+        | Ok (Combined (c, o, c')) -> Some (c, (o, c'))
+        | _ -> None)
+    ~children:(fun c x -> match ~&c with
+        | Ok c -> fold_condition_children v c x
+        | Error () -> x)
+    ~right:(fun (o, c') x -> x >> P.fold_logop v o
+                             >> fold_condition_or_error' v c')
 
 and fold_condition' (v: _ #folder) =
   handle' v#fold_condition' ~fold:fold_condition v
 
-and fold_condition_or_error' (v: _ #folder) =
-  handle v#fold_condition_or_error'
-    ~continue:(fold_or_error' ~fold:fold_condition' v)
+and fold_condition_or_error' (v: _ #folder) c x =
+  fold_condition_chain v c x
 
 (* --- Operands *)
 

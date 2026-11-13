@@ -361,21 +361,31 @@ and fold_object_view (v: _ #folder) =
     end
 
 and fold_expr (v: _ #folder) =
-  handle v#fold_expr
-    ~continue:begin fun e x -> match e with
-      | Atom a -> x
-          >> fold_scalar v a
-      | Unop (o, e) -> x
-          >> fold_unop v o
-          >> fold_expr' v e
-      | Binop (e, o, e') -> x
-          >> fold_expr' v e
-          >> fold_binop v o
-          >> fold_expr' v e'
-    end
+  handle v#fold_expr ~continue:(fold_expr_children v)
 
-and fold_expr' (v: _ #folder) =
-  handle' v#fold_expr' ~fold:fold_expr v
+and fold_expr_children (v: _ #folder) (e: expr) x =
+  match e with
+  | Atom a -> x
+      >> fold_scalar v a
+  | Unop (o, e) -> x
+      >> fold_unop v o
+      >> fold_expr' v e
+  | Binop (e, o, e') ->
+      fold_expr_chain v ~rights:[o, e'] e x
+
+(* Chains of binary operations are left-nested, and may be very long. *)
+and fold_expr_chain (v: _ #folder) ?rights e x =
+  fold_left_spine e x ?rights
+    ~pre:(fun e -> pre_actions [v#fold' e; v#fold_expr' e;
+                                v#fold_expr e.payload])
+    ~split:(fun e -> match e.payload with
+        | Binop (e, o, e') -> Some (e, (o, e'))
+        | _ -> None)
+    ~children:(fun e -> fold_expr_children v e.payload)
+    ~right:(fun (o, e') x -> x >> fold_binop v o >> fold_expr' v e')
+
+and fold_expr' (v: _ #folder) e x =
+  fold_expr_chain v e x
 
 and fold_ident_or_literal (v: _ #folder) : ident_or_literal -> 'a -> 'a = function
   | Address _
@@ -448,32 +458,42 @@ let fold_class (v: _ #shared_folder) =
     end
 
 let rec fold_condition: _ #folder -> condition -> _ = fun v ->
-  handle v#fold_condition
-    ~continue:begin fun (c: condition) x -> match c with
-      | CondSubject (e, c) -> x
-          >> fold_expr' v e
-          >> fold_condition' v c
-      | CondRelOp (r, c) -> x
-          >> fold_relop v r.payload
-          >> fold_condition' v c
-      | CondObjectOrExpr e -> x
-          >> fold_expr' v e
-      | CondParen c
-      | CondNot c -> x
-          >> fold_condition' v c
-      | CondCombined (c, l, d) -> x
-          >> fold_condition' v c
-          >> fold_logop v l
-          >> fold_condition' v d
-      | CondClass c -> x
-          >> fold_class v c
-      | CondSign s -> x
-          >> fold_signz v s
-      | CondOmitted -> x
-    end
+  handle v#fold_condition ~continue:(fold_condition_children v)
 
-and fold_condition' (v: _ #folder) =
-  handle' v#fold_condition' ~fold:fold_condition v
+and fold_condition_children (v: _ #folder) (c: condition) x =
+  match c with
+  | CondSubject (e, c) -> x
+      >> fold_expr' v e
+      >> fold_condition' v c
+  | CondRelOp (r, c) -> x
+      >> fold_relop v r.payload
+      >> fold_condition' v c
+  | CondObjectOrExpr e -> x
+      >> fold_expr' v e
+  | CondParen c
+  | CondNot c -> x
+      >> fold_condition' v c
+  | CondCombined (c, l, d) ->
+      fold_condition_chain v ~rights:[l, d] c x
+  | CondClass c -> x
+      >> fold_class v c
+  | CondSign s -> x
+      >> fold_signz v s
+  | CondOmitted -> x
+
+(* Chains of combined conditions are left-nested, and may be very long. *)
+and fold_condition_chain (v: _ #folder) ?rights c' x =
+  fold_left_spine c' x ?rights
+    ~pre:(fun c' -> pre_actions [v#fold' c'; v#fold_condition' c';
+                                 v#fold_condition c'.payload])
+    ~split:(fun c' -> match c'.payload with
+        | CondCombined (c, l, d) -> Some (c, (l, d))
+        | _ -> None)
+    ~children:(fun c' -> fold_condition_children v c'.payload)
+    ~right:(fun (l, d) x -> x >> fold_logop v l >> fold_condition' v d)
+
+and fold_condition' (v: _ #folder) c' x =
+  fold_condition_chain v c' x
 
 let fold_expression = fold_expr'                                     (* alias *)
 

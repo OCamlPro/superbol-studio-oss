@@ -194,6 +194,46 @@ module Fold = struct
   let leaf' vfold =
     handle' vfold ~fold:(fun _ _ -> Fun.id)
 
+  (** Outcome of {!pre_actions}: [Children (x, posts)] when children are to
+      be visited, with [posts] to apply afterwards; [Done x] otherwise. *)
+  type 'a pre_outcome =
+    | Done of 'a
+    | Children of 'a * ('a -> 'a) list
+
+  let apply_posts posts x =
+    List.fold_left (|>) x posts
+
+  (** [pre_actions folds x] calls each of [folds] in turn, as nested {!handle}s
+      would do, until one of them skips children. *)
+  let pre_actions folds x =
+    let rec aux posts x = function
+      | [] -> Children (x, posts)
+      | fold :: folds ->
+          match fold x with
+          | SkipChildren x -> Done (apply_posts posts x)
+          | DoChildren x -> aux posts x folds
+          | DoChildrenAndThen (x, f) -> aux (f :: posts) x folds
+    in
+    aux [] x folds
+
+  (** [fold_left_spine ~pre ~split ~children ~right ?rights n x] folds over a
+      left-nested chain of nodes rooted at [n] without recursing on their left
+      child.  [split n] gives the left child and the rest of [n] if it belongs
+      to the chain; [rights] are rests whose left child is [n]. *)
+  let fold_left_spine ~pre ~split ~children ~right ?(rights = []) n x =
+    let rec down n x stack =
+      match pre n x with
+      | Done x -> up x stack
+      | Children (x, posts) ->
+          match split n with
+          | Some (left, r) -> down left x ((r, posts) :: stack)
+          | None -> up (apply_posts posts (children n x)) stack
+    and up x = function
+      | [] -> x
+      | (r, posts) :: stack -> up (apply_posts posts (right r x)) stack
+    in
+    down n x (List.map (fun r -> r, []) rights)
+
   (* --- *)
 
   (** Reports a missing folding visitor implementation {e once}. Use
