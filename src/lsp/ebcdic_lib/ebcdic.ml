@@ -680,7 +680,7 @@ let read_gnucobol_collation_file filename =
       if len > 0 && line.[0] <> '#' then
         let items = String.split_on_char ' ' line in
         if List.length items <> 16 then
-          Printf.kprintf failwith "Wrong number of items on line %S" line;
+          Printf.ksprintf failwith "Wrong number of items on line %S" line;
         let items = List.map (fun hh ->
             int_of_string ( "0x" ^ hh )
           ) items in

@@ -14,7 +14,7 @@
 open Ez_file.V1
 
 let error fmt =
-  Printf.kprintf (fun s ->
+  Printf.ksprintf (fun s ->
       Printf.eprintf "Error: %s\n%!" s;
       exit 2
     ) fmt

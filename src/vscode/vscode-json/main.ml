@@ -70,7 +70,7 @@ type state = {
 }
 
 let add_error ?(error=true) state fmt =
-  Printf.kprintf (fun s ->
+  Printf.ksprintf (fun s ->
       if error then
         state.errors <- s :: state.errors
       else
