@@ -61,8 +61,8 @@ let iter_comma_separated_spec ~showable ~option_name ~f spec =
 
 (** Departures from project configurations that are explicitly requested on the
     command line, for commands that analyze documents within their projects. *)
-let analysis_overrides ~config ~conf ~dialect ~format ~libpath ~libexts ~env
-    ~recovery ~show : Superbol_project.Analysis.overrides =
+let analysis_overrides ~config ~conf ~dialect ~format ~mf_comment ~libpath
+    ~libexts ~env ~recovery ~show : Superbol_project.Analysis.overrides =
   let absolute dir =
     Ez_file.V1.Slashifier.slashify @@
     if Ez_file.V1.EzFile.is_absolute dir then dir
@@ -86,6 +86,7 @@ let analysis_overrides ~config ~conf ~dialect ~format ~libpath ~libexts ~env
   {
     override_cobol_config;
     override_source_format = format;
+    override_mf_comment = mf_comment;
     override_libpath = List.map absolute libpath;
     override_libexts = libexts;
     override_env = env;
@@ -155,6 +156,7 @@ let get () =
   let libexts = ref Cobol_common.Copybook.copybook_extensions in
   let extra_libexts = ref [] in
   let definitions = ref [] in
+  let mf_comments = ref false in
   let recovery = ref true in
   let explicit_recovery = ref false in
   let show = ref [`Pending] in                                     (* default *)
@@ -196,6 +198,11 @@ let get () =
     ["free"], Arg.Unit (fun () -> explicit_format := true;
                          format := SF SFFree),
     EZCMD.info "Shorthand for `--source-format FREE`";
+
+    ["mf-comment"], Arg.Set mf_comments,
+    EZCMD.info "Treat lines with an asterisk (`*`) in the first column as \
+                comments in FIXED, COBOL85, and VARIABLE source formats (like \
+                GnuCOBOL's `-fmfcomment`)";
 
     ["recovery"], Arg.Symbol (["true"; "false"], fun b ->
         explicit_recovery := true;
@@ -280,6 +287,7 @@ let get () =
     let analysis_overrides =
       analysis_overrides ~config ~conf:!conf ~dialect:!dialect
         ~format:(if !explicit_format then Some !format else None)
+        ~mf_comment:(if !mf_comments then Some true else None)
         ~libpath:!extra_libpath ~libexts:!extra_libexts ~env
         ~recovery:(if !explicit_recovery then Some recovery else None)
         ~show:(if !explicit_show then Some !show else None)
@@ -288,6 +296,7 @@ let get () =
     (*   Cobol_preproc.Env.pp env; *)
     { platform;
       preproc_options = { platform; config; source_format;
+                          mf_comments = !mf_comments;
                           exec_preprocs = EXEC_MAP.empty;
                           copybook_lookup_config =
                             Cobol_common.Copybook.lookup_config !libpath

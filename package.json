@@ -184,6 +184,13 @@
           "items": "string",
           "order": 6
         },
+        "superbol.cobol.mfComment": {
+          "title": "Micro Focus-style Comment Lines",
+          "markdownDescription": "Treat lines with an asterisk (`*`) in the first column as comments in `fixed`, `cobol85`, and `variable` source formats (like GnuCOBOL's `-fmfcomment`).\n\n*(May be overriden in project-specific `superbol.toml` files)*.",
+          "type": "boolean",
+          "default": false,
+          "order": 7
+        },
         "superbol.cobcPath": {
           "title": "GnuCOBOL Compiler Executable",
           "type": "string",

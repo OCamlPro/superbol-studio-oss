@@ -256,13 +256,23 @@ let mf_cdir_word =
 
 rule fixed_line state
   = shortest
-  | sna (* sna fast path *)
+  | sna                                                      (* sna fast path *)
       {
         fixed_indicator (Src_lexing.sna state lexbuf) lexbuf
       }
   | epsilon
       {
-        fixed_sna_continuation 6 state lexbuf (*TODO: Parametrize 6 *)
+        fixed_sna_continuation 6 state lexbuf
+      }
+and fixed_mf_line state           (* fixed format with MF-style comment lines *)
+  = parse
+  | ('*' as marker)                                           (* comment line *)
+      {
+        comment_line marker state lexbuf
+      }
+  | epsilon
+      {
+        fixed_line state lexbuf
       }
 and fixed_indicator state
   = parse
@@ -825,7 +835,10 @@ and pptoken = parse
       |   CRTIndic, _            -> crt_line s
       |   TrmIndic, _            -> acutrm_line s
       |  CBLXIndic, _            -> cobolx_line s
-      |          _, FixedWidth _ -> fixed_line s
+      |          _, FixedWidth _ ->
+          if Src_lexing.mf_comments s
+          then fixed_mf_line s
+          else fixed_line s
 
   let cdtoken: Compdir_tree.directive_kind -> _ = function
     (* | Call_directive *)

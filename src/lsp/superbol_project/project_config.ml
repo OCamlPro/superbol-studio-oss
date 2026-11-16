@@ -33,6 +33,7 @@ module TYPES = struct
     mutable libexts: string list;
     mutable indent_config: (string * int) list;
     mutable exclude_dirs: string list;
+    mutable mf_comment: bool;
     mutable source_encoding: Cobol_common.Text_encoding.t option;
     toml_handle: Ezr_toml.toml_handle;
   }
@@ -83,6 +84,7 @@ let default_libexts = Cobol_common.Copybook.copybook_extensions
 let default_indent_config = []
 let default_source_format_by_extension = []
 let default_exclude_dirs = ["_build"; "_opam"; "node_modules"]
+let default_mf_comment = false
 
 let default_dialect_name = "default"
 
@@ -95,6 +97,7 @@ let default = {
   libexts = default_libexts;
   indent_config = default_indent_config;
   exclude_dirs = default_exclude_dirs;
+  mf_comment = default_mf_comment;
   source_encoding = None;
   toml_handle = Ezr_toml.make_empty ();
 }
@@ -189,7 +192,14 @@ let config_repr config ~name =
                            in project-wide operations: names of directories \
                            (anywhere in the project), or paths relative to \
                            the project root"]
-        (exclude_dirs_repr config.exclude_dirs)
+        (exclude_dirs_repr config.exclude_dirs);
+
+      option
+        ~name: "mf-comment"
+        ~after_comments: ["Treat lines with an asterisk in the first column \
+                           as comments in FIXED, COBOL85, and VARIABLE \
+                           source formats (like GnuCOBOL's `-fmfcomment`)"]
+        (TOML.value_of_bool config.mf_comment)
     ]
 
 
@@ -236,6 +246,9 @@ let get_exclude_dirs toml =
   try Array.to_list @@ TOML.get_strings toml ["exclude-dirs"]
   with Not_found -> default_exclude_dirs
 
+let get_mf_comment toml =
+  TOML.get_bool toml ["mf-comment"] ~default:default_mf_comment
+
 let get_indent_config toml =
   try
     EzCompat.StringMap.fold (fun name node v ->
@@ -266,6 +279,7 @@ let load_file ~platform ?(verbose=false) config_filename =
         libexts = get_libexts section;
         indent_config = get_indent_config section;
         exclude_dirs = get_exclude_dirs section;
+        mf_comment = get_mf_comment section;
         source_encoding = None }
   in
   try
@@ -300,7 +314,8 @@ let reload ~platform ?(verbose=false) ~config_filename config =
     and libpath = get_libpath section
     and libexts = get_libexts section
     and indent_config = get_indent_config section
-    and exclude_dirs = get_exclude_dirs section in
+    and exclude_dirs = get_exclude_dirs section
+    and mf_comment = get_mf_comment section in
     let changed =
       config.source_format <> source_format ||
       config.source_format_by_extension <> source_format_by_extension ||
@@ -309,6 +324,7 @@ let reload ~platform ?(verbose=false) ~config_filename config =
       config.indent_config <> indent_config ||
       config.dialect_name <> dialect_name ||
       config.exclude_dirs <> exclude_dirs ||
+      config.mf_comment <> mf_comment ||
       config.cobol_config <> cobol_config
     in
     config.cobol_config <- cobol_config;
@@ -319,6 +335,7 @@ let reload ~platform ?(verbose=false) ~config_filename config =
     config.libexts <- libexts;
     config.indent_config <- indent_config;
     config.exclude_dirs <- exclude_dirs;
+    config.mf_comment <- mf_comment;
     DIAGS.result changed ~diags
   in
   try
@@ -336,6 +353,7 @@ let reload ~platform ?(verbose=false) ~config_filename config =
       config.libexts <- default.libexts;
       config.indent_config <- default.indent_config;
       config.exclude_dirs <- default.exclude_dirs;
+      config.mf_comment <- default.mf_comment;
       DIAGS.result true
   with TOML.Types.Error (loc, _code, error) ->
     raise @@ ERROR (Invalid_toml { loc; error })
@@ -412,6 +430,7 @@ type cached =
     cached_libexts: string list;
     cached_indent_config: (string * int) list;
     cached_exclude_dirs: string list;
+    cached_mf_comment: bool;
     cached_toml_handle: Ezr_toml.cacheable;
   }
 
@@ -419,7 +438,8 @@ type cached =
    file is read from that file again.  The encoding of source files is not
    cached, as it does not come from the configuration file. *)
 let to_cache { dialect_name; source_format; source_format_by_extension;
-               libpath; libexts; indent_config; exclude_dirs; toml_handle;
+               libpath; libexts; indent_config; exclude_dirs; mf_comment;
+               toml_handle;
                cobol_config = _; source_encoding = _ } =
   {
     cached_dialect = dialect_name;
@@ -429,13 +449,15 @@ let to_cache { dialect_name; source_format; source_format_by_extension;
     cached_libexts = libexts;
     cached_indent_config = indent_config;
     cached_exclude_dirs = exclude_dirs;
+    cached_mf_comment = mf_comment;
     cached_toml_handle = Ezr_toml.cacheable toml_handle;
   }
 
 let of_cache ~platform ~config_filename
     { cached_dialect; cached_source_format; cached_source_format_by_extension;
       cached_libpath; cached_libexts; cached_indent_config;
-      cached_exclude_dirs; cached_toml_handle = toml_handle } =
+      cached_exclude_dirs; cached_mf_comment;
+      cached_toml_handle = toml_handle } =
   if Ezr_toml.checksum toml_handle <> Digest.file config_filename
   then raise BAD_CHECKSUM;
   let DIAGS.{ result = cobol_config; _ } =
@@ -449,6 +471,7 @@ let of_cache ~platform ~config_filename
       libexts = cached_libexts;
       indent_config = cached_indent_config;
       exclude_dirs = cached_exclude_dirs;
+      mf_comment = cached_mf_comment;
       source_encoding = None;                (* set anew by whoever loads it *)
       toml_handle }
   in

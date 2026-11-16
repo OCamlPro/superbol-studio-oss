@@ -73,6 +73,11 @@
                     "items": {
                         "type": "string"
                     }
+                },
+                "mf-comment": {
+                    "type": "boolean",
+                    "description": "Treat lines with an asterisk in the first column as comments in FIXED, COBOL85, and VARIABLE source formats (like GnuCOBOL's `-fmfcomment`).",
+                    "default": false
                 }
             }
         }

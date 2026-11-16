@@ -100,6 +100,10 @@ type overrides =
     override_source_format: Cobol_config.source_format_spec option;
     (** Source format to use regardless of the project configuration. *)
 
+    override_mf_comment: bool option;
+    (** Whether to recognize MF-style comment lines regardless of the project
+        configuration. *)
+
     override_libpath: string list;
     (** Copybook directories to search after the project's.  Should be
         absolute. *)

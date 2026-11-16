@@ -14,6 +14,7 @@
 (** {1 Source format} *)
 
 module Src_format = Src_format
+module Src_options = Src_options
 
 (** {1 Text}
 
