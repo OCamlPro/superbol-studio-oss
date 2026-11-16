@@ -7,14 +7,6 @@ GNUCOBOL_SRCDIR = import/gnucobol
 SUPERBOL_LSP_PKG = lsp/superbol-free
 TRAMABOL_PKG = tramabol/tramabol
 
-GNUCOBOL4_COB_CONFIG ?= cob-config
-GNUCOBOL4_COB_CONFIG_HOST ?= $(GNUCOBOL4_COB_CONFIG)
-GNUCOBOL4_LIBDIR ?= $(shell $(GNUCOBOL4_COB_CONFIG_HOST) --libdir)
-
-export GNUCOBOL4_COB_CONFIG
-export GNUCOBOL4_COB_CONFIG_HOST
-export GNUCOBOL4_LIBDIR
-
 JS_OUTDIR = _out
 JS_TARGETS = $(addprefix $(JS_OUTDIR)/,superbol-vscode-oss-bundle.js	\
 				       superbol-vscode-gdb.js)
@@ -29,6 +21,7 @@ AUTOFONCE_EXE = dune exec -- src/autofonce/autofonce/main.exe
 
 # ---
 
+include Makefile.cob-config
 include Makefile.vsix-rules
 
 # ---
