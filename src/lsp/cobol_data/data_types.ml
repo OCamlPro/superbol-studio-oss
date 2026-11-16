@@ -107,8 +107,7 @@ type usage =
         scaling: int;
         byte_size: byte_size;
         truncation: binary_truncation;
-        (* always_bigendian: bool;             (\** always use big-endian representation *)
-        (*                                         (COMP-5/X) *\) *)
+        byte_order: byte_order;
       }
   | Bit of (* [`boolean] *) picture
   | Display_numeric of
@@ -146,6 +145,9 @@ and signedness = { signed: bool }
 and binary_truncation =
   | Truncate_to_digits of { digits: int }
   | Truncate_to_native_size
+and byte_order = Data_memory.byte_order =
+  | Big_endian
+  | Little_endian
 and byte_size =
   | Byte_size
   | Short_size

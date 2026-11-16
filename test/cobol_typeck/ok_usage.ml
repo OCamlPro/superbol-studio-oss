@@ -938,3 +938,63 @@ let%expect_test "usage-comp-3-group" =
         }
       }
     } |}];;
+
+let native_byteorder_options =
+  let default_options = Prog_parser.options () in
+  { default_options with
+    config =
+      (module (struct
+        include (val default_options.config)
+        let binary_byteorder =
+          Cobol_config.Options.binary_byteorder#from_val ~config Native
+      end)) }
+
+(** Shows the byte order of each binary item. *)
+let show_byte_orders ?parser_options contents =
+  Prog_typeck.typeck ?parser_options contents |>
+  Cobol_common.Diagnostics.show_n_forget ~set_status:false ~ppf:Fmt.stdout
+    ~platform:Prog_common.platform |>
+  begin fun Cobol_typeck.Outputs.{ group; _ } ->
+    Cobol_unit.Visitor.fold_unit_group object
+      inherit [unit] Cobol_unit.Visitor.folder
+      method! fold_item_definition' { payload = def; _ } () =
+        Cobol_common.Visitor.skip_children @@
+        match def with
+        | Field { field_qualname = Some name;
+                  field_layout = Elementary_field {
+                      usage = Binary { byte_order; _ }; _ }; _ } ->
+            Pretty.out "%a: %s@." Cobol_ptree.pp_qualname' name
+              (match byte_order with
+               | Big_endian -> "big-endian"
+               | Little_endian -> "little-endian")
+        | _ ->
+            ()
+    end group ()
+  end
+
+let byte_order_items = {|
+       77 A PIC 9(4) COMP.
+       77 B PIC 9(4) BINARY.
+       77 C PIC 9(4) COMP-5.
+       77 D PIC X(2) COMP-5.
+       77 E BINARY-LONG.
+|}
+
+let%expect_test "byte-order-big-endian" =
+  show_byte_orders @@ prog "byte-order" ~working_storage:byte_order_items;
+  [%expect {|
+    A: big-endian
+    B: big-endian
+    C: little-endian
+    D: little-endian
+    E: little-endian |}];;
+
+let%expect_test "byte-order-native" =
+  show_byte_orders ~parser_options:native_byteorder_options @@
+  prog "byte-order" ~working_storage:byte_order_items;
+  [%expect {|
+    A: little-endian
+    B: little-endian
+    C: little-endian
+    D: little-endian
+    E: little-endian |}];;

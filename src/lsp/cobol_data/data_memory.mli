@@ -53,6 +53,13 @@ type memory_config = int ElementarySizeMap.t
 
 val amd64_memory_config: memory_config
 
+(** Order of the bytes of a binary number in memory and in files. *)
+type byte_order =
+  | Big_endian                          (** most significant byte first *)
+  | Little_endian                       (** least significant byte first *)
+
+val amd64_byte_order: byte_order
+
 (* --- *)
 
 val int: int -> factor

@@ -21,3 +21,4 @@ module Walk = Project_walk
 module Analysis = Project_analysis
 module Cached_diagnostics = Project_cached_diagnostics
 module Semantic_tokens = Project_semantic_tokens
+module Hardcoded_assumptions = Hardcoded_assumptions

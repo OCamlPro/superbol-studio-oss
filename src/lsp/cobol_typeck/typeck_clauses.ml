@@ -315,8 +315,18 @@ let byte_size_of_int = function
   | 16 -> Long_double_size
   | n -> Custom_size n
 
+(** Byte order of BINARY and COMP items, set by [binary-byteorder]. *)
+let binary_byte_order { typeck_options = o; _ } : byte_order =
+  match o.binary_byteorder with
+  | Cobol_config.Types.Big_endian -> Big_endian
+  | Cobol_config.Types.Native -> o.target_byte_order
+
+(** Byte order of COMP-5 and BINARY-* items: always the one of the target. *)
+let native_byte_order { typeck_options = o; _ } =
+  o.target_byte_order
+
 let binary_from_numeric_info ~data_config ?(native_truncation = true)
-    diags ?picture PIC.TYPES.{ digits; scale = scaling; signed } =
+    ~byte_order diags ?picture PIC.TYPES.{ digits; scale = scaling; signed } =
   let byte_size =
     byte_size_of_int @@
     match data_config.typeck_options.binary_size with
@@ -358,10 +368,12 @@ let binary_from_numeric_info ~data_config ?(native_truncation = true)
     then Truncate_to_native_size
     else Truncate_to_digits { digits }
   in
-  diags, Ok (Binary { picture; signed; scaling; byte_size; truncation })
+  diags, Ok (Binary { picture; signed; scaling; byte_size; truncation;
+                      byte_order })
 
 
-let native_binary_usage diags byte_size ?(signedness = None) ~usage picture =
+let native_binary_usage ~data_config diags byte_size ?(signedness = None)
+    ~usage picture =
   let diags =
     match picture with
     | None | Some Error _ ->
@@ -372,7 +384,8 @@ let native_binary_usage diags byte_size ?(signedness = None) ~usage picture =
   diags,
   Ok (Binary { picture = None; byte_size; scaling = 0;
                signed = signedness <> Some Cobol_ptree.Unsigned;
-               truncation = Truncate_to_native_size })
+               truncation = Truncate_to_native_size;
+               byte_order = native_byte_order data_config })
 
 
 let display_usage_from_picture diags ~data_config (picture: picture) =
@@ -400,7 +413,7 @@ let auto_usage diags ~item_loc ?(usage: Cobol_ptree.usage_clause = Display)
         = ensure_picture diags ~only:`Numeric_category ~item_loc ~usage
           picture in
       binary_from_numeric_info ~data_config diags ~picture
-        ~native_truncation:false
+        ~native_truncation:false ~byte_order:(binary_byte_order data_config)
         (Result.value ~default:{ digits = 1; scale = 0; signed = false } @@
          PIC.numeric_info picture)
   | Bit ->
@@ -443,12 +456,13 @@ let range_extended_usage ~data_config diags ~item_loc given_picture usage =
     ensure_picture diags ~only:`Numeric_or_alphanum_category
       ~item_loc ~required:true ~usage given_picture
   in
+  let byte_order = native_byte_order data_config in
   if PIC.is_numeric picture then
     match PIC.numeric_info picture with                 (* TODO: check scale? *)
     | Ok ({ digits; _ } as numeric_info)
       when digits >= 1 && digits <= 18 ->
         binary_from_numeric_info ~data_config diags ~picture numeric_info
-          ~native_truncation:true
+          ~native_truncation:true ~byte_order
     | Ok { digits; scale = scaling; signed } ->
         let picture = Result.get_ok @@ Option.get given_picture in
         let feature = Digits { given = digits ; min = 1; max = 18 } in
@@ -456,10 +470,12 @@ let range_extended_usage ~data_config diags ~item_loc given_picture usage =
         if digits < 0
         then Ok (Binary { picture = Some ~&picture;
                           signed; scaling; byte_size = Short_size;
-                          truncation = Truncate_to_native_size })
+                          truncation = Truncate_to_native_size;
+                          byte_order })
         else Ok (Binary { picture = Some ~&picture;
                           signed; scaling; byte_size = Double_size;
-                          truncation = Truncate_to_native_size })
+                          truncation = Truncate_to_native_size;
+                          byte_order })
     | Error _ ->
         diags, Error None               (* already reported in `ensure_picture` *)
   else if PIC.is_alphanum picture then
@@ -473,7 +489,7 @@ let range_extended_usage ~data_config diags ~item_loc given_picture usage =
       | n -> Custom_size n
     in
     diags, Ok (Binary { picture = None; signed = false; scaling = 0; byte_size;
-                        truncation = Truncate_to_native_size })
+                        truncation = Truncate_to_native_size; byte_order })
   else
     diags, Error None                 (* already reported in `ensure_picture` *)
 
@@ -548,16 +564,16 @@ let to_usage_n_value ~item_name ~item_loc ~data_config item_clauses =
         auto_usage diags ~item_loc ~data_config ~usage picture
 
     | BinaryChar signedness ->
-        native_binary_usage diags Byte_size ~signedness ~usage picture
+        native_binary_usage ~data_config diags Byte_size ~signedness ~usage picture
 
     | BinaryDouble signedness ->
-        native_binary_usage diags Double_size ~signedness ~usage picture
+        native_binary_usage ~data_config diags Double_size ~signedness ~usage picture
 
     | BinaryLong signedness ->
-        native_binary_usage diags Long_size ~signedness ~usage picture
+        native_binary_usage ~data_config diags Long_size ~signedness ~usage picture
 
     | BinaryShort signedness ->
-        native_binary_usage diags Short_size ~signedness ~usage picture
+        native_binary_usage ~data_config diags Short_size ~signedness ~usage picture
 
     | Bit ->
         auto_usage diags ~item_loc ~data_config ~usage picture
@@ -624,7 +640,7 @@ let to_usage_n_value ~item_name ~item_loc ~data_config item_clauses =
 
     (* TODO: customizable USAGE mapping *)
     | UsagePending `BinaryCLong signedness ->
-        native_binary_usage diags C_long_size ~signedness ~usage picture
+        native_binary_usage ~data_config diags C_long_size ~signedness ~usage picture
 
     | UsagePending `Comp1 ->
         diags, Ok Float_short
