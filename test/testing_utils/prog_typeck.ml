@@ -26,7 +26,9 @@ let typeck ?parser_options ?source_format ?copybooks ?filename contents =
   Cobol_parser.Outputs.translate_diags |>
   Cobol_common.Diagnostics.map_result
     ~f:(Cobol_typeck.compilation_group
-          ~options:{ binary_size = Config.binary_size#value }
+          ~options:{ binary_size = Config.binary_size#value;
+                     binary_byteorder = Config.binary_byteorder#value;
+                     target_byte_order = Cobol_data.Memory.amd64_byte_order }
           ~fold_exec_block' ) |>
   Cobol_common.Diagnostics.more_result
     ~f:Cobol_typeck.Results.translate_diags

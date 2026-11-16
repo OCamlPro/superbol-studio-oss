@@ -14,6 +14,10 @@
 type options =
   {
     binary_size: binary_size;
+    binary_byteorder: binary_byteorder;
+    target_byte_order: byte_order;  (** byte order of the target machine *)
   }
 
 and binary_size = Cobol_config.Types.binary_size
+and binary_byteorder = Cobol_config.Types.binary_byteorder
+and byte_order = Cobol_data.Types.byte_order

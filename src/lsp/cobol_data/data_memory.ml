@@ -156,3 +156,9 @@ let amd64_memory_config =
     Size_of_index,         8 * 8;
     Size_of_pointer,       8 * 8;
   ]
+
+type byte_order =
+  | Big_endian
+  | Little_endian
+
+let amd64_byte_order = Little_endian

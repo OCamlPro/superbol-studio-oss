@@ -27,7 +27,9 @@ let parse_n_typeck { preproc_options; parser_options; platform; _ } filename =
     Cobol_parser.Outputs.translate_diags |>
     Cobol_common.Diagnostics.more_result ~f:begin fun ptree ->
       Cobol_typeck.compilation_group ptree
-        ~options:{ binary_size = Config.binary_size#value }
+        ~options:{ binary_size = Config.binary_size#value;
+                   binary_byteorder = Config.binary_byteorder#value;
+                   target_byte_order = Cobol_data.Memory.amd64_byte_order }
         ~fold_exec_block':Superbol_preprocs.Esql.fold_exec_block' |>
       Cobol_typeck.Results.translate_diags
     end |>
