@@ -25,16 +25,22 @@ jobs:
           - !{ci-systems}
         ocaml-compiler:
           - !{edition}
-        skip_test:
-          - false
-        build_vsix:
-          - true
-![if:min-edition]
+        # What a job builds and tests:
+        # - native: native LSP server, platform-specific VSIX, native tests
+        #   and debugger tests;
+        # - js: universal VSIX, and tests of the LSP server compiled into
+        #   JavaScript;
+        # - build: only the native build, without tests.
+        focus:
+          - native
         include:
           - os: !{ci-first-system}
+            ocaml-compiler: !{edition}
+            focus: js
+![if:min-edition]
+          - os: !{ci-first-system}
             ocaml-compiler: !{min-edition}
-            skip_test: true
-            build_vsix: false
+            focus: build
 ![fi]
 
     runs-on: ${{ matrix.os }}
@@ -65,7 +71,7 @@ jobs:
         id: cache-opam
         with:
           path: _opam
-          key: v5-${{ runner.os }}-${{ matrix.ocaml-compiler }}-!{name}-${{ hashFiles('**/*.opam', '.github/workflows/workflow.yml') }}-skip_tests=${{ matrix.skip_test }}-repo=!(opam-repo)
+          key: v5-${{ runner.os }}-${{ matrix.ocaml-compiler }}-!{name}-${{ hashFiles('**/*.opam', '.github/workflows/workflow.yml') }}-deps=${{ matrix.focus == 'build' && 'build' || 'dev' }}-repo=!(opam-repo)
 
       # use fields.opam-repo = "git+https://" to add an 'extra' opam repository
 ![if:field:opam-repo]
@@ -78,11 +84,11 @@ jobs:
 !(github-workflow-before-opam)
       - run: make build-deps
         id: build-deps
-        if: ${{ steps.cache-opam.outputs.cache-hit != 'true' && matrix.skip_test }}
+        if: ${{ steps.cache-opam.outputs.cache-hit != 'true' && matrix.focus == 'build' }}
 
       - run: make dev-deps
         id: dev-deps
-        if: ${{ steps.cache-opam.outputs.cache-hit != 'true' && ! matrix.skip_test }}
+        if: ${{ steps.cache-opam.outputs.cache-hit != 'true' && matrix.focus != 'build' }}
 
       # Use fields.build-scripts to add more scripts to convert here
       - run: dos2unix scripts/*.sh !(build-scripts)
@@ -91,21 +97,22 @@ jobs:
       # Use fields.github-workflow-before-build to add something here
 !(github-workflow-before-build)
       - run: make build
+        if: matrix.focus != 'js'
 
       # Use fields.github-workflow-after-build to add something here
 !(github-workflow-after-build)
       - run: make test
-        if: ${{ ! matrix.skip_test }}
+        if: matrix.focus == 'native'
 
       # Use fields.github-workflow-after-test to add something here
 !(github-workflow-after-test)
       # - name: Check whether source is well formatted
       #   run: make fmt
       #   continue-on-error: true
-      #   if: matrix.ocaml-compiler == '!{edition}' && matrix.os == '!{ci-first-system}'
+      #   if: matrix.ocaml-compiler == '!{edition}' && matrix.os == '!{ci-first-system}' && matrix.focus == 'native'
 
       - name: Build documentation
-        if: github.ref == 'refs/heads/!(git-main-branch:default:master)' && matrix.ocaml-compiler == '!{edition}' && matrix.os == '!{ci-first-system}'
+        if: github.ref == 'refs/heads/!(git-main-branch:default:master)' && matrix.ocaml-compiler == '!{edition}' && matrix.os == '!{ci-first-system}' && matrix.focus == 'native'
         run: |
              sudo apt install -yqq python3-sphinx python3-sphinx-rtd-theme
              opam install -y dune odoc
@@ -116,7 +123,7 @@ jobs:
 
       - name: Deploy documentation
         uses: JamesIves/github-pages-deploy-action@3.6.2
-        if: github.ref == 'refs/heads/!(git-main-branch:default:master)' && matrix.ocaml-compiler == '!{edition}' && matrix.os == '!{ci-first-system}'
+        if: github.ref == 'refs/heads/!(git-main-branch:default:master)' && matrix.ocaml-compiler == '!{edition}' && matrix.os == '!{ci-first-system}' && matrix.focus == 'native'
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
