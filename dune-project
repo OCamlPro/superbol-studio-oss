@@ -270,7 +270,6 @@
    (cobol_lsp (= :version))
    (cobol_indent (= :version))
    (cobol_common (= :version))
-   (ppx_cobcflags (= :version))
    (cmdliner ( < 2 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
@@ -468,23 +467,6 @@
    (cobol_config (= :version))
    (cobol_common (= :version))
    (cobol_cfg (= :version))
-   odoc
-   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
-  )
- )
-
-(package
- (name ppx_cobcflags)
- (synopsis "SuperBOL Studio OSS Project")
- (description "SuperBOL Studio OSS is a new platform for COBOL")
- 
-  (sites
-    
-  )
-
- (depends
-   (ocaml (>= 4.14.2))
-   (ppxlib ( >= 0.15 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )

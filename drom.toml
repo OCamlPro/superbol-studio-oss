@@ -355,10 +355,6 @@ dir = "src/lsp/cobol_lsp"
 # edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
 
 [[package]]
-dir = "src/lsp/ppx_cobcflags"
-# edit 'src/lsp/ppx_cobcflags/package.toml' for package-specific options
-
-[[package]]
 dir = "src/lsp/pretty"
 # edit 'src/lsp/pretty/package.toml' for package-specific options
 
