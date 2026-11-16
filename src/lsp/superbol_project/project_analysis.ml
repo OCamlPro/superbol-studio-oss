@@ -202,7 +202,7 @@ let typecheck ?overrides ~parsing_diags project parsed =
       ~fold_exec_block':Superbol_preprocs.Esql.fold_exec_block'
       ~options:{ binary_size = Config.binary_size#value;
                  binary_byteorder = Config.binary_byteorder#value;
-                 target_byte_order = Cobol_data.Memory.amd64_byte_order }
+                 target_byte_order = Hardcoded_assumptions.machine_byte_order }
   in
   let typeck_diags =
     (* Do not report typeck diagnostics in case of syntax or pre-processing
