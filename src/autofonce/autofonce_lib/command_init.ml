@@ -60,6 +60,9 @@ let default_project_config project_file =
   } in
   let testsuite_config = {
     config_name = "testsuite" ;
+    config_desc = "Default testsuite à la GnuCOBOL";
+    config_level = 0 ;
+    config_keywords = [];
     config_file = "tests/testsuite.at" ;
     config_env = env ;
     config_path = [ "tests/testsuite.src" ] ;
@@ -78,6 +81,8 @@ let default_project_config project_file =
     project_envs = StringMap.of_list [ env.env_name, env ];
     project_run_from = Build_dir ;
     project_captured_files = [];
+    project_checker = None;
+    project_default = [];
 
     project_file = project_file ;
     project_source_dir = Filename.dirname project_file ;

@@ -21,6 +21,8 @@ module M4Parser = Autofonce_m4.M4Parser
 module M4Types = Autofonce_m4.M4Types
 module Misc = Autofonce_misc.Misc
 
+let ntests = ref 0
+
 let name_of_loc loc =
   M4Printer.string_of_location { loc with file = Filename.basename loc.file }
 
@@ -157,8 +159,9 @@ let load_file ~dirs ~keep_files ~path c filename =
 
           | Macro ( ( "AF_SETUP" | "AT_SETUP" ), [ name ]) ->
               c.suite_ntests <- c.suite_ntests + 1;
+              incr ntests;
               let test_name = M4Parser.to_string name in
-              let test_id = c.suite_ntests in
+              let test_id = !ntests in
               let t = {
                 test_suite = c;
                 test_loc = macro.loc ;
@@ -289,6 +292,18 @@ let load_file ~dirs ~keep_files ~path c filename =
           let file = M4Parser.to_string file in
           let content = M4Parser.to_string content in
           AT_DATA  { file ; content }
+
+      | Macro ( ( "AF_DATA_COPY" ) , [ file ; content_file]) ->
+          let file = M4Parser.to_string file in
+          let content_file = M4Parser.to_string content_file in
+          let dir = Filename.dirname macro.loc.file in
+          AF_DATA_COPY  { file ; dir ; content_file }
+
+      | Macro ( ( "AF_DATA_LINK" ) , [ file ; content_file]) ->
+          let file = M4Parser.to_string file in
+          let content_file = M4Parser.to_string content_file in
+          let dir = Filename.dirname macro.loc.file in
+          AF_DATA_LINK  { file ; dir ; content_file }
 
       | Macro ( ( "AF_CAPTURE_FILE" | "AT_CAPTURE_FILE" ) , [ file ] ) ->
           let file = M4Parser.to_string file in
@@ -560,8 +575,9 @@ let m4_escape ?(can_quote=true) s =
         | ']' -> nbras+1
         | _ -> nbras
       in
+      let ending_space = ( c = '\n' && pos > 0 && s.[pos-1] = ' ') in
       let has_quote = has_quote || nbras > 0 in
-      let has_impaired = has_impaired || nbras < 0 in
+      let has_impaired = has_impaired || nbras < 0 || ending_space in
       iter ~npars ~nbras ~has_quote ~has_impaired ~pos
     else
       let has_impaired = has_impaired || nbras > 0 in
@@ -613,3 +629,6 @@ let m4_escape ?(can_quote=true) s =
     iter 0 false 0 ;
     Buffer.add_char b ']';
     Buffer.contents b
+
+let reset_ntests () = ntests := 0
+let ntests () = !ntests

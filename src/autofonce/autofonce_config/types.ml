@@ -22,6 +22,9 @@ type testsuite_env = {
 
 type testsuite_config = {
   config_name : string ;
+  config_desc : string ;
+  config_keywords : string list ;
+  config_level : int ; (* 0 = default, 1 = ok, 2 = not by default, etc. *)
   config_file : string ;
   config_path : string list ;
   config_env : testsuite_env ; (* name of env in file, actually *)
@@ -42,6 +45,8 @@ type project_config = {
   project_envs : testsuite_env EzCompat.StringMap.t ;
   (* list of files to include in results.log *)
   project_captured_files : string list ;
+  project_checker : string option ;
+  project_default : string list ;
 
   (* computed *)
   project_file : string ;

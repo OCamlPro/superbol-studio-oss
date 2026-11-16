@@ -1,0 +1,36 @@
+lib: [
+  "_build/install/default/lib/autofonce_share/META"
+  "_build/install/default/lib/autofonce_share/autofonce_share.a"
+  "_build/install/default/lib/autofonce_share/autofonce_share.cma"
+  "_build/install/default/lib/autofonce_share/autofonce_share.cmi"
+  "_build/install/default/lib/autofonce_share/autofonce_share.cmt"
+  "_build/install/default/lib/autofonce_share/autofonce_share.cmx"
+  "_build/install/default/lib/autofonce_share/autofonce_share.cmxa"
+  "_build/install/default/lib/autofonce_share/autofonce_share.ml"
+  "_build/install/default/lib/autofonce_share/autofonce_share__Files.cmi"
+  "_build/install/default/lib/autofonce_share/autofonce_share__Files.cmt"
+  "_build/install/default/lib/autofonce_share/autofonce_share__Files.cmx"
+  "_build/install/default/lib/autofonce_share/autofonce_share__Main.cmi"
+  "_build/install/default/lib/autofonce_share/autofonce_share__Main.cmt"
+  "_build/install/default/lib/autofonce_share/autofonce_share__Main.cmx"
+  "_build/install/default/lib/autofonce_share/autofonce_share__Tree.cmi"
+  "_build/install/default/lib/autofonce_share/autofonce_share__Tree.cmt"
+  "_build/install/default/lib/autofonce_share/autofonce_share__Tree.cmx"
+  "_build/install/default/lib/autofonce_share/autofonce_share__Version.cmi"
+  "_build/install/default/lib/autofonce_share/autofonce_share__Version.cmt"
+  "_build/install/default/lib/autofonce_share/autofonce_share__Version.cmx"
+  "_build/install/default/lib/autofonce_share/dune-package"
+  "_build/install/default/lib/autofonce_share/files.ml"
+  "_build/install/default/lib/autofonce_share/main.ml"
+  "_build/install/default/lib/autofonce_share/tree.ml"
+  "_build/install/default/lib/autofonce_share/version.ml"
+]
+libexec: [
+  "_build/install/default/lib/autofonce_share/autofonce_share.cmxs"
+]
+doc: [
+  "_build/install/default/doc/autofonce_share/CHANGELOG.md"
+  "_build/install/default/doc/autofonce_share/LICENSE.md"
+  "_build/install/default/doc/autofonce_share/README.md"
+  "_build/install/default/doc/autofonce_share/odoc-pages/index.mld" {"odoc-pages/index.mld"}
+]

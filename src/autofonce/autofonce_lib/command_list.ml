@@ -25,8 +25,8 @@ let cmd =
     "list"
     (fun () ->
        let filter_args = get_filter_args () in
-       let (_p, _tc, suite) = Testsuite.find ( get_testsuite_args ())  in
-       Testsuite.print ~filter_args suite
+       let (_p, suites) = Testsuite.find ( get_testsuite_args ())  in
+       Testsuite.print ~filter_args suites
     )
     ~args
     ~doc: "Print testsuite of the current project"

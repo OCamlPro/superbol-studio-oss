@@ -32,7 +32,6 @@ module EzCall = struct
 
   let command ?on_error fmt =
     Printf.kprintf (fun cmd ->
-        Printf.eprintf "%s\n%!" cmd;
         let retcode = Sys.command cmd in
         if retcode <> 0 then begin
           Printf.eprintf "  returned error %d\n%!" retcode;

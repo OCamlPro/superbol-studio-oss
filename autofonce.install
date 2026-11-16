@@ -1,0 +1,13 @@
+lib: [
+  "_build/install/default/lib/autofonce/META"
+  "_build/install/default/lib/autofonce/dune-package"
+]
+bin: [
+  "_build/install/default/bin/autofonce"
+]
+doc: [
+  "_build/install/default/doc/autofonce/CHANGELOG.md"
+  "_build/install/default/doc/autofonce/LICENSE.md"
+  "_build/install/default/doc/autofonce/README.md"
+  "_build/install/default/doc/autofonce/odoc-pages/index.mld" {"odoc-pages/index.mld"}
+]

@@ -1,0 +1,42 @@
+lib: [
+  "_build/install/default/lib/autofonce_config/META"
+  "_build/install/default/lib/autofonce_config/autofonce_config.a"
+  "_build/install/default/lib/autofonce_config/autofonce_config.cma"
+  "_build/install/default/lib/autofonce_config/autofonce_config.cmi"
+  "_build/install/default/lib/autofonce_config/autofonce_config.cmt"
+  "_build/install/default/lib/autofonce_config/autofonce_config.cmx"
+  "_build/install/default/lib/autofonce_config/autofonce_config.cmxa"
+  "_build/install/default/lib/autofonce_config/autofonce_config.ml"
+  "_build/install/default/lib/autofonce_config/autofonce_config__EzToml.cmi"
+  "_build/install/default/lib/autofonce_config/autofonce_config__EzToml.cmt"
+  "_build/install/default/lib/autofonce_config/autofonce_config__EzToml.cmx"
+  "_build/install/default/lib/autofonce_config/autofonce_config__Globals.cmi"
+  "_build/install/default/lib/autofonce_config/autofonce_config__Globals.cmt"
+  "_build/install/default/lib/autofonce_config/autofonce_config__Globals.cmx"
+  "_build/install/default/lib/autofonce_config/autofonce_config__Project_config.cmi"
+  "_build/install/default/lib/autofonce_config/autofonce_config__Project_config.cmt"
+  "_build/install/default/lib/autofonce_config/autofonce_config__Project_config.cmti"
+  "_build/install/default/lib/autofonce_config/autofonce_config__Project_config.cmx"
+  "_build/install/default/lib/autofonce_config/autofonce_config__Types.cmi"
+  "_build/install/default/lib/autofonce_config/autofonce_config__Types.cmt"
+  "_build/install/default/lib/autofonce_config/autofonce_config__Types.cmx"
+  "_build/install/default/lib/autofonce_config/autofonce_config__Version.cmi"
+  "_build/install/default/lib/autofonce_config/autofonce_config__Version.cmt"
+  "_build/install/default/lib/autofonce_config/autofonce_config__Version.cmx"
+  "_build/install/default/lib/autofonce_config/dune-package"
+  "_build/install/default/lib/autofonce_config/ezToml.ml"
+  "_build/install/default/lib/autofonce_config/globals.ml"
+  "_build/install/default/lib/autofonce_config/project_config.ml"
+  "_build/install/default/lib/autofonce_config/project_config.mli"
+  "_build/install/default/lib/autofonce_config/types.ml"
+  "_build/install/default/lib/autofonce_config/version.ml"
+]
+libexec: [
+  "_build/install/default/lib/autofonce_config/autofonce_config.cmxs"
+]
+doc: [
+  "_build/install/default/doc/autofonce_config/CHANGELOG.md"
+  "_build/install/default/doc/autofonce_config/LICENSE.md"
+  "_build/install/default/doc/autofonce_config/README.md"
+  "_build/install/default/doc/autofonce_config/odoc-pages/index.mld" {"odoc-pages/index.mld"}
+]

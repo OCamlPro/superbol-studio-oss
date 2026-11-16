@@ -29,6 +29,10 @@ type replace_block = {
   new_content : string ;
 }
 
+let string_of_action a =
+  Printf.sprintf "%s, %d-%d, content:\n<<<<%s>>>>\n"
+    a.file a.line_first a.line_last a.new_content
+
 let h = Hashtbl.create 100
 
 let replace_block ~file ~line_first ~line_last new_content =
@@ -62,10 +66,21 @@ let check_consistency actions =
         | a2 :: actions ->
             if a1.line_last < a2.line_first then
               iter a2 actions
-            else
+            else begin
+              Printf.eprintf "Inconsistency between:\n%s\nand:\n%s\n%!"
+                ( string_of_action a1 )
+                ( string_of_action a2 );
               true
+            end
       in
       iter action actions
+
+let rec remove_duplicates list =
+  match list with
+  | [] -> []
+  | a1 :: a2 :: tail when a1 = a2 ->
+      remove_duplicates (a1 :: tail)
+  | a1 :: list -> a1 :: remove_duplicates list
 
 let commit_to_disk ?(action=Diff { exclude=[]; args=None }) ?(backup="~") () =
   let tmp_dir = Filename.temp_file "patch_lines" "dir" in
@@ -75,6 +90,7 @@ let commit_to_disk ?(action=Diff { exclude=[]; args=None }) ?(backup="~") () =
   let cwd = MISC.getcwd () in
   Hashtbl.iter (fun file actions ->
       let actions = List.sort compare_actions !actions in
+      let actions = remove_duplicates actions in
       let inconsistent = check_consistency actions in
       if inconsistent then
         Printf.eprintf

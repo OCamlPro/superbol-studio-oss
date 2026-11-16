@@ -17,6 +17,7 @@ open EzFile.OP
 open Types
 
 module Misc = Autofonce_misc.Misc
+module PARSER = Autofonce_core.Parser
 
 type args = {
   mutable arg_filter : bool ;
@@ -44,8 +45,8 @@ let args () =
     arg_all_keywords = false ;
   }
 
-let select_tests ~args ?state select_test suite =
-  let ntests = suite.suite_ntests in
+let select_tests ~args ?state select_test suites =
+  let ntests = PARSER.ntests () in
   let all_tests =
     args.arg_tests_ids = [] && args.arg_tests_keywords = []
   in
@@ -86,81 +87,83 @@ let select_tests ~args ?state select_test suite =
     end;
     !yes_set, !no_set
   in
-  List.iter (fun t ->
-      if t.test_id >= args.arg_exec_after
-      && t.test_id <= args.arg_exec_before
-      && (all_tests
-          || id_set. (t.test_id)
-          ||
-          (if args.arg_all_keywords then
-             StringSet.for_all
-               (fun k ->  StringSet.mem k t.test_keywords_set) keyword_set
-           else
-             StringSet.exists (fun k ->  StringSet.mem k keyword_set) t.test_keywords_set)
-         )
-      && not (
-          StringSet.exists (fun k -> StringSet.mem k nokeyword_set)
-            t.test_keywords_set
+  List.iter (fun (suite, tg) ->
+      List.iter (fun t ->
+          if t.test_id >= args.arg_exec_after
+          && t.test_id <= args.arg_exec_before
+          && (all_tests
+              || id_set. (t.test_id)
+              ||
+              (if args.arg_all_keywords then
+                 StringSet.for_all
+                   (fun k ->  StringSet.mem k t.test_keywords_set) keyword_set
+               else
+                 StringSet.exists (fun k ->  StringSet.mem k keyword_set) t.test_keywords_set)
+             )
+          && not (
+              StringSet.exists (fun k -> StringSet.mem k nokeyword_set)
+                t.test_keywords_set
+            )
+          then
+            if args.arg_only_failed then begin
+              (* only_failed option should only be available
+                                       with state *)
+              match state with
+              | None ->
+                  Misc.error "Options --failed/--failure only works with 'run' or 'promote'"
+              | Some state ->
+                  let test_dir = Runner_common.test_dir t in
+                  let test_dir = state.state_run_dir // test_dir in
+                  if Sys.file_exists test_dir then
+                    match args.arg_failures with
+                    | None ->
+                        select_test t tg
+                    | Some failure ->
+                        let reason =
+                          let failure_exitcode = ref false in
+                          let failure_stdout = ref false in
+                          let failure_stderr = ref false in
+                          let files = Sys.readdir test_dir in
+                          Array.iter (fun file ->
+                              if Filename.check_suffix file ".exit.expected" then
+                                failure_exitcode := true
+                              else
+                              if Filename.check_suffix file ".out.expected" then
+                                failure_stdout := true
+                              else
+                              if Filename.check_suffix file ".err.expected" then
+                                failure_stderr := true
+                            ) files ;
+                          String.concat " " (
+                            begin
+                              if !failure_exitcode then
+                                [ "exitcode" ]
+                              else
+                                []
+                            end
+                            @
+                            begin
+                              if !failure_stdout then
+                                [ "stdout" ]
+                              else
+                                []
+                            end
+                            @
+                            begin
+                              if !failure_stderr then
+                                [ "stderr" ]
+                              else
+                                []
+                            end
+                          )
+                        in
+                        if failure = reason then
+                          select_test t tg
+            end else
+              select_test t tg
         )
-      then
-        if args.arg_only_failed then begin
-          (* only_failed option should only be available
-                                   with state *)
-          match state with
-          | None ->
-              Misc.error "Options --failed/--failure only works with 'run' or 'promote'"
-          | Some state ->
-              let test_dir = Runner_common.test_dir t in
-              let test_dir = state.state_run_dir // test_dir in
-              if Sys.file_exists test_dir then
-                match args.arg_failures with
-                | None ->
-                    select_test t
-                | Some failure ->
-                    let reason =
-                      let failure_exitcode = ref false in
-                      let failure_stdout = ref false in
-                      let failure_stderr = ref false in
-                      let files = Sys.readdir test_dir in
-                      Array.iter (fun file ->
-                          if Filename.check_suffix file ".exit.expected" then
-                            failure_exitcode := true
-                          else
-                          if Filename.check_suffix file ".out.expected" then
-                            failure_stdout := true
-                          else
-                          if Filename.check_suffix file ".err.expected" then
-                            failure_stderr := true
-                        ) files ;
-                      String.concat " " (
-                        begin
-                          if !failure_exitcode then
-                            [ "exitcode" ]
-                          else
-                            []
-                        end
-                        @
-                        begin
-                          if !failure_stdout then
-                            [ "stdout" ]
-                          else
-                            []
-                        end
-                        @
-                        begin
-                          if !failure_stderr then
-                            [ "stderr" ]
-                          else
-                            []
-                        end
-                      )
-                    in
-                    if failure = reason then
-                      select_test t
-        end else
-          select_test t
-    )
-    suite.suite_tests
+        suite.suite_tests
+    ) suites
 
 open Ezcmd.V2
 open EZCMD.TYPES
