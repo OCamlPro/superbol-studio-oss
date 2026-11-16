@@ -221,6 +221,14 @@ and unescape = parse
   | "@:>@" { quadrigraph lexbuf "]"; unescape lexbuf }
   | "@S|@" { quadrigraph lexbuf "$"; unescape lexbuf }
   | "@%:@" { quadrigraph lexbuf "#"; unescape lexbuf }
+  | "@&t@" ['0'-'9' ]+ "@&t@" {
+      let s = Lexing.lexeme lexbuf in
+      let len = String.length s in
+      let code = String.sub s 4 (len-8) in
+      let code = int_of_string code in
+      let c = char_of_int code in
+      let s = String.make 1 c in
+      quadrigraph lexbuf s; unescape lexbuf }
   | "@&t@" { quadrigraph lexbuf ""; unescape lexbuf }
   | "@{:@" { quadrigraph lexbuf "("; unescape lexbuf }
   | "@:}@" { quadrigraph lexbuf ")"; unescape lexbuf }

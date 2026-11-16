@@ -13,19 +13,21 @@
 open Ezcmd.V2
 open EZCMD.TYPES
 module Patch_lines = Autofonce_patch.Patch_lines
+module PARSER = Autofonce_core.Parser
 
 let nb_promotions = ref 10
 
-let rec action ~filter_args ~exec_args p tc suite =
-  let n = Testsuite.exec ~filter_args ~exec_args p tc suite in
+let rec action ~filter_args ~exec_args p suites =
+  let n = Testsuite.exec ~filter_args ~exec_args p suites in
   if n > 0 then begin
     if !nb_promotions > 0 then begin
       decr nb_promotions;
       filter_args.arg_only_failed <- true ;
       filter_args.arg_filter <- true ;
-      Command_diff.patch_action ~filter_args ~exec_args ~action:Patch_lines.Apply p tc suite ;
-      let (p, tc, suite) = Testsuite.read p tc in
-      action ~filter_args ~exec_args p tc suite
+      Command_diff.patch_action ~filter_args ~exec_args ~action:Patch_lines.Apply p suites ;
+      PARSER.reset_ntests ();
+      let suites = List.map (fun (_, tc) -> Testsuite.read p tc) suites in
+      action ~filter_args ~exec_args p suites
     end else
       exit 1
   end
@@ -49,8 +51,8 @@ let cmd =
     "promote"
     (fun () ->
        let filter_args = get_filter_args () in
-       let p, tc, suite = Testsuite.find ( get_testsuite_args () ) in
-       action ~filter_args ~exec_args p tc suite
+       let p, suites = Testsuite.find ( get_testsuite_args () ) in
+       action ~filter_args ~exec_args p suites
     )
     ~args
     ~doc: "Promote tests results as expected results"

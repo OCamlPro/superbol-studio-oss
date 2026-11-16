@@ -24,7 +24,7 @@ let cmd =
   EZCMD.sub
     "config"
     (fun () ->
-       let (p, _tc, _suite) = Testsuite.find (get_testsuite_args ()) in
+       let (p, _suites) = Testsuite.find (get_testsuite_args ()) in
        Printf.printf "Project filename: %S\n" p.project_file ;
        Printf.printf "  Directories: %S\n" p.project_source_dir ;
        Printf.printf "    Source dir: %S\n" p.project_source_dir ;

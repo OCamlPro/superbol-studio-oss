@@ -57,6 +57,8 @@ and action =
                  promote : bool ; (* explicit or implicit ? *)
                }
   | AF_COMMENT of string
+  | AF_DATA_LINK of { file:string ; dir : string ; content_file: string }
+  | AF_DATA_COPY of { file:string ; dir : string ; content_file: string }
 
 and test = { (* variable name is `t` *)
   test_suite : suite ;
@@ -89,7 +91,7 @@ let string_of_location = Autofonce_m4.M4Printer.string_of_location
 
 let rec string_of_action = function
   | AT_DATA { file ; content } ->
-      Printf.sprintf "AT_DATA ( file=%S, content=%S )" file content
+      Printf.sprintf "AT_DATA ( file=%S, content=%s )" file content
   | AT_CAPTURE_FILE string ->
       Printf.sprintf "AT_CAPTURE_FILE %s" string
   | AT_XFAIL -> "AT_XFAIL_IF([true])"
@@ -114,6 +116,12 @@ let rec string_of_action = function
       Printf.sprintf "AF_ENV %S" env
   | AF_COMMENT comment ->
       Printf.sprintf "AF_COMMENT %S" comment
+  | AF_DATA_COPY { file ; dir ; content_file } ->
+      Printf.sprintf "AF_DATA_COPY ( file=%S, dir=%s, content_file=%s )"
+        file dir content_file
+  | AF_DATA_LINK { file ; dir ; content_file } ->
+      Printf.sprintf "AF_DATA_LINK ( file=%S, dir=%s, content_file=%s )"
+        file dir content_file
 
 and string_of_check_output = function
     | Ignore -> "IGNORE"

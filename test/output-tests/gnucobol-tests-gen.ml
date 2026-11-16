@@ -43,10 +43,16 @@ List.iter begin fun at_file ->
   let basename = Filename.chop_extension at_file in
   Printf.printf "
 (rule
- (ignore-stderr
-  (with-stdout-to %s.output
-   (setenv COB_CONFIG_DIR \"%%{env:DUNE_SOURCEROOT=.}/import/gnucobol/config\"
-    (run %%{exe:gnucobol.exe} %s.at)))))
+ (deps
+  %%{project_root}/.autofonce
+  %%{project_root}/import/gnucobol/tests/testsuite.at
+  (source_tree %%{project_root}/import/gnucobol/tests/testsuite.src)
+  (source_tree %%{project_root}/import/gnucobol/config))
+ (action
+  (ignore-stderr
+   (with-stdout-to %s.output
+    (setenv COB_CONFIG_DIR \"%%{env:DUNE_SOURCEROOT=.}/import/gnucobol/config\"
+     (run %%{exe:gnucobol.exe} %s.at))))))
 (rule
  (alias runtest)
  (action (diff %s.expected %s.output)))

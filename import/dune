@@ -1,0 +1,10 @@
+; Only expose (as data) the parts of the GnuCOBOL sources that tests read,
+; so that dune re-runs them whenever the `import/gnucobol` submodule changes.
+(dirs gnucobol)
+
+(subdir gnucobol
+ (dirs config tests)
+ (data_only_dirs config)
+ (subdir tests
+  (dirs testsuite.src)
+  (data_only_dirs testsuite.src)))

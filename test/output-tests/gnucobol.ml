@@ -72,7 +72,7 @@ let make_n_enter_rundir () =
 
 (* Read the testsuite: should be named `testsuite` in `.autofonce` file *)
 
-let _pconf, _tconf, testsuite =
+let testsuite, _tconf =
   let toml = EzFile.concat srcdir ".autofonce" in
   let contents = EzFile.read_file toml in
   let project_config =
