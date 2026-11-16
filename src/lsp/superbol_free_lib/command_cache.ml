@@ -286,34 +286,34 @@ let client_settings_of_string s =
       Cobol_common.fatal "Expected a JSON object: %s" s
 
 let analyze_cmd =
-  let files = ref [] and ppf = ref Fmt.stderr
+  let ppf = ref Fmt.stderr
   and storage_directory = ref None and client_settings = ref None
   and error_status = ref true and show_diagnostics = ref true
   and for_lsp = ref true in
   let common, common_args = Common_args.get () in
   let parallel, parallel_args = Parallel_batches.args () in
   let project_setup, project_args = Project_args.get () in
+  let input_files, input_args =
+    Input_files.get () ~docv:"FILE" ~doc:"Cobol file to analyze" in
+  let setup () =
+    project_setup () ~setup:
+      (Project_commands.lsp_like_setup ()
+         ?storage_directory:!storage_directory
+         ?client_settings:!client_settings)
+  in
   let analyze files =
-    let setup =
-      project_setup () ~setup:
-        (Project_commands.lsp_like_setup ()
-           ?storage_directory:!storage_directory
-           ?client_settings:!client_settings)
-    in
-    Project_commands.analyze_n_report (common ()) ~for_lsp:!for_lsp ~setup
-      ~error_status:!error_status ~show_diagnostics:!show_diagnostics
-      ~ppf:!ppf files
+    Project_commands.analyze_n_report (common ()) ~for_lsp:!for_lsp
+      ~setup:(setup ()) ~error_status:!error_status
+      ~show_diagnostics:!show_diagnostics ~ppf:!ppf files
   in
   (* Processes that analyze batches of files are given every option that was
-     given to this one, except [--jobs] and [--batch-size]; {!Parallel_batches}
-     passes the verbosity on with [-v], and colors and margins through the
-     environment. *)
+     given to this one, except [--jobs], [--batch-size], and those that
+     designate files (listed here); {!Parallel_batches} passes the verbosity on
+     with [-v], and colors and margins through the environment. *)
   let given_args, args =
     Arg_utils.recording @@
     common_args @ project_args @
-    [ [], Arg.Anons (fun list -> files := list),
-      EZCMD.info ~docv:"FILE" "Cobol file to analyze";
-             ["stdout"], Arg.Unit (fun () -> ppf := Fmt.stdout),
+    [        ["stdout"], Arg.Unit (fun () -> ppf := Fmt.stdout),
              EZCMD.info "Output errors/warnings to stdout";
              ["no-error-status"], Arg.Clear error_status,
              EZCMD.info "Exit with status 0 even when analyzed files hold \
@@ -346,10 +346,11 @@ let analyze_cmd =
        (* Processes report progress on the files they analyze as asked, except
           on a line of their own, as their outputs are copied when they end. *)
        let args = List.filter ((<>) "--progress=force") (given_args ()) in
+       let common = common () in
        Parallel_batches.run ~jobs ?batch_size ~command:["cache"; "analyze"]
-         ~progress:(common ()).progress_display ~args
-         ~sequential:analyze !files)
-    ~args:(args @ parallel_args)
+         ~progress:common.progress_display ~args ~sequential:analyze @@
+       input_files ~common ~setup:(setup ()))
+    ~args:(args @ input_args @ parallel_args)
     ~doc:"Analyze files, reusing and filling the cache of their project"
     ~man:[ `S "DESCRIPTION";
            `Blocks [ `P "Preprocess, parse and typecheck each FILE as the LSP \

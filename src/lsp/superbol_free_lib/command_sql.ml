@@ -111,21 +111,20 @@ let parse ~sql_in_copybooks ~test_extension ~setup common files =
 let preproc_cmd =
   let sql_in_copybooks = ref false in
   let test_extension = ref false in
-  let files = ref [] in
   let common, common_args = Common_args.get () in
   let project_setup, project_args = Project_args.get () in
+  let input_files, input_args =
+    Input_files.get () ~docv:"FILE" ~doc:"COBOL files to preproc" in
   EZCMD.sub "sql preproc"
     (fun () ->
-      let common = common () in
+      let common = common () and setup = project_setup () in
       Printexc.record_backtrace true;
       parse ~sql_in_copybooks:!sql_in_copybooks common
-      ~test_extension:!test_extension ~setup:(project_setup ()) !files )
+      ~test_extension:!test_extension ~setup
+      (input_files ~common ~setup) )
     ~args:
-      ( common_args @ project_args
-      @ [ ( [],
-            Arg.Anons (fun l -> files := l),
-            EZCMD.info ~docv:"FILE" "COBOL files to preproc" );
-          ( [ "copybooks" ],
+      ( common_args @ project_args @ input_args
+      @ [ ( [ "copybooks" ],
             Arg.Set sql_in_copybooks,
             EZCMD.info "Preprocess copybooks also (without REPLACING)" );
           ( [ "test-ext" ],
