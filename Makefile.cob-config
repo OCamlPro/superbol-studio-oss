@@ -1,0 +1,63 @@
+# -*- Makefile -*-
+
+# GnuCOBOL 4 configuration (for TramaBOL).  `GNUCOBOL4_COB_CONFIG`
+# and `GNUCOBOL4_COB_CONFIG_HOST` are left undefined whenever they do
+# not designate an executable (`cob-config` in PATH by default) that
+# reports a version with major number 4;
+# `GNUCOBOL4_LIBDIR` is then undefined as well, unless given
+# explicitly, and `HAVE_LIBCOB5` is forced to `false`.
+
+# Prints a warning, only once in case of recursive calls to `make`.
+cob_config_warning = $(if $(filter 0,$(MAKELEVEL)),$(warning $(1)))
+
+# Undefines the given variable, even if it was given on the command
+# line or through the environment.
+cob_config_undefine = $(eval unexport $(1))$(eval override undefine $(1))
+
+# Outputs the major version number reported by the given `cob-config`.
+cob_config_major = $(strip $(shell $(1) --version 2>/dev/null |	\
+  sed -n '1s/^[^0-9]*\([0-9]*\).*/\1/p'))
+
+# Outputs nothing if the given `cob-config` is executable and reports a
+# version with major number 4; outputs a description of the problem
+# otherwise.
+cob_config_problem = $(if $(strip $(shell command -v $(1) 2>/dev/null)),\
+  $(if $(filter 4,$(call cob_config_major,$(1))),,			\
+    reports version `$(shell $(1) --version 2>/dev/null)', not 4.x)\
+  ,not found)
+
+GNUCOBOL4_COB_CONFIG ?= cob-config
+cob_config_target_problem := $(strip $(call cob_config_problem,$(GNUCOBOL4_COB_CONFIG)))
+ifneq ($(cob_config_target_problem),)
+  $(call cob_config_warning,GnuCOBOL 4 `cob-config'			\
+    $(cob_config_target_problem)					\
+    (GNUCOBOL4_COB_CONFIG = $(GNUCOBOL4_COB_CONFIG)): set		\
+    GNUCOBOL4_COB_CONFIG to its path to build TramaBOL)
+  $(call cob_config_undefine,GNUCOBOL4_COB_CONFIG)
+endif
+
+GNUCOBOL4_COB_CONFIG_HOST ?= $(GNUCOBOL4_COB_CONFIG)
+cob_config_host_problem := $(strip $(call cob_config_problem,$(GNUCOBOL4_COB_CONFIG_HOST)))
+ifneq ($(cob_config_host_problem),)
+  ifdef GNUCOBOL4_COB_CONFIG
+    $(call cob_config_warning,GnuCOBOL 4 host `cob-config'		\
+      $(cob_config_host_problem)					\
+      (GNUCOBOL4_COB_CONFIG_HOST = $(GNUCOBOL4_COB_CONFIG_HOST)))
+  endif
+  $(call cob_config_undefine,GNUCOBOL4_COB_CONFIG_HOST)
+endif
+
+ifdef GNUCOBOL4_COB_CONFIG_HOST
+  GNUCOBOL4_LIBDIR ?= $(shell $(GNUCOBOL4_COB_CONFIG_HOST) --libdir)
+else
+  # Disable everything that needs libcob (TramaBOL) without `cob-config`.
+  override HAVE_LIBCOB5 = false
+  export HAVE_LIBCOB5
+endif
+ifeq ($(strip $(GNUCOBOL4_LIBDIR)),)
+  $(call cob_config_undefine,GNUCOBOL4_LIBDIR)
+endif
+
+$(foreach v,GNUCOBOL4_COB_CONFIG GNUCOBOL4_COB_CONFIG_HOST	\
+	    GNUCOBOL4_LIBDIR,					\
+  $(if $(filter undefined,$(origin $(v))),,$(eval export $(v))))
