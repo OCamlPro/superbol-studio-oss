@@ -43,7 +43,6 @@ gen-version = "version.ml"
 
 # preprocessing options
 #  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
-preprocess = "pps ppx_cobcflags"
 
 # files to skip while updating at package level
 skip = ["index.mld", "main.ml"]
@@ -80,7 +79,6 @@ version = ">=2.0"
 # package tools dependencies
 [tools]
 cmdliner = "<2"
-ppx_cobcflags = "version"
 
 # package fields (depends on package skeleton)
 #Examples:
