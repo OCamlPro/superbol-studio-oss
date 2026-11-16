@@ -17,7 +17,7 @@ open Types
 
 type scheduler = {
   state : state ;
-  test_fifo : ( test * testsuite_config ) Queue.t ;
+  test_fifo : test Queue.t ;
   mutable running_tests : running_test IntMap.t ;
   mutable current_jobs : int ;
 }
@@ -42,15 +42,13 @@ let update_status s = (* 1 + 4 + 1 + 32 + 3 + 2 = 43 chars *)
     | Some (_, r) ->
         let ter = r.running_test in
         let t = ter.tester_test in
-        let tc = ter.tester_config in
-        let test_name = Types.long_test_name t tc in
         Printf.bprintf b "%d %s"
           t.test_id
-          (let len = String.length test_name in
+          (let len = String.length t.test_name in
            if len > title_size then
-             (String.sub test_name 0 (title_size-2) ^ "..")
+             (String.sub t.test_name 0 (title_size-2) ^ "..")
            else
-             test_name ^ (String.sub spaces 0 (title_size - len))
+             t.test_name ^ (String.sub spaces 0 (title_size - len))
           );
         if n > 1 then
           Printf.bprintf b " +%d]" (n-1)
@@ -103,8 +101,6 @@ and schedule_action r action =
   | AF_COMMENT _
   | AT_XFAIL
   | AT_DATA _
-  | AF_DATA_COPY _
-  | AF_DATA_LINK _
   | AT_CAPTURE_FILE _
   | AT_CLEANUP _
   | AF_ENV _
@@ -124,10 +120,10 @@ and schedule_check r check =
   s.running_tests <- IntMap.add cer.checker_pid r s.running_tests;
   update_status s
 
-let schedule_test s t tc =
+let schedule_test s t =
   if !Globals.verbose > 1 then Printf.eprintf "schedule_test\n%!";
   let state = s.state in
-  let ter = Runner_common.start_test state t tc in
+  let ter = Runner_common.start_test state t in
   let r = {
     scheduler = s ;
     running_test = ter ;
@@ -173,8 +169,8 @@ let run s =
     if !Globals.verbose > 1 then Printf.eprintf "iter %d\n%!" s.current_jobs;
     if s.current_jobs < s.state.state_args.arg_max_jobs &&
        not (Queue.is_empty s.test_fifo) then
-      let (t, tc) = Queue.take s.test_fifo in
-      schedule_test s t tc;
+      let t = Queue.take s.test_fifo in
+      schedule_test s t;
       iter ()
     else
     if s.current_jobs > 0 then
@@ -200,15 +196,16 @@ let run s =
   iter ()
 
 let exec_testsuite ~filter_args state =
+  let c = state.state_suite in
   let s = {
     state;
     test_fifo = Queue.create () ;
     running_tests = IntMap.empty;
     current_jobs = 0;
   } in
-  let select_test t tc =
-    Queue.add (t, tc) s.test_fifo;
+  let select_test t =
+    Queue.add t s.test_fifo;
   in
-  Filter.select_tests ~args:filter_args ~state select_test state.state_suites;
+  Filter.select_tests ~args:filter_args ~state select_test c;
   state.state_ntests <- Queue.length s.test_fifo ;
   run s

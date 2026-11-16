@@ -10,13 +10,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type promote_options = {
-  ignore_exitcode : bool ;
-  keep_old : bool ;
-  (* Only update iff the new exitcode is 0 *)
-  only_successful : bool ;
-}
-
-(* print the given actions in the buffer *)
 val print_actions :
-  promote_options -> Types.test -> Buffer.t -> Types.action list -> unit
+  Types.test ->
+  ignore_exitcode:bool ->
+  keep_old:bool ->
+  Buffer.t -> Types.action list -> unit

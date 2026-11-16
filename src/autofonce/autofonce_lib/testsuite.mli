@@ -15,8 +15,6 @@ type args = {
   mutable arg_testsuite_file : string option ;
   mutable arg_testsuite_env : string option ;  (* path to env file *)
   mutable arg_testsuite_path : string list ;
-  mutable arg_testsuite_keywords : string list ;
-  mutable arg_testsuite_level : int ;
 }
 
 val args : unit ->
@@ -26,13 +24,13 @@ val exec :
   filter_args:Filter.args ->
   exec_args:Types.exec_args ->
   Types.project_config ->
-  Types.suites -> int
+  Types.testsuite_config -> Types.suite -> int
 
-val find : args -> Types.project_config * Types.suites
+val find : args ->
+  Types.project_config * Types.testsuite_config * Types.suite
 
-val print : filter_args:Filter.args ->  Types.suites -> unit
+val print : filter_args:Filter.args -> Types.suite -> unit
 
 val read :
   Types.project_config -> Types.testsuite_config ->
-  Types.suite * Types.testsuite_config
-  
+  Types.project_config * Types.testsuite_config * Types.suite

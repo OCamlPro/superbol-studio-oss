@@ -25,7 +25,6 @@ type args = {
 
 val select_tests :
   args:args ->
-  ?state:Types.state -> (Types.test -> 'a -> unit) ->
-  (Types.suite * 'a) list -> unit
+  ?state:Types.state -> (Types.test -> unit) -> Types.suite -> unit
 
 val args : unit -> Ezcmd.V2.EZCMD.TYPES.arg_list * ( unit -> args )

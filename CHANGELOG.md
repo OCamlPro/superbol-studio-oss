@@ -21,7 +21,6 @@
 - The `superbol.lspPath` setting, and with it the support for connecting to the LSP server remotely (`tcp://` values) [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
 
 ### Improved
-- Update `autofonce` to its latest version (`AF_DATA_COPY` and `AF_DATA_LINK` macros replacing `AF_DATA_FILE`, `autofonce summary` sub-command, `default` keyword in project config, better scaling to very large testsuites)
 - Memory usage of the LSP server [#714](https://github.com/OCamlPro/superbol-studio-oss/pull/714)
 - Workspace analyzis for every COBOL file, that now runs in parallel sub-processes, and reports diagnostics of files that are not open [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
 

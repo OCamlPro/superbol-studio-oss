@@ -36,7 +36,6 @@ let args () =
       arg_keep_skipped = false ;
       arg_keep_all = false ;
       arg_output = None ;
-      arg_only_successful = false ;
     }
   in
   [
@@ -67,20 +66,13 @@ let args () =
     [ "no-clean" ], Arg.Unit (fun () -> args.arg_clean_tests_dir <- false),
     EZCMD.info "Do not clean _autofonce/ dir on startup";
 
-    [ "ignore-exitcode" ], Arg.Unit (fun () ->
-        args.arg_ignore_exitcode <- true),
+    [ "ignore-exitcode" ], Arg.Unit (fun () -> args.arg_ignore_exitcode <- true),
     EZCMD.info "Do not promote or fail for wrong exit code" ;
-
-    [ "only-successful" ], Arg.Unit (fun () ->
-        args.arg_only_successful <- true),
-    EZCMD.info "Promote only failed checks for commands with \
-                successful exit status" ;
 
     [ "o" ; "output" ], Arg.String (fun s -> args.arg_output <- Some s),
     EZCMD.info
       ~env:(EZCMD.env "AUTOFONCE_OUTPUT")
-      ~docv:"TESTSUITE"
-      "Path of the output file (default: _autofonce/results.log)";
+      ~docv:"TESTSUITE" "Path of the output file (default: _autofonce/results.log)";
 
   ] ,
   args
@@ -89,24 +81,22 @@ let status_len = 30
 let spaces = String.make 80 ' '
 
 let test_status ter fmt =
+  let t = ter.tester_test in
   Printf.kprintf (fun s ->
-      let t = ter.tester_test in
-      let tc = ter.tester_config in
       let len = String.length s in
       let status_len = if len > status_len then len else status_len in
       let test_id = Printf.sprintf "%04d" t.test_id in
       let id_len = String.length test_id in
       let max_name_len = 79 - 2 - status_len - id_len in
       let max_name_len = if max_name_len < 0 then 0 else max_name_len in
-      let test_name = Types.long_test_name t tc in
-      let len = String.length test_name in
+      let len = String.length t.test_name in
       let test_name =
         if len > max_name_len then
-          String.sub test_name 0 max_name_len
+          String.sub t.test_name 0 max_name_len
         else
-          test_name ^ String.sub spaces 0 (max_name_len - len)
+          t.test_name ^ String.sub spaces 0 (max_name_len - len)
       in
-      Printf.sprintf "%s %s %s" test_id s test_name
+      Printf.sprintf "%s %s %s" test_id test_name s
     ) fmt
 
 let buffer_test state test_status =
@@ -142,11 +132,10 @@ let test_is_ok ter =
     MISC.remove_rec ( tester_dir ter ) ;
   state.state_ntests_ok <- state.state_ntests_ok + 1;
   buffer_test state (
-    test_status ter "GOOD . (%s)"
+    test_status ter "OK (%s)"
       ( PARSER.name_of_loc test.test_loc )
   )
 
-(* a return code of 77 means that the failure is ok to skip *)
 let test_is_skipped_fail cer s =
   let ter = cer.checker_tester in
   let state = ter.tester_state in
@@ -155,7 +144,7 @@ let test_is_skipped_fail cer s =
     MISC.remove_rec ( tester_dir ter ) ;
   state.state_tests_failexpected <- ter :: state.state_tests_failexpected ;
   buffer_test state (
-    test_status ter "SK77 _ (%s %s)"
+    test_status ter "SKIPPED FAIL (%s %s)"
       ( PARSER.name_of_loc check.check_loc ) s
   )
 
@@ -167,13 +156,12 @@ let test_is_failed loc ter ?check s =
     if not state.state_args.arg_keep_skipped then
       MISC.remove_rec ( tester_dir ter ) ;
     buffer_test state
-      ( test_status ter "KOOK ! (%s %s)"
+      ( test_status ter "EXPECTED FAIL (%s %s)"
           ( PARSER.name_of_loc loc ) s )
   end else begin
     state.state_tests_failed <- ter :: state.state_tests_failed ;
-    state.state_ntests_failed <- state.state_ntests_failed + 1;
     let status =
-      test_status ter "FAIL E (%s %s)" ( PARSER.name_of_loc loc ) s
+      test_status ter "FAIL (%s %s)" ( PARSER.name_of_loc loc ) s
     in
     output state "%s" status;
     buffer_test state status;
@@ -186,36 +174,12 @@ let test_is_skip ter =
   state.state_tests_skipped <- ter :: state.state_tests_skipped ;
   if not state.state_args.arg_keep_skipped then MISC.remove_rec ( tester_dir ter ) ;
   buffer_test state
-    (test_status ter "SKIP   (%s)" ( PARSER.name_of_loc t.test_loc ) )
-
-(* Create [dir] and all its missing parents *)
-let rec mkdir_p dir =
-  if not ( Sys.file_exists dir ) then begin
-    let parent = Filename.dirname dir in
-    if parent <> dir then mkdir_p parent;
-    try Unix.mkdir dir 0o755 with
-    | Unix.Unix_error ( Unix.EEXIST, _, _ ) -> ()
-  end
-
-(* Prepare [dst_file] for writing: create its parent directories
-   and remove any existing file *)
-let prepare_dst_file dst_file =
-  mkdir_p ( Filename.dirname dst_file );
-  if Sys.file_exists dst_file then Unix.unlink dst_file
+    (test_status ter "SKIP (%s)" ( PARSER.name_of_loc t.test_loc ) )
 
 let exec_action_no_check ter action =
   match action with
   | AT_DATA { file ; content } ->
       EzFile.write_text_file ( tester_dir ter // file ) content
-  | AF_DATA_COPY { file ; dir ; content_file } ->
-      let dst_file = tester_dir ter // file in
-      prepare_dst_file dst_file;
-      let content = EzFile.read_file ( dir // content_file ) in
-      EzFile.write_file dst_file content
-  | AF_DATA_LINK { file ; dir ; content_file } ->
-      let dst_file = tester_dir ter // file in
-      prepare_dst_file dst_file;
-      Unix.link ( dir // content_file ) dst_file
   | AT_CLEANUP _ -> ()
   | AF_COMMENT _ -> ()
   | AT_XFAIL -> ter.tester_fail_expected <- true
@@ -307,18 +271,18 @@ let print_status state =
     Terminal.move_bol ();
     Terminal.erase Eol;
     Terminal.printf [] " %d / %d" state.state_ntests_ran state.state_ntests;
-    if state.state_ntests_failed > 0 then begin
+    if state.state_tests_failed <> [] then begin
       Terminal.printf [ Terminal.red ]
-        " %d fails:%!" state.state_ntests_failed;
-      (* print_ntests 2 state.state_tests_failed; *)
+        " %d fails:%!" (List.length state.state_tests_failed);
+      print_ntests 3 state.state_tests_failed;
     end;
     Terminal.printf [] " %s" state.state_status;
     Printf.printf "%!";
     state.state_status_printed <- true
   end
 
-let start_test state t  cg =
-  let c = t.test_suite in
+let start_test state t =
+  let c = state.state_suite in
   state.state_ntests_ran <- state.state_ntests_ran + 1;
   state.state_status_printed <- false ;
   print_status state;
@@ -326,7 +290,6 @@ let start_test state t  cg =
     tester_test = t ;
     tester_state = state ;
     tester_suite = c ;
-    tester_config = cg ;
     tester_renvs = [] ;
     tester_fail_expected = false ;
     tester_captured_files = StringSet.empty ;
@@ -356,11 +319,11 @@ AUTOFONCE_BUILD_DIR="%s"
 # test env by AF_ENV
 %s
 |}
-    cg.config_name
+    state.state_config.config_name
     state.state_run_dir
     state.state_project.project_source_dir
     state.state_project.project_build_dir
-    cg.config_env.env_content
+    state.state_config.config_env.env_content
     t.test_env
   ;
   Unix.chmod ( test_dir // Autofonce_config.Globals.env_autofonce_sh ) 0o755;
@@ -399,8 +362,8 @@ let start_check ter check =
   EzFile.write_text_file ( test_dir // check_sh ) check_content ;
   Unix.chmod (test_dir // check_sh ) 0o755 ;
   Unix.chdir test_dir ;
-  let checker_pid = EzCall.create_process
-      [ "timeout" ; "-k" ; "5s";  "30s"; "sh" ; "-c" ; "./" ^ check_sh ]
+  let checker_pid = EzCall.create_process_for_shell
+      [ "./" ^ check_sh ]
       ~stdout:check_stdout
       ~stderr:check_stderr
   in
@@ -492,6 +455,7 @@ let check_failures cer retcode =
         let expected_file = test_dir // expected in
         let expected_content = EzFile.read_text_file expected_file in
         if expected_content <> stdout_content then begin
+          assert (if true then false else false);
           let stdout_expected_file = stdout_file ^ ".expected" in
           EzFile.write_text_file stdout_expected_file expected_content ;
           MISC.command_ "diff -u %s %s > %s.diff"
@@ -517,17 +481,13 @@ let check_failures cer retcode =
   @
   compare check.check_stderr check_stderr "stderr"
 
-let create_state ~exec_args p suites =
+let create_state ~exec_args p tc suite =
   let state_run_dir = p.project_run_dir in
   Unix.chdir state_run_dir;
-  let ntests = ref 0 in
-  List.iter (fun (suite,_tc) ->
-      ntests := !ntests + suite.suite_ntests ;
-    ) suites;
   {
     state_args = exec_args ;
-    state_suites = suites ;
-
+    state_suite = suite ;
+    state_config = tc ;
     state_project = p ;
     state_run_dir ;
     state_status = "";
@@ -535,11 +495,10 @@ let create_state ~exec_args p suites =
     state_ntests_ran = 0 ;
     state_ntests_ok = 0 ;
     state_tests_failed = [] ;
-    state_ntests_failed = 0 ;
     state_tests_skipped = [] ;
     state_tests_failexpected = [] ;
     state_buffer = Buffer.create 10000;
-    state_ntests = !ntests ;
+    state_ntests = suite.suite_ntests ;
     state_nchecks = 0;
     state_status_printed = false ;
   }

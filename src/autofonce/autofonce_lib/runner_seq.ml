@@ -44,8 +44,6 @@ let rec exec_action_or_check ter action =
   | AF_COMMENT _
   | AT_XFAIL
   | AT_DATA _
-  | AF_DATA_COPY _
-  | AF_DATA_LINK _
   | AT_CAPTURE_FILE _
   | AT_CLEANUP _
   | AF_ENV _
@@ -87,8 +85,8 @@ and exec_check ter check =
         | actions ->
             List.iter (exec_action_or_check ter) actions
 
-let exec_test state t tc =
-  let ter = Runner_common.start_test state t tc in
+let exec_test state t =
+  let ter = Runner_common.start_test state t in
   state.state_status <- Printf.sprintf "running test %04d" t.test_id ;
   state.state_status_printed <- false;
   Runner_common.print_status state;
@@ -106,11 +104,11 @@ let exec_test state t tc =
   ()
 
 let exec_testsuite ~filter_args state =
-  Filter.select_tests ~args:filter_args ~state (fun t tc ->
+  let suite = state.state_suite in
+  Filter.select_tests ~args:filter_args ~state (fun t ->
       if t.test_banner <> state.state_banner then begin
         Runner_common.output state "%s" t.test_banner;
         state.state_banner <- t.test_banner
       end;
-      exec_test state t tc
-    ) state.state_suites
-
+      exec_test state t;
+    ) suite

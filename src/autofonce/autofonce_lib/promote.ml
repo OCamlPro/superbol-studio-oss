@@ -14,9 +14,8 @@ open EzCompat
 open Ez_file.V1
 open EzFile.OP
 
-module PATCH_LINES = Autofonce_patch.Patch_lines
-module PARSER = Autofonce_core.Parser
-
+module Patch_lines = Autofonce_patch.Patch_lines
+module Parser = Autofonce_core.Parser
 open Types
 
 (* TODO: Currently, we don't handle the use of `expout` and `experr`
@@ -28,20 +27,14 @@ open Types
    `AT_CHECK`, so that the user can use it if he wants.
 *)
 
-type promote_options = {
-  ignore_exitcode : bool ;
-  keep_old : bool ;
-  (* Only update iff the new exitcode is 0 *)
-  only_successful : bool ;
-}
 
-let print_actions o t b actions =
+let print_actions t ~ignore_exitcode ~keep_old b actions =
   let rec string_of_check check =
     let b = Buffer.create 1000 in
     Buffer.add_string b "AT_CHECK(";
     let check_dir = Runner_common.check_dir check in
     let check_prefix = check_dir // Runner_common.check_prefix check in
-    Printf.bprintf b "%s" ( PARSER.m4_escape check.check_command );
+    Printf.bprintf b "%s" ( Parser.m4_escape check.check_command );
     (* AT_CHECK can be used as a 'if', in which case either
        run-if-pass or run-if-fail is not empty. Otherwise,
        the check must pass after promotion.
@@ -52,33 +45,19 @@ let print_actions o t b actions =
     then begin
       (* We can promote these results *)
 
-      let new_retcode =
-        let check_exit = Printf.sprintf "%s.exit" check_prefix in
-        if Sys.file_exists check_exit then
-          let s = Globals.read_text_file_partial check_exit in
-          let retcode = int_of_string s in
-          Some retcode
-        else
-          None
-      in
-      let keep_old =
-        match o.only_successful, new_retcode with
-        | false, _ -> o.keep_old
-        | true, Some 0 -> o.keep_old
-        | true, _ ->
-            (* ignore failed tests if only-successful is set *)
-            true
-      in
-
       let retcode =
-        if o.ignore_exitcode || keep_old then check.check_retcode
+        if ignore_exitcode || keep_old then check.check_retcode
         else
           match check.check_retcode with
           | None -> None
           | Some old_retcode ->
-              match new_retcode with
-              | Some _ -> new_retcode
-              | None -> Some old_retcode
+              let check_exit = Printf.sprintf "%s.exit" check_prefix in
+              if Sys.file_exists check_exit then
+                let s = EzFile.read_text_file check_exit in
+                let retcode = int_of_string s in
+                Some retcode
+              else
+                Some old_retcode
       in
 
       let stdout =
@@ -89,7 +68,7 @@ let print_actions o t b actions =
               let check_stdout =
                 Printf.sprintf "%s.out.subst" check_prefix in
               if Sys.file_exists check_stdout then
-                let s = Globals.read_text_file_partial check_stdout in
+                let s = EzFile.read_text_file check_stdout in
                 Content s
               else
                 Content old_content
@@ -106,7 +85,7 @@ let print_actions o t b actions =
               let check_stderr =
                 Printf.sprintf "%s.err.subst" check_prefix in
               if Sys.file_exists check_stderr then
-                let s = Globals.read_text_file_partial check_stderr in
+                let s = EzFile.read_text_file check_stderr in
                 Content s
               else
                 Content old_content
@@ -140,7 +119,7 @@ let print_actions o t b actions =
       if nargs > 1 then begin
         match stdout with
         | Content content ->
-            let s = PARSER.m4_escape content in
+            let s = Parser.m4_escape content in
             if Buffer.length b + String.length s > 80 then
               Printf.bprintf b ",\n%s" s
             else
@@ -167,7 +146,7 @@ let print_actions o t b actions =
             Printf.bprintf b ", [%s]" file
         | Content "" -> ()
         | Content content ->
-            let s = PARSER.m4_escape content in
+            let s = Parser.m4_escape content in
             if Buffer.length b + String.length s > 80 then
               Printf.bprintf b ",\n%s" s
             else
@@ -195,7 +174,7 @@ let print_actions o t b actions =
             assert (file = "expout" || file = "experr");
             Printf.bprintf b ", [%s]" file
         | Content content ->
-            let s = PARSER.m4_escape content in
+            let s = Parser.m4_escape content in
             if Buffer.length b + String.length s > 80 then
               Printf.bprintf b ",\n%s" s
             else
@@ -232,22 +211,14 @@ let print_actions o t b actions =
     | AT_CLEANUP _ -> Printf.bprintf b "\nAT_CLEANUP";
     | AT_DATA { file ; content } ->
         Printf.bprintf b "AT_DATA(%s, %s)\n"
-          ( PARSER.m4_escape file )
-          ( PARSER.m4_escape content )
-    | AF_DATA_COPY { file ; dir=_; content_file } ->
-        Printf.bprintf b "AF_DATA_COPY(%s, %s)\n"
-          ( PARSER.m4_escape file )
-          ( PARSER.m4_escape content_file )
-    | AF_DATA_LINK { file ; dir=_; content_file } ->
-        Printf.bprintf b "AF_DATA_LINK(%s, %s)\n"
-          ( PARSER.m4_escape file )
-          ( PARSER.m4_escape content_file )
+          ( Parser.m4_escape file )
+          ( Parser.m4_escape content )
     | AF_ENV string ->
         Printf.bprintf b "AT_ENV(%s)\n"
-          ( PARSER.m4_escape string )
+          ( Parser.m4_escape string )
     | AT_CAPTURE_FILE string ->
         Printf.bprintf b "AT_CAPTURE_FILE(%s)\n"
-          ( PARSER.m4_escape string )
+          ( Parser.m4_escape string )
     | AT_XFAIL ->
         Printf.bprintf b "AT_XFAIL_IF([true])\n"
     | AT_SKIP ->
@@ -255,17 +226,17 @@ let print_actions o t b actions =
     | AT_FAIL _ ->
         Buffer.add_string b "AT_FAIL_IF([true])\n"
     | AT_XFAIL_IF { command ; _ } ->
-        Printf.bprintf b "AT_XFAIL_IF([%s])\n" ( PARSER.m4_escape command )
+        Printf.bprintf b "AT_XFAIL_IF([%s])\n" ( Parser.m4_escape command )
     | AT_SKIP_IF { command ; _ } ->
-        Printf.bprintf b "AT_SKIP_IF([%s])\n" ( PARSER.m4_escape command )
+        Printf.bprintf b "AT_SKIP_IF([%s])\n" ( Parser.m4_escape command )
     | AT_FAIL_IF { command ; _ } ->
-        Printf.bprintf b "AT_FAIL_IF([%s])\n" ( PARSER.m4_escape command )
+        Printf.bprintf b "AT_FAIL_IF([%s])\n" ( Parser.m4_escape command )
     | AF_COPY { files ; copy ; promote ; _ } ->
         if promote then
           Printf.bprintf b "AF_%s([%s])\n"
             (if copy then "COPY" else "LINK")
             ( String.concat "], ["
-                ( List.map PARSER.m4_escape files ))
+                ( List.map Parser.m4_escape files ))
     | AT_CHECK check ->
         Printf.bprintf b "\n%s\n" ( string_of_check check )
     | AF_COMMENT comment ->
@@ -282,7 +253,7 @@ let print_actions o t b actions =
           | None -> content
           | Some filename ->
               let dirname = Filename.dirname t.test_loc.file in
-              Globals.read_text_file_partial (Filename.concat dirname filename)
+              EzFile.read_text_file (Filename.concat dirname filename)
         in
         print_action b (AF_COMMENT comment);
         print_action b (AT_DATA { file ; content });

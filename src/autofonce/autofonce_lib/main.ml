@@ -47,7 +47,6 @@ let commands = [
   Command_regen.cmd ;
   Command_diff.cmd ;
   Command_promote.cmd ;
-  Command_summary.cmd ;
 ]
 
 let main () =

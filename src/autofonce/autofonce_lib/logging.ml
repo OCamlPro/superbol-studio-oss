@@ -94,7 +94,7 @@ let log_checks ?failed_check state ter =
         let filename = check_dir // file in
         if Sys.file_exists filename then begin
           log_header ~indent:6 state "File %s" file;
-          match Globals.read_text_file_partial filename with
+          match EzFile.read_text_file filename with
           | exception exn ->
               Printf.bprintf b "Exception while reading %S:\n  %s\n"
                 filename ( Printexc.to_string exn )
@@ -123,8 +123,6 @@ let log_checks ?failed_check state ter =
     | AF_COMMENT _
     | AF_COPY _
     | AT_DATA _
-    | AF_DATA_COPY _
-    | AF_DATA_LINK _
     | AF_ENV _
     | AT_CAPTURE_FILE _
     | AT_XFAIL
@@ -151,7 +149,7 @@ let log_captured_files ?indent ?dir state msg files =
   List.iter (fun file ->
       log_header ?indent state "%s: captured file %S" msg file ;
       let filename = dir // file in
-      match Globals.read_text_file_partial filename with
+      match EzFile.read_text_file filename with
       | exception exn ->
           Printf.bprintf b "Exception while reading %S:\n  %s\n"
             filename ( Printexc.to_string exn )
@@ -166,7 +164,6 @@ let log_failed_tests state msg tests =
   let b = state.state_buffer in
   List.iter (fun ter ->
       let t = ter.tester_test in
-      let tc = ter.tester_config in
       let test_dir = Runner_common.tester_dir ter in
 
       let (reason, failed_check) =
@@ -174,9 +171,8 @@ let log_failed_tests state msg tests =
         | None -> assert false
         | Some (_loc, reason, check ) -> reason, check
       in
-      log_header state "%s %s %04d %s (%s %s)"
-        msg ter.tester_config.config_name t.test_id
-        (Types.long_test_name t tc)
+      log_header state "%s %04d %s (%s %s)"
+        msg t.test_id t.test_name
         (PARSER.name_of_loc t.test_loc) reason;
 
       begin
@@ -188,18 +184,18 @@ let log_failed_tests state msg tests =
       end;
 
       Buffer.reset b1;
-      let o = Promote.{
-        ignore_exitcode = false ;
-        keep_old = true ;
-        only_successful = false ;
-      } in
-      Promote.print_actions o t b1 t.test_actions ;
+      Promote.print_actions
+        ~ignore_exitcode:false
+        ~keep_old:true
+        t b1 t.test_actions ;
       let s1 = Buffer.contents b1 in
       let f1 = test_dir // "test.at.expected" in
       EzFile.write_text_file f1 s1;
 
       Buffer.reset b2;
-      Promote.print_actions { o with keep_old = false }
+      Promote.print_actions
+        ~ignore_exitcode:false
+        ~keep_old:false
         t b2 t.test_actions ;
       let s2 = Buffer.contents b2 in
       let f2 = test_dir // "test.at.promoted" in
@@ -208,7 +204,7 @@ let log_failed_tests state msg tests =
       let test_at_diff = test_dir // "test.at.diff" in
       MISC.command_ "diff -u %s %s > %s"
         f1 f2 test_at_diff ;
-      let diff = Globals.read_text_file_partial test_at_diff in
+      let diff = EzFile.read_text_file test_at_diff in
 
       log_header ~indent:2 state "Expected test:";
       Printf.bprintf state.state_buffer "%s\n" s1;
@@ -234,14 +230,6 @@ let log_failed_tests state msg tests =
 
 let log_state_buffer state =
   let p = state.state_project in
-  let tests_dir = Autofonce_config.Globals.tests_dir in
-  let log_dir = MISC.getcwd () // tests_dir in
-
-  let buffer_file = log_dir // "results.summary" in
-  let buffer = Buffer.contents state.state_buffer in
-  EzFile.write_text_file buffer_file buffer;
-  Printf.eprintf "File %S created with failure results\n%!" buffer_file;
-
   log_failed_tests state "Failure"
     ( List.rev state.state_tests_failed ) ;
   log_failed_tests state "Expected Failure"
@@ -249,7 +237,9 @@ let log_state_buffer state =
   log_captured_files state "Project" p.project_captured_files;
 
   let buffer_file = match state.state_args.arg_output with
-    | None -> log_dir // "results.log"
+    | None ->
+        let tests_dir = Autofonce_config.Globals.tests_dir in
+        MISC.getcwd () // tests_dir // "results.log"
     | Some output -> output
   in
   let buffer = Buffer.contents state.state_buffer in

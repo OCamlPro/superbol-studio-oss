@@ -16,7 +16,3 @@ val m4_escape : ?can_quote:bool -> string -> string
 
 (* Read filename to get the corresponding testsuite *)
 val read : ?path:string list -> string -> Types.suite
-
-val ntests : unit -> int
-val reset_ntests : unit -> unit
-
