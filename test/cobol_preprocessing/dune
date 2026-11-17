@@ -12,7 +12,8 @@
           auto_sourceformat
           auto_sourceformat_rewind
           tabs
-          mf_comments)
+          mf_comments
+          read_errors)
  (preprocess
    (pps ppx_expect))
  (inline_tests

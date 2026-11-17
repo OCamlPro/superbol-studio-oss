@@ -62,6 +62,7 @@ module TYPES = struct
     mutable getcwd: unit -> string;
     (** [now ()] is the current time, in seconds since the epoch. *)
     mutable now: unit -> float;
+    (** Raises only [Sys_error] if the file cannot be read. *)
     mutable read_text_file : string -> string ;
     (** [read_text_file_in_path ~search_path filename] gives the path and
         contents of the first file named [filename] in [search_path] (or of

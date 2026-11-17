@@ -41,6 +41,7 @@ and unexpected_stuff =
   | Characters
   | Indicator_char of char
   | Indicator_string of string
+  | Line_number of string
   | Non_blank_area_A_on_continuation_line
   | Opening_alphanumeric_literal_delimiter of string
   | Tab_character_in_alphanum_literal
@@ -56,6 +57,8 @@ let pp_unexpected_stuff ppf = function
       Pretty.print ppf "indicator:@ `%c'" c
   | Indicator_string s ->
       Pretty.print ppf "indicator:@ `%s'" s
+  | Line_number n ->
+      Pretty.print ppf "line@ number@ `%s'@ (out@ of@ range)" n
   | Non_blank_area_A_on_continuation_line ->
       Pretty.print ppf "non-blank@ area@ A@ on@ continuation@ line"
   | Opening_alphanumeric_literal_delimiter str ->

@@ -20,6 +20,7 @@ type error =
   | Copybook_lookup_error of { copyloc: srcloc option;
                                lnf: Cobol_common.Copybook.TYPES.lookup_error }
   | Cyclic_copy of { copyloc: srcloc; filename: string }
+  | Unreadable_copybook of { copyloc: srcloc; filename: string; msg: string }
   | Feature_error of Cobol_config.DIAG.error
   | Forbidden of { loc: srcloc; stuff: forbidden_stuff }
   | Invalid of { loc: srcloc; stuff: invalid_stuff }
@@ -71,6 +72,7 @@ let error_loc = function
   | Literal_error e ->
       Some (Cobol_data.Error.loc e)
   | Cyclic_copy { copyloc = loc; _ }
+  | Unreadable_copybook { copyloc = loc; _ }
   | Forbidden { loc; _ }
   | Invalid { loc; _ }
   | Malformed { loc; _ }
@@ -143,6 +145,8 @@ let pp_error ppf = function
       Cobol_common.Copybook.pp_lookup_error ppf lnf
   | Cyclic_copy { filename; _ } ->
       Pretty.print ppf "Cyclic@ COPY@ of@ `%s'" filename
+  | Unreadable_copybook { filename; msg; _ } ->
+      Pretty.print ppf "Unable@ to@ read@ library@ `%s':@ %s" filename msg
   | Feature_error e ->
       Cobol_config.DIAG.pp_error ppf e
   | Forbidden { stuff; _ } ->
