@@ -7,7 +7,7 @@
   )
 
 )
-(dirs share src test vendors )
+(dirs share src test vendors import)
 
 ; Ignore ANSITerminal, that we vendor ourself in vendors/ANSITerminal:
 (subdir vendors

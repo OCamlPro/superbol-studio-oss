@@ -24,10 +24,10 @@ let diff args = Patch_lines.Diff { exclude = [ "^# promoted on .*" ]; args }
 let todo = ref (diff None)
 
 (* TODO: remove code duplication with Command_diff *)
-let patch_action ~filter_args ~exec_args ~action p tc suite =
+let patch_action ~filter_args ~exec_args ~action p suites =
   filter_args.arg_only_failed <- true ;
   Patch_lines.reset ();
-  let state = Runner_common.create_state ~exec_args p tc suite in
+  let state = Runner_common.create_state ~exec_args p suites in
   Unix.chdir state.state_run_dir ;
   (*
   let comment_line =
@@ -76,14 +76,18 @@ let patch_action ~filter_args ~exec_args ~action p tc suite =
               (Parser.m4_escape (String.concat " " list))
       end;
       Promote.print_actions
-        ~ignore_exitcode:exec_args.arg_ignore_exitcode
-        ~keep_old:true
+        {
+          ignore_exitcode = exec_args.arg_ignore_exitcode ;
+          keep_old = true ;
+          only_successful = false ;
+        }
         t b t.test_actions;
 
       let content = Buffer.contents b in
       Patch_lines.replace_block ~file ~line_first ~line_last content
   in
-  List.iter promote_test suite.suite_tests;
+  List.iter (fun (suite, _tc) ->
+      List.iter promote_test suite.suite_tests) suites;
   Patch_lines.commit_to_disk ~action ();
   ()
 
@@ -114,8 +118,8 @@ let cmd =
     "regen"
     (fun () ->
        let filter_args = get_filter_args () in
-       let p, tc, suite = Testsuite.find ( get_testsuite_args () ) in
-       patch_action ~filter_args ~exec_args ~action:!todo p tc suite
+       let p, suites = Testsuite.find ( get_testsuite_args () ) in
+       patch_action ~filter_args ~exec_args ~action:!todo p suites
     )
     ~args
     ~doc: "Regenerate tests from templates"

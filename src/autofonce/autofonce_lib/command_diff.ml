@@ -24,10 +24,10 @@ open Filter
 let diff args = Patch_lines.Diff { exclude = [ "^# promoted on .*" ]; args }
 let todo = ref (diff None)
 
-let patch_action ~filter_args ~exec_args ~action p tc suite =
+let patch_action ~filter_args ~exec_args ~action p suites =
   filter_args.arg_only_failed <- true ;
   Patch_lines.reset ();
-  let state = Runner_common.create_state ~exec_args p tc suite in
+  let state = Runner_common.create_state ~exec_args p suites in
   Unix.chdir state.state_run_dir ;
   (*
   let comment_line =
@@ -41,7 +41,7 @@ let patch_action ~filter_args ~exec_args ~action p tc suite =
       tm.tm_min
   in
 *)
-  let promote_test t =
+  let promote_test t _tc =
     let file = t.test_loc.file in
     Printf.eprintf "Promoting test %d %s\n%!"
       t.test_id ( Parser.name_of_loc t.test_loc );
@@ -65,14 +65,17 @@ let patch_action ~filter_args ~exec_args ~action p tc suite =
             (Parser.m4_escape (String.concat " " list))
     end;
     Promote.print_actions
-      ~ignore_exitcode:exec_args.arg_ignore_exitcode
-      ~keep_old:false
+      {
+        ignore_exitcode = exec_args.arg_ignore_exitcode ;
+        keep_old = false ;
+        only_successful = exec_args.arg_only_successful ;
+      }
       t b t.test_actions;
 
     let content = Buffer.contents b in
     Patch_lines.replace_block ~file ~line_first ~line_last content
   in
-  Filter.select_tests ~args:filter_args ~state promote_test suite;
+  Filter.select_tests ~args:filter_args ~state promote_test suites;
 
   Patch_lines.commit_to_disk ~action ();
   ()
@@ -105,8 +108,8 @@ let cmd =
     "diff"
     (fun () ->
        let filter_args = get_filter_args () in
-       let p, tc, suite = Testsuite.find ( get_testsuite_args () ) in
-       patch_action ~filter_args ~exec_args ~action:!todo p tc suite
+       let p, suites = Testsuite.find ( get_testsuite_args () ) in
+       patch_action ~filter_args ~exec_args ~action:!todo p suites
     )
     ~args
     ~doc: "Display difference between tests results and expected results"

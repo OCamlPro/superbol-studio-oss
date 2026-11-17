@@ -27,8 +27,8 @@ let cmd =
     (fun () ->
        try
          let filter_args = get_filter_args () in
-         let (p, tc, suite) = Testsuite.find ( get_testsuite_args () ) in
-         let n = Testsuite.exec ~filter_args ~exec_args p tc suite in
+         let (p, suites) = Testsuite.find ( get_testsuite_args () ) in
+         let n = Testsuite.exec ~filter_args ~exec_args p suites in
          if n > 0 then exit 1
        with
          exn ->

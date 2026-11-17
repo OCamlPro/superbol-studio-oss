@@ -14,7 +14,7 @@ val check_dir : Types.check -> string
 val create_state :
   exec_args:Types.exec_args ->
   Types.project_config ->
-  Types.testsuite_config -> Types.suite -> Types.state
+  (Types.suite * Types.testsuite_config) list -> Types.state
 val check_prefix : Types.check -> string
 val test_dir : Types.test -> string
 val test_is_ok : Types.tester -> unit
@@ -32,7 +32,7 @@ val exec_action_no_check : Types.tester -> Types.action -> unit
 val test_is_skip : Types.tester -> unit
 
 val check_failures : Types.checker -> int -> string list
-val start_test : Types.state -> Types.test -> Types.tester
+val start_test : Types.state -> Types.test -> Types.testsuite_config -> Types.tester
 val start_check : Types.tester -> Types.check -> Types.checker
 val tester_dir : Types.tester -> string
 val test_is_failed :

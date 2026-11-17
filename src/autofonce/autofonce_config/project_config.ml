@@ -18,12 +18,19 @@ open Types
 
 module Misc = Autofonce_misc.Misc
 
-let get_string ~prefix ~file table suffix =
+let get_field get ~prefix ~file ?default table suffix =
   try
-    EzToml.get_string table suffix
+     get table suffix
   with Not_found ->
-    Misc.error "Missing key %s in file %s"
-      ( String.concat "." ( prefix @ suffix ) ) file
+  match default with
+  | None ->
+      Misc.error "Missing key %s in file %s"
+        ( String.concat "." ( prefix @ suffix ) ) file
+  | Some default -> default
+
+let get_string = get_field EzToml.get_string
+(* let get_bool = get_field EzToml.get_bool *)
+let get_int = get_field EzToml.get_int
 
 let find_dir_by_anchor ?cwd anchors =
   let cwd = match cwd with
@@ -171,20 +178,33 @@ let parse_table
          let t =
            match value with
            | EzToml.TYPES.TString file ->
+               let dirname = Filename.dirname file in
                {
                  config_name ;
+                 config_desc = "";
+                 config_keywords = [];
+                 config_level = 0 ;
                  config_file = file ;
-                 config_path = [ Filename.dirname file // "testsuite.src" ];
+                 config_path = [ dirname ; dirname // "testsuite.src" ];
                  config_env = find_env ~config_name "testsuite" ;
                }
            | EzToml.TYPES.TTable table ->
                let prefix = [ "testsuites" ; config_name ] in
+               let config_desc = get_string
+                   ~default:"" ~file ~prefix table [ "desc" ] in
+               let config_level =
+                 get_int ~default:0 ~file ~prefix table [ "level" ] in
                let config_file = get_string ~file ~prefix table [ "file" ] in
                let config_env = get_string ~file ~prefix table [ "env" ] in
                let config_path = EzToml.get_string_list_default
                    table [ "path" ] [] in
+               let config_keywords = EzToml.get_string_list_default
+                   table [ "keywords" ] [] in
                {
                  config_name ;
+                 config_desc ;
+                 config_keywords ;
+                 config_level ;
                  config_file ;
                  config_path ;
                  config_env = find_env ~config_name config_env;
@@ -205,6 +225,12 @@ let parse_table
       [ "project" ; "name" ] in
   let project_run_from = EzToml.get_string_default table
       [ "project" ; "run_from" ] "build" in
+  let project_checker = try
+      Some ( EzToml.get_string table [ "project" ; "checker" ] )
+    with _ -> None in
+  let project_default = try
+      [ EzToml.get_string table [ "project" ; "default" ] ]
+    with _ -> [] in
   let project_run_from = match project_run_from with
     | "build" -> Build_dir
     | "source" -> Source_dir
@@ -228,6 +254,8 @@ let parse_table
     project_testsuites ;
     project_envs ;
     project_captured_files ;
+    project_checker ;
+    project_default ;
 
     (* computed *)
     project_file ;
@@ -311,12 +339,24 @@ let to_string p =
       | Source_dir -> "source"
       | Config_dir -> "config" ) ;
   Buffer.add_char b '\n';
+  begin
+    match p.project_checker with
+    | None ->
+        Printf.bprintf b "# checker = \"/some/checking/script.sh\"\n"
+    | Some checker ->
+        Printf.bprintf b "checker = %S\n" checker
+  end;
 
   Printf.bprintf b "[testsuites]\n" ;
   Buffer.add_string b {|# alias = "path-from-topdir"|} ;
   Buffer.add_char b '\n' ;
   List.iter (fun t ->
       Printf.bprintf b "[testsuites.%s]\n" t.config_name ;
+      Printf.bprintf b "desc = %S\n" t.config_desc ;
+      Printf.bprintf b "default = %d\n" t.config_level ;
+      Printf.bprintf b "keywords = [%s]\n"
+        ( String.concat ", "
+            ( List.map (Printf.sprintf " %S") t.config_keywords) ) ;
       Printf.bprintf b "file = %S\n" t.config_file ;
       Printf.bprintf b "path = [%s]\n"
         ( String.concat ", "

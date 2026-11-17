@@ -27,22 +27,25 @@ type exec_args = {
   mutable arg_keep_skipped : bool ;
   mutable arg_keep_all : bool ;
   mutable arg_output : string option ; (* full path to results.log *)
-
+  mutable arg_only_successful : bool ;
+  (* timeout in seconds for each check, 0 = no timeout,
+     None = default (30s if a GNU [timeout] command is available, 0 otherwise) *)
+  mutable arg_timeout : int option ;
 }
 
 (* imperative context, these values are meaningless at the end of
    functions *)
 type state = { (* variable name is `state` *)
   state_args : exec_args ;
-  state_suite : suite ;
+  state_suites : (suite * testsuite_config) list ;
   state_run_dir : string ;
-  state_config : testsuite_config ;
   state_project : project_config ;
   mutable state_banner : string ;
   mutable state_status : string ;
   mutable state_ntests_ran : int ;
   mutable state_ntests_ok : int ;
   mutable state_tests_failed : tester list ;
+  mutable state_ntests_failed : int ;
   mutable state_tests_skipped : tester list ;
   mutable state_tests_failexpected : tester list ;
   mutable state_buffer : Buffer.t ;
@@ -55,6 +58,7 @@ and tester = { (* variable name is `ter` *)
   tester_state : state ;
   tester_suite : suite ;
   tester_test : test ;
+  tester_config : testsuite_config ;
   mutable tester_renvs : string list ;
   mutable tester_fail_expected : bool ;
   mutable tester_captured_files : StringSet.t ;
@@ -67,3 +71,8 @@ and checker = { (* variable name is `cer` *)
   checker_tester : tester ;
   checker_pid : int ;
 }
+
+type suites = (suite * testsuite_config) list
+
+let long_test_name t tc =
+  Printf.sprintf "%s:%s" tc.config_name t.test_name
