@@ -17,11 +17,9 @@ let preproc ?source_format ?copybooks ?(filename = "prog.cob") contents =
   Cobol_preproc.preprocessor
     ~options:(Prog_preproc.options ~verbose:false ?source_format ?copybooks ())
 
-let options
-    ?(verbose = false)
-    ?(exec_scanners = Superbol_preprocs.exec_scanners) () =
+let options ?(verbose = false) () =
   {
-    (Cobol_parser.Options.default ~exec_scanners) with
+    Cobol_parser.Options.default with
     verbose;
     recovery = EnableRecovery { silence_benign_recoveries = true }
   }

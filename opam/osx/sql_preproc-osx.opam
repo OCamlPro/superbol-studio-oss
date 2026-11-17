@@ -51,7 +51,8 @@ install: [
 depends: [
   "ocaml" {>= "4.14.2"}
   "dune" {>= "3.17.0"}
-  "superbol_preprocs-osx" {= version}
+  "sql_parser-osx" {= version}
+  "sql_ast-osx" {= version}
   "ppx_deriving-osx" {>= "5.2.1"}
   "ez_file-osx" {>= "0.3"}
   "cobol_unit-osx" {= version}

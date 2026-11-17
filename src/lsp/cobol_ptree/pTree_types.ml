@@ -15,6 +15,7 @@
     strings. *)
 
 include Common
+include Exec_blocks
 include Alphanums
 include Numericals
 include Terms

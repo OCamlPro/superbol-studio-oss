@@ -75,6 +75,7 @@ let
 
     propagatedBuildInputs = with ocamlPackages; [
       cobol_common
+      sql_ast
     ];
   };
 
@@ -165,6 +166,7 @@ let
       cobol_ptree
       cobol_preproc
       cobol_unit
+      sql_parser
 
       menhirSdk
     ];
@@ -226,19 +228,7 @@ let
 
     propagatedBuildInputs = with ocamlPackages; [
       sql_ast
-      cobol_parser
-    ];
-  };
-
-  superbol_preprocs = ocamlPackages.buildDunePackage {
-    pname = "superbol_preprocs";
-    inherit version src;
-
-    minimalOcamlVersion = "4.14";
-    duneVersion = "3";
-
-    propagatedBuildInputs = with ocamlPackages; [
-      sql_parser
+      cobol_preproc
     ];
   };
 
@@ -296,7 +286,6 @@ let
 
     propagatedBuildInputs = with ocamlPackages; [
       superbol_project
-      superbol_preprocs
       cobol_cfg
       cobol_indent
       toml
@@ -388,7 +377,6 @@ in
     superbol_project
     ezr_toml
     ez_toml
-    superbol_preprocs
     sql_parser
     sql_ast
     cobol_cfg

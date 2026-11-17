@@ -58,6 +58,7 @@ cobol_preproc = "version"
 cobol_ptree = "version"
 ebcdic_lib = "version"
 ez_file = ">=0.3"
+sql_parser = "version"
 [dependencies.menhirLib]
 libname = "menhirLib"
 version = ">=20231231 <20240715"

@@ -669,7 +669,7 @@ and statement =
   | Enter of Cobol_ptree.enter_stmt
   | Entry of entry_stmt
   | Evaluate of evaluate_stmt
-  | ExecBlock of Cobol_common.Exec_block.t
+  | ExecBlock of Cobol_ptree.exec_block
   | Exit of exit_stmt
   | Free of data_reference list
   | Generate of Cobol_ptree.qualname with_loc

@@ -255,27 +255,16 @@ let ptree_element_at_position ~filename pos group =
     method! fold_exec_block' exec_block acc =
       Visitor.skip_children @@
       match exec_block.payload with
-      | Superbol_preprocs.Generic.Generic_exec_block _ ->
-          acc
-      | Superbol_preprocs.Esql.Esql_exec_block esql ->
-          let cob_var_extractor_folder = object
-            (* TODO: also use a sieve *)
-            inherit [Sql_ast.cobolVarId list] Sql_ast.Visitor.folder
-            method! fold_cobol_var_id cob_var acc =
-              Visitor.skip (cob_var::acc)
-          end in
-          let cobol_vars =
-            Sql_ast.Visitor.fold_esql_instruction cob_var_extractor_folder
-              esql []
-          in
+      | Cobol_ptree.Esql esql ->
+          (* TODO: also use a sieve *)
           let string_name_opt = List.find_opt begin fun cobol_var_id ->
               Lsp_position.is_in_srcloc ~filename pos ~@cobol_var_id
-            end cobol_vars
+            end (Sql_ast.cobol_vars esql)
           in
           (match string_name_opt with
            | Some name -> on_data_name (Name name) acc
            | None -> acc)
-      | _ ->                        (* unknow/unimplemented kind of EXEC block *)
+      | Cobol_ptree.Unparsed _ ->
           acc
 
   end group init

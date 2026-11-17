@@ -56,7 +56,6 @@ depends: [
   "ez_file-osx" {>= "0.3"}
   "ebcdic_lib-osx" {= version}
   "cobol_preproc-osx" {= version}
-  "cobol_parser-osx" {= version}
   "cobol_common-osx" {= version}
   "ppx_deriving" {>= "5.2.1"}
   "menhir" {>= "20230415"}

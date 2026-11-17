@@ -11,26 +11,23 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type Cobol_common.Exec_block.TYPES.exec_block +=   (* TEMPORARY, for testing. *)
-  | Generic_exec_block of Cobol_preproc.Text.t
+open Cobol_common.Srcloc.TYPES
 
-let () =
-  Cobol_common.Exec_block.register_exec_block_type
-    ~name:"GENERIC-EXEC-BLOCK"
-    ~compare:begin fun a b -> match a, b with
-      | Generic_exec_block a, Generic_exec_block b ->
-          Some ((* FIXME: text comparison *)Stdlib.compare a b)
-      | _ ->
-          None
-    end
-    ~pp:begin function
-      | Generic_exec_block a ->
-          Some (Pretty.delayed "%a" Cobol_preproc.Text.pp_text a)
-      | _ ->
-          None
-    end
+(** Contents of EXEC/EXECUTE ... END-EXEC blocks.
 
-let scanner =
-  Cobol_parser.Options.Stateless_exec_scanner begin fun text ->
-    Generic_exec_block text, []
-  end
+    Note this type is closed on purpose (instead of extensible), so that its
+    values can be marshalled (e.g, into caches), and still be matched against
+    after unmarshalling. *)
+type exec_block =
+  | Esql of Sql_ast.esql_instruction
+  | Unparsed of exec_text   (** non-SQL blocks, as their words
+                                (including "EXEC" and "END-EXEC") *)
+and exec_text = string with_loc list
+[@@deriving ord]
+
+let pp_exec_text: exec_text Pretty.printer =
+  Fmt.(list ~sep:sp (using (fun { payload; _ } -> payload) string))
+
+let pp_exec_block ppf = function
+  | Esql esql -> Sql_ast.Printer.pp ppf esql
+  | Unparsed text -> pp_exec_text ppf text

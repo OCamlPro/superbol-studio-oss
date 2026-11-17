@@ -71,7 +71,6 @@ lwt = ">=5 <5.9"
 sql_preproc = "version"
 superbol_cache = "version"
 superbol_platform = "version"
-superbol_preprocs = "version"
 vscode-json = "version"
 [dependencies.ez_api]
 libname = "ez_api.encoding"

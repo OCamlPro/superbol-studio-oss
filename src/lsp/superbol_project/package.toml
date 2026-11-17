@@ -65,7 +65,6 @@ ocplib_stuff = "0.4.0"
 pretty = "version"
 superbol_cache = "version"
 superbol_platform = "version"
-superbol_preprocs = "version"
 
 # package tools dependencies
 [tools]

@@ -339,11 +339,11 @@ let pp_report_group_item ppf { report_level; report_data_name;
     report_level report_data_name report_group_clauses
 
 type exec_declarations =
-  Cobol_common.Exec_block.t
+  Exec_blocks.exec_block
 [@@deriving ord]
 
 let pp_exec_declarations ppf =
-  Fmt.fmt "%a." ppf Cobol_common.Exec_block.pp
+  Fmt.fmt "%a." ppf Exec_blocks.pp_exec_block
 
 (* --- *)
 

@@ -175,7 +175,7 @@ let parser_options ?(overrides = no_overrides) project =
   let { config; _ } = with_overrides ~overrides project in
   let options =
     Cobol_parser.Options.{
-      (default ~exec_scanners:Superbol_preprocs.exec_scanners) with
+      default with
       recovery = EnableRecovery { silence_benign_recoveries = true };
       config = config.cobol_config;
     }
@@ -186,10 +186,9 @@ let parser_options ?(overrides = no_overrides) project =
     show = Option.value overrides.override_show ~default:options.show }
 
 (* Describes the choices made in the functions above that are not part of the
-   project configuration: [exec_scanners] is a function, so the options cannot
-   be digested as they are.  To be changed along with any of these choices. *)
+   project configuration.  To be changed along with any of these choices. *)
 let options_signature =
-  "exec-scanners=superbol_preprocs;recovery=silence-benign"
+  "exec-blocks=closed;recovery=silence-benign"
 
 let parse parse_fun ~platform ?overrides ~filename ~contents project =
   parse_fun
@@ -202,7 +201,6 @@ let typecheck ?overrides ~parsing_diags project parsed =
   let { config; _ } = with_overrides ?overrides project in
   let Cobol_typeck.Results.{ result = checked; diags = typeck_diags } =
     Cobol_typeck.compilation_group parsed
-      ~fold_exec_block':Superbol_preprocs.Esql.fold_exec_block'
       ~options:(Cobol_typeck.Config.from_cobol_config config.cobol_config
                   ~target_byte_order:Hardcoded_assumptions.machine_byte_order)
   in

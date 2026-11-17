@@ -51,6 +51,7 @@ install: [
 depends: [
   "ocaml" {>= "4.14.2"}
   "dune" {>= "3.17.0"}
+  "sql_parser-osx" {= version}
   "menhirLib-osx" {>= "20231231" & < "20240715"}
   "ez_file-osx" {>= "0.3"}
   "ebcdic_lib-osx" {= version}

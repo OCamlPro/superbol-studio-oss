@@ -46,7 +46,6 @@ type 'a state
 val init
   : ?verbose: bool
   -> ?show_if_verbose: [> `Tks | `Ctx] list
-  -> exec_scanners: Parser_options.exec_scanners
   -> memory: 'a memory
   -> intrinsics: StringSet.t
   -> ?default_intrinsics: StringSet.t

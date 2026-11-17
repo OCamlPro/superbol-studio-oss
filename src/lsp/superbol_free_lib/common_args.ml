@@ -288,8 +288,7 @@ let get () =
                               ~libexts:!libexts;
                           env };
       analysis_overrides;
-      parser_options = { config; recovery; verbose; show = !show;
-                         exec_scanners = Superbol_preprocs.exec_scanners };
+      parser_options = { config; recovery; verbose; show = !show };
       progress_display;
       pretty_progress = fun fmt -> pretty_progress progress_display fmt }
   in
