@@ -153,6 +153,13 @@ let enforceable_area_a (type k) : k source_format -> bool = function
   | _ -> false
 
 (* --- *)
+
+let mf_comment_applies (type k) : k source_format -> bool = function
+  | FixedIndic, FixedWidth p ->
+      p = fixed_paging || p = cobol85_paging || p = variable_paging
+  | _ -> false
+
+(* --- *)
 let default_tab_stops = Cobol_common.Tab_stops.default
 let next_tab_stop = Cobol_common.Tab_stops.next_stop
 

@@ -58,6 +58,12 @@ let config_string key ~config =
   try Jsonoo.Decode.string @@ Hashtbl.find config key
   with Not_found -> Superbol_config.string key
 
+let config_bool key ~config ~ok args =
+  match Jsonoo.Decode.bool @@ Hashtbl.find config key with
+  | exception Not_found when Superbol_config.bool key -> ok args
+  | exception (Not_found | Jsonoo.Decode_error _) -> args
+  | b -> if b then ok args else args
+
 let config_strings key ~config ~append =
   append @@
   try Jsonoo.Decode.(list string) @@ Hashtbl.find config key
@@ -159,6 +165,8 @@ let cobc_execution ?config attributes =
       end|>
     config_string "cobol.sourceFormat" ~config
       ~append:(fun f -> List.cons ("-fformat=" ^ f)) |>
+    config_bool "cobol.mfComment" ~config
+      ~ok:(List.cons "-fmfcomment") |>
     attr_bool_flag "forDebug" ~attributes
       ~ok:(List.append debug_args) |>
     attr_bool_flag "forCoverage" ~attributes

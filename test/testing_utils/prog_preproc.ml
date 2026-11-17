@@ -33,6 +33,7 @@ let options
     ?(source_format = Cobol_config.(SF SFFixed))
     ?(copybooks = [])
     ?tab_stops
+    ?(mf_comments = false)
     () =
   let platform =
       { Prog_common.platform with verbosity = if verbose then 1 else 0 }
@@ -58,21 +59,24 @@ let options
   let defaults = Cobol_preproc.Options.default ~platform in
   { defaults with
     source_format;
+    mf_comments;
     config = match tab_stops with
       | None -> defaults.config
       | Some widths -> config_with_tab_stops widths }
 
 let preprocess
     ?verbose ?(filename = "prog.cob") ?source_format ?copybooks ?tab_stops
-    contents =
+    ?mf_comments contents =
   Cobol_preproc.Outputs.show_n_forget ~ppf:Fmt.stdout @@
   Cobol_preproc.preprocess_input
-    ~options:(options ?verbose ?source_format ?copybooks ?tab_stops ()) @@
+    ~options:(options ?verbose ?source_format ?copybooks ?tab_stops
+                ?mf_comments ()) @@
   Cobol_preproc.Input.string ~filename contents
 
-let show_text ?verbose ?(filename = "prog.cob") ?source_format ?tab_stops
-    contents =
-  let options = options ?verbose ?source_format ?tab_stops () in
+let show_text ?verbose ?(filename = "prog.cob") ?source_format ?copybooks
+    ?tab_stops ?mf_comments contents =
+  let options =
+    options ?verbose ?source_format ?copybooks ?tab_stops ?mf_comments () in
   let text =
     Cobol_preproc.Outputs.show_n_forget ~ppf:Fmt.stdout @@
     Cobol_preproc.text_of_input ~options @@

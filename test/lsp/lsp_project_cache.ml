@@ -117,6 +117,8 @@ let%expect_test "a dialect given as a .conf file survives the round trip from/to
               copyexts = [ "cpy", "cbl", "cob" ]
               #Directories that hold no source file to consider in project-wide operations: names of directories (anywhere in the project), or paths relative to the project root
               exclude-dirs = [ "_build", "_opam", "node_modules" ]
+              #Treat lines with an asterisk in the first column as comments in FIXED, COBOL85, and VARIABLE source formats (like GnuCOBOL's `-fmfcomment`)
+              mf-comment = false
               #Where to find copybooks
               [[cobol.copybooks]]
               file-relative = false

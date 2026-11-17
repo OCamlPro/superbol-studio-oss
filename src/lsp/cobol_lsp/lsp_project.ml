@@ -242,6 +242,12 @@ let update_exclude_dirs: t -> Yojson.Safe.t -> bool = fun { config; _ } json ->
     Yojson.Safe.Util.(Type_error _ | Undefined _) as e ->
       Pretty.invalid_arg "%s: %a" (Yojson.Safe.to_string json) Fmt.exn e
 
+let update_mf_comment: t -> Yojson.Safe.t -> bool = fun { config; _ } json ->
+  match json with
+  | `Bool mf_comment when mf_comment = config.mf_comment -> false
+  | `Bool mf_comment -> config.mf_comment <- mf_comment; true
+  | _ -> Pretty.invalid_arg "%s" (Yojson.Safe.to_string json)
+
 (** [update_project_config assoc project] updates the configuration of [project]
     according to key/value paires in [assoc]; returns [true] whenever the
     configuration upon termination differs from the configuration upon call. *)
@@ -271,6 +277,7 @@ let update_project_config
     "copybooks", update_copybooks;
     "copyexts", update_copyexts;
     "excludeDirs", update_exclude_dirs;
+    "mfComment", update_mf_comment;
   ]
 
 
@@ -330,6 +337,9 @@ let get_project_config ?(flat = true) project : Yojson.Safe.t =
 
       "excludeDirs",
       `List (List.map (fun s -> `String s) config.exclude_dirs);
+
+      "mfComment",
+      `Bool config.mf_comment;
     ]
   in
   if flat

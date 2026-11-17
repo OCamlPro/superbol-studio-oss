@@ -63,3 +63,7 @@ val guess_from: contents_prefix: string -> Cobol_config.source_format
 val comment_entry_termination: _ source_format -> comment_entry_termination
 val first_area_b_column: _ source_format -> int option
 val enforceable_area_a: _ source_format -> bool
+
+(** Holds for FIXED, COBOL85, and VARIABLE formats, where MF-style comment
+    lines may be recognized (see {!Src_options.t}). *)
+val mf_comment_applies: _ source_format -> bool

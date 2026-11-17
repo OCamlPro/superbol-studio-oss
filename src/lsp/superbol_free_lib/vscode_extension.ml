@@ -414,6 +414,16 @@ let configuration =
       ~default:Superbol_project.Config.default_exclude_dirs
       ~order:6;
 
+    Manifest.PROPERTY.bool "superbol.cobol.mfComment"
+      ~title:"Micro Focus-style Comment Lines"
+      ~markdownDescription:
+        (with_superbol_toml_note
+           "Treat lines with an asterisk (`*`) in the first column as \
+            comments in `fixed`, `cobol85`, and `variable` source formats \
+            (like GnuCOBOL's `-fmfcomment`).")
+      ~default:Superbol_project.Config.default_mf_comment
+      ~order:7;
+
     (* Paths *)
 
     Manifest.PROPERTY.string "superbol.cobcPath"

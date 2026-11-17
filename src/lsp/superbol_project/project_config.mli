@@ -31,6 +31,8 @@ module TYPES: sig
     mutable indent_config: (string * int) list;
     mutable exclude_dirs: string list;
     (** See {!excludes_dir}. *)
+    mutable mf_comment: bool;
+    (** See {!Cobol_preproc.Src_options.t}. *)
     mutable source_encoding: Cobol_common.Text_encoding.t option;
     (** Encoding that source files read from disk are decoded with (see
         {!Project.decode_source}).  Not saved in the configuration file: the
@@ -53,6 +55,9 @@ val new_default: unit -> t
 
 (** Default value of the [exclude-dirs] setting (see {!excludes_dir}). *)
 val default_exclude_dirs: string list
+
+(** Default value of the [mf-comment] setting. *)
+val default_mf_comment: bool
 
 (** [load_file ~verbose config_filename] loads the given project configuration
     file.  Raises {!ERROR} or [Sys_error] in case of failure. *)

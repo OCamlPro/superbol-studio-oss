@@ -11,7 +11,8 @@
           alphanums_with_utf8
           auto_sourceformat
           auto_sourceformat_rewind
-          tabs)
+          tabs
+          mf_comments)
  (preprocess
    (pps ppx_expect))
  (inline_tests

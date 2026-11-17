@@ -13,7 +13,10 @@
 
 type 'k state
 
-val init_state: ?tab_stops:int list -> 'k Src_format.source_format -> 'k state
+val init_state
+  : ?options:Src_options.t
+  -> 'k Src_format.source_format
+  -> 'k state
 val diagnostics: _ state -> Src_diagnostics.t
 val rev_comments: _ state -> Text.comments
 val rev_ignored: _ state -> Cobol_common.Srcloc.lexloc list
@@ -22,6 +25,10 @@ val source_format: 'k state -> 'k Src_format.source_format
 val change_source_format
   : 'k state -> 'c Src_format.source_format -> ('c state, unit) result
 val allow_debug: 'a state -> bool
+
+(** Holds when MF-style comment lines are to be recognized in the current
+    source format. *)
+val mf_comments: 'a state -> bool
 val flush: 'a state -> 'a state * Text.text
 val flush_continued: ?force:bool -> 'a state -> 'a state
 val eof: 'a state -> Lexing.lexbuf -> 'a state

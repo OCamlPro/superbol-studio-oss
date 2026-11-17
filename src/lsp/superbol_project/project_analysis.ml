@@ -104,6 +104,7 @@ type overrides =
   {
     override_cobol_config: (Cobol_config.t * string) option;
     override_source_format: Cobol_config.source_format_spec option;
+    override_mf_comment: bool option;
     override_libpath: string list;
     override_libexts: string list;
     override_env: Cobol_preproc.Env.t;
@@ -115,6 +116,7 @@ let no_overrides =
   {
     override_cobol_config = None;
     override_source_format = None;
+    override_mf_comment = None;
     override_libpath = [];
     override_libexts = [];
     override_env = Cobol_preproc.Env.empty;
@@ -126,10 +128,11 @@ let no_overrides =
    it, so that everything that derives from it (copybook detection and lookup,
    cache keys) sees them. *)
 let with_overrides ?(overrides = no_overrides) ({ config; _ } as project) =
-  let { override_cobol_config; override_source_format;
+  let { override_cobol_config; override_source_format; override_mf_comment;
         override_libpath; override_libexts; _ } = overrides in
   if Option.is_none override_cobol_config &&
      Option.is_none override_source_format &&
+     Option.is_none override_mf_comment &&
      override_libpath = [] && override_libexts = []
   then project
   else
@@ -145,6 +148,8 @@ let with_overrides ?(overrides = no_overrides) ({ config; _ } as project) =
           (if override_source_format = None
            then config.source_format_by_extension
            else []);
+        mf_comment =
+          Option.value override_mf_comment ~default:config.mf_comment;
         libpath =
           config.libpath @
           List.map (fun dir -> RelativeToProjectRoot dir) override_libpath;
@@ -164,6 +169,7 @@ let preproc_options ~platform ?overrides ~filename project =
       Project.copybook_lookup_config_for ~filename project;
     config = config.cobol_config;
     source_format = Project_config.source_format_for ~filename config;
+    mf_comments = config.mf_comment;
     env = (Option.value overrides ~default:no_overrides).override_env;
   }
 
@@ -269,6 +275,7 @@ let config_inputs ?(overrides = no_overrides) project =
        Cobol_config.dialect config.cobol_config,
        config.source_format,
        config.source_format_by_extension,
+       config.mf_comment,
        config.libpath,
        config.libexts,
        Option.map snd overrides.override_cobol_config,
