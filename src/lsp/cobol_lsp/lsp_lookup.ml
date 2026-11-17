@@ -164,6 +164,10 @@ let init =
     context = Data_decls;                           (* does not really matter *)
   }
 
+let is_in_srcloc ~filename pos loc =
+  try Lsp_position.is_in_srcloc ~filename pos loc
+  with Invalid_argument _ -> false                              (* dummy loc *)
+
 let ptree_element_at_position ~filename pos group =
   let enter_context context ({ context = prev_context; _ } as acc) =
     Visitor.do_children_and_then { acc with context }
@@ -220,6 +224,25 @@ let ptree_element_at_position ~filename pos group =
           on_data_full_name qn acc
       | Procedure _ ->            (* for now, no more info, data-name expected *)
           on_data_name qn acc
+
+    method! fold_data_reference { resolved_name = qn; resolved } acc =
+      (* The resolved item tells which item the qualifier at [pos] designates,
+         even if its name is ambiguous on its own (e.g, [B] in [A IN B]). *)
+      let qn_at_pos = qualname_at_pos ~filename ~&qn pos in
+      let full_qn_at_pos = match resolved with
+        | Ok def when is_in_srcloc ~filename pos ~@qn ->
+            Option.bind (Cobol_data.Item.def_qualname def) @@ fun full ->
+            Cobol_unit.Qual.qualifier_full_qn ~&qn ~full qn_at_pos
+        | _ ->
+            None
+      in
+      match full_qn_at_pos, qn_at_pos with
+      | None, _ ->
+          Visitor.do_children acc
+      | Some full_qn, (Name n | Qual (n, _)) ->
+          (* keep the location of the name at [pos] (e.g, for hover ranges) *)
+          Visitor.skip_children @@
+          on_data_full_name Cobol_unit.Qual.(qual n (qual_of full_qn)) acc
 
     method! fold_record_reference { resolved_name; _ } acc =
       let qn = qualname_at_pos ~filename (Name resolved_name) pos in

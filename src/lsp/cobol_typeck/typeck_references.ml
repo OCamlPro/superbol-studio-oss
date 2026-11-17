@@ -34,28 +34,61 @@ let baseloc_of_qualname: Cobol_ptree.qualname -> srcloc = function
   | Name name
   | Qual (name, _) -> ~@name
 
+let register_data_qualref ~loc full_qn acc =
+  { acc with refs = Typeck_outputs.register_data_qualref ~loc full_qn acc.refs }
+
+(** Registers the references to the qualifiers of [qn], e.g, [A] in [B IN A]
+    (see {!Typeck_outputs.references_in_unit}).  Qualifiers are looked up in
+    [full_qn], the fully qualified name of the item that [qn] references, if
+    known; otherwise, they are resolved on their own, and silently ignored if
+    this resolution fails: only [qn] needs to be unambiguous. *)
+let rec register_qualifiers ~data_definitions ?full_qn
+    (qn: Cobol_ptree.qualname) acc =
+  match qn with
+  | Name _ ->
+      acc
+  | Qual (_, qn') ->
+      let full_qn =
+        match Option.bind full_qn Cobol_unit.Qual.qual_of with
+        | Some full_qn -> Cobol_unit.Qual.suffix_named qn' full_qn
+        | None ->
+            try
+              Some (Resolver_map.find_binding qn'
+                      data_definitions.data_items.named).full_qn
+            with Not_found | Resolver_map.Ambiguous _ -> None
+      in
+      Option.fold full_qn ~none:acc ~some:(fun full_qn ->
+          register_data_qualref ~loc:(baseloc_of_qualname qn') full_qn acc)
+      |> register_qualifiers ~data_definitions ?full_qn qn'
+
 (** Emits a warning diagnostic on undefined data-name unless
     [assume_partial_data_definitions] is explictly set to [true].
-    The reference is registered at the location of the base name of [qn]. *)
+    The reference is registered at the location of the base name of [qn], along
+    with references to its qualifiers. *)
 let resolve_data_qualname ~data_definitions
     ?(assume_partial_data_definitions = false)
     qn acc =
-  try
-    let bnd = Resolver_map.find_binding ~&qn data_definitions.data_items.named in
-    let loc = baseloc_of_qualname ~&qn in
-    { resolved_name = qn; resolved = Ok bnd.value },
-    { acc with
-      refs = Typeck_outputs.register_data_qualref ~loc bnd.full_qn acc.refs }
-  with
-  | Not_found ->
-      { resolved_name = qn; resolved = Error () },
-      if assume_partial_data_definitions
-      then acc                                 (* skip "undefined" diagnostic *)
-      else error acc @@ Undefined_data_name qn
-  | Resolver_map.Ambiguous (lazy matching_qualnames) ->
-      { resolved_name = qn; resolved = Error () },
-      error acc @@ Ambiguous_data_name { given_qualname = qn;
-                                         matching_qualnames }
+  let resolved, acc, full_qn =
+    match Resolver_map.find_binding ~&qn data_definitions.data_items.named with
+    | bnd ->
+        let loc = baseloc_of_qualname ~&qn in
+        Ok bnd.value,
+        register_data_qualref ~loc bnd.full_qn acc,
+        Some bnd.full_qn
+    | exception Not_found ->
+        Error (),
+        (if assume_partial_data_definitions
+         then acc                              (* skip "undefined" diagnostic *)
+         else error acc @@ Undefined_data_name qn),
+        None
+    | exception Resolver_map.Ambiguous (lazy matching_qualnames) ->
+        Error (),
+        error acc @@ Ambiguous_data_name { given_qualname = qn;
+                                           matching_qualnames },
+        None
+  in
+  { resolved_name = qn; resolved },
+  register_qualifiers ~data_definitions ?full_qn ~&qn acc
 
 let resolve_record_name ~data_definitions ?(assume_partial_data_definitions = false)
     name acc =

@@ -443,6 +443,54 @@ let%expect_test "hover-datadef-vars" =
     ```
     - 6 bytes at position 5 in `STRUCT` |}];;
 
+let%expect_test "hover-ambiguous-qualifiers" =
+  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  print_hovered server ~projdir @@ extract_position_markers {cobol|
+        PROGRAM-ID. prog.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 R1.
+          02 B.
+            03 A PIC X.
+        01 R2.
+          02 B.
+            03 C PIC X.
+        PROCEDURE DIVISION.
+          DISPLAY A IN _|_B C OF _|_B
+          STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    (line 11, character 23):
+    __rootdir__/prog.cob:12.23-12.24:
+       9             02 B.
+      10               03 C PIC X.
+      11           PROCEDURE DIVISION.
+      12 >           DISPLAY A IN B C OF B
+    ----                          ^
+      13             STOP RUN.
+      14
+    ```cobol
+    B IN R1
+    ```
+    Group of 1 subfield
+    - 1 byte at position 1 in `R1`
+    (line 11, character 30):
+    __rootdir__/prog.cob:12.30-12.31:
+       9             02 B.
+      10               03 C PIC X.
+      11           PROCEDURE DIVISION.
+      12 >           DISPLAY A IN B C OF B
+    ----                                 ^
+      13             STOP RUN.
+      14
+    ```cobol
+    B IN R2
+    ```
+    Group of 1 subfield
+    - 1 byte at position 1 in `R2` |}]
+
 let%expect_test "hover-datadef-value-with-tab" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
   print_hovered server ~projdir @@ extract_position_markers {cobol|
