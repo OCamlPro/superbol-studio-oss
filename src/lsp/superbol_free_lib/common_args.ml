@@ -282,7 +282,6 @@ let get () =
     { platform;
       preproc_options = { platform; config; source_format;
                           mf_comments = !mf_comments;
-                          exec_preprocs = EXEC_MAP.empty;
                           copybook_lookup_config =
                             Cobol_common.Copybook.lookup_config !libpath
                               ~libexts:!libexts;

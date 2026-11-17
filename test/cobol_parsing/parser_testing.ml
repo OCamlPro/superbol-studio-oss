@@ -116,7 +116,6 @@ let rewindable_parse
     Cobol_preproc.preprocessor
       ~options:Cobol_preproc.Options.{
           base_preproc_options with
-          exec_preprocs = EXEC_MAP.empty;
           env = Cobol_preproc.Env.empty;
           config = Option.value config ~default:parser_options.config;
         } |>

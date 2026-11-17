@@ -55,7 +55,6 @@ and preprocessor_persist =
     dialect: Cobol_dialect.Types.id;
     src_options: Src_options.t;
     source_format: Src_format.any option;  (* to keep auto-detecting on reset *)
-    exec_preprocs: exec_preprocessor EXEC_MAP.t;
     platform: Cobol_common.Platform.TYPES.platform;     (* == reader.platform *)
     show_if_verbose: [`Txt | `Src] list;
   }
@@ -166,8 +165,7 @@ let source_format_config = function
   | Auto -> None
 
 let preprocessor input = function
-  | `WithOptions { platform; source_format; env; mf_comments;
-                   exec_preprocs; config;
+  | `WithOptions { platform; source_format; env; mf_comments; config;
                    copybook_lookup_config } ->
       let module Om_config = struct
         let name = __MODULE__
@@ -203,7 +201,6 @@ let preprocessor input = function
             dialect = config.origin.id;
             src_options;
             source_format;
-            exec_preprocs;
             platform;
             show_if_verbose = [`Src];
           };
@@ -469,8 +466,7 @@ and do_replace lp rev_prefix repl suffix =
 and do_exec ?(partial = false) lp rev_prefix exec_block suffix =
   (* Note: `exec_block` must be non-empty; it should at least start with an
      `EXEC(UTE)` text word (not checked here). *)
-  (* CHECKME: Assumes pre-processed EXEC blocks are NOT subject to
-     replacement... *)
+  (* CHECKME: Assumes EXEC blocks are NOT subject to replacement... *)
   let loc = Option.get @@ Cobol_common.Srcloc.concat_locs exec_block in
   let lp =
     if partial
@@ -493,14 +489,8 @@ and do_exec ?(partial = false) lp rev_prefix exec_block suffix =
     emit lp exec_block
   in
   match List.tl exec_block with                             (* skip EXEC(UTE) *)
-  | { payload = Text.TextWord lang; _ } :: _ :: _ ->         (* avoid empty tail *)
-      (match EXEC_MAP.find_opt lang lp.persist.exec_preprocs with
-       | Some Text_preprocessor f ->
-           (* TODO: check whether the relevant compiler directive/option has
-              been set? *)
-           emit lp (f exec_block)
-       | None ->
-           emit lp exec_block)           (* would a warning be relevant here? *)
+  | { payload = Text.TextWord _; _ } :: _ :: _ ->         (* avoid empty tail *)
+      emit lp exec_block
   | { payload = Alphanum _ | AlphanumPrefix _; loc } :: _ ->
       error @@ Unexpected { loc; stuff = Alphanumeric_literal }
   | { payload = Pseudo _; loc } :: _ ->

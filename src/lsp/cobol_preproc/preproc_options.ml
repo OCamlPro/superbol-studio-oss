@@ -11,12 +11,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module EXEC_LANG = struct
-  type t = string
-  let compare a b = String.(compare (uppercase_ascii a) (uppercase_ascii b))
-end
-module EXEC_MAP = Stdlib.Map.Make (EXEC_LANG)
-
 type preproc_options =
   {
     config: Cobol_config.t;
@@ -24,12 +18,8 @@ type preproc_options =
     copybook_lookup_config: Cobol_common.Copybook.TYPES.lookup_config;
     source_format: Cobol_config.source_format_spec;
     mf_comments: bool;                            (** see {!Src_options.t} *)
-    exec_preprocs: exec_preprocessor EXEC_MAP.t;
     env: Preproc_env.t;
   }
-
-and exec_preprocessor =
-  | Text_preprocessor of (Text.t -> Text.t)
 
 let default ~platform =
   {
@@ -38,6 +28,5 @@ let default ~platform =
     config = Cobol_config.default;
     source_format = Cobol_config.Auto;
     mf_comments = false;
-    exec_preprocs = EXEC_MAP.empty;
     env = Preproc_env.empty;
   }
