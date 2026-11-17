@@ -22,6 +22,7 @@ let public_subcommands = [
   Command_indent_file.cmd;
   Command_json_vscode.cmd;
   Command_lsp.cmd;
+  Command_project_files.cmd;
   Command_sql.preproc_cmd;
 ]
 

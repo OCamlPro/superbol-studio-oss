@@ -27,18 +27,19 @@ let action { platform; preproc_options; parser_options; pretty_progress; _ }
   end files
 
 let cmd =
-  let files = ref [] in
   let ppf = ref Fmt.stderr in
   let common, common_args = Common_args.get () in
+  let input_files, input_args =
+    Input_files.get () ~docv:"FILE" ~doc:"Cobol file to check"
+      ~walk:false in
 
   EZCMD.sub
     "check syntax"          (* add the corresponding line in Main.subcommands *)
-    (fun () -> action (common ()) ~ppf:!ppf !files)
-    ~args:(common_args @ [
-        [],
-        Arg.Anons (fun list -> files := list),
-        EZCMD.info ~docv:"FILE" "Cobol file to check";
-
+    (fun () ->
+       let common = common () in
+       action common ~ppf:!ppf @@
+       input_files ~common ~setup:Project_commands.default_setup)
+    ~args:(common_args @ input_args @ [
         [ "stdout" ], Arg.Unit (fun () -> ppf := Fmt.stdout),
         EZCMD.info "Output errors/warnings to stdout";
       ])

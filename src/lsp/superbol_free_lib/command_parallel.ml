@@ -62,6 +62,7 @@ let names_subcommand ~subcommands command =
 let make ~subcommands ~run_in_process =
   let parallel, parallel_args = Parallel_batches.args () in
   let progress, progress_arg = Common_args.progress_arg () in
+  let listed, list_args = Input_files.list_args () in
   let words = ref [] in
   EZCMD.sub name
     (fun () ->
@@ -71,25 +72,36 @@ let make ~subcommands ~run_in_process =
          | w :: _ when w = name -> Cobol_common.fatal "Nested `%s'" name
          | c when not (names_subcommand ~subcommands c) ->
              Cobol_common.fatal "Unknown sub-command: %s" (String.concat " " c)
+         | c when Input_files.designates_files c ->
+             Cobol_common.fatal
+               "@[<hov>Options@ that@ designate@ files@ (`--files-from',@ \
+                `--null',@ `--walk-project')@ are@ to@ be@ given@ to@ `%s'@ \
+                (before@ the@ first@ `--'),@ not@ to@ the@ sub-command;@ \
+                `superbol@ %s'@ lists@ the@ source@ files@ of@ a@ project@]"
+               name Command_project_files.name
          | _ -> ()
        end;
-       let files = match files with
-         | Some files -> files
-         | None -> read_lines stdin
+       let files =
+         match files, listed ~platform:Superbol_platform.record with
+         | None, None -> read_lines stdin
+         | given, listed ->
+             Input_files.dedup @@
+             Option.value given ~default:[] @ Option.value listed ~default:[]
        in
        let jobs, batch_size = parallel () in
        if files <> [] then
          Parallel_batches.run ~jobs ?batch_size ~progress:(progress ())
            ~command ~args:[] files
            ~sequential:(fun files -> run_in_process (command @ "--" :: files)))
-    ~args:(parallel_args @ progress_arg @
+    ~args:(parallel_args @ progress_arg @ list_args @
            [ [], Arg.Anons (fun l -> words := l),
              EZCMD.info ~docv:"SUB-COMMAND"
                "Sub-command to run, with its options, followed by $(b,--) and \
                 the files to give it" ])
     ~doc:"Run a sub-command on batches of files, in parallel processes"
     ~man:[ `S "SYNOPSIS";
-           `P "$(b,superbol parallel) [$(b,-j) N] [$(b,-n) K] $(b,--) \
+           `P "$(b,superbol parallel) [$(b,-j) N] [$(b,-n) K] \
+               [$(b,--files-from) LIST [$(b,-0)]] $(b,--) \
                SUB-COMMAND [OPTION]... [$(b,--) FILE...]";
            `S "DESCRIPTION";
            `Blocks [ `P "Split the files into batches (see $(b,--batch-size)), \
@@ -102,9 +114,13 @@ let make ~subcommands ~run_in_process =
                          all of them, as if SUB-COMMAND had been run on every \
                          file at once.";
                      `P "The first $(b,--) ends the options of this command; \
-                         files follow the second one.  Without a second \
-                         $(b,--), files are read from the standard input, one \
-                         per line.";
+                         files follow the second one, and are given along with \
+                         those listed with $(b,--files-from).  Without either, \
+                         files are read from the standard input, one per \
+                         line.  Options of SUB-COMMAND that designate files, \
+                         such as $(b,--files-from) or $(b,--walk-project), are \
+                         rejected: they would make each process consider \
+                         every file they designate.";
                      `P "The output of each process is shown as a whole when \
                          it ends, so outputs follow the order in which batches \
                          end rather than that of the given files.  Outputs are \
@@ -115,5 +131,7 @@ let make ~subcommands ~run_in_process =
                          within the same process." ];
            `S "EXAMPLES";
            `Pre "superbol parallel -j 8 -- cache analyze --stdout -- *.cbl\n\
-                 find . -name '*.cbl' | superbol parallel -j 8 -- check syntax"
+                 find . -name '*.cbl' | superbol parallel -j 8 -- check syntax\n\
+                 superbol project files -0 | \
+                 superbol parallel -j 8 -0 --files-from - -- sql preproc"
          ]
