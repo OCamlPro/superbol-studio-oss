@@ -7,8 +7,8 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sub-commands and Arguments &mdash; superbol-studio-oss master
- (3f64664
-) (2026/11/17 10:48) documentation</title>
+ (4ee30a2
+) (2026/11/17 11:30) documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=beddf052" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=98b44b8a" />
       <link rel="stylesheet" type="text/css" href="_static/css/fixes.css" />
@@ -16,7 +16,7 @@
   
       <script src="_static/jquery.js?v=958b65b0"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=3e9646b8"></script>
+      <script src="_static/documentation_options.js?v=d974a1f7"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -181,6 +181,7 @@
 <li><p><code class="code docutils literal notranslate"><span class="pre">--ext</span> <span class="pre">EXT</span></code>   Add EXT as a filename extension for copybook resolution (default: <cite>cpy</cite> <cite>cbl</cite> <cite>cob</cite>)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--free</span></code>   Shorthand for <cite>–source-format FREE</cite></p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--jobs</span> <span class="pre">N</span></code> or <code class="code docutils literal notranslate"><span class="pre">-j</span> <span class="pre">N</span></code>   Process files in up to N processes at once (default: 1)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--mf-comment</span></code>   Treat lines with an asterisk (<cite>*</cite>) in the first column as comments in FIXED, COBOL85, and VARIABLE source formats (like GnuCOBOL’s <cite>-fmfcomment</cite>)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--no-diagnostics</span></code>   Do not output the diagnostics of analyzed files (errors that prevent analyzing a file are still reported)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--no-error-status</span></code>   Exit with status 0 even when analyzed files hold errors (errors that prevent analyzing a file still make the program exit with a non-zero status)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--no-lsp-artifacts</span></code>   Leave out what only the LSP server needs (it does not reuse analyses stored this way)</p></li>
@@ -264,6 +265,7 @@
 <li><p><code class="code docutils literal notranslate"><span class="pre">--dialect</span> <span class="pre">DIALECT</span></code> or <code class="code docutils literal notranslate"><span class="pre">--std</span> <span class="pre">DIALECT</span></code>   Set the dialect to bu used (overriden by <cite>–conf</cite> if used)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--ext</span> <span class="pre">EXT</span></code>   Add EXT as a filename extension for copybook resolution (default: <cite>cpy</cite> <cite>cbl</cite> <cite>cob</cite>)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--free</span></code>   Shorthand for <cite>–source-format FREE</cite></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--mf-comment</span></code>   Treat lines with an asterisk (<cite>*</cite>) in the first column as comments in FIXED, COBOL85, and VARIABLE source formats (like GnuCOBOL’s <cite>-fmfcomment</cite>)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--progress</span> <span class="pre">MODE</span></code>   Set how to display progress of the command.</p></li>
 </ul>
 <dl class="simple">
@@ -302,6 +304,7 @@
 <li><p><code class="code docutils literal notranslate"><span class="pre">--inplace</span></code>   Modify files in place</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--intext</span></code>   For numeric, indentation size is relative to area A</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--lines</span> <span class="pre">LINE-LINE</span></code>   Indent only lines between these lines</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--mf-comment</span></code>   Treat lines with an asterisk (<cite>*</cite>) in the first column as comments in FIXED, COBOL85, and VARIABLE source formats (like GnuCOBOL’s <cite>-fmfcomment</cite>)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--numeric</span></code>   Output indentation size at the beginning of each line</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--progress</span> <span class="pre">MODE</span></code>   Set how to display progress of the command.</p></li>
 </ul>
@@ -407,6 +410,7 @@
 <li><p><code class="code docutils literal notranslate"><span class="pre">--encoding</span> <span class="pre">ENCODING</span></code>   Decode files as Visual Studio Code does with this value of its <a href="#id27"><span class="problematic" id="id28">`</span></a>files.encoding’ setting (e.g. <a href="#id29"><span class="problematic" id="id30">`</span></a>windows1252’, <a href="#id31"><span class="problematic" id="id32">`</span></a>cp850’).  Files are read as they are by default, or (with a warning listing the supported encodings) if ENCODING is not supported</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--ext</span> <span class="pre">EXT</span></code>   Add EXT as a filename extension for copybook resolution (default: <cite>cpy</cite> <cite>cbl</cite> <cite>cob</cite>)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--free</span></code>   Shorthand for <cite>–source-format FREE</cite></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--mf-comment</span></code>   Treat lines with an asterisk (<cite>*</cite>) in the first column as comments in FIXED, COBOL85, and VARIABLE source formats (like GnuCOBOL’s <cite>-fmfcomment</cite>)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--progress</span> <span class="pre">MODE</span></code>   Set how to display progress of the command.</p></li>
 </ul>
 <dl class="simple">

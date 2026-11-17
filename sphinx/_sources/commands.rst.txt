@@ -100,6 +100,8 @@ Where options are:
 
 * :code:`--jobs N` or :code:`-j N`   Process files in up to N processes at once (default: 1)
 
+* :code:`--mf-comment`   Treat lines with an asterisk (`*`) in the first column as comments in FIXED, COBOL85, and VARIABLE source formats (like GnuCOBOL's `-fmfcomment`)
+
 * :code:`--no-diagnostics`   Do not output the diagnostics of analyzed files (errors that prevent analyzing a file are still reported)
 
 * :code:`--no-error-status`   Exit with status 0 even when analyzed files hold errors (errors that prevent analyzing a file still make the program exit with a non-zero status)
@@ -236,6 +238,8 @@ Where options are:
 
 * :code:`--free`   Shorthand for `--source-format FREE`
 
+* :code:`--mf-comment`   Treat lines with an asterisk (`*`) in the first column as comments in FIXED, COBOL85, and VARIABLE source formats (like GnuCOBOL's `-fmfcomment`)
+
 * :code:`--progress MODE`   Set how to display progress of the command.
 MODE can be hide, force, log or log-err.
       By default progress is displayed when stderr is a TTY.
@@ -293,6 +297,8 @@ Where options are:
 * :code:`--intext`   For numeric, indentation size is relative to area A
 
 * :code:`--lines LINE-LINE`   Indent only lines between these lines
+
+* :code:`--mf-comment`   Treat lines with an asterisk (`*`) in the first column as comments in FIXED, COBOL85, and VARIABLE source formats (like GnuCOBOL's `-fmfcomment`)
 
 * :code:`--numeric`   Output indentation size at the beginning of each line
 
@@ -463,6 +469,8 @@ Where options are:
 * :code:`--ext EXT`   Add EXT as a filename extension for copybook resolution (default: `cpy` `cbl` `cob`)
 
 * :code:`--free`   Shorthand for `--source-format FREE`
+
+* :code:`--mf-comment`   Treat lines with an asterisk (`*`) in the first column as comments in FIXED, COBOL85, and VARIABLE source formats (like GnuCOBOL's `-fmfcomment`)
 
 * :code:`--progress MODE`   Set how to display progress of the command.
 MODE can be hide, force, log or log-err.
