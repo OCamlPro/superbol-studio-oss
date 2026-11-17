@@ -286,7 +286,9 @@ and fixed_indicator state
       }
   | '-'                                                  (* continuation line *)
       {
-        fixed_continue_line state lexbuf
+        if Src_lexing.in_c_comment state
+        then fixed_c_comment state lexbuf
+        else fixed_continue_line state lexbuf
       }
   | ('$' as marker)                                     (* compiler directive *)
       {
@@ -448,6 +450,14 @@ and fixed_debug_line state
       }
 and fixed_nominal_line state
   = parse
+  | epsilon
+      {
+        if Src_lexing.in_c_comment state
+        then fixed_c_comment state lexbuf
+        else fixed_nominal_line_start state lexbuf
+      }
+and fixed_nominal_line_start state
+  = parse
   | '\t'
     {
       Src_lexing.tab ~k:fixed_nominal_line state lexbuf
@@ -492,6 +502,11 @@ and fixed_nominal state
       {
         Src_lexing.comment ~floating:true state lexbuf
       }
+  | "/*" nonblank*         (* C-style comment, at least as long as text_word *)
+      {
+        Src_lexing.fixed_c_comment_opener state lexbuf
+          ~k_comment:fixed_c_comment ~k_word:fixed_word
+      }
   | "=="
       {
         Src_lexing.eqeq ~ktkd:gobble_line ~knom:fixed_nominal
@@ -506,6 +521,28 @@ and fixed_nominal state
       {
         Src_lexing.text_word ~ktkd:gobble_line ~knom:fixed_nominal
           state lexbuf
+      }
+  | epsilon
+      {
+        newline_or_eof state lexbuf
+      }
+and fixed_word state             (* text word, after rewind from "/*" rule *)
+  = parse
+  | text_word
+      {
+        Src_lexing.text_word ~ktkd:gobble_line ~knom:fixed_nominal
+          state lexbuf
+      }
+and fixed_c_comment state
+  = parse
+  | '\t'
+      {
+        Src_lexing.tab ~before_indicator:false ~k:fixed_c_comment state lexbuf
+      }
+  | "*/" | (nnl # ['*' '\t'])+ | '*'
+      {
+        Src_lexing.fixed_c_comment_text state lexbuf
+          ~ktkd:gobble_line ~k_comment:fixed_c_comment ~k_closed:fixed_nominal
       }
   | epsilon
       {
@@ -698,6 +735,11 @@ and free_nominal state
       {
         Src_lexing.comment ~floating:true state lexbuf
       }
+  | "/*" nonblank*         (* C-style comment, at least as long as text_word *)
+      {
+        Src_lexing.c_comment_opener' state lexbuf
+          ~k_comment:free_c_comment ~k_word:free_word
+      }
   | "=="
       {
         Src_lexing.eqeq' ~k:free_nominal state lexbuf
@@ -709,6 +751,28 @@ and free_nominal state
   | text_word
       {
         Src_lexing.text_word' ~k:free_nominal state lexbuf
+      }
+  | epsilon
+      {
+        free_newline_or_eof state lexbuf
+      }
+
+and free_word state               (* text word, after rewind from "/*" rule *)
+  = parse
+  | text_word
+      {
+        Src_lexing.text_word' ~k:free_nominal state lexbuf
+      }
+and free_c_comment state
+  = parse
+  | '\t'
+      {
+        Src_lexing.tab ~before_indicator:false ~k:free_c_comment state lexbuf
+      }
+  | "*/" | (nnl # ['*' '\t'])+ | '*'
+      {
+        Src_lexing.c_comment_text' state lexbuf
+          ~k_comment:free_c_comment ~k_closed:free_nominal
       }
   | epsilon
       {
@@ -830,7 +894,10 @@ and pptoken = parse
   let line
     : type k. k Src_lexing.state -> Lexing.lexbuf -> k Src_lexing.state * _
     = fun s -> match Src_lexing.source_format s with
-      |          _, FreePaging   -> free_line s
+      |          _, FreePaging   ->
+          if Src_lexing.in_c_comment s
+          then free_c_comment s
+          else free_line s
       | XOpenIndic, _            -> xopen_line s
       |   CRTIndic, _            -> crt_line s
       |   TrmIndic, _            -> acutrm_line s

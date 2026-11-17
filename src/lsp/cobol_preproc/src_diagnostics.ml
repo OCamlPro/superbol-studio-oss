@@ -35,6 +35,10 @@ type error =
       {
         loc: srcloc;
       }
+  | Unterminated_c_comment of
+      {
+        loc: srcloc;                       (** location of the opening `/*' *)
+      }
 
 and unexpected_stuff =
   | Character
@@ -77,7 +81,8 @@ let error_loc = function
   | Mismatch_in_alphanum_continuation { continued_alphanum_loc = loc; _ }
   | Missing_continuation { loc; _ }
   | Unexpected { loc; _ }
-  | Unterminated_pseudotext { loc } ->
+  | Unterminated_pseudotext { loc }
+  | Unterminated_c_comment { loc } ->
       loc
 
 let pp_error ppf = function
@@ -91,6 +96,8 @@ let pp_error ppf = function
       Pretty.print ppf "Unexpected@ %a" pp_unexpected_stuff item
   | Unterminated_pseudotext _ ->
       Pretty.print ppf "Unterminated@ pseudotext"
+  | Unterminated_c_comment _ ->
+      Pretty.print ppf "Unterminated@ comment"
 
 type warning =
   | Warn_unexpected of
