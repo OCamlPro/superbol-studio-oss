@@ -20,7 +20,7 @@ open Cobol_common.Srcloc.TYPES
     after unmarshalling. *)
 type exec_block =
   | Esql of Sql_ast.esql_instruction
-  | Unparsed of exec_text   (** non-SQL blocks, as their words
+  | Unparsed of exec_text   (** non-SQL or unparsable blocks, as their words
                                 (including "EXEC" and "END-EXEC") *)
 and exec_text = string with_loc list
 [@@deriving ord]

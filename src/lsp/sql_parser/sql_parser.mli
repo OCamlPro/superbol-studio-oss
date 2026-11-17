@@ -13,6 +13,8 @@
 
 type error = string                            (* description string, for now *)
 
-val parse: Cobol_preproc.Text.t -> Sql_ast.esql_instruction
+(** Parses an EXEC SQL block, including its "EXEC" and "END-EXEC" words.  Also
+    fails on valid SQL statements that are not supported yet. *)
+val parse: Cobol_preproc.Text.t -> (Sql_ast.esql_instruction, error) result
 
 val parse_string: string -> (Sql_ast.esql_instruction, error) result

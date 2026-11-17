@@ -374,13 +374,18 @@ let distinguish_words: (Grammar_tokens.token with_loc as 't) -> 't = function
 
 
 let scan_exec_block text : Cobol_ptree.exec_block =
+  let unparsed () =
+    Cobol_ptree.Unparsed
+      (List.map (fun w -> Pretty.to_string "%a" TEXT.pp_word ~&w &@<- w) ~&text)
+  in
   match ~&text with
   | { payload = TextWord _(* EXEC(UTE) *); _ } ::
     { payload = TextWord "SQL"; _ } :: _ ->
-      Esql (Sql_parser.parse ~&text)
-  | words ->
-      Unparsed (List.map (fun w -> Pretty.to_string "%a" TEXT.pp_word ~&w &@<- w)
-                  words)
+      (match Sql_parser.parse ~&text with
+       | Ok esql -> Esql esql
+       | Error _ -> unparsed ())
+  | _ ->
+      unparsed ()
 
 
 let acc_tokens_of_text_word (rev_prefix_tokens, state) { payload = c; loc } =
