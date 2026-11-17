@@ -79,6 +79,27 @@ let rec matches (qn: Cobol_ptree.qualname) ~(full: Cobol_ptree.qualname) =
       name_of qn = name_of full ||
       matches qn ~full:full'
 
+(** [suffix_named qn full] returns the longest suffix of [full] whose base name
+    is that of [qn], if any. *)
+let rec suffix_named qn (full: Cobol_ptree.qualname) =
+  if name_of full = name_of qn
+  then Some full
+  else Option.bind (qual_of full) (suffix_named qn)
+
+(** [qualifier_full_qn qn ~full qualifier] returns the fully qualified name
+    designated by [qualifier], a physical sub-term of [qn] (e.g, [B IN C] or
+    [C] in [A IN B IN C]), given the fully qualified name [full] of the item
+    that [qn] references. *)
+let rec qualifier_full_qn (qn: Cobol_ptree.qualname) ~full qualifier =
+  if qn == qualifier
+  then Some full
+  else match qual_of qn, qual_of full with
+    | Some qn', Some full' ->
+        Option.bind (suffix_named qn' full') @@ fun full' ->
+        qualifier_full_qn qn' ~full:full' qualifier
+    | _ ->
+        None
+
 (** {1 Collections} *)
 
 (** Collections to be used over fully qualified names. *)

@@ -22,29 +22,15 @@ module NEL = Cobol_common.Basics.NEL
 
 (* --- Data references *)
 
-(** Registers the (indirect) references to the qualifiers of a qualified name,
-    e.g, [A] in [B IN A] (see {!Typeck_outputs.references_in_unit}). *)
-let rec register_qualifiers ~data_definitions (qn : Cobol_ptree.qualname) acc =
-  match qn with
-  | Name _ -> acc
-  | Qual (_, qn) ->
-      Typeck_references.register_data_qualname ~data_definitions
-        (qn &@ Typeck_references.baseloc_of_qualname qn)
-        acc
-      |> register_qualifiers ~data_definitions qn
-
 let typeck_data_reference (qn : Cobol_ptree.qualname with_loc)
   : data_reference Typeck_procedure_monad.t =
   fun env acc ->
-  let r, acc =
-    (* TODO: report undefined data-names (see
-       {!Typeck_references.resolve_record_name})
-       by removing the assume_partial_data_definitions flag *)
-    Typeck_references.resolve_data_qualname qn acc
-      ~data_definitions:env.data_definitions
-      ~assume_partial_data_definitions:true
-  in
-  r, register_qualifiers ~&qn acc ~data_definitions:env.data_definitions
+  (* TODO: report undefined data-names (see
+     {!Typeck_references.resolve_record_name})
+     by removing the assume_partial_data_definitions flag *)
+  Typeck_references.resolve_data_qualname qn acc
+    ~data_definitions:env.data_definitions
+    ~assume_partial_data_definitions:true
 
 let typeck_record_reference (n : Cobol_ptree.name with_loc)
   : record_reference Typeck_procedure_monad.t =

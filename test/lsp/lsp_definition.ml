@@ -821,6 +821,68 @@ let%expect_test "definition-malformed-qualifiers" =
 
 
 
+let%expect_test "definition-ambiguous-qualifiers" =
+  let { end_with_postproc; projdir }, server = make_lsp_project () in
+  print_definitions ~projdir server @@ extract_position_markers {cobol|
+        PROGRAM-ID. prog.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 R1.
+          02 B.
+            03 A PIC X.
+        01 R2.
+          02 B.
+            03 C PIC X.
+        PROCEDURE DIVISION.
+          DISPLAY _|1-a|_A IN _|2-b|_B C OF _|3-b|_B IN _|4-r2|_R2
+          DISPLAY _|5-b|_B
+          STOP RUN.
+  |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[{"message":"Ambiguous data-name 'B'; known matching names are 'B IN R2', 'B IN R1'","range":{"end":{"character":19,"line":12},"start":{"character":18,"line":12}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    1-a (line 11, character 18):
+    __rootdir__/prog.cob:7.15-7.16:
+       4           WORKING-STORAGE SECTION.
+       5           01 R1.
+       6             02 B.
+       7 >             03 A PIC X.
+    ----                  ^
+       8           01 R2.
+       9             02 B.
+    2-b (line 11, character 23):
+    __rootdir__/prog.cob:6.13-6.14:
+       3           DATA DIVISION.
+       4           WORKING-STORAGE SECTION.
+       5           01 R1.
+       6 >           02 B.
+    ----                ^
+       7               03 A PIC X.
+       8           01 R2.
+    3-b (line 11, character 30):
+    __rootdir__/prog.cob:9.13-9.14:
+       6             02 B.
+       7               03 A PIC X.
+       8           01 R2.
+       9 >           02 B.
+    ----                ^
+      10               03 C PIC X.
+      11           PROCEDURE DIVISION.
+    4-r2 (line 11, character 35):
+    __rootdir__/prog.cob:8.11-8.13:
+       5           01 R1.
+       6             02 B.
+       7               03 A PIC X.
+       8 >         01 R2.
+    ----              ^^
+       9             02 B.
+      10               03 C PIC X.
+    5-b (line 12, character 18):
+    {"params":{"message":"Data-name 'B' is ambiguous; known matching names are 'B IN R2', 'B IN R1'","type":2},"method":"window/showMessage","jsonrpc":"2.0"}
+    No definition found |}];;
+
+
+
 let%expect_test "definition-index" =
   let { end_with_postproc; projdir }, server = make_lsp_project () in
   print_definitions ~projdir server @@ extract_position_markers {cobol|

@@ -89,3 +89,29 @@ let%expect_test "non-toplevel-proc-arg" =
        8
     >> Error: Data name 'A-OK' does not reference a 01- or 77-level item in the
               DATA DIVISION |}];;
+
+let%expect_test "ambiguous-data-qualifiers" =
+  dotest @@ prog "ambiguous-data-qualifiers"
+    ~working_storage:{|
+       01 R1.
+         02 B.
+           03 A PIC X.
+       01 R2.
+         02 B.
+           03 C PIC X.
+    |}
+    ~procedure:{|
+           DISPLAY A IN B.
+           DISPLAY C OF B IN R2.
+           DISPLAY B.
+    |};
+  [%expect {|
+    prog.cob:13.19-13.20:
+      10          PROCEDURE DIVISION.
+      11          DISPLAY A IN B.
+      12              DISPLAY C OF B IN R2.
+      13 >            DISPLAY B.
+    ----                      ^
+      14
+    >> Error: Ambiguous data-name 'B'; known matching names are 'B IN R2', 'B IN
+              R1' |}];;

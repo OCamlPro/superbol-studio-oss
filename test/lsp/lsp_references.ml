@@ -295,6 +295,94 @@ let doc =
   |cobol}
 ;;
 
+let%expect_test "ambiguous-qualifier-references-requests" =
+  let { end_with_postproc; projdir }, server = make_lsp_project () in
+  print_references ~projdir server @@ extract_position_markers {cobol|
+        PROGRAM-ID. prog.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 R1.
+          02 _|1-b|_B.
+            03 A PIC X.
+        01 R2.
+          02 _|2-b|_B.
+            03 C PIC X.
+        PROCEDURE DIVISION.
+          DISPLAY A IN _|3-b|_B C OF _|4-b|_B
+          STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    1-b (line 5, character 13):
+    __rootdir__/prog.cob:6.13-6.14:
+       3           DATA DIVISION.
+       4           WORKING-STORAGE SECTION.
+       5           01 R1.
+       6 >           02 B.
+    ----                ^
+       7               03 A PIC X.
+       8           01 R2.
+    __rootdir__/prog.cob:12.23-12.24:
+       9             02 B.
+      10               03 C PIC X.
+      11           PROCEDURE DIVISION.
+      12 >           DISPLAY A IN B C OF B
+    ----                          ^
+      13             STOP RUN.
+      14
+    2-b (line 8, character 13):
+    __rootdir__/prog.cob:9.13-9.14:
+       6             02 B.
+       7               03 A PIC X.
+       8           01 R2.
+       9 >           02 B.
+    ----                ^
+      10               03 C PIC X.
+      11           PROCEDURE DIVISION.
+    __rootdir__/prog.cob:12.30-12.31:
+       9             02 B.
+      10               03 C PIC X.
+      11           PROCEDURE DIVISION.
+      12 >           DISPLAY A IN B C OF B
+    ----                                 ^
+      13             STOP RUN.
+      14
+    3-b (line 11, character 23):
+    __rootdir__/prog.cob:6.13-6.14:
+       3           DATA DIVISION.
+       4           WORKING-STORAGE SECTION.
+       5           01 R1.
+       6 >           02 B.
+    ----                ^
+       7               03 A PIC X.
+       8           01 R2.
+    __rootdir__/prog.cob:12.23-12.24:
+       9             02 B.
+      10               03 C PIC X.
+      11           PROCEDURE DIVISION.
+      12 >           DISPLAY A IN B C OF B
+    ----                          ^
+      13             STOP RUN.
+      14
+    4-b (line 11, character 30):
+    __rootdir__/prog.cob:9.13-9.14:
+       6             02 B.
+       7               03 A PIC X.
+       8           01 R2.
+       9 >           02 B.
+    ----                ^
+      10               03 C PIC X.
+      11           PROCEDURE DIVISION.
+    __rootdir__/prog.cob:12.30-12.31:
+       9             02 B.
+      10               03 C PIC X.
+      11           PROCEDURE DIVISION.
+      12 >           DISPLAY A IN B C OF B
+    ----                                 ^
+      13             STOP RUN.
+      14 |}]
+
 let%expect_test "references-requests-renames" =
   let { end_with_postproc; projdir }, server = make_lsp_project () in
   print_references ~projdir server doc;

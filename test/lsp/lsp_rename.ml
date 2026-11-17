@@ -164,6 +164,44 @@ let%expect_test "rename-group" =
        7             02 CHILD PIC 9.
        8           PROCEDURE DIVISION. |}]
 
+let%expect_test "rename-ambiguous-qualifier" =
+  let end_with_postproc = rename_positions @@ extract_position_markers {cobol|
+        PROGRAM-ID. prog.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 R1.
+          02 B.
+            03 A PIC X.
+        01 R2.
+          02 B.
+            03 C PIC X.
+        PROCEDURE DIVISION.
+          DISPLAY A IN _|_B C OF B
+          STOP RUN.
+  |cobol}
+  in
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    (line 11, character 23):
+    2 rename entries:
+        aNewName at __rootdir__/prog.cob:12.23-12.24:
+           9             02 B.
+      10               03 C PIC X.
+      11           PROCEDURE DIVISION.
+      12 >           DISPLAY A IN B C OF B
+    ----                          ^
+      13             STOP RUN.
+      14
+    aNewName at __rootdir__/prog.cob:6.13-6.14:
+       3           DATA DIVISION.
+       4           WORKING-STORAGE SECTION.
+       5           01 R1.
+       6 >           02 B.
+    ----                ^
+       7               03 A PIC X.
+       8           01 R2. |}]
+
 let%expect_test "rename-with-a-ref-in-a-copybook" =
   let copybooks = [
     ("lib.cpy", {cobol|
