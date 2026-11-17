@@ -162,39 +162,39 @@ let%expect_test "pic-on-wrong-usage" =
 let%expect_test "unsupported-usage" =
   dotest @@ prog "unsupported-usage"
     ~working_storage:{|
-       77 A COMP-X.
+       77 A COMP-9.
        01 B.
-         02 FILLER COMP-X.
+         02 FILLER COMP-9.
        01 C.
          02 D COMP-0 OCCURS 10.
       *> CHECKME: Here it's unclear whether F's error flag should propagate to E.
        01 E PIC X.
-       01 F COMP-X REDEFINES E.
+       01 F COMP-9 REDEFINES E.
     |};
   [%expect {|
     prog.cob:4.12-4.18:
        1          PROGRAM-ID. unsupported-usage.
        2          DATA DIVISION.
        3          WORKING-STORAGE SECTION.
-       4 >        77 A COMP-X.
+       4 >        77 A COMP-9.
     ----               ^^^^^^
        5          01 B.
-       6            02 FILLER COMP-X.
-    >> Warning: Unsupported USAGE COMP-X
+       6            02 FILLER COMP-9.
+    >> Warning: Unsupported USAGE COMP-9
 
     prog.cob:6.19-6.25:
        3          WORKING-STORAGE SECTION.
-       4          77 A COMP-X.
+       4          77 A COMP-9.
        5          01 B.
-       6 >          02 FILLER COMP-X.
+       6 >          02 FILLER COMP-9.
     ----                      ^^^^^^
        7          01 C.
        8            02 D COMP-0 OCCURS 10.
-    >> Warning: Unsupported USAGE COMP-X
+    >> Warning: Unsupported USAGE COMP-9
 
     prog.cob:8.14-8.20:
        5          01 B.
-       6            02 FILLER COMP-X.
+       6            02 FILLER COMP-9.
        7          01 C.
        8 >          02 D COMP-0 OCCURS 10.
     ----                 ^^^^^^
@@ -206,20 +206,20 @@ let%expect_test "unsupported-usage" =
        8            02 D COMP-0 OCCURS 10.
        9         *> CHECKME: Here it's unclear whether F's error flag should propagate to E.
       10          01 E PIC X.
-      11 >        01 F COMP-X REDEFINES E.
+      11 >        01 F COMP-9 REDEFINES E.
     ----               ^^^^^^
       12          PROCEDURE DIVISION.
       13
-    >> Warning: Unsupported USAGE COMP-X
+    >> Warning: Unsupported USAGE COMP-9
 
     prog.cob:4.7-4.19:
        1          PROGRAM-ID. unsupported-usage.
        2          DATA DIVISION.
        3          WORKING-STORAGE SECTION.
-       4 >        77 A COMP-X.
+       4 >        77 A COMP-9.
     ----          ^^^^^^^^^^^^
        5          01 B.
-       6            02 FILLER COMP-X.
+       6            02 FILLER COMP-9.
     Item definition: {
       qualname: A
       /!\ with_errors /!\
@@ -237,10 +237,10 @@ let%expect_test "unsupported-usage" =
     prog.cob:5.7-6.26:
        2          DATA DIVISION.
        3          WORKING-STORAGE SECTION.
-       4          77 A COMP-X.
+       4          77 A COMP-9.
        5 >        01 B.
     ----          ^^^^^
-       6 >          02 FILLER COMP-X.
+       6 >          02 FILLER COMP-9.
     ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
        7          01 C.
        8            02 D COMP-0 OCCURS 10.
@@ -269,9 +269,9 @@ let%expect_test "unsupported-usage" =
       }
     }
     prog.cob:7.7-8.31:
-       4          77 A COMP-X.
+       4          77 A COMP-9.
        5          01 B.
-       6            02 FILLER COMP-X.
+       6            02 FILLER COMP-9.
        7 >        01 C.
     ----          ^^^^^
        8 >          02 D COMP-0 OCCURS 10.
@@ -319,7 +319,7 @@ let%expect_test "unsupported-usage" =
        9         *> CHECKME: Here it's unclear whether F's error flag should propagate to E.
       10 >        01 E PIC X.
     ----          ^^^^^^^^^^^
-      11 >        01 F COMP-X REDEFINES E.
+      11 >        01 F COMP-9 REDEFINES E.
     ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
       12          PROCEDURE DIVISION.
       13

@@ -315,6 +315,31 @@ let byte_size_of_int = function
   | 16 -> Long_double_size
   | n -> Custom_size n
 
+(** Minimal number of bytes holding any unsigned integer of [i] digits, at
+    index [i]. *)
+let unsigned_bytes_for_digits =
+  [|1; 1; 1;                                                    (* (0,) 1, 2 *)
+    2; 2;                                                       (* 3, 4 *)
+    3; 3; 3;                                                    (* 5, 6, 7 *)
+    4; 4;                                                       (* 8, 9 *)
+    5; 5; 5;                                                    (* 10, 11, 12 *)
+    6; 6;                                                       (* 13, 14 *)
+    7; 7;                                                       (* 15, 16 *)
+    8; 8; 8;                                                    (* 17, 18, 19 *)
+    9; 9;                                                       (* 20, 21 *)
+    10; 10; 10;                                                 (* 22, 23, 24 *)
+    11; 11;                                                     (* 25, 26 *)
+    12; 12;                                                     (* 27, 28 *)
+    13; 13; 13;                                                 (* 29, 30, 31 *)
+    14; 14;                                                     (* 32, 33 *)
+    15; 15; 15|]                                                (* 34, 35, 36 *)
+
+(** Binary item as large as the given alphanumeric PICTURE. *)
+let binary_of_alphanum_picture ~byte_order picture =
+  Binary { picture = None; signed = false; scaling = 0;
+           byte_size = byte_size_of_int @@ PIC.data_size picture;
+           truncation = Truncate_to_native_size; byte_order }
+
 (** Byte order of BINARY and COMP items, set by [binary-byteorder]. *)
 let binary_byte_order { typeck_options = o; _ } : byte_order =
   match o.binary_byteorder with
@@ -353,15 +378,7 @@ let binary_from_numeric_info ~data_config ?(native_truncation = true)
           8; 8|]                                                (* 17; 18 *)
         .(digits)
     | B_1__8 when not signed && digits < 19 ->
-        [|1; 1; 1;                                              (* (0,) 1, 2 *)
-          2; 2;                                                 (* 3, 4 *)
-          3; 3; 3;                                              (* 5, 6, 7 *)
-          4; 4;                                                 (* 8, 9 *)
-          5; 5; 5;                                              (* 10, 11, 12 *)
-          6; 6;                                                 (* 13, 14 *)
-          7; 7;                                                 (* 15, 16 *)
-          8; 8|]                                                (* 17; 18 *)
-        .(digits)
+        unsigned_bytes_for_digits.(digits)
     | B_1__8 -> 16                                     (* CHECKME: error case? *)
   and truncation =
     if native_truncation
@@ -477,18 +494,67 @@ let range_extended_usage ~data_config diags ~item_loc given_picture usage =
                           truncation = Truncate_to_native_size;
                           byte_order })
     | Error _ ->
-        diags, Error None               (* already reported in `ensure_picture` *)
+        diags, Error None             (* already reported in `ensure_picture` *)
+  else if PIC.is_alphanum picture then            (* MF extension: TODO: warn *)
+    diags, Ok (binary_of_alphanum_picture ~byte_order picture)
+  else
+    diags, Error None                 (* already reported in `ensure_picture` *)
+
+
+(** Items with USAGE COMP-X or COMP-N, sized as in GnuCOBOL: from the number
+    of digits of a numeric PICTURE, or the size of an alphanumeric one, which
+    gives 15 bytes beyond 8 characters (as [9(36)]). *)
+let comp_x_usage ~data_config diags ~item_loc given_picture usage comp =
+  let diags, picture =
+    ensure_picture diags ~only:`Numeric_or_alphanum_category
+      ~item_loc ~required:true ~usage given_picture
+  in
+  let byte_order = match comp with
+    | `CompX -> binary_byte_order data_config
+    | `CompN -> Big_endian                    (* always big-endian in GnuCOBOL *)
+  in
+  if PIC.is_numeric picture then
+    match PIC.numeric_info picture with
+    | Ok { digits; scale = scaling; signed } ->
+        let diags =
+          if digits >= 1 && digits <= 36 then diags
+          else
+            let picture = Result.get_ok @@ Option.get given_picture in
+            let feature = Digits { given = digits ; min = 1; max = 36 } in
+            data_error diags @@ Invalid_picture_feature { picture; usage;
+                                                          feature }
+        in
+        let byte_size =
+          byte_size_of_int @@
+          if digits > 36 then 16
+          else unsigned_bytes_for_digits.(max 0 digits)
+        in
+        diags, Ok (Binary { picture = Some picture; signed; scaling; byte_size;
+                            truncation = Truncate_to_digits { digits };
+                            byte_order })
+    | Error _ ->
+        diags, Error None             (* already reported in `ensure_picture` *)
+  else if PIC.is_alphanum picture && PIC.data_size picture <= 8 then
+    diags, Ok (binary_of_alphanum_picture ~byte_order picture)
   else if PIC.is_alphanum picture then
-    let byte_size =                (* MF extension (we should emit a warning) *)
-      match PIC.data_size picture with
-      | 1 -> Byte_size
-      | 2 -> Short_size
-      | 4 -> Long_size
-      | 8 -> Double_size
-      | 16 -> Long_double_size
-      | n -> Custom_size n
+    let byte_size = unsigned_bytes_for_digits.(36) in
+    let diags =
+      match given_picture with
+      | Some Ok picture ->
+          let { dialect; alphanumeric_comp_x_over_8_chars_rejected_by; _ }
+            : Typeck_config.options = data_config.typeck_options in
+          Option.fold alphanumeric_comp_x_over_8_chars_rejected_by
+            ~none:diags ~some:begin fun rejected_by ->
+            data_warning diags @@
+            Oversized_alphanumeric_binary { picture; usage; byte_size;
+                                            max_chars = 8; rejected_by;
+                                            dialect }
+          end
+      | None | Some Error _ ->
+          diags
     in
-    diags, Ok (Binary { picture = None; signed = false; scaling = 0; byte_size;
+    diags, Ok (Binary { picture = None; signed = false; scaling = 0;
+                        byte_size = byte_size_of_int byte_size;
                         truncation = Truncate_to_native_size; byte_order })
   else
     diags, Error None                 (* already reported in `ensure_picture` *)
@@ -654,8 +720,11 @@ let to_usage_n_value ~item_name ~item_loc ~data_config item_clauses =
     | UsagePending `Comp5 as usage ->
         range_extended_usage ~data_config diags ~item_loc picture usage
 
+    | UsagePending (`CompX | `CompN as comp) as usage ->
+        comp_x_usage ~data_config diags ~item_loc picture usage comp
+
     | Type _
-    | UsagePending (`Comp10|`CompN|`Comp0|`Comp15|`CompX|`Comp9) ->
+    | UsagePending (`Comp10|`Comp0|`Comp15|`Comp9) ->
         (* Note: `usage_clause_loc = None` implies `usage_clause = Display`,
            unreachable here. *)
         let usage = usage &@ Option.get usage_clause_loc in

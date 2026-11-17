@@ -202,13 +202,11 @@ let parse parse_fun ~platform ?overrides ~filename ~contents project =
 
 let typecheck ?overrides ~parsing_diags project parsed =
   let { config; _ } = with_overrides ?overrides project in
-  let module Config = (val config.cobol_config) in
   let Cobol_typeck.Results.{ result = checked; diags = typeck_diags } =
     Cobol_typeck.compilation_group parsed
       ~fold_exec_block':Superbol_preprocs.Esql.fold_exec_block'
-      ~options:{ binary_size = Config.binary_size#value;
-                 binary_byteorder = Config.binary_byteorder#value;
-                 target_byte_order = Hardcoded_assumptions.machine_byte_order }
+      ~options:(Cobol_typeck.Config.from_cobol_config config.cobol_config
+                  ~target_byte_order:Hardcoded_assumptions.machine_byte_order)
   in
   let typeck_diags =
     (* Do not report typeck diagnostics in case of syntax or pre-processing

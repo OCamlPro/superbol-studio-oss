@@ -978,6 +978,10 @@ let byte_order_items = {|
        77 C PIC 9(4) COMP-5.
        77 D PIC X(2) COMP-5.
        77 E BINARY-LONG.
+       77 F PIC 9(4) COMP-X.
+       77 G PIC X(2) COMP-X.
+       77 H PIC 9(4) COMP-N.
+       77 I PIC X(2) COMP-N.
 |}
 
 let%expect_test "byte-order-big-endian" =
@@ -987,7 +991,11 @@ let%expect_test "byte-order-big-endian" =
     B: big-endian
     C: little-endian
     D: little-endian
-    E: little-endian |}];;
+    E: little-endian
+    F: big-endian
+    G: big-endian
+    H: big-endian
+    I: big-endian |}];;
 
 let%expect_test "byte-order-native" =
   show_byte_orders ~parser_options:native_byteorder_options @@
@@ -997,4 +1005,180 @@ let%expect_test "byte-order-native" =
     B: little-endian
     C: little-endian
     D: little-endian
-    E: little-endian |}];;
+    E: little-endian
+    F: little-endian
+    G: little-endian
+    H: big-endian
+    I: big-endian |}];;
+
+(** Shows the layout of each binary item. *)
+let show_binary_sizes ?parser_options contents =
+  Prog_typeck.typeck ?parser_options contents |>
+  Cobol_common.Diagnostics.show_n_forget ~set_status:false ~ppf:Fmt.stdout
+    ~platform:Prog_common.platform |>
+  begin fun Cobol_typeck.Outputs.{ group; _ } ->
+    Cobol_unit.Visitor.fold_unit_group object
+      inherit [unit] Cobol_unit.Visitor.folder
+      method! fold_item_definition' { payload = def; _ } () =
+        Cobol_common.Visitor.skip_children @@
+        match def with
+        | Field { field_qualname = Some name;
+                  field_layout = Elementary_field {
+                      usage = Binary { signed; scaling; byte_size;
+                                       truncation; _ }; _ }; _ } ->
+            Pretty.out "%a: bytes=%d signed=%b scaling=%d truncation=%s@."
+              Cobol_ptree.pp_qualname' name
+              (match byte_size with
+               | Byte_size -> 1 | Short_size -> 2 | Long_size -> 4
+               | Double_size -> 8 | Long_double_size -> 16
+               | C_long_size -> -1 | Custom_size n -> n)
+              signed scaling
+              (match truncation with
+               | Truncate_to_digits { digits } -> Fmt.str "digits(%d)" digits
+               | Truncate_to_native_size -> "native")
+        | _ ->
+            ()
+    end group ()
+  end
+
+let%expect_test "usage-comp-x-n" =
+  show_binary_sizes @@ prog "usage-comp-x-n"
+    ~working_storage:{|
+       77 X1 PIC 9 COMP-X.
+       77 X2 PIC 9(2) COMP-X.
+       77 X3 PIC 9(3) COMP-X.
+       77 X5 PIC 9(5) COMP-X.
+       77 X8 PIC 9(8) COMP-X.
+       77 X10 PIC 9(10) COMP-X.
+       77 X18 PIC 9(18) COMP-X.
+       77 X19 PIC 9(19) COMP-X.
+       77 X36 PIC 9(36) COMP-X.
+       77 SX4 PIC S9(2)V9(2) COMP-X.
+       77 AX1 PIC X COMP-X.
+       77 AX3 PIC X(3) COMP-X.
+       77 AX8 PIC X(8) COMP-X.
+       77 AX9 PIC X(9) COMP-X.
+       77 N4 PIC 9(4) COMP-N.
+       77 AN2 PIC X(2) COMP-N.
+    |};
+  [%expect {|
+    X1: bytes=1 signed=false scaling=0 truncation=digits(1)
+    X2: bytes=1 signed=false scaling=0 truncation=digits(2)
+    X3: bytes=2 signed=false scaling=0 truncation=digits(3)
+    X5: bytes=3 signed=false scaling=0 truncation=digits(5)
+    X8: bytes=4 signed=false scaling=0 truncation=digits(8)
+    X10: bytes=5 signed=false scaling=0 truncation=digits(10)
+    X18: bytes=8 signed=false scaling=0 truncation=digits(18)
+    X19: bytes=8 signed=false scaling=0 truncation=digits(19)
+    X36: bytes=15 signed=false scaling=0 truncation=digits(36)
+    SX4: bytes=2 signed=true scaling=2 truncation=digits(4)
+    AX1: bytes=1 signed=false scaling=0 truncation=native
+    AX3: bytes=3 signed=false scaling=0 truncation=native
+    AX8: bytes=8 signed=false scaling=0 truncation=native
+    AX9: bytes=15 signed=false scaling=0 truncation=native
+    N4: bytes=2 signed=false scaling=0 truncation=digits(4)
+    AN2: bytes=2 signed=false scaling=0 truncation=native |}];;
+
+let%expect_test "usage-comp-x-errors" =
+  show_binary_sizes @@ prog "usage-comp-x-errors"
+    ~working_storage:{|
+       77 X COMP-X.
+       77 N PIC N(2) COMP-N.
+    |};
+  [%expect {|
+    prog.cob:4.7-4.19:
+       1          PROGRAM-ID. usage-comp-x-errors.
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4 >        77 X COMP-X.
+    ----          ^^^^^^^^^^^^
+       5          77 N PIC N(2) COMP-N.
+       6          PROCEDURE DIVISION.
+    >> Error: Missing PICTURE clause for item with USAGE COMP-X
+
+    prog.cob:5.16-5.20:
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4          77 X COMP-X.
+       5 >        77 N PIC N(2) COMP-N.
+    ----                   ^^^^
+       6          PROCEDURE DIVISION.
+       7
+    >> Error: PICTURE of category national is incompatible with USAGE
+              COMP-N; expected a PICTURE for numeric or alphanumeric data item
+
+    X: bytes=1 signed=false scaling=0 truncation=native
+    N: bytes=4 signed=false scaling=0 truncation=native |}];;
+
+let options_with_dialect_ancestry ancestry =
+  let default_options = Prog_parser.options () in
+  { default_options with
+    config =
+      (module (struct
+        include (val default_options.config)
+        let dialect = List.hd (List.rev ancestry)
+        let dialect_ancestry = ancestry
+      end)) }
+
+let%expect_test "usage-comp-x-alphanum-mf" =
+  show_binary_sizes
+    ~parser_options:(options_with_dialect_ancestry
+                       Cobol_config.DIALECT.[mf_strict; mf]) @@
+  prog "usage-comp-x-alphanum-mf"
+    ~working_storage:{|
+       77 AX8 PIC X(8) COMP-X.
+       77 AX9 PIC X(9) COMP-X.
+       77 AN12 PIC X(12) COMP-N.
+    |};
+  [%expect {|
+    prog.cob:5.18-5.22:
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4          77 AX8 PIC X(8) COMP-X.
+       5 >        77 AX9 PIC X(9) COMP-X.
+    ----                     ^^^^
+       6          77 AN12 PIC X(12) COMP-N.
+       7          PROCEDURE DIVISION.
+    >> Warning: PICTURE of 9 characters for item with USAGE COMP-X exceeds the
+                limit of 8 characters of dialect mf; its size is 15 bytes, as in
+                GnuCOBOL
+
+    prog.cob:6.19-6.24:
+       3          WORKING-STORAGE SECTION.
+       4          77 AX8 PIC X(8) COMP-X.
+       5          77 AX9 PIC X(9) COMP-X.
+       6 >        77 AN12 PIC X(12) COMP-N.
+    ----                      ^^^^^
+       7          PROCEDURE DIVISION.
+       8
+    >> Warning: PICTURE of 12 characters for item with USAGE COMP-N exceeds the
+                limit of 8 characters of dialect mf; its size is 15 bytes, as in
+                GnuCOBOL
+
+    AX8: bytes=8 signed=false scaling=0 truncation=native
+    AX9: bytes=15 signed=false scaling=0 truncation=native
+    AN12: bytes=15 signed=false scaling=0 truncation=native |}];;
+
+let%expect_test "usage-comp-x-alphanum-mf-derived" =
+  show_binary_sizes
+    ~parser_options:(options_with_dialect_ancestry
+                       Cobol_config.DIALECT.[mf; Custom ("my-mf",
+                                                         { strict = false })]) @@
+  prog "usage-comp-x-alphanum-mf-derived"
+    ~working_storage:{|
+       77 AX9 PIC X(9) COMP-X.
+    |};
+  [%expect {|
+    prog.cob:4.18-4.22:
+       1          PROGRAM-ID. usage-comp-x-alphanum-mf-derived.
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4 >        77 AX9 PIC X(9) COMP-X.
+    ----                     ^^^^
+       5          PROCEDURE DIVISION.
+       6
+    >> Warning: PICTURE of 9 characters for item with USAGE COMP-X exceeds the
+                limit of 8 characters of dialect mf, from which my-mf derives;
+                its size is 15 bytes, as in GnuCOBOL
+
+    AX9: bytes=15 signed=false scaling=0 truncation=native |}];;

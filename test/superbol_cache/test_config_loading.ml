@@ -25,6 +25,8 @@ let files =
     (* Comes earlier in the search path, but is not next to [my.conf]: *)
     "/elsewhere/inc.conf", "tab-width: 2\n";
     "/conf/Mixed-Case.conf", "include \"inc.conf\"\nname: \"mixed\"\n";
+    "/conf/mf.conf", "name: \"Micro Focus COBOL (lax)\"\n";
+    "/conf/my-mf.conf", "include \"mf.conf\"\nname: \"my-mf\"\n";
   ]
 
 (* Can be found, but not read. *)
@@ -96,3 +98,21 @@ let%expect_test "custom dialects keep the case of their file name" =
     load ~platform "/conf/Mixed-Case.conf" in
   Printf.printf "loaded: %s\n" (Option.value file ~default:"none");
   [%expect {| loaded: /conf/Mixed-Case.conf |}];;
+
+let%expect_test "configurations derived from Micro Focus ones are detected" =
+  List.iter begin fun name ->
+    let { result = config, _; _ }: _ Cobol_common.Diagnostics.with_diags =
+      load ~platform name in
+    Printf.printf "%s: dialect=%s ancestry=[%s] mf-ancestor=%s\n" name
+      Cobol_config.(DIALECT.to_string @@ dialect config)
+      (String.concat "; " @@
+       List.map Cobol_config.DIALECT.to_string @@
+       Cobol_config.dialect_ancestry config)
+      (match Cobol_config.microfocus_ancestor config with
+       | None -> "none"
+       | Some d -> Cobol_config.DIALECT.to_string d)
+  end ["my.conf"; "mf"; "my-mf.conf"];
+  [%expect {|
+    my.conf: dialect=default ancestry=[default] mf-ancestor=none
+    mf: dialect=mf ancestry=[mf] mf-ancestor=mf
+    my-mf.conf: dialect=my-mf ancestry=[mf; my-mf] mf-ancestor=mf |}];;

@@ -74,6 +74,7 @@ module Make
 
   let config = config
   let dialect = dialect
+  let dialect_ancestry = dialect_ancestry
 
   (* reserved_words *)
   let words = words

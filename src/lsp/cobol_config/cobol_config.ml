@@ -268,9 +268,9 @@ let from_file_n_path ~platform ?search_path ?(verbose=false) file =
   if verbose then
     Pretty.error "Loading: `%s'@." file;
   let module Words = Words.Make () in
-  let path, options = load_file (module Words) ~platform ?search_path file in
+  let path, options_list = load_file (module Words) ~platform ?search_path file in
   let options, words, intrinsic, system_names, registers
-    = make_conf (module Words) options in
+    = make_conf (module Words) options_list in
   let module Diags = DIAGS.InitStateful () in
   let module Config =
     From_file.Make (Diags) (struct
@@ -282,6 +282,14 @@ let from_file_n_path ~platform ?search_path ?(verbose=false) file =
         try DIALECT.of_gnucobol_config_name config.name
         with Invalid_argument _ ->
           raise @@ ERROR (Unknown_dialect config.name)
+      let dialect_ancestry =
+        List.filter_map begin function
+          | Conf_ast.Value { key = "name"; value = String s } ->
+              (try Some (DIALECT.of_gnucobol_config_name s)
+               with Invalid_argument _ -> None)
+          | _ ->
+              None
+        end options_list
       let options = options
       let words = words
       let intrinsic_functions = intrinsic
@@ -321,5 +329,12 @@ let from_dialect ~platform ?search_path ?verbose d =
   from_dialect_n_file ~platform ?search_path ?verbose d
 
 let dialect (module C: T) = C.dialect
+let dialect_ancestry (module C: T) = C.dialect_ancestry
+let microfocus_ancestor config =
+  (* closest ancestors come last *)
+  List.fold_left begin fun found -> function
+    | DIALECT.MicroFocus _ as d -> Some d
+    | _ -> found
+  end None (dialect_ancestry config)
 
 let tab_stops (module C: T) = C.tab_stops#value

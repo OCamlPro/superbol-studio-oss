@@ -74,4 +74,10 @@ val from_dialect_n_file
 
 val dialect: t -> dialect
 
+(** See {!Types.CONFIG.dialect_ancestry}. *)
+val dialect_ancestry: t -> dialect list
+
+(** Closest Micro Focus dialect in {!dialect_ancestry}, if any. *)
+val microfocus_ancestor: t -> dialect option
+
 val tab_stops: t -> int list

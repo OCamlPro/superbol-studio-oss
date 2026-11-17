@@ -544,6 +544,10 @@ type dialect = DIALECT.t
 
 module type CONFIG = sig
   val dialect: dialect
+
+  (** Dialects of the configurations this one includes (directly or not),
+      followed by its own [dialect]; each comes after those it includes. *)
+  val dialect_ancestry: dialect list
   val config: configuration
 end
 

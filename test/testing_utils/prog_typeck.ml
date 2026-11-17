@@ -12,8 +12,11 @@
 (**************************************************************************)
 
 let typeck ?parser_options ?source_format ?copybooks ?filename contents =
-  let module Config =
-    (val match parser_options with
+  let options =
+    let module H = Superbol_project.Hardcoded_assumptions in
+    Cobol_typeck.Config.from_cobol_config
+      ~target_byte_order:H.machine_byte_order
+      (match parser_options with
        | None -> Cobol_config.default
        | Some o -> o.Cobol_parser.Options.config)
   in
@@ -25,10 +28,6 @@ let typeck ?parser_options ?source_format ?copybooks ?filename contents =
   Prog_parser.parse ?parser_options ?source_format ?copybooks ?filename contents |>
   Cobol_parser.Outputs.translate_diags |>
   Cobol_common.Diagnostics.map_result
-    ~f:(Cobol_typeck.compilation_group
-          ~options:{ binary_size = Config.binary_size#value;
-                     binary_byteorder = Config.binary_byteorder#value;
-                     target_byte_order = Superbol_project.Hardcoded_assumptions.machine_byte_order }
-          ~fold_exec_block' ) |>
+    ~f:(Cobol_typeck.compilation_group ~options ~fold_exec_block') |>
   Cobol_common.Diagnostics.more_result
     ~f:Cobol_typeck.Results.translate_diags

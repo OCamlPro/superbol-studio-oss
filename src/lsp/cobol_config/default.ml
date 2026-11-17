@@ -44,6 +44,7 @@ let default_aliases =
 module Default: Types.T = struct
   open Types
   let dialect = DIALECT.Default
+  let dialect_ancestry = [dialect]
   let config = { name = DIALECT.to_string dialect }
 
   let words =
