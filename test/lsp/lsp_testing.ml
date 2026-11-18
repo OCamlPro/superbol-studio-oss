@@ -46,7 +46,8 @@ let make_server ?(with_semantic_tokens = false) () =
   Cobol_common.Platform.copy ~dst:LSP.Platform.record ~src:platform;
   LSP.Server.init
     ~params:{ config = { lsp_project_layout = layout;
-                         lsp_cache_for = Lsp_caching.lsp_cache_for;
+                         lsp_cache_for = (fun ~rootdir:_ ->
+                             Superbol_cache.Cache.disabled);
                          lsp_cache_verbose = false;
                          lsp_cache_pruning_policy = Never;
                          enable_client_configs = false;

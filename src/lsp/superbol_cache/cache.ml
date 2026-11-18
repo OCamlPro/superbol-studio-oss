@@ -143,7 +143,8 @@ let remove_value { cache_store; _ } ~unless_one_of digest =
   if not (List.mem digest unless_one_of) then
     cache_store.remove (Layout.object_ digest)
 
-let store ({ cache_store; _ } as t) ~key ~label ~witnesses ~write_item value =
+let store_value ({ cache_store; _ } as t) ~key ~label ~witnesses ~write_item
+    value =
   match write_item value with
   | Error err ->
       Error (Unreadable err)
@@ -184,6 +185,11 @@ let store ({ cache_store; _ } as t) ~key ~label ~witnesses ~write_item value =
             ()
       end;
       Result.map_error (fun msg -> Storage msg) published
+
+let store ({ cache_store; _ } as t) ~key ~label ~witnesses ~write_item value =
+  if cache_store == Store.unavailable
+  then Error (Storage "no storage available")
+  else store_value t ~key ~label ~witnesses ~write_item value
 
 (* --- Superseding --- *)
 
