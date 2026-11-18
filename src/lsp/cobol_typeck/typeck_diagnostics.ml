@@ -11,7 +11,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Srcloc.TYPES
 
 module DIAGS = Cobol_common.Diagnostics
 module LIST = Cobol_common.Basics.LIST
@@ -24,11 +23,8 @@ type diagnostic =
   | Proc_error of Typeck_procedure_diagnostics.error
   | Condition_error of Typeck_condition_diagnostics.error
   | Condition_warning of Typeck_condition_diagnostics.warning
-  | Dialect_feature_used of
-      {
-        feature: Cobol_dialect.Types.feature_info;
-        usage_loc: srcloc;
-      }
+  | Dialect_feature_error of Cobol_dialect.Types.usage
+  | Dialect_feature_warning of Cobol_dialect.Types.usage
 
 type diagnostics = diagnostic list
 type t = diagnostics
@@ -39,14 +35,13 @@ let diagnostic_severity = function
   | Env_error _
   | Data_error _
   | Proc_error _ 
-  | Condition_error _ ->
+  | Condition_error _
+  | Dialect_feature_error _ ->
       `Print DIAGS.Error
   | Data_warning _ 
-  | Condition_warning _ ->
+  | Condition_warning _
+  | Dialect_feature_warning _ ->
       `Print DIAGS.Warn
-  | Dialect_feature_used { feature = _; _ } ->
-      (* TODO: explicitly add a feature -> support mapping in [config] *)
-      `Ignore
 
 let diagnostic_loc = function
   | Env_error e ->
@@ -61,7 +56,8 @@ let diagnostic_loc = function
       Typeck_condition_diagnostics.error_loc e
   | Condition_warning w ->
       Typeck_condition_diagnostics.warning_loc w
-  | Dialect_feature_used { usage_loc = loc; _ } ->
+  | Dialect_feature_error { loc; _ }
+  | Dialect_feature_warning { loc; _ } ->
       loc
 
 let pp_diagnostic ppf = function
@@ -77,18 +73,20 @@ let pp_diagnostic ppf = function
       Typeck_condition_diagnostics.pp_error ppf e
   | Condition_warning w ->
       Typeck_condition_diagnostics.pp_warning ppf w
-  | Dialect_feature_used { feature; _ } ->
-      Pretty.print ppf "%(%)@ used" (Cobol_dialect.Feature.short feature)
+  | Dialect_feature_error u
+  | Dialect_feature_warning u ->
+      Cobol_dialect.Diagnostics.pp_usage ppf u
 
 let has_errors: diagnostics -> bool =
   List.exists begin function
     | Env_error _
     | Data_error _
     | Proc_error _ 
-    | Condition_error _ -> true
+    | Condition_error _
+    | Dialect_feature_error _ -> true
     | Data_warning _
     | Condition_warning _
-    | Dialect_feature_used _ -> false
+    | Dialect_feature_warning _ -> false
   end
 
 let count_errors: diagnostics -> int =
@@ -96,10 +94,11 @@ let count_errors: diagnostics -> int =
     | Env_error _
     | Data_error _
     | Proc_error _ 
-    | Condition_error _ -> succ acc
+    | Condition_error _
+    | Dialect_feature_error _ -> succ acc
     | Data_warning _
     | Condition_warning _
-    | Dialect_feature_used _ -> acc
+    | Dialect_feature_warning _ -> acc
   end 0
 
 let count_warnings: diagnostics -> int =
@@ -107,10 +106,11 @@ let count_warnings: diagnostics -> int =
     | Env_error _
     | Data_error _
     | Proc_error _
-    | Condition_error _ -> acc
+    | Condition_error _
+    | Dialect_feature_error _ -> acc
     | Data_warning _
     | Condition_warning _
-    | Dialect_feature_used _ -> succ acc
+    | Dialect_feature_warning _ -> succ acc
   end 0
 
 let translate diagnostics =

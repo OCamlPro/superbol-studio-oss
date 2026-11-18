@@ -20,6 +20,7 @@ type options =
     alphanumeric_comp_x_over_8_chars_rejected_by: Cobol_config.dialect option;
     (** if set, warn about COMP-X and COMP-N items with an alphanumeric PICTURE
         of more than 8 characters, which this dialect rejects *)
+    free_redefines_position: unit Cobol_dialect.Types.binding;
   }
 
 and binary_size = Cobol_config.Types.binary_size
@@ -38,4 +39,5 @@ let from_cobol_config ~target_byte_order (config: Cobol_config.t) =
     alphanumeric_comp_x_over_8_chars_rejected_by =
       Cobol_dialect.Origin.closest_ancestor
         (function MicroFocus _ -> true | _ -> false) Config.origin;
+    free_redefines_position = Config.free_redefines_position;
   }

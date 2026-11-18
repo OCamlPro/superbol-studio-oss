@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Reporting of REDEFINES clauses that do not immediately follow the data-name, according to the support of the dialect for this feature [#742](https://github.com/OCamlPro/superbol-studio-oss/pull/742)
 - Support for data items with `USAGE COMP-X` or `COMP-N` [#737](https://github.com/OCamlPro/superbol-studio-oss/pull/737)
 - Support for Micro Focus-style comment lines [#734](https://github.com/OCamlPro/superbol-studio-oss/pull/734)
 - Byte order of binary data items (`BINARY`, `COMP`, `COMP-5`, `BINARY-*`), decided by the typechecker from the `binary-byteorder` option and the byte order of the target

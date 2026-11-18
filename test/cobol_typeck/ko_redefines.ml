@@ -102,3 +102,75 @@ let%expect_test "duplicate-clause-in-redefinition" =
        6          PROCEDURE DIVISION.
        7
     >> Warning: Duplicate PICTURE clause |}];;
+
+let options_with_free_redefines_position ?(dialect = Cobol_dialect.Id.default)
+    level =
+  let default_options = Prog_parser.options () in
+  { default_options with
+    config =
+      (module (struct
+        include (val default_options.config)
+        let origin = Cobol_dialect.Origin.of_id dialect
+        let free_redefines_position =
+          Cobol_dialect.Feature.bind ~origin
+            Cobol_config.Options.free_redefines_position level
+      end)) }
+
+let free_redefines_prog =
+  prog "free-redefines"
+    ~working_storage:{|
+       01 A PIC 9.
+       01 B PIC 9 REDEFINES A.
+    |}
+
+let%expect_test "free-redefines-position-default" =
+  dotest free_redefines_prog;
+  [%expect {|
+    prog.cob:5.18-5.29:
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4          01 A PIC 9.
+       5 >        01 B PIC 9 REDEFINES A.
+    ----                     ^^^^^^^^^^^
+       6          PROCEDURE DIVISION.
+       7
+    >> Warning: REDEFINES clause not following entry-name in definition used |}];;
+
+let%expect_test "free-redefines-position-ok" =
+  dotest free_redefines_prog
+    ~parser_options:(options_with_free_redefines_position (Ok ()));
+  [%expect {| |}];;
+
+let%expect_test "free-redefines-position-unconformable" =
+  dotest free_redefines_prog
+    ~parser_options:(options_with_free_redefines_position Unconformable
+                       ~dialect:Cobol_dialect.Id.cobol85);
+  [%expect {|
+    prog.cob:5.18-5.29:
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4          01 A PIC 9.
+       5 >        01 B PIC 9 REDEFINES A.
+    ----                     ^^^^^^^^^^^
+       6          PROCEDURE DIVISION.
+       7
+    >> Error: REDEFINES clause not following entry-name in definition does not
+              conform to cobol85 |}];;
+
+let%expect_test "free-redefines-position-diagnostics-can-be-marshalled" =
+  let parser_options =
+    options_with_free_redefines_position Unconformable
+      ~dialect:Cobol_dialect.Id.cobol85 in
+  let options =
+    Cobol_typeck.Config.from_cobol_config parser_options.config
+      ~target_byte_order:Big_endian in
+  let { result = ptree; _ }: _ Cobol_common.Diagnostics.with_diags =
+    Prog_parser.parse ~parser_options free_redefines_prog |>
+    Cobol_parser.Outputs.translate_diags in
+  let Cobol_typeck.Results.{ diags; _ } =
+    Cobol_typeck.compilation_group ptree ~options
+      ~fold_exec_block':(fun ~data_definitions:_ _ acc -> acc) in
+  Printf.printf "diagnostics: %d, marshalled: %b\n"
+    (List.length diags)
+    (String.length (Marshal.to_string diags []) > 0);
+  [%expect {| diagnostics: 1, marshalled: true |}];;
