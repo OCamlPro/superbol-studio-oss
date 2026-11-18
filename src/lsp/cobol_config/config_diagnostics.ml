@@ -15,7 +15,6 @@ type error =
   | Invalid_key_value_pair of string * Conf_ast.value
   | Lexing_error of Conf_lexer.error
   | Syntax_error of Cobol_common.Srcloc.srcloc option * string option
-  | Unknown_dialect of string
   | Missing_file of string * string list
 
 let pp_error ?platform ppf = function
@@ -35,8 +34,6 @@ let pp_error ?platform ppf = function
         (Pretty.option @@
          Cobol_common.Srcloc.pp_srcloc_with_optional_caret ?platform) loc
         Fmt.(option (any ": " ++ string)) msg
-  | Unknown_dialect name ->
-      Pretty.print ppf "Unknown@ dialect@ `%s'" name
   | Missing_file (filename, search_path) ->
       Pretty.print ppf "Configuration@ file@ `%s'@ not@ found@ (search@ path:@ \
                         %a)" filename Pretty.path search_path

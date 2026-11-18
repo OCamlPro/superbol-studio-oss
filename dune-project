@@ -491,6 +491,24 @@
  )
 
 (package
+ (name cobol_dialect)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "SuperBOL Studio OSS is a new platform for COBOL")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.2))
+   (pretty (= :version))
+   (cobol_common (= :version))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
  (name cobol_config)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
@@ -503,6 +521,7 @@
    (ocaml (>= 4.14.2))
    (pretty (= :version))
    (menhirLib (and ( >= 20231231 )( < 20240715 )))
+   (cobol_dialect (= :version))
    (cobol_common (= :version))
    (ppx_deriving ( >= 5.2.1 ))
    (menhir (and ( >= 20231231 )( < 20240715 )))
@@ -608,6 +627,7 @@
    (cobol_ptree (= :version))
    (cobol_procedure (= :version))
    (cobol_parser (= :version))
+   (cobol_dialect (= :version))
    (cobol_data (= :version))
    (cobol_config (= :version))
    (cobol_common (= :version))

@@ -42,7 +42,7 @@ let action ~numeric ~intext ~inplace ?suffix ?range
         ~platform:Superbol_platform.record
         ~source_format
         ~config:project.config.indent_config
-        ~dialect:Config.dialect
+        ~dialect:Config.origin.id
         ~filename
         ?output
         ?range

@@ -1,0 +1,20 @@
+# name of package
+name = "cobol_dialect"
+skeleton = "library"
+
+# kind is either "library", "program" or "virtual"
+kind = "library"
+
+# name of a file to generate with the current version
+gen-version = "version.ml"
+
+# files to skip while updating at package level
+skip = ["main.ml", "index.mld"]
+
+# package library dependencies
+[dependencies]
+cobol_common = "version"
+pretty = "version"
+
+# package fields (depends on package skeleton)
+[fields]

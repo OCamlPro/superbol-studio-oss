@@ -103,14 +103,14 @@ let%expect_test "configurations derived from Micro Focus ones are detected" =
   List.iter begin fun name ->
     let { result = config, _; _ }: _ Cobol_common.Diagnostics.with_diags =
       load ~platform name in
+    let origin = Cobol_config.origin config in
     Printf.printf "%s: dialect=%s ancestry=[%s] mf-ancestor=%s\n" name
-      Cobol_config.(DIALECT.to_string @@ dialect config)
-      (String.concat "; " @@
-       List.map Cobol_config.DIALECT.to_string @@
-       Cobol_config.dialect_ancestry config)
-      (match Cobol_config.microfocus_ancestor config with
+      (Cobol_dialect.Id.to_string origin.id)
+      (String.concat "; " @@ List.map Cobol_dialect.Id.to_string origin.ancestry)
+      (match Cobol_dialect.Origin.closest_ancestor
+               (function MicroFocus _ -> true | _ -> false) origin with
        | None -> "none"
-       | Some d -> Cobol_config.DIALECT.to_string d)
+       | Some d -> Cobol_dialect.Id.to_string d)
   end ["my.conf"; "mf"; "my-mf.conf"];
   [%expect {|
     my.conf: dialect=default ancestry=[default] mf-ancestor=none

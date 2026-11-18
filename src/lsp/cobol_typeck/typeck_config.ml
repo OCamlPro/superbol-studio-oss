@@ -34,7 +34,8 @@ let from_cobol_config ~target_byte_order (config: Cobol_config.t) =
     binary_size = Config.binary_size#value;
     binary_byteorder = Config.binary_byteorder#value;
     target_byte_order;
-    dialect = Config.dialect;
+    dialect = Config.origin.id;
     alphanumeric_comp_x_over_8_chars_rejected_by =
-      Cobol_config.microfocus_ancestor config;
+      Cobol_dialect.Origin.closest_ancestor
+        (function MicroFocus _ -> true | _ -> false) Config.origin;
   }

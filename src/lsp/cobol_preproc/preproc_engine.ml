@@ -196,7 +196,7 @@ let preprocessor input = function
             copybooks = Cobol_common.Srcloc.no_copy;
             copybook_rev_comments = StringMap.empty;
             copybook_lookup_config;
-            dialect = Config.dialect;
+            dialect = Config.origin.id;
             src_options;
             source_format;
             exec_preprocs;

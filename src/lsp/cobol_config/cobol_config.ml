@@ -274,22 +274,22 @@ let from_file_n_path ~platform ?search_path ?(verbose=false) file =
   let module Diags = DIAGS.InitStateful () in
   let module Config =
     From_file.Make (Diags) (struct
-      let config =
-        { name = match StringMap.find "name" options with
-              | Conf_ast.String s -> s
-              | v -> raise @@ ERROR (Invalid_key_value_pair ("name", v)) }
-      let dialect =
-        try DIALECT.of_gnucobol_config_name config.name
-        with Invalid_argument _ ->
-          raise @@ ERROR (Unknown_dialect config.name)
-      let dialect_ancestry =
-        List.filter_map begin function
-          | Conf_ast.Value { key = "name"; value = String s } ->
-              (try Some (DIALECT.of_gnucobol_config_name s)
-               with Invalid_argument _ -> None)
-          | _ ->
-              None
-        end options_list
+      let origin : Cobol_dialect.Types.origin =
+        let display_name = match StringMap.find "name" options with
+          | Conf_ast.String s -> s
+          | v -> raise @@ ERROR (Invalid_key_value_pair ("name", v))
+        in
+        {
+          id = DIALECT.of_config_name display_name;
+          display_name;
+          file = Option.some path;
+          ancestry = List.filter_map begin function
+              | Conf_ast.Value { key = "name"; value = String s } ->
+                  Option.some (DIALECT.of_config_name s)
+              | _ ->
+                  Option.none
+            end options_list;
+        }
       let options = options
       let words = words
       let intrinsic_functions = intrinsic
@@ -328,13 +328,7 @@ let from_dialect ~platform ?search_path ?verbose d =
   DIAGS.map_result ~f:fst @@
   from_dialect_n_file ~platform ?search_path ?verbose d
 
-let dialect (module C: T) = C.dialect
-let dialect_ancestry (module C: T) = C.dialect_ancestry
-let microfocus_ancestor config =
-  (* closest ancestors come last *)
-  List.fold_left begin fun found -> function
-    | DIALECT.MicroFocus _ as d -> Some d
-    | _ -> found
-  end None (dialect_ancestry config)
+let origin (module C: T) = C.origin
+let dialect config = (origin config).id
 
 let tab_stops (module C: T) = C.tab_stops#value

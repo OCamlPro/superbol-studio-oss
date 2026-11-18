@@ -25,7 +25,7 @@ let config_with_tab_stops widths: Cobol_config.t =
     include Default
     let tab_stops =
       Cobol_config.Options.tab_stops#from_val
-        ~config:Cobol_config.{ name = "test" } widths
+        ~config:Default.origin widths
   end)
 
 let options

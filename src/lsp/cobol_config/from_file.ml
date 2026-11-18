@@ -72,9 +72,7 @@ module Make
     | None -> not_found name; raise LookupError
 
 
-  let config = config
-  let dialect = dialect
-  let dialect_ancestry = dialect_ancestry
+  let origin = origin
 
   (* reserved_words *)
   let words = words
@@ -84,15 +82,15 @@ module Make
 
 
   let parse_value finder v default =
-    try v#from_val ~config (finder v#name)
+    try v#from_val ~config:origin (finder v#name)
     with LookupError -> default
   let parse_int_value = parse_value find_int
   let parse_bool_value = parse_value find_bool
   let parse_string_value v default =
-    try v#from_string ~config (find_any v#name)
+    try v#from_string ~config:origin (find_any v#name)
     with LookupError -> default
   let parse_support_value v default =
-    try v#from_ast ~config (find_support v#name)
+    try v#from_ast ~config:origin (find_support v#name)
     with LookupError -> default
 
   (* int values *)

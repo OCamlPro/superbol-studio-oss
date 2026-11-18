@@ -21,7 +21,7 @@ let mf_binary_sizing_options =
     config =
       (module (struct
         include (val default_options.config)
-        let binary_size = Cobol_config.Options.binary_size#from_val ~config B_1__8
+        let binary_size = Cobol_config.Options.binary_size#from_val ~config:origin B_1__8
       end)) }
 
 let%expect_test "usage-binary" =
@@ -946,7 +946,7 @@ let native_byteorder_options =
       (module (struct
         include (val default_options.config)
         let binary_byteorder =
-          Cobol_config.Options.binary_byteorder#from_val ~config Native
+          Cobol_config.Options.binary_byteorder#from_val ~config:origin Native
       end)) }
 
 (** Shows the byte order of each binary item. *)
@@ -1116,14 +1116,14 @@ let options_with_dialect_ancestry ancestry =
     config =
       (module (struct
         include (val default_options.config)
-        let dialect = List.hd (List.rev ancestry)
-        let dialect_ancestry = ancestry
+        let origin =
+          { origin with id = List.hd (List.rev ancestry); ancestry }
       end)) }
 
 let%expect_test "usage-comp-x-alphanum-mf" =
   show_binary_sizes
     ~parser_options:(options_with_dialect_ancestry
-                       Cobol_config.DIALECT.[mf_strict; mf]) @@
+                       Cobol_dialect.Id.[mf_strict; mf]) @@
   prog "usage-comp-x-alphanum-mf"
     ~working_storage:{|
        77 AX8 PIC X(8) COMP-X.
@@ -1162,8 +1162,7 @@ let%expect_test "usage-comp-x-alphanum-mf" =
 let%expect_test "usage-comp-x-alphanum-mf-derived" =
   show_binary_sizes
     ~parser_options:(options_with_dialect_ancestry
-                       Cobol_config.DIALECT.[mf; Custom ("my-mf",
-                                                         { strict = false })]) @@
+                       Cobol_dialect.Id.[mf; From_file "my-mf"]) @@
   prog "usage-comp-x-alphanum-mf-derived"
     ~working_storage:{|
        77 AX9 PIC X(9) COMP-X.

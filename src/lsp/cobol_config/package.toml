@@ -54,6 +54,7 @@ skip = ["main.ml", "index.mld"]
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
 cobol_common = "version"
+cobol_dialect = "version"
 pretty = "version"
 [dependencies.menhirLib]
 libname = "menhirLib"
