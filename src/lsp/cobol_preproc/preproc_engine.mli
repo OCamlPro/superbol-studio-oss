@@ -93,16 +93,6 @@ val lex_file
   -> string
   -> unit Preproc_outputs.with_diags
 
-val lex_lib
-  : platform: Cobol_common.Platform.TYPES.platform
-  -> dialect: Cobol_dialect.Types.id
-  -> source_format: Cobol_config.source_format_spec
-  -> lookup_config: Cobol_common.Copybook.TYPES.lookup_config
-  -> ?src_options:Src_options.t
-  -> ?ppf:Format.formatter
-  -> Cobol_common.Copybook.TYPES.fileloc
-  -> unit Preproc_outputs.with_diags
-
 (** [fold_source_lines ~dialect ~source_format ~skip_compiler_directives_text
     ~on_compiler_directive ~on_initial_source_format ~f input acc] applies [f
     line_number line acc] for each successive source line [line] of [input].

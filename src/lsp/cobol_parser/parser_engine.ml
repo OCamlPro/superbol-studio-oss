@@ -138,8 +138,8 @@ let malformed ps ~loc stuff = error ps @@ Malformed { loc; stuff }
 let unexpected ps ~loc stuff = error ps @@ Unexpected { loc; stuff }
 let missing ps ~loc stuff = error ps @@ Missing { loc; stuff }
 
-let add_diag ({ preproc = ({ diags; _ } as pp); _ } as ps) severity ?loc diag =
-  let diags = Parser_diagnostics.add_diag ~severity ?loc diag diags in
+let add_diag ({ preproc = ({ diags; _ } as pp); _ } as ps) severity ~loc diag =
+  let diags = Parser_diagnostics.add_diag ~severity ~loc diag diags in
   { ps with preproc = { pp with diags } }
 
 
@@ -336,14 +336,14 @@ let on_reduction ps tokens prod =
 
 (* --- *)
 
-let env_loc env =
+let env_loc ps env =
   match Grammar_interpr.top env with
-  | None -> None
-  | Some (Element (_, _, s, e)) -> Some (Srcloc_overlay.join_limits (s, e))
+  | None -> Srcloc_overlay.pointwise ps.prev_limit
+  | Some (Element (_, _, s, e)) -> Srcloc_overlay.join_limits (s, e)
 
 let on_pending ?(severity = Cobol_common.Diagnostics.Warn) descr ps env =
   if List.mem `Pending ps.preproc.persist.show
-  then add_diag ps severity ?loc:(env_loc env) (Implementation_pending descr)
+  then add_diag ps severity ~loc:(env_loc ps env) (Implementation_pending descr)
   else ps
 
 (* Report the WHEN phrases that were ignored because they carry no imperative statement
