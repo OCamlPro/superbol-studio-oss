@@ -17,7 +17,7 @@ module LIST = Cobol_common.Basics.LIST
 module NEL = Cobol_common.Basics.NEL
 
 type error =
-  | Copybook_lookup_error of { copyloc: srcloc option;
+  | Copybook_lookup_error of { copyloc: srcloc;
                                lnf: Cobol_common.Copybook.TYPES.lookup_error }
   | Cyclic_copy of { copyloc: srcloc; filename: string }
   | Unreadable_copybook of { copyloc: srcloc; filename: string; msg: string }
@@ -65,22 +65,20 @@ and unterminated_stuff =
   | Exec_block
 
 let error_loc = function
-  | Feature_error e ->
-      Some e.loc
   | Src_error e ->
-      Some (Src_diagnostics.error_loc e)
+      Src_diagnostics.error_loc e
   | Literal_error e ->
-      Some (Cobol_data.Error.loc e)
+      Cobol_data.Error.loc e
+  | Copybook_lookup_error { copyloc = loc; _ }
   | Cyclic_copy { copyloc = loc; _ }
-  | Unreadable_copybook { copyloc = loc; _ }
+  | Feature_error { loc; _ }
   | Forbidden { loc; _ }
   | Invalid { loc; _ }
   | Malformed { loc; _ }
   | Missing { loc; _ }
   | Unexpected { loc; _ }
+  | Unreadable_copybook { copyloc = loc; _ }
   | Unterminated { loc; _ } ->
-      Some loc
-  | Copybook_lookup_error { copyloc = loc; _ } ->
       loc
 
 let pp_preproc_statement ppf = function
@@ -291,6 +289,10 @@ let count_errors diags = List.length diags.errors
 let count_warnings diags = List.length diags.warnings
 let has_errors diags = diags.errors <> []
 
+let first_error_loc = function
+  | { errors = e :: _; _ } -> Some (error_loc e)
+  | _ -> None
+
 let add_src_diagnostics Src_diagnostics.{ errors; warnings } diags =
   diags |>
   List.fold_right (fun e -> add_error (Src_error e)) errors |>
@@ -311,5 +313,5 @@ let translate ({ warnings; errors }: t) =
     DIAGS.Acc.warn diags ~loc:(warning_loc w) "%a" pp_warning w
   end DIAGS.Set.none warnings |> fun diags ->
   List.fold_left begin fun diags e ->
-    DIAGS.Acc.error diags ?loc:(error_loc e) "%a" pp_error e
+    DIAGS.Acc.error diags ~loc:(error_loc e) "%a" pp_error e
   end diags errors

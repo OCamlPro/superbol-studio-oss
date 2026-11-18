@@ -104,7 +104,7 @@ let pp_customizable_diagnostic ppf = function
 type custom =
   {
     severity: Cobol_common.Diagnostics.severity;
-    loc: srcloc option;
+    loc: srcloc;
     diag: customizable_diagnostic;
   }
 type diagnostics =
@@ -131,6 +131,16 @@ let has_errors diags =
   diags.errors <> [] ||
   List.exists (fun { severity; _ } -> severity = Error) diags.customs
 
+let first_error_loc diags =
+  match diags.errors with
+  | e :: _ ->
+      Some (error_loc e)
+  | [] ->
+      List.find_map begin function
+        | { severity = Error; loc; _ } -> Some loc
+        | _ -> None
+      end diags.customs
+
 let count_errors diags =
   List.fold_left (fun n { severity; _ } -> n + if severity = Error then 1 else 0)
     (List.length diags.errors)
@@ -140,7 +150,7 @@ let count_warnings diags =
   List.fold_left (fun n { severity; _ } -> n + if severity = Warn then 1 else 0)
     0 diags.customs
 
-let add_diag ~severity ?loc diag diags =
+let add_diag ~severity ~loc diag diags =
   { diags with customs = { severity; loc; diag } :: diags.customs }
 
 let translate ({ errors; customs }: t) =
@@ -150,7 +160,7 @@ let translate ({ errors; customs }: t) =
     DIAGS.Acc.error diags ~loc:(error_loc e) "%a" pp_error e
   end diags errors |> fun diags ->
   List.fold_left begin fun diags { severity; loc; diag } ->
-    DIAGS.Acc.diag severity diags ?loc "%a" pp_customizable_diagnostic diag
+    DIAGS.Acc.diag severity diags ~loc "%a" pp_customizable_diagnostic diag
   end diags customs
 
 module Accumulator = struct
@@ -188,6 +198,10 @@ module ALL = struct                 (* combines preproc & parsing diagnostics *)
   let has_errors { preproc_diags; parser_diags } =
     Cobol_preproc.Diagnostics.has_errors preproc_diags ||
     has_errors parser_diags
+  let first_error_loc { preproc_diags; parser_diags } =
+    match Cobol_preproc.Diagnostics.first_error_loc preproc_diags with
+    | Some loc -> Some loc
+    | None -> first_error_loc parser_diags
   let count_errors { preproc_diags; parser_diags } =
     Cobol_preproc.Diagnostics.count_errors preproc_diags +
     count_errors parser_diags

@@ -540,7 +540,7 @@ and read_lib ({ persist = { copybook_lookup_config; platform;
     | Error lnf ->
         [],
         Preproc_diagnostics.add_error
-          (Copybook_lookup_error { copyloc = Some loc; lnf }) lp.diags,
+          (Copybook_lookup_error { copyloc = loc; lnf }) lp.diags,
         Preproc_trace.missing_copy ~loc ~error:lnf lp.pplog,
         lp.persist.copybook_rev_comments
   in
@@ -640,19 +640,6 @@ let lex_input ~platform ~dialect ~source_format ?src_options
 let lex_file ~platform ~dialect ~source_format ?src_options ?ppf filename =
   Src_input.from ~filename ~platform
     ~f:(lex_input ~dialect ~source_format ?src_options ~platform ?ppf)
-
-let lex_lib ~platform ~dialect ~source_format ~lookup_config
-    ?src_options ?(ppf = default_oppf) lib =
-  match platform.find_lib ~lookup_config lib with
-  | Ok filename ->
-      Src_input.from ~platform ~filename ~f:begin fun input ->
-        OUT.result @@
-        Src_reader.print_lines ~dialect ~skip_compiler_directives_text:true ppf @@
-        Src_reader.from input ?source_format:(source_format_config source_format)
-          ?options:src_options ~platform
-      end
-  | Error lnf ->
-      OUT.error_result () @@ Copybook_lookup_error { lnf; copyloc = None }
 
 let fold_source_lines ~platform ~dialect ~source_format ?src_options
     ?on_change_of_source_format ?skip_compiler_directives_text
