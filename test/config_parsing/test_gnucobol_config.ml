@@ -58,54 +58,54 @@ let%test_module _ = (module struct
 end)
 
 let%test "int values" = true
-  && Default_conf.tab_stops#value = Parsed_conf.tab_stops#value
-  && Default_conf.text_column#value = Parsed_conf.text_column#value
-  && Default_conf.pic_length#value = Parsed_conf.pic_length#value
-  && Default_conf.word_length#value = Parsed_conf.word_length#value
-  && Default_conf.literal_length#value = Parsed_conf.literal_length#value
-  && Default_conf.numeric_literal_length#value = Parsed_conf.numeric_literal_length#value
+  && Default_conf.tab_stops = Parsed_conf.tab_stops
+  && Default_conf.text_column = Parsed_conf.text_column
+  && Default_conf.pic_length = Parsed_conf.pic_length
+  && Default_conf.word_length = Parsed_conf.word_length
+  && Default_conf.literal_length = Parsed_conf.literal_length
+  && Default_conf.numeric_literal_length = Parsed_conf.numeric_literal_length
 
 let%test "any values" = true
-  && Default_conf.defaultbyte#value = Parsed_conf.defaultbyte#value
-  && Default_conf.standard_define#value = Parsed_conf.standard_define#value
-  && Default_conf.format#value = Parsed_conf.format#value
-  && Default_conf.binary_size#value = Parsed_conf.binary_size#value
-  && Default_conf.binary_byteorder#value = Parsed_conf.binary_byteorder#value
-  && Default_conf.assign_clause#value = Parsed_conf.assign_clause#value
-  && Default_conf.screen_section_rules#value = Parsed_conf.screen_section_rules#value
-  && Default_conf.dpc_in_data#value = Parsed_conf.dpc_in_data#value
+  && Default_conf.defaultbyte = Parsed_conf.defaultbyte
+  && Default_conf.standard_define = Parsed_conf.standard_define
+  && Default_conf.format = Parsed_conf.format
+  && Default_conf.binary_size = Parsed_conf.binary_size
+  && Default_conf.binary_byteorder = Parsed_conf.binary_byteorder
+  && Default_conf.assign_clause = Parsed_conf.assign_clause
+  && Default_conf.screen_section_rules = Parsed_conf.screen_section_rules
+  && Default_conf.dpc_in_data = Parsed_conf.dpc_in_data
 
 let%test "boolean values" = true
-  && Default_conf.filename_mapping#value = Parsed_conf.filename_mapping#value
-  && Default_conf.pretty_display#value = Parsed_conf.pretty_display#value
-  && Default_conf.binary_truncate#value = Parsed_conf.binary_truncate#value
-  && Default_conf.complex_odo#value = Parsed_conf.complex_odo#value
-  && Default_conf.odoslide#value = Parsed_conf.odoslide#value
-  && Default_conf.indirect_redefines#value = Parsed_conf.indirect_redefines#value
-  && Default_conf.relax_syntax_checks#value = Parsed_conf.relax_syntax_checks#value
-  && Default_conf.ref_mod_zero_length#value = Parsed_conf.ref_mod_zero_length#value
-  && Default_conf.relax_level_hierarchy#value = Parsed_conf.relax_level_hierarchy#value
-  && Default_conf.select_working#value = Parsed_conf.select_working#value
-  && Default_conf.local_implies_recursive#value = Parsed_conf.local_implies_recursive#value
-  && Default_conf.sticky_linkage#value = Parsed_conf.sticky_linkage#value
-  && Default_conf.move_ibm#value = Parsed_conf.move_ibm#value
-  && Default_conf.perform_osvs#value = Parsed_conf.perform_osvs#value
-  && Default_conf.arithmetic_osvs#value = Parsed_conf.arithmetic_osvs#value
-  && Default_conf.hostsign#value = Parsed_conf.hostsign#value
-  && Default_conf.program_name_redefinition#value = Parsed_conf.program_name_redefinition#value
-  && Default_conf.accept_update#value = Parsed_conf.accept_update#value
-  && Default_conf.accept_auto#value = Parsed_conf.accept_auto#value
-  && Default_conf.console_is_crt#value = Parsed_conf.console_is_crt#value
-  && Default_conf.no_echo_means_secure#value = Parsed_conf.no_echo_means_secure#value
-  && Default_conf.line_col_zero_default#value = Parsed_conf.line_col_zero_default#value
-  && Default_conf.display_special_fig_consts#value = Parsed_conf.display_special_fig_consts#value
-  && Default_conf.binary_comp_1#value = Parsed_conf.binary_comp_1#value
-  && Default_conf.numeric_pointer#value = Parsed_conf.numeric_pointer#value
-  && Default_conf.move_non_numeric_lit_to_numeric_is_zero#value = Parsed_conf.move_non_numeric_lit_to_numeric_is_zero#value
-  && Default_conf.implicit_assign_dynamic_var#value = Parsed_conf.implicit_assign_dynamic_var#value
-  && Default_conf.device_mnemonics#value = Parsed_conf.device_mnemonics#value
-  && Default_conf.xml_parse_xmlss#value = Parsed_conf.xml_parse_xmlss#value
-  && Default_conf.areacheck#value = Parsed_conf.areacheck#value
+  && Default_conf.filename_mapping = Parsed_conf.filename_mapping
+  && Default_conf.pretty_display = Parsed_conf.pretty_display
+  && Default_conf.binary_truncate = Parsed_conf.binary_truncate
+  && Default_conf.complex_odo = Parsed_conf.complex_odo
+  && Default_conf.odoslide = Parsed_conf.odoslide
+  && Default_conf.indirect_redefines = Parsed_conf.indirect_redefines
+  && Default_conf.relax_syntax_checks = Parsed_conf.relax_syntax_checks
+  && Default_conf.ref_mod_zero_length = Parsed_conf.ref_mod_zero_length
+  && Default_conf.relax_level_hierarchy = Parsed_conf.relax_level_hierarchy
+  && Default_conf.select_working = Parsed_conf.select_working
+  && Default_conf.local_implies_recursive = Parsed_conf.local_implies_recursive
+  && Default_conf.sticky_linkage = Parsed_conf.sticky_linkage
+  && Default_conf.move_ibm = Parsed_conf.move_ibm
+  && Default_conf.perform_osvs = Parsed_conf.perform_osvs
+  && Default_conf.arithmetic_osvs = Parsed_conf.arithmetic_osvs
+  && Default_conf.hostsign = Parsed_conf.hostsign
+  && Default_conf.program_name_redefinition = Parsed_conf.program_name_redefinition
+  && Default_conf.accept_update = Parsed_conf.accept_update
+  && Default_conf.accept_auto = Parsed_conf.accept_auto
+  && Default_conf.console_is_crt = Parsed_conf.console_is_crt
+  && Default_conf.no_echo_means_secure = Parsed_conf.no_echo_means_secure
+  && Default_conf.line_col_zero_default = Parsed_conf.line_col_zero_default
+  && Default_conf.display_special_fig_consts = Parsed_conf.display_special_fig_consts
+  && Default_conf.binary_comp_1 = Parsed_conf.binary_comp_1
+  && Default_conf.numeric_pointer = Parsed_conf.numeric_pointer
+  && Default_conf.move_non_numeric_lit_to_numeric_is_zero = Parsed_conf.move_non_numeric_lit_to_numeric_is_zero
+  && Default_conf.implicit_assign_dynamic_var = Parsed_conf.implicit_assign_dynamic_var
+  && Default_conf.device_mnemonics = Parsed_conf.device_mnemonics
+  && Default_conf.xml_parse_xmlss = Parsed_conf.xml_parse_xmlss
+  && Default_conf.areacheck = Parsed_conf.areacheck
 
 let%test "support options" = true
   && Default_conf.control_division.level = Parsed_conf.control_division.level
@@ -223,7 +223,7 @@ let tab_stops_of_conf value =
     (val load_conf (Printf.sprintf "include \"default.conf\"\ntab-width: %s\n"
                       value))
   in
-  Conf.tab_stops#value
+  Conf.tab_stops
 
 let rejected value =
   match tab_stops_of_conf value with

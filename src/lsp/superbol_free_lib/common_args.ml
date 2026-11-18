@@ -256,7 +256,7 @@ let get () =
       match !format with
       | Auto ->
           let module Config = (val config: Cobol_config.T) in
-          Config.format#value
+          Config.format
       | SF _ -> !format
     in
     let recovery =

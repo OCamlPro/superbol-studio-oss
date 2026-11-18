@@ -17,98 +17,23 @@ open EzCompat
 
 type doc = Pretty.simple
 
-type configuration = Cobol_dialect.Types.origin
-
-(** Any object with a pretty-printing method. *)
-class type showable =
-  object
-    method pp: Pretty.delayed
-  end
-
-(** Kind (type) of configuration options. *)
-class virtual ['a] kind ~name =
-  object
-    val name: string = name
-    method name = name
-    method pp: Pretty.delayed = fun ppf -> Pretty.string ppf name
-    method virtual parse: string -> 'a
-  end
-
-let all_configs: showable list ref = ref []         (* for listing of options *)
-let configurable_name_style = [`Yellow; `Bold]
-and configurable_kind_style = [`Cyan]
-
-(** Any object that is configurable. *)
-class virtual ['a] configurable ~name ~kind ?short doc =
-  let uncapitalize_heuristics s = match s.[1] with
-    | 'A' .. 'Z' | '-' -> s
-    | _ -> String.uncapitalize_ascii s
-    | exception Invalid_argument _ -> String.uncapitalize_ascii s
-  in
-  object (self)
-    val name: string = name
-    val kind: 'a kind = kind
-    val doc: doc = doc
-    method name = name
-    method short: doc = match short with
-      | Some s -> s
-      | None -> Pretty.Simple.map uncapitalize_heuristics doc
-    method pp ppf =
-      let pp_name = Pretty.styles configurable_name_style @@ Pretty.string
-      and pp_kind = Pretty.styles configurable_kind_style @@ Fmt.fmt "%t" in
-      Pretty.print ppf "@[<4>%a@ [%a]:@\n%(%)@]"
-        pp_name name pp_kind kind#pp doc
-    initializer begin
-      all_configs := (self :> showable) :: !all_configs;
-    end
-  end
-
 type 'a feature = 'a Cobol_dialect.Types.feature
 type 'a feature_support = 'a Cobol_dialect.Types.binding
 
-(* TODO: add min/max for int values. *)
+(** Definition of a valued option. *)
+type 'a value =
+  {
+    name: string;
+    doc: doc;
+    parse: string -> 'a;
+  }
+
 module Value = struct
-  (** Valued (typed) options. *)
-
-  (** Internal representation of typed option binding. *)
-  class ['a] v option ~config:_ v =
-    object
-      val option: 'a configurable = option
-      method value: 'a = v
-    end
-
-  (** Type of valued options *)
-  class ['a] value ~kind ~name ?short doc =
-    object (self)
-      inherit ['a] configurable ~kind ~name ?short doc
-      method from_val: config:configuration -> 'a -> 'a v =
-        new v (self :> 'a configurable)
-      method from_string ~(config:configuration) str: 'a v =
-        let value = kind#parse str in
-        new v (self :> 'a configurable) ~config value
-    end
-
-  type 'a t = 'a value
-
-  (** Definitions *)
-  let def ~name = new value ~name
-
-  let kind_from_fmt ~name fmt =
-    object
-      inherit [_] kind ~name
-      method parse s = Scanf.sscanf s fmt Fun.id
-    end
-
-  let int = def ~kind:(kind_from_fmt ~name:"int" "%d")
-  let int_list = def ~kind:(object
-    inherit [_] kind ~name:"int_list"
-    method parse s = Cobol_common.Tab_stops.of_string s
-  end)
-  let bool = def ~kind:(kind_from_fmt ~name:"bool" "%B")
-
+  let def ~name ~parse doc = { name; doc; parse }
+  let int = def ~parse:(fun s -> Scanf.sscanf s "%d" Fun.id)
+  let int_list = def ~parse:Cobol_common.Tab_stops.of_string
+  let bool = def ~parse:(fun s -> Scanf.sscanf s "%B" Fun.id)
 end
-type 'a valued_option = 'a Value.v                                     (* alias *)
-type 'a value = 'a Value.t                                             (* alias *)
 
 type defaultbyte =
   | Char of char (* int values will be translated to char *)
@@ -194,7 +119,7 @@ module type PP_OPTS = sig
   (** Preprocessor options*)
 
   (* int options *)
-  val tab_stops: int list valued_option
+  val tab_stops: int list
 
   (* support options *)
   val comment_paragraphs: unit feature_support
@@ -211,54 +136,54 @@ module type COMP_OPTS = sig
   val registers: StringSet.t
 
   (* int options *)
-  val text_column: int valued_option
-  val pic_length: int valued_option
-  val word_length: int valued_option
-  val literal_length: int valued_option
-  val numeric_literal_length: int valued_option
+  val text_column: int
+  val pic_length: int
+  val word_length: int
+  val literal_length: int
+  val numeric_literal_length: int
 
   (* any options *)
-  val defaultbyte: defaultbyte valued_option
-  val standard_define: standard valued_option
-  val format: source_format_spec valued_option
-  val binary_size: binary_size valued_option
-  val binary_byteorder: binary_byteorder valued_option
-  val assign_clause: assign_clause valued_option
-  val screen_section_rules: screen_section_rules valued_option
-  val dpc_in_data: dpc_in_data valued_option
+  val defaultbyte: defaultbyte
+  val standard_define: standard
+  val format: source_format_spec
+  val binary_size: binary_size
+  val binary_byteorder: binary_byteorder
+  val assign_clause: assign_clause
+  val screen_section_rules: screen_section_rules
+  val dpc_in_data: dpc_in_data
 
   (* boolean options *)
-  val filename_mapping: bool valued_option
-  val pretty_display: bool valued_option
-  val binary_truncate: bool valued_option
-  val complex_odo: bool valued_option
-  val odoslide: bool valued_option
-  val indirect_redefines: bool valued_option
-  val relax_syntax_checks: bool valued_option
-  val ref_mod_zero_length: bool valued_option
-  val relax_level_hierarchy: bool valued_option
-  val select_working: bool valued_option
-  val local_implies_recursive: bool valued_option
-  val sticky_linkage: bool valued_option
-  val move_ibm: bool valued_option
-  val perform_osvs: bool valued_option
-  val arithmetic_osvs: bool valued_option
-  val hostsign: bool valued_option
-  val program_name_redefinition: bool valued_option
-  val accept_update: bool valued_option
-  val accept_auto: bool valued_option
-  val console_is_crt: bool valued_option
-  val no_echo_means_secure: bool valued_option
-  val line_col_zero_default: bool valued_option
-  val display_special_fig_consts:  bool valued_option
-  val binary_comp_1: bool valued_option
-  val numeric_pointer:  bool valued_option
-  val move_non_numeric_lit_to_numeric_is_zero:  bool valued_option
-  val implicit_assign_dynamic_var:  bool valued_option
-  val device_mnemonics: bool valued_option
-  val xml_parse_xmlss: bool valued_option
-  val areacheck: bool valued_option
-  val ebcdic_symbolic_characters: bool valued_option
+  val filename_mapping: bool
+  val pretty_display: bool
+  val binary_truncate: bool
+  val complex_odo: bool
+  val odoslide: bool
+  val indirect_redefines: bool
+  val relax_syntax_checks: bool
+  val ref_mod_zero_length: bool
+  val relax_level_hierarchy: bool
+  val select_working: bool
+  val local_implies_recursive: bool
+  val sticky_linkage: bool
+  val move_ibm: bool
+  val perform_osvs: bool
+  val arithmetic_osvs: bool
+  val hostsign: bool
+  val program_name_redefinition: bool
+  val accept_update: bool
+  val accept_auto: bool
+  val console_is_crt: bool
+  val no_echo_means_secure: bool
+  val line_col_zero_default: bool
+  val display_special_fig_consts:  bool
+  val binary_comp_1: bool
+  val numeric_pointer:  bool
+  val move_non_numeric_lit_to_numeric_is_zero:  bool
+  val implicit_assign_dynamic_var:  bool
+  val device_mnemonics: bool
+  val xml_parse_xmlss: bool
+  val areacheck: bool
+  val ebcdic_symbolic_characters: bool
 
   (* support options *)
   val control_division: unit feature_support

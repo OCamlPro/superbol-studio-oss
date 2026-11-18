@@ -42,48 +42,38 @@ let numeric_literal_length: int value =
 
 (* any options *)
 let defaultbyte: defaultbyte value =
-  let kind = object
-    inherit [_] kind ~name:"defaultbyte"
-    method parse s: defaultbyte =
-      match s with
-      | "init" -> Init
-      | "none" -> None
-      | _ ->
-          if String.length s = 1 then
-            Char (s.[0])
-          else
-            begin match int_of_string_opt s with
-              | Some i when i >= 0 && i <= 255 ->
-                  Char (Char.chr i)
-              | _ -> invalid_arg s
-            end
-  end
+  let parse: string -> defaultbyte = function
+    | "init" -> Init
+    | "none" -> None
+    | s ->
+        if String.length s = 1 then
+          Char (s.[0])
+        else
+          begin match int_of_string_opt s with
+            | Some i when i >= 0 && i <= 255 ->
+                Char (Char.chr i)
+            | _ -> invalid_arg s
+          end
   in
-  Value.def ~name:"defaultbyte" ~kind
+  Value.def ~parse ~name:"defaultbyte"
     "Default@ initialization@ for@ field@ without@ Value."
 
 let standard_define: standard value =
-  let kind = object
-    inherit [_] kind ~name:"standard-define"
-    method parse s: standard =
-      match int_of_string_opt s with
-      | Some i when i >= 0 && i <= 9 ->
-          begin match i with
-            | 0 -> GnuCOBOL
-            | 1 -> MicroFocus
-            | 2 -> IBM
-            | 3 -> MVS
-            | 4 -> BS2000
-            | 5 -> ACU
-            | 6 -> RM
-            | 7 -> STD85
-            | 8 -> STD2002
-            | 9 -> STD2014
-            | _ -> assert false (*unreachable*)
-          end
-      | _ -> invalid_arg s
-  end in
-  Value.def ~kind ~name:"standard-define"
+  let parse: string -> standard = fun s ->
+    match int_of_string_opt s with
+    | Some 0 -> GnuCOBOL
+    | Some 1 -> MicroFocus
+    | Some 2 -> IBM
+    | Some 3 -> MVS
+    | Some 4 -> BS2000
+    | Some 5 -> ACU
+    | Some 6 -> RM
+    | Some 7 -> STD85
+    | Some 8 -> STD2002
+    | Some 9 -> STD2014
+    | _ -> invalid_arg s
+  in
+  Value.def ~parse ~name:"standard-define"
     "Used@ standard"
 
 let format_of_string s =
@@ -127,82 +117,66 @@ let string_of_format = function
   | Auto -> "auto"
 
 let format: source_format_spec value =
-  let kind = object
-    inherit [_] kind ~name:"format"
-    method parse s: source_format_spec = format_of_string s
-  end in
-  Value.def ~kind ~name:"format"
+  let parse: string -> source_format_spec = format_of_string in
+  Value.def ~parse ~name:"format"
     "Default@ reference@ format."
 
 let binary_size: binary_size value =
-  let kind = object
-    inherit [_] kind ~name:"binary-size"
-    method parse s: binary_size =
-      match s with
-      | "2-4-8" -> B_2_4_8
-      | "1-2-4-8" -> B_1_2_4_8
-      | "1--8" -> B_1__8
-      | _ -> invalid_arg s
-  end in
-  Value.def ~kind ~name:"binary-size"
-    ~short:"binary@ byte@ size"
+  let parse: string -> binary_size = function
+    | "2-4-8" -> B_2_4_8
+    | "1-2-4-8" -> B_1_2_4_8
+    | "1--8" -> B_1__8
+    | s -> invalid_arg s
+  in
+  Value.def ~parse ~name:"binary-size"
     "Binary@ byte@ size@ -@ defines@ the@ allocated@ bytes@ according@ to@ PIC."
 
 let binary_byteorder: binary_byteorder value =
-  let kind = object
-    inherit [_] kind ~name:"binary-byteorder"
-    method parse s: binary_byteorder =
-      match String.lowercase_ascii s with
-      | "native" -> Native
-      | "big-endian" -> Big_endian
-      | _ -> invalid_arg s
-  end in
-  Value.def ~kind ~name:"binary-byteorder"
+  let parse: string -> binary_byteorder = fun s ->
+    match String.lowercase_ascii s with
+    | "native" -> Native
+    | "big-endian" -> Big_endian
+    | _ -> invalid_arg s
+  in
+  Value.def ~parse ~name:"binary-byteorder"
     "Binary@ byte@ order."
 
 let assign_clause: assign_clause value =
-  let kind = object
-    inherit [_] kind ~name:"assign-clause"
-    method parse s: assign_clause =
-      match String.lowercase_ascii s with
-      | "dynamic" -> Dynamic
-      | "external" -> External
-      | "ibm" -> IBM
-      | "mf" -> MF
-      | _ -> invalid_arg s
-  end in
-  Value.def ~kind ~name:"assign-clause"
-    ~short:"how@ to@ interpret@ 'ASSIGN@ word'"
+  let parse: string -> assign_clause = fun s ->
+    match String.lowercase_ascii s with
+    | "dynamic" -> Dynamic
+    | "external" -> External
+    | "ibm" -> IBM
+    | "mf" -> MF
+    | _ -> invalid_arg s
+  in
+  Value.def ~parse ~name:"assign-clause"
     "How@ to@ interpret@ 'ASSIGN@ word':@ as@ 'ASSIGN@ EXTERNAL@ word'@ or@ 'ASSIGN@ DYNAMIC@ word'"
 
 let screen_section_rules: screen_section_rules value =
-  let kind = object
-    inherit [_] kind ~name:"screen-section-rules"
-    method parse s: screen_section_rules =
-      match String.lowercase_ascii s with
-      | "acu" -> ACU
-      | "gc" -> GC
-      | "mf" -> MF
-      | "rm" -> RM
-      | "std" -> STD
-      | "xopen" -> XOPEN
-      | _ -> invalid_arg s
-  end in
-  Value.def ~kind ~name:"screen-section-rules"
+  let parse: string -> screen_section_rules = fun s ->
+    match String.lowercase_ascii s with
+    | "acu" -> ACU
+    | "gc" -> GC
+    | "mf" -> MF
+    | "rm" -> RM
+    | "std" -> STD
+    | "xopen" -> XOPEN
+    | _ -> invalid_arg s
+  in
+  Value.def ~parse ~name:"screen-section-rules"
     "Which@ compiler's@ rules@ to@ apply@ to@ SCREEN@ SECTION@ item@ clauses."
 
 let dpc_in_data: dpc_in_data value =
-  let kind = object
-    inherit [_] kind ~name:"dpc-in-data"
-    method parse s: dpc_in_data =
-      match String.lowercase_ascii s with
-      | "none" -> None
-      | "xml" -> XML
-      | "json" -> Json
-      | "all" -> All
-      | _ -> invalid_arg s
-  end in
-  Value.def ~kind ~name:"dpc-in-data"
+  let parse: string -> dpc_in_data = fun s ->
+    match String.lowercase_ascii s with
+    | "none" -> None
+    | "xml" -> XML
+    | "json" -> Json
+    | "all" -> All
+    | _ -> invalid_arg s
+  in
+  Value.def ~parse ~name:"dpc-in-data"
     "Wether@ DECIMAL@ POINT@ IS@ COMMA@ has@ effect@ in@ XML/JSON@ GENERATE."
 
 (* boolean options *)
@@ -236,7 +210,6 @@ let relax_syntax_checks: bool value =
 
 let ref_mod_zero_length: bool value =
   Value.bool ~name:"ref-mod-zero-length"
-    ~short:"allow@ zero@ length@ reference-modification"
     "allow@ zero@ length@ reference-modification@ (only@ changed@ with@ EC-BOUND-REF-MOD@ active)"
 
 let relax_level_hierarchy: bool value =
@@ -293,7 +266,6 @@ let no_echo_means_secure: bool value =
 
 let line_col_zero_default: bool value =
   Value.bool ~name:"line-col-zero-default"
-    ~short:"assume@ a@ field@ DISPLAY@ starts@ at@ LINE@ 0@ COL@ 0"
     "assume@ a@ field@ DISPLAY@ starts@ at@ LINE@ 0@ COL@ 0@ (i.e.@ at@ the@ cursor),@ not LINE@ 1@ COL@ 1"
 
 let display_special_fig_consts: bool value =
@@ -326,7 +298,6 @@ let xml_parse_xmlss: bool value =
 
 let areacheck: bool value =
   Value.bool ~name:"areacheck"
-    ~short:"check@ contents@ of@ Area@ A@"
     "check@ contents@ of@ Area@ A@ (when@ reference@ format@ supports@ Area@ A enforcement)@\n\
      @[@[enabled@ checks@ include:@]@\n\
      @[*@ division,@ section,@ paragraph@ names,@ level@ indicators@ (FD,@ SD,@ RD,@ \
@@ -336,7 +307,6 @@ let areacheck: bool value =
 
 let ebcdic_symbolic_characters: bool value =
   Value.bool ~name:"ebcdic-symbolic-characters"
-    ~short:"EBCDIC symbolic characters"
     "EBCDIC symbolic characters in literals (\" \"135,151,151\"bar\"195, \
      194\"Z\" for \" foobarBAZ\")"
 

@@ -177,7 +177,7 @@ let preprocessor input = function
       let module Pp = Preproc_grammar.Make (Config) (Om) in
       let source_format = source_format_config source_format in
       let src_options =
-        Src_options.{ tab_stops = Config.tab_stops#value; mf_comments } in
+        Src_options.{ tab_stops = Config.tab_stops; mf_comments } in
       {
         buff = [];
         reader = Src_reader.from input ?source_format ~platform

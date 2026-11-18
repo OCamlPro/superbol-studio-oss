@@ -17,15 +17,13 @@ open Cobol_common.Srcloc.INFIX
 (** [config_with_tab_stops widths] is the default COBOL configuration, with its
     [tab-width] option overridden with [widths] (see {!Cobol_config.Options}).
     Tab stops are only reachable through the configuration (they are read in
-    [Cobol_preproc]'s engine via [Config.tab_stops#value]), so tests that need
+    [Cobol_preproc]'s engine via [Config.tab_stops]), so tests that need
     non-default tab stops must go through a configuration module. *)
 let config_with_tab_stops widths: Cobol_config.t =
   let module Default = (val Cobol_config.default: Cobol_config.T) in
   (module struct
     include Default
-    let tab_stops =
-      Cobol_config.Options.tab_stops#from_val
-        ~config:Default.origin widths
+    let tab_stops = widths
   end)
 
 let options

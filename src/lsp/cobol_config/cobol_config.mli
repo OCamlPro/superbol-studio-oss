@@ -25,8 +25,6 @@ module Diagnostics = Config_diagnostics
 
 exception ERROR of Diagnostics.error
 
-val print_options: Format.formatter -> unit
-
 val default: (module T)
 
 (** [default_search_path ~platform] is where configuration files are looked

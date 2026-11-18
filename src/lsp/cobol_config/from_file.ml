@@ -82,12 +82,12 @@ module Make
 
 
   let parse_value finder v default =
-    try v#from_val ~config:origin (finder v#name)
+    try finder v.name
     with LookupError -> default
   let parse_int_value = parse_value find_int
   let parse_bool_value = parse_value find_bool
   let parse_string_value v default =
-    try v#from_string ~config:origin (find_any v#name)
+    try v.parse (find_any v.name)
     with LookupError -> default
   let parse_support_value v default =
     try Cobol_dialect.Feature.bind_level ~origin v (find_support v.info.name)

@@ -40,10 +40,6 @@ let __init_default_exn_printers =
 
 (* --- *)
 
-let print_options: Pretty.delayed = fun ppf ->
-  Pretty.list ~fopen:"@[<v>" ~fsep:"@\n" ~fclose:"@]" (fun ppf v -> v#pp ppf)
-    ppf !all_configs
-
 let default_search_path ~platform =
   let getenv_opt = platform.getenv_opt in
   let append root ~sub = match root with
@@ -321,4 +317,4 @@ let from_dialect ~platform ?search_path ?verbose d =
 let origin (module C: T) = C.origin
 let dialect config = (origin config).id
 
-let tab_stops (module C: T) = C.tab_stops#value
+let tab_stops (module C: T) = C.tab_stops

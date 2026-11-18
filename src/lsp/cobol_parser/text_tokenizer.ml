@@ -440,7 +440,7 @@ let acc_tokens_of_text_word (rev_prefix_tokens, state) { payload = c; loc } =
         generic state w
     (* | Alphanum { knd = Basic; str; qte = quotation; _ } *)
     (*   (\* TODO: Leave those as is in the parse-tree, and decode later *\) *)
-    (*   when Config.ebcdic_symbolic_characters#value *)
+    (*   when Config.ebcdic_symbolic_characters *)
     (*   -> let token, diags = *)
     (*        Text_lexer.decode_symbolic_ebcdics' ~quotation (str &@ loc) in *)
     (*     [token], diags *)

@@ -32,8 +32,8 @@ and byte_order = Cobol_data.Types.byte_order
 let from_cobol_config ~target_byte_order (config: Cobol_config.t) =
   let module Config = (val config) in
   {
-    binary_size = Config.binary_size#value;
-    binary_byteorder = Config.binary_byteorder#value;
+    binary_size = Config.binary_size;
+    binary_byteorder = Config.binary_byteorder;
     target_byte_order;
     dialect = Config.origin.id;
     alphanumeric_comp_x_over_8_chars_rejected_by =

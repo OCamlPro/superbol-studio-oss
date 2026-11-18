@@ -21,7 +21,7 @@ let mf_binary_sizing_options =
     config =
       (module (struct
         include (val default_options.config)
-        let binary_size = Cobol_config.Options.binary_size#from_val ~config:origin B_1__8
+        let binary_size = Cobol_config.B_1__8
       end)) }
 
 let%expect_test "usage-binary" =
@@ -945,8 +945,7 @@ let native_byteorder_options =
     config =
       (module (struct
         include (val default_options.config)
-        let binary_byteorder =
-          Cobol_config.Options.binary_byteorder#from_val ~config:origin Native
+        let binary_byteorder = Cobol_config.Native
       end)) }
 
 (** Shows the byte order of each binary item. *)
