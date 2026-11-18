@@ -102,7 +102,7 @@ let of_lsp_artifacts { lsp_copybook; lsp_checked;
 
 type overrides =
   {
-    override_cobol_config: (Cobol_config.t * string) option;
+    override_cobol_config: Cobol_config.t option;
     override_source_format: Cobol_config.source_format_spec option;
     override_mf_comment: bool option;
     override_libpath: string list;
@@ -139,9 +139,7 @@ let with_overrides ?(overrides = no_overrides) ({ config; _ } as project) =
     let config =
       { config with
         cobol_config =
-          (match override_cobol_config with
-           | Some (cobol_config, _) -> cobol_config
-           | None -> config.cobol_config);
+          Option.value override_cobol_config ~default:config.cobol_config;
         source_format =
           Option.value override_source_format ~default:config.source_format;
         source_format_by_extension =
@@ -259,8 +257,7 @@ let analyze_for_lsp ~platform ?overrides ~filename ~contents project =
 (* Everything about the project and options that bears on how a document is
    preprocessed and parsed.  It takes part in every key rather than being
    witnessed, because settings pushed by an LSP client never reach a file we
-   could witness.  An overriding COBOL configuration is represented by its
-   description, as it cannot be digested itself. *)
+   could witness. *)
 type config_inputs = Superbol_cache.Types.digest
 
 let config_inputs ?(overrides = no_overrides) project =
@@ -269,14 +266,12 @@ let config_inputs ?(overrides = no_overrides) project =
     Option.some @@
     Digest.string @@
     Marshal.to_string
-      (Cobol_dialect.Id.to_string @@
-       Cobol_config.dialect config.cobol_config,
+      (config.cobol_config,
        config.source_format,
        config.source_format_by_extension,
        config.mf_comment,
        config.libpath,
        config.libexts,
-       Option.map snd overrides.override_cobol_config,
        overrides.override_env,
        overrides.override_recovery,
        overrides.override_show,

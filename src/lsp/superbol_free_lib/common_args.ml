@@ -68,23 +68,9 @@ let analysis_overrides ~config ~conf ~dialect ~format ~mf_comment ~libpath
     if Ez_file.V1.EzFile.is_absolute dir then dir
     else Ez_file.V1.EzFile.concat (Sys.getcwd ()) dir
   in
-  (* Describes the configuration for cache keys.  The configuration file
-     itself is identified by its contents whenever it can be found as given;
-     files it includes are not accounted for, as with dialects. *)
-  let override_cobol_config =
-    match conf, dialect with
-    | "", None ->
-        None
-    | "", Some d ->
-        Some (config, "dialect:" ^ Cobol_dialect.Id.to_string d)
-    | file, _ when Sys.file_exists file ->
-        Some (config, Pretty.to_string "conf:%s:%s" (absolute file)
-                (Digest.to_hex @@ Digest.file file))
-    | file, _ ->
-        Some (config, "conf:" ^ file)
-  in
   {
-    override_cobol_config;
+    override_cobol_config =
+      if conf = "" && dialect = None then None else Some config;
     override_source_format = format;
     override_mf_comment = mf_comment;
     override_libpath = List.map absolute libpath;

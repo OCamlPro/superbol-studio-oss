@@ -91,11 +91,8 @@ val of_lsp_artifacts: for_lsp -> t
     defaults to {!no_overrides}. *)
 type overrides =
   {
-    override_cobol_config: (Cobol_config.t * string) option;
-    (** COBOL configuration to use instead of the project's, along with a
-        description of where it comes from.  The configuration itself cannot be
-        digested, so its description is what takes part in cache keys: it
-        should identify the configuration uniquely. *)
+    override_cobol_config: Cobol_config.t option;
+    (** COBOL configuration to use instead of the project's *)
 
     override_source_format: Cobol_config.source_format_spec option;
     (** Source format to use regardless of the project configuration. *)
