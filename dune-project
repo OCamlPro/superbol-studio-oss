@@ -269,6 +269,7 @@
    (cobol_parser (= :version))
    (cobol_lsp (= :version))
    (cobol_indent (= :version))
+   (cobol_dialect (= :version))
    (cobol_common (= :version))
    (cmdliner ( < 2 ))
    odoc
@@ -319,6 +320,7 @@
    (cobol_typeck (= :version))
    (cobol_preproc (= :version))
    (cobol_parser (= :version))
+   (cobol_dialect (= :version))
    (cobol_config (= :version))
    (cobol_common (= :version))
    odoc
@@ -561,6 +563,7 @@
    (ocaml (>= 4.14.2))
    (fmt ( >= 0.9 ))
    (cobol_preproc (= :version))
+   (cobol_dialect (= :version))
    (cobol_common (= :version))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))

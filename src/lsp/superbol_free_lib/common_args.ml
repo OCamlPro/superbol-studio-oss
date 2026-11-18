@@ -76,7 +76,7 @@ let analysis_overrides ~config ~conf ~dialect ~format ~mf_comment ~libpath
     | "", None ->
         None
     | "", Some d ->
-        Some (config, "dialect:" ^ Cobol_config.DIALECT.to_string d)
+        Some (config, "dialect:" ^ Cobol_dialect.Id.to_string d)
     | file, _ when Sys.file_exists file ->
         Some (config, Pretty.to_string "conf:%s:%s" (absolute file)
                 (Digest.to_hex @@ Digest.file file))
@@ -173,8 +173,8 @@ let get () =
     EZCMD.info ~docv:"CONF_FILE" "Set the configuration file to be used";
 
     ["dialect"; "std"], Arg.Symbol
-      (Cobol_config.DIALECT.all_canonical_names,
-       fun d -> dialect := Some (Cobol_config.DIALECT.of_string d)),
+      (Cobol_dialect.Id.all_canonical_names,
+       fun d -> dialect := Some (Cobol_dialect.Id.of_string d)),
     EZCMD.info ~docv:"DIALECT"
       "Set the dialect to bu used (overriden by `--conf` if used)";
 

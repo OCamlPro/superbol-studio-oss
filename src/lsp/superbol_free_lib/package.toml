@@ -53,6 +53,7 @@ skip = ["index.mld", "main.ml"]
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
 cobol_common = "version"
+cobol_dialect = "version"
 cobol_indent = "version"
 cobol_lsp = "version"
 cobol_parser = "version"

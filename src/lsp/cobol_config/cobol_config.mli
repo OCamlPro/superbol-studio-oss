@@ -59,20 +59,20 @@ val from_dialect
   : platform: Cobol_common.Platform.TYPES.platform
   -> ?search_path: string list
   -> ?verbose:bool
-  -> Types.DIALECT.t
+  -> Cobol_dialect.Types.id
   -> (module T) Cobol_common.Diagnostics.with_diags
 
 (** [from_dialect_n_file ~platform ~search_path dialect] is like
     {!from_dialect}, also giving the configuration file loaded ([None] for
-    {!DIALECT.Default}). *)
+    {!Cobol_dialect.Id.Default}). *)
 val from_dialect_n_file
   : platform: Cobol_common.Platform.TYPES.platform
   -> ?search_path: string list
   -> ?verbose:bool
-  -> Types.DIALECT.t
+  -> Cobol_dialect.Types.id
   -> ((module T) * string option) Cobol_common.Diagnostics.with_diags
 
-val dialect: t -> dialect
+val dialect: t -> Cobol_dialect.Types.id
 
 val origin: t -> Cobol_dialect.Types.origin
 

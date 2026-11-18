@@ -269,7 +269,7 @@ let config_inputs ?(overrides = no_overrides) project =
     Option.some @@
     Digest.string @@
     Marshal.to_string
-      (Cobol_config.DIALECT.to_string @@
+      (Cobol_dialect.Id.to_string @@
        Cobol_config.dialect config.cobol_config,
        config.source_format,
        config.source_format_by_extension,

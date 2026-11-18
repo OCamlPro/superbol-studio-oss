@@ -193,8 +193,8 @@ and warning =
         usage: Cobol_ptree.usage_clause;
         byte_size: int;
         max_chars: int;
-        rejected_by: Cobol_config.dialect;   (** dialect imposing [max_chars] *)
-        dialect: Cobol_config.dialect;       (** configured dialect *)
+        rejected_by: Cobol_dialect.Types.id;          (** imposes [max_chars] *)
+        dialect: Cobol_dialect.Types.id;               (** configured dialect *)
       }
   (* | Extraneous_clause of *)
   (*     { *)
@@ -373,7 +373,7 @@ let pp_warning ppf = function
   | Oversized_alphanumeric_binary { picture; usage; byte_size; max_chars;
                                     rejected_by; dialect } ->
       let pp_dialect ppf d =
-        Fmt.string ppf (Cobol_config.DIALECT.to_string d) in
+        Fmt.string ppf (Cobol_dialect.Id.to_string d) in
       Pretty.print ppf "PICTURE@ of@ %u@ characters@ for@ item@ with@ USAGE@ %a@ \
                         exceeds@ the@ limit@ of@ %u@ characters@ of@ dialect@ \
                         %a%a;@ its@ size@ is@ %u@ bytes,@ as@ in@ GnuCOBOL"

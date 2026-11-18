@@ -339,7 +339,7 @@ let configuration =
                               You may also specify an absolute path to a custom GnuCOBOL dialect \
                               configuration file (see `cobc`'s `-conf` option)."
            Fmt.(list ~sep:(any ",@ ") (quote ~mark:"`" string))
-           Cobol_config.DIALECT.all_canonical_names)
+           Cobol_dialect.Id.all_canonical_names)
       ~default:"default"
       ~order:1;
 

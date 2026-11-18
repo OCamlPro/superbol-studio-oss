@@ -16,8 +16,8 @@ type options =
     binary_size: binary_size;
     binary_byteorder: binary_byteorder;
     target_byte_order: byte_order;  (** byte order of the target machine *)
-    dialect: Cobol_config.dialect;
-    alphanumeric_comp_x_over_8_chars_rejected_by: Cobol_config.dialect option;
+    dialect: Cobol_dialect.Types.id;
+    alphanumeric_comp_x_over_8_chars_rejected_by: Cobol_dialect.Types.id option;
     (** if set, warn about COMP-X and COMP-N items with an alphanumeric PICTURE
         of more than 8 characters, which this dialect rejects *)
     free_redefines_position: unit Cobol_dialect.Types.binding;

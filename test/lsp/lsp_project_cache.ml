@@ -38,7 +38,7 @@ let toml =
 let describe project =
   let config = LSP.Project.config project in
   Printf.sprintf "dialect %s, format %s, copyexts %s"
-    (Cobol_config.DIALECT.to_string @@ Cobol_config.dialect config.cobol_config)
+    (Cobol_dialect.Id.to_string @@ Cobol_config.dialect config.cobol_config)
     (match config.source_format with
      | Cobol_config.Auto -> "auto"
      | Cobol_config.SF _ -> "fixed by the project")
@@ -81,7 +81,7 @@ let%expect_test "a dialect given as a .conf file survives the round trip from/to
     let config = LSP.Project.config project in
     Pretty.print ppf "%s (%s)"
       config.dialect_name
-      Cobol_config.(DIALECT.to_string @@ dialect config.cobol_config)
+      (Cobol_dialect.Id.to_string @@ Cobol_config.dialect config.cobol_config)
   in
   let project = LSP.Project.in_existing_dir projdir ~layout in
   (* As if changed by the client: *)

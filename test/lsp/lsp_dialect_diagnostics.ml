@@ -129,7 +129,7 @@ let%expect_test "the CLI loads dialects given by client settings" =
   in
   ignore [%expect.output];
   Printf.printf "dialect: %s\n" @@
-  Cobol_config.DIALECT.to_string @@ Cobol_config.dialect @@
+  Cobol_dialect.Id.to_string @@ Cobol_config.dialect @@
   (Superbol_project.config project).cobol_config;
   remove_temp_dir dir;
   [%expect {| dialect: ibm-strict |}];;

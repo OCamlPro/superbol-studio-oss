@@ -56,7 +56,7 @@ let search_path = ["/elsewhere"; "/conf"]
 
 let load ~platform name =
   Cobol_config.from_dialect_n_file ~platform ~search_path @@
-  Cobol_config.DIALECT.of_string name
+  Cobol_dialect.Id.of_string name
 
 let%expect_test "configuration files are looked up and read at once" =
   let { result = config, file; _ }: _ Cobol_common.Diagnostics.with_diags =

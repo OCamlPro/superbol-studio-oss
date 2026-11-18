@@ -60,8 +60,8 @@ let __init_default_exn_printers =
 
 let cobol_config_n_file_from_dialect_name ~platform ~verbose dialect_name =
   try
-    Cobol_config.(from_dialect_n_file ~platform ~verbose @@
-                  DIALECT.of_string dialect_name)
+    Cobol_config.from_dialect_n_file ~platform ~verbose @@
+    Cobol_dialect.Id.of_string dialect_name
   with
   | Invalid_argument e ->
       raise @@ ERROR (Unknown_dialect e)

@@ -52,7 +52,7 @@ and preprocessor_persist =
     copybooks: Cobol_common.Srcloc.copylocs;              (* opened copybooks *)
     copybook_rev_comments: Text.comments StringMap.t;
     copybook_lookup_config: Cobol_common.Copybook.TYPES.lookup_config;
-    dialect: Cobol_config.dialect;
+    dialect: Cobol_dialect.Types.id;
     src_options: Src_options.t;
     source_format: Src_format.any option;  (* to keep auto-detecting on reset *)
     exec_preprocs: exec_preprocessor EXEC_MAP.t;

@@ -28,7 +28,8 @@ module Parsed_conf =
 
 module MF_conf =
   (val (Cobol_common.Diagnostics.show_n_forget @@
-        Cobol_config.(from_dialect ~platform ~search_path DIALECT.mf_strict)))
+        Cobol_config.from_dialect ~platform ~search_path
+          Cobol_dialect.Id.mf_strict))
 
 let both_diff s1 s2 =
   StringSet.union

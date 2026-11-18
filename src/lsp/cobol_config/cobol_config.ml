@@ -280,12 +280,12 @@ let from_file_n_path ~platform ?search_path ?(verbose=false) file =
           | v -> raise @@ ERROR (Invalid_key_value_pair ("name", v))
         in
         {
-          id = DIALECT.of_config_name display_name;
+          id = Cobol_dialect.Id.of_config_name display_name;
           display_name;
           file = Option.some path;
           ancestry = List.filter_map begin function
               | Conf_ast.Value { key = "name"; value = String s } ->
-                  Option.some (DIALECT.of_config_name s)
+                  Option.some (Cobol_dialect.Id.of_config_name s)
               | _ ->
                   Option.none
             end options_list;
@@ -304,13 +304,13 @@ let from_file ~platform ?search_path ?verbose file =
   from_file_n_path ~platform ?search_path ?verbose file
 
 (* NB: [Some] is shadowed by a constructor of {!Types}. *)
-let dialect_config_filename: DIALECT.t -> string option = function
-  | DIALECT.Default ->
+let dialect_config_filename: Cobol_dialect.Id.t -> string option = function
+  | Cobol_dialect.Id.Default ->
       Option.none
-  | DIALECT.GnuCOBOL ->
+  | Cobol_dialect.Id.GnuCOBOL ->
       Option.some "default.conf"
   | dialect ->
-      let name = DIALECT.to_string dialect in
+      let name = Cobol_dialect.Id.to_string dialect in
       Option.some @@
       if String.ends_with ~suffix:".conf" name
       then name

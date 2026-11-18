@@ -62,6 +62,7 @@ depends: [
   "cobol_parser" {= version}
   "cobol_lsp" {= version}
   "cobol_indent" {= version}
+  "cobol_dialect" {= version}
   "cobol_common" {= version}
   "cmdliner" {< "2"}
   "odoc" {with-doc}

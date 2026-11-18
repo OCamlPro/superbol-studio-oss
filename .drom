@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-8111e2fabd14ee625ffe12906ca2adb9:.
+8005b9ab2cb643f5f0b2ce05ead820c1:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -55,7 +55,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-6fc78551eb789573351352d6580747b9:dune-project
+285a74e4ac125659e7945715e00643df:dune-project
 # end context for dune-project
 
 # begin context for opam/autofonce.opam
@@ -145,7 +145,7 @@ d6a2045782e3c1fb664f89953afa3081:opam/cobol_indent.opam
 
 # begin context for opam/cobol_indent_old.opam
 # file opam/cobol_indent_old.opam
-e94ff6d5a0790f9adaecb3149fb875b1:opam/cobol_indent_old.opam
+a3adf2804f6343af73c793b09bf63a61:opam/cobol_indent_old.opam
 # end context for opam/cobol_indent_old.opam
 
 # begin context for opam/cobol_interp.opam
@@ -280,7 +280,7 @@ ff8cba3873fe5f1e018ab1512a3da22a:opam/superbol_cache.opam
 
 # begin context for opam/superbol_free_lib.opam
 # file opam/superbol_free_lib.opam
-4dd193b595e5b3337bf4659a91134b37:opam/superbol_free_lib.opam
+7fe0d050855f24d76f231f148a7c8bbd:opam/superbol_free_lib.opam
 # end context for opam/superbol_free_lib.opam
 
 # begin context for opam/superbol_platform.opam
@@ -295,7 +295,7 @@ af65e0ca6fdd4fed8767257c29912a92:opam/superbol_preprocs.opam
 
 # begin context for opam/superbol_project.opam
 # file opam/superbol_project.opam
-bef58c10ca49300270185fa5b4f529a1:opam/superbol_project.opam
+ddbba8df5a0cb4e0ebf588681ab0248d:opam/superbol_project.opam
 # end context for opam/superbol_project.opam
 
 # begin context for opam/tramabol.opam
@@ -675,7 +675,7 @@ a18438bf6e347bb93779045b0a7006d1:src/lsp/cobol_indent/version.mlt
 
 # begin context for src/lsp/cobol_indent_old/dune
 # file src/lsp/cobol_indent_old/dune
-95e29a1e4344b6f6db820680fe2b2475:src/lsp/cobol_indent_old/dune
+f885eab1d69dbfea1d445db893b0c217:src/lsp/cobol_indent_old/dune
 # end context for src/lsp/cobol_indent_old/dune
 
 # begin context for src/lsp/cobol_indent_old/package.toml
@@ -915,7 +915,7 @@ a18438bf6e347bb93779045b0a7006d1:src/lsp/superbol_cache/version.mlt
 
 # begin context for src/lsp/superbol_free_lib/dune
 # file src/lsp/superbol_free_lib/dune
-b296199c5c7e2cc486fe2b2a0969e5d2:src/lsp/superbol_free_lib/dune
+3c79192d6408dc90c83072c4d8d3c073:src/lsp/superbol_free_lib/dune
 # end context for src/lsp/superbol_free_lib/dune
 
 # begin context for src/lsp/superbol_free_lib/package.toml

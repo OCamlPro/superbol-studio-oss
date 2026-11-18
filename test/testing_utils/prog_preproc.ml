@@ -89,7 +89,7 @@ let show_source_lines
     ?(with_source_cdir_markers = false)
     ?(with_compiler_directives_text = true)
     ?(filename = "prog.cob")
-    ?(dialect = Cobol_config.DIALECT.Default)
+    ?(dialect = Cobol_dialect.Id.Default)
     ?(source_format = Cobol_config.(SF SFFixed))
     contents
   =

@@ -59,6 +59,7 @@ depends: [
   "cobol_typeck" {= version}
   "cobol_preproc" {= version}
   "cobol_parser" {= version}
+  "cobol_dialect" {= version}
   "cobol_config" {= version}
   "cobol_common" {= version}
   "odoc" {with-doc}

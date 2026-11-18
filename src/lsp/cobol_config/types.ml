@@ -185,8 +185,6 @@ and word_spec =
       }
   | NotReserved
 
-module DIALECT = Cobol_dialect.Id
-type dialect = Cobol_dialect.Types.id
 
 module type CONFIG = sig
   val origin: Cobol_dialect.Types.origin
