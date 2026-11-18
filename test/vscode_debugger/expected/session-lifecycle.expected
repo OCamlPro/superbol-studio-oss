@@ -6,8 +6,5 @@ Session lifecycle
   ok      runtime errors are reported
   no bug  program output is shown as soon as it is printed
   BUG?    pausing a running program stops it at a COBOL statement
-            -> paused at ?:0
   BUG?    a runtime error stops the program at the faulty statement
-            -> the program terminated instead of stopping
   BUG?    the debug console does not show gdb's internal messages
-            -> the debug console shows internal messages of gdb

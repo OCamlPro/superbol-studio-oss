@@ -14,5 +14,4 @@ Build tasks
   ok      a tasks.json task with a missing compiler fails
   no bug  listingsTarget of a tasks.json task generates listings in that directory
   BUG?    customizing a default build task in tasks.json applies to that task
-            -> tasks named SuperBOL: build module (debug): SuperBOL/build module (debug), Workspace/SuperBOL: build module (debug)
   no bug  building a file whose name contains a space
