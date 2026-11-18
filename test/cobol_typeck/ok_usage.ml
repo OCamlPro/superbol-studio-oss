@@ -19,10 +19,7 @@ let mf_binary_sizing_options =
   let default_options = Prog_parser.options () in
   { default_options with
     config =
-      (module (struct
-        include (val default_options.config)
-        let binary_size = Cobol_config.B_1__8
-      end)) }
+      { default_options.config with binary_size = B_1__8 } }
 
 let%expect_test "usage-binary" =
   dotest @@ prog "usage-binary"
@@ -943,10 +940,7 @@ let native_byteorder_options =
   let default_options = Prog_parser.options () in
   { default_options with
     config =
-      (module (struct
-        include (val default_options.config)
-        let binary_byteorder = Cobol_config.Native
-      end)) }
+      { default_options.config with binary_byteorder = Native } }
 
 (** Shows the byte order of each binary item. *)
 let show_byte_orders ?parser_options contents =
@@ -1113,11 +1107,9 @@ let options_with_dialect_ancestry ancestry =
   let default_options = Prog_parser.options () in
   { default_options with
     config =
-      (module (struct
-        include (val default_options.config)
-        let origin =
-          { origin with id = List.hd (List.rev ancestry); ancestry }
-      end)) }
+      { default_options.config with
+        origin = { default_options.config.origin with
+                   id = List.hd (List.rev ancestry); ancestry } } }
 
 let%expect_test "usage-comp-x-alphanum-mf" =
   show_binary_sizes

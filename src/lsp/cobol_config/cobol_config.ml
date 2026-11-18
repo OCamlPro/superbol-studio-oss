@@ -87,7 +87,7 @@ let read_file_in_path ~platform ~search_path filename =
 
 (* --- *)
 
-let default = (module Default: T)
+let default = Default.default
 
 let meet_support (s1: Conf_ast.support_value as 's) (s2: 's) : 's =
   match s1, s2 with
@@ -292,7 +292,7 @@ let from_file ~platform ?search_path ?(verbose=false) file =
       let registers = registers
     end)
   in
-  DIAGS.result (module Config: T) ~diags:(Diags.inspect ~reset:true)
+  DIAGS.result Config.config ~diags:(Diags.inspect ~reset:true)
 
 (* NB: [Some] is shadowed by a constructor of {!Types}. *)
 let dialect_config_filename: Cobol_dialect.Id.t -> string option = function
@@ -310,11 +310,8 @@ let dialect_config_filename: Cobol_dialect.Id.t -> string option = function
 let from_dialect ~platform ?search_path ?verbose d =
   match (dialect_config_filename d: string option) with
   | None ->
-      DIAGS.result (module Default: T)
+      DIAGS.result default
   | Some filename ->
       from_file ~platform ?search_path ?verbose filename
 
-let origin (module C: T) = C.origin
-let dialect config = (origin config).id
-
-let tab_stops (module C: T) = C.tab_stops
+let dialect { origin; _ } = origin.id

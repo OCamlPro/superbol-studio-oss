@@ -170,7 +170,7 @@ let update_dialect ~platform ~reporter ({ config; _ } as project) str : bool =
       Superbol_project.Config.cobol_config_from_dialect_name str
         ~platform ~verbose:false
     in
-    let dialect_file = (Cobol_config.origin result).file in
+    let dialect_file = result.origin.file in
     if result = config.cobol_config &&         (* note: structural comparison *)
        String.equal str config.dialect_name
     then false

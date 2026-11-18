@@ -10,11 +10,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-%parameter <CONFIG: Cobol_config.T>
+%parameter <PARAMS: Preproc_utils.PARAMS>
 %parameter <Srcloc_overlay: Src_overlay.MANAGER>
 %{
   open Cobol_common.Srcloc.INFIX
-  module PP_UTILS = Preproc_utils.Make (CONFIG)
+  module PP_UTILS = Preproc_utils.Make (PARAMS)
 %}
 
 (* Tokens are listed in `preproc_tokens.mly' *)

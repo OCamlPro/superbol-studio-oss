@@ -17,7 +17,7 @@ module type S = sig
   (* From _build/default/src/cobol_preproc/preproc_grammar.mli *)
 
   module Make
-      (CONFIG: Cobol_config.T)
+      (PARAMS: Preproc_utils.PARAMS)
       (Srcloc_overlay: Src_overlay.MANAGER)
     : sig
 

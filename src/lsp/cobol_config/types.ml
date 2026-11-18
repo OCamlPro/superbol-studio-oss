@@ -111,160 +111,149 @@ and word_spec =
   | NotReserved
 
 
-module type CONFIG = sig
-  val origin: Cobol_dialect.Types.origin
-end
+type t =
+  {
+    origin: Cobol_dialect.Types.origin;
 
-module type PP_OPTS = sig
-  (** Preprocessor options*)
+    (* Preprocessor options *)
 
-  (* int options *)
-  val tab_stops: int list
+    (* int options *)
+    tab_stops: int list;
 
-  (* support options *)
-  val comment_paragraphs: unit feature_support
-  val safe_partial_replacing_when_src_literal: [`Safe | `Unsafe] feature_support
-end
+    (* support options *)
+    comment_paragraphs: unit feature_support;
+    safe_partial_replacing_when_src_literal: [`Safe | `Unsafe] feature_support;
 
-module type COMP_OPTS = sig
-  (** Compiler options *)
+    (* Compiler options *)
 
-  (* reserved words *)
-  val words: words_spec
-  val intrinsic_functions: StringSet.t
-  val system_names: StringSet.t
-  val registers: StringSet.t
+    (* reserved words *)
+    words: words_spec;
+    intrinsic_functions: StringSet.t;
+    system_names: StringSet.t;
+    registers: StringSet.t;
 
-  (* int options *)
-  val text_column: int
-  val pic_length: int
-  val word_length: int
-  val literal_length: int
-  val numeric_literal_length: int
+    (* int options *)
+    text_column: int;
+    pic_length: int;
+    word_length: int;
+    literal_length: int;
+    numeric_literal_length: int;
 
-  (* any options *)
-  val defaultbyte: defaultbyte
-  val standard_define: standard
-  val format: source_format_spec
-  val binary_size: binary_size
-  val binary_byteorder: binary_byteorder
-  val assign_clause: assign_clause
-  val screen_section_rules: screen_section_rules
-  val dpc_in_data: dpc_in_data
+    (* any options *)
+    defaultbyte: defaultbyte;
+    standard_define: standard;
+    format: source_format_spec;
+    binary_size: binary_size;
+    binary_byteorder: binary_byteorder;
+    assign_clause: assign_clause;
+    screen_section_rules: screen_section_rules;
+    dpc_in_data: dpc_in_data;
 
-  (* boolean options *)
-  val filename_mapping: bool
-  val pretty_display: bool
-  val binary_truncate: bool
-  val complex_odo: bool
-  val odoslide: bool
-  val indirect_redefines: bool
-  val relax_syntax_checks: bool
-  val ref_mod_zero_length: bool
-  val relax_level_hierarchy: bool
-  val select_working: bool
-  val local_implies_recursive: bool
-  val sticky_linkage: bool
-  val move_ibm: bool
-  val perform_osvs: bool
-  val arithmetic_osvs: bool
-  val hostsign: bool
-  val program_name_redefinition: bool
-  val accept_update: bool
-  val accept_auto: bool
-  val console_is_crt: bool
-  val no_echo_means_secure: bool
-  val line_col_zero_default: bool
-  val display_special_fig_consts:  bool
-  val binary_comp_1: bool
-  val numeric_pointer:  bool
-  val move_non_numeric_lit_to_numeric_is_zero:  bool
-  val implicit_assign_dynamic_var:  bool
-  val device_mnemonics: bool
-  val xml_parse_xmlss: bool
-  val areacheck: bool
-  val ebcdic_symbolic_characters: bool
+    (* boolean options *)
+    filename_mapping: bool;
+    pretty_display: bool;
+    binary_truncate: bool;
+    complex_odo: bool;
+    odoslide: bool;
+    indirect_redefines: bool;
+    relax_syntax_checks: bool;
+    ref_mod_zero_length: bool;
+    relax_level_hierarchy: bool;
+    select_working: bool;
+    local_implies_recursive: bool;
+    sticky_linkage: bool;
+    move_ibm: bool;
+    perform_osvs: bool;
+    arithmetic_osvs: bool;
+    hostsign: bool;
+    program_name_redefinition: bool;
+    accept_update: bool;
+    accept_auto: bool;
+    console_is_crt: bool;
+    no_echo_means_secure: bool;
+    line_col_zero_default: bool;
+    display_special_fig_consts: bool;
+    binary_comp_1: bool;
+    numeric_pointer: bool;
+    move_non_numeric_lit_to_numeric_is_zero: bool;
+    implicit_assign_dynamic_var: bool;
+    device_mnemonics: bool;
+    xml_parse_xmlss: bool;
+    areacheck: bool;
+    ebcdic_symbolic_characters: bool;
 
-  (* support options *)
-  val control_division: unit feature_support
-  val memory_size_clause: unit feature_support
-  val multiple_file_tape_clause: unit feature_support
-  val label_records_clause: unit feature_support
-  val value_of_clause: unit feature_support
-  val data_records_clause: unit feature_support
-  val top_level_occurs_clause: unit feature_support
-  val same_as_clause: unit feature_support
-  val type_to_clause: unit feature_support
-  val usage_type: unit feature_support
-  val synchronized_clause: unit feature_support
-  val sync_left_right: unit feature_support
-  val special_names_clause: unit feature_support
-  val goto_statement_without_name: unit feature_support
-  val stop_literal_statement: unit feature_support
-  val stop_identifier_statement: unit feature_support
-  val stop_error_statement: unit feature_support
-  val debugging_mode: unit feature_support
-  val use_for_debugging: unit feature_support
-  val padding_character_clause: unit feature_support
-  val next_sentence_phrase: unit feature_support
-  val listing_statements: unit feature_support
-  val title_statement: unit feature_support
-  val entry_statement: unit feature_support
-  val move_noninteger_to_alphanumeric: unit feature_support
-  val move_figurative_constant_to_numeric: unit feature_support
-  val move_figurative_space_to_numeric: unit feature_support
-  val move_figurative_quote_to_numeric: unit feature_support
-  val odo_without_to: unit feature_support
-  val section_segments: unit feature_support
-  val alter_statement: unit feature_support
-  val call_overflow: unit feature_support
-  val numeric_boolean: unit feature_support
-  val hexadecimal_boolean: unit feature_support
-  val national_literals: unit feature_support
-  val hexadecimal_national_literals: unit feature_support
-  val national_character_literals: unit feature_support
-  val hp_octal_literals: unit feature_support
-  val acu_literals: unit feature_support
-  val word_continuation: unit feature_support
-  val not_exception_before_exception: unit feature_support
-  val accept_display_extensions: unit feature_support
-  val larger_redefines: unit feature_support
-  val symbolic_constant: unit feature_support
-  val constant_78: unit feature_support
-  val constant_01: unit feature_support
-  val perform_varying_without_by: unit feature_support
-  val reference_out_of_declaratives: unit feature_support
-  val program_prototypes: unit feature_support
-  val call_convention_mnemonic: unit feature_support
-  val call_convention_linkage: unit feature_support
-  val numeric_value_for_edited_item: unit feature_support
-  val incorrect_conf_sec_order: unit feature_support
-  val define_constant_directive: unit feature_support
-  val free_redefines_position: unit feature_support
-  val records_mismatch_record_clause: unit feature_support
-  val record_delimiter: unit feature_support
-  val sequential_delimiters: unit feature_support
-  val record_delim_with_fixed_recs: unit feature_support
-  val missing_statement: unit feature_support
-  val missing_period: unit feature_support
-  val zero_length_literals: unit feature_support
-  val xml_generate_extra_phrases: unit feature_support
-  val continue_after: unit feature_support
-  val goto_entry: unit feature_support
-  val assign_variable: unit feature_support
-  val assign_using_variable: unit feature_support
-  val assign_ext_dyn: unit feature_support
-  val assign_disk_from: unit feature_support
-  val vsam_status: unit feature_support
-  val self_call_recursive: unit feature_support
-  val record_contains_depending_clause: unit feature_support
-  val picture_l: unit feature_support
-end
-
-module type T = sig
-  include CONFIG
-  include PP_OPTS
-  include COMP_OPTS
-end
-
-type t = (module T)
+    (* support options *)
+    control_division: unit feature_support;
+    memory_size_clause: unit feature_support;
+    multiple_file_tape_clause: unit feature_support;
+    label_records_clause: unit feature_support;
+    value_of_clause: unit feature_support;
+    data_records_clause: unit feature_support;
+    top_level_occurs_clause: unit feature_support;
+    same_as_clause: unit feature_support;
+    type_to_clause: unit feature_support;
+    usage_type: unit feature_support;
+    synchronized_clause: unit feature_support;
+    sync_left_right: unit feature_support;
+    special_names_clause: unit feature_support;
+    goto_statement_without_name: unit feature_support;
+    stop_literal_statement: unit feature_support;
+    stop_identifier_statement: unit feature_support;
+    stop_error_statement: unit feature_support;
+    debugging_mode: unit feature_support;
+    use_for_debugging: unit feature_support;
+    padding_character_clause: unit feature_support;
+    next_sentence_phrase: unit feature_support;
+    listing_statements: unit feature_support;
+    title_statement: unit feature_support;
+    entry_statement: unit feature_support;
+    move_noninteger_to_alphanumeric: unit feature_support;
+    move_figurative_constant_to_numeric: unit feature_support;
+    move_figurative_space_to_numeric: unit feature_support;
+    move_figurative_quote_to_numeric: unit feature_support;
+    odo_without_to: unit feature_support;
+    section_segments: unit feature_support;
+    alter_statement: unit feature_support;
+    call_overflow: unit feature_support;
+    numeric_boolean: unit feature_support;
+    hexadecimal_boolean: unit feature_support;
+    national_literals: unit feature_support;
+    hexadecimal_national_literals: unit feature_support;
+    national_character_literals: unit feature_support;
+    hp_octal_literals: unit feature_support;
+    acu_literals: unit feature_support;
+    word_continuation: unit feature_support;
+    not_exception_before_exception: unit feature_support;
+    accept_display_extensions: unit feature_support;
+    larger_redefines: unit feature_support;
+    symbolic_constant: unit feature_support;
+    constant_78: unit feature_support;
+    constant_01: unit feature_support;
+    perform_varying_without_by: unit feature_support;
+    reference_out_of_declaratives: unit feature_support;
+    program_prototypes: unit feature_support;
+    call_convention_mnemonic: unit feature_support;
+    call_convention_linkage: unit feature_support;
+    numeric_value_for_edited_item: unit feature_support;
+    incorrect_conf_sec_order: unit feature_support;
+    define_constant_directive: unit feature_support;
+    free_redefines_position: unit feature_support;
+    records_mismatch_record_clause: unit feature_support;
+    record_delimiter: unit feature_support;
+    sequential_delimiters: unit feature_support;
+    record_delim_with_fixed_recs: unit feature_support;
+    missing_statement: unit feature_support;
+    missing_period: unit feature_support;
+    zero_length_literals: unit feature_support;
+    xml_generate_extra_phrases: unit feature_support;
+    continue_after: unit feature_support;
+    goto_entry: unit feature_support;
+    assign_variable: unit feature_support;
+    assign_using_variable: unit feature_support;
+    assign_ext_dyn: unit feature_support;
+    assign_disk_from: unit feature_support;
+    vsam_status: unit feature_support;
+    self_call_recursive: unit feature_support;
+    record_contains_depending_clause: unit feature_support;
+    picture_l: unit feature_support;
+  }

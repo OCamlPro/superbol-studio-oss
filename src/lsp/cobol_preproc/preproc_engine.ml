@@ -167,17 +167,21 @@ let source_format_config = function
 
 let preprocessor input = function
   | `WithOptions { platform; source_format; env; mf_comments;
-                   exec_preprocs; config = (module Config);
+                   exec_preprocs; config;
                    copybook_lookup_config } ->
       let module Om_config = struct
         let name = __MODULE__
         let approximate_srclocs = false
       end in
       let module Om = Src_overlay.New_manager (Om_config) () in
-      let module Pp = Preproc_grammar.Make (Config) (Om) in
+      let module Pp =
+        Preproc_grammar.Make (struct
+          let safe_partial_replacing_when_src_literal =
+            config.safe_partial_replacing_when_src_literal
+        end) (Om) in
       let source_format = source_format_config source_format in
       let src_options =
-        Src_options.{ tab_stops = Config.tab_stops; mf_comments } in
+        Src_options.{ tab_stops = config.tab_stops; mf_comments } in
       {
         buff = [];
         reader = Src_reader.from input ?source_format ~platform
@@ -196,7 +200,7 @@ let preprocessor input = function
             copybooks = Cobol_common.Srcloc.no_copy;
             copybook_rev_comments = StringMap.empty;
             copybook_lookup_config;
-            dialect = Config.origin.id;
+            dialect = config.origin.id;
             src_options;
             source_format;
             exec_preprocs;

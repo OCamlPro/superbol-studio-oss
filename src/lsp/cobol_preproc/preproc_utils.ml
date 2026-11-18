@@ -17,11 +17,16 @@ open Preproc_outputs.TYPES
 
 module OUT = Preproc_outputs
 
-module Make (Config: Cobol_config.T) = struct
+module type PARAMS = sig
+  val safe_partial_replacing_when_src_literal:
+    [`Safe | `Unsafe] Cobol_dialect.Types.binding
+end
+
+module Make (Params: PARAMS) = struct
 
   let safe_partial_replacing_when_src_literal ~loc =
     Cobol_dialect.Feature.verify ~loc
-      Config.safe_partial_replacing_when_src_literal |>
+      Params.safe_partial_replacing_when_src_literal |>
     OUT.of_config_verif |>
     OUT.map_result ~f:(function Some s -> s = `Safe | None -> false)
 

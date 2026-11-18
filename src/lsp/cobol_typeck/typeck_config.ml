@@ -30,14 +30,13 @@ and byte_order = Cobol_data.Types.byte_order
 (** Options derived from the given dialect configuration, for a target machine
     with the given byte order. *)
 let from_cobol_config ~target_byte_order (config: Cobol_config.t) =
-  let module Config = (val config) in
   {
-    binary_size = Config.binary_size;
-    binary_byteorder = Config.binary_byteorder;
+    binary_size = config.binary_size;
+    binary_byteorder = config.binary_byteorder;
     target_byte_order;
-    dialect = Config.origin.id;
+    dialect = config.origin.id;
     alphanumeric_comp_x_over_8_chars_rejected_by =
       Cobol_dialect.Origin.closest_ancestor
-        (function MicroFocus _ -> true | _ -> false) Config.origin;
-    free_redefines_position = Config.free_redefines_position;
+        (function MicroFocus _ -> true | _ -> false) config.origin;
+    free_redefines_position = config.free_redefines_position;
   }

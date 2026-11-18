@@ -108,13 +108,12 @@ let options_with_free_redefines_position ?(dialect = Cobol_dialect.Id.default)
   let default_options = Prog_parser.options () in
   { default_options with
     config =
-      (module (struct
-        include (val default_options.config)
-        let origin = Cobol_dialect.Origin.of_id dialect
-        let free_redefines_position =
+      let origin = Cobol_dialect.Origin.of_id dialect in
+      { default_options.config with
+        origin;
+        free_redefines_position =
           Cobol_dialect.Feature.bind ~origin
-            Cobol_config.Options.free_redefines_position level
-      end)) }
+            Cobol_config.Options.free_redefines_position level } }
 
 let free_redefines_prog =
   prog "free-redefines"

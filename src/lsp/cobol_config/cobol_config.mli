@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** This library is used to build configuration modules, either from file or
+(** This library is used to build configurations, either from file or
     from a dialect.  All the [from_] functions will fail if a file is not found,
     or use the default value of any options that is badly typed in the
     configuration file or not set in the configuration file.*)
@@ -25,7 +25,7 @@ module Diagnostics = Config_diagnostics
 
 exception ERROR of Diagnostics.error
 
-val default: (module T)
+val default: t
 
 (** [default_search_path ~platform] is where configuration files are looked
     up after any search path given to the functions below: the current working
@@ -39,7 +39,7 @@ val default_search_path
   : platform: Cobol_common.Platform.TYPES.platform
   -> string list
 
-(** [from_file ~platform ~search_path filename] loads a configuration module
+(** [from_file ~platform ~search_path filename] loads a configuration
     from [filename], looked up in its directory, then [search_path], then
     {!default_search_path}.  Files it includes are looked up likewise, starting
     with the directory of the file found. *)
@@ -48,7 +48,7 @@ val from_file
   -> ?search_path: string list
   -> ?verbose:bool
   -> string
-  -> (module T) Cobol_common.Diagnostics.with_diags
+  -> t Cobol_common.Diagnostics.with_diags
 
 (** [from_dialect ~platform ~search_path dialect] returns the configuration
     module according to the dialect defaults, looking its file up as
@@ -58,10 +58,6 @@ val from_dialect
   -> ?search_path: string list
   -> ?verbose:bool
   -> Cobol_dialect.Types.id
-  -> (module T) Cobol_common.Diagnostics.with_diags
+  -> t Cobol_common.Diagnostics.with_diags
 
 val dialect: t -> Cobol_dialect.Types.id
-
-val origin: t -> Cobol_dialect.Types.origin
-
-val tab_stops: t -> int list
