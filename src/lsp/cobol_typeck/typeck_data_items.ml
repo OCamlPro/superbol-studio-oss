@@ -427,6 +427,12 @@ let field_layout_n_sizes ~usage ~init_value { item_name;
       item_size_max
 
 
+let affect_definition =
+  LIST.exists begin function
+    | Typeck_diagnostics.Dialect_feature_used _ -> false
+    | _ -> true
+  end
+
 let subitem_fields_have_issues { item_rev_fields; _ } =
   LIST.exists begin fun f -> match ~&f with
     | Field { field_has_definition_issues; _ } -> field_has_definition_issues
@@ -461,7 +467,7 @@ let item_definition acc ({ item_name;
     LIST.append ~loc:__LOC__ diags @@
     LIST.append ~loc:__LOC__ diags' item_diagnostics in
   let definition_issues =
-    item_diagnostics <> [] || subitem_fields_have_issues item
+    affect_definition item_diagnostics || subitem_fields_have_issues item
   in
   let field =
     { field_qualname = item_qualname;
@@ -686,13 +692,16 @@ let on_redefinition_item acc item_clauses
                                              redef_name = item_name },
             { item_clauses with value = None }
       in
-      let item_diagnostics, item_clauses =
+      let item_diagnostics', item_clauses =
         check_inherited_usage ~item_name item_clauses base_stack
       and item_qualname = qualname item_name base_stack
       and item_qualifier = qualifier item_name base_stack
       and item_redefines = Some (qualify redefined_name base_stack) in
       let item_range, item_rev_leading_ranges =
         item_range ~item_qualifier item_clauses base_stack in
+      let item_diagnostics =
+        LIST.append ~loc:__LOC__ item_clauses.data_clause_diags item_diagnostics'
+      in
       { acc with                            (* push on stack, with same level *)
         item_stack = { item_level = expected_level;
                        item_name;
