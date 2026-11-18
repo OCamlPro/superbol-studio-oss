@@ -559,7 +559,9 @@ let run_test ~workdir ~suite_name test : outcome Promise.t =
   let details = match result with Ok () -> "" | Error msg -> "\n            -> " ^ msg in
   log "  %s%s%s%s" label test.title details
     (if Result.is_error result then Buffer.contents diagnostics else "");
-  add_to_transcript "  %s%s%s" label test.title details;
+  (* How a probe fails may vary from one run to the next: *)
+  add_to_transcript "  %s%s%s" label test.title
+    (if test.kind = Probe then "" else details);
   write_transcript suite_name;
   Promise.return { test; suite_name; result }
 
