@@ -58,19 +58,15 @@ let __init_default_exn_printers =
 
 (* Intermediate converters *)
 
-let cobol_config_n_file_from_dialect_name ~platform ~verbose dialect_name =
+let cobol_config_from_dialect_name ~platform ~verbose dialect_name =
   try
-    Cobol_config.from_dialect_n_file ~platform ~verbose @@
+    Cobol_config.from_dialect ~platform ~verbose @@
     Cobol_dialect.Id.of_string dialect_name
   with
   | Invalid_argument e ->
       raise @@ ERROR (Unknown_dialect e)
   | Cobol_config.ERROR e ->
       raise @@ ERROR (Cobol_config_error e)
-
-let cobol_config_from_dialect_name ~platform ~verbose dialect_name =
-  DIAGS.map_result ~f:fst @@
-  cobol_config_n_file_from_dialect_name ~platform ~verbose dialect_name
 
 let cobol_source_format source_format_name =
   try Cobol_config.Options.format_of_string source_format_name

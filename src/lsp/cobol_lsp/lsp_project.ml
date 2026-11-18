@@ -166,10 +166,11 @@ let update_source_format ~reporter { config; _ } str : bool =
 
 let update_dialect ~platform ~reporter ({ config; _ } as project) str : bool =
   try
-    let { result = result, dialect_file; diags } =
-      Superbol_project.Config.cobol_config_n_file_from_dialect_name str
+    let { result; diags } =
+      Superbol_project.Config.cobol_config_from_dialect_name str
         ~platform ~verbose:false
     in
+    let dialect_file = (Cobol_config.origin result).file in
     if result = config.cobol_config &&         (* note: structural comparison *)
        String.equal str config.dialect_name
     then false

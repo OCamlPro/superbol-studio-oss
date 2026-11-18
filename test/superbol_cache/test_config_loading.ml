@@ -55,13 +55,14 @@ let platform =
 let search_path = ["/elsewhere"; "/conf"]
 
 let load ~platform name =
-  Cobol_config.from_dialect_n_file ~platform ~search_path @@
+  Cobol_config.from_dialect ~platform ~search_path @@
   Cobol_dialect.Id.of_string name
 
 let%expect_test "configuration files are looked up and read at once" =
-  let { result = config, file; _ }: _ Cobol_common.Diagnostics.with_diags =
+  let { result = config; _ }: _ Cobol_common.Diagnostics.with_diags =
     load ~platform "my.conf" in
-  Printf.printf "loaded: %s\n" (Option.value file ~default:"none");
+  Printf.printf "loaded: %s\n"
+    (Option.value (Cobol_config.origin config).file ~default:"none");
   (* [inc.conf] is taken next to [my.conf]: *)
   Printf.printf "tab-width: %d\n" (Cobol_config.tab_stops config |> List.hd);
   begin match load ~platform "missing.conf" with
@@ -94,14 +95,15 @@ let%expect_test "configuration files read are recorded" =
     /conf/my.conf |}];;
 
 let%expect_test "custom dialects keep the case of their file name" =
-  let { result = _, file; _ }: _ Cobol_common.Diagnostics.with_diags =
+  let { result = config; _ }: _ Cobol_common.Diagnostics.with_diags =
     load ~platform "/conf/Mixed-Case.conf" in
-  Printf.printf "loaded: %s\n" (Option.value file ~default:"none");
+  Printf.printf "loaded: %s\n"
+    (Option.value (Cobol_config.origin config).file ~default:"none");
   [%expect {| loaded: /conf/Mixed-Case.conf |}];;
 
 let%expect_test "configurations derived from Micro Focus ones are detected" =
   List.iter begin fun name ->
-    let { result = config, _; _ }: _ Cobol_common.Diagnostics.with_diags =
+    let { result = config; _ }: _ Cobol_common.Diagnostics.with_diags =
       load ~platform name in
     let origin = Cobol_config.origin config in
     Printf.printf "%s: dialect=%s ancestry=[%s] mf-ancestor=%s\n" name

@@ -263,8 +263,7 @@ let load_file (module Words: Words.S) ~platform ?search_path file =
   in
   path, List.rev @@ process [] ~path contents
 
-(* Same as [from_file], also giving the path of the file loaded. *)
-let from_file_n_path ~platform ?search_path ?(verbose=false) file =
+let from_file ~platform ?search_path ?(verbose=false) file =
   if verbose then
     Pretty.error "Loading: `%s'@." file;
   let module Words = Words.Make () in
@@ -297,11 +296,7 @@ let from_file_n_path ~platform ?search_path ?(verbose=false) file =
       let registers = registers
     end)
   in
-  DIAGS.result ((module Config: T), path) ~diags:(Diags.inspect ~reset:true)
-
-let from_file ~platform ?search_path ?verbose file =
-  DIAGS.map_result ~f:fst @@
-  from_file_n_path ~platform ?search_path ?verbose file
+  DIAGS.result (module Config: T) ~diags:(Diags.inspect ~reset:true)
 
 (* NB: [Some] is shadowed by a constructor of {!Types}. *)
 let dialect_config_filename: Cobol_dialect.Id.t -> string option = function
@@ -316,17 +311,12 @@ let dialect_config_filename: Cobol_dialect.Id.t -> string option = function
       then name
       else Pretty.to_string "%s.conf" name
 
-let from_dialect_n_file ~platform ?search_path ?verbose d =
+let from_dialect ~platform ?search_path ?verbose d =
   match (dialect_config_filename d: string option) with
   | None ->
-      DIAGS.result ((module Default: T), Option.none)
+      DIAGS.result (module Default: T)
   | Some filename ->
-      DIAGS.map_result ~f:(fun (config, path) -> config, Option.some path) @@
-      from_file_n_path ~platform ?search_path ?verbose filename
-
-let from_dialect ~platform ?search_path ?verbose d =
-  DIAGS.map_result ~f:fst @@
-  from_dialect_n_file ~platform ?search_path ?verbose d
+      from_file ~platform ?search_path ?verbose filename
 
 let origin (module C: T) = C.origin
 let dialect config = (origin config).id
