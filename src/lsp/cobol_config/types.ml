@@ -256,4 +256,7 @@ type t =
     self_call_recursive: unit feature_support;
     record_contains_depending_clause: unit feature_support;
     picture_l: unit feature_support;
+
+    (* support options derived from the dialect ancestry *)
+    alphanumeric_comp_x_over_8_chars: unit feature_support;
   }

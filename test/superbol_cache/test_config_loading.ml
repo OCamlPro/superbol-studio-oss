@@ -106,15 +106,20 @@ let%expect_test "configurations derived from Micro Focus ones are detected" =
     let { result = config; _ }: _ Cobol_common.Diagnostics.with_diags =
       load ~platform name in
     let origin = config.origin in
-    Printf.printf "%s: dialect=%s ancestry=[%s] mf-ancestor=%s\n" name
+    Printf.printf "%s: dialect=%s ancestry=[%s] mf-ancestor=%s \
+                   alphanumeric-comp-x-over-8-chars=%s\n" name
       (Cobol_dialect.Id.to_string origin.id)
       (String.concat "; " @@ List.map Cobol_dialect.Id.to_string origin.ancestry)
       (match Cobol_dialect.Origin.closest_ancestor
                (function MicroFocus _ -> true | _ -> false) origin with
        | None -> "none"
        | Some d -> Cobol_dialect.Id.to_string d)
+      (match config.alphanumeric_comp_x_over_8_chars.level with
+       | Ok () -> "ok"
+       | Unconformable -> "unconformable"
+       | _ -> "other")
   end ["my.conf"; "mf"; "my-mf.conf"];
   [%expect {|
-    my.conf: dialect=default ancestry=[default] mf-ancestor=none
-    mf: dialect=mf ancestry=[mf] mf-ancestor=mf
-    my-mf.conf: dialect=my-mf ancestry=[mf; my-mf] mf-ancestor=mf |}];;
+    my.conf: dialect=default ancestry=[default] mf-ancestor=none alphanumeric-comp-x-over-8-chars=ok
+    mf: dialect=mf ancestry=[mf] mf-ancestor=mf alphanumeric-comp-x-over-8-chars=unconformable
+    my-mf.conf: dialect=my-mf ancestry=[mf; my-mf] mf-ancestor=mf alphanumeric-comp-x-over-8-chars=unconformable |}];;

@@ -629,3 +629,9 @@ let record_contains_depending_clause: unit feature =
 let picture_l: unit feature =
   Cobol_dialect.Feature.unit ~name:"picture-l"
     "PICTURE@ string@ with@ 'L'@ character"
+
+(* not a GnuCOBOL configuration option: derived from the dialect ancestry *)
+let alphanumeric_comp_x_over_8_chars: unit feature =
+  Cobol_dialect.Feature.unit ~name:"alphanumeric-comp-x-over-8-chars"
+    "alphanumeric@ PICTURE@ of@ more@ than@ 8@ characters@ for@ COMP-X@ or@ \
+     COMP-N@ item"

@@ -259,3 +259,5 @@ val self_call_recursive: unit feature
 val record_contains_depending_clause: unit feature
 
 val picture_l: unit feature
+
+val alphanumeric_comp_x_over_8_chars: unit feature

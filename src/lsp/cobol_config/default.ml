@@ -204,4 +204,8 @@ let default : Types.t =
     record_contains_depending_clause =
       bind record_contains_depending_clause Unconformable;
     picture_l = bind picture_l @@ Ok ();
+
+    (* support options derived from the dialect ancestry *)
+    alphanumeric_comp_x_over_8_chars =
+      bind alphanumeric_comp_x_over_8_chars @@ Ok ();
   }

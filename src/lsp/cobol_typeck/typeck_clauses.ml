@@ -74,11 +74,15 @@ let clause_warn acc warn =
 let clause_diagnostic acc diag =
   { acc with data_clause_diags = diag :: acc.data_clause_diags }
 
-let verify_feature acc ~loc binding =
+let feature_diagnostics diags ~loc binding =
   match Cobol_dialect.(Diagnostics.decompose @@ Feature.verify ~loc binding) with
-  | _, None -> acc
-  | _, Some `Error u -> clause_diagnostic acc @@ Dialect_feature_error u
-  | _, Some `Warning u -> clause_diagnostic acc @@ Dialect_feature_warning u
+  | _, None -> diags
+  | _, Some `Error u -> Dialect_feature_error u :: diags
+  | _, Some `Warning u -> Dialect_feature_warning u :: diags
+
+let verify_feature acc ~loc binding =
+  { acc with
+    data_clause_diags = feature_diagnostics acc.data_clause_diags ~loc binding }
 
 
 let on_unique_clause ~clause_name ~f prev_val acc clause =
@@ -543,16 +547,9 @@ let comp_x_usage ~data_config diags ~item_loc given_picture usage comp =
     let byte_size = unsigned_bytes_for_digits.(36) in
     let diags =
       match given_picture with
-      | Some Ok picture ->
-          let { dialect; alphanumeric_comp_x_over_8_chars_rejected_by; _ }
-            : Typeck_config.options = data_config.typeck_options in
-          Option.fold alphanumeric_comp_x_over_8_chars_rejected_by
-            ~none:diags ~some:begin fun rejected_by ->
-            data_warning diags @@
-            Oversized_alphanumeric_binary { picture; usage; byte_size;
-                                            max_chars = 8; rejected_by;
-                                            dialect }
-          end
+      | Some Ok { loc; _ } ->
+          feature_diagnostics diags ~loc
+            data_config.typeck_options.alphanumeric_comp_x_over_8_chars
       | None | Some Error _ ->
           diags
     in

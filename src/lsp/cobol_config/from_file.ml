@@ -345,5 +345,13 @@ module Make
         parse_support_value record_contains_depending_clause
           default.record_contains_depending_clause;
       picture_l = parse_support_value picture_l default.picture_l;
+
+      (* support options derived from the dialect ancestry *)
+      alphanumeric_comp_x_over_8_chars =
+        if Option.is_some @@ Cobol_dialect.Origin.closest_ancestor
+            (function MicroFocus _ -> true | _ -> false) origin
+        then Cobol_dialect.Feature.bind ~origin
+            alphanumeric_comp_x_over_8_chars Unconformable
+        else default.alphanumeric_comp_x_over_8_chars;
     }
 end
