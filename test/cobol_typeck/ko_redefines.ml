@@ -85,3 +85,20 @@ let%expect_test "redefines-proc-arg" =
        9
     >> Error: Data item 'B' with a REDEFINES clause is not allowed here
               (expecting a not-redefined 01- or 77-level data item) |}];;
+
+let%expect_test "duplicate-clause-in-redefinition" =
+  dotest @@ prog "duplicate-clause-in-redefinition"
+    ~working_storage:{|
+       01 A PIC 9.
+       01 B REDEFINES A PIC 9 PIC 9.
+    |};
+  [%expect {|
+    prog.cob:5.30-5.35:
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4          01 A PIC 9.
+       5 >        01 B REDEFINES A PIC 9 PIC 9.
+    ----                                 ^^^^^
+       6          PROCEDURE DIVISION.
+       7
+    >> Warning: Duplicate PICTURE clause |}];;

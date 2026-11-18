@@ -598,7 +598,7 @@ let define_constant_directive: unit feature =
 
 let free_redefines_position: unit feature =
   FEATURE.unit ~name:"free-redefines-position"
-    "REDEFINES@ caluse@ not@ follwing@ entry-name@ in@ defintion"
+    "REDEFINES@ clause@ not@ following@ entry-name@ in@ definition"
 
 let records_mismatch_record_clause: unit feature =
   FEATURE.unit ~name:"records-mismatch-record-clause"
