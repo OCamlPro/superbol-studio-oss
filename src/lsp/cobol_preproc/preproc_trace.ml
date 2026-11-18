@@ -69,6 +69,7 @@ module TYPES = struct
     | CopyDone of string
     | CyclicCopy of string
     | MissingCopy of Cobol_common.Copybook.TYPES.lookup_error
+    | UnreadableCopy of string
 
   type log = log_entry list
 end
@@ -89,6 +90,8 @@ let cyclic_copy ~loc ~filename : log -> log =
   List.cons @@ FileCopy { copyloc = loc; status = CyclicCopy filename }
 let missing_copy ~loc ~error : log -> log =
   List.cons @@ FileCopy { copyloc = loc; status = MissingCopy error }
+let unreadable_copy ~loc ~filename : log -> log =
+  List.cons @@ FileCopy { copyloc = loc; status = UnreadableCopy filename }
 let new_replace ~loc : log -> log =
   List.cons @@ Replace { replloc = loc }
 let exec_block ~preamble_loc ?postamble_loc text : log -> log =

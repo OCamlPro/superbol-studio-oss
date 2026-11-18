@@ -705,7 +705,7 @@ let preproc_info_on_hover ~filename position pplog =
   | Some Variable_definition _
   | Some Variable_substitution _
   | Some Variable_evaluation _
-  | Some FileCopy { status = MissingCopy _; _ }
+  | Some FileCopy { status = MissingCopy _ | UnreadableCopy _; _ }
   | Some Replace _
   | Some CompilerDirective _
   | Some Exec_block _

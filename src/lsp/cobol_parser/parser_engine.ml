@@ -143,8 +143,6 @@ let add_diag ({ preproc = ({ diags; _ } as pp); _ } as ps) severity ?loc diag =
   let diags = Parser_diagnostics.add_diag ~severity ?loc diag diags in
   { ps with preproc = { pp with diags } }
 
-let add_exn ({ preproc = ({ diags; _ } as pp); _ } as ps) e =
-  { ps with preproc = { pp with diags = Parser_diagnostics.add_exn e diags } }
 
 let all_diags { preproc = { pp; diags; tokzr; _ }; _ } =
   Parser_diagnostics.ALL.{
@@ -612,9 +610,6 @@ and recover ps tokens candidates ~report_syntax_hints_n_error =
 and accept ps v =
   Final (ps, Some v, Sink)
 
-let on_exn ps e =
-  Final (add_exn ps e, None, Sink)
-
 (* --- *)
 
 type _ grammar_entry =
@@ -635,8 +630,8 @@ let first_stage (ps: 'm state) ~grammar_entry : ('a, 'm) stage =
 let rec full_parse: ('a, 'm) stage -> 'a option * 'm state = function
   | Final (ps, res, _) ->
       res, ps
-  | Trans ((ps, _, _) as state) ->
-      full_parse @@ try on_interim_stage state with e -> on_exn ps e
+  | Trans state ->
+      full_parse @@ on_interim_stage state
 
 (* --- *)
 
@@ -746,12 +741,12 @@ let parse_with_history ?stop_before_eof ?(save_stage = 10) rwps =
   let rec loop count ({ store; stage; _ } as rwps) = match stage with
     | Final (_, res, _) ->
         res, rwps
-    | Trans ((ps, _, _) as state) ->
+    | Trans state ->
         let store, count =
           if count = save_stage then store, succ count
           else save_interim_stage state store, 0
         and stage =
-          try on_interim_stage ?stop_before_eof state with e -> on_exn ps e
+          on_interim_stage ?stop_before_eof state
         in
         loop count { rwps with store; stage }
   in

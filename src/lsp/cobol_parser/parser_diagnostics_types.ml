@@ -14,7 +14,6 @@
 open Cobol_common.Srcloc.TYPES
 
 type error =
-  | Caught_exception of { msg: string }
   | Malformed of { loc: srcloc; stuff: malformed_stuff }
   | Missing of { loc: srcloc; stuff: missing_stuff }
   | Unexpected of { loc: srcloc; stuff: unexpected_stuff }

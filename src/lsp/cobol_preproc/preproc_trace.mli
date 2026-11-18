@@ -65,6 +65,7 @@ module TYPES: sig
     | CopyDone of string
     | CyclicCopy of string
     | MissingCopy of Cobol_common.Copybook.TYPES.lookup_error
+    | UnreadableCopy of string
 
   type log
 end
@@ -96,6 +97,10 @@ val cyclic_copy
 val missing_copy
   : loc: srcloc
   -> error: Cobol_common.Copybook.TYPES.lookup_error
+  -> log -> log
+val unreadable_copy
+  : loc: srcloc
+  -> filename: string
   -> log -> log
 val new_replace
   : loc: srcloc

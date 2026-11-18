@@ -667,11 +667,11 @@ and free_line state
           (Src_lexing.flush_continued ~force:true state) lexbuf
       }
   | (line_directive_prefix
-       (['0'-'9']+ as num) spaces line_directive_filename as dir) nnl*
+       (['0'-'9']+ as num) spaces line_directive_filename) nnl*
     {
         match int_of_string num with
-        | exception _ ->
-            Pretty.failwith "line number out of range: %s" dir
+        | exception Failure _ ->
+            Src_lexing.unexpected (Line_number num) ~k:free_line state lexbuf
         | line_num ->
             update_loc lexbuf (Some name) (line_num - 1) true 0;
             free_line state lexbuf

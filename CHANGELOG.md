@@ -28,6 +28,7 @@
 - Workspace analyzis for every COBOL file, that now runs in parallel sub-processes, and reports diagnostics of files that are not open [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
 
 ### Fixed
+- Analysis of programs that copy a library that cannot be read, which now reports the error on the `COPY` statement instead of aborting [#741](https://github.com/OCamlPro/superbol-studio-oss/pull/741)
 - Missing diagnostics about the clauses of data items with a REDEFINES clause, such as duplicate clauses [#738](https://github.com/OCamlPro/superbol-studio-oss/pull/738)
 - Spurious errors about ambiguous data-names on qualifiers (e.g. `B` in `A IN B`) when the qualified name itself is not ambiguous, and navigation (definitions, references, hover, renaming) from such qualifiers [#735](https://github.com/OCamlPro/superbol-studio-oss/pull/735)
 - Stack overflows of the LSP server compiled to JavaScript (shipped in universal VSIXs) on very large programs, slow code lenses on programs with many data items or paragraphs, and slow analysis with high memory usage on deeply nested statements (e.g. `IF`s) [#727](https://github.com/OCamlPro/superbol-studio-oss/pull/727)

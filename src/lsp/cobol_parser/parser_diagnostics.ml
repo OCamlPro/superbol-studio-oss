@@ -55,18 +55,14 @@ let pp_unterminated_stuff ppf = function
       Pretty.string ppf "comment@ entry"
 
 let error_loc = function
-  | Caught_exception _ ->
-      None
   | Malformed { loc; _ }
   | Missing { loc; _ }
   | Unexpected { loc; _ }
   | Unsupported { loc; _ }
   | Unterminated { loc; _ } ->
-      Some loc
+      loc
 
 let pp_error ppf = function
-  | Caught_exception { msg } ->
-      Pretty.print ppf "%a" Pretty.text msg
   | Malformed { stuff; _ } ->
       Pretty.print ppf "Malformed@ %a" pp_malformed_stuff stuff
   | Missing { stuff; _ } ->
@@ -161,19 +157,11 @@ let add_exec_block_diag d diags =
 let add_exec_block_diags d diags =
   List.fold_left (fun diags d -> add_exec_block_diag d diags) diags d
 
-let add_exn exn diags =
-  match exn with
-  | Failure msg
-  | Sys_error msg ->
-      add_error (Caught_exception { msg }) diags
-  | e ->
-      raise e                                                          (* ??? *)
-
 let translate ({ errors; customs }: t) =
   let module DIAGS = Cobol_common.Diagnostics in
   DIAGS.Set.none |> fun diags ->
   List.fold_left begin fun diags e ->
-    DIAGS.Acc.error diags ?loc:(error_loc e) "%a" pp_error e
+    DIAGS.Acc.error diags ~loc:(error_loc e) "%a" pp_error e
   end diags errors |> fun diags ->
   List.fold_left begin fun diags { severity; loc; diag } ->
     DIAGS.Acc.diag severity diags ?loc "%a" pp_customizable_diagnostic diag

@@ -525,16 +525,24 @@ and read_lib ({ persist = { copybook_lookup_config; platform;
     | Ok filename ->
         if platform.verbosity>0 then
           platform.error "Reading library `%s'@." filename;
-        let text, lp' =             (* note: [lp] holds all prev and new diags *)
-          Src_input.from ~filename ~platform ~f:begin fun input ->
-            full_text                                   (* likewise for pplog *)
-              (preprocessor input (`Fork (lp, loc, filename)))
-              ~postproc:(Cobol_common.Srcloc.copy_from ~filename ~copyloc:loc)
-          end
-        in
-        text, lp'.diags, Preproc_trace.copy_done ~loc ~filename lp'.pplog,
-        StringMap.union (fun _ x _ -> Some x (* unreachable *))
-          lp.persist.copybook_rev_comments (rev_comments lp')
+        (match platform.read_text_file filename with
+         | exception Sys_error msg ->
+             [],
+             Preproc_diagnostics.add_error
+               (Unreadable_copybook { copyloc = loc; filename; msg }) lp.diags,
+             Preproc_trace.unreadable_copy ~loc ~filename lp.pplog,
+             lp.persist.copybook_rev_comments
+         | contents ->
+             let input = Src_input.string ~filename contents in
+             let text, lp' =        (* note: [lp] holds all prev and new diags *)
+               full_text                                (* likewise for pplog *)
+                 (preprocessor input (`Fork (lp, loc, filename)))
+                 ~postproc:(Cobol_common.Srcloc.copy_from ~filename
+                              ~copyloc:loc)
+             in
+             text, lp'.diags, Preproc_trace.copy_done ~loc ~filename lp'.pplog,
+             StringMap.union (fun _ x _ -> Some x (* unreachable *))
+               lp.persist.copybook_rev_comments (rev_comments lp'))
     | Error lnf ->
         [],
         Preproc_diagnostics.add_error
