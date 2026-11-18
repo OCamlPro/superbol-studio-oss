@@ -581,6 +581,7 @@
    (ppx_import ( >= 1 ))
    (ppx_deriving ( >= 5.2.1 ))
    (menhirLib (and ( >= 20231231 )( < 20240715 )))
+   (cobol_dialect (= :version))
    (cobol_data (= :version))
    (cobol_config (= :version))
    (cobol_common (= :version))

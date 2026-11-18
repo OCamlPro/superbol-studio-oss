@@ -21,7 +21,7 @@ type error =
                                lnf: Cobol_common.Copybook.TYPES.lookup_error }
   | Cyclic_copy of { copyloc: srcloc; filename: string }
   | Unreadable_copybook of { copyloc: srcloc; filename: string; msg: string }
-  | Feature_error of Cobol_config.DIAG.error
+  | Feature_error of Cobol_dialect.Types.usage
   | Forbidden of { loc: srcloc; stuff: forbidden_stuff }
   | Invalid of { loc: srcloc; stuff: invalid_stuff }
   | Literal_error of Cobol_data.Types.error
@@ -66,7 +66,7 @@ and unterminated_stuff =
 
 let error_loc = function
   | Feature_error e ->
-      Some (Cobol_config.DIAG.error_loc e)
+      Some e.loc
   | Src_error e ->
       Some (Src_diagnostics.error_loc e)
   | Literal_error e ->
@@ -148,7 +148,7 @@ let pp_error ppf = function
   | Unreadable_copybook { filename; msg; _ } ->
       Pretty.print ppf "Unable@ to@ read@ library@ `%s':@ %s" filename msg
   | Feature_error e ->
-      Cobol_config.DIAG.pp_error ppf e
+      Cobol_dialect.Diagnostics.pp_usage ppf e
   | Forbidden { stuff; _ } ->
       Pretty.print ppf "Forbidden@ %a" pp_forbidden_stuff stuff
   | Invalid { stuff; _ } ->
@@ -173,7 +173,7 @@ let pp_error ppf = function
 (* --- *)
 
 type warning =
-  | Feature_warning of Cobol_config.DIAG.warning
+  | Feature_warning of Cobol_dialect.Types.usage
   | Ignored of { loc: srcloc; item: ignored_item }
   | Incompatible of { loc: srcloc; stuff: incompatible_warning_stuff }
   | Src_warning of Src_diagnostics.warning
@@ -222,7 +222,7 @@ and unexpected_warning_stuff =
 
 let warning_loc = function
   | Feature_warning w ->
-      Cobol_config.DIAG.warning_loc w
+      w.loc
   | Ignored { loc; _ }
   | Incompatible { loc; _ }
   | Undefine_of_unknown_env_variable { loc; _ }
@@ -255,7 +255,7 @@ let pp_unexpected_warning_stuff ppf = function
 
 let pp_warning ppf = function
   | Feature_warning w ->
-      Cobol_config.DIAG.pp_warning ppf w
+      Cobol_dialect.Diagnostics.pp_usage ppf w
   | Ignored { item; _ } ->
       Pretty.print ppf "Ignored@ %a" pp_ignored_item item
   | Incompatible { stuff; _ } ->

@@ -14,3 +14,5 @@
 module Types = Dialect_types
 module Id = Dialect_id
 module Origin = Dialect_origin
+module Feature = Dialect_feature
+module Diagnostics = Dialect_diagnostics

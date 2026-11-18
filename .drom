@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-5c0c5e109f1beaf92dabae1342af4dcf:.
+8111e2fabd14ee625ffe12906ca2adb9:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -55,7 +55,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-b56ae60503cceb72364259b446ea2226:dune-project
+6fc78551eb789573351352d6580747b9:dune-project
 # end context for dune-project
 
 # begin context for opam/autofonce.opam
@@ -165,7 +165,7 @@ a779620553ab4e69758385124e667945:opam/cobol_parser.opam
 
 # begin context for opam/cobol_preproc.opam
 # file opam/cobol_preproc.opam
-712c61d5c0bccfc521519cc20c5bcc74:opam/cobol_preproc.opam
+74f9ce88f30f2d73daeaf67e071c13a2:opam/cobol_preproc.opam
 # end context for opam/cobol_preproc.opam
 
 # begin context for opam/cobol_procedure.opam
@@ -720,7 +720,7 @@ a18438bf6e347bb93779045b0a7006d1:src/lsp/cobol_parser/version.mlt
 
 # begin context for src/lsp/cobol_preproc/dune
 # file src/lsp/cobol_preproc/dune
-68ef30d82b03c578363e7c17a7de12ce:src/lsp/cobol_preproc/dune
+82b9034c6ce7e736cb5bdc390e161fb0:src/lsp/cobol_preproc/dune
 # end context for src/lsp/cobol_preproc/dune
 
 # begin context for src/lsp/cobol_preproc/package.toml

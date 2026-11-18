@@ -20,7 +20,8 @@ module OUT = Preproc_outputs
 module Make (Config: Cobol_config.T) = struct
 
   let safe_partial_replacing_when_src_literal ~loc =
-    Config.safe_partial_replacing_when_src_literal#verify ~loc |>
+    Cobol_dialect.Feature.verify ~loc
+      Config.safe_partial_replacing_when_src_literal |>
     OUT.of_config_verif |>
     OUT.map_result ~f:(function Some s -> s = `Safe | None -> false)
 

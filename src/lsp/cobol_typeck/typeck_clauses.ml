@@ -114,7 +114,7 @@ let on_redefines_clause acc =
       let acc =
         if acc != no_data_clauses then (* note: hackish use of physical equality *)
           register_used_feature acc
-            ~feature:Cobol_config.Options.free_redefines_position
+            ~feature:Cobol_config.Options.free_redefines_position.info
             ~loc:~@clause
         else acc
       in

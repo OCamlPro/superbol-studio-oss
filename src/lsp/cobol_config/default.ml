@@ -155,156 +155,158 @@ module Default: Types.T = struct
     = ebcdic_symbolic_characters#from_val ~config:origin false
 
   (* support options *)
+  open Cobol_dialect.Types
+  let bind f = Cobol_dialect.Feature.bind ~origin f
   let comment_paragraphs
-    = comment_paragraphs#from_level ~config:origin @@ Obsolete ()
+    = bind comment_paragraphs @@ Obsolete ()
   let safe_partial_replacing_when_src_literal
-    = safe_partial_replacing_when_src_literal#from_level ~config:origin @@ Obsolete `Unsafe
+    = bind safe_partial_replacing_when_src_literal @@ Obsolete `Unsafe
   let control_division
-    = control_division#from_level ~config:origin Unconformable
+    = bind control_division Unconformable
   let memory_size_clause
-    = memory_size_clause#from_level ~config:origin @@ Obsolete ()
+    = bind memory_size_clause @@ Obsolete ()
   let multiple_file_tape_clause
-    = multiple_file_tape_clause#from_level ~config:origin @@ Obsolete ()
+    = bind multiple_file_tape_clause @@ Obsolete ()
   let label_records_clause
-    = label_records_clause#from_level ~config:origin @@ Obsolete ()
+    = bind label_records_clause @@ Obsolete ()
   let value_of_clause
-    = value_of_clause#from_level ~config:origin @@ Obsolete ()
+    = bind value_of_clause @@ Obsolete ()
   let data_records_clause
-    = data_records_clause#from_level ~config:origin @@ Obsolete ()
+    = bind data_records_clause @@ Obsolete ()
   let top_level_occurs_clause
-    = top_level_occurs_clause#from_level ~config:origin @@ Ok ()
+    = bind top_level_occurs_clause @@ Ok ()
   let same_as_clause
-    = same_as_clause#from_level ~config:origin @@ Ok ()
+    = bind same_as_clause @@ Ok ()
   let type_to_clause
-    = type_to_clause#from_level ~config:origin @@ Ok ()
+    = bind type_to_clause @@ Ok ()
   let usage_type
-    = usage_type#from_level ~config:origin @@ Ok ()
+    = bind usage_type @@ Ok ()
   let synchronized_clause
-    = synchronized_clause#from_level ~config:origin @@ Ok ()
+    = bind synchronized_clause @@ Ok ()
   let sync_left_right
-    = sync_left_right#from_level ~config:origin @@ Ok ()
+    = bind sync_left_right @@ Ok ()
   let special_names_clause
-    = special_names_clause#from_level ~config:origin @@ Ok ()
+    = bind special_names_clause @@ Ok ()
   let goto_statement_without_name
-    = goto_statement_without_name#from_level ~config:origin @@ Obsolete ()
+    = bind goto_statement_without_name @@ Obsolete ()
   let stop_literal_statement
-    = stop_literal_statement#from_level ~config:origin @@ Obsolete ()
+    = bind stop_literal_statement @@ Obsolete ()
   let stop_identifier_statement
-    = stop_identifier_statement#from_level ~config:origin @@ Obsolete ()
+    = bind stop_identifier_statement @@ Obsolete ()
   let stop_error_statement
-    = stop_error_statement#from_level ~config:origin Unconformable
+    = bind stop_error_statement Unconformable
   let debugging_mode
-    = debugging_mode#from_level ~config:origin @@ Ok ()
+    = bind debugging_mode @@ Ok ()
   let use_for_debugging
-    = use_for_debugging#from_level ~config:origin @@ Ok ()
+    = bind use_for_debugging @@ Ok ()
   let padding_character_clause
-    = padding_character_clause#from_level ~config:origin  @@ Obsolete ()
+    = bind padding_character_clause  @@ Obsolete ()
   let next_sentence_phrase
-    = next_sentence_phrase#from_level ~config:origin @@ Archaic ()
+    = bind next_sentence_phrase @@ Archaic ()
   let listing_statements
-    = listing_statements#from_level ~config:origin Skip
+    = bind listing_statements Skip
   let title_statement
-    = title_statement#from_level ~config:origin Skip
+    = bind title_statement Skip
   let entry_statement
-    = entry_statement#from_level ~config:origin @@ Ok ()
+    = bind entry_statement @@ Ok ()
   let move_noninteger_to_alphanumeric
-    = move_noninteger_to_alphanumeric#from_level ~config:origin Error
+    = bind move_noninteger_to_alphanumeric Error
   let move_figurative_constant_to_numeric
-    = move_figurative_constant_to_numeric#from_level ~config:origin @@ Archaic ()
+    = bind move_figurative_constant_to_numeric @@ Archaic ()
   let move_figurative_space_to_numeric
-    = move_figurative_space_to_numeric#from_level ~config:origin Error
+    = bind move_figurative_space_to_numeric Error
   let move_figurative_quote_to_numeric
-    = move_figurative_quote_to_numeric#from_level ~config:origin @@ Obsolete ()
+    = bind move_figurative_quote_to_numeric @@ Obsolete ()
   let odo_without_to
-    = odo_without_to#from_level ~config:origin @@ Warning ()
+    = bind odo_without_to @@ Warning ()
   let section_segments
-    = section_segments#from_level ~config:origin Ignore
+    = bind section_segments Ignore
   let alter_statement
-    = alter_statement#from_level ~config:origin @@ Obsolete ()
+    = bind alter_statement @@ Obsolete ()
   let call_overflow
-    = call_overflow#from_level ~config:origin @@ Archaic ()
+    = bind call_overflow @@ Archaic ()
   let numeric_boolean
-    = numeric_boolean#from_level ~config:origin @@ Ok ()
+    = bind numeric_boolean @@ Ok ()
   let hexadecimal_boolean
-    = hexadecimal_boolean#from_level ~config:origin @@ Ok ()
+    = bind hexadecimal_boolean @@ Ok ()
   let national_literals
-    = national_literals#from_level ~config:origin @@ Ok ()
+    = bind national_literals @@ Ok ()
   let hexadecimal_national_literals
-    = hexadecimal_national_literals#from_level ~config:origin @@ Ok ()
+    = bind hexadecimal_national_literals @@ Ok ()
   let national_character_literals
-    = national_character_literals#from_level ~config:origin @@ Warning ()
+    = bind national_character_literals @@ Warning ()
   let hp_octal_literals
-    = hp_octal_literals#from_level ~config:origin Unconformable
+    = bind hp_octal_literals Unconformable
   let acu_literals
-    = acu_literals#from_level ~config:origin Unconformable
+    = bind acu_literals Unconformable
   let word_continuation
-    = word_continuation#from_level ~config:origin @@ Warning ()
+    = bind word_continuation @@ Warning ()
   let not_exception_before_exception
-    = not_exception_before_exception#from_level ~config:origin @@ Ok ()
+    = bind not_exception_before_exception @@ Ok ()
   let accept_display_extensions
-    = accept_display_extensions#from_level ~config:origin @@ Ok ()
+    = bind accept_display_extensions @@ Ok ()
   let larger_redefines
-    = larger_redefines#from_level ~config:origin Error
+    = bind larger_redefines Error
   let symbolic_constant
-    = symbolic_constant#from_level ~config:origin @@ Ok ()
+    = bind symbolic_constant @@ Ok ()
   let constant_78
-    = constant_78#from_level ~config:origin @@ Ok ()
+    = bind constant_78 @@ Ok ()
   let constant_01
-    = constant_01#from_level ~config:origin @@ Ok ()
+    = bind constant_01 @@ Ok ()
   let perform_varying_without_by
-    = perform_varying_without_by#from_level ~config:origin @@ Ok ()
+    = bind perform_varying_without_by @@ Ok ()
   let reference_out_of_declaratives
-    = reference_out_of_declaratives#from_level ~config:origin @@ Warning ()
+    = bind reference_out_of_declaratives @@ Warning ()
   let program_prototypes
-    = program_prototypes#from_level ~config:origin @@ Ok ()
+    = bind program_prototypes @@ Ok ()
   let call_convention_mnemonic
-    = call_convention_mnemonic#from_level ~config:origin @@ Ok ()
+    = bind call_convention_mnemonic @@ Ok ()
   let call_convention_linkage
-    = call_convention_linkage#from_level ~config:origin @@ Ok ()
+    = bind call_convention_linkage @@ Ok ()
   let numeric_value_for_edited_item
-    = numeric_value_for_edited_item#from_level ~config:origin @@ Ok ()
+    = bind numeric_value_for_edited_item @@ Ok ()
   let incorrect_conf_sec_order
-    = incorrect_conf_sec_order#from_level ~config:origin @@ Ok ()
+    = bind incorrect_conf_sec_order @@ Ok ()
   let define_constant_directive
-    = define_constant_directive#from_level ~config:origin @@ Archaic ()
+    = bind define_constant_directive @@ Archaic ()
   let free_redefines_position
-    = free_redefines_position#from_level ~config:origin @@ Warning ()
+    = bind free_redefines_position @@ Warning ()
   let records_mismatch_record_clause
-    = records_mismatch_record_clause#from_level ~config:origin @@ Warning ()
+    = bind records_mismatch_record_clause @@ Warning ()
   let record_delimiter
-    = record_delimiter#from_level ~config:origin @@ Ok ()
+    = bind record_delimiter @@ Ok ()
   let sequential_delimiters
-    = sequential_delimiters#from_level ~config:origin @@ Ok ()
+    = bind sequential_delimiters @@ Ok ()
   let record_delim_with_fixed_recs
-    = record_delim_with_fixed_recs#from_level ~config:origin @@ Ok ()
+    = bind record_delim_with_fixed_recs @@ Ok ()
   let missing_statement
-    = missing_statement#from_level ~config:origin @@ Warning ()
+    = bind missing_statement @@ Warning ()
   let missing_period
-    = missing_period#from_level ~config:origin @@ Warning ()
+    = bind missing_period @@ Warning ()
   let zero_length_literals
-    = zero_length_literals#from_level ~config:origin @@ Ok ()
+    = bind zero_length_literals @@ Ok ()
   let xml_generate_extra_phrases
-    = xml_generate_extra_phrases#from_level ~config:origin @@ Ok ()
+    = bind xml_generate_extra_phrases @@ Ok ()
   let continue_after
-    = continue_after#from_level ~config:origin @@ Ok ()
+    = bind continue_after @@ Ok ()
   let goto_entry
-    = goto_entry#from_level ~config:origin @@ Warning ()
+    = bind goto_entry @@ Warning ()
   let assign_variable
-    = assign_variable#from_level ~config:origin @@ Ok ()
+    = bind assign_variable @@ Ok ()
   let assign_using_variable
-    = assign_using_variable#from_level ~config:origin @@ Ok ()
+    = bind assign_using_variable @@ Ok ()
   let assign_ext_dyn
-    = assign_ext_dyn#from_level ~config:origin @@ Ok ()
+    = bind assign_ext_dyn @@ Ok ()
   let assign_disk_from
-    = assign_disk_from#from_level ~config:origin @@ Ok ()
+    = bind assign_disk_from @@ Ok ()
   let vsam_status
-    = vsam_status#from_level ~config:origin Ignore
+    = bind vsam_status Ignore
   let self_call_recursive
-    = self_call_recursive#from_level ~config:origin @@ Warning ()
+    = bind self_call_recursive @@ Warning ()
   let record_contains_depending_clause
-    = record_contains_depending_clause#from_level ~config:origin Unconformable
+    = bind record_contains_depending_clause Unconformable
   let picture_l
-    = picture_l#from_level ~config:origin @@ Ok ()
+    = bind picture_l @@ Ok ()
 end
 
 include Default

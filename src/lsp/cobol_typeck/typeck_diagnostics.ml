@@ -26,7 +26,7 @@ type diagnostic =
   | Condition_warning of Typeck_condition_diagnostics.warning
   | Dialect_feature_used of
       {
-        feature: unit Cobol_config.feature;
+        feature: Cobol_dialect.Types.feature_info;
         usage_loc: srcloc;
       }
 
@@ -78,7 +78,7 @@ let pp_diagnostic ppf = function
   | Condition_warning w ->
       Typeck_condition_diagnostics.pp_warning ppf w
   | Dialect_feature_used { feature; _ } ->
-      Pretty.print ppf "%(%)@ used" feature#short
+      Pretty.print ppf "%(%)@ used" (Cobol_dialect.Feature.short feature)
 
 let has_errors: diagnostics -> bool =
   List.exists begin function

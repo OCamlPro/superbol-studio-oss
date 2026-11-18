@@ -343,332 +343,319 @@ let ebcdic_symbolic_characters: bool value =
 (* support options *)
 (*NOTE: GnuCOBOL option name is "partial-replace-when-literal-src"*)
 let safe_partial_replacing_when_src_literal: [`Safe | `Unsafe] feature =
-  let feature_kind = object
-    inherit [_] FEATURE.feature_kind ~name:"safety support"
-    method parse s : [`Safe | `Unsafe] FEATURE.support_level =
-      match String.lowercase_ascii s with
-      | "ok" -> FEATURE.Ok `Safe
-      | "warning" -> Warning `Safe
-      | "archaic" -> Archaic `Safe
-      | "obsolete" -> Obsolete `Safe
-      | "skip" -> Ok `Unsafe                            (* special semantics *)
-      | "ignore" -> Ignore
-      | "error" -> Error
-      | "unconformable" -> Unconformable
-      | _ as s -> raise @@ Invalid_argument s
-    method from_ast s: [`Safe | `Unsafe] FEATURE.support_level =
-      match s with
-      | Conf_ast.Ok -> FEATURE.Ok `Safe
-      | Warning -> Warning `Safe
-      | Archaic -> Archaic `Safe
-      | Obsolete -> Obsolete `Safe
-      | Skip -> Ok `Unsafe
-      | Ignore -> Ignore
-      | Error -> Error
-      | Unconformable -> Unconformable
-  end in
-  FEATURE.def ~feature_kind ~name:"partial-replace-when-literal-src"
+  let open Cobol_dialect.Types in
+  let of_level : unit support -> [`Safe | `Unsafe] support = function
+    | Ok () -> Ok `Safe
+    | Warning () -> Warning `Safe
+    | Archaic () -> Archaic `Safe
+    | Obsolete () -> Obsolete `Safe
+    | Skip -> Ok `Unsafe                                (* special semantics *)
+    | Ignore -> Ignore
+    | Error -> Error
+    | Unconformable -> Unconformable
+  in
+  Cobol_dialect.Feature.def ~of_level ~name:"partial-replace-when-literal-src"
     ~short:"partial@ replacing@ with@ literal@ source@ operands"
     "Enable@ partial@ replacings@ (COPY...REPLACING/REPLACE@ \
      LEADING/TRAILING)@ with@ literal@ source@ operands, and@ apply@ them@ \
      even@ when@ they@ replace@ with@ spaces@ only."
 
 let comment_paragraphs: unit feature =
-  FEATURE.unit ~name:"comment-paragraphs"
+  Cobol_dialect.Feature.unit ~name:"comment-paragraphs"
     ~short:"comment@ paragraph@ in@ IDENTIFICATION@ DIVISION"
     "Comment@ paragraphs@ in@ IDENTIFICATION@ DIVISION@ (AUTHOR,@ \
      DATE-WRITTEN,@ ...)."
 
 let control_division: unit feature =
-  FEATURE.unit ~name:"control-division"
+  Cobol_dialect.Feature.unit ~name:"control-division"
     "CONTROL@ DIVISION"
 
 let memory_size_clause: unit feature =
-  FEATURE.unit ~name:"memory-size-clause"
+  Cobol_dialect.Feature.unit ~name:"memory-size-clause"
     "MEMORY-SIZE@ clause"
 
 let multiple_file_tape_clause: unit feature =
-  FEATURE.unit ~name:"multiple-file-tape-clause"
+  Cobol_dialect.Feature.unit ~name:"multiple-file-tape-clause"
     "MULTIPLE-FILE-TAPE@ clause"
 
 let label_records_clause: unit feature =
-  FEATURE.unit ~name:"label-records-clause"
+  Cobol_dialect.Feature.unit ~name:"label-records-clause"
     "LABEL_RECORDS@ clause"
 
 let value_of_clause: unit feature =
-  FEATURE.unit ~name:"value-of-clause"
+  Cobol_dialect.Feature.unit ~name:"value-of-clause"
     "Value-OF@ clause"
 
 let data_records_clause: unit feature =
-  FEATURE.unit ~name:"data-records-clause"
+  Cobol_dialect.Feature.unit ~name:"data-records-clause"
     "DATA-RECORDS@ clause"
 
 let top_level_occurs_clause: unit feature =
-  FEATURE.unit ~name:"top-level-occurs-clause"
+  Cobol_dialect.Feature.unit ~name:"top-level-occurs-clause"
     "OCCURS@ clause@ on@ top-level"
 
 let same_as_clause: unit feature =
-  FEATURE.unit ~name:"same-as-clause"
+  Cobol_dialect.Feature.unit ~name:"same-as-clause"
     "SAME@ AS@ clause"
 
 let type_to_clause: unit feature =
-  FEATURE.unit ~name:"type-to-clause"
+  Cobol_dialect.Feature.unit ~name:"type-to-clause"
     "TYPE@ TO@ clause"
 
 let usage_type: unit feature =
-  FEATURE.unit ~name:"usage-type"
+  Cobol_dialect.Feature.unit ~name:"usage-type"
     "USAGE@ type-name"
 
 let synchronized_clause: unit feature =
-  FEATURE.unit ~name:"synchronized-clause"
+  Cobol_dialect.Feature.unit ~name:"synchronized-clause"
     "SYNCHRONIZED@ clause"
 
 let sync_left_right: unit feature =
-  FEATURE.unit ~name:"sync-left-right"
+  Cobol_dialect.Feature.unit ~name:"sync-left-right"
     "LEFT/RIGHT@ phrases@ in@ SYNCHRONIZED@ clause"
 
 let special_names_clause: unit feature =
-  FEATURE.unit ~name:"special-names-clause"
+  Cobol_dialect.Feature.unit ~name:"special-names-clause"
     "SPECIAL-NAMES@ clause"
 
 let goto_statement_without_name: unit feature =
-  FEATURE.unit ~name:"goto-statement-without-name"
+  Cobol_dialect.Feature.unit ~name:"goto-statement-without-name"
     "GO@ TO@ statement without name"
 
 let stop_literal_statement: unit feature =
-  FEATURE.unit ~name:"stop-literal-statement"
+  Cobol_dialect.Feature.unit ~name:"stop-literal-statement"
     "STOP-literal@ statement"
 
 let stop_identifier_statement: unit feature =
-  FEATURE.unit ~name:"stop-identifier-statement"
+  Cobol_dialect.Feature.unit ~name:"stop-identifier-statement"
     "STOP-identifier@ statement"
 
 let stop_error_statement: unit feature =
-  FEATURE.unit ~name:"stop-error-statement"
+  Cobol_dialect.Feature.unit ~name:"stop-error-statement"
     "STOP-error@ statement"
 
 let debugging_mode: unit feature =
-  FEATURE.unit ~name:"debugging-mode"
+  Cobol_dialect.Feature.unit ~name:"debugging-mode"
     "DEBUGGING@ MODE@ and@ debugging@ indicator"
 
 let use_for_debugging: unit feature =
-  FEATURE.unit ~name:"use-for-debugging"
+  Cobol_dialect.Feature.unit ~name:"use-for-debugging"
     "USE@ FOR@ DEBUGGING"
 
 let padding_character_clause: unit feature =
-  FEATURE.unit ~name:"padding-character-clause"
+  Cobol_dialect.Feature.unit ~name:"padding-character-clause"
     "PADDING@ CHARACTER@ clause"
 
 let next_sentence_phrase: unit feature =
-  FEATURE.unit ~name:"next-sentence-phrase"
+  Cobol_dialect.Feature.unit ~name:"next-sentence-phrase"
     "NEXT@ SENTENCE@ phrase"
 
 let listing_statements: unit feature =
-  FEATURE.unit ~name:"listing-statements"
+  Cobol_dialect.Feature.unit ~name:"listing-statements"
     "listing-directive@ statements@ EJECT,@ SKIP1,@ SKIP2,@ SKIP3"
 
 let title_statement: unit feature =
-  FEATURE.unit ~name:"title-statement"
+  Cobol_dialect.Feature.unit ~name:"title-statement"
     "listing-directive@ statement@ TITLE"
 
 let entry_statement: unit feature =
-  FEATURE.unit ~name:"entry-statement"
+  Cobol_dialect.Feature.unit ~name:"entry-statement"
     "ENTRY@ statement"
 
 let move_noninteger_to_alphanumeric: unit feature =
-  FEATURE.unit ~name:"move-noninteger-to-alphanumeric"
+  Cobol_dialect.Feature.unit ~name:"move-noninteger-to-alphanumeric"
     "move@ noninteger@ to@ alphanumeric"
 
 let move_figurative_constant_to_numeric: unit feature =
-  FEATURE.unit ~name:"move-figurative-constant-to-numeric"
+  Cobol_dialect.Feature.unit ~name:"move-figurative-constant-to-numeric"
     "move@ figurative@ constants@ to@ numeric"
 
 let move_figurative_space_to_numeric: unit feature =
-  FEATURE.unit ~name:"move-figurative-space-to-numeric"
+  Cobol_dialect.Feature.unit ~name:"move-figurative-space-to-numeric"
     "move@ figurative@ constant@ SPACE@ to@ numeric"
 
 let move_figurative_quote_to_numeric: unit feature =
-  FEATURE.unit ~name:"move-figurative-quote-to-numeric"
+  Cobol_dialect.Feature.unit ~name:"move-figurative-quote-to-numeric"
     "move@ figurative@ constant@ QUOTE@ to@ numeric"
 
 let odo_without_to: unit feature =
-  FEATURE.unit ~name:"odo-without-to"
+  Cobol_dialect.Feature.unit ~name:"odo-without-to"
     "OCCURS@ DEPENDING@ ON@ without@ to"
 
 let section_segments: unit feature =
-  FEATURE.unit ~name:"section-segments"
+  Cobol_dialect.Feature.unit ~name:"section-segments"
     "section@ segments"
 
 let alter_statement: unit feature =
-  FEATURE.unit ~name:"alter-statement"
+  Cobol_dialect.Feature.unit ~name:"alter-statement"
     "ALTER@ statement"
 
 let call_overflow: unit feature =
-  FEATURE.unit ~name:"call-overflow"
+  Cobol_dialect.Feature.unit ~name:"call-overflow"
     "OVERFLOW@ clause@ for@ CALL"
 
 let numeric_boolean: unit feature =
-  FEATURE.unit ~name:"numeric-boolean"
+  Cobol_dialect.Feature.unit ~name:"numeric-boolean"
     "boolean@ literal@ (B'1010')"
 
 let hexadecimal_boolean: unit feature =
-  FEATURE.unit ~name:"hexadecimal-boolean"
+  Cobol_dialect.Feature.unit ~name:"hexadecimal-boolean"
     "hexadecimal-boolean@ literal@ (BX'A')"
 
 let national_literals: unit feature =
-  FEATURE.unit ~name:"national-literals"
+  Cobol_dialect.Feature.unit ~name:"national-literals"
     "national@ literals@ (N'UTF-16 string')"
 
 let hexadecimal_national_literals: unit feature =
-  FEATURE.unit ~name:"hexadecimal-national-literals"
+  Cobol_dialect.Feature.unit ~name:"hexadecimal-national-literals"
     "hexadecimal-national@ literals@ (NX'265E')"
 
 let national_character_literals: unit feature =
-  FEATURE.unit ~name:"national-character-literals"
+  Cobol_dialect.Feature.unit ~name:"national-character-literals"
     "non-standard@ national@ literals@ (NC'UTF-16 string')"
 
 let hp_octal_literals: unit feature =
-  FEATURE.unit ~name:"hp-octal-literals"
+  Cobol_dialect.Feature.unit ~name:"hp-octal-literals"
     "HP@ COBOL@ octal@ literals (%%377)"
 
 let acu_literals: unit feature =
-  FEATURE.unit ~name:"acu-literals"
+  Cobol_dialect.Feature.unit ~name:"acu-literals"
     "ACUCOBOL-G@ literals@ (#B #O #H #X)"
 
 let word_continuation: unit feature =
-  FEATURE.unit ~name:"word-continuation"
+  Cobol_dialect.Feature.unit ~name:"word-continuation"
     "continuation@ of@ COBOL@ words"
 
 let not_exception_before_exception: unit feature =
-  FEATURE.unit ~name:"not-exception-before-exception"
+  Cobol_dialect.Feature.unit ~name:"not-exception-before-exception"
     "NOT@ ON@ EXCEPTION@ before@ ON@ EXCEPTION"
 
 let accept_display_extensions: unit feature =
-  FEATURE.unit ~name:"accept-display-extensions"
+  Cobol_dialect.Feature.unit ~name:"accept-display-extensions"
     "extensions@ to@ ACCEPT@ and@ DISPLAY"
 
 let larger_redefines: unit feature =
-  FEATURE.unit ~name:"larger-redefines"
+  Cobol_dialect.Feature.unit ~name:"larger-redefines"
     "allow@ larger@ REDEFINES@ items"
 
 let symbolic_constant: unit feature =
-  FEATURE.unit ~name:"symbolic-constant"
+  Cobol_dialect.Feature.unit ~name:"symbolic-constant"
     "constants@ defined@ in@ SPECIAL-NAMES"
 
 let constant_78: unit feature =
-  FEATURE.unit ~name:"constant-78"
+  Cobol_dialect.Feature.unit ~name:"constant-78"
     ~short:"constant@ with@ level@ 78@ item"
     "constant@ with@ level@ 78@ item@ (note:@ has@ left@ to@ right@ precedence@ in@ expressions)"
 
 let constant_01: unit feature =
-  FEATURE.unit ~name:"constant-01"
+  Cobol_dialect.Feature.unit ~name:"constant-01"
     "constant@ wiht@ level@ 01@ CONSTANT@ AS/FROM@ item (COBOL@ 2002+)"
 
 let perform_varying_without_by: unit feature =
-  FEATURE.unit ~name:"perform-varying-without-by"
+  Cobol_dialect.Feature.unit ~name:"perform-varying-without-by"
     "PERFORM@ VARYING@ without@ BY@ phrase@ (implies@ BY@ 1)"
 
 let reference_out_of_declaratives: unit feature =
-  FEATURE.unit ~name:"reference-out-of-declaratives"
+  Cobol_dialect.Feature.unit ~name:"reference-out-of-declaratives"
     "references@ to@ sections@ not@ in@ DECLARATIVES@ from@ within@ DECLARATIVES"
 
 let program_prototypes: unit feature =
-  FEATURE.unit ~name:"program-prototypes"
+  Cobol_dialect.Feature.unit ~name:"program-prototypes"
     "CALL/CANCEL@ with@ program-prototype-name"
 
 let call_convention_mnemonic: unit feature =
-  FEATURE.unit ~name:"call-convention-mnemonic"
+  Cobol_dialect.Feature.unit ~name:"call-convention-mnemonic"
     "specifying@ call-convention@ by@ mnemonic"
 
 let call_convention_linkage: unit feature =
-  FEATURE.unit ~name:"call-convention-linkage"
+  Cobol_dialect.Feature.unit ~name:"call-convention-linkage"
     "specifying@ call-convention@ by@ WITH@ ...@ LINKAGE"
 
 let numeric_value_for_edited_item: unit feature =
-  FEATURE.unit ~name:"numeric-value-for-edited-item"
+  Cobol_dialect.Feature.unit ~name:"numeric-value-for-edited-item"
     "numeric@ literals@ in@ Value@ clause@ of@ numeric-edited@ items"
 
 let incorrect_conf_sec_order: unit feature =
-  FEATURE.unit ~name:"incorrect-conf-sec-order"
+  Cobol_dialect.Feature.unit ~name:"incorrect-conf-sec-order"
     "incorrect@ order@ of@ CONFIGURATION@ SECTION@ paragraphs@ (OpenCOBOL/GnuCOBOL@ extension)"
 
 let define_constant_directive: unit feature =
-  FEATURE.unit ~name:"define-constant-directive"
+  Cobol_dialect.Feature.unit ~name:"define-constant-directive"
     "allow@ >>@ DEFINE@ CONSTANT@ var@ AS@ literal@ (OpenCOBOL/GnuCOBOL@ extension)"
 
 let free_redefines_position: unit feature =
-  FEATURE.unit ~name:"free-redefines-position"
+  Cobol_dialect.Feature.unit ~name:"free-redefines-position"
     "REDEFINES@ clause@ not@ following@ entry-name@ in@ definition"
 
 let records_mismatch_record_clause: unit feature =
-  FEATURE.unit ~name:"records-mismatch-record-clause"
+  Cobol_dialect.Feature.unit ~name:"records-mismatch-record-clause"
     "record@ sizes@ does@ not@ match@ RECORD@ clause"
 
 let record_delimiter: unit feature =
-  FEATURE.unit ~name:"record-delimiter"
+  Cobol_dialect.Feature.unit ~name:"record-delimiter"
     "RECORD@ DELIMITER@ clause"
 
 let sequential_delimiters: unit feature =
-  FEATURE.unit ~name:"sequential-delimiters"
+  Cobol_dialect.Feature.unit ~name:"sequential-delimiters"
     "BINARY-SEQUENTIAL@ and @ LINE-SEQUENTIAL@ phrases@ in@ RECORD@ DELIMITER"
 
 let record_delim_with_fixed_recs: unit feature =
-  FEATURE.unit ~name:"record-delim-with-fixed-recs"
+  Cobol_dialect.Feature.unit ~name:"record-delim-with-fixed-recs"
     "RECORD@ DELIMITER@ clause@ on@ file@ with@ fixed-length@ records"
 
 let missing_statement: unit feature =
-  FEATURE.unit ~name:"missing-statement"
+  Cobol_dialect.Feature.unit ~name:"missing-statement"
     "missing@ statement@ (e.g.@ empty@ IF/PERFORM)"
 
 let missing_period: unit feature =
-  FEATURE.unit ~name:"missing-period"
+  Cobol_dialect.Feature.unit ~name:"missing-period"
     ~short:"missing@ period@ in@ PROCEDURE@ DIVISION"
     "missing@ period@ in@ PROCEDURE@ DIVISION@ (when@ reference@ format@ supports@ Area@ A@ enforcement)"
 
 let zero_length_literals: unit feature =
-  FEATURE.unit ~name:"zero-length-literals"
+  Cobol_dialect.Feature.unit ~name:"zero-length-literals"
     "zero-length@ literals,@ e.g.@ ''@ and@ \"\""
 
 let xml_generate_extra_phrases: unit feature =
-  FEATURE.unit ~name:"xml-generate-extra-phrases"
+  Cobol_dialect.Feature.unit ~name:"xml-generate-extra-phrases"
     "XML@ GENERATE's@ phrases@ other@ thant@ COUNT@ IN"
 
 let continue_after: unit feature =
-  FEATURE.unit ~name:"continue-after"
+  Cobol_dialect.Feature.unit ~name:"continue-after"
     "AFTER@ phrase@ in@ CONTINUE@ statement"
 
 let goto_entry: unit feature =
-  FEATURE.unit ~name:"goto-entry"
+  Cobol_dialect.Feature.unit ~name:"goto-entry"
     "ENTRY@ FOR@ GO@ TO@ and@ GO@ TO@ ENTRY@ statements"
 
 let assign_variable: unit feature =
-  FEATURE.unit ~name:"assign-variable"
+  Cobol_dialect.Feature.unit ~name:"assign-variable"
     "ASSIGN@ [TO]@ variable@ in@ SELECT"
 
 let assign_using_variable: unit feature =
-  FEATURE.unit ~name:"assign-using-variable"
+  Cobol_dialect.Feature.unit ~name:"assign-using-variable"
     "ASSIGN@ USING/VARYING variable@ in@ SELECT"
 
 let assign_ext_dyn: unit feature =
-  FEATURE.unit ~name:"assign-ext-dyn"
+  Cobol_dialect.Feature.unit ~name:"assign-ext-dyn"
     "ASSIGN@ EXTERNAL/DYNAMIC@ in@ SELECT"
 
 let assign_disk_from: unit feature =
-  FEATURE.unit ~name:"assign-disk-from"
+  Cobol_dialect.Feature.unit ~name:"assign-disk-from"
     "ASSIGN@ DISK@ FROM@ variable@ in@ SELECT"
 
 let vsam_status: unit feature =
-  FEATURE.unit ~name:"vsam-status"
+  Cobol_dialect.Feature.unit ~name:"vsam-status"
     "VSAM@ status@ in@ FILE@ STATUS"
 
 let self_call_recursive: unit feature =
-  FEATURE.unit ~name:"self-call-recursive"
+  Cobol_dialect.Feature.unit ~name:"self-call-recursive"
     "CALL@ to@ own@ PROGRAM-ID@ implies@ RECURSIVE@ attribute"
 
 let record_contains_depending_clause: unit feature =
-  FEATURE.unit ~name:"record-contains-depending-clause"
+  Cobol_dialect.Feature.unit ~name:"record-contains-depending-clause"
     "DEPENDING@ clause@ in@ RECORD@ CONTAINS"
 
 let picture_l: unit feature =
-  FEATURE.unit ~name:"picture-l"
+  Cobol_dialect.Feature.unit ~name:"picture-l"
     "PICTURE@ string@ with@ 'L'@ character"

@@ -90,7 +90,7 @@ module Make
     try v#from_string ~config:origin (find_any v#name)
     with LookupError -> default
   let parse_support_value v default =
-    try v#from_ast ~config:origin (find_support v#name)
+    try Cobol_dialect.Feature.bind_level ~origin v (find_support v.info.name)
     with LookupError -> default
 
   (* int values *)

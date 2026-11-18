@@ -95,12 +95,12 @@ let default = (module Default: T)
 
 let meet_support (s1: Conf_ast.support_value as 's) (s2: 's) : 's =
   match s1, s2 with
-  | Ok, _ -> Ok
-  | Warning, (Warning | Archaic | Obsolete | Skip | Ignore | Error |
-              Unconformable) -> Warning
-  | Archaic, (Archaic | Obsolete | Skip | Ignore | Error |
-              Unconformable) -> Archaic
-  | Obsolete, (Obsolete | Skip | Ignore | Error | Unconformable) -> Obsolete
+  | Ok (), _ -> s1
+  | Warning (), (Warning () | Archaic () | Obsolete () | Skip | Ignore | Error |
+                 Unconformable) -> s1
+  | Archaic (), (Archaic () | Obsolete () | Skip | Ignore | Error |
+                 Unconformable) -> s1
+  | Obsolete (), (Obsolete () | Skip | Ignore | Error | Unconformable) -> s1
   | Skip, (Skip | Ignore | Error | Unconformable) -> Skip
   | Ignore, (Ignore | Error | Unconformable) -> Ignore
   | Error, (Error | Unconformable) -> Error
