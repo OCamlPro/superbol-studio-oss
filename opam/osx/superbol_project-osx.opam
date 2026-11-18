@@ -51,7 +51,6 @@ install: [
 depends: [
   "ocaml" {>= "4.14.2"}
   "dune" {>= "3.17.0"}
-  "superbol_preprocs-osx" {= version}
   "superbol_platform-osx" {= version}
   "superbol_cache-osx" {= version}
   "pretty-osx" {= version}

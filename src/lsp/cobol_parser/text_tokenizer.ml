@@ -307,7 +307,6 @@ and persist =
     context_tokens: Grammar_contexts.context_tokens;
     known_intrinsics: Text_lexer.IntrinsicHandles.t;
     default_intrinsics: Text_lexer.IntrinsicHandles.t;
-    exec_scanners: Parser_options.exec_scanners;
     verbose: bool;
     show_if_verbose: [`Tks | `Ctx] list;
   }
@@ -317,7 +316,6 @@ let eidetic = Eidetic []
 let init
     ?(verbose = false)
     ?(show_if_verbose = [`Tks; `Ctx])
-    ~exec_scanners
     ~memory
     ~intrinsics
     ?(default_intrinsics = StringSet.empty)       (* preregistered_intrinsics *)
@@ -353,7 +351,6 @@ let init
         context_tokens;
         known_intrinsics;
         default_intrinsics;
-        exec_scanners;
         verbose;
         show_if_verbose =
           (if LIST.mem `Tks show_if_verbose then [`Tks] else []) @
@@ -376,40 +373,19 @@ let distinguish_words: (Grammar_tokens.token with_loc as 't) -> 't = function
       t
 
 
-let scan_exec_block
-    ({ persist = { exec_scanners = { exec_scanners = scanners;
-                                     exec_scanner_fallback = fallback; _ }; _ };
-       _ } as state)
-    text =
-  let module EXEC_MAP = Parser_options.EXEC_MAP in
-  let exec_scanner, lang = match ~&text with
-    | { payload = TextWord _(* EXEC(UTE) *); _ } ::
-      { payload = TextWord lang; _ } :: _ ->
-        (try EXEC_MAP.find lang scanners, Some lang
-         with Not_found -> fallback, None)
-    | _ ->
-        fallback, None
+let scan_exec_block text : Cobol_ptree.exec_block =
+  let unparsed () =
+    Cobol_ptree.Unparsed
+      (List.map (fun w -> Pretty.to_string "%a" TEXT.pp_word ~&w &@<- w) ~&text)
   in
-  match exec_scanner with
-  | Stateless_exec_scanner s ->
-      let block, diags = s ~&text in
-      let diags = Parser_diagnostics.add_exec_block_diags diags state.diags in
-      EXEC_BLOCK block &@<- text,
-      if diags == state.diags then state else { state with diags }
-  | Stateful_exec_scanner (s, s_acc) ->
-      let block, diags, s_acc = s ~&text s_acc in
-      let scanner = Parser_options.Stateful_exec_scanner (s, s_acc) in
-      let exec_scanners = match lang with
-        | None ->
-            { state.persist.exec_scanners with
-              exec_scanner_fallback = scanner }
-        | Some lang ->
-            { state.persist.exec_scanners with
-              exec_scanners = EXEC_MAP.add lang scanner scanners }
-      in
-      let diags = Parser_diagnostics.add_exec_block_diags diags state.diags in
-      EXEC_BLOCK block &@<- text,
-      { state with diags; persist = { state.persist with exec_scanners } }
+  match ~&text with
+  | { payload = TextWord _(* EXEC(UTE) *); _ } ::
+    { payload = TextWord "SQL"; _ } :: _ ->
+      (match Sql_parser.parse ~&text with
+       | Ok esql -> Esql esql
+       | Error _ -> unparsed ())
+  | _ ->
+      unparsed ()
 
 
 let acc_tokens_of_text_word (rev_prefix_tokens, state) { payload = c; loc } =
@@ -468,8 +444,7 @@ let acc_tokens_of_text_word (rev_prefix_tokens, state) { payload = c; loc } =
     | Eof ->
         tok EOF
     | ExecBlock text ->
-        let block, state = scan_exec_block state (text &@ loc) in
-        block :: rev_prefix_tokens, state
+        tok @@ EXEC_BLOCK (scan_exec_block (text &@ loc))
     | Pseudo _ ->
         let error = Unexpected { loc; stuff = Pseudotext } in
         rev_prefix_tokens,

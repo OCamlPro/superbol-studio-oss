@@ -29,6 +29,8 @@
 - Workspace analyzis for every COBOL file, that now runs in parallel sub-processes, and reports diagnostics of files that are not open [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)
 
 ### Fixed
+- Analysis of programs that stopped at `EXEC SQL` blocks with characters unknown to the SQL parser, ignoring everything after them [#743](https://github.com/OCamlPro/superbol-studio-oss/pull/743)
+- Navigation (definitions, references, hover) from COBOL variables in `EXEC SQL` blocks, that did not work in documents whose analysis was restored from the caches of the language server [#743](https://github.com/OCamlPro/superbol-studio-oss/pull/743)
 - Analysis of programs that copy a library that cannot be read, which now reports the error on the `COPY` statement instead of aborting [#741](https://github.com/OCamlPro/superbol-studio-oss/pull/741)
 - Missing diagnostics about the clauses of data items with a REDEFINES clause, such as duplicate clauses [#738](https://github.com/OCamlPro/superbol-studio-oss/pull/738)
 - Spurious errors about ambiguous data-names on qualifiers (e.g. `B` in `A IN B`) when the qualified name itself is not ambiguous, and navigation (definitions, references, hover, renaming) from such qualifiers [#735](https://github.com/OCamlPro/superbol-studio-oss/pull/735)

@@ -247,7 +247,6 @@ let procedure_of_compilation_unit ~data_definitions ~refs cu' =
 
 let collect_references
     ~(data_definitions: Cobol_unit.Types.data_definitions)
-    ~(fold_exec_block': Typeck_outputs.exec_block_folder)
     ~(refs: references_acc)
     procedure =
 
@@ -292,7 +291,13 @@ let collect_references
 
     method! fold_exec_block' exec_block acc =
       Visitor.skip_children @@
-      fold_exec_block' ~data_definitions exec_block acc
+      match ~&exec_block with
+      | Cobol_ptree.Esql esql ->
+          List.fold_left begin fun acc cobol_var_id ->
+            Typeck_references.register_name cobol_var_id acc ~data_definitions
+          end acc (Sql_ast.cobol_vars esql)
+      | Cobol_ptree.Unparsed _ ->
+          acc
 
   end in
 
@@ -300,12 +305,12 @@ let collect_references
 
 (* --- *)
 
-let of_compilation_unit ~data_definitions ~fold_exec_block' cu' =
+let of_compilation_unit ~data_definitions cu' =
   let procedure, refs =
     procedure_of_compilation_unit ~data_definitions cu'
       ~refs:Typeck_references.empty_accumulator
   in
   let { refs = references; diags; _ } =
-    collect_references ~data_definitions ~fold_exec_block' ~refs procedure
+    collect_references ~data_definitions ~refs procedure
   in
   { procedure; references }, diags

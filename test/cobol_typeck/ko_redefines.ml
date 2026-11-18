@@ -167,8 +167,7 @@ let%expect_test "free-redefines-position-diagnostics-can-be-marshalled" =
     Prog_parser.parse ~parser_options free_redefines_prog |>
     Cobol_parser.Outputs.translate_diags in
   let Cobol_typeck.Results.{ diags; _ } =
-    Cobol_typeck.compilation_group ptree ~options
-      ~fold_exec_block':(fun ~data_definitions:_ _ acc -> acc) in
+    Cobol_typeck.compilation_group ptree ~options in
   Printf.printf "diagnostics: %d, marshalled: %b\n"
     (List.length diags)
     (String.length (Marshal.to_string diags []) > 0);

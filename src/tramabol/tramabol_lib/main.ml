@@ -30,9 +30,7 @@ let parse_n_typeck { preproc_options; parser_options; platform; _ } filename =
     Cobol_parser.parse_simple ~options:parser_options |>
     Cobol_parser.Outputs.translate_diags |>
     Cobol_common.Diagnostics.more_result ~f:begin fun ptree ->
-      Cobol_typeck.compilation_group ptree
-        ~options:typeck_options
-        ~fold_exec_block':Superbol_preprocs.Esql.fold_exec_block' |>
+      Cobol_typeck.compilation_group ptree ~options:typeck_options |>
       Cobol_typeck.Results.translate_diags
     end |>
     Cobol_common.Diagnostics.show_diags ~platform

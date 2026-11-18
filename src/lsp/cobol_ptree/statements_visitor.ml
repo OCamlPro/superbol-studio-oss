@@ -14,7 +14,6 @@
 open PTree_types
 
 open Cobol_common.Srcloc.INFIX
-open Cobol_common.Exec_block.TYPES
 open Cobol_common.Visitor
 open Cobol_common.Visitor.INFIX                         (* for `>>` (== `|>`) *)
 open Terms_visitor
@@ -110,7 +109,7 @@ class virtual ['a] folder = object
   method fold_enter'         : (enter_stmt with_loc           , 'a) fold = default
   method fold_entry'         : (entry_stmt with_loc           , 'a) fold = default
   method fold_evaluate'      : (evaluate_stmt with_loc        , 'a) fold = default
-  method fold_exec_block'    : (exec_block with_loc           , 'a) fold = default
+  method fold_exec_block'    : (Exec_blocks.exec_block with_loc, 'a) fold = default
   method fold_exit'          : (exit_stmt with_loc            , 'a) fold = default
   method fold_free'          : (qualname with_loc list with_loc, 'a) fold = default
   method fold_generate'      : (qualname with_loc with_loc    , 'a) fold = default

@@ -53,8 +53,8 @@ depends: [
   "dune" {>= "3.17.0"}
   "toml-windows" {>= "7.1.0" & < "8.0.0"}
   "superbol_project-windows" {= version}
-  "superbol_preprocs-windows" {= version}
   "superbol_cache-windows" {= version}
+  "sql_ast-windows" {= version}
   "pretty-windows" {= version}
   "lsp-windows" {>= "1.18" & < "1.19"}
   "jsonrpc-windows" {>= "1.15"}

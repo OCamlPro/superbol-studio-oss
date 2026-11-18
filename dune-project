@@ -257,7 +257,6 @@
  (depends
    (ocaml (>= 4.14.2))
    (vscode-json (= :version))
-   (superbol_preprocs (= :version))
    (superbol_platform (= :version))
    (superbol_cache (= :version))
    (sql_preproc (= :version))
@@ -278,28 +277,6 @@
  )
 
 (package
- (name superbol_preprocs)
- (synopsis "SuperBOL Studio OSS Project")
- (description "SuperBOL Studio OSS is a new platform for COBOL")
- 
-  (sites
-    
-  )
-
- (depends
-   (ocaml (>= 4.14.2))
-   (sql_parser (= :version))
-   (pretty (= :version))
-   (cobol_typeck (= :version))
-   (cobol_preproc (= :version))
-   (cobol_parser (= :version))
-   (cobol_common (= :version))
-   odoc
-   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
-  )
- )
-
-(package
  (name superbol_project)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
@@ -310,7 +287,6 @@
 
  (depends
    (ocaml (>= 4.14.2))
-   (superbol_preprocs (= :version))
    (superbol_platform (= :version))
    (superbol_cache (= :version))
    (pretty (= :version))
@@ -396,6 +372,7 @@
 
  (depends
    (ocaml (>= 4.14.2))
+   (sql_parser (= :version))
    (menhirLib (and ( >= 20231231 )( < 20240715 )))
    (ez_file ( >= 0.3 ))
    (ebcdic_lib (= :version))
@@ -420,6 +397,7 @@
 
  (depends
    (ocaml (>= 4.14.2))
+   (sql_ast (= :version))
    (cobol_common (= :version))
    (ppx_deriving ( >= 5.2.1 ))
    odoc
@@ -456,8 +434,8 @@
    (ocaml (>= 4.14.2))
    (toml (and (>= 7.1.0) (< 8.0.0)))
    (superbol_project (= :version))
-   (superbol_preprocs (= :version))
    (superbol_cache (= :version))
+   (sql_ast (= :version))
    (pretty (= :version))
    (lsp (and ( >= 1.18 )( < 1.19 )))
    (jsonrpc ( >= 1.15 ))
@@ -627,6 +605,7 @@
 
  (depends
    (ocaml (>= 4.14.2))
+   (sql_ast (= :version))
    (cobol_unit (= :version))
    (cobol_ptree (= :version))
    (cobol_procedure (= :version))
@@ -715,7 +694,8 @@
 
  (depends
    (ocaml (>= 4.14.2))
-   (superbol_preprocs (= :version))
+   (sql_parser (= :version))
+   (sql_ast (= :version))
    (ppx_deriving ( >= 5.2.1 ))
    (ez_file ( >= 0.3 ))
    (cobol_unit (= :version))
@@ -763,7 +743,6 @@
    (ez_file ( >= 0.3 ))
    (ebcdic_lib (= :version))
    (cobol_preproc (= :version))
-   (cobol_parser (= :version))
    (cobol_common (= :version))
    (ppx_deriving ( >= 5.2.1 ))
    (menhir ( >= 20230415 ))

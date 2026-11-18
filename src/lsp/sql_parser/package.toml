@@ -54,7 +54,6 @@ skip = ["main.ml", "index.mld"]
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
 cobol_common = "version"
-cobol_parser = "version"
 cobol_preproc = "version"
 ebcdic_lib = "version"
 ez_file = ">=0.3"

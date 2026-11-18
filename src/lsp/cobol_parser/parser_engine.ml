@@ -84,14 +84,14 @@ and 'm persist =
 
 (** Initializes a parser state, given a preprocessor. *)
 let make_parser
-    (type m) Parser_options.{ verbose; show; recovery; config; exec_scanners }
+    (type m) Parser_options.{ verbose; show; recovery; config }
     ?show_if_verbose ~(tokenizer_memory: m memory) pp =
   let tokzr: m Tokzr.state =
     let memory: m Tokzr.memory = match tokenizer_memory with
       | Parser_options.Amnesic -> Tokzr.amnesic
       | Parser_options.Eidetic -> Tokzr.eidetic
     in
-    Tokzr.init ~verbose ?show_if_verbose ~exec_scanners ~memory config.words
+    Tokzr.init ~verbose ?show_if_verbose ~memory config.words
       ~intrinsics:config.intrinsic_functions
       (* CHECKME: no default intrinsics for now (shouldn't it be in `Config`?): *)
       (* ~default_intrinsics: Cobol_config.Reserved.default_intrinsics *)

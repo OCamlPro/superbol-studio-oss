@@ -59,7 +59,8 @@ cobol_typeck = "version"
 cobol_unit = "version"
 ez_file = ">=0.3"
 ppx_deriving = ">=5.2.1"
-superbol_preprocs = "version"
+sql_ast = "version"
+sql_parser = "version"
 
 # package tools dependencies
 [tools]

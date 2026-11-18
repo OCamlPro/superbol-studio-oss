@@ -56,7 +56,6 @@ depends: [
   "ez_file-windows" {>= "0.3"}
   "ebcdic_lib-windows" {= version}
   "cobol_preproc-windows" {= version}
-  "cobol_parser-windows" {= version}
   "cobol_common-windows" {= version}
   "ppx_deriving" {>= "5.2.1"}
   "menhir" {>= "20230415"}

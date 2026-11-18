@@ -39,7 +39,7 @@
 %token <string> PICTURE_PREFIX [@recovery "X("] [@symbol "<picture character string>"]
 %token <string> PICTURE_INTERM [@recovery ")X("] [@symbol "<picture character string>"]
 %token <string> PICTURE_SUFFIX [@recovery ")"] [@symbol "<picture character string>"]
-%token <Cobol_common.Exec_block.t> EXEC_BLOCK [@cost 999]
+%token <Cobol_ptree.exec_block> EXEC_BLOCK [@cost 999]
 
 %token EIGHTY_EIGHT
 

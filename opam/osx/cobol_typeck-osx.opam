@@ -51,6 +51,7 @@ install: [
 depends: [
   "ocaml" {>= "4.14.2"}
   "dune" {>= "3.17.0"}
+  "sql_ast-osx" {= version}
   "cobol_unit-osx" {= version}
   "cobol_ptree-osx" {= version}
   "cobol_procedure-osx" {= version}

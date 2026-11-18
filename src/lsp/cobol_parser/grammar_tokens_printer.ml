@@ -57,7 +57,7 @@ let pp_token_string: token Pretty.printer = fun ppf ->
   | NATLIT s -> print "N\"%s\"" s
   | BOOLIT b -> print "B\"%a\"" Cobol_ptree.pp_boolean b
   | COMMENT_ENTRY e -> print "%a" Fmt.(list ~sep:sp string) e
-  | EXEC_BLOCK b -> Cobol_common.Exec_block.pp ppf b
+  | EXEC_BLOCK b -> Cobol_ptree.pp_exec_block ppf b
   | INTERVENING_ c -> print "%c" c
   | t -> string @@
       match Text_lexer.string_of_punct_or_keyword_token t with

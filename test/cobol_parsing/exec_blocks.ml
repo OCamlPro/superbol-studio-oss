@@ -11,14 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let exec_scanners =
-  Superbol_preprocs.more [
-    "SQL", Superbol_preprocs.Esql.scanner;
-  ]
-
 let%expect_test "exec-block-with-cobol-separators" =
-  Parser_testing.show_parsed_tokens
-    ~parser_options:(Parser_testing.options ~exec_scanners ()) @@
+  Parser_testing.show_parsed_tokens @@
   {|
        PROGRAM-ID.        prog.
        PROCEDURE          DIVISION.
@@ -36,33 +30,18 @@ let%expect_test "exec-block-with-cobol-separators" =
     EXEC_BLOCK[EXEC SQL BEGIN SELECT something_1, something_2  FROM some_table WHERE condition > 0; EXCEPTION  END; END-EXEC],
     ., STOP, RUN, ., EOF |}];;
 
-let%expect_test "exec-block-with-invalid-percentage-character" =
-  let exec_scanners =
-    Superbol_preprocs.more [
-      "NO-%", Superbol_preprocs.No_percentage_toy.scanner;
-    ]
-  in
-  Parser_testing.show_diagnostics
-    ~parser_options:(Parser_testing.options ~exec_scanners ()) @@
-  {|
+let%expect_test "unparsed-exec-block" =
+  Parser_testing.show_parsed_tokens {|
        PROGRAM-ID.        prog.
        PROCEDURE          DIVISION.
-           EXEC NO-%
-              a % b
+           EXEC CICS
+              SEND MAP('A') MAPSET('B') ERASE
            END-EXEC.
            STOP RUN.
   |};
   [%expect {|
-    prog.cob:5.16-5.17:
-       2          PROGRAM-ID.        prog.
-       3          PROCEDURE          DIVISION.
-       4              EXEC NO-%
-       5 >               a % b
-    ----                   ^
-       6              END-EXEC.
-       7              STOP RUN.
-    >> Error: Unexpected character `%' in no-percentage-allowed EXEC/END-EXEC
-              block |}];;
+    PROGRAM-ID, ., INFO_WORD[prog], ., PROCEDURE, DIVISION, ., EXEC_BLOCK[EXEC
+    CICS SEND MAP( 'A' ) MAPSET( 'B' ) ERASE END-EXEC], ., STOP, RUN, ., EOF |}];;
 
 let%expect_test "exec-block-sequence-without-separator-periods" =
   Parser_testing.show_parsed_tokens {|
@@ -77,3 +56,33 @@ let%expect_test "exec-block-sequence-without-separator-periods" =
     PROGRAM-ID, ., INFO_WORD[prog], ., PROCEDURE, DIVISION, .,
     EXEC_BLOCK[EXEC SQL A END-EXEC], EXEC_BLOCK[EXEC SQL B END-EXEC], DISPLAY,
     'C', EXEC_BLOCK[EXEC SQL D END-EXEC], ., EOF |}];;
+
+let show_exec_blocks prog =
+  let { result = WithArtifacts (_, { tokens; _ }); _ } =
+    Parser_testing.preproc prog |>
+    Cobol_parser.parse_with_artifacts ~options:(Parser_testing.options ())
+  in
+  List.iter begin function
+    | Cobol_common.Srcloc.{ payload = Cobol_parser.Tokens.EXEC_BLOCK b; _ } ->
+        Pretty.out "%s: %a@."
+          (match b with Esql _ -> "Esql" | Unparsed _ -> "Unparsed")
+          Cobol_ptree.pp_exec_block b
+    | _ ->
+        ()
+  end (Lazy.force tokens)
+
+let%expect_test "unparsable-exec-sql-blocks" =
+  show_exec_blocks {|
+       PROGRAM-ID.        prog.
+       PROCEDURE          DIVISION.
+           EXEC SQL IGNORE whatever ! END-EXEC.
+           EXEC SQL SELECT FROM FROM END-EXEC.
+           EXEC SQL SELECT a FROM t WHERE b ! 0 END-EXEC.
+           STOP RUN.
+  |};
+  [%expect {|
+    Esql: EXEC SQL IGNORE  END-EXEC
+    Unparsed: EXEC SQL SELECT FROM FROM
+    END-EXEC
+    Unparsed: EXEC SQL SELECT a FROM t WHERE b ! 0
+    END-EXEC |}];;

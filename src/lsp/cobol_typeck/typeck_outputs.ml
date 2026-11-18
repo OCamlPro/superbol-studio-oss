@@ -13,7 +13,6 @@
 
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
-open Cobol_common.Exec_block.TYPES
 module LIST = Cobol_common.Basics.LIST
 
 (** Contains the locations of syntactic occurences for each qualified name *)
@@ -49,21 +48,13 @@ type outputs =
   }
 type t = outputs
 
-(* TODO: move those types to a new `Typeck_external/plugins/extensions' module *)
-(* An accumulator for {!exec_block_folder}, used to collect references in EXEC
-   blocks *)
+(* An accumulator used to collect references in procedures *)
 type references_acc =
   {
     current_section: Cobol_unit.Types.section option;
     refs: references_in_unit;
     diags: Typeck_diagnostics.t;
   }
-
-type exec_block_folder
-  = data_definitions: Cobol_unit.Types.data_definitions
-  -> exec_block with_loc
-  -> references_acc
-  -> references_acc
 
 (* --- *)
 
