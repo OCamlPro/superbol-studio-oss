@@ -187,6 +187,15 @@ and warning =
       {
         usage: Cobol_ptree.usage_clause with_loc;
       }
+  | Oversized_alphanumeric_binary of
+      {
+        picture: Cobol_data.Types.picture with_loc;
+        usage: Cobol_ptree.usage_clause;
+        byte_size: int;
+        max_chars: int;
+        rejected_by: Cobol_config.dialect;   (** dialect imposing [max_chars] *)
+        dialect: Cobol_config.dialect;       (** configured dialect *)
+      }
   (* | Extraneous_clause of *)
   (*     { *)
   (*       clause_name: string; *)
@@ -234,7 +243,8 @@ let warning_loc = function
   | Ignored_picture_clause { picture = { loc; _ }; _ }
   | Mismatching_usage_in_group { item_usage = { loc; _ }; _ }
   | Redefinition_of_table_item { redef_loc = loc; _ }
-  | Unsupported_usage { usage = { loc; _ } } ->
+  | Unsupported_usage { usage = { loc; _ } }
+  | Oversized_alphanumeric_binary { picture = { loc; _ }; _ } ->
       loc
 
 let pp_data_name'_opt
@@ -360,5 +370,20 @@ let pp_warning ppf = function
   | Unsupported_usage { usage } ->
       Pretty.print ppf "Unsupported@ USAGE@ %a"
         Cobol_ptree.pp_usage_clause ~&usage
+  | Oversized_alphanumeric_binary { picture; usage; byte_size; max_chars;
+                                    rejected_by; dialect } ->
+      let pp_dialect ppf d =
+        Fmt.string ppf (Cobol_config.DIALECT.to_string d) in
+      Pretty.print ppf "PICTURE@ of@ %u@ characters@ for@ item@ with@ USAGE@ %a@ \
+                        exceeds@ the@ limit@ of@ %u@ characters@ of@ dialect@ \
+                        %a%a;@ its@ size@ is@ %u@ bytes,@ as@ in@ GnuCOBOL"
+        (Cobol_data.Picture.data_size ~&picture)
+        Cobol_ptree.pp_usage_clause usage max_chars
+        pp_dialect rejected_by
+        (fun ppf () ->
+           if dialect <> rejected_by then
+             Pretty.print ppf ",@ from@ which@ %a@ derives" pp_dialect dialect)
+        ()
+        byte_size
 (* | Extraneous_clause { clause_name; _ } -> *)
 (*     Pretty.print ppf "Extraneous %s clause" clause_name *)

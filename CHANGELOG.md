@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Support for data items with `USAGE COMP-X` or `COMP-N` [#737](https://github.com/OCamlPro/superbol-studio-oss/pull/737)
 - Support for Micro Focus-style comment lines [#734](https://github.com/OCamlPro/superbol-studio-oss/pull/734)
 - Byte order of binary data items (`BINARY`, `COMP`, `COMP-5`, `BINARY-*`), decided by the typechecker from the `binary-byteorder` option and the byte order of the target
 - `SuperBOL Caches` view in the explorer, and status bar item, for keeping an eye on how much room the caches of the language server take, seeing what they hold, and pruning them [#725](https://github.com/OCamlPro/superbol-studio-oss/pull/725)

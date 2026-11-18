@@ -1204,7 +1204,7 @@ let%expect_test "hover-datadef-table-and-index" =
         01 T3_|_.
           02 FILLER PIC 99 USAGE DISPLAY.
         01 T4_|_. *> (no size shown yet, on purpose as COMP-0 is unsupported)
-          02 FILLER PIC 99 USAGE COMP-X.
+          02 FILLER PIC 99 USAGE COMP-0.
         01 FILLER OCCURS 10 TO 20 TIMES DEPENDING CNT INDEXED BY I_|_4.
           02 SUB-FIELD pic 9.
         01 VARTAB1.
@@ -1220,7 +1220,7 @@ let%expect_test "hover-datadef-table-and-index" =
     |cobol};
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[{"message":"Unsupported USAGE COMP-X","range":{"end":{"character":39,"line":13},"start":{"character":27,"line":13}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[{"message":"Unsupported USAGE COMP-0","range":{"end":{"character":39,"line":13},"start":{"character":27,"line":13}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     (line 5, character 18):
     __rootdir__/prog.cob:6.8-6.30:
        3           PROGRAM-ID. prog.
@@ -1331,7 +1331,7 @@ let%expect_test "hover-datadef-table-and-index" =
       12             02 FILLER PIC 99 USAGE DISPLAY.
       13 >         01 T4. *> (no size shown yet, on purpose as COMP-0 is unsupported)
     ----              ^^
-      14             02 FILLER PIC 99 USAGE COMP-X.
+      14             02 FILLER PIC 99 USAGE COMP-0.
       15           01 FILLER OCCURS 10 TO 20 TIMES DEPENDING CNT INDEXED BY I4.
     ```cobol
     T4
@@ -1345,7 +1345,7 @@ let%expect_test "hover-datadef-table-and-index" =
     __rootdir__/prog.cob:15.65-15.67:
       12             02 FILLER PIC 99 USAGE DISPLAY.
       13           01 T4. *> (no size shown yet, on purpose as COMP-0 is unsupported)
-      14             02 FILLER PIC 99 USAGE COMP-X.
+      14             02 FILLER PIC 99 USAGE COMP-0.
       15 >         01 FILLER OCCURS 10 TO 20 TIMES DEPENDING CNT INDEXED BY I4.
     ----                                                                    ^^
       16             02 SUB-FIELD pic 9.

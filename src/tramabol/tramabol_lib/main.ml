@@ -19,17 +19,19 @@ open Superbol_free_lib.Common_args
 let platform = Superbol_platform.record
 
 let parse_n_typeck { preproc_options; parser_options; platform; _ } filename =
-  let module Config = (val parser_options.config) in
   let filename = Option.value ~default:"" filename in
+  let typeck_options =
+    let module H = Superbol_project.Hardcoded_assumptions in
+    Cobol_typeck.Config.from_cobol_config parser_options.config
+      ~target_byte_order:H.machine_byte_order
+  in
   Cobol_preproc.Input.from ~filename ~platform ~f:begin fun input ->
     Cobol_preproc.preprocessor ~options:preproc_options input |>
     Cobol_parser.parse_simple ~options:parser_options |>
     Cobol_parser.Outputs.translate_diags |>
     Cobol_common.Diagnostics.more_result ~f:begin fun ptree ->
       Cobol_typeck.compilation_group ptree
-        ~options:{ binary_size = Config.binary_size#value;
-                   binary_byteorder = Config.binary_byteorder#value;
-                   target_byte_order = Superbol_project.Hardcoded_assumptions.machine_byte_order }
+        ~options:typeck_options
         ~fold_exec_block':Superbol_preprocs.Esql.fold_exec_block' |>
       Cobol_typeck.Results.translate_diags
     end |>
