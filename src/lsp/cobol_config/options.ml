@@ -30,7 +30,7 @@ let pic_length: int value =
 
 let word_length: int value =
   Value.int ~name:"word-length"
-    "Maximum@ word-length @ for@ COBOL@ (=@ programmer@ defined)@ words."
+    "Maximum@ word-length@ for@ COBOL@ (=@ programmer@ defined)@ words."
 
 let literal_length: int value =
   Value.int ~name:"literal-length"
@@ -56,7 +56,7 @@ let defaultbyte: defaultbyte value =
           end
   in
   Value.def ~parse ~name:"defaultbyte"
-    "Default@ initialization@ for@ field@ without@ Value."
+    "Default@ initialization@ for@ field@ without@ VALUE."
 
 let standard_define: standard value =
   let parse: string -> standard = fun s ->
@@ -177,7 +177,7 @@ let dpc_in_data: dpc_in_data value =
     | _ -> invalid_arg s
   in
   Value.def ~parse ~name:"dpc-in-data"
-    "Wether@ DECIMAL@ POINT@ IS@ COMMA@ has@ effect@ in@ XML/JSON@ GENERATE."
+    "Whether@ DECIMAL@ POINT@ IS@ COMMA@ has@ effect@ in@ XML/JSON@ GENERATE."
 
 (* boolean options *)
 let filename_mapping: bool value =
@@ -218,7 +218,7 @@ let relax_level_hierarchy: bool value =
 
 let select_working: bool value =
   Value.bool ~name:"select-working"
-    "require@ ASSING@ UNSING@ items@ to@ be@ in@ WORKING-STORAGE"
+    "require@ ASSIGN@ USING@ items@ to@ be@ in@ WORKING-STORAGE"
 
 let local_implies_recursive: bool value =
   Value.bool ~name:"local-implies-recursive"
@@ -234,7 +234,7 @@ let move_ibm: bool value =
 
 let perform_osvs: bool value =
   Value.bool ~name:"perform-osvs"
-    "exit@ point@ of@ any@ currently@ executing@ perfom@ is@ recognized@ if@ reached"
+    "exit@ point@ of@ any@ currently@ executing@ perform@ is@ recognized@ if@ reached"
 
 let arithmetic_osvs: bool value =
   Value.bool ~name:"arithmetic-osvs"
@@ -246,7 +246,7 @@ let hostsign: bool value =
 
 let program_name_redefinition: bool value =
   Value.bool ~name:"program-name-redefinition"
-    "program@ names@ dont't@ lead@ to@ reserved@ identifier"
+    "program@ names@ don't@ lead@ to@ reserved@ identifier"
 
 let accept_update: bool value =
   Value.bool ~name:"accept-update"
@@ -254,7 +254,7 @@ let accept_update: bool value =
 
 let accept_auto: bool value =
   Value.bool ~name:"accept-auto"
-    "set@ WITH@ AUTO@ clause@ as@ default@ for@ ACCEPT@ dest-item,@ instead@ of@ WIHT@ TAB"
+    "set@ WITH@ AUTO@ clause@ as@ default@ for@ ACCEPT@ dest-item,@ instead@ of@ WITH@ TAB"
 
 let console_is_crt: bool value =
   Value.bool ~name:"console-is-crt"
@@ -350,11 +350,11 @@ let multiple_file_tape_clause: unit feature =
 
 let label_records_clause: unit feature =
   Cobol_dialect.Feature.unit ~name:"label-records-clause"
-    "LABEL_RECORDS@ clause"
+    "LABEL-RECORDS@ clause"
 
 let value_of_clause: unit feature =
   Cobol_dialect.Feature.unit ~name:"value-of-clause"
-    "Value-OF@ clause"
+    "VALUE-OF@ clause"
 
 let data_records_clause: unit feature =
   Cobol_dialect.Feature.unit ~name:"data-records-clause"
@@ -490,7 +490,7 @@ let hp_octal_literals: unit feature =
 
 let acu_literals: unit feature =
   Cobol_dialect.Feature.unit ~name:"acu-literals"
-    "ACUCOBOL-G@ literals@ (#B #O #H #X)"
+    "ACUCOBOL-GT@ literals@ (#B #O #H #X)"
 
 let word_continuation: unit feature =
   Cobol_dialect.Feature.unit ~name:"word-continuation"
@@ -519,7 +519,7 @@ let constant_78: unit feature =
 
 let constant_01: unit feature =
   Cobol_dialect.Feature.unit ~name:"constant-01"
-    "constant@ wiht@ level@ 01@ CONSTANT@ AS/FROM@ item (COBOL@ 2002+)"
+    "constant@ with@ level@ 01@ CONSTANT@ AS/FROM@ item (COBOL@ 2002+)"
 
 let perform_varying_without_by: unit feature =
   Cobol_dialect.Feature.unit ~name:"perform-varying-without-by"
@@ -543,7 +543,7 @@ let call_convention_linkage: unit feature =
 
 let numeric_value_for_edited_item: unit feature =
   Cobol_dialect.Feature.unit ~name:"numeric-value-for-edited-item"
-    "numeric@ literals@ in@ Value@ clause@ of@ numeric-edited@ items"
+    "numeric@ literals@ in@ VALUE@ clause@ of@ numeric-edited@ items"
 
 let incorrect_conf_sec_order: unit feature =
   Cobol_dialect.Feature.unit ~name:"incorrect-conf-sec-order"
@@ -559,7 +559,7 @@ let free_redefines_position: unit feature =
 
 let records_mismatch_record_clause: unit feature =
   Cobol_dialect.Feature.unit ~name:"records-mismatch-record-clause"
-    "record@ sizes@ does@ not@ match@ RECORD@ clause"
+    "record@ sizes@ do@ not@ match@ RECORD@ clause"
 
 let record_delimiter: unit feature =
   Cobol_dialect.Feature.unit ~name:"record-delimiter"
@@ -567,7 +567,7 @@ let record_delimiter: unit feature =
 
 let sequential_delimiters: unit feature =
   Cobol_dialect.Feature.unit ~name:"sequential-delimiters"
-    "BINARY-SEQUENTIAL@ and @ LINE-SEQUENTIAL@ phrases@ in@ RECORD@ DELIMITER"
+    "BINARY-SEQUENTIAL@ and@ LINE-SEQUENTIAL@ phrases@ in@ RECORD@ DELIMITER"
 
 let record_delim_with_fixed_recs: unit feature =
   Cobol_dialect.Feature.unit ~name:"record-delim-with-fixed-recs"
@@ -588,7 +588,7 @@ let zero_length_literals: unit feature =
 
 let xml_generate_extra_phrases: unit feature =
   Cobol_dialect.Feature.unit ~name:"xml-generate-extra-phrases"
-    "XML@ GENERATE's@ phrases@ other@ thant@ COUNT@ IN"
+    "XML@ GENERATE's@ phrases@ other@ than@ COUNT@ IN"
 
 let continue_after: unit feature =
   Cobol_dialect.Feature.unit ~name:"continue-after"
