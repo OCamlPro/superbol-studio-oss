@@ -185,11 +185,6 @@ let parser_options ?(overrides = no_overrides) project =
       Option.value overrides.override_recovery ~default:options.recovery;
     show = Option.value overrides.override_show ~default:options.show }
 
-(* Describes the choices made in the functions above that are not part of the
-   project configuration.  To be changed along with any of these choices. *)
-let options_signature =
-  "exec-blocks=closed;recovery=silence-benign"
-
 let parse parse_fun ~platform ?overrides ~filename ~contents project =
   parse_fun
     ~options:(parser_options ?overrides project) @@
@@ -264,16 +259,13 @@ let config_inputs ?(overrides = no_overrides) project =
     Option.some @@
     Digest.string @@
     Marshal.to_string
-      (config.cobol_config,
+      (parser_options ~overrides project,
        config.source_format,
        config.source_format_by_extension,
        config.mf_comment,
        config.libpath,
        config.libexts,
-       overrides.override_env,
-       overrides.override_recovery,
-       overrides.override_show,
-       options_signature) []
+       overrides.override_env) []
   with Invalid_argument _ ->
     None         (* nothing here should be functional, but if ever, just fail *)
 
