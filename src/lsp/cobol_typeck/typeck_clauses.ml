@@ -74,8 +74,15 @@ let clause_warn acc warn =
 let clause_diagnostic acc diag =
   { acc with data_clause_diags = diag :: acc.data_clause_diags }
 
-let register_used_feature acc ~loc:usage_loc ~feature =
-  clause_diagnostic acc @@ Dialect_feature_used { feature; usage_loc }
+let feature_diagnostics diags ~loc binding =
+  match Cobol_dialect.(Diagnostics.decompose @@ Feature.verify ~loc binding) with
+  | _, None -> diags
+  | _, Some `Error u -> Dialect_feature_error u :: diags
+  | _, Some `Warning u -> Dialect_feature_warning u :: diags
+
+let verify_feature acc ~loc binding =
+  { acc with
+    data_clause_diags = feature_diagnostics acc.data_clause_diags ~loc binding }
 
 
 let on_unique_clause ~clause_name ~f prev_val acc clause =
@@ -108,14 +115,13 @@ let on_value_clause acc =
     ~f:(fun acc clause -> { acc with value = Some clause })
 
 
-let on_redefines_clause acc =
+let on_redefines_clause ~data_config acc =
   on_unique_clause ~clause_name:"REDEFINES" acc.redefines acc
     ~f:begin fun acc clause ->
       let acc =
         if acc != no_data_clauses then (* note: hackish use of physical equality *)
-          register_used_feature acc
-            ~feature:Cobol_config.Options.free_redefines_position
-            ~loc:~@clause
+          verify_feature acc ~loc:~@clause
+            data_config.typeck_options.free_redefines_position
         else acc
       in
       { acc with redefines = Some ~&clause }
@@ -127,11 +133,12 @@ let on_sign_clause acc =
     ~f:(fun acc clause -> { acc with sign = Some clause })
 
 
-let of_data_item (data_clauses: Cobol_ptree.data_clause with_loc list) =
+let of_data_item ~data_config
+    (data_clauses: Cobol_ptree.data_clause with_loc list) =
   List.fold_left begin fun acc { payload = clause; loc } ->
     match (clause: Cobol_ptree.data_clause) with
     | DataOccurs    o -> on_occurs_clause acc (o &@ loc)
-    | DataRedefines r -> on_redefines_clause acc (r &@ loc)
+    | DataRedefines r -> on_redefines_clause ~data_config acc (r &@ loc)
     | DataUsage     u -> on_usage_clause acc (u &@ loc)
     | DataPicture   p -> on_picture_clause acc p
     | DataValue     d -> on_value_clause acc (d &@ loc)
@@ -540,16 +547,9 @@ let comp_x_usage ~data_config diags ~item_loc given_picture usage comp =
     let byte_size = unsigned_bytes_for_digits.(36) in
     let diags =
       match given_picture with
-      | Some Ok picture ->
-          let { dialect; alphanumeric_comp_x_over_8_chars_rejected_by; _ }
-            : Typeck_config.options = data_config.typeck_options in
-          Option.fold alphanumeric_comp_x_over_8_chars_rejected_by
-            ~none:diags ~some:begin fun rejected_by ->
-            data_warning diags @@
-            Oversized_alphanumeric_binary { picture; usage; byte_size;
-                                            max_chars = 8; rejected_by;
-                                            dialect }
-          end
+      | Some Ok { loc; _ } ->
+          feature_diagnostics diags ~loc
+            data_config.typeck_options.alphanumeric_comp_x_over_8_chars
       | None | Some Error _ ->
           diags
     in

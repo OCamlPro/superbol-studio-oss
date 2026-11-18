@@ -39,7 +39,7 @@ val rev_newline_cnums: t -> int list
 val next_chunk: t -> t * Text.t
 
 val fold_lines
-  : dialect: Cobol_config.dialect
+  : dialect: Cobol_dialect.Types.id
   -> ?skip_compiler_directives_text: bool
   -> ?on_compiler_directive
      : (int -> Preproc_directives.compiler_directive with_loc -> 'a -> 'a)
@@ -47,12 +47,12 @@ val fold_lines
   -> t -> 'a -> 'a
 
 val print_lines
-  : dialect: Cobol_config.dialect
+  : dialect: Cobol_dialect.Types.id
   -> ?skip_compiler_directives_text: bool
   -> Format.formatter -> t -> unit
 
 val try_compiler_directive
-  : dialect: Cobol_config.dialect -> Text.t
+  : dialect: Cobol_dialect.Types.id -> Text.t
   -> (Text.t * Preproc_directives.compiler_directive with_loc list * Text.t
       * Preproc_diagnostics.t) option
 

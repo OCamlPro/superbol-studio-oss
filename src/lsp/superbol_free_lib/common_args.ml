@@ -68,23 +68,9 @@ let analysis_overrides ~config ~conf ~dialect ~format ~mf_comment ~libpath
     if Ez_file.V1.EzFile.is_absolute dir then dir
     else Ez_file.V1.EzFile.concat (Sys.getcwd ()) dir
   in
-  (* Describes the configuration for cache keys.  The configuration file
-     itself is identified by its contents whenever it can be found as given;
-     files it includes are not accounted for, as with dialects. *)
-  let override_cobol_config =
-    match conf, dialect with
-    | "", None ->
-        None
-    | "", Some d ->
-        Some (config, "dialect:" ^ Cobol_config.DIALECT.to_string d)
-    | file, _ when Sys.file_exists file ->
-        Some (config, Pretty.to_string "conf:%s:%s" (absolute file)
-                (Digest.to_hex @@ Digest.file file))
-    | file, _ ->
-        Some (config, "conf:" ^ file)
-  in
   {
-    override_cobol_config;
+    override_cobol_config =
+      if conf = "" && dialect = None then None else Some config;
     override_source_format = format;
     override_mf_comment = mf_comment;
     override_libpath = List.map absolute libpath;
@@ -173,8 +159,8 @@ let get () =
     EZCMD.info ~docv:"CONF_FILE" "Set the configuration file to be used";
 
     ["dialect"; "std"], Arg.Symbol
-      (Cobol_config.DIALECT.all_canonical_names,
-       fun d -> dialect := Some (Cobol_config.DIALECT.of_string d)),
+      (Cobol_dialect.Id.all_canonical_names,
+       fun d -> dialect := Some (Cobol_dialect.Id.of_string d)),
     EZCMD.info ~docv:"DIALECT"
       "Set the dialect to bu used (overriden by `--conf` if used)";
 
@@ -255,8 +241,7 @@ let get () =
     let source_format =
       match !format with
       | Auto ->
-          let module Config = (val config: Cobol_config.T) in
-          Config.format#value
+          config.format
       | SF _ -> !format
     in
     let recovery =

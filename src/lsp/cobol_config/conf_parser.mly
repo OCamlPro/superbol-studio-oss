@@ -100,10 +100,10 @@ let support :=
 | PLUS; ~=support_value; <Additional>
 
 let support_value :=
-| OK;            { Ok }
-| WARNING;       { Warning }
-| ARCHAIC;       { Archaic }
-| OBSOLETE;      { Obsolete }
+| OK;            { Ok () }
+| WARNING;       { Warning () }
+| ARCHAIC;       { Archaic () }
+| OBSOLETE;      { Obsolete () }
 | SKIP;          { Skip }
 | IGNORE;        { Ignore }
 | ERROR;         { Error }

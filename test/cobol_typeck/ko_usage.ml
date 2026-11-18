@@ -212,6 +212,16 @@ let%expect_test "unsupported-usage" =
       13
     >> Warning: Unsupported USAGE COMP-9
 
+    prog.cob:11.19-11.30:
+       8            02 D COMP-0 OCCURS 10.
+       9         *> CHECKME: Here it's unclear whether F's error flag should propagate to E.
+      10          01 E PIC X.
+      11 >        01 F COMP-9 REDEFINES E.
+    ----                      ^^^^^^^^^^^
+      12          PROCEDURE DIVISION.
+      13
+    >> Warning: REDEFINES clause not following entry-name in definition used
+
     prog.cob:4.7-4.19:
        1          PROGRAM-ID. unsupported-usage.
        2          DATA DIVISION.

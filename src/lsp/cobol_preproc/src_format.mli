@@ -56,7 +56,7 @@ val from_config: Cobol_config.source_format -> any
 (* val to_config: 'k source_format -> Cobol_config.source_format *)
 
 (** May raise {!INVALID_SOURCE_FORMAT}. *)
-val decypher: dialect: Cobol_config.dialect -> string -> any
+val decypher: dialect: Cobol_dialect.Types.id -> string -> any
 
 val guess_from: contents_prefix: string -> Cobol_config.source_format
 

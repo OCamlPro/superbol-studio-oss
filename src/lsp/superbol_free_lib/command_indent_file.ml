@@ -22,7 +22,6 @@ open Common_args
 
 let action ~numeric ~intext ~inplace ?suffix ?range
     { preproc_options = { source_format; config; _ } ; _ } files =
-  let module Config = (val config) in
 
   let f ?contents filename =
     let project = Project.for_ ~filename () in
@@ -42,7 +41,7 @@ let action ~numeric ~intext ~inplace ?suffix ?range
         ~platform:Superbol_platform.record
         ~source_format
         ~config:project.config.indent_config
-        ~dialect:Config.dialect
+        ~dialect:config.origin.id
         ~filename
         ?output
         ?range

@@ -91,9 +91,8 @@ let make_parser
       | Parser_options.Amnesic -> Tokzr.amnesic
       | Parser_options.Eidetic -> Tokzr.eidetic
     in
-    let module Config = (val config) in
-    Tokzr.init ~verbose ?show_if_verbose ~exec_scanners ~memory Config.words
-      ~intrinsics: Config.intrinsic_functions
+    Tokzr.init ~verbose ?show_if_verbose ~exec_scanners ~memory config.words
+      ~intrinsics:config.intrinsic_functions
       (* CHECKME: no default intrinsics for now (shouldn't it be in `Config`?): *)
       (* ~default_intrinsics: Cobol_config.Reserved.default_intrinsics *)
   in

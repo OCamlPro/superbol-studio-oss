@@ -54,6 +54,7 @@ depends: [
   "ppx_import-windows" {>= "1"}
   "ppx_deriving-windows" {>= "5.2.1"}
   "menhirLib-windows" {>= "20231231" & < "20240715"}
+  "cobol_dialect-windows" {= version}
   "cobol_data-windows" {= version}
   "cobol_config-windows" {= version}
   "cobol_common-windows" {= version}

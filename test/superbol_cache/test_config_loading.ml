@@ -55,15 +55,16 @@ let platform =
 let search_path = ["/elsewhere"; "/conf"]
 
 let load ~platform name =
-  Cobol_config.from_dialect_n_file ~platform ~search_path @@
-  Cobol_config.DIALECT.of_string name
+  Cobol_config.from_dialect ~platform ~search_path @@
+  Cobol_dialect.Id.of_string name
 
 let%expect_test "configuration files are looked up and read at once" =
-  let { result = config, file; _ }: _ Cobol_common.Diagnostics.with_diags =
+  let { result = config; _ }: _ Cobol_common.Diagnostics.with_diags =
     load ~platform "my.conf" in
-  Printf.printf "loaded: %s\n" (Option.value file ~default:"none");
+  Printf.printf "loaded: %s\n"
+    (Option.value config.origin.file ~default:"none");
   (* [inc.conf] is taken next to [my.conf]: *)
-  Printf.printf "tab-width: %d\n" (Cobol_config.tab_stops config |> List.hd);
+  Printf.printf "tab-width: %d\n" (List.hd config.tab_stops);
   begin match load ~platform "missing.conf" with
     | _ -> print_endline "missing: loaded?"
     | exception Cobol_config.ERROR (Missing_file (name, _)) ->
@@ -94,25 +95,31 @@ let%expect_test "configuration files read are recorded" =
     /conf/my.conf |}];;
 
 let%expect_test "custom dialects keep the case of their file name" =
-  let { result = _, file; _ }: _ Cobol_common.Diagnostics.with_diags =
+  let { result = config; _ }: _ Cobol_common.Diagnostics.with_diags =
     load ~platform "/conf/Mixed-Case.conf" in
-  Printf.printf "loaded: %s\n" (Option.value file ~default:"none");
+  Printf.printf "loaded: %s\n"
+    (Option.value config.origin.file ~default:"none");
   [%expect {| loaded: /conf/Mixed-Case.conf |}];;
 
 let%expect_test "configurations derived from Micro Focus ones are detected" =
   List.iter begin fun name ->
-    let { result = config, _; _ }: _ Cobol_common.Diagnostics.with_diags =
+    let { result = config; _ }: _ Cobol_common.Diagnostics.with_diags =
       load ~platform name in
-    Printf.printf "%s: dialect=%s ancestry=[%s] mf-ancestor=%s\n" name
-      Cobol_config.(DIALECT.to_string @@ dialect config)
-      (String.concat "; " @@
-       List.map Cobol_config.DIALECT.to_string @@
-       Cobol_config.dialect_ancestry config)
-      (match Cobol_config.microfocus_ancestor config with
+    let origin = config.origin in
+    Printf.printf "%s: dialect=%s ancestry=[%s] mf-ancestor=%s \
+                   alphanumeric-comp-x-over-8-chars=%s\n" name
+      (Cobol_dialect.Id.to_string origin.id)
+      (String.concat "; " @@ List.map Cobol_dialect.Id.to_string origin.ancestry)
+      (match Cobol_dialect.Origin.closest_ancestor
+               (function MicroFocus _ -> true | _ -> false) origin with
        | None -> "none"
-       | Some d -> Cobol_config.DIALECT.to_string d)
+       | Some d -> Cobol_dialect.Id.to_string d)
+      (match config.alphanumeric_comp_x_over_8_chars.level with
+       | Ok () -> "ok"
+       | Unconformable -> "unconformable"
+       | _ -> "other")
   end ["my.conf"; "mf"; "my-mf.conf"];
   [%expect {|
-    my.conf: dialect=default ancestry=[default] mf-ancestor=none
-    mf: dialect=mf ancestry=[mf] mf-ancestor=mf
-    my-mf.conf: dialect=my-mf ancestry=[mf; my-mf] mf-ancestor=mf |}];;
+    my.conf: dialect=default ancestry=[default] mf-ancestor=none alphanumeric-comp-x-over-8-chars=ok
+    mf: dialect=mf ancestry=[mf] mf-ancestor=mf alphanumeric-comp-x-over-8-chars=unconformable
+    my-mf.conf: dialect=my-mf ancestry=[mf; my-mf] mf-ancestor=mf alphanumeric-comp-x-over-8-chars=unconformable |}];;

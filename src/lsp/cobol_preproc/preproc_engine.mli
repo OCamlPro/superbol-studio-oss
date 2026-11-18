@@ -77,7 +77,7 @@ val record_compilation_variable_substitution
 
 val lex_input
   : platform: Cobol_common.Platform.TYPES.platform
-  -> dialect: Cobol_config.dialect
+  -> dialect: Cobol_dialect.Types.id
   -> source_format: Cobol_config.source_format_spec
   -> ?src_options:Src_options.t
   -> ?ppf:Format.formatter
@@ -86,7 +86,7 @@ val lex_input
 
 val lex_file
   : platform: Cobol_common.Platform.TYPES.platform
-  -> dialect: Cobol_config.dialect
+  -> dialect: Cobol_dialect.Types.id
   -> source_format: Cobol_config.source_format_spec
   -> ?src_options:Src_options.t
   -> ?ppf:Format.formatter
@@ -95,7 +95,7 @@ val lex_file
 
 val lex_lib
   : platform: Cobol_common.Platform.TYPES.platform
-  -> dialect: Cobol_config.dialect
+  -> dialect: Cobol_dialect.Types.id
   -> source_format: Cobol_config.source_format_spec
   -> lookup_config: Cobol_common.Copybook.TYPES.lookup_config
   -> ?src_options:Src_options.t
@@ -127,7 +127,7 @@ val lex_lib
     returned accumulated value. *)
 val fold_source_lines
   : platform: Cobol_common.Platform.TYPES.platform
-  -> dialect: Cobol_config.dialect
+  -> dialect: Cobol_dialect.Types.id
   -> source_format: Cobol_config.source_format_spec
   -> ?src_options: Src_options.t
   -> ?on_change_of_source_format: (Src_format.any -> 'a -> 'a)
@@ -141,7 +141,7 @@ val fold_source_lines
 
 val scan_prefix_for_copybook
   : platform: Cobol_common.Platform.TYPES.platform
-  -> dialect: Cobol_config.dialect
+  -> dialect: Cobol_dialect.Types.id
   -> source_format: Cobol_config.source_format_spec
   -> Src_input.t
   -> [`Program | `Copybook]

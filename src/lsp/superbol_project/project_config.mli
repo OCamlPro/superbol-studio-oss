@@ -123,13 +123,6 @@ val cobol_config_from_dialect_name
   -> verbose:bool -> string
   -> Cobol_config.t Cobol_common.Diagnostics.with_diags
 
-(** Same as {!cobol_config_from_dialect_name}, also giving the configuration
-    file loaded, if any (see {!Cobol_config.from_dialect_n_file}). *)
-val cobol_config_n_file_from_dialect_name
-  : platform: Cobol_common.Platform.TYPES.platform
-  -> verbose:bool -> string
-  -> (Cobol_config.t * string option) Cobol_common.Diagnostics.with_diags
-
 val cobol_source_format
   : string
   -> Cobol_config.source_format_spec

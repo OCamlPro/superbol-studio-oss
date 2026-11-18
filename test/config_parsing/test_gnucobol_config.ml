@@ -18,17 +18,16 @@ let confdir = Testsuite_utils.confdir
 let platform = Testsuite_utils.platform
 let search_path = Cobol_config.default_search_path ~platform
 
-module Default_conf =
-  (val Cobol_config.default)
+let default_conf = Cobol_config.default
 
-module Parsed_conf =
-  (val (Cobol_common.Diagnostics.show_n_forget @@
-        Cobol_config.from_file ~platform ~search_path @@
-        Filename.concat confdir "default.conf"))
+let parsed_conf =
+  Cobol_common.Diagnostics.show_n_forget @@
+  Cobol_config.from_file ~platform ~search_path @@
+  Filename.concat confdir "default.conf"
 
-module MF_conf =
-  (val (Cobol_common.Diagnostics.show_n_forget @@
-        Cobol_config.(from_dialect ~platform ~search_path DIALECT.mf_strict)))
+let mf_conf =
+  Cobol_common.Diagnostics.show_n_forget @@
+  Cobol_config.from_dialect ~platform ~search_path Cobol_dialect.Id.mf_strict
 
 let both_diff s1 s2 =
   StringSet.union
@@ -36,13 +35,13 @@ let both_diff s1 s2 =
     (StringSet.diff s2 s1)
 
 let%test_module _ = (module struct
-  let intrinsics = both_diff Parsed_conf.intrinsic_functions Default_conf.intrinsic_functions
-  let system_names = both_diff Parsed_conf.system_names Default_conf.system_names
-  let registers = both_diff Parsed_conf.registers Default_conf.registers
+  let intrinsics = both_diff parsed_conf.intrinsic_functions default_conf.intrinsic_functions
+  let system_names = both_diff parsed_conf.system_names default_conf.system_names
+  let registers = both_diff parsed_conf.registers default_conf.registers
 
   let diff_words =
-    let parsed_words = List.to_seq Parsed_conf.words |> StringMap.of_seq
-    and default_words = List.to_seq Default_conf.words |> StringMap.of_seq in
+    let parsed_words = List.to_seq parsed_conf.words |> StringMap.of_seq
+    and default_words = List.to_seq default_conf.words |> StringMap.of_seq in
     StringMap.merge begin fun _ p d -> match d, p with
       | Some _, None -> Some "-"
       | None, Some _ -> Some "+"
@@ -57,129 +56,129 @@ let%test_module _ = (module struct
 end)
 
 let%test "int values" = true
-  && Default_conf.tab_stops#value = Parsed_conf.tab_stops#value
-  && Default_conf.text_column#value = Parsed_conf.text_column#value
-  && Default_conf.pic_length#value = Parsed_conf.pic_length#value
-  && Default_conf.word_length#value = Parsed_conf.word_length#value
-  && Default_conf.literal_length#value = Parsed_conf.literal_length#value
-  && Default_conf.numeric_literal_length#value = Parsed_conf.numeric_literal_length#value
+  && default_conf.tab_stops = parsed_conf.tab_stops
+  && default_conf.text_column = parsed_conf.text_column
+  && default_conf.pic_length = parsed_conf.pic_length
+  && default_conf.word_length = parsed_conf.word_length
+  && default_conf.literal_length = parsed_conf.literal_length
+  && default_conf.numeric_literal_length = parsed_conf.numeric_literal_length
 
 let%test "any values" = true
-  && Default_conf.defaultbyte#value = Parsed_conf.defaultbyte#value
-  && Default_conf.standard_define#value = Parsed_conf.standard_define#value
-  && Default_conf.format#value = Parsed_conf.format#value
-  && Default_conf.binary_size#value = Parsed_conf.binary_size#value
-  && Default_conf.binary_byteorder#value = Parsed_conf.binary_byteorder#value
-  && Default_conf.assign_clause#value = Parsed_conf.assign_clause#value
-  && Default_conf.screen_section_rules#value = Parsed_conf.screen_section_rules#value
-  && Default_conf.dpc_in_data#value = Parsed_conf.dpc_in_data#value
+  && default_conf.defaultbyte = parsed_conf.defaultbyte
+  && default_conf.standard_define = parsed_conf.standard_define
+  && default_conf.format = parsed_conf.format
+  && default_conf.binary_size = parsed_conf.binary_size
+  && default_conf.binary_byteorder = parsed_conf.binary_byteorder
+  && default_conf.assign_clause = parsed_conf.assign_clause
+  && default_conf.screen_section_rules = parsed_conf.screen_section_rules
+  && default_conf.dpc_in_data = parsed_conf.dpc_in_data
 
 let%test "boolean values" = true
-  && Default_conf.filename_mapping#value = Parsed_conf.filename_mapping#value
-  && Default_conf.pretty_display#value = Parsed_conf.pretty_display#value
-  && Default_conf.binary_truncate#value = Parsed_conf.binary_truncate#value
-  && Default_conf.complex_odo#value = Parsed_conf.complex_odo#value
-  && Default_conf.odoslide#value = Parsed_conf.odoslide#value
-  && Default_conf.indirect_redefines#value = Parsed_conf.indirect_redefines#value
-  && Default_conf.relax_syntax_checks#value = Parsed_conf.relax_syntax_checks#value
-  && Default_conf.ref_mod_zero_length#value = Parsed_conf.ref_mod_zero_length#value
-  && Default_conf.relax_level_hierarchy#value = Parsed_conf.relax_level_hierarchy#value
-  && Default_conf.select_working#value = Parsed_conf.select_working#value
-  && Default_conf.local_implies_recursive#value = Parsed_conf.local_implies_recursive#value
-  && Default_conf.sticky_linkage#value = Parsed_conf.sticky_linkage#value
-  && Default_conf.move_ibm#value = Parsed_conf.move_ibm#value
-  && Default_conf.perform_osvs#value = Parsed_conf.perform_osvs#value
-  && Default_conf.arithmetic_osvs#value = Parsed_conf.arithmetic_osvs#value
-  && Default_conf.hostsign#value = Parsed_conf.hostsign#value
-  && Default_conf.program_name_redefinition#value = Parsed_conf.program_name_redefinition#value
-  && Default_conf.accept_update#value = Parsed_conf.accept_update#value
-  && Default_conf.accept_auto#value = Parsed_conf.accept_auto#value
-  && Default_conf.console_is_crt#value = Parsed_conf.console_is_crt#value
-  && Default_conf.no_echo_means_secure#value = Parsed_conf.no_echo_means_secure#value
-  && Default_conf.line_col_zero_default#value = Parsed_conf.line_col_zero_default#value
-  && Default_conf.display_special_fig_consts#value = Parsed_conf.display_special_fig_consts#value
-  && Default_conf.binary_comp_1#value = Parsed_conf.binary_comp_1#value
-  && Default_conf.numeric_pointer#value = Parsed_conf.numeric_pointer#value
-  && Default_conf.move_non_numeric_lit_to_numeric_is_zero#value = Parsed_conf.move_non_numeric_lit_to_numeric_is_zero#value
-  && Default_conf.implicit_assign_dynamic_var#value = Parsed_conf.implicit_assign_dynamic_var#value
-  && Default_conf.device_mnemonics#value = Parsed_conf.device_mnemonics#value
-  && Default_conf.xml_parse_xmlss#value = Parsed_conf.xml_parse_xmlss#value
-  && Default_conf.areacheck#value = Parsed_conf.areacheck#value
+  && default_conf.filename_mapping = parsed_conf.filename_mapping
+  && default_conf.pretty_display = parsed_conf.pretty_display
+  && default_conf.binary_truncate = parsed_conf.binary_truncate
+  && default_conf.complex_odo = parsed_conf.complex_odo
+  && default_conf.odoslide = parsed_conf.odoslide
+  && default_conf.indirect_redefines = parsed_conf.indirect_redefines
+  && default_conf.relax_syntax_checks = parsed_conf.relax_syntax_checks
+  && default_conf.ref_mod_zero_length = parsed_conf.ref_mod_zero_length
+  && default_conf.relax_level_hierarchy = parsed_conf.relax_level_hierarchy
+  && default_conf.select_working = parsed_conf.select_working
+  && default_conf.local_implies_recursive = parsed_conf.local_implies_recursive
+  && default_conf.sticky_linkage = parsed_conf.sticky_linkage
+  && default_conf.move_ibm = parsed_conf.move_ibm
+  && default_conf.perform_osvs = parsed_conf.perform_osvs
+  && default_conf.arithmetic_osvs = parsed_conf.arithmetic_osvs
+  && default_conf.hostsign = parsed_conf.hostsign
+  && default_conf.program_name_redefinition = parsed_conf.program_name_redefinition
+  && default_conf.accept_update = parsed_conf.accept_update
+  && default_conf.accept_auto = parsed_conf.accept_auto
+  && default_conf.console_is_crt = parsed_conf.console_is_crt
+  && default_conf.no_echo_means_secure = parsed_conf.no_echo_means_secure
+  && default_conf.line_col_zero_default = parsed_conf.line_col_zero_default
+  && default_conf.display_special_fig_consts = parsed_conf.display_special_fig_consts
+  && default_conf.binary_comp_1 = parsed_conf.binary_comp_1
+  && default_conf.numeric_pointer = parsed_conf.numeric_pointer
+  && default_conf.move_non_numeric_lit_to_numeric_is_zero = parsed_conf.move_non_numeric_lit_to_numeric_is_zero
+  && default_conf.implicit_assign_dynamic_var = parsed_conf.implicit_assign_dynamic_var
+  && default_conf.device_mnemonics = parsed_conf.device_mnemonics
+  && default_conf.xml_parse_xmlss = parsed_conf.xml_parse_xmlss
+  && default_conf.areacheck = parsed_conf.areacheck
 
 let%test "support options" = true
-  && Default_conf.control_division#level = Parsed_conf.control_division#level
-  && Default_conf.memory_size_clause#level = Parsed_conf.memory_size_clause#level
-  && Default_conf.multiple_file_tape_clause#level = Parsed_conf.multiple_file_tape_clause#level
-  && Default_conf.label_records_clause#level = Parsed_conf.label_records_clause#level
-  && Default_conf.value_of_clause#level = Parsed_conf.value_of_clause#level
-  && Default_conf.data_records_clause#level = Parsed_conf.data_records_clause#level
-  && Default_conf.top_level_occurs_clause#level = Parsed_conf.top_level_occurs_clause#level
-  && Default_conf.same_as_clause#level = Parsed_conf.same_as_clause#level
-  && Default_conf.type_to_clause#level = Parsed_conf.type_to_clause#level
-  && Default_conf.usage_type#level = Parsed_conf.usage_type#level
-  && Default_conf.synchronized_clause#level = Parsed_conf.synchronized_clause#level
-  && Default_conf.sync_left_right#level = Parsed_conf.sync_left_right#level
-  && Default_conf.special_names_clause#level = Parsed_conf.special_names_clause#level
-  && Default_conf.goto_statement_without_name#level = Parsed_conf.goto_statement_without_name#level
-  && Default_conf.stop_literal_statement#level = Parsed_conf.stop_literal_statement#level
-  && Default_conf.stop_identifier_statement#level = Parsed_conf.stop_identifier_statement#level
-  && Default_conf.stop_error_statement#level = Parsed_conf.stop_error_statement#level
-  && Default_conf.debugging_mode#level = Parsed_conf.debugging_mode#level
-  && Default_conf.use_for_debugging#level = Parsed_conf.use_for_debugging#level
-  && Default_conf.padding_character_clause#level = Parsed_conf.padding_character_clause#level
-  && Default_conf.next_sentence_phrase#level = Parsed_conf.next_sentence_phrase#level
-  && Default_conf.listing_statements#level = Parsed_conf.listing_statements#level
-  && Default_conf.title_statement#level = Parsed_conf.title_statement#level
-  && Default_conf.entry_statement#level = Parsed_conf.entry_statement#level
-  && Default_conf.move_noninteger_to_alphanumeric#level = Parsed_conf.move_noninteger_to_alphanumeric#level
-  && Default_conf.move_figurative_constant_to_numeric#level = Parsed_conf.move_figurative_constant_to_numeric#level
-  && Default_conf.move_figurative_space_to_numeric#level = Parsed_conf.move_figurative_space_to_numeric#level
-  && Default_conf.move_figurative_quote_to_numeric#level = Parsed_conf.move_figurative_quote_to_numeric#level
-  && Default_conf.odo_without_to#level = Parsed_conf.odo_without_to#level
-  && Default_conf.section_segments#level = Parsed_conf.section_segments#level
-  && Default_conf.alter_statement#level = Parsed_conf.alter_statement#level
-  && Default_conf.call_overflow#level = Parsed_conf.call_overflow#level
-  && Default_conf.numeric_boolean#level = Parsed_conf.numeric_boolean#level
-  && Default_conf.hexadecimal_boolean#level = Parsed_conf.hexadecimal_boolean#level
-  && Default_conf.national_literals#level = Parsed_conf.national_literals#level
-  && Default_conf.hexadecimal_national_literals#level = Parsed_conf.hexadecimal_national_literals#level
-  && Default_conf.national_character_literals#level = Parsed_conf.national_character_literals#level
-  && Default_conf.hp_octal_literals#level = Parsed_conf.hp_octal_literals#level
-  && Default_conf.acu_literals#level = Parsed_conf.acu_literals#level
-  && Default_conf.word_continuation#level = Parsed_conf.word_continuation#level
-  && Default_conf.not_exception_before_exception#level = Parsed_conf.not_exception_before_exception#level
-  && Default_conf.accept_display_extensions#level = Parsed_conf.accept_display_extensions#level
-  && Default_conf.larger_redefines#level = Parsed_conf.larger_redefines#level
-  && Default_conf.symbolic_constant#level = Parsed_conf.symbolic_constant#level
-  && Default_conf.constant_78#level = Parsed_conf.constant_78#level
-  && Default_conf.constant_01#level = Parsed_conf.constant_01#level
-  && Default_conf.perform_varying_without_by#level = Parsed_conf.perform_varying_without_by#level
-  && Default_conf.reference_out_of_declaratives#level = Parsed_conf.reference_out_of_declaratives#level
-  && Default_conf.program_prototypes#level = Parsed_conf.program_prototypes#level
-  && Default_conf.call_convention_mnemonic#level = Parsed_conf.call_convention_mnemonic#level
-  && Default_conf.call_convention_linkage#level = Parsed_conf.call_convention_linkage#level
-  && Default_conf.numeric_value_for_edited_item#level = Parsed_conf.numeric_value_for_edited_item#level
-  && Default_conf.incorrect_conf_sec_order#level = Parsed_conf.incorrect_conf_sec_order#level
-  && Default_conf.define_constant_directive#level = Parsed_conf.define_constant_directive#level
-  && Default_conf.free_redefines_position#level = Parsed_conf.free_redefines_position#level
-  && Default_conf.records_mismatch_record_clause#level = Parsed_conf.records_mismatch_record_clause#level
-  && Default_conf.record_delimiter#level = Parsed_conf.record_delimiter#level
-  && Default_conf.sequential_delimiters#level = Parsed_conf.sequential_delimiters#level
-  && Default_conf.record_delim_with_fixed_recs#level = Parsed_conf.record_delim_with_fixed_recs#level
-  && Default_conf.missing_statement#level = Parsed_conf.missing_statement#level
-  && Default_conf.missing_period#level = Parsed_conf.missing_period#level
-  && Default_conf.zero_length_literals#level = Parsed_conf.zero_length_literals#level
-  && Default_conf.xml_generate_extra_phrases#level = Parsed_conf.xml_generate_extra_phrases#level
-  && Default_conf.continue_after#level = Parsed_conf.continue_after#level
-  && Default_conf.goto_entry#level = Parsed_conf.goto_entry#level
-  && Default_conf.assign_variable#level = Parsed_conf.assign_variable#level
-  && Default_conf.assign_using_variable#level = Parsed_conf.assign_using_variable#level
-  && Default_conf.assign_ext_dyn#level = Parsed_conf.assign_ext_dyn#level
-  && Default_conf.assign_disk_from#level = Parsed_conf.assign_disk_from#level
-  && Default_conf.vsam_status#level = Parsed_conf.vsam_status#level
-  && Default_conf.self_call_recursive#level = Parsed_conf.self_call_recursive#level
-  && Default_conf.record_contains_depending_clause#level = Parsed_conf.record_contains_depending_clause#level
-  && Default_conf.picture_l#level = Parsed_conf.picture_l#level
+  && default_conf.control_division.level = parsed_conf.control_division.level
+  && default_conf.memory_size_clause.level = parsed_conf.memory_size_clause.level
+  && default_conf.multiple_file_tape_clause.level = parsed_conf.multiple_file_tape_clause.level
+  && default_conf.label_records_clause.level = parsed_conf.label_records_clause.level
+  && default_conf.value_of_clause.level = parsed_conf.value_of_clause.level
+  && default_conf.data_records_clause.level = parsed_conf.data_records_clause.level
+  && default_conf.top_level_occurs_clause.level = parsed_conf.top_level_occurs_clause.level
+  && default_conf.same_as_clause.level = parsed_conf.same_as_clause.level
+  && default_conf.type_to_clause.level = parsed_conf.type_to_clause.level
+  && default_conf.usage_type.level = parsed_conf.usage_type.level
+  && default_conf.synchronized_clause.level = parsed_conf.synchronized_clause.level
+  && default_conf.sync_left_right.level = parsed_conf.sync_left_right.level
+  && default_conf.special_names_clause.level = parsed_conf.special_names_clause.level
+  && default_conf.goto_statement_without_name.level = parsed_conf.goto_statement_without_name.level
+  && default_conf.stop_literal_statement.level = parsed_conf.stop_literal_statement.level
+  && default_conf.stop_identifier_statement.level = parsed_conf.stop_identifier_statement.level
+  && default_conf.stop_error_statement.level = parsed_conf.stop_error_statement.level
+  && default_conf.debugging_mode.level = parsed_conf.debugging_mode.level
+  && default_conf.use_for_debugging.level = parsed_conf.use_for_debugging.level
+  && default_conf.padding_character_clause.level = parsed_conf.padding_character_clause.level
+  && default_conf.next_sentence_phrase.level = parsed_conf.next_sentence_phrase.level
+  && default_conf.listing_statements.level = parsed_conf.listing_statements.level
+  && default_conf.title_statement.level = parsed_conf.title_statement.level
+  && default_conf.entry_statement.level = parsed_conf.entry_statement.level
+  && default_conf.move_noninteger_to_alphanumeric.level = parsed_conf.move_noninteger_to_alphanumeric.level
+  && default_conf.move_figurative_constant_to_numeric.level = parsed_conf.move_figurative_constant_to_numeric.level
+  && default_conf.move_figurative_space_to_numeric.level = parsed_conf.move_figurative_space_to_numeric.level
+  && default_conf.move_figurative_quote_to_numeric.level = parsed_conf.move_figurative_quote_to_numeric.level
+  && default_conf.odo_without_to.level = parsed_conf.odo_without_to.level
+  && default_conf.section_segments.level = parsed_conf.section_segments.level
+  && default_conf.alter_statement.level = parsed_conf.alter_statement.level
+  && default_conf.call_overflow.level = parsed_conf.call_overflow.level
+  && default_conf.numeric_boolean.level = parsed_conf.numeric_boolean.level
+  && default_conf.hexadecimal_boolean.level = parsed_conf.hexadecimal_boolean.level
+  && default_conf.national_literals.level = parsed_conf.national_literals.level
+  && default_conf.hexadecimal_national_literals.level = parsed_conf.hexadecimal_national_literals.level
+  && default_conf.national_character_literals.level = parsed_conf.national_character_literals.level
+  && default_conf.hp_octal_literals.level = parsed_conf.hp_octal_literals.level
+  && default_conf.acu_literals.level = parsed_conf.acu_literals.level
+  && default_conf.word_continuation.level = parsed_conf.word_continuation.level
+  && default_conf.not_exception_before_exception.level = parsed_conf.not_exception_before_exception.level
+  && default_conf.accept_display_extensions.level = parsed_conf.accept_display_extensions.level
+  && default_conf.larger_redefines.level = parsed_conf.larger_redefines.level
+  && default_conf.symbolic_constant.level = parsed_conf.symbolic_constant.level
+  && default_conf.constant_78.level = parsed_conf.constant_78.level
+  && default_conf.constant_01.level = parsed_conf.constant_01.level
+  && default_conf.perform_varying_without_by.level = parsed_conf.perform_varying_without_by.level
+  && default_conf.reference_out_of_declaratives.level = parsed_conf.reference_out_of_declaratives.level
+  && default_conf.program_prototypes.level = parsed_conf.program_prototypes.level
+  && default_conf.call_convention_mnemonic.level = parsed_conf.call_convention_mnemonic.level
+  && default_conf.call_convention_linkage.level = parsed_conf.call_convention_linkage.level
+  && default_conf.numeric_value_for_edited_item.level = parsed_conf.numeric_value_for_edited_item.level
+  && default_conf.incorrect_conf_sec_order.level = parsed_conf.incorrect_conf_sec_order.level
+  && default_conf.define_constant_directive.level = parsed_conf.define_constant_directive.level
+  && default_conf.free_redefines_position.level = parsed_conf.free_redefines_position.level
+  && default_conf.records_mismatch_record_clause.level = parsed_conf.records_mismatch_record_clause.level
+  && default_conf.record_delimiter.level = parsed_conf.record_delimiter.level
+  && default_conf.sequential_delimiters.level = parsed_conf.sequential_delimiters.level
+  && default_conf.record_delim_with_fixed_recs.level = parsed_conf.record_delim_with_fixed_recs.level
+  && default_conf.missing_statement.level = parsed_conf.missing_statement.level
+  && default_conf.missing_period.level = parsed_conf.missing_period.level
+  && default_conf.zero_length_literals.level = parsed_conf.zero_length_literals.level
+  && default_conf.xml_generate_extra_phrases.level = parsed_conf.xml_generate_extra_phrases.level
+  && default_conf.continue_after.level = parsed_conf.continue_after.level
+  && default_conf.goto_entry.level = parsed_conf.goto_entry.level
+  && default_conf.assign_variable.level = parsed_conf.assign_variable.level
+  && default_conf.assign_using_variable.level = parsed_conf.assign_using_variable.level
+  && default_conf.assign_ext_dyn.level = parsed_conf.assign_ext_dyn.level
+  && default_conf.assign_disk_from.level = parsed_conf.assign_disk_from.level
+  && default_conf.vsam_status.level = parsed_conf.vsam_status.level
+  && default_conf.self_call_recursive.level = parsed_conf.self_call_recursive.level
+  && default_conf.record_contains_depending_clause.level = parsed_conf.record_contains_depending_clause.level
+  && default_conf.picture_l.level = parsed_conf.picture_l.level
 
 module Tab_stops = Cobol_common.Tab_stops
 
@@ -218,11 +217,8 @@ let load_conf contents =
   Cobol_config.from_file ~platform ~search_path (Filename.basename file)
 
 let tab_stops_of_conf value =
-  let module Conf =
-    (val load_conf (Printf.sprintf "include \"default.conf\"\ntab-width: %s\n"
-                      value))
-  in
-  Conf.tab_stops#value
+  (load_conf (Printf.sprintf "include \"default.conf\"\ntab-width: %s\n"
+                value)).tab_stops
 
 let rejected value =
   match tab_stops_of_conf value with

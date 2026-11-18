@@ -12,4 +12,4 @@
 (**************************************************************************)
 
 (** This module contains all the default configurations. *)
-include Types.T
+val default: Types.t

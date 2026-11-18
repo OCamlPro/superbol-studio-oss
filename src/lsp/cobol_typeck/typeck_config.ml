@@ -16,10 +16,8 @@ type options =
     binary_size: binary_size;
     binary_byteorder: binary_byteorder;
     target_byte_order: byte_order;  (** byte order of the target machine *)
-    dialect: Cobol_config.dialect;
-    alphanumeric_comp_x_over_8_chars_rejected_by: Cobol_config.dialect option;
-    (** if set, warn about COMP-X and COMP-N items with an alphanumeric PICTURE
-        of more than 8 characters, which this dialect rejects *)
+    free_redefines_position: unit Cobol_dialect.Types.binding;
+    alphanumeric_comp_x_over_8_chars: unit Cobol_dialect.Types.binding;
   }
 
 and binary_size = Cobol_config.Types.binary_size
@@ -29,12 +27,10 @@ and byte_order = Cobol_data.Types.byte_order
 (** Options derived from the given dialect configuration, for a target machine
     with the given byte order. *)
 let from_cobol_config ~target_byte_order (config: Cobol_config.t) =
-  let module Config = (val config) in
   {
-    binary_size = Config.binary_size#value;
-    binary_byteorder = Config.binary_byteorder#value;
+    binary_size = config.binary_size;
+    binary_byteorder = config.binary_byteorder;
     target_byte_order;
-    dialect = Config.dialect;
-    alphanumeric_comp_x_over_8_chars_rejected_by =
-      Cobol_config.microfocus_ancestor config;
+    free_redefines_position = config.free_redefines_position;
+    alphanumeric_comp_x_over_8_chars = config.alphanumeric_comp_x_over_8_chars;
   }

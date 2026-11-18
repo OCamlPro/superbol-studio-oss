@@ -19,10 +19,7 @@ let mf_binary_sizing_options =
   let default_options = Prog_parser.options () in
   { default_options with
     config =
-      (module (struct
-        include (val default_options.config)
-        let binary_size = Cobol_config.Options.binary_size#from_val ~config B_1__8
-      end)) }
+      { default_options.config with binary_size = B_1__8 } }
 
 let%expect_test "usage-binary" =
   dotest @@ prog "usage-binary"
@@ -943,11 +940,7 @@ let native_byteorder_options =
   let default_options = Prog_parser.options () in
   { default_options with
     config =
-      (module (struct
-        include (val default_options.config)
-        let binary_byteorder =
-          Cobol_config.Options.binary_byteorder#from_val ~config Native
-      end)) }
+      { default_options.config with binary_byteorder = Native } }
 
 (** Shows the byte order of each binary item. *)
 let show_byte_orders ?parser_options contents =
@@ -1110,20 +1103,21 @@ let%expect_test "usage-comp-x-errors" =
     X: bytes=1 signed=false scaling=0 truncation=native
     N: bytes=4 signed=false scaling=0 truncation=native |}];;
 
-let options_with_dialect_ancestry ancestry =
+let options_rejecting_alphanumeric_comp_x_over_8_chars =
   let default_options = Prog_parser.options () in
+  let origin = Cobol_dialect.Origin.of_id Cobol_dialect.Id.mf in
   { default_options with
     config =
-      (module (struct
-        include (val default_options.config)
-        let dialect = List.hd (List.rev ancestry)
-        let dialect_ancestry = ancestry
-      end)) }
+      { default_options.config with
+        origin;
+        alphanumeric_comp_x_over_8_chars =
+          Cobol_dialect.Feature.bind ~origin
+            Cobol_config.Options.alphanumeric_comp_x_over_8_chars
+            Unconformable } }
 
 let%expect_test "usage-comp-x-alphanum-mf" =
   show_binary_sizes
-    ~parser_options:(options_with_dialect_ancestry
-                       Cobol_config.DIALECT.[mf_strict; mf]) @@
+    ~parser_options:options_rejecting_alphanumeric_comp_x_over_8_chars @@
   prog "usage-comp-x-alphanum-mf"
     ~working_storage:{|
        77 AX8 PIC X(8) COMP-X.
@@ -1139,9 +1133,8 @@ let%expect_test "usage-comp-x-alphanum-mf" =
     ----                     ^^^^
        6          77 AN12 PIC X(12) COMP-N.
        7          PROCEDURE DIVISION.
-    >> Warning: PICTURE of 9 characters for item with USAGE COMP-X exceeds the
-                limit of 8 characters of dialect mf; its size is 15 bytes, as in
-                GnuCOBOL
+    >> Error: alphanumeric PICTURE of more than 8 characters for COMP-X or COMP-N item
+              does not conform to mf
 
     prog.cob:6.19-6.24:
        3          WORKING-STORAGE SECTION.
@@ -1151,34 +1144,9 @@ let%expect_test "usage-comp-x-alphanum-mf" =
     ----                      ^^^^^
        7          PROCEDURE DIVISION.
        8
-    >> Warning: PICTURE of 12 characters for item with USAGE COMP-N exceeds the
-                limit of 8 characters of dialect mf; its size is 15 bytes, as in
-                GnuCOBOL
+    >> Error: alphanumeric PICTURE of more than 8 characters for COMP-X or COMP-N item
+              does not conform to mf
 
     AX8: bytes=8 signed=false scaling=0 truncation=native
     AX9: bytes=15 signed=false scaling=0 truncation=native
     AN12: bytes=15 signed=false scaling=0 truncation=native |}];;
-
-let%expect_test "usage-comp-x-alphanum-mf-derived" =
-  show_binary_sizes
-    ~parser_options:(options_with_dialect_ancestry
-                       Cobol_config.DIALECT.[mf; Custom ("my-mf",
-                                                         { strict = false })]) @@
-  prog "usage-comp-x-alphanum-mf-derived"
-    ~working_storage:{|
-       77 AX9 PIC X(9) COMP-X.
-    |};
-  [%expect {|
-    prog.cob:4.18-4.22:
-       1          PROGRAM-ID. usage-comp-x-alphanum-mf-derived.
-       2          DATA DIVISION.
-       3          WORKING-STORAGE SECTION.
-       4 >        77 AX9 PIC X(9) COMP-X.
-    ----                     ^^^^
-       5          PROCEDURE DIVISION.
-       6
-    >> Warning: PICTURE of 9 characters for item with USAGE COMP-X exceeds the
-                limit of 8 characters of dialect mf, from which my-mf derives;
-                its size is 15 bytes, as in GnuCOBOL
-
-    AX9: bytes=15 signed=false scaling=0 truncation=native |}];;

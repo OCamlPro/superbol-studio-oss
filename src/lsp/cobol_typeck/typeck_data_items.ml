@@ -429,7 +429,7 @@ let field_layout_n_sizes ~usage ~init_value { item_name;
 
 let affect_definition =
   LIST.exists begin function
-    | Typeck_diagnostics.Dialect_feature_used _ -> false
+    | Typeck_diagnostics.Dialect_feature_warning _ -> false
     | _ -> true
   end
 
@@ -726,7 +726,8 @@ let on_item acc ~at_level
                               data_name = item_name;
                               data_clauses }; loc }
   =
-  let item_clauses = Typeck_clauses.of_data_item data_clauses in
+  let item_clauses =
+    Typeck_clauses.of_data_item ~data_config:acc.data_config data_clauses in
   let item_diagnostics = item_clauses.data_clause_diags in
   match item_clauses.redefines with
   | Some redefined_name ->

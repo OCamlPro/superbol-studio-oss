@@ -14,7 +14,12 @@
 open Cobol_common.Srcloc.TYPES
 open Preproc_outputs.TYPES
 
-module Make (Config: Cobol_config.T) : sig
+module type PARAMS = sig
+  val safe_partial_replacing_when_src_literal:
+    [`Safe | `Unsafe] Cobol_dialect.Types.binding
+end
+
+module Make (Params: PARAMS) : sig
 
   val replacing'
     : ?repl_dir:Preproc_directives.replacing_direction

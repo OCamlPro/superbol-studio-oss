@@ -30,7 +30,7 @@ let pic_length: int value =
 
 let word_length: int value =
   Value.int ~name:"word-length"
-    "Maximum@ word-length @ for@ COBOL@ (=@ programmer@ defined)@ words."
+    "Maximum@ word-length@ for@ COBOL@ (=@ programmer@ defined)@ words."
 
 let literal_length: int value =
   Value.int ~name:"literal-length"
@@ -42,48 +42,38 @@ let numeric_literal_length: int value =
 
 (* any options *)
 let defaultbyte: defaultbyte value =
-  let kind = object
-    inherit [_] kind ~name:"defaultbyte"
-    method parse s: defaultbyte =
-      match s with
-      | "init" -> Init
-      | "none" -> None
-      | _ ->
-          if String.length s = 1 then
-            Char (s.[0])
-          else
-            begin match int_of_string_opt s with
-              | Some i when i >= 0 && i <= 255 ->
-                  Char (Char.chr i)
-              | _ -> invalid_arg s
-            end
-  end
+  let parse: string -> defaultbyte = function
+    | "init" -> Init
+    | "none" -> None
+    | s ->
+        if String.length s = 1 then
+          Char (s.[0])
+        else
+          begin match int_of_string_opt s with
+            | Some i when i >= 0 && i <= 255 ->
+                Char (Char.chr i)
+            | _ -> invalid_arg s
+          end
   in
-  Value.def ~name:"defaultbyte" ~kind
-    "Default@ initialization@ for@ field@ without@ Value."
+  Value.def ~parse ~name:"defaultbyte"
+    "Default@ initialization@ for@ field@ without@ VALUE."
 
 let standard_define: standard value =
-  let kind = object
-    inherit [_] kind ~name:"standard-define"
-    method parse s: standard =
-      match int_of_string_opt s with
-      | Some i when i >= 0 && i <= 9 ->
-          begin match i with
-            | 0 -> GnuCOBOL
-            | 1 -> MicroFocus
-            | 2 -> IBM
-            | 3 -> MVS
-            | 4 -> BS2000
-            | 5 -> ACU
-            | 6 -> RM
-            | 7 -> STD85
-            | 8 -> STD2002
-            | 9 -> STD2014
-            | _ -> assert false (*unreachable*)
-          end
-      | _ -> invalid_arg s
-  end in
-  Value.def ~kind ~name:"standard-define"
+  let parse: string -> standard = fun s ->
+    match int_of_string_opt s with
+    | Some 0 -> GnuCOBOL
+    | Some 1 -> MicroFocus
+    | Some 2 -> IBM
+    | Some 3 -> MVS
+    | Some 4 -> BS2000
+    | Some 5 -> ACU
+    | Some 6 -> RM
+    | Some 7 -> STD85
+    | Some 8 -> STD2002
+    | Some 9 -> STD2014
+    | _ -> invalid_arg s
+  in
+  Value.def ~parse ~name:"standard-define"
     "Used@ standard"
 
 let format_of_string s =
@@ -127,83 +117,67 @@ let string_of_format = function
   | Auto -> "auto"
 
 let format: source_format_spec value =
-  let kind = object
-    inherit [_] kind ~name:"format"
-    method parse s: source_format_spec = format_of_string s
-  end in
-  Value.def ~kind ~name:"format"
+  let parse: string -> source_format_spec = format_of_string in
+  Value.def ~parse ~name:"format"
     "Default@ reference@ format."
 
 let binary_size: binary_size value =
-  let kind = object
-    inherit [_] kind ~name:"binary-size"
-    method parse s: binary_size =
-      match s with
-      | "2-4-8" -> B_2_4_8
-      | "1-2-4-8" -> B_1_2_4_8
-      | "1--8" -> B_1__8
-      | _ -> invalid_arg s
-  end in
-  Value.def ~kind ~name:"binary-size"
-    ~short:"binary@ byte@ size"
+  let parse: string -> binary_size = function
+    | "2-4-8" -> B_2_4_8
+    | "1-2-4-8" -> B_1_2_4_8
+    | "1--8" -> B_1__8
+    | s -> invalid_arg s
+  in
+  Value.def ~parse ~name:"binary-size"
     "Binary@ byte@ size@ -@ defines@ the@ allocated@ bytes@ according@ to@ PIC."
 
 let binary_byteorder: binary_byteorder value =
-  let kind = object
-    inherit [_] kind ~name:"binary-byteorder"
-    method parse s: binary_byteorder =
-      match String.lowercase_ascii s with
-      | "native" -> Native
-      | "big-endian" -> Big_endian
-      | _ -> invalid_arg s
-  end in
-  Value.def ~kind ~name:"binary-byteorder"
+  let parse: string -> binary_byteorder = fun s ->
+    match String.lowercase_ascii s with
+    | "native" -> Native
+    | "big-endian" -> Big_endian
+    | _ -> invalid_arg s
+  in
+  Value.def ~parse ~name:"binary-byteorder"
     "Binary@ byte@ order."
 
 let assign_clause: assign_clause value =
-  let kind = object
-    inherit [_] kind ~name:"assign-clause"
-    method parse s: assign_clause =
-      match String.lowercase_ascii s with
-      | "dynamic" -> Dynamic
-      | "external" -> External
-      | "ibm" -> IBM
-      | "mf" -> MF
-      | _ -> invalid_arg s
-  end in
-  Value.def ~kind ~name:"assign-clause"
-    ~short:"how@ to@ interpret@ 'ASSIGN@ word'"
+  let parse: string -> assign_clause = fun s ->
+    match String.lowercase_ascii s with
+    | "dynamic" -> Dynamic
+    | "external" -> External
+    | "ibm" -> IBM
+    | "mf" -> MF
+    | _ -> invalid_arg s
+  in
+  Value.def ~parse ~name:"assign-clause"
     "How@ to@ interpret@ 'ASSIGN@ word':@ as@ 'ASSIGN@ EXTERNAL@ word'@ or@ 'ASSIGN@ DYNAMIC@ word'"
 
 let screen_section_rules: screen_section_rules value =
-  let kind = object
-    inherit [_] kind ~name:"screen-section-rules"
-    method parse s: screen_section_rules =
-      match String.lowercase_ascii s with
-      | "acu" -> ACU
-      | "gc" -> GC
-      | "mf" -> MF
-      | "rm" -> RM
-      | "std" -> STD
-      | "xopen" -> XOPEN
-      | _ -> invalid_arg s
-  end in
-  Value.def ~kind ~name:"screen-section-rules"
+  let parse: string -> screen_section_rules = fun s ->
+    match String.lowercase_ascii s with
+    | "acu" -> ACU
+    | "gc" -> GC
+    | "mf" -> MF
+    | "rm" -> RM
+    | "std" -> STD
+    | "xopen" -> XOPEN
+    | _ -> invalid_arg s
+  in
+  Value.def ~parse ~name:"screen-section-rules"
     "Which@ compiler's@ rules@ to@ apply@ to@ SCREEN@ SECTION@ item@ clauses."
 
 let dpc_in_data: dpc_in_data value =
-  let kind = object
-    inherit [_] kind ~name:"dpc-in-data"
-    method parse s: dpc_in_data =
-      match String.lowercase_ascii s with
-      | "none" -> None
-      | "xml" -> XML
-      | "json" -> Json
-      | "all" -> All
-      | _ -> invalid_arg s
-  end in
-  Value.def ~kind ~name:"dpc-in-data"
-    "Wether@ DECIMAL@ POINT@ IS@ COMMA@ has@ effect@ in@ XML/JSON@ GENERATE."
+  let parse: string -> dpc_in_data = fun s ->
+    match String.lowercase_ascii s with
+    | "none" -> None
+    | "xml" -> XML
+    | "json" -> Json
+    | "all" -> All
+    | _ -> invalid_arg s
+  in
+  Value.def ~parse ~name:"dpc-in-data"
+    "Whether@ DECIMAL@ POINT@ IS@ COMMA@ has@ effect@ in@ XML/JSON@ GENERATE."
 
 (* boolean options *)
 let filename_mapping: bool value =
@@ -236,7 +210,6 @@ let relax_syntax_checks: bool value =
 
 let ref_mod_zero_length: bool value =
   Value.bool ~name:"ref-mod-zero-length"
-    ~short:"allow@ zero@ length@ reference-modification"
     "allow@ zero@ length@ reference-modification@ (only@ changed@ with@ EC-BOUND-REF-MOD@ active)"
 
 let relax_level_hierarchy: bool value =
@@ -245,7 +218,7 @@ let relax_level_hierarchy: bool value =
 
 let select_working: bool value =
   Value.bool ~name:"select-working"
-    "require@ ASSING@ UNSING@ items@ to@ be@ in@ WORKING-STORAGE"
+    "require@ ASSIGN@ USING@ items@ to@ be@ in@ WORKING-STORAGE"
 
 let local_implies_recursive: bool value =
   Value.bool ~name:"local-implies-recursive"
@@ -261,7 +234,7 @@ let move_ibm: bool value =
 
 let perform_osvs: bool value =
   Value.bool ~name:"perform-osvs"
-    "exit@ point@ of@ any@ currently@ executing@ perfom@ is@ recognized@ if@ reached"
+    "exit@ point@ of@ any@ currently@ executing@ perform@ is@ recognized@ if@ reached"
 
 let arithmetic_osvs: bool value =
   Value.bool ~name:"arithmetic-osvs"
@@ -273,7 +246,7 @@ let hostsign: bool value =
 
 let program_name_redefinition: bool value =
   Value.bool ~name:"program-name-redefinition"
-    "program@ names@ dont't@ lead@ to@ reserved@ identifier"
+    "program@ names@ don't@ lead@ to@ reserved@ identifier"
 
 let accept_update: bool value =
   Value.bool ~name:"accept-update"
@@ -281,7 +254,7 @@ let accept_update: bool value =
 
 let accept_auto: bool value =
   Value.bool ~name:"accept-auto"
-    "set@ WITH@ AUTO@ clause@ as@ default@ for@ ACCEPT@ dest-item,@ instead@ of@ WIHT@ TAB"
+    "set@ WITH@ AUTO@ clause@ as@ default@ for@ ACCEPT@ dest-item,@ instead@ of@ WITH@ TAB"
 
 let console_is_crt: bool value =
   Value.bool ~name:"console-is-crt"
@@ -293,7 +266,6 @@ let no_echo_means_secure: bool value =
 
 let line_col_zero_default: bool value =
   Value.bool ~name:"line-col-zero-default"
-    ~short:"assume@ a@ field@ DISPLAY@ starts@ at@ LINE@ 0@ COL@ 0"
     "assume@ a@ field@ DISPLAY@ starts@ at@ LINE@ 0@ COL@ 0@ (i.e.@ at@ the@ cursor),@ not LINE@ 1@ COL@ 1"
 
 let display_special_fig_consts: bool value =
@@ -326,7 +298,6 @@ let xml_parse_xmlss: bool value =
 
 let areacheck: bool value =
   Value.bool ~name:"areacheck"
-    ~short:"check@ contents@ of@ Area@ A@"
     "check@ contents@ of@ Area@ A@ (when@ reference@ format@ supports@ Area@ A enforcement)@\n\
      @[@[enabled@ checks@ include:@]@\n\
      @[*@ division,@ section,@ paragraph@ names,@ level@ indicators@ (FD,@ SD,@ RD,@ \
@@ -336,339 +307,331 @@ let areacheck: bool value =
 
 let ebcdic_symbolic_characters: bool value =
   Value.bool ~name:"ebcdic-symbolic-characters"
-    ~short:"EBCDIC symbolic characters"
     "EBCDIC symbolic characters in literals (\" \"135,151,151\"bar\"195, \
      194\"Z\" for \" foobarBAZ\")"
 
 (* support options *)
 (*NOTE: GnuCOBOL option name is "partial-replace-when-literal-src"*)
 let safe_partial_replacing_when_src_literal: [`Safe | `Unsafe] feature =
-  let feature_kind = object
-    inherit [_] FEATURE.feature_kind ~name:"safety support"
-    method parse s : [`Safe | `Unsafe] FEATURE.support_level =
-      match String.lowercase_ascii s with
-      | "ok" -> FEATURE.Ok `Safe
-      | "warning" -> Warning `Safe
-      | "archaic" -> Archaic `Safe
-      | "obsolete" -> Obsolete `Safe
-      | "skip" -> Ok `Unsafe                            (* special semantics *)
-      | "ignore" -> Ignore
-      | "error" -> Error
-      | "unconformable" -> Unconformable
-      | _ as s -> raise @@ Invalid_argument s
-    method from_ast s: [`Safe | `Unsafe] FEATURE.support_level =
-      match s with
-      | Conf_ast.Ok -> FEATURE.Ok `Safe
-      | Warning -> Warning `Safe
-      | Archaic -> Archaic `Safe
-      | Obsolete -> Obsolete `Safe
-      | Skip -> Ok `Unsafe
-      | Ignore -> Ignore
-      | Error -> Error
-      | Unconformable -> Unconformable
-  end in
-  FEATURE.def ~feature_kind ~name:"partial-replace-when-literal-src"
+  let open Cobol_dialect.Types in
+  let of_level : unit support -> [`Safe | `Unsafe] support = function
+    | Ok () -> Ok `Safe
+    | Warning () -> Warning `Safe
+    | Archaic () -> Archaic `Safe
+    | Obsolete () -> Obsolete `Safe
+    | Skip -> Ok `Unsafe                                (* special semantics *)
+    | Ignore -> Ignore
+    | Error -> Error
+    | Unconformable -> Unconformable
+  in
+  Cobol_dialect.Feature.def ~of_level ~name:"partial-replace-when-literal-src"
     ~short:"partial@ replacing@ with@ literal@ source@ operands"
     "Enable@ partial@ replacings@ (COPY...REPLACING/REPLACE@ \
      LEADING/TRAILING)@ with@ literal@ source@ operands, and@ apply@ them@ \
      even@ when@ they@ replace@ with@ spaces@ only."
 
 let comment_paragraphs: unit feature =
-  FEATURE.unit ~name:"comment-paragraphs"
+  Cobol_dialect.Feature.unit ~name:"comment-paragraphs"
     ~short:"comment@ paragraph@ in@ IDENTIFICATION@ DIVISION"
     "Comment@ paragraphs@ in@ IDENTIFICATION@ DIVISION@ (AUTHOR,@ \
      DATE-WRITTEN,@ ...)."
 
 let control_division: unit feature =
-  FEATURE.unit ~name:"control-division"
+  Cobol_dialect.Feature.unit ~name:"control-division"
     "CONTROL@ DIVISION"
 
 let memory_size_clause: unit feature =
-  FEATURE.unit ~name:"memory-size-clause"
+  Cobol_dialect.Feature.unit ~name:"memory-size-clause"
     "MEMORY-SIZE@ clause"
 
 let multiple_file_tape_clause: unit feature =
-  FEATURE.unit ~name:"multiple-file-tape-clause"
+  Cobol_dialect.Feature.unit ~name:"multiple-file-tape-clause"
     "MULTIPLE-FILE-TAPE@ clause"
 
 let label_records_clause: unit feature =
-  FEATURE.unit ~name:"label-records-clause"
-    "LABEL_RECORDS@ clause"
+  Cobol_dialect.Feature.unit ~name:"label-records-clause"
+    "LABEL-RECORDS@ clause"
 
 let value_of_clause: unit feature =
-  FEATURE.unit ~name:"value-of-clause"
-    "Value-OF@ clause"
+  Cobol_dialect.Feature.unit ~name:"value-of-clause"
+    "VALUE-OF@ clause"
 
 let data_records_clause: unit feature =
-  FEATURE.unit ~name:"data-records-clause"
+  Cobol_dialect.Feature.unit ~name:"data-records-clause"
     "DATA-RECORDS@ clause"
 
 let top_level_occurs_clause: unit feature =
-  FEATURE.unit ~name:"top-level-occurs-clause"
+  Cobol_dialect.Feature.unit ~name:"top-level-occurs-clause"
     "OCCURS@ clause@ on@ top-level"
 
 let same_as_clause: unit feature =
-  FEATURE.unit ~name:"same-as-clause"
+  Cobol_dialect.Feature.unit ~name:"same-as-clause"
     "SAME@ AS@ clause"
 
 let type_to_clause: unit feature =
-  FEATURE.unit ~name:"type-to-clause"
+  Cobol_dialect.Feature.unit ~name:"type-to-clause"
     "TYPE@ TO@ clause"
 
 let usage_type: unit feature =
-  FEATURE.unit ~name:"usage-type"
+  Cobol_dialect.Feature.unit ~name:"usage-type"
     "USAGE@ type-name"
 
 let synchronized_clause: unit feature =
-  FEATURE.unit ~name:"synchronized-clause"
+  Cobol_dialect.Feature.unit ~name:"synchronized-clause"
     "SYNCHRONIZED@ clause"
 
 let sync_left_right: unit feature =
-  FEATURE.unit ~name:"sync-left-right"
+  Cobol_dialect.Feature.unit ~name:"sync-left-right"
     "LEFT/RIGHT@ phrases@ in@ SYNCHRONIZED@ clause"
 
 let special_names_clause: unit feature =
-  FEATURE.unit ~name:"special-names-clause"
+  Cobol_dialect.Feature.unit ~name:"special-names-clause"
     "SPECIAL-NAMES@ clause"
 
 let goto_statement_without_name: unit feature =
-  FEATURE.unit ~name:"goto-statement-without-name"
+  Cobol_dialect.Feature.unit ~name:"goto-statement-without-name"
     "GO@ TO@ statement without name"
 
 let stop_literal_statement: unit feature =
-  FEATURE.unit ~name:"stop-literal-statement"
+  Cobol_dialect.Feature.unit ~name:"stop-literal-statement"
     "STOP-literal@ statement"
 
 let stop_identifier_statement: unit feature =
-  FEATURE.unit ~name:"stop-identifier-statement"
+  Cobol_dialect.Feature.unit ~name:"stop-identifier-statement"
     "STOP-identifier@ statement"
 
 let stop_error_statement: unit feature =
-  FEATURE.unit ~name:"stop-error-statement"
+  Cobol_dialect.Feature.unit ~name:"stop-error-statement"
     "STOP-error@ statement"
 
 let debugging_mode: unit feature =
-  FEATURE.unit ~name:"debugging-mode"
+  Cobol_dialect.Feature.unit ~name:"debugging-mode"
     "DEBUGGING@ MODE@ and@ debugging@ indicator"
 
 let use_for_debugging: unit feature =
-  FEATURE.unit ~name:"use-for-debugging"
+  Cobol_dialect.Feature.unit ~name:"use-for-debugging"
     "USE@ FOR@ DEBUGGING"
 
 let padding_character_clause: unit feature =
-  FEATURE.unit ~name:"padding-character-clause"
+  Cobol_dialect.Feature.unit ~name:"padding-character-clause"
     "PADDING@ CHARACTER@ clause"
 
 let next_sentence_phrase: unit feature =
-  FEATURE.unit ~name:"next-sentence-phrase"
+  Cobol_dialect.Feature.unit ~name:"next-sentence-phrase"
     "NEXT@ SENTENCE@ phrase"
 
 let listing_statements: unit feature =
-  FEATURE.unit ~name:"listing-statements"
+  Cobol_dialect.Feature.unit ~name:"listing-statements"
     "listing-directive@ statements@ EJECT,@ SKIP1,@ SKIP2,@ SKIP3"
 
 let title_statement: unit feature =
-  FEATURE.unit ~name:"title-statement"
+  Cobol_dialect.Feature.unit ~name:"title-statement"
     "listing-directive@ statement@ TITLE"
 
 let entry_statement: unit feature =
-  FEATURE.unit ~name:"entry-statement"
+  Cobol_dialect.Feature.unit ~name:"entry-statement"
     "ENTRY@ statement"
 
 let move_noninteger_to_alphanumeric: unit feature =
-  FEATURE.unit ~name:"move-noninteger-to-alphanumeric"
+  Cobol_dialect.Feature.unit ~name:"move-noninteger-to-alphanumeric"
     "move@ noninteger@ to@ alphanumeric"
 
 let move_figurative_constant_to_numeric: unit feature =
-  FEATURE.unit ~name:"move-figurative-constant-to-numeric"
+  Cobol_dialect.Feature.unit ~name:"move-figurative-constant-to-numeric"
     "move@ figurative@ constants@ to@ numeric"
 
 let move_figurative_space_to_numeric: unit feature =
-  FEATURE.unit ~name:"move-figurative-space-to-numeric"
+  Cobol_dialect.Feature.unit ~name:"move-figurative-space-to-numeric"
     "move@ figurative@ constant@ SPACE@ to@ numeric"
 
 let move_figurative_quote_to_numeric: unit feature =
-  FEATURE.unit ~name:"move-figurative-quote-to-numeric"
+  Cobol_dialect.Feature.unit ~name:"move-figurative-quote-to-numeric"
     "move@ figurative@ constant@ QUOTE@ to@ numeric"
 
 let odo_without_to: unit feature =
-  FEATURE.unit ~name:"odo-without-to"
+  Cobol_dialect.Feature.unit ~name:"odo-without-to"
     "OCCURS@ DEPENDING@ ON@ without@ to"
 
 let section_segments: unit feature =
-  FEATURE.unit ~name:"section-segments"
+  Cobol_dialect.Feature.unit ~name:"section-segments"
     "section@ segments"
 
 let alter_statement: unit feature =
-  FEATURE.unit ~name:"alter-statement"
+  Cobol_dialect.Feature.unit ~name:"alter-statement"
     "ALTER@ statement"
 
 let call_overflow: unit feature =
-  FEATURE.unit ~name:"call-overflow"
+  Cobol_dialect.Feature.unit ~name:"call-overflow"
     "OVERFLOW@ clause@ for@ CALL"
 
 let numeric_boolean: unit feature =
-  FEATURE.unit ~name:"numeric-boolean"
+  Cobol_dialect.Feature.unit ~name:"numeric-boolean"
     "boolean@ literal@ (B'1010')"
 
 let hexadecimal_boolean: unit feature =
-  FEATURE.unit ~name:"hexadecimal-boolean"
+  Cobol_dialect.Feature.unit ~name:"hexadecimal-boolean"
     "hexadecimal-boolean@ literal@ (BX'A')"
 
 let national_literals: unit feature =
-  FEATURE.unit ~name:"national-literals"
+  Cobol_dialect.Feature.unit ~name:"national-literals"
     "national@ literals@ (N'UTF-16 string')"
 
 let hexadecimal_national_literals: unit feature =
-  FEATURE.unit ~name:"hexadecimal-national-literals"
+  Cobol_dialect.Feature.unit ~name:"hexadecimal-national-literals"
     "hexadecimal-national@ literals@ (NX'265E')"
 
 let national_character_literals: unit feature =
-  FEATURE.unit ~name:"national-character-literals"
+  Cobol_dialect.Feature.unit ~name:"national-character-literals"
     "non-standard@ national@ literals@ (NC'UTF-16 string')"
 
 let hp_octal_literals: unit feature =
-  FEATURE.unit ~name:"hp-octal-literals"
+  Cobol_dialect.Feature.unit ~name:"hp-octal-literals"
     "HP@ COBOL@ octal@ literals (%%377)"
 
 let acu_literals: unit feature =
-  FEATURE.unit ~name:"acu-literals"
-    "ACUCOBOL-G@ literals@ (#B #O #H #X)"
+  Cobol_dialect.Feature.unit ~name:"acu-literals"
+    "ACUCOBOL-GT@ literals@ (#B #O #H #X)"
 
 let word_continuation: unit feature =
-  FEATURE.unit ~name:"word-continuation"
+  Cobol_dialect.Feature.unit ~name:"word-continuation"
     "continuation@ of@ COBOL@ words"
 
 let not_exception_before_exception: unit feature =
-  FEATURE.unit ~name:"not-exception-before-exception"
+  Cobol_dialect.Feature.unit ~name:"not-exception-before-exception"
     "NOT@ ON@ EXCEPTION@ before@ ON@ EXCEPTION"
 
 let accept_display_extensions: unit feature =
-  FEATURE.unit ~name:"accept-display-extensions"
+  Cobol_dialect.Feature.unit ~name:"accept-display-extensions"
     "extensions@ to@ ACCEPT@ and@ DISPLAY"
 
 let larger_redefines: unit feature =
-  FEATURE.unit ~name:"larger-redefines"
+  Cobol_dialect.Feature.unit ~name:"larger-redefines"
     "allow@ larger@ REDEFINES@ items"
 
 let symbolic_constant: unit feature =
-  FEATURE.unit ~name:"symbolic-constant"
+  Cobol_dialect.Feature.unit ~name:"symbolic-constant"
     "constants@ defined@ in@ SPECIAL-NAMES"
 
 let constant_78: unit feature =
-  FEATURE.unit ~name:"constant-78"
+  Cobol_dialect.Feature.unit ~name:"constant-78"
     ~short:"constant@ with@ level@ 78@ item"
     "constant@ with@ level@ 78@ item@ (note:@ has@ left@ to@ right@ precedence@ in@ expressions)"
 
 let constant_01: unit feature =
-  FEATURE.unit ~name:"constant-01"
-    "constant@ wiht@ level@ 01@ CONSTANT@ AS/FROM@ item (COBOL@ 2002+)"
+  Cobol_dialect.Feature.unit ~name:"constant-01"
+    "constant@ with@ level@ 01@ CONSTANT@ AS/FROM@ item (COBOL@ 2002+)"
 
 let perform_varying_without_by: unit feature =
-  FEATURE.unit ~name:"perform-varying-without-by"
+  Cobol_dialect.Feature.unit ~name:"perform-varying-without-by"
     "PERFORM@ VARYING@ without@ BY@ phrase@ (implies@ BY@ 1)"
 
 let reference_out_of_declaratives: unit feature =
-  FEATURE.unit ~name:"reference-out-of-declaratives"
+  Cobol_dialect.Feature.unit ~name:"reference-out-of-declaratives"
     "references@ to@ sections@ not@ in@ DECLARATIVES@ from@ within@ DECLARATIVES"
 
 let program_prototypes: unit feature =
-  FEATURE.unit ~name:"program-prototypes"
+  Cobol_dialect.Feature.unit ~name:"program-prototypes"
     "CALL/CANCEL@ with@ program-prototype-name"
 
 let call_convention_mnemonic: unit feature =
-  FEATURE.unit ~name:"call-convention-mnemonic"
+  Cobol_dialect.Feature.unit ~name:"call-convention-mnemonic"
     "specifying@ call-convention@ by@ mnemonic"
 
 let call_convention_linkage: unit feature =
-  FEATURE.unit ~name:"call-convention-linkage"
+  Cobol_dialect.Feature.unit ~name:"call-convention-linkage"
     "specifying@ call-convention@ by@ WITH@ ...@ LINKAGE"
 
 let numeric_value_for_edited_item: unit feature =
-  FEATURE.unit ~name:"numeric-value-for-edited-item"
-    "numeric@ literals@ in@ Value@ clause@ of@ numeric-edited@ items"
+  Cobol_dialect.Feature.unit ~name:"numeric-value-for-edited-item"
+    "numeric@ literals@ in@ VALUE@ clause@ of@ numeric-edited@ items"
 
 let incorrect_conf_sec_order: unit feature =
-  FEATURE.unit ~name:"incorrect-conf-sec-order"
+  Cobol_dialect.Feature.unit ~name:"incorrect-conf-sec-order"
     "incorrect@ order@ of@ CONFIGURATION@ SECTION@ paragraphs@ (OpenCOBOL/GnuCOBOL@ extension)"
 
 let define_constant_directive: unit feature =
-  FEATURE.unit ~name:"define-constant-directive"
+  Cobol_dialect.Feature.unit ~name:"define-constant-directive"
     "allow@ >>@ DEFINE@ CONSTANT@ var@ AS@ literal@ (OpenCOBOL/GnuCOBOL@ extension)"
 
 let free_redefines_position: unit feature =
-  FEATURE.unit ~name:"free-redefines-position"
+  Cobol_dialect.Feature.unit ~name:"free-redefines-position"
     "REDEFINES@ clause@ not@ following@ entry-name@ in@ definition"
 
 let records_mismatch_record_clause: unit feature =
-  FEATURE.unit ~name:"records-mismatch-record-clause"
-    "record@ sizes@ does@ not@ match@ RECORD@ clause"
+  Cobol_dialect.Feature.unit ~name:"records-mismatch-record-clause"
+    "record@ sizes@ do@ not@ match@ RECORD@ clause"
 
 let record_delimiter: unit feature =
-  FEATURE.unit ~name:"record-delimiter"
+  Cobol_dialect.Feature.unit ~name:"record-delimiter"
     "RECORD@ DELIMITER@ clause"
 
 let sequential_delimiters: unit feature =
-  FEATURE.unit ~name:"sequential-delimiters"
-    "BINARY-SEQUENTIAL@ and @ LINE-SEQUENTIAL@ phrases@ in@ RECORD@ DELIMITER"
+  Cobol_dialect.Feature.unit ~name:"sequential-delimiters"
+    "BINARY-SEQUENTIAL@ and@ LINE-SEQUENTIAL@ phrases@ in@ RECORD@ DELIMITER"
 
 let record_delim_with_fixed_recs: unit feature =
-  FEATURE.unit ~name:"record-delim-with-fixed-recs"
+  Cobol_dialect.Feature.unit ~name:"record-delim-with-fixed-recs"
     "RECORD@ DELIMITER@ clause@ on@ file@ with@ fixed-length@ records"
 
 let missing_statement: unit feature =
-  FEATURE.unit ~name:"missing-statement"
+  Cobol_dialect.Feature.unit ~name:"missing-statement"
     "missing@ statement@ (e.g.@ empty@ IF/PERFORM)"
 
 let missing_period: unit feature =
-  FEATURE.unit ~name:"missing-period"
+  Cobol_dialect.Feature.unit ~name:"missing-period"
     ~short:"missing@ period@ in@ PROCEDURE@ DIVISION"
     "missing@ period@ in@ PROCEDURE@ DIVISION@ (when@ reference@ format@ supports@ Area@ A@ enforcement)"
 
 let zero_length_literals: unit feature =
-  FEATURE.unit ~name:"zero-length-literals"
+  Cobol_dialect.Feature.unit ~name:"zero-length-literals"
     "zero-length@ literals,@ e.g.@ ''@ and@ \"\""
 
 let xml_generate_extra_phrases: unit feature =
-  FEATURE.unit ~name:"xml-generate-extra-phrases"
-    "XML@ GENERATE's@ phrases@ other@ thant@ COUNT@ IN"
+  Cobol_dialect.Feature.unit ~name:"xml-generate-extra-phrases"
+    "XML@ GENERATE's@ phrases@ other@ than@ COUNT@ IN"
 
 let continue_after: unit feature =
-  FEATURE.unit ~name:"continue-after"
+  Cobol_dialect.Feature.unit ~name:"continue-after"
     "AFTER@ phrase@ in@ CONTINUE@ statement"
 
 let goto_entry: unit feature =
-  FEATURE.unit ~name:"goto-entry"
+  Cobol_dialect.Feature.unit ~name:"goto-entry"
     "ENTRY@ FOR@ GO@ TO@ and@ GO@ TO@ ENTRY@ statements"
 
 let assign_variable: unit feature =
-  FEATURE.unit ~name:"assign-variable"
+  Cobol_dialect.Feature.unit ~name:"assign-variable"
     "ASSIGN@ [TO]@ variable@ in@ SELECT"
 
 let assign_using_variable: unit feature =
-  FEATURE.unit ~name:"assign-using-variable"
+  Cobol_dialect.Feature.unit ~name:"assign-using-variable"
     "ASSIGN@ USING/VARYING variable@ in@ SELECT"
 
 let assign_ext_dyn: unit feature =
-  FEATURE.unit ~name:"assign-ext-dyn"
+  Cobol_dialect.Feature.unit ~name:"assign-ext-dyn"
     "ASSIGN@ EXTERNAL/DYNAMIC@ in@ SELECT"
 
 let assign_disk_from: unit feature =
-  FEATURE.unit ~name:"assign-disk-from"
+  Cobol_dialect.Feature.unit ~name:"assign-disk-from"
     "ASSIGN@ DISK@ FROM@ variable@ in@ SELECT"
 
 let vsam_status: unit feature =
-  FEATURE.unit ~name:"vsam-status"
+  Cobol_dialect.Feature.unit ~name:"vsam-status"
     "VSAM@ status@ in@ FILE@ STATUS"
 
 let self_call_recursive: unit feature =
-  FEATURE.unit ~name:"self-call-recursive"
+  Cobol_dialect.Feature.unit ~name:"self-call-recursive"
     "CALL@ to@ own@ PROGRAM-ID@ implies@ RECURSIVE@ attribute"
 
 let record_contains_depending_clause: unit feature =
-  FEATURE.unit ~name:"record-contains-depending-clause"
+  Cobol_dialect.Feature.unit ~name:"record-contains-depending-clause"
     "DEPENDING@ clause@ in@ RECORD@ CONTAINS"
 
 let picture_l: unit feature =
-  FEATURE.unit ~name:"picture-l"
+  Cobol_dialect.Feature.unit ~name:"picture-l"
     "PICTURE@ string@ with@ 'L'@ character"
+
+(* not a GnuCOBOL configuration option: derived from the dialect ancestry *)
+let alphanumeric_comp_x_over_8_chars: unit feature =
+  Cobol_dialect.Feature.unit ~name:"alphanumeric-comp-x-over-8-chars"
+    "alphanumeric@ PICTURE@ of@ more@ than@ 8@ characters@ for@ COMP-X@ or@ \
+     COMP-N@ item"

@@ -21,11 +21,11 @@ include Cobol_common.Diagnostics_accumulator.MAKE
       let translate = translate
     end)
 
-let of_config_verif (c: 'a Cobol_config.FEATURE.verification_result) =
-  match Cobol_config.DIAG.decompose_verification_result c with
-  | result, Some Error e ->
+let of_config_verif (c: 'a Cobol_dialect.Types.verification) =
+  match Cobol_dialect.Diagnostics.decompose c with
+  | result, Some `Error e ->
       { result; diags = add_error (Feature_error e) none }
-  | result, Some Warning w ->
+  | result, Some `Warning w ->
       { result; diags = add_warning (Feature_warning w) none }
   | result, None ->
       { result; diags = none }

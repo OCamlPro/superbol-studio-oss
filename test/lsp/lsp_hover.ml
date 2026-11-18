@@ -1061,7 +1061,7 @@ let%expect_test "hover-datadef-redefines" =
     |cobol};
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[{"message":"Missing PICTURE clause for item 'Z'","range":{"end":{"character":27,"line":10},"start":{"character":10,"line":10}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[{"message":"Missing PICTURE clause for item 'Z'","range":{"end":{"character":27,"line":10},"start":{"character":10,"line":10}},"severity":1},{"message":"REDEFINES clause not following entry-name in definition used","range":{"end":{"character":32,"line":7},"start":{"character":21,"line":7}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     (line 7, character 13):
     __rootdir__/prog.cob:8.13-8.14:
        5           WORKING-STORAGE SECTION.

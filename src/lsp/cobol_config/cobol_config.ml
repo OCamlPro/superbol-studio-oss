@@ -40,10 +40,6 @@ let __init_default_exn_printers =
 
 (* --- *)
 
-let print_options: Pretty.delayed = fun ppf ->
-  Pretty.list ~fopen:"@[<v>" ~fsep:"@\n" ~fclose:"@]" (fun ppf v -> v#pp ppf)
-    ppf !all_configs
-
 let default_search_path ~platform =
   let getenv_opt = platform.getenv_opt in
   let append root ~sub = match root with
@@ -91,16 +87,16 @@ let read_file_in_path ~platform ~search_path filename =
 
 (* --- *)
 
-let default = (module Default: T)
+let default = Default.default
 
 let meet_support (s1: Conf_ast.support_value as 's) (s2: 's) : 's =
   match s1, s2 with
-  | Ok, _ -> Ok
-  | Warning, (Warning | Archaic | Obsolete | Skip | Ignore | Error |
-              Unconformable) -> Warning
-  | Archaic, (Archaic | Obsolete | Skip | Ignore | Error |
-              Unconformable) -> Archaic
-  | Obsolete, (Obsolete | Skip | Ignore | Error | Unconformable) -> Obsolete
+  | Ok (), _ -> s1
+  | Warning (), (Warning () | Archaic () | Obsolete () | Skip | Ignore | Error |
+                 Unconformable) -> s1
+  | Archaic (), (Archaic () | Obsolete () | Skip | Ignore | Error |
+                 Unconformable) -> s1
+  | Obsolete (), (Obsolete () | Skip | Ignore | Error | Unconformable) -> s1
   | Skip, (Skip | Ignore | Error | Unconformable) -> Skip
   | Ignore, (Ignore | Error | Unconformable) -> Ignore
   | Error, (Error | Unconformable) -> Error
@@ -263,8 +259,7 @@ let load_file (module Words: Words.S) ~platform ?search_path file =
   in
   path, List.rev @@ process [] ~path contents
 
-(* Same as [from_file], also giving the path of the file loaded. *)
-let from_file_n_path ~platform ?search_path ?(verbose=false) file =
+let from_file ~platform ?search_path ?(verbose=false) file =
   if verbose then
     Pretty.error "Loading: `%s'@." file;
   let module Words = Words.Make () in
@@ -274,22 +269,22 @@ let from_file_n_path ~platform ?search_path ?(verbose=false) file =
   let module Diags = DIAGS.InitStateful () in
   let module Config =
     From_file.Make (Diags) (struct
-      let config =
-        { name = match StringMap.find "name" options with
-              | Conf_ast.String s -> s
-              | v -> raise @@ ERROR (Invalid_key_value_pair ("name", v)) }
-      let dialect =
-        try DIALECT.of_gnucobol_config_name config.name
-        with Invalid_argument _ ->
-          raise @@ ERROR (Unknown_dialect config.name)
-      let dialect_ancestry =
-        List.filter_map begin function
-          | Conf_ast.Value { key = "name"; value = String s } ->
-              (try Some (DIALECT.of_gnucobol_config_name s)
-               with Invalid_argument _ -> None)
-          | _ ->
-              None
-        end options_list
+      let origin : Cobol_dialect.Types.origin =
+        let display_name = match StringMap.find "name" options with
+          | Conf_ast.String s -> s
+          | v -> raise @@ ERROR (Invalid_key_value_pair ("name", v))
+        in
+        {
+          id = Cobol_dialect.Id.of_config_name display_name;
+          display_name;
+          file = Option.some path;
+          ancestry = List.filter_map begin function
+              | Conf_ast.Value { key = "name"; value = String s } ->
+                  Option.some (Cobol_dialect.Id.of_config_name s)
+              | _ ->
+                  Option.none
+            end options_list;
+        }
       let options = options
       let words = words
       let intrinsic_functions = intrinsic
@@ -297,44 +292,26 @@ let from_file_n_path ~platform ?search_path ?(verbose=false) file =
       let registers = registers
     end)
   in
-  DIAGS.result ((module Config: T), path) ~diags:(Diags.inspect ~reset:true)
-
-let from_file ~platform ?search_path ?verbose file =
-  DIAGS.map_result ~f:fst @@
-  from_file_n_path ~platform ?search_path ?verbose file
+  DIAGS.result Config.config ~diags:(Diags.inspect ~reset:true)
 
 (* NB: [Some] is shadowed by a constructor of {!Types}. *)
-let dialect_config_filename: DIALECT.t -> string option = function
-  | DIALECT.Default ->
+let dialect_config_filename: Cobol_dialect.Id.t -> string option = function
+  | Cobol_dialect.Id.Default ->
       Option.none
-  | DIALECT.GnuCOBOL ->
+  | Cobol_dialect.Id.GnuCOBOL ->
       Option.some "default.conf"
   | dialect ->
-      let name = DIALECT.to_string dialect in
+      let name = Cobol_dialect.Id.to_string dialect in
       Option.some @@
       if String.ends_with ~suffix:".conf" name
       then name
       else Pretty.to_string "%s.conf" name
 
-let from_dialect_n_file ~platform ?search_path ?verbose d =
+let from_dialect ~platform ?search_path ?verbose d =
   match (dialect_config_filename d: string option) with
   | None ->
-      DIAGS.result ((module Default: T), Option.none)
+      DIAGS.result default
   | Some filename ->
-      DIAGS.map_result ~f:(fun (config, path) -> config, Option.some path) @@
-      from_file_n_path ~platform ?search_path ?verbose filename
+      from_file ~platform ?search_path ?verbose filename
 
-let from_dialect ~platform ?search_path ?verbose d =
-  DIAGS.map_result ~f:fst @@
-  from_dialect_n_file ~platform ?search_path ?verbose d
-
-let dialect (module C: T) = C.dialect
-let dialect_ancestry (module C: T) = C.dialect_ancestry
-let microfocus_ancestor config =
-  (* closest ancestors come last *)
-  List.fold_left begin fun found -> function
-    | DIALECT.MicroFocus _ as d -> Some d
-    | _ -> found
-  end None (dialect_ancestry config)
-
-let tab_stops (module C: T) = C.tab_stops#value
+let dialect { origin; _ } = origin.id

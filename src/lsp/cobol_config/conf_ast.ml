@@ -11,15 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type support_value =
-  | Ok
-  | Warning
-  | Archaic
-  | Obsolete
-  | Skip
-  | Ignore
-  | Error
-  | Unconformable
+type support_value = unit Cobol_dialect.Types.support
 
 type support =
   | Normal of support_value
