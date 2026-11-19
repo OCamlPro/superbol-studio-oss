@@ -4,8 +4,12 @@
   },
   "activationEvents": [
     "onLanguage:cobol",
-    "workspaceContains:**/*.[cC]{ob,OB,bl,BL,py,PY,bx,BX,bsql}",
-    "workspaceContains:**/*.[pP]{co,CO}",
+    "workspaceContains:**/*.[cC][oO][bB]",
+    "workspaceContains:**/*.[cC][bB][lL]",
+    "workspaceContains:**/*.[cC][pP][yY]",
+    "workspaceContains:**/*.[cC][bB][xX]",
+    "workspaceContains:**/*.[cC][bB][sS][qQ][lL]",
+    "workspaceContains:**/*.[pP][cC][oO]",
     "workspaceContains:{_superbol,superbol.toml}"
   ],
   "contributes": {
@@ -61,6 +65,11 @@
       {
         "command": "superbol.toggleComments",
         "title": "Toggle Comments",
+        "category": "SuperBOL"
+      },
+      {
+        "command": "superbol.saveUntitled",
+        "title": "Save Untitled COBOL Document",
         "category": "SuperBOL"
       },
       {
@@ -520,6 +529,18 @@
     ],
     "keybindings": [
       {
+        "command": "superbol.saveUntitled",
+        "key": "ctrl+s",
+        "mac": "cmd+s",
+        "when": "editorLangId == 'cobol' && resourceScheme == 'untitled' && superbol.languageServerRunning"
+      },
+      {
+        "command": "superbol.saveUntitled",
+        "key": "ctrl+shift+s",
+        "mac": "cmd+shift+s",
+        "when": "editorLangId == 'cobol' && resourceScheme == 'untitled' && superbol.languageServerRunning"
+      },
+      {
         "command": "superbol.toggleComments",
         "key": "ctrl+/",
         "mac": "cmd+/",
@@ -533,8 +554,12 @@
           "COBOL"
         ],
         "filenamePatterns": [
-          "*.[cC]{ob,OB,bl,BL,py,PY,bx,BX,bsql}",
-          "*.[pP]{co,CO}"
+          "*.[cC][oO][bB]",
+          "*.[cC][bB][lL]",
+          "*.[cC][pP][yY]",
+          "*.[cC][bB][xX]",
+          "*.[cC][bB][sS][qQ][lL]",
+          "*.[pP][cC][oO]"
         ],
         "configuration": "./syntaxes/language-configuration.json"
       },
@@ -604,6 +629,10 @@
         {
           "command": "superbol.toggleComments",
           "when": "editorLangId == 'cobol' && !editorReadonly && superbol.languageServerRunning"
+        },
+        {
+          "command": "superbol.saveUntitled",
+          "when": "editorLangId == 'cobol' && resourceScheme == 'untitled' && superbol.languageServerRunning"
         }
       ]
     },

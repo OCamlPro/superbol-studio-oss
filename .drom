@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-8c6ad8b8742398cd9cdba582d368fa53:.
+9a1e1a244b9943ffedfad05ac4358bb7:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -20,7 +20,7 @@ c45749b93d3b3ea32e8b56a62ad2bf92:.github/workflows/workflow.yml
 
 # begin context for Makefile
 # file Makefile
-8ab563a7580bf1453cde7def2f49ae48:Makefile
+52c675b9e092e6c78c00d6105cab2ccd:Makefile
 # end context for Makefile
 
 # begin context for docs/README.txt
@@ -265,7 +265,7 @@ a8d08bc44bcd6d1a6367409e9a149c8a:opam/superbol-studio-oss.opam
 
 # begin context for opam/superbol-vscode-lib.opam
 # file opam/superbol-vscode-lib.opam
-31b210fdd728d969e96d2cc5ea01efa4:opam/superbol-vscode-lib.opam
+367f957278355a8b2d9a8245914d7083:opam/superbol-vscode-lib.opam
 # end context for opam/superbol-vscode-lib.opam
 
 # begin context for opam/superbol-vscode-oss.opam
@@ -292,6 +292,11 @@ ff8cba3873fe5f1e018ab1512a3da22a:opam/superbol_cache.opam
 # file opam/superbol_project.opam
 ddbba8df5a0cb4e0ebf588681ab0248d:opam/superbol_project.opam
 # end context for opam/superbol_project.opam
+
+# begin context for opam/superbol_shared.opam
+# file opam/superbol_shared.opam
+13829cee0eda944851ef175e9b549147:opam/superbol_shared.opam
+# end context for opam/superbol_shared.opam
 
 # begin context for opam/tramabol.opam
 # file opam/tramabol.opam
@@ -910,7 +915,7 @@ a18438bf6e347bb93779045b0a7006d1:src/lsp/superbol_cache/version.mlt
 
 # begin context for src/lsp/superbol_free_lib/dune
 # file src/lsp/superbol_free_lib/dune
-550d9bcbff854a37fb7d42d8ba5d8a32:src/lsp/superbol_free_lib/dune
+d515847a5c631a5f48610341bf5f5a32:src/lsp/superbol_free_lib/dune
 # end context for src/lsp/superbol_free_lib/dune
 
 # begin context for src/lsp/superbol_free_lib/package.toml
@@ -952,6 +957,11 @@ d449b7c85d10cc51b7d703484a04114c:src/lsp/superbol_project/dune
 # file src/lsp/superbol_project/version.mlt
 a18438bf6e347bb93779045b0a7006d1:src/lsp/superbol_project/version.mlt
 # end context for src/lsp/superbol_project/version.mlt
+
+# begin context for src/shared/superbol_shared/dune
+# file src/shared/superbol_shared/dune
+58fa8e717bc978bbe56ec654dd19140f:src/shared/superbol_shared/dune
+# end context for src/shared/superbol_shared/dune
 
 # begin context for src/superbol-studio-oss/package.toml
 # file src/superbol-studio-oss/package.toml

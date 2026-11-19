@@ -486,3 +486,7 @@ dir = "src/tramabol/cir_logic"
 dir = "src/lsp/cobol_procedure"
 # edit 'src/lsp/cobol_procedure/package.toml' for package-specific options
 
+[[package]]
+dir = "src/shared/superbol_shared"
+# edit 'src/shared/superbol_shared/package.toml' for package-specific options
+

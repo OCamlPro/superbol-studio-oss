@@ -1761,6 +1761,26 @@ module OpenDialogOptions : sig
     -> t
 end
 
+module SaveDialogOptions : sig
+  include Js.T
+
+  val defaultUri : t -> Uri.t option
+
+  val filters : t -> string list Interop.Dict.t option
+
+  val saveLabel : t -> string option
+
+  val title : t -> string option
+
+  val create :
+       ?defaultUri:Uri.t
+    -> ?filters:(string list Interop.Dict.t)
+    -> ?saveLabel:string
+    -> ?title:string
+    -> unit
+    -> t
+end
+
 module Progress : sig
   include Js.T
 
@@ -2529,6 +2549,11 @@ module Window : sig
        ?options:OpenDialogOptions.t
     -> unit
     -> Uri.t array option Promise.t
+
+  val showSaveDialog :
+       ?options:SaveDialogOptions.t
+    -> unit
+    -> Uri.t option Promise.t
 
   val showQuickPickItems :
        choices:(QuickPickItem.t * 'a) list

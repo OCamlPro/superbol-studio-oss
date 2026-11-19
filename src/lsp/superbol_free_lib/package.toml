@@ -60,6 +60,7 @@ cobol_parser = "version"
 cobol_typeck = "version"
 ez_cmdliner = "0.3.0"
 ez_file = ">=0.4"
+superbol_shared = "version"
 
 # We only depend on `lwt` via `ez_api` (and we don't even use any bit
 # of `lwt` at all).  But we still need to add the following constraint

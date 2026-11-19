@@ -84,7 +84,16 @@ let package =
       "typescript", "^5.1.6";
     ]
 
-let cob_extensions_pattern = [ "[cC]{ob,OB,bl,BL,py,PY,bx,BX,bsql}"; "[pP]{co,CO}" ]
+(* Case-insensitive glob patterns for each extension of COBOL files *)
+let cob_extensions_pattern =
+  let case_insensitive_char c =
+    let l = Char.lowercase_ascii c and u = Char.uppercase_ascii c in
+    if l = u then String.make 1 c else Printf.sprintf "[%c%c]" l u
+  in
+  List.map begin fun ext ->
+    String.concat "" @@ List.map case_insensitive_char @@
+    List.of_seq @@ String.to_seq ext
+  end Superbol_shared.Cobol_files.source_extensions
 
 let languages =
   [
@@ -723,6 +732,10 @@ let commands =
       ~title:"Toggle Comments"
       ~category:"SuperBOL";
     Manifest.command ()
+      ~command:"superbol.saveUntitled"
+      ~title:"Save Untitled COBOL Document"
+      ~category:"SuperBOL";
+    Manifest.command ()
       ~command:"superbol.coverage.show"
       ~title:"Show Coverage"
       ~category:"SuperBOL";
@@ -743,6 +756,10 @@ let commands =
       ~title:"Show Control-flow as an Arc-diagram"
       ~category:"SuperBOL";
   ]
+
+let untitled_cobol_document =
+  "editorLangId == 'cobol' && resourceScheme == 'untitled' \
+   && superbol.languageServerRunning"
 
 let menus =
   [
@@ -768,11 +785,19 @@ let menus =
       menu ~command:"superbol.cache.pruneUnusedSince" ~when_:"false" ();
       menu ~command:"superbol.toggleComments"
         ~when_:"editorLangId == 'cobol' && !editorReadonly \
-                && superbol.languageServerRunning" ()];
+                && superbol.languageServerRunning" ();
+      menu ~command:"superbol.saveUntitled"
+        ~when_:untitled_cobol_document ()];
   ]
 
 let keybindings =
   [
+    (* Overrides `workbench.action.files.save{,As}` on untitled documents, to
+       propose a file name based on the PROGRAM-ID *)
+    Manifest.keybinding "superbol.saveUntitled"
+      ~key:"ctrl+s" ~mac:"cmd+s" ~when_:untitled_cobol_document;
+    Manifest.keybinding "superbol.saveUntitled"
+      ~key:"ctrl+shift+s" ~mac:"cmd+shift+s" ~when_:untitled_cobol_document;
     (* Overrides `editor.action.commentLine` while the server runs *)
     Manifest.keybinding "superbol.toggleComments"
       ~key:"ctrl+/" ~mac:"cmd+/"

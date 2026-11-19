@@ -2248,6 +2248,28 @@ module OpenDialogOptions = struct
       -> t [@@js.builder]]
 end
 
+module SaveDialogOptions = struct
+  include Interface.Make ()
+
+  include
+    [%js:
+    val defaultUri : t -> Uri.t option [@@js.get]
+
+    val filters : t -> string list Dict.t option [@@js.get]
+
+    val saveLabel : t -> string option [@@js.get]
+
+    val title : t -> string option [@@js.get]
+
+    val create :
+         ?defaultUri:Uri.t
+      -> ?filters:(string list Dict.t)
+      -> ?saveLabel:string
+      -> ?title:string
+      -> unit
+      -> t [@@js.builder]]
+end
+
 module Progress = struct
   include Interface.Make ()
 
@@ -3292,6 +3314,12 @@ module Window = struct
       -> unit
       -> Uri.t array option Promise.t
       [@@js.global "__SUPERBOL__.vscode.window.showOpenDialog"]
+
+    val showSaveDialog :
+         ?options:SaveDialogOptions.t
+      -> unit
+      -> Uri.t option Promise.t
+      [@@js.global "__SUPERBOL__.vscode.window.showSaveDialog"]
 
     val showQuickPickItems :
          choices:QuickPickItem.t list

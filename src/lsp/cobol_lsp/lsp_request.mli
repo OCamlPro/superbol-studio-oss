@@ -69,6 +69,10 @@ module INTERNAL: sig
     -> uri:Lsp.Types.DocumentUri.t
     -> Lsp.Types.Range.t list
     -> Lsp.Types.TextEdit.t list option
+  val compilation_unit_names
+    : Lsp_server.t
+    -> uri:Lsp.Types.DocumentUri.t
+    -> string list option
   val document_symbol
     : Lsp_server.t
     -> Lsp.Types.DocumentSymbolParams.t

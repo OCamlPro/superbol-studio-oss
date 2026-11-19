@@ -260,3 +260,112 @@ let toggle_comments ?text_editor instance =
           Promise.Result.return ()
       | Error _ as e ->
           Promise.return e
+
+(* --- *)
+
+let compilation_unit_names ~document instance =
+  let data =
+    Jsonoo.Encode.(object_ [
+        "uri", string @@ Vscode.Uri.toString (Vscode.TextDocument.uri document) ();
+      ])
+  in
+  lsp_request instance ~meth:"superbol/compilationUnitNames" ~data |>
+  Promise.Result.map Jsonoo.Decode.(fun json ->
+      Option.value ~default:[] (nullable (list string) json))
+
+(** Tells whether [name] may be used as a file name as is. *)
+let valid_file_basename name =
+  name <> "" && name <> "." && name <> ".." &&
+  String.for_all
+    (fun c -> Char.code c >= 32 && not (String.contains "/\\:*?\"<>|" c))
+    name
+
+let preferred_extension =
+  List.hd Superbol_shared.Cobol_files.source_extensions
+
+let cobol_file_filters =
+  Interop.Dict.of_alist [
+    "COBOL", Superbol_shared.Cobol_files.source_extensions;
+    "All Files", ["*"];
+  ]
+
+(** Directory proposed for saving untitled documents. *)
+let default_save_directory () =
+  match Vscode.Workspace.workspaceFolders () with
+  | folder :: _ -> Vscode.WorkspaceFolder.uri folder
+  | [] -> Vscode.Uri.file (Node.Os.homedir ())
+
+(** Replaces the (untitled) [text_editor] with an editor for the file at
+    [uri], that is assumed to hold the same text. *)
+let replace_untitled_editor text_editor ~uri =
+  let selection = Vscode.TextEditor.selection text_editor
+  and visible = Vscode.TextEditor.visibleRanges text_editor
+  and column = Vscode.TextEditor.viewColumn text_editor in
+  (* Discards the untitled document without prompting; it is the active
+     editor as the save dialog was modal. *)
+  let* _ = Vscode.Commands.executeCommand
+      ~command:"workbench.action.revertAndCloseActiveEditor" ~args:[] in
+  let+ editor =
+    Vscode.Window.showTextDocument () ~document:(`Uri uri) ?column
+  in
+  Vscode.TextEditor.set_selection editor selection;
+  match visible with
+  | range :: _ ->
+      Vscode.TextEditor.revealRange editor ~range ~revealType:AtTop ()
+  | [] -> ()
+
+(** Saves the untitled COBOL document of [text_editor], proposing a file name
+    that is based on the name of its first compilation unit.  Falls back to
+    the regular save command whenever no name can be proposed (including when
+    the language server is not running). *)
+let save_untitled_document ?text_editor instance =
+  let default_save () =
+    let+ _ = Vscode.Commands.executeCommand
+        ~command:"workbench.action.files.save" ~args:[] in
+    ()
+  in
+  match active_text_editor ?text_editor () with
+  | Some text_editor
+    when Vscode.TextDocument.isUntitled (Vscode.TextEditor.document
+                                           text_editor) ->
+      let document = Vscode.TextEditor.document text_editor in
+      compilation_unit_names ~document instance >>= begin function
+        | Ok (name :: _) when valid_file_basename name ->
+            let defaultUri =
+              Vscode.Uri.joinPath (default_save_directory ())
+                ~pathSegments:[name ^ "." ^ preferred_extension]
+            in
+            let options =
+              Vscode.SaveDialogOptions.create ()
+                ~defaultUri ~filters:cobol_file_filters
+            in
+            Vscode.Window.showSaveDialog ~options () >>= begin function
+              | None ->
+                  Promise.return ()
+              | Some uri when Vscode.Uri.scheme uri <> "file" ->
+                  (* No support for other file systems for now *)
+                  Superbol_printer.log_error
+                    "Unable to save %s: unsupported URI scheme; reverting \
+                     to the regular save command"
+                    (Vscode.Uri.toString uri ());
+                  default_save ()
+              | Some uri ->
+                  match
+                    Node.Fs.writeFileSync (Vscode.Uri.fsPath uri)
+                      (Vscode.TextDocument.getText document ())
+                  with
+                  | () ->
+                      replace_untitled_editor text_editor ~uri
+                  | exception e ->
+                      let message =
+                        Printf.sprintf "Unable to save %s: %s"
+                          (Vscode.Uri.fsPath uri) (Printexc.to_string e)
+                      in
+                      let _ = Vscode.Window.showErrorMessage () ~message in
+                      Promise.return ()
+            end
+        | Ok _ | Error _ ->
+            default_save ()
+      end
+  | _ ->
+      default_save ()
