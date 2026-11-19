@@ -53,6 +53,7 @@ depends: [
   "dune" {>= "3.17.0"}
   "vscode-languageclient-js-stubs-windows" {= version}
   "vscode-js-stubs-windows" {= version}
+  "superbol_shared-windows" {= version}
   "node-js-stubs-windows" {= version}
   "interop-js-stubs-windows" {= version}
   "js_of_ocaml-ppx" {>= "4"}

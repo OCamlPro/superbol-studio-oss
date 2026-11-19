@@ -217,6 +217,43 @@ let handle_toggle_comments registry params : Yojson.Safe.t =
 
 (* --- *)
 
+(** Names of the compilation units (programs, functions, classes, and
+    interfaces) of the document at [uri], in order of appearance.  Names
+    that were recovered from syntax errors or given as non-alphanumeric
+    literals are left out. *)
+let compilation_unit_names registry ~uri =
+  try_with_checked_doc registry (TextDocumentIdentifier.create ~uri)
+    ~f:begin fun ~doc:_ { ptree; _ } ->
+      let open Cobol_ptree in
+      let name_of: name_or_literal -> string option = function
+        | Name n -> Some ~&n
+        | Alphanum { str; hexadecimal = false; _ } -> Some str
+        | _ -> None
+      in
+      Option.some @@
+      List.filter_map begin fun cu ->
+        match ~&cu with
+        | Program { program_name = n; _ }
+        | Function { function_name = n; _ }
+        | ClassDefinition { class_name = n; _ }
+        | InterfaceDefinition { interface_name = n; _ } ->
+            match name_of ~&n with
+            | Some s when s <> Dummies.alphanum__ && s <> "" -> Some s
+            | _ -> None
+      end ptree.compilation_units
+    end
+
+(* Params: [{ "uri": uri }]; reply: [[ name, ... ]], or [null] if the
+   document could not be parsed. *)
+let handle_compilation_unit_names registry : Jsonrpc.Structured.t -> Yojson.Safe.t =
+  with_uri ~f:begin fun ~uri _params ->
+    match compilation_unit_names registry ~uri with
+    | Some names -> `List (List.map (fun s -> `String s) names)
+    | None -> `Null
+  end
+
+(* --- *)
+
 (* Params: [{ "uris": [ uri, ... ] }]; reply: [{ "missed": [ uri, ... ] }]. *)
 let handle_publish_cached_diagnostics param registry =
   try
@@ -988,6 +1025,9 @@ let on_request
     | UnknownRequest { meth = "superbol/editionsToToggleComments";
                        params = Some param } ->
         Ok (handle_toggle_comments registry param, state)
+    | UnknownRequest { meth = "superbol/compilationUnitNames";
+                       params = Some param } ->
+        Ok (handle_compilation_unit_names registry param, state)
     | UnknownRequest { meth = "superbol/getCFG";
                        params = Some param } ->
         Ok (handle_get_cfg registry param, state)
@@ -1077,4 +1117,5 @@ module INTERNAL = struct
   let semtoks_range = handle_semtoks_range
   let workspace_symbol = handle_workspace_symbol
   let toggle_comments = toggle_comments
+  let compilation_unit_names = compilation_unit_names
 end

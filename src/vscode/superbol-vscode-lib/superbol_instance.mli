@@ -80,3 +80,11 @@ val toggle_comments
   : ?text_editor: Vscode.TextEditor.t
   -> t
   -> (unit, Superbol_types.error) result Promise.t
+
+(** Saves the untitled document of the active (or given) text editor,
+    proposing a file name derived from the name of its first program (or
+    other compilation unit), if any. *)
+val save_untitled_document
+  : ?text_editor: Vscode.TextEditor.t
+  -> t
+  -> unit Promise.t

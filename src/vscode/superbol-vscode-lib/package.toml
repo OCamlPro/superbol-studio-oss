@@ -58,6 +58,7 @@ js_of_ocaml = ">=4"
 jsonoo = "0.2.1"
 node-js-stubs = "version"
 promise_jsoo = "0.3.1"
+superbol_shared = "version"
 vscode-js-stubs = "version"
 vscode-languageclient-js-stubs = "version"
 

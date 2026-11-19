@@ -134,6 +134,13 @@ let _toggle_comments =
       in ()
     end
 
+let _save_untitled =
+  command "superbol.saveUntitled" @@ Instance
+    begin fun instance ~args:_ ->
+      let _: unit Promise.t = Superbol_instance.save_untitled_document instance
+      in ()
+    end
+
 let _show_coverage =
   command "superbol.coverage.show" @@ Instance
     (fun _instance ~args:_ ->

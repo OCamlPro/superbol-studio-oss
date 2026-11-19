@@ -52,6 +52,7 @@ depends: [
   "ocaml" {>= "4.14.2"}
   "dune" {>= "3.17.0"}
   "vscode-json-windows" {= version}
+  "superbol_shared-windows" {= version}
   "superbol_platform-windows" {= version}
   "superbol_cache-windows" {= version}
   "sql_preproc-windows" {= version}

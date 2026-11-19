@@ -39,6 +39,7 @@
    (ocaml (>= 4.14.2))
    (vscode-languageclient-js-stubs (= :version))
    (vscode-js-stubs (= :version))
+   (superbol_shared (= :version))
    (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
    (node-js-stubs (= :version))
    (jsonoo (and (>= 0.2.1) (< 1.0.0)))
@@ -257,6 +258,7 @@
  (depends
    (ocaml (>= 4.14.2))
    (vscode-json (= :version))
+   (superbol_shared (= :version))
    (superbol_platform (= :version))
    (superbol_cache (= :version))
    (sql_preproc (= :version))
@@ -1138,6 +1140,22 @@
    (cobol_ptree (= :version))
    (cobol_data (= :version))
    (cobol_common (= :version))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name superbol_shared)
+ (synopsis "Information shared between the SuperBOL tools and the VS Code extension")
+ (description "Dependency-free definitions (e.g, COBOL file extensions) that both native and JavaScript components of SuperBOL Studio rely on")
+ 
+  (sites
+    
+  )
+
+ (depends
+   (ocaml (>= 4.14.2))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
