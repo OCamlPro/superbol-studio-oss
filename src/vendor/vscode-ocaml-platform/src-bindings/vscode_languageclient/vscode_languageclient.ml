@@ -291,8 +291,28 @@ module DidChangeConfiguration = struct
   include [%js: val create : settings:Ojs.t -> unit -> t [@@js.builder]]
 end
 
+module State = struct
+  type t =
+    | Stopped [@js 1]
+    | Running [@js 2]
+    | Starting [@js 3]
+  [@@js.enum] [@@js]
+end
+
+module StateChangeEvent = struct
+  include Interface.Make ()
+
+  include
+    [%js:
+    val oldState : t -> State.t [@@js.get]
+
+    val newState : t -> State.t [@@js.get]]
+end
+
 module LanguageClient = struct
   include Class.Make ()
+
+  module OnDidChangeState = Vscode.Event.Make (StateChangeEvent)
 
   include
     [%js:
@@ -316,6 +336,10 @@ module LanguageClient = struct
     val start : t -> unit Promise.t [@@js.call]
 
     val isRunning : t -> bool [@@js.call]
+
+    val state : t -> State.t [@@js.get]
+
+    val onDidChangeState : t -> OnDidChangeState.t [@@js.get]
 
     val stop : t -> unit Promise.t [@@js.call]
 
