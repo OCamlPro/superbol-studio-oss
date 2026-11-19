@@ -148,30 +148,74 @@ let handle_shutdown registry =
 let assoc_of_jsonrpc_struct params =
   Yojson.Safe.Util.to_assoc @@ Jsonrpc.Structured.yojson_of_t params
 
-
-let handle_write_project_config_command param registry =
+let with_optional_uri ~f params =
   try
-    let uri = match List.assoc_opt "uri" @@ assoc_of_jsonrpc_struct param with
+    let uri = match List.assoc_opt "uri" @@ assoc_of_jsonrpc_struct params with
       | Some uri -> Some (Lsp.Uri.t_of_yojson uri)
       | None -> None
     in
-    let registry = Lsp_server.on_write_project_config_command ?uri registry in
-    Ok (`Null, Running registry)
+    f ?uri params
   with Yojson.Safe.Util.(Type_error _ | Undefined _) ->
     Lsp_error.invalid_params "param = %s (association list with \"uri\" key \
-                              expected)" Yojson.Safe.(to_string (param :> t))
+                              mapping to a valid URI expected)\
+                             " Yojson.Safe.(to_string (params :> t))
 
-
-let handle_get_project_config_command param registry =
+let with_uri ~f params =
   try
-    let assoc = assoc_of_jsonrpc_struct param in
+    let assoc = assoc_of_jsonrpc_struct params in
     let uri = Lsp.Uri.t_of_yojson (List.assoc "uri" assoc) in
+    f ~uri assoc
+  with Yojson.Safe.Util.(Type_error _ | Undefined _) | Not_found ->
+    Lsp_error.invalid_params "param = %s (association list with \"uri\" key \
+                              expected)" Yojson.Safe.(to_string (params :> t))
+
+let handle_write_project_config_command registry =
+  with_optional_uri ~f:begin fun ?uri _params ->
+    let registry = Lsp_server.on_write_project_config_command ?uri registry in
+    Ok (`Null, Running registry)
+  end
+
+let handle_get_project_config_command registry =
+  with_uri ~f:begin fun ~uri _params ->
     let reply = Lsp_server.get_project_config_command uri registry in
     Lsp_io.log_debug "Reply: %a" (Yojson.Safe.pretty_print ~std:false) reply;
     Ok (reply, Running registry)
-  with Yojson.Safe.Util.(Type_error _ | Undefined _) | Not_found ->
-    Lsp_error.invalid_params "param = %s (association list with \"uri\" key \
-                              expected)" Yojson.Safe.(to_string (param :> t))
+  end
+
+(* --- *)
+
+let toggle_comments registry ~uri ranges =
+  try_with_doc registry (TextDocumentIdentifier.create ~uri)
+    ~f:begin fun ~doc ->
+      let platform = Lsp_platform.record
+      and textdoc = doc.Lsp_document.textdoc in
+      Option.some @@
+      Lsp_comments.edits ~platform ~filename:(Lsp_utils.path_of_uri uri)
+        ~options:(Lsp_document.preproc_options ~platform doc)
+        ~position_encoding:(Lsp.Text_document.position_encoding textdoc)
+        (Lsp.Text_document.text textdoc) ranges
+    end
+
+(* Params: [{ "uri": uri, "selectionRanges": [ range, ... ] }]; reply:
+   [[ textEdit, ... ]], in the negotiated position encoding. *)
+let handle_toggle_comments registry params : Yojson.Safe.t =
+  with_uri params ~f:begin fun ~uri params ->
+    let ranges =
+      try
+        List.rev_map Range.t_of_yojson @@             (* order is irrelevant *)
+        Yojson.Safe.Util.to_list @@ List.assoc "selectionRanges" params
+      with Not_found | Yojson.Safe.Util.Type_error _
+         | Ppx_yojson_conv_lib.Yojson_conv.Of_yojson_error _ ->
+        Lsp_error.invalid_params "param = %s (\"selectionRanges\" key mapping \
+                                  to a list of ranges expected)\
+                                 " Yojson.Safe.(to_string (`Assoc params))
+    in
+    match toggle_comments registry ~uri ranges with
+    | Some edits -> `List (List.rev @@ List.rev_map TextEdit.yojson_of_t edits)
+    | None -> `Null
+  end
+
+(* --- *)
 
 (* Params: [{ "uris": [ uri, ... ] }]; reply: [{ "missed": [ uri, ... ] }]. *)
 let handle_publish_cached_diagnostics param registry =
@@ -200,9 +244,8 @@ let handle_get_cfg registry params =
   let textDoc = TextDocumentIdentifier.create ~uri in
   try_with_checked_doc registry textDoc
     ~f:begin fun ~doc:_ checked_doc ->
-      let jsoono =
-        Lsp_cfg.doc_to_cfg_jsoono ~filename:(Lsp_utils.path_of_uri uri) ~name ~options checked_doc
-      in Some jsoono
+      Option.some @@
+      Lsp_cfg.doc_to_cfg_jsoono ~filename:(Lsp_utils.path_of_uri uri) ~name ~options checked_doc
     end |>
   Option.get
 
@@ -938,10 +981,13 @@ let on_request
         Ok (handle_rename registry params, state)
     | UnknownRequest { meth = "superbol/writeProjectConfiguration";
                        params = Some param } ->
-        handle_write_project_config_command param registry
+        handle_write_project_config_command registry param
     | UnknownRequest { meth = "superbol/getProjectConfiguration";
                        params = Some param } ->
-        handle_get_project_config_command param registry
+        handle_get_project_config_command registry param
+    | UnknownRequest { meth = "superbol/editionsToToggleComments";
+                       params = Some param } ->
+        Ok (handle_toggle_comments registry param, state)
     | UnknownRequest { meth = "superbol/getCFG";
                        params = Some param } ->
         Ok (handle_get_cfg registry param, state)
@@ -1030,4 +1076,5 @@ module INTERNAL = struct
   let semtoks_full = handle_semtoks_full
   let semtoks_range = handle_semtoks_range
   let workspace_symbol = handle_workspace_symbol
+  let toggle_comments = toggle_comments
 end

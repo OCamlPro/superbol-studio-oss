@@ -72,5 +72,11 @@ val write_project_config
   -> unit Promise.t
 
 val get_project_config
-  : t
+  : ?text_editor: Vscode.TextEditor.t
+  -> t
   -> ((string, Jsonoo.t) Hashtbl.t, Superbol_types.error) result Promise.t
+
+val toggle_comments
+  : ?text_editor: Vscode.TextEditor.t
+  -> t
+  -> (unit, Superbol_types.error) result Promise.t

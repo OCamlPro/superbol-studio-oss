@@ -250,8 +250,27 @@ module StreamInfo: sig
          [@@js.builder]
 end
 
+module State : sig
+  type t =
+    | Stopped
+    | Running
+    | Starting
+
+  include Js.T with type t := t
+end
+
+module StateChangeEvent : sig
+  include Js.T
+
+  val oldState : t -> State.t
+
+  val newState : t -> State.t
+end
+
 module LanguageClient : sig
   include Js.T
+
+  module OnDidChangeState : Js.T with type t = StateChangeEvent.t Vscode.Event.t
 
   val make :
        id:string
@@ -271,6 +290,10 @@ module LanguageClient : sig
   val start : t -> unit Promise.t
 
   val isRunning : t -> bool
+
+  val state : t -> State.t
+
+  val onDidChangeState : t -> OnDidChangeState.t
 
   val stop : t -> unit Promise.t
 

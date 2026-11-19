@@ -51,12 +51,22 @@ let on_language_server_start t hook =
 let subscribe_disposable { context; _ } disposable =
   Vscode.ExtensionContext.subscribe context ~disposable
 
+(** Context key that holds while the language server runs. *)
+let running_context_key = "superbol.languageServerRunning"
+
+let set_running_context running =
+  let _: Ojs.t option Promise.t =
+    Vscode.Commands.executeCommand ~command:"setContext"
+      ~args:[Ojs.string_to_js running_context_key; Ojs.bool_to_js running]
+  in ()
+
 let stop_language_server t =
   match t.language_client with
   | None ->
       Promise.return ()
   | Some client ->
       t.language_client <- None;
+      set_running_context false;     (* in case [client] is already stopped *)
       if LanguageClient.isRunning client then
         LanguageClient.stop client
       else
@@ -70,6 +80,16 @@ let start_language_server ({ lsp_server_prefix = server_prefix; context; _ } as 
       ~serverOptions:(Superbol_languageclient.server_options
                         ~server_prefix ~context)
       ~clientOptions:(Superbol_languageclient.client_options ())
+  in
+  (* The client may also stop on its own, e.g. after repeated crashes. *)
+  let _: Vscode.Disposable.t =
+    LanguageClient.onDidChangeState client ()
+      ~listener:begin fun event ->
+        set_running_context @@
+        match StateChangeEvent.newState event with
+        | Running -> true
+        | Stopped | Starting -> false
+      end
   in
   let+ () = LanguageClient.start client in
   t.language_client <- Some client;
@@ -100,13 +120,23 @@ module JSON = struct
 
 end
 
+let active_text_editor ?text_editor () =
+  match text_editor with None -> Vscode.Window.activeTextEditor () | e -> e
+
+let current_document ?text_editor () =
+  match active_text_editor ?text_editor () with
+  | None -> None
+  | Some e -> Some (Vscode.TextEditor.document e)
 
 let current_document_uri ?text_editor () =
-  match
-    match text_editor with None -> Vscode.Window.activeTextEditor () | e -> e
-  with
+  match current_document ?text_editor () with
   | None -> None
-  | Some e -> Some (Vscode.TextDocument.uri @@ Vscode.TextEditor.document e)
+  | Some doc -> Some (Vscode.TextDocument.uri doc)
+
+let current_selections ?text_editor () =
+  match active_text_editor ?text_editor () with
+  | None -> None
+  | Some e -> Some (Vscode.TextEditor.selections e)
 
 let write_project_config_for ?uri client =
   let assoc = match uri with
@@ -152,10 +182,10 @@ let lsp_notification ~meth ~data instance =
       Vscode_languageclient.LanguageClient.sendNotification client meth
         (Jsonoo.t_to_js data)
 
-let get_project_config instance =
+let get_project_config ?text_editor instance =
   (* The active editor may show something else than a file, like an output
      channel (e.g, with URI [output:tasks]), that belongs to no project. *)
-  match Vscode.Window.activeTextEditor () with
+  match active_text_editor ?text_editor () with
   | Some text_editor
     when Vscode.(Uri.scheme @@ TextDocument.uri @@
                  TextEditor.document text_editor) = "file" ->
@@ -165,3 +195,68 @@ let get_project_config instance =
       Promise.Result.map Jsonoo.Decode.(dict id)
   | _ ->
       Promise.return @@ Error No_active_text_editor
+
+(** Toggles comments on the selected lines, unless the document changes
+    while waiting for the server. *)
+let toggle_comments ?text_editor instance =
+  match active_text_editor ?text_editor () with
+  | None ->
+      Promise.return @@ Error No_active_text_editor
+  | Some text_editor ->
+      let document = Vscode.TextEditor.document text_editor in
+      let version = Vscode.TextDocument.version document in
+      let open Jsonoo.Encode in
+      let jsposition pos =
+        object_ [
+          "line", int (Vscode.Position.line pos);
+          "character", int (Vscode.Position.character pos);
+        ]
+      in
+      let jsselection s =
+        object_ [
+          "start", jsposition (Vscode.Selection.start s);
+          "end", jsposition (Vscode.Selection.end_ s);
+        ]
+      in
+      let data =
+        object_ [
+          "uri", string @@
+          Vscode.Uri.toString (Vscode.TextDocument.uri document) ();
+          "selectionRanges", list jsselection @@
+          Vscode.TextEditor.selections text_editor;
+        ]
+      in
+      let decode_edits =
+        let open Jsonoo.Decode in
+        let position json =
+          Vscode.Position.make
+            ~line:(field "line" int json)
+            ~character:(field "character" int json)
+        in
+        let range json =
+          Vscode.Range.makePositions
+            ~start:(field "start" position json)
+            ~end_:(field "end" position json)
+        in
+        let edit json = field "range" range json, field "newText" string json in
+        fun json -> Option.value ~default:[] (nullable (list edit) json)
+      in
+      lsp_request instance ~meth:"superbol/editionsToToggleComments" ~data |>
+      Promise.Result.map decode_edits >>= function
+      | Ok edits
+        when edits <> [] &&
+             Vscode.TextDocument.version document = version ->
+          let+ _applied =
+            Vscode.TextEditor.edit text_editor () ~callback:begin
+              fun ~editBuilder ->
+                List.iter begin fun (range, value) ->
+                  Vscode.TextEditorEdit.replace editBuilder
+                    ~location:(`Range range) ~value
+                end edits
+            end
+          in
+          Ok ()
+      | Ok _ ->
+          Promise.Result.return ()
+      | Error _ as e ->
+          Promise.return e

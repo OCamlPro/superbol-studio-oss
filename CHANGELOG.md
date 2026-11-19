@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Support for comment toggling, sensitive to source format [#746](https://github.com/OCamlPro/superbol-studio-oss/pull/746)
 - Reporting of REDEFINES clauses that do not immediately follow the data-name, according to the support of the dialect for this feature [#742](https://github.com/OCamlPro/superbol-studio-oss/pull/742)
 - Support for data items with `USAGE COMP-X` or `COMP-N` [#737](https://github.com/OCamlPro/superbol-studio-oss/pull/737)
 - Support for Micro Focus-style comment lines [#734](https://github.com/OCamlPro/superbol-studio-oss/pull/734)

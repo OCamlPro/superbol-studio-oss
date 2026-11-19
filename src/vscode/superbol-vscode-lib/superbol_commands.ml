@@ -125,6 +125,15 @@ let _write_project_config =
       in ()
     end
 
+let _toggle_comments =
+  command "superbol.toggleComments" @@ Instance
+    begin fun instance ~args:_ ->
+      let _: unit Promise.t =
+        Promise.then_ ~fulfilled:Superbol_printer.show_error_message @@
+        Superbol_instance.toggle_comments instance
+      in ()
+    end
+
 let _show_coverage =
   command "superbol.coverage.show" @@ Instance
     (fun _instance ~args:_ ->
