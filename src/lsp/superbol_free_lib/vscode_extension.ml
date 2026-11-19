@@ -719,6 +719,10 @@ let commands =
       ~title:"Retrieve Copybook Directories"
       ~category:"SuperBOL";
     Manifest.command ()
+      ~command:"superbol.toggleComments"
+      ~title:"Toggle Comments"
+      ~category:"SuperBOL";
+    Manifest.command ()
       ~command:"superbol.coverage.show"
       ~title:"Show Coverage"
       ~category:"SuperBOL";
@@ -760,8 +764,20 @@ let menus =
        ~when_:"view == superbol.cacheView && \
                viewItem == superbolCacheBucket" ()];
     "commandPalette",
-    (* Only from the view, as it takes one of its elements *)
-    [menu ~command:"superbol.cache.pruneUnusedSince" ~when_:"false" ()];
+    [(* Only from the view, as it takes one of its elements *)
+      menu ~command:"superbol.cache.pruneUnusedSince" ~when_:"false" ();
+      menu ~command:"superbol.toggleComments"
+        ~when_:"editorLangId == 'cobol' && !editorReadonly \
+                && superbol.languageServerRunning" ()];
+  ]
+
+let keybindings =
+  [
+    (* Overrides `editor.action.commentLine` while the server runs *)
+    Manifest.keybinding "superbol.toggleComments"
+      ~key:"ctrl+/" ~mac:"cmd+/"
+      ~when_:"editorTextFocus && !editorReadonly && editorLangId == 'cobol' \
+              && superbol.languageServerRunning";
   ]
 
 let views =
@@ -805,6 +821,7 @@ let contributes =
     ]
     ~menus
     ~views
+    ~keybindings
 
 let manifest =
   Manifest.vscode

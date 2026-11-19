@@ -64,6 +64,11 @@ module INTERNAL: sig
     : Lsp_server.t
     -> Lsp.Types.DocumentFormattingParams.t
     -> Lsp.Types.TextEdit.t list option
+  val toggle_comments
+    : Lsp_server.t
+    -> uri:Lsp.Types.DocumentUri.t
+    -> Lsp.Types.Range.t list
+    -> Lsp.Types.TextEdit.t list option
   val document_symbol
     : Lsp_server.t
     -> Lsp.Types.DocumentSymbolParams.t

@@ -59,6 +59,11 @@
         "category": "SuperBOL"
       },
       {
+        "command": "superbol.toggleComments",
+        "title": "Toggle Comments",
+        "category": "SuperBOL"
+      },
+      {
         "command": "superbol.coverage.show",
         "title": "Show Coverage",
         "category": "SuperBOL"
@@ -513,6 +518,14 @@
         "url": "https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema-1.2.0.json"
       }
     ],
+    "keybindings": [
+      {
+        "command": "superbol.toggleComments",
+        "key": "ctrl+/",
+        "mac": "cmd+/",
+        "when": "editorTextFocus && !editorReadonly && editorLangId == 'cobol' && superbol.languageServerRunning"
+      }
+    ],
     "languages": [
       {
         "id": "cobol",
@@ -587,6 +600,10 @@
         {
           "command": "superbol.cache.pruneUnusedSince",
           "when": "false"
+        },
+        {
+          "command": "superbol.toggleComments",
+          "when": "editorLangId == 'cobol' && !editorReadonly && superbol.languageServerRunning"
         }
       ]
     },

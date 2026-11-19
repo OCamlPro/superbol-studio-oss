@@ -93,14 +93,17 @@ let analysis_overrides ~language_id =
 let analysis_overrides_for doc =
   analysis_overrides ~language_id:(language_id doc)
 
+let preproc_options ~platform ({ project; _ } as doc) =
+  ANALYSIS.preproc_options project ~platform
+    ~overrides:(analysis_overrides_for doc)
+    ~filename:(Lsp_utils.path_of_uri (uri doc))
+
 let rewindable_parse ~platform ({ project; textdoc; _ } as doc) =
   let filename = Lsp_utils.path_of_uri (uri doc) in
   let overrides = analysis_overrides_for doc in
   Cobol_parser.rewindable_parse_with_artifacts
     ~options:(ANALYSIS.parser_options ~overrides project) @@
-  Cobol_preproc.preprocessor
-    ~options:(ANALYSIS.preproc_options ~platform ~overrides ~filename
-                project) @@
+  Cobol_preproc.preprocessor ~options:(preproc_options ~platform doc) @@
   Cobol_preproc.Input.string ~filename @@
   Lsp.Text_document.text textdoc
 
