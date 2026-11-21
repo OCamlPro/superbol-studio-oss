@@ -14,11 +14,16 @@
 include Cobol_common.Srcloc.INFIX
 
 let ( let* ) = Result.bind
+let ( let+ ) a f = let* a in Ok (f a)
 let ( and* ) r s =
   match r, s with
   | Ok r, Ok s -> Ok (r, s)
   | Error e, Ok _ |  Ok _, Error e -> Error e
   | Error e, Error f -> Error Types.NEL.(append f e)    (* note: reverse order *)
+let ( and+ ) = ( and* )
+
+let ok = Result.ok
+let error = Result.error
 
 module INFIX = struct
   let ( >>= ) = Result.bind

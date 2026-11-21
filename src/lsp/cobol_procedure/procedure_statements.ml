@@ -186,11 +186,11 @@ type merge_stmt = {
 type move_stmt =
   | MoveSimple of {
       from: scalar;
-      to_: ident list;
+      to_: ident list;                                           (* non-empty *)
     }
   | MoveCorresponding of {
       from: ident;
-      to_: ident list;
+      to_: ident list;                                           (* non-empty *)
     }
 [@@deriving ord]
 

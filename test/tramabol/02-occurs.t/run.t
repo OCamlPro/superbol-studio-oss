@@ -181,215 +181,220 @@
         };
       local_storage = { storage_records = []; storage_fields = [] } };
     module_proc =
-    [IR_display {
-       data_refs =
-       [|{ data_field =
-           Field_in_memory {field = (Fixed_field "      ");
-             field_info =
-             { field_definition = {
-                 qualname: X
-                 offset: 0
-                 size: 48
-                 size-max: 48
-                 layout: {
-                   elementary
-                   usage: {
-                     display
-                     category: ALPHANUMERIC(6)
-                   }
-                   value: "ABCDEF"
-                 }
-                 redefs: {
-                   table
-                   redefines: X
-                   offset: 0
-                   size: 48
-                   size-max: 48
-                   range: {
-                     span: fixed-length: 6
-                   }
-                   field: {
-                     qualname: Y
-                     leading ranges: 1
-                     offset: 0
-                     size: 8
-                     size-max: 8
-                     layout: {
-                       elementary
-                       usage: {
-                         display
-                         category: ALPHANUMERIC(1)
-                       }
-                     }
-                   }
-                 }{
-                   table
-                   redefines: X
-                   offset: 0
-                   size: 48
-                   size-max: 48
-                   range: {
-                     span: fixed-length: 3
-                   }
-                   field: {
-                     qualname: Z
-                     leading ranges: 1
-                     offset: 0
-                     size: 16
-                     size-max: 16
-                     layout: {
-                       elementary
-                       usage: {
-                         display
-                         category: ALPHANUMERIC(2)
-                       }
-                     }
-                   }
-                 }
-               }; field_initial_value = (Some "ABCDEF") }};
-           data_ref_loc = <opaque>; data_refmod = None }
-         |];
-       advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {
-              field =
-              (Table_field
-                 { cell_first_field = (Fixed_field " ");
-                   cell_index_field =
-                   { field_ref = (Constant_field 1/int32);
-                     field_ref_loc = <opaque> };
-                   cell_index_max = 6; cell_stride = 1 });
-              field_info =
-              { field_definition = {
-                  qualname: Y
-                  leading ranges: 1
-                  offset: 0
-                  size: 8
-                  size-max: 8
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: ALPHANUMERIC(1)
-                    }
-                  }
-                }; field_initial_value = None }};
-            data_ref_loc = <opaque>; data_refmod = None };
-          { data_field = (Constant_field "*"); data_ref_loc = <opaque>;
-            data_refmod = None };
-          { data_field =
-            Field_in_memory {
-              field =
-              (Table_field
-                 { cell_first_field = (Fixed_field " ");
-                   cell_index_field =
-                   { field_ref = (Constant_field 6/int32);
-                     field_ref_loc = <opaque> };
-                   cell_index_max = 6; cell_stride = 1 });
-              field_info =
-              { field_definition = {
-                  qualname: Y
-                  leading ranges: 1
-                  offset: 0
-                  size: 8
-                  size-max: 8
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: ALPHANUMERIC(1)
-                    }
-                  }
-                }; field_initial_value = None }};
-            data_ref_loc = <opaque>; data_refmod = None }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {
-              field =
-              (Table_field
-                 { cell_first_field = (Fixed_field "  ");
-                   cell_index_field =
-                   { field_ref = (Constant_field 1/int32);
-                     field_ref_loc = <opaque> };
-                   cell_index_max = 3; cell_stride = 1 });
-              field_info =
-              { field_definition = {
-                  qualname: Z
-                  leading ranges: 1
-                  offset: 0
-                  size: 16
-                  size-max: 16
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: ALPHANUMERIC(2)
-                    }
-                  }
-                }; field_initial_value = None }};
-            data_ref_loc = <opaque>; data_refmod = None };
-          { data_field = (Constant_field "*"); data_ref_loc = <opaque>;
-            data_refmod = None };
-          { data_field =
-            Field_in_memory {
-              field =
-              (Table_field
-                 { cell_first_field = (Fixed_field "  ");
-                   cell_index_field =
-                   { field_ref = (Constant_field 2/int32);
-                     field_ref_loc = <opaque> };
-                   cell_index_max = 3; cell_stride = 1 });
-              field_info =
-              { field_definition = {
-                  qualname: Z
-                  leading ranges: 1
-                  offset: 0
-                  size: 16
-                  size-max: 16
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: ALPHANUMERIC(2)
-                    }
-                  }
-                }; field_initial_value = None }};
-            data_ref_loc = <opaque>; data_refmod = None };
-          { data_field = (Constant_field "*"); data_ref_loc = <opaque>;
-            data_refmod = None };
-          { data_field =
-            Field_in_memory {
-              field =
-              (Table_field
-                 { cell_first_field = (Fixed_field "  ");
-                   cell_index_field =
-                   { field_ref = (Constant_field 3/int32);
-                     field_ref_loc = <opaque> };
-                   cell_index_max = 3; cell_stride = 1 });
-              field_info =
-              { field_definition = {
-                  qualname: Z
-                  leading ranges: 1
-                  offset: 0
-                  size: 16
-                  size-max: 16
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: ALPHANUMERIC(2)
-                    }
-                  }
-                }; field_initial_value = None }};
-            data_ref_loc = <opaque>; data_refmod = None }
-          |];
-        advancing = true};
-      IR_stop {optional_status = None}]
+    { proc_blocks =
+      [|{ block_stmts =
+          [|IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {field = (Fixed_field "      ");
+                    field_info =
+                    { field_definition = {
+                        qualname: X
+                        offset: 0
+                        size: 48
+                        size-max: 48
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category: ALPHANUMERIC(6)
+                          }
+                          value: "ABCDEF"
+                        }
+                        redefs: {
+                          table
+                          redefines: X
+                          offset: 0
+                          size: 48
+                          size-max: 48
+                          range: {
+                            span: fixed-length: 6
+                          }
+                          field: {
+                            qualname: Y
+                            leading ranges: 1
+                            offset: 0
+                            size: 8
+                            size-max: 8
+                            layout: {
+                              elementary
+                              usage: {
+                                display
+                                category: ALPHANUMERIC(1)
+                              }
+                            }
+                          }
+                        }{
+                          table
+                          redefines: X
+                          offset: 0
+                          size: 48
+                          size-max: 48
+                          range: {
+                            span: fixed-length: 3
+                          }
+                          field: {
+                            qualname: Z
+                            leading ranges: 1
+                            offset: 0
+                            size: 16
+                            size-max: 16
+                            layout: {
+                              elementary
+                              usage: {
+                                display
+                                category: ALPHANUMERIC(2)
+                              }
+                            }
+                          }
+                        }
+                      }; field_initial_value = (Some "ABCDEF") }};
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {
+                    field =
+                    (Table_field
+                       { cell_first_field = (Fixed_field " ");
+                         cell_index_field =
+                         { field_ref = (Constant_field 1/int32);
+                           field_ref_loc = <opaque> };
+                         cell_index_max = 6; cell_stride = 1 });
+                    field_info =
+                    { field_definition = {
+                        qualname: Y
+                        leading ranges: 1
+                        offset: 0
+                        size: 8
+                        size-max: 8
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category: ALPHANUMERIC(1)
+                          }
+                        }
+                      }; field_initial_value = None }};
+                  data_ref_loc = <opaque>; data_refmod = None };
+                { data_field = (Constant_field "*"); data_ref_loc = <opaque>;
+                  data_refmod = None };
+                { data_field =
+                  Field_in_memory {
+                    field =
+                    (Table_field
+                       { cell_first_field = (Fixed_field " ");
+                         cell_index_field =
+                         { field_ref = (Constant_field 6/int32);
+                           field_ref_loc = <opaque> };
+                         cell_index_max = 6; cell_stride = 1 });
+                    field_info =
+                    { field_definition = {
+                        qualname: Y
+                        leading ranges: 1
+                        offset: 0
+                        size: 8
+                        size-max: 8
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category: ALPHANUMERIC(1)
+                          }
+                        }
+                      }; field_initial_value = None }};
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {
+                    field =
+                    (Table_field
+                       { cell_first_field = (Fixed_field "  ");
+                         cell_index_field =
+                         { field_ref = (Constant_field 1/int32);
+                           field_ref_loc = <opaque> };
+                         cell_index_max = 3; cell_stride = 1 });
+                    field_info =
+                    { field_definition = {
+                        qualname: Z
+                        leading ranges: 1
+                        offset: 0
+                        size: 16
+                        size-max: 16
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category: ALPHANUMERIC(2)
+                          }
+                        }
+                      }; field_initial_value = None }};
+                  data_ref_loc = <opaque>; data_refmod = None };
+                { data_field = (Constant_field "*"); data_ref_loc = <opaque>;
+                  data_refmod = None };
+                { data_field =
+                  Field_in_memory {
+                    field =
+                    (Table_field
+                       { cell_first_field = (Fixed_field "  ");
+                         cell_index_field =
+                         { field_ref = (Constant_field 2/int32);
+                           field_ref_loc = <opaque> };
+                         cell_index_max = 3; cell_stride = 1 });
+                    field_info =
+                    { field_definition = {
+                        qualname: Z
+                        leading ranges: 1
+                        offset: 0
+                        size: 16
+                        size-max: 16
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category: ALPHANUMERIC(2)
+                          }
+                        }
+                      }; field_initial_value = None }};
+                  data_ref_loc = <opaque>; data_refmod = None };
+                { data_field = (Constant_field "*"); data_ref_loc = <opaque>;
+                  data_refmod = None };
+                { data_field =
+                  Field_in_memory {
+                    field =
+                    (Table_field
+                       { cell_first_field = (Fixed_field "  ");
+                         cell_index_field =
+                         { field_ref = (Constant_field 3/int32);
+                           field_ref_loc = <opaque> };
+                         cell_index_max = 3; cell_stride = 1 });
+                    field_info =
+                    { field_definition = {
+                        qualname: Z
+                        leading ranges: 1
+                        offset: 0
+                        size: 16
+                        size-max: 16
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category: ALPHANUMERIC(2)
+                          }
+                        }
+                      }; field_initial_value = None }};
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true}
+            |];
+          block_term = IR_stop {optional_status = None} }
+        |];
+      proc_entry = 0 }
     }
 
   $ tramabol ok-1.cob
@@ -896,184 +901,224 @@
         };
       local_storage = { storage_records = []; storage_fields = [] } };
     module_proc =
-    [IR_display {
-       data_refs =
-       [|{ data_field =
-           Field_in_memory {field = (Fixed_field "      ");
-             field_info =
-             { field_definition = {
-                 qualname: X
-                 offset: 0
-                 size: 48
-                 size-max: 48
-                 layout: {
-                   elementary
-                   usage: {
-                     display
-                     category: ALPHANUMERIC(6)
-                   }
-                   value: "ABCDEF"
-                 }
-                 redefs: {
-                   table
-                   redefines: X
-                   offset: 0
-                   size: 48
-                   size-max: 48
-                   range: {
-                     span: fixed-length: 2
-                   }
-                   field: {
-                     qualname: Y-1
-                     leading ranges: 1
-                     offset: 0
-                     size: 24
-                     size-max: 24
-                     layout: {
-                       structure
-                       fields: {
-                         table
-                         offset: 0
-                         size: 24
-                         size-max: 24
-                         range: {
-                           span: fixed-length: 3
-                         }
-                         field: {
-                           qualname: Y-2 IN Y-1
-                           leading ranges: 2
-                           offset: 0
-                           size: 8
-                           size-max: 8
-                           layout: {
-                             elementary
-                             usage: {
-                               display
-                               category: ALPHANUMERIC(1)
-                             }
-                           }
-                         }
-                       }
-                     }
-                   }
-                 }{
-                   table
-                   redefines: X
-                   offset: 0
-                   size: 48
-                   size-max: 48
-                   range: {
-                     span: fixed-length: 3
-                   }
-                   field: {
-                     qualname: Z-1
-                     leading ranges: 1
-                     offset: 0
-                     size: 16
-                     size-max: 16
-                     layout: {
-                       elementary
-                       usage: {
-                         display
-                         category: ALPHANUMERIC(2)
-                       }
-                     }
-                   }
-                 }{
-                   table
-                   redefines: X
-                   offset: 0
-                   size: 48
-                   size-max: 48
-                   range: {
-                     span: fixed-length: 1
-                   }
-                   field: {
-                     qualname: T-1
-                     leading ranges: 1
-                     offset: 0
-                     size: 48
-                     size-max: 48
-                     layout: {
-                       structure
-                       fields: {
-                         table
-                         offset: 0
-                         size: 48
-                         size-max: 48
-                         range: {
-                           span: fixed-length: 1
-                         }
-                         field: {
-                           qualname: T-2 IN T-1
-                           leading ranges: 2
-                           offset: 0
-                           size: 48
-                           size-max: 48
-                           layout: {
-                             structure
-                             fields: {
-                               table
-                               offset: 0
-                               size: 48
-                               size-max: 48
-                               range: {
-                                 span: fixed-length: 3
-                               }
-                               field: {
-                                 qualname: T-3 IN T-2 IN T-1
-                                 leading ranges: 3
-                                 offset: 0
-                                 size: 16
-                                 size-max: 16
-                                 layout: {
-                                   elementary
-                                   usage: {
-                                     display
-                                     category: ALPHANUMERIC(2)
-                                   }
-                                 }
-                               }
-                             }
-                           }
-                         }
-                       }
-                     }
-                   }
-                 }
-               }; field_initial_value = (Some "ABCDEF") }};
-           data_ref_loc = <opaque>; data_refmod = None }
-         |];
-       advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {
-              field =
-              (Table_field
-                 { cell_first_field = (Fixed_field "   ");
-                   cell_index_field =
-                   { field_ref = (Constant_field 1/int32);
-                     field_ref_loc = <opaque> };
-                   cell_index_max = 2; cell_stride = 1 });
-              field_info =
-              { field_definition = {
-                  qualname: Y-1
-                  leading ranges: 1
-                  offset: 0
-                  size: 24
-                  size-max: 24
-                  layout: {
-                    structure
-                    fields: {
-                      table
-                      offset: 0
-                      size: 24
-                      size-max: 24
-                      range: {
-                        span: fixed-length: 3
-                      }
-                      field: {
+    { proc_blocks =
+      [|{ block_stmts =
+          [|IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {field = (Fixed_field "      ");
+                    field_info =
+                    { field_definition = {
+                        qualname: X
+                        offset: 0
+                        size: 48
+                        size-max: 48
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category: ALPHANUMERIC(6)
+                          }
+                          value: "ABCDEF"
+                        }
+                        redefs: {
+                          table
+                          redefines: X
+                          offset: 0
+                          size: 48
+                          size-max: 48
+                          range: {
+                            span: fixed-length: 2
+                          }
+                          field: {
+                            qualname: Y-1
+                            leading ranges: 1
+                            offset: 0
+                            size: 24
+                            size-max: 24
+                            layout: {
+                              structure
+                              fields: {
+                                table
+                                offset: 0
+                                size: 24
+                                size-max: 24
+                                range: {
+                                  span: fixed-length: 3
+                                }
+                                field: {
+                                  qualname: Y-2 IN Y-1
+                                  leading ranges: 2
+                                  offset: 0
+                                  size: 8
+                                  size-max: 8
+                                  layout: {
+                                    elementary
+                                    usage: {
+                                      display
+                                      category: ALPHANUMERIC(1)
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }{
+                          table
+                          redefines: X
+                          offset: 0
+                          size: 48
+                          size-max: 48
+                          range: {
+                            span: fixed-length: 3
+                          }
+                          field: {
+                            qualname: Z-1
+                            leading ranges: 1
+                            offset: 0
+                            size: 16
+                            size-max: 16
+                            layout: {
+                              elementary
+                              usage: {
+                                display
+                                category: ALPHANUMERIC(2)
+                              }
+                            }
+                          }
+                        }{
+                          table
+                          redefines: X
+                          offset: 0
+                          size: 48
+                          size-max: 48
+                          range: {
+                            span: fixed-length: 1
+                          }
+                          field: {
+                            qualname: T-1
+                            leading ranges: 1
+                            offset: 0
+                            size: 48
+                            size-max: 48
+                            layout: {
+                              structure
+                              fields: {
+                                table
+                                offset: 0
+                                size: 48
+                                size-max: 48
+                                range: {
+                                  span: fixed-length: 1
+                                }
+                                field: {
+                                  qualname: T-2 IN T-1
+                                  leading ranges: 2
+                                  offset: 0
+                                  size: 48
+                                  size-max: 48
+                                  layout: {
+                                    structure
+                                    fields: {
+                                      table
+                                      offset: 0
+                                      size: 48
+                                      size-max: 48
+                                      range: {
+                                        span: fixed-length: 3
+                                      }
+                                      field: {
+                                        qualname: T-3 IN T-2 IN T-1
+                                        leading ranges: 3
+                                        offset: 0
+                                        size: 16
+                                        size-max: 16
+                                        layout: {
+                                          elementary
+                                          usage: {
+                                            display
+                                            category: ALPHANUMERIC(2)
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }; field_initial_value = (Some "ABCDEF") }};
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {
+                    field =
+                    (Table_field
+                       { cell_first_field = (Fixed_field "   ");
+                         cell_index_field =
+                         { field_ref = (Constant_field 1/int32);
+                           field_ref_loc = <opaque> };
+                         cell_index_max = 2; cell_stride = 1 });
+                    field_info =
+                    { field_definition = {
+                        qualname: Y-1
+                        leading ranges: 1
+                        offset: 0
+                        size: 24
+                        size-max: 24
+                        layout: {
+                          structure
+                          fields: {
+                            table
+                            offset: 0
+                            size: 24
+                            size-max: 24
+                            range: {
+                              span: fixed-length: 3
+                            }
+                            field: {
+                              qualname: Y-2 IN Y-1
+                              leading ranges: 2
+                              offset: 0
+                              size: 8
+                              size-max: 8
+                              layout: {
+                                elementary
+                                usage: {
+                                  display
+                                  category: ALPHANUMERIC(1)
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }; field_initial_value = None }};
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {
+                    field =
+                    (Table_field
+                       { cell_first_field =
+                         (Table_field
+                            { cell_first_field = (Fixed_field " ");
+                              cell_index_field =
+                              { field_ref = (Constant_field 3/int32);
+                                field_ref_loc = <opaque> };
+                              cell_index_max = 3; cell_stride = 1 });
+                         cell_index_field =
+                         { field_ref = (Constant_field 1/int32);
+                           field_ref_loc = <opaque> };
+                         cell_index_max = 2; cell_stride = 3 });
+                    field_info =
+                    { field_definition = {
                         qualname: Y-2 IN Y-1
                         leading ranges: 2
                         offset: 0
@@ -1086,183 +1131,148 @@
                             category: ALPHANUMERIC(1)
                           }
                         }
-                      }
-                    }
-                  }
-                }; field_initial_value = None }};
-            data_ref_loc = <opaque>; data_refmod = None }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {
-              field =
-              (Table_field
-                 { cell_first_field =
-                   (Table_field
-                      { cell_first_field = (Fixed_field " ");
-                        cell_index_field =
-                        { field_ref = (Constant_field 3/int32);
-                          field_ref_loc = <opaque> };
-                        cell_index_max = 3; cell_stride = 1 });
-                   cell_index_field =
-                   { field_ref = (Constant_field 1/int32);
-                     field_ref_loc = <opaque> };
-                   cell_index_max = 2; cell_stride = 3 });
-              field_info =
-              { field_definition = {
-                  qualname: Y-2 IN Y-1
-                  leading ranges: 2
-                  offset: 0
-                  size: 8
-                  size-max: 8
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: ALPHANUMERIC(1)
-                    }
-                  }
-                }; field_initial_value = None }};
-            data_ref_loc = <opaque>; data_refmod = None }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {
-              field =
-              (Table_field
-                 { cell_first_field =
-                   (Table_field
-                      { cell_first_field = (Fixed_field " ");
-                        cell_index_field =
-                        { field_ref = (Constant_field 3/int32);
-                          field_ref_loc = <opaque> };
-                        cell_index_max = 3; cell_stride = 1 });
-                   cell_index_field =
-                   { field_ref = (Constant_field 2/int32);
-                     field_ref_loc = <opaque> };
-                   cell_index_max = 2; cell_stride = 3 });
-              field_info =
-              { field_definition = {
-                  qualname: Y-2 IN Y-1
-                  leading ranges: 2
-                  offset: 0
-                  size: 8
-                  size-max: 8
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: ALPHANUMERIC(1)
-                    }
-                  }
-                }; field_initial_value = None }};
-            data_ref_loc = <opaque>; data_refmod = None }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {
-              field =
-              (Table_field
-                 { cell_first_field = (Fixed_field "  ");
-                   cell_index_field =
-                   { field_ref = (Constant_field 1/int32);
-                     field_ref_loc = <opaque> };
-                   cell_index_max = 3; cell_stride = 1 });
-              field_info =
-              { field_definition = {
-                  qualname: Z-1
-                  leading ranges: 1
-                  offset: 0
-                  size: 16
-                  size-max: 16
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: ALPHANUMERIC(2)
-                    }
-                  }
-                }; field_initial_value = None }};
-            data_ref_loc = <opaque>; data_refmod = None }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {
-              field =
-              (Table_field
-                 { cell_first_field = (Fixed_field "  ");
-                   cell_index_field =
-                   { field_ref = (Constant_field 3/int32);
-                     field_ref_loc = <opaque> };
-                   cell_index_max = 3; cell_stride = 1 });
-              field_info =
-              { field_definition = {
-                  qualname: Z-1
-                  leading ranges: 1
-                  offset: 0
-                  size: 16
-                  size-max: 16
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: ALPHANUMERIC(2)
-                    }
-                  }
-                }; field_initial_value = None }};
-            data_ref_loc = <opaque>; data_refmod = None }
-          |];
-        advancing = true};
-      IR_display {
-        data_refs =
-        [|{ data_field =
-            Field_in_memory {
-              field =
-              (Table_field
-                 { cell_first_field =
-                   (Table_field
-                      { cell_first_field =
-                        (Table_field
-                           { cell_first_field = (Fixed_field "  ");
-                             cell_index_field =
-                             { field_ref = (Constant_field 2/int32);
-                               field_ref_loc = <opaque> };
-                             cell_index_max = 3; cell_stride = 1 });
-                        cell_index_field =
-                        { field_ref = (Constant_field 1/int32);
-                          field_ref_loc = <opaque> };
-                        cell_index_max = 1; cell_stride = 3 });
-                   cell_index_field =
-                   { field_ref = (Constant_field 1/int32);
-                     field_ref_loc = <opaque> };
-                   cell_index_max = 1; cell_stride = 3 });
-              field_info =
-              { field_definition = {
-                  qualname: T-3 IN T-2 IN T-1
-                  leading ranges: 3
-                  offset: 0
-                  size: 16
-                  size-max: 16
-                  layout: {
-                    elementary
-                    usage: {
-                      display
-                      category: ALPHANUMERIC(2)
-                    }
-                  }
-                }; field_initial_value = None }};
-            data_ref_loc = <opaque>; data_refmod = None }
-          |];
-        advancing = true};
-      IR_stop {optional_status = None}]
+                      }; field_initial_value = None }};
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {
+                    field =
+                    (Table_field
+                       { cell_first_field =
+                         (Table_field
+                            { cell_first_field = (Fixed_field " ");
+                              cell_index_field =
+                              { field_ref = (Constant_field 3/int32);
+                                field_ref_loc = <opaque> };
+                              cell_index_max = 3; cell_stride = 1 });
+                         cell_index_field =
+                         { field_ref = (Constant_field 2/int32);
+                           field_ref_loc = <opaque> };
+                         cell_index_max = 2; cell_stride = 3 });
+                    field_info =
+                    { field_definition = {
+                        qualname: Y-2 IN Y-1
+                        leading ranges: 2
+                        offset: 0
+                        size: 8
+                        size-max: 8
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category: ALPHANUMERIC(1)
+                          }
+                        }
+                      }; field_initial_value = None }};
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {
+                    field =
+                    (Table_field
+                       { cell_first_field = (Fixed_field "  ");
+                         cell_index_field =
+                         { field_ref = (Constant_field 1/int32);
+                           field_ref_loc = <opaque> };
+                         cell_index_max = 3; cell_stride = 1 });
+                    field_info =
+                    { field_definition = {
+                        qualname: Z-1
+                        leading ranges: 1
+                        offset: 0
+                        size: 16
+                        size-max: 16
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category: ALPHANUMERIC(2)
+                          }
+                        }
+                      }; field_initial_value = None }};
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {
+                    field =
+                    (Table_field
+                       { cell_first_field = (Fixed_field "  ");
+                         cell_index_field =
+                         { field_ref = (Constant_field 3/int32);
+                           field_ref_loc = <opaque> };
+                         cell_index_max = 3; cell_stride = 1 });
+                    field_info =
+                    { field_definition = {
+                        qualname: Z-1
+                        leading ranges: 1
+                        offset: 0
+                        size: 16
+                        size-max: 16
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category: ALPHANUMERIC(2)
+                          }
+                        }
+                      }; field_initial_value = None }};
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true};
+            IR_display {
+              data_refs =
+              [|{ data_field =
+                  Field_in_memory {
+                    field =
+                    (Table_field
+                       { cell_first_field =
+                         (Table_field
+                            { cell_first_field =
+                              (Table_field
+                                 { cell_first_field = (Fixed_field "  ");
+                                   cell_index_field =
+                                   { field_ref = (Constant_field 2/int32);
+                                     field_ref_loc = <opaque> };
+                                   cell_index_max = 3; cell_stride = 1 });
+                              cell_index_field =
+                              { field_ref = (Constant_field 1/int32);
+                                field_ref_loc = <opaque> };
+                              cell_index_max = 1; cell_stride = 3 });
+                         cell_index_field =
+                         { field_ref = (Constant_field 1/int32);
+                           field_ref_loc = <opaque> };
+                         cell_index_max = 1; cell_stride = 3 });
+                    field_info =
+                    { field_definition = {
+                        qualname: T-3 IN T-2 IN T-1
+                        leading ranges: 3
+                        offset: 0
+                        size: 16
+                        size-max: 16
+                        layout: {
+                          elementary
+                          usage: {
+                            display
+                            category: ALPHANUMERIC(2)
+                          }
+                        }
+                      }; field_initial_value = None }};
+                  data_ref_loc = <opaque>; data_refmod = None }
+                |];
+              advancing = true}
+            |];
+          block_term = IR_stop {optional_status = None} }
+        |];
+      proc_entry = 0 }
     }
 
   $ tramabol ok-2.cob
@@ -1419,18 +1429,18 @@
     30              display T-3 (1, 2, 0.5)
   Error: extraneous subscript for data-name 'T-3'
   [1]
-TODO: For now an unsupported literal; should be about an invalid type
-for the index instead.
+TODO: Should be about the invalid type of the 0.5 index instead (and
+reported before execution).
   $ CHECK=8 tramabol ko-2.cob
-  ko-2.cob:30.30-30.33:
+  ko-2.cob:30.27-30.28:
     27          >>ELIF CHECK = 7
     28              display T-3 (1, 2, 0.5, 4)
     29          >>ELIF CHECK = 8
     30 >            display T-3 (1, 2, 0.5)
-  ----                                 ^^^
+  ----                              ^
     31          >>ELSE
     32              display T-3 (1, 1, 4)
-  Error: unsupported literal 0.5
+  Error: Index is out of bounds: got 2, expected in [1..1]
   [1]
   $ CHECK=9 tramabol ko-2.cob
   ko-2.cob:32.30-32.31:
