@@ -121,3 +121,27 @@ val unexpected
   -> ?severity: [`Error | `Warn]
   -> k: ('k state -> Lexing.lexbuf -> 'b)
   -> 'k state -> Lexing.lexbuf -> 'b
+
+(** {2 C-style comments in some EXEC blocks} *)
+
+(** Holds when a C-style comment ([/* ... */]) is currently open. *)
+val in_c_comment: _ state -> bool
+
+val fixed_c_comment_opener
+  : k_comment:((Src_format.fixed state as 's) -> Lexing.lexbuf -> 'a)
+  -> k_word:('s -> Lexing.lexbuf -> 'a)
+  -> 's -> Lexing.lexbuf -> 'a
+val c_comment_opener'
+  : k_comment:(('a state as 's) -> Lexing.lexbuf -> 'b)
+  -> k_word:('s -> Lexing.lexbuf -> 'b)
+  -> 's -> Lexing.lexbuf -> 'b
+
+val fixed_c_comment_text
+  : ktkd:((Src_format.fixed state as 's) -> Lexing.lexbuf -> 'a)
+  -> k_comment:('s -> Lexing.lexbuf -> 'a)
+  -> k_closed:('s -> Lexing.lexbuf -> 'a)
+  -> 's -> Lexing.lexbuf -> 'a
+val c_comment_text'
+  : k_comment:(('a state as 's) -> Lexing.lexbuf -> 'b)
+  -> k_closed:('s -> Lexing.lexbuf -> 'b)
+  -> 's -> Lexing.lexbuf -> 'b

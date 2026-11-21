@@ -86,3 +86,16 @@ let%expect_test "unparsable-exec-sql-blocks" =
     END-EXEC
     Unparsed: EXEC SQL SELECT a FROM t WHERE b ! 0
     END-EXEC |}];;
+
+let%expect_test "exec-sql-block-with-c-comments" =
+  show_exec_blocks {|
+       PROGRAM-ID.        prog.
+       PROCEDURE          DIVISION.
+           EXEC SQL
+             /* it's tricky. END-EXEC
+                multiline */
+             SELECT a FROM t /* where */ WHERE b > 0
+           END-EXEC.
+           STOP RUN.
+  |};
+  [%expect {| Esql: EXEC SQL SELECT a  FROM t WHERE b > 0 END-EXEC |}];;
