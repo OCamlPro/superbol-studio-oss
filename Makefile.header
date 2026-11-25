@@ -67,6 +67,7 @@ DROM_PROJECT_ARGS ?=
 .PHONY: project
 project:
 	opam exec -- drom project $(DROM_PROJECT_ARGS)
+	./scripts/drom-unnest.sh
 	$(MAKE) opam-fix opam-cross
 	git add opam
 
