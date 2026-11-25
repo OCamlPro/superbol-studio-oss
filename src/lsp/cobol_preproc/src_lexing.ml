@@ -34,6 +34,13 @@ let remove_blanks = Str.global_replace (Str.regexp " ") ""           (* '\t'? *)
 (* --- *)
 
 (* TODO: split this into hot/cold records w.r.t likely mutation frequency. *)
+(** Tracks [EXEC <lang>] ... [END-EXEC] blocks while lexing, to recognize
+    C-style comments in EXEC SQL blocks only. *)
+type exec_tracker =
+  | Outside_exec
+  | After_exec
+  | Inside_exec of { lang: string }
+
 type 'k state =
   {
     lex_prods: text;
@@ -50,6 +57,11 @@ type 'k state =
     newline_cnums: int list;    (** index of all newline characters encountered
                                     so far (in reverse order) *)
     diags: Src_diagnostics.diagnostics;
+    exec: exec_tracker;
+    exec_before_last_word: exec_tracker;  (** for [append] to re-classify the
+                                              last emitted word *)
+    c_comment: srcloc option;      (** opening delimiter of the C-style comment
+                                       being lexed *)
     config: 'k config;
   }
 and continued =
@@ -88,6 +100,9 @@ let init_state ?(options = Src_options.default) source_format : _ state =
     newline = true;
     newline_cnums = [];
     diags = Src_diagnostics.none;
+    exec = Outside_exec;
+    exec_before_last_word = Outside_exec;
+    c_comment = None;
     config =
       {
         debug = false;
@@ -191,11 +206,27 @@ let skip state lexbuf =
   let (_, start_pos, end_pos), state = lexeme_with_utf8_chars state lexbuf in
   ignore_lexloc ~start_pos ~end_pos state
 
+let track_exec (prod: text_word with_loc) = function
+  | Outside_exec ->
+      (match prod.payload with
+       | TextWord ("EXEC" | "EXECUTE") -> After_exec
+       | _ -> Outside_exec)
+  | After_exec ->
+      (match prod.payload with
+       | TextWord lang -> Inside_exec { lang }
+       | _ -> Outside_exec)
+  | Inside_exec _ as exec ->
+      (match prod.payload with
+       | TextWord "END-EXEC" -> Outside_exec
+       | _ -> exec)
+
 let emit prod ({ pseudotext; cdir_seen; _ } as state) =
   match pseudotext with
-  | None ->
+  | None ->                                    (* no tracking in pseudotext *)
       { state with lex_prods = prod :: state.lex_prods;
                    cdir_seen = cdir_seen || Text.cdirp prod;
+                   exec_before_last_word = state.exec;
+                   exec = track_exec prod state.exec;
                    newline = false }
   | Some (start_loc, prods) ->
       { state with pseudotext = Some (start_loc, prod :: prods);
@@ -209,6 +240,7 @@ let append t state =
     { payload = TextWord s; loc = tloc } ->
       let prod = TextWord (w ^ s) &@ (Cobol_common.Srcloc.concat wloc tloc) in
       { state with lex_prods = prod :: tl;
+                   exec = track_exec prod state.exec_before_last_word;
                    newline = false }
   | { pseudotext = Some (start_loc, { payload = TextWord w;
                                       loc = wloc} :: prods); _ },
@@ -412,6 +444,12 @@ let tab ?(before_indicator = true) ~k state lexbuf =
 let eof state lexbuf =
   let _, start_pos, end_pos = lexeme_info lexbuf in
   let loc = raw_loc ~start_pos ~end_pos state in
+  let state = match state.c_comment with
+    | None -> state
+    | Some loc ->
+        lex_error { state with c_comment = None } @@
+        Unterminated_c_comment { loc }
+  in
   let state = flush_continued ~force:true state in  (* checks state.continued *)
   match state.pseudotext with                       (* and state.pseudotext  *)
   | None ->
@@ -453,6 +491,36 @@ let remove_floating_comment ~start_pos ~end_pos w state =
       Lexing.{ end_pos with pos_cnum = start_pos.pos_cnum + comment_idx },
       { state with comments = comment :: state.comments }
 
+
+(* --- C-style comments in some EXEC blocks --- *)
+
+let c_comment_exec_langs = ["SQL"]
+
+let in_c_comment { c_comment; _ } =
+  Option.is_some c_comment
+
+let c_comments_allowed { exec; _ } =
+  match exec with
+  | Inside_exec { lang } -> List.mem lang c_comment_exec_langs
+  | Outside_exec | After_exec -> false
+
+(** Shrinks the current lexeme to its first [n] bytes, so that lexing resumes
+    right after them. *)
+let shrink_lexeme lexbuf n =
+  let open Lexing in
+  lexbuf.lex_curr_pos <- lexbuf.lex_start_pos + n;
+  lexbuf.lex_curr_p <- { lexbuf.lex_start_p with
+                         pos_cnum = lexbuf.lex_start_p.pos_cnum + n }
+
+let c_comment_opening = Str.regexp_string "/*"
+
+(** Where C-style comments are allowed, shrinks the current lexeme (a text
+    word) so that it ends right before any opening delimiter [/*]. *)
+let stop_before_c_comment state lexbuf =
+  if c_comments_allowed state then
+    match Str.search_forward c_comment_opening (Lexing.lexeme lexbuf) 0 with
+    | i when i > 0 -> shrink_lexeme lexbuf i
+    | _ | exception Not_found -> ()
 
 type line_fitting = Nominal | Tacked
 
@@ -752,7 +820,9 @@ let fixed_srctok mk ~ktkd ~knom state lexbuf =
   let state, fitting = mk state lexbuf in
   (if fitting = Tacked then ktkd else knom) state lexbuf
 
-let text_word ?cont = fixed_srctok (fixed_text_word ?cont)
+let text_word ?cont ~ktkd ~knom state lexbuf =
+  stop_before_c_comment state lexbuf;
+  fixed_srctok (fixed_text_word ?cont) ~ktkd ~knom state lexbuf
 let cdir_word ?marker s = fixed_srctok (fixed_cdir_word ?marker) s
 let eqeq s = fixed_srctok fixed_eqeq s
 let separator ~char s = fixed_srctok (fixed_separator ~char) s
@@ -793,10 +863,96 @@ let free_alphanum_lit state lexbuf =
 
 let free_text mk ~k state lexbuf = k (mk state lexbuf) lexbuf
 
-let text_word' ~k = free_text free_text_word ~k
+let text_word' ~k state lexbuf =
+  stop_before_c_comment state lexbuf;
+  free_text free_text_word ~k state lexbuf
 let cdir_word' ~k = free_text free_cdir_word ~k
 let eqeq' ~k = free_text free_eqeq ~k
 let separator' ~char ~k = free_text (free_separator ~char) ~k
 let alphanum_lit' ~k = free_text free_alphanum_lit ~k
 
 (* --- *)
+
+(* --- *)
+
+(** Records the comment text [s], from [start_pos] to [end_pos].  Comments are
+    recorded as one segment per line; when [merge] holds, [s] extends the
+    latest segment if it is on the same line. *)
+let push_c_comment_segment ~merge ~start_pos ~end_pos s state =
+  match state.comments with
+  | { comment_kind = `Floating; comment_loc = (p, e);
+      comment_contents = c } :: tl
+    when merge &&
+         p.Lexing.pos_fname = start_pos.Lexing.pos_fname &&
+         p.pos_lnum = start_pos.pos_lnum ->
+      let gap = String.make (max 0 (start_pos.pos_cnum - e.pos_cnum)) ' ' in
+      let comment = { comment_kind = `Floating;
+                      comment_loc = (p, end_pos);
+                      comment_contents = c ^ gap ^ s } in
+      { state with comments = comment :: tl }
+  | comments ->
+      let comment = { comment_kind = `Floating;
+                      comment_loc = (start_pos, end_pos);
+                      comment_contents = s } in
+      { state with comments = comment :: comments }
+
+(** To be called on a lexeme that starts with [/*]: opens a comment and
+    continues with [k_comment] if C-style comments are allowed; otherwise,
+    rewinds the lexing buffer and continues with [k_word], which is expected to
+    lex the lexeme anew as a text word. *)
+let open_c_comment ~fits ~k_comment ~k_word state lexbuf =
+  if fits && c_comments_allowed state then begin
+    shrink_lexeme lexbuf 2;
+    let s, start_pos, end_pos = lexeme_info lexbuf in
+    let state = flush_continued state in
+    let loc = raw_loc ~start_pos ~end_pos state in
+    let state =
+      push_c_comment_segment ~merge:false ~start_pos ~end_pos s state in
+    k_comment { state with c_comment = Some loc } lexbuf
+  end else begin
+    shrink_lexeme lexbuf 0;
+    k_word state lexbuf
+  end
+
+let fixed_c_comment_opener ~k_comment ~k_word
+    ({ config = { source_format; _ }; _ } as state: fixed state) lexbuf =
+  let _, FixedWidth { cut_at_col; _ } = source_format in
+  (* the opening delimiter must entirely fit before the cut column *)
+  let fits = pos_column state (Lexing.lexeme_start_p lexbuf) < cut_at_col in
+  open_c_comment ~fits ~k_comment ~k_word state lexbuf
+
+let c_comment_opener' ~k_comment ~k_word state lexbuf =
+  open_c_comment ~fits:true ~k_comment ~k_word state lexbuf
+
+(** To be called on comment text or closing delimiter [*/].  Continues with
+    [ktkd] when the lexeme reaches the cut column, [k_comment] if the comment is
+    still open, or [k_closed] otherwise. *)
+let fixed_c_comment_text ~ktkd ~k_comment ~k_closed
+    ({ config = { source_format; _ }; _ } as state: fixed state) lexbuf =
+  let _, FixedWidth { cut_at_col; _ } = source_format in
+  let (lexeme, start_pos, end_pos) as lexinf, end_state =
+    lexeme_with_utf8_chars state lexbuf
+  in
+  if pos_column state start_pos > cut_at_col then
+    ktkd (ignore_lexloc ~start_pos ~end_pos ~start_state:state end_state) lexbuf
+  else
+    let (s, start_pos, end_pos), fitting, end_state =
+      trunc_to_col cut_at_col lexinf ~start_state:state ~end_state
+    in
+    let state =
+      push_c_comment_segment ~merge:true ~start_pos ~end_pos s end_state in
+    let state, closed =
+      if lexeme = "*/" && s = lexeme              (* not truncated: closing *)
+      then { state with c_comment = None }, true
+      else state, false
+    in
+    if fitting = Tacked then ktkd state lexbuf
+    else if closed then k_closed state lexbuf
+    else k_comment state lexbuf
+
+let c_comment_text' ~k_comment ~k_closed state lexbuf =
+  let s, start_pos, end_pos = lexeme_info lexbuf in
+  let state = push_c_comment_segment ~merge:true ~start_pos ~end_pos s state in
+  if s = "*/"
+  then k_closed { state with c_comment = None } lexbuf
+  else k_comment state lexbuf
