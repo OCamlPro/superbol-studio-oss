@@ -23,11 +23,37 @@ module PARSER = Autofonce_core.Parser
 module MISC = Autofonce_misc.Misc
 module CONFIG = Autofonce_config.Project_config
 
+(* Default number of parallel jobs: the number of online processors,
+   or 16 if it cannot be found *)
+let default_max_jobs = 16
+
+let number_of_processors () =
+  let positive s =
+    match int_of_string_opt ( String.trim s ) with
+    | Some n when n > 0 -> Some n
+    | _ -> None
+  in
+  if Sys.win32 then
+    match Sys.getenv "NUMBER_OF_PROCESSORS" with
+    | exception Not_found -> None
+    | s -> positive s
+  else
+    match Unix.open_process_in "getconf _NPROCESSORS_ONLN 2>/dev/null" with
+    | exception _ -> None
+    | ic ->
+        let line = try Some ( input_line ic ) with _ -> None in
+        match Unix.close_process_in ic, line with
+        | Unix.WEXITED 0, Some line -> positive line
+        | _ -> None
+
 let args () =
   let args =
     {
       arg_clean_tests_dir = true ;
-      arg_max_jobs = 16 ;
+      arg_max_jobs =
+        ( match number_of_processors () with
+          | Some n -> n
+          | None -> default_max_jobs ) ;
       arg_ignore_exitcode = false;
       arg_print_results = false ;
       arg_subst_env = StringMap.empty ;
@@ -52,7 +78,11 @@ let args () =
     EZCMD.info "Stop on first failure";
 
     [ "j" ], Arg.Int (fun n -> args.arg_max_jobs <- max 1 n),
-    EZCMD.info ~docv:"NJOBS" "Set maximal parallelism";
+    EZCMD.info
+      ~env:(EZCMD.env "AUTOFONCE_JOBS")
+      ~docv:"NJOBS"
+      "Set maximal parallelism (default: number of processors, or 16 \
+       if it cannot be found)";
 
     [ "1" ; "j1" ], Arg.Unit (fun () -> args.arg_max_jobs <- 1),
     EZCMD.info "Use Sequential scheduling of tests";

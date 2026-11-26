@@ -9,6 +9,7 @@
 - Support for data items with `USAGE COMP-X` or `COMP-N` [#737](https://github.com/OCamlPro/superbol-studio-oss/pull/737)
 - Support for Micro Focus-style comment lines [#734](https://github.com/OCamlPro/superbol-studio-oss/pull/734)
 - `autofonce`: macro `AF_TIMEOUT(N)` multiplying the timeouts of a test by `N` (`0` disables them), option `--cpu-timeout` limiting the CPU time of checks (mostly independent of the load of the machine), and warnings at the end about checks that used more than 50% of their timeouts (`--timeout-warning`)
+- `autofonce`: the default number of parallel jobs (`-j`) is now the number of processors instead of 16, and can be set with `AUTOFONCE_JOBS`
 - Byte order of binary data items (`BINARY`, `COMP`, `COMP-5`, `BINARY-*`), decided by the typechecker from the `binary-byteorder` option and the byte order of the target
 - `SuperBOL Caches` view in the explorer, and status bar item, for keeping an eye on how much room the caches of the language server take, seeing what they hold, and pruning them [#725](https://github.com/OCamlPro/superbol-studio-oss/pull/725)
 - Option `--no-lsp-artifacts` of `superbol cache analyze`, for analyzing files without computing or caching what only the LSP server needs [#720](https://github.com/OCamlPro/superbol-studio-oss/pull/720)
