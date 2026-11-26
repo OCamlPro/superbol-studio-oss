@@ -41,5 +41,6 @@ val test_is_failed :
 val test_is_skipped_fail : Types.checker -> string -> unit
 val output : Types.state -> ('a, unit, string, unit) format4 -> 'a
 val print_ntests : int -> Types.tester list -> unit
+val print_slow_checks : Types.state -> unit
 
 val args : unit -> Ezcmd.V2.EZCMD.TYPES.arg_list * Types.exec_args

@@ -8,6 +8,7 @@
 - Reporting of REDEFINES clauses that do not immediately follow the data-name, according to the support of the dialect for this feature [#742](https://github.com/OCamlPro/superbol-studio-oss/pull/742)
 - Support for data items with `USAGE COMP-X` or `COMP-N` [#737](https://github.com/OCamlPro/superbol-studio-oss/pull/737)
 - Support for Micro Focus-style comment lines [#734](https://github.com/OCamlPro/superbol-studio-oss/pull/734)
+- `autofonce`: macro `AF_TIMEOUT(N)` multiplying the timeouts of a test by `N` (`0` disables them), option `--cpu-timeout` limiting the CPU time of checks (mostly independent of the load of the machine), and warnings at the end about checks that used more than 50% of their timeouts (`--timeout-warning`)
 - Byte order of binary data items (`BINARY`, `COMP`, `COMP-5`, `BINARY-*`), decided by the typechecker from the `binary-byteorder` option and the byte order of the target
 - `SuperBOL Caches` view in the explorer, and status bar item, for keeping an eye on how much room the caches of the language server take, seeing what they hold, and pruning them [#725](https://github.com/OCamlPro/superbol-studio-oss/pull/725)
 - Option `--no-lsp-artifacts` of `superbol cache analyze`, for analyzing files without computing or caching what only the LSP server needs [#720](https://github.com/OCamlPro/superbol-studio-oss/pull/720)
@@ -36,6 +37,7 @@
 - Analysis of programs that copy a library that cannot be read, which now reports the error on the `COPY` statement instead of aborting [#741](https://github.com/OCamlPro/superbol-studio-oss/pull/741)
 - Missing diagnostics about the clauses of data items with a REDEFINES clause, such as duplicate clauses [#738](https://github.com/OCamlPro/superbol-studio-oss/pull/738)
 - Spurious errors about ambiguous data-names on qualifiers (e.g. `B` in `A IN B`) when the qualified name itself is not ambiguous, and navigation (definitions, references, hover, renaming) from such qualifiers [#735](https://github.com/OCamlPro/superbol-studio-oss/pull/735)
+- `autofonce init` generating an invalid `autofonce.toml` when it contains non-ASCII characters
 - Stack overflows of the LSP server compiled to JavaScript (shipped in universal VSIXs) on very large programs, slow code lenses on programs with many data items or paragraphs, and slow analysis with high memory usage on deeply nested statements (e.g. `IF`s) [#727](https://github.com/OCamlPro/superbol-studio-oss/pull/727)
 - Stepping and breakpoints in programs built by debug build tasks, with GnuCOBOL configured to optimize C code (e.g. with `--enable-hardening`) [#718](https://github.com/OCamlPro/superbol-studio-oss/pull/718)
 - Handling of dialects given as configuration files whose path holds uppercase letters (e.g. `Dialects/My.conf`), that were looked up with a lowercased path [#717](https://github.com/OCamlPro/superbol-studio-oss/pull/717)

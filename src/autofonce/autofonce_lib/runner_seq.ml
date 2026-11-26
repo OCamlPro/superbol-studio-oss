@@ -49,6 +49,7 @@ let rec exec_action_or_check ter action =
   | AT_CAPTURE_FILE _
   | AT_CLEANUP _
   | AF_ENV _
+  | AF_TIMEOUT _
     ->
       Runner_common.exec_action_no_check ter action
 

@@ -292,6 +292,27 @@ let from_string
     ?force_build_dir ?force_source_dir
     ?computed ~file table
 
+(* Quote [s] as a TOML basic string. OCaml's %S cannot be used, as it
+   escapes non-ASCII bytes as \ddd, which is not valid TOML: UTF-8
+   bytes are kept as is, only quotes, backslashes and control
+   characters are escaped. *)
+let toml_string s =
+  let b = Buffer.create ( String.length s + 2 ) in
+  Buffer.add_char b '"';
+  String.iter (fun c ->
+      match c with
+      | '"' -> Buffer.add_string b "\\\""
+      | '\\' -> Buffer.add_string b "\\\\"
+      | '\n' -> Buffer.add_string b "\\n"
+      | '\t' -> Buffer.add_string b "\\t"
+      | '\r' -> Buffer.add_string b "\\r"
+      | '\000'..'\031' | '\127' ->
+          Printf.bprintf b "\\u%04X" ( Char.code c )
+      | c -> Buffer.add_char b c
+    ) s;
+  Buffer.add_char b '"';
+  Buffer.contents b
+
 let to_string p =
   let b = Buffer.create 10000 in
 
@@ -299,9 +320,9 @@ let to_string p =
   Buffer.add_string b "# name to use to infer config\n";
   begin match p.project_name with
     | None ->
-        Printf.bprintf b "# name = %S\n" "project-name" ;
+        Printf.bprintf b "# name = %s\n" (toml_string "project-name") ;
     | Some name ->
-        Printf.bprintf b "name = %S\n" name ;
+        Printf.bprintf b "name = %s\n" (toml_string name) ;
   end;
   Buffer.add_char b '\n';
 
@@ -309,7 +330,7 @@ let to_string p =
   Buffer.add_string b "#   and to set the AUTOFONCE_SOURCE_DIR\n";
   Printf.bprintf b "source_anchors = [ %s ]\n"
     ( String.concat ", "
-        ( List.map (Printf.sprintf "%S") p.project_source_anchors )) ;
+        ( List.map toml_string p.project_source_anchors )) ;
   Buffer.add_char b '\n';
 
   Buffer.add_string b "# files used to locate the project build directory\n";
@@ -318,7 +339,7 @@ let to_string p =
   Buffer.add_string b "#   use \"!\" to trigger an error if build dir is mandatory\n";
   Printf.bprintf b "build_anchors = [ %s ]\n"
     ( String.concat ", "
-        ( List.map (Printf.sprintf "%S") p.project_build_anchors )) ;
+        ( List.map toml_string p.project_build_anchors )) ;
   Buffer.add_char b '\n';
 
   Buffer.add_string b "# paths in project sources that are good candidates to\n";
@@ -326,15 +347,15 @@ let to_string p =
   Buffer.add_string b "#   from outside the build directory\n";
   Printf.bprintf b "build_dir_candidates = [ %s ]\n"
     ( String.concat ", "
-        ( List.map (Printf.sprintf "%S") p.project_build_dir_candidates )) ;
+        ( List.map toml_string p.project_build_dir_candidates )) ;
   Buffer.add_char b '\n';
 
   Buffer.add_string b "# where the _autofonce/ dir should be created:\n";
   Buffer.add_string b "#   * 'build': in the build directory\n";
   Buffer.add_string b "#   * 'source': in the source directory\n";
   Buffer.add_string b "#   * 'config': in the directory of the config file\n";
-  Printf.bprintf b "run_from = %S\n"
-    ( match p.project_run_from with
+  Printf.bprintf b "run_from = %s\n"
+    @@ toml_string ( match p.project_run_from with
       | Build_dir -> "build"
       | Source_dir -> "source"
       | Config_dir -> "config" ) ;
@@ -344,7 +365,7 @@ let to_string p =
     | None ->
         Printf.bprintf b "# checker = \"/some/checking/script.sh\"\n"
     | Some checker ->
-        Printf.bprintf b "checker = %S\n" checker
+        Printf.bprintf b "checker = %s\n" (toml_string checker)
   end;
 
   Printf.bprintf b "[testsuites]\n" ;
@@ -352,16 +373,16 @@ let to_string p =
   Buffer.add_char b '\n' ;
   List.iter (fun t ->
       Printf.bprintf b "[testsuites.%s]\n" t.config_name ;
-      Printf.bprintf b "desc = %S\n" t.config_desc ;
+      Printf.bprintf b "desc = %s\n" (toml_string t.config_desc) ;
       Printf.bprintf b "default = %d\n" t.config_level ;
       Printf.bprintf b "keywords = [%s]\n"
         ( String.concat ", "
-            ( List.map (Printf.sprintf " %S") t.config_keywords) ) ;
-      Printf.bprintf b "file = %S\n" t.config_file ;
+            ( List.map (fun s -> " " ^ toml_string s) t.config_keywords) ) ;
+      Printf.bprintf b "file = %s\n" (toml_string t.config_file) ;
       Printf.bprintf b "path = [%s]\n"
         ( String.concat ", "
-            ( List.map (Printf.sprintf " %S") t.config_path) ) ;
-      Printf.bprintf b "env = %S\n" t.config_env.env_name ;
+            ( List.map (fun s -> " " ^ toml_string s) t.config_path) ) ;
+      Printf.bprintf b "env = %s\n" (toml_string t.config_env.env_name) ;
     ) p.project_testsuites ;
   Buffer.add_char b '\n';
 
@@ -386,7 +407,7 @@ let to_string p =
   Buffer.add_string b "#   in case of test failure.\n";
   Printf.bprintf b "captured_files = [ %s ]\n"
     ( String.concat ", "
-        ( List.map (Printf.sprintf "%S") p.project_captured_files )) ;
+        ( List.map toml_string p.project_captured_files )) ;
   Buffer.add_char b '\n';
 
   Buffer.contents b

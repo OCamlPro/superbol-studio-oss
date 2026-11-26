@@ -51,6 +51,7 @@ type state = {
   env_acc : string ;
   banner : string ;
   subst : string list ;
+  timeout : int option ;
 }
 
 let bool_of_string bool macro =
@@ -60,6 +61,13 @@ let bool_of_string bool macro =
   | _ ->
       M4Parser.macro_error macro
         "Could not parse boolean %S" bool
+
+let timeout_of_string timeout macro =
+  match int_of_string_opt ( String.trim timeout ) with
+  | Some n when n >= 0 -> n
+  | _ ->
+      M4Parser.macro_error macro
+        "AF_TIMEOUT: expected an integer factor >= 0, got %S" timeout
 
 let load_file ~dirs ~keep_files ~path c filename =
   let rec iter_state s macros =
@@ -149,6 +157,11 @@ let load_file ~dirs ~keep_files ~path c filename =
               let s = { s with keep_files } in
               iter_state s macros
 
+          | Macro ( "AF_TIMEOUT", [ timeout ]) ->
+              let timeout = M4Parser.to_string timeout in
+              let timeout = Some ( timeout_of_string timeout macro ) in
+              iter_state { s with timeout } macros
+
           | Macro ( ( "AF_SUBST" | "AT_SUBST" ), subst) ->
               let subst = List.map M4Parser.to_string subst in
               let s = { s with subst } in
@@ -174,6 +187,7 @@ let load_file ~dirs ~keep_files ~path c filename =
                 test_subst = s.subst ;
                 test_keywords_set = StringSet.empty ;
                 test_regen = false ;
+                test_timeout = s.timeout ;
               }
               in
               let steps = ref [0] in
@@ -450,6 +464,10 @@ let load_file ~dirs ~keep_files ~path c filename =
       | Macro ( ( "AF_ENV" | "AT_ENV" ), [ env ] ) ->
           AF_ENV ( M4Parser.to_string env )
 
+      | Macro ( "AF_TIMEOUT", [ timeout ] ) ->
+          let timeout = M4Parser.to_string timeout in
+          AF_TIMEOUT ( timeout_of_string timeout macro )
+
       | Macro ( ( "AF_COPY" | "AT_COPY" ), files ) ->
           let files = List.map M4Parser.to_string files in
           at_file steps macro ~copy:true files
@@ -521,6 +539,7 @@ let load_file ~dirs ~keep_files ~path c filename =
     keep_files = keep_files ;
     banner = "" ;
     subst = [] ;
+    timeout = None ;
   } in
   iter_state s macros;
   ()

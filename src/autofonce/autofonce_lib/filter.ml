@@ -120,11 +120,15 @@ let select_tests ~args ?state select_test suites =
                         select_test t tg
                     | Some failure ->
                         let reason =
+                          let failure_timeout = ref false in
                           let failure_exitcode = ref false in
                           let failure_stdout = ref false in
                           let failure_stderr = ref false in
                           let files = Sys.readdir test_dir in
                           Array.iter (fun file ->
+                              if Filename.check_suffix file ".timeout" then
+                                failure_timeout := true
+                              else
                               if Filename.check_suffix file ".exit.expected" then
                                 failure_exitcode := true
                               else
@@ -135,6 +139,13 @@ let select_tests ~args ?state select_test suites =
                                 failure_stderr := true
                             ) files ;
                           String.concat " " (
+                            begin
+                              if !failure_timeout then
+                                [ "timeout" ]
+                              else
+                                []
+                            end
+                            @
                             begin
                               if !failure_exitcode then
                                 [ "exitcode" ]

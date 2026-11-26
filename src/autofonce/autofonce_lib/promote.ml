@@ -61,7 +61,11 @@ let print_actions o t b actions =
         else
           None
       in
+      (* a check killed by a timeout has meaningless results *)
+      let timed_out =
+        Sys.file_exists ( Printf.sprintf "%s.timeout" check_prefix ) in
       let keep_old =
+        timed_out ||
         match o.only_successful, new_retcode with
         | false, _ -> o.keep_old
         | true, Some 0 -> o.keep_old
@@ -245,6 +249,8 @@ let print_actions o t b actions =
     | AF_ENV string ->
         Printf.bprintf b "AT_ENV(%s)\n"
           ( PARSER.m4_escape string )
+    | AF_TIMEOUT n ->
+        Printf.bprintf b "AF_TIMEOUT([%d])\n" n
     | AT_CAPTURE_FILE string ->
         Printf.bprintf b "AT_CAPTURE_FILE(%s)\n"
           ( PARSER.m4_escape string )

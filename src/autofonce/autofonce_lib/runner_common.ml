@@ -38,6 +38,8 @@ let args () =
       arg_output = None ;
       arg_only_successful = false ;
       arg_timeout = None ;
+      arg_cpu_timeout = None ;
+      arg_timeout_warning = 50 ;
     }
   in
   [
@@ -81,9 +83,28 @@ let args () =
     EZCMD.info
       ~env:(EZCMD.env "AUTOFONCE_TIMEOUT")
       ~docv:"SECONDS"
-      "Kill checks running longer than $(docv) seconds, using GNU \
-       timeout. 0 disables it (default: 30, or 0 if no GNU timeout \
-       command is found)";
+      "Kill checks running longer than $(docv) seconds (wall-clock), \
+       using GNU timeout. 0 disables it (default: 30, or 10 times the \
+       CPU timeout if --cpu-timeout is set, or 0 if no GNU timeout \
+       command is found). Multiplied by N in tests using AF_TIMEOUT(N)";
+
+    [ "cpu-timeout" ], Arg.Int (fun n -> args.arg_cpu_timeout <- Some (max 0 n)),
+    EZCMD.info
+      ~env:(EZCMD.env "AUTOFONCE_CPU_TIMEOUT")
+      ~docv:"SECONDS"
+      "Kill processes of checks using more than $(docv) seconds of CPU \
+       time (ulimit -t), which is mostly independent of the load of the \
+       machine. The limit applies to each process separately. 0 disables \
+       it (default: 0). Multiplied by N in tests using AF_TIMEOUT(N)";
+
+    [ "timeout-warning" ], Arg.Int (fun n ->
+        args.arg_timeout_warning <- max 0 n),
+    EZCMD.info
+      ~env:(EZCMD.env "AUTOFONCE_TIMEOUT_WARNING")
+      ~docv:"PERCENT"
+      "At the end, warn about checks that used more than $(docv)% of \
+       their wall-clock or CPU timeout, to help adding AF_TIMEOUT(N) \
+       where needed. 0 disables the warning (default: 50)";
 
     [ "o" ; "output" ], Arg.String (fun s -> args.arg_output <- Some s),
     EZCMD.info
@@ -234,28 +255,61 @@ let timeout_command = lazy (
 
 let timeout_warned = ref false
 
-(* Command prefix used to run checks: [timeout] is only used when the
-   timeout is not 0. Without a GNU timeout command, the default timeout
-   is 0, and an explicit timeout is ignored with a warning. *)
-let timeout_prefix state =
+(* Effective timeouts for a check, as [(wall_clock, cpu)] in seconds,
+   0 meaning no timeout. Base timeouts come from --timeout and
+   --cpu-timeout. If only --cpu-timeout is given, the wall-clock
+   timeout defaults to 10 times the CPU timeout, as a CPU limit alone
+   would never kill a check that is waiting (deadlock, input...).
+   Both are multiplied by the factor N set in the test by AF_TIMEOUT(N),
+   so AF_TIMEOUT(0) disables them. Without a GNU timeout command, the
+   default wall-clock timeout is 0, and an explicit one is ignored with
+   a warning. *)
+let timeouts ter =
+  let args = ter.tester_state.state_args in
   let timeout_command = Lazy.force timeout_command in
-  let timeout = match state.state_args.arg_timeout, timeout_command with
+  let cpu = match args.arg_cpu_timeout with
+    | None -> 0
+    | Some n -> n
+  in
+  let wall = match args.arg_timeout, timeout_command with
     | Some n, _ -> n
-    | None, Some _ -> default_timeout
+    | None, Some _ -> if cpu > 0 then 10 * cpu else default_timeout
     | None, None -> 0
   in
-  if timeout = 0 then []
-  else
-    match timeout_command with
-    | Some cmd ->
-        [ cmd ; "-k" ; "5s" ; Printf.sprintf "%ds" timeout ]
-    | None ->
-        if not !timeout_warned then begin
-          timeout_warned := true;
-          Printf.eprintf
-            "Warning: no GNU timeout command found, --timeout ignored\n%!"
-        end;
-        []
+  let factor = match ter.tester_timeout with
+    | None -> 1
+    | Some factor -> factor
+  in
+  let wall = wall * factor in
+  let cpu = cpu * factor in
+  let wall =
+    if wall > 0 && timeout_command = None then begin
+      if not !timeout_warned then begin
+        timeout_warned := true;
+        Printf.eprintf
+          "Warning: no GNU timeout command found, timeout ignored\n%!"
+      end;
+      0
+    end else wall
+  in
+  wall, cpu
+
+(* Command prefix used to run checks: [timeout] is only used when the
+   wall-clock timeout is not 0. *)
+let timeout_prefix wall =
+  match Lazy.force timeout_command with
+  | Some cmd when wall > 0 ->
+      [ cmd ; "-k" ; "5s" ; Printf.sprintf "%ds" wall ]
+  | _ -> []
+
+(* Exit codes of a check killed by a timeout: 124 = GNU timeout,
+   137 = SIGKILL (timeout -k, or hard CPU limit), 152 = SIGXCPU.
+   For the wall-clock timeout, we also check the elapsed time, as the
+   check itself may return 124 or 137. *)
+let killed_by_timeout cer ~elapsed retcode =
+  ( cer.checker_timeout > 0 && ( retcode = 124 || retcode = 137 )
+    && elapsed >= float cer.checker_timeout -. 0.1 )
+  || ( cer.checker_cpu_timeout > 0 && ( retcode = 152 || retcode = 137 ) )
 
 let exec_action_no_check ter action =
   match action with
@@ -274,6 +328,7 @@ let exec_action_no_check ter action =
   | AF_COMMENT _ -> ()
   | AT_XFAIL -> ter.tester_fail_expected <- true
   | AF_ENV env -> ter.tester_renvs <- env :: ter.tester_renvs
+  | AF_TIMEOUT n -> ter.tester_timeout <- Some n
   | AT_CAPTURE_FILE file ->
       ter.tester_captured_files <- StringSet.add file ter.tester_captured_files
   | AT_SKIP
@@ -385,6 +440,7 @@ let start_test state t  cg =
     tester_fail_expected = false ;
     tester_captured_files = StringSet.empty ;
     tester_fail_reason = None ;
+    tester_timeout = t.test_timeout ;
   }
   in
   let test_dir = tester_dir ter in
@@ -428,6 +484,7 @@ let start_check ter check =
   let state = ter.tester_state in
   let check_prefix = check_prefix check in
   let check_sh = Printf.sprintf "%s.sh" check_prefix in
+  let timeout, cpu_timeout = timeouts ter in
   let check_stdout = Printf.sprintf "%s.out" check_prefix in
   let check_stderr = Printf.sprintf "%s.err" check_prefix in
   let check_content =
@@ -438,7 +495,7 @@ let start_check ter check =
 
 # additional test env by AT_ENV
 %s
-
+%s
 # check to perform
 %s
 
@@ -446,6 +503,10 @@ let start_check ter check =
 |}
       Autofonce_config.Globals.env_autofonce_sh
       (String.concat "\n" ( List.rev ter.tester_renvs ))
+      (if cpu_timeout > 0 then
+         Printf.sprintf "\n# CPU time limit (--cpu-timeout, AF_TIMEOUT)\n\
+                         ulimit -t %d\n" cpu_timeout
+       else "")
       (commented (string_of_check check))
       check.check_command
   in
@@ -453,8 +514,13 @@ let start_check ter check =
   EzFile.write_text_file ( test_dir // check_sh ) check_content ;
   Unix.chmod (test_dir // check_sh ) 0o755 ;
   Unix.chdir test_dir ;
+  (* [times] saves the CPU time used by the check, for timeout warnings *)
+  let checker_start = Unix.gettimeofday () in
   let checker_pid = EzCall.create_process
-      ( timeout_prefix state @ [ "sh" ; "-c" ; "./" ^ check_sh ] )
+      ( timeout_prefix timeout @
+        [ "sh" ; "-c" ;
+          Printf.sprintf "./%s; r=$?; times > %s.times; exit $r"
+            check_sh check_prefix ] )
       ~stdout:check_stdout
       ~stderr:check_stderr
   in
@@ -463,6 +529,9 @@ let start_check ter check =
     checker_check = check ;
     checker_tester = ter ;
     checker_pid ;
+    checker_timeout = timeout ;
+    checker_cpu_timeout = cpu_timeout ;
+    checker_start ;
   }
 
 let replace str ~by ~s =
@@ -506,6 +575,66 @@ let read_subst_output ter file =
         | None -> s
         | Some (str, by) -> replace str ~by ~s
     ) s t.test_subst
+
+(* CPU time (user+sys) of the children of the check, as printed by
+   [times] in its second line. This is the total of all the processes
+   of the check, whereas the CPU limit applies to each process, so it
+   is an upper bound. *)
+let read_cpu_time file =
+  match EzFile.read_lines file with
+  | exception _ -> None
+  | lines ->
+      if Array.length lines < 2 then None else
+        try
+          Scanf.sscanf lines.(1) " %dm%fs %dm%fs"
+            (fun um us sm ss ->
+               Some ( float ( um + sm ) *. 60. +. us +. ss ))
+        with _ -> None
+
+(* Record checks that used more than [arg_timeout_warning]% of one of
+   their timeouts *)
+let record_slow_check cer ~elapsed ~cpu_file =
+  let state = cer.checker_tester.tester_state in
+  let percent = state.state_args.arg_timeout_warning in
+  if percent > 0 then begin
+    let check limit kind used =
+      if limit > 0 &&
+         used *. 100. > float ( limit * percent ) then
+        state.state_slow_checks <- {
+          slow_check = cer.checker_check ;
+          slow_kind = kind ;
+          slow_used = used ;
+          slow_limit = limit ;
+        } :: state.state_slow_checks
+    in
+    check cer.checker_timeout "timeout" elapsed;
+    if cer.checker_cpu_timeout > 0 then
+      match read_cpu_time cpu_file with
+      | None -> ()
+      | Some used -> check cer.checker_cpu_timeout "cpu-timeout" used
+  end
+
+let print_slow_checks state =
+  match state.state_slow_checks with
+  | [] -> ()
+  | list ->
+      let ratio s = s.slow_used /. float s.slow_limit in
+      let list =
+        List.sort (fun s1 s2 -> compare (ratio s2) (ratio s1)) list in
+      Terminal.printf [ Terminal.magenta ]
+        "* %d checks used more than %d%% of their timeout:\n%!"
+        ( List.length list ) state.state_args.arg_timeout_warning ;
+      List.iteri (fun i s ->
+          if i < 20 then
+            Printf.printf "  %04d %s: %s %.1fs / %ds (%.0f%%)\n%!"
+              s.slow_check.check_test.test_id
+              ( PARSER.name_of_loc s.slow_check.check_loc )
+              s.slow_kind s.slow_used s.slow_limit ( 100. *. ratio s )
+          else if i = 20 then
+            Printf.printf "  ...\n%!"
+        ) list ;
+      Printf.printf
+        "  Use AF_TIMEOUT(N) in these tests to multiply their timeouts\n%!"
 
 let check_failures cer retcode =
   let check = cer.checker_check in
@@ -554,6 +683,21 @@ let check_failures cer retcode =
         end else []
 
   in
+  let elapsed = Unix.gettimeofday () -. cer.checker_start in
+  let killed = killed_by_timeout cer ~elapsed retcode in
+  if not killed then
+    record_slow_check cer ~elapsed
+      ~cpu_file:( test_dir // ( check_prefix ^ ".times" ) );
+  if killed && check.check_retcode <> Some retcode then begin
+    (* stdout/stderr are truncated, no need to compare them. The
+       .timeout file prevents promotion of this check. *)
+    let check_timeout = test_dir // ( check_prefix ^ ".timeout" ) in
+    EzFile.write_text_file check_timeout
+      ( Printf.sprintf
+          "exit code %d, timeout %ds, cpu timeout %ds\n"
+          retcode cer.checker_timeout cer.checker_cpu_timeout );
+    [ "timeout" ]
+  end else
   begin match check.check_retcode with
     | None -> []
     | Some expected ->
@@ -596,4 +740,5 @@ let create_state ~exec_args p suites =
     state_ntests = !ntests ;
     state_nchecks = 0;
     state_status_printed = false ;
+    state_slow_checks = [] ;
   }
