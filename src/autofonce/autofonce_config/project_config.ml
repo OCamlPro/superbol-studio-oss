@@ -57,6 +57,27 @@ let find_dir_by_anchor ?cwd anchors =
   in
   iter anchors
 
+
+(* Lexically remove "." and "dir/.." from [path], so that candidate build
+   dirs such as "../../_build" give the same paths as [getcwd], which
+   matters for substitutions in outputs *)
+let normalize_path path =
+  if EzString.starts_with path ~prefix:"//" then path (* UNC path *) else
+  let is_root = String.length path > 0 && path.[0] = '/' in
+  let parts = String.split_on_char '/' path in
+  let rec iter acc parts =
+    match parts, acc with
+    | [], _ -> List.rev acc
+    | ( "" | "." ) :: parts, _ -> iter acc parts
+    | ".." :: parts, dir :: acc when dir <> ".." -> iter acc parts
+    | ".." :: parts, [] when is_root -> iter [] parts
+    | part :: parts, _ -> iter ( part :: acc ) parts
+  in
+  let path = String.concat "/" ( iter [] parts ) in
+  if is_root then "/" ^ path
+  else if path = "" then "."
+  else path
+
 let parse_table
     ?force_build_dir ?force_source_dir
     ?(computed=true) ~file table =
@@ -121,7 +142,8 @@ let parse_table
         in
         iter ~fail:false
           ( Misc.getcwd () ::
-            (List.map (fun s -> project_source_dir // s) project_build_dir_candidates))
+            (List.map (fun s -> normalize_path ( project_source_dir // s ))
+               project_build_dir_candidates))
   in
   let project_envs =
     let table = try

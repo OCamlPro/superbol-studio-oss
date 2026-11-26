@@ -1,0 +1,80 @@
+
+#######################################
+#
+#             AF_DATA_COPY
+#
+#######################################
+
+
+AT_SETUP([AF_DATA_COPY])
+AF_DATA_COPY([copied.txt], [simple-file.txt])
+AT_CHECK([cat copied.txt], [0], [This
+file
+is
+in
+simple-file.txt
+])
+# a copy, not a link
+AT_CHECK([test -L copied.txt], [1])
+AT_CHECK([test copied.txt -ef "${TESTSUITE_SRC}/simple-file.txt"], [1])
+AT_CLEANUP
+
+
+AT_SETUP([AF_DATA_COPY in sub-directory])
+AF_DATA_COPY([sub/dir/copied.txt], [dir/file-in-dir.txt])
+AT_CHECK([cat sub/dir/copied.txt], [0], [This
+file
+is
+dir/file-in-dir.txt
+])
+AT_CLEANUP
+
+
+AT_SETUP([AF_DATA_COPY replaces existing file])
+AT_DATA([copied.txt], [old content
+])
+AF_DATA_COPY([copied.txt], [simple-file.txt])
+AT_CHECK([head -n 1 copied.txt], [0], [This
+])
+AT_CLEANUP
+
+
+#######################################
+#
+#             AF_DATA_LINK
+#
+#######################################
+
+
+AT_SETUP([AF_DATA_LINK])
+AF_DATA_LINK([linked.txt], [simple-file.txt])
+AT_CHECK([cat linked.txt], [0], [This
+file
+is
+in
+simple-file.txt
+])
+# a hard link, not a symbolic link
+AT_CHECK([test -L linked.txt], [1])
+AT_CHECK([test linked.txt -ef "${TESTSUITE_SRC}/simple-file.txt"])
+AT_CLEANUP
+
+
+AT_SETUP([AF_DATA_LINK in sub-directory])
+AF_DATA_LINK([sub/dir/linked.txt], [dir/file-in-dir.txt])
+AT_CHECK([cat sub/dir/linked.txt], [0], [This
+file
+is
+dir/file-in-dir.txt
+])
+AT_CHECK([test sub/dir/linked.txt -ef "${TESTSUITE_SRC}/dir/file-in-dir.txt"])
+AT_CLEANUP
+
+
+AT_SETUP([AF_DATA_LINK replaces existing file])
+AT_DATA([linked.txt], [old content
+])
+AF_DATA_LINK([linked.txt], [simple-file.txt])
+AT_CHECK([head -n 1 linked.txt], [0], [This
+])
+AT_CLEANUP

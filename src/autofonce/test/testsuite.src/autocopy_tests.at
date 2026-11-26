@@ -1,0 +1,35 @@
+
+#######################################
+#
+#             AT_COPY_ALL([true])
+#
+#######################################
+
+
+AT_SETUP([auto AT_COPY_ALL(true)])
+AT_CHECK([cat simple-file.txt], [0], [This
+file
+is
+in
+simple-file.txt
+], [])
+AT_CHECK([cat dir/file-in-dir.txt], [0], [This
+file
+is
+dir/file-in-dir.txt
+], [])
+AT_CLEANUP
+
+
+#######################################
+#
+#             AT_COPY_ALL([false])
+#
+#######################################
+
+
+AT_COPY_ALL([false])
+AT_SETUP([auto AT_COPY_ALL(false)])
+AT_CHECK([cat simple-file.txt], [1], [], [ignore])
+AT_CHECK([cat dir/file-in-dir.txt], [1], [], [ignore])
+AT_CLEANUP
