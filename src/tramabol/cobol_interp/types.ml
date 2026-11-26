@@ -63,9 +63,8 @@ type builder =
 
 (** Manager for the libcob-based CIR interpretation logic *)
 type manager =
-  (cob_field, condition_result, cob_record_data, cob_module_memory,
-   state, (state, cob_field Cir_types.code_block) Cir_logic.Types.branch)
-    Cir_logic.Types.manager
+  (cob_field, condition_result, cob_record_data, cob_module_memory, state,
+   Cir_logic.Types.det) Cir_logic.Types.manager
 
 (** The libcob-based CIR is purely imperative, so it's state is [unit]. *)
 and state = unit
@@ -83,6 +82,7 @@ type evaluation_result =
 type options =
   {
     integer_literals: [`numeric_display | `binary_when_small_enough];
+    run_options: Cir_logic.Types.run_options;
   }
 
 (* --- *)

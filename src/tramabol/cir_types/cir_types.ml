@@ -164,28 +164,119 @@ and ('f, 'r) memory_storage =
 
 [@@deriving show { with_path = false }]
 
-(** High-level statements for the PROCEDURE DIVISION. *)
-type 'f statement =
+(** Straight-line statements for the PROCEDURE DIVISION, that cannot branch. *)
+type 'f straight_statement =
   | IR_display of                   (* Note: may actually branch on exception *)
       {
         data_refs: 'f data_reference array;
         advancing: bool;
       }
+  | IR_move of
+      {
+        source: 'f data_reference;
+        targets: 'f data_reference NEL.t;
+      }
+  | IR_arithmetic of                       (* truncates targets on size error *)
+      'f arithmetic_operation
+
+and 'f arithmetic_operation =
+  {
+    operator: arithmetic_operator;
+    operand: 'f field_reference;
+    targets: 'f arithmetic_target NEL.t;
+  }
+
+and arithmetic_operator =
+  | Add
+  | Subtract
+
+and 'f arithmetic_target =
+  {
+    target: 'f field_reference;
+    rounded: bool;
+  }
+
+[@@deriving show { with_path = false }]
+
+(** Control-flow graph of basic blocks, where every block is designated by its
+    index in [proc_blocks]. *)
+type 'f procedure =
+  {
+    proc_blocks: 'f basic_block array;
+    proc_entry: label;
+  }
+
+and 'f basic_block =
+  {
+    block_stmts: 'f straight_statement with_loc array;
+    block_term: 'f terminator with_loc;
+  }
+
+(** Index of a {e basic block} in its enclosing procedure; see {!procedure}. *)
+and label = int
+
+(** Statements that end a basic block. *)
+and 'f terminator =
+  | IR_goto of label
+  | IR_branch of
+      {
+        condition: 'f condition;
+        if_true: label;
+        if_false: label;
+      }
+  | IR_goto_depending of
+      {
+        selector: 'f field_reference;
+        targets: label NEL.t;
+        default: label;
+      }
+  | IR_perform of
+      {
+        entry: label;
+        exit_point: exit_point;
+        return_to: label;
+      }
+  | IR_perform_exit of
+      {
+        exit_points: exit_point NEL.t;
+        fallthrough: label;
+      }
+  | IR_set_counter of                                (* initializes a counter *)
+      {
+        counter: counter;
+        count: 'f field_reference;
+        next: label;
+      }
+  | IR_count_down of                                (* decrements the counter *)
+      {
+        counter: counter;
+        if_positive: label;                 (* where to jump if positive *)
+        if_zero: label;                     (* where to jump if zero already  *)
+      }
+  | IR_checked_arithmetic of        (* leaves targets unchanged on size error *)
+      {
+        arithmetic: 'f arithmetic_operation;
+        on_size_error: label;
+        not_on_size_error: label;
+      }
   | IR_stop of
       {
         optional_status: 'f data_reference option;
       }
-  | IR_conditional of
+  | IR_goback
+  | IR_exit_program of
       {
-        condition: 'f condition;
-        then_branch: 'f code_block;
-        else_branch: 'f code_block;
+        fallthrough: label;                (* continuation for a main program *)
       }
 
-(** A block of code that is amenable to interpretation; for now, only a list of
-    statements. *)
-and 'f code_block =
-  'f statement with_loc list                                        (* for now *)
+(** Iteration counter, for [PERFORM ... TIMES] statements. *)
+and counter = int
+
+(** End of a paragraph or section, designated by the label of its first
+    block, that may terminate a PERFORM. *)
+and exit_point =
+  | Paragraph_end of label
+  | Section_end of label
 
 [@@deriving show { with_path = false }]
 
@@ -194,7 +285,7 @@ type ('f, 'r, 'm) module_handle =
     module_memory: 'm;
     module_unit: Cobol_unit.Types.t [@opaque];
     module_data: ('f, 'r) data;
-    module_proc: 'f code_block;                           (* one block for now *)
+    module_proc: 'f procedure;
   }
 
 [@@deriving show { with_path = false }]

@@ -11,11 +11,27 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val create: name:string -> source_file:string -> Types.cob_module_memory
-val enter: Types.cob_module_memory -> params:Types.cob_field array -> unit
-val leave: Types.cob_module_memory -> unit
+open Types
 
-val ws_needs_initialization
-  : Types.cob_module_memory -> bool
+val create
+  : name:string
+  -> source_file:string
+  -> cob_module_memory
+val enter
+  : cob_module_memory
+  -> params:cob_field array
+  -> state
+  -> evaluation_result
+val leave
+  : cob_module_memory
+  -> state
+  -> evaluation_result
+
+val ws_initialized
+  : cob_module_memory
+  -> state
+  -> (state * bool) Cir_logic.Types.evaluation_result
 val ws_initialization_done
-  : Types.cob_module_memory -> Types.state -> Types.evaluation_result
+  : cob_module_memory
+  -> state
+  -> evaluation_result

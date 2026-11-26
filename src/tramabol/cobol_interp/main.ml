@@ -28,22 +28,27 @@ let build_error e =
 let default_options =
   {
     integer_literals = `binary_when_small_enough;
+    run_options = Cir_logic.Main.default_run_options;
   }
 
-let exec_unit ~builder unit =
+let exec_unit ~options ~builder unit =
   match Cir_builder.Module.of_cobol_unit ~builder unit with
   | Error errs ->
       Error (Initialization_errors errs)
   | Ok m ->
-      match Cir_logic.Main.run_module ~vm:Values.manager m () with
-      | Error errs ->
+      match
+        Cir_logic.Main.run_module ~options:options.run_options
+          ~vm:Values.manager m ()
+      with
+      | Det Error errs ->
           Error (Runtime_errors errs)
-      | Ok (_state, x) ->
-          Ok x
+      | Det Ok (_state, status) ->
+          Result.map_error (fun errs -> Runtime_errors errs) @@
+          Field.as_int status
 
 let run_unit ?(options = default_options) unit =
   Runtime.run ~f:begin fun () ->
-    exec_unit ~builder:(Values.builder ~options) unit
+    exec_unit ~options ~builder:(Values.builder ~options) unit
   end
 
 let run_group ?(options = default_options) group =
@@ -51,7 +56,7 @@ let run_group ?(options = default_options) group =
     let builder = Values.builder ~options in
     match Cobol_unit.Group.cardinal group with
     | 1 ->
-        exec_unit ~builder @@ Cobol_unit.Group.choose group
+        exec_unit ~options ~builder @@ Cobol_unit.Group.choose group
     | 0 ->
         build_error @@ Invalid_compilation_group { reason = `empty_group }
     | _ ->

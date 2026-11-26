@@ -153,6 +153,15 @@ let resolve_data_reference env (t: ident_or_literal with_loc) =
            data_ref_loc = field_ref_loc;
            data_refmod = None }
 
+let resolve_scalar_data_reference env (s: scalar with_loc) =
+  match ~&s with
+  | ScalarIdent i ->
+      resolve_data_reference env (Ident i &@<- s)
+  | ScalarLiteral lit ->
+      resolve_data_reference env (Literal lit &@<- s)
+  | LengthOf _ ->
+      error @@ Unsupported { stuff = Scalar ~&s; loc = ~@s }
+
 let resolve_condition env
     (c: Cobol_procedure.Types.condition or_error with_loc) =
   match ~&c with
