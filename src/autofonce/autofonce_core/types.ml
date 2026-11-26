@@ -59,6 +59,8 @@ and action =
   | AF_COMMENT of string
   | AF_DATA_LINK of { file:string ; dir : string ; content_file: string }
   | AF_DATA_COPY of { file:string ; dir : string ; content_file: string }
+  (* AF_TIMEOUT(N): multiply the timeouts of next checks by N, 0 = none *)
+  | AF_TIMEOUT of int
 
 and test = { (* variable name is `t` *)
   test_suite : suite ;
@@ -69,6 +71,8 @@ and test = { (* variable name is `t` *)
   test_env : string ;
   test_subst : string list ;
   test_regen : bool ;
+  (* timeout factor set by a toplevel AF_TIMEOUT(N) before the test *)
+  test_timeout : int option ;
   mutable test_keywords : string list ;
   mutable test_actions : action list ;
   mutable test_keywords_set : StringSet.t ;
@@ -116,6 +120,8 @@ let rec string_of_action = function
       Printf.sprintf "AF_ENV %S" env
   | AF_COMMENT comment ->
       Printf.sprintf "AF_COMMENT %S" comment
+  | AF_TIMEOUT n ->
+      Printf.sprintf "AF_TIMEOUT([%d])" n
   | AF_DATA_COPY { file ; dir ; content_file } ->
       Printf.sprintf "AF_DATA_COPY ( file=%S, dir=%s, content_file=%s )"
         file dir content_file

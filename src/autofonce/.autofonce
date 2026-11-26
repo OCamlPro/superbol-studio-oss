@@ -1,0 +1,52 @@
+[project]
+# name to use to infer config
+name = "autofonce"
+
+# files used to locate the project top directory
+#   and to set the AUTOFONCE_SOURCE_DIR
+source_anchors = [ ".autofonce" ]
+
+# files used to locate the project build directory
+#   where the _autofonce/ directory will be created
+#   and to set the AUTOFONCE_BUILD_DIR
+#   use "!" to trigger an error if build dir is mandatory
+build_anchors = [ "default" ]
+
+# paths in project sources that are good candidates to
+#   be tested as build dirs. Useful to run autofonce
+#   from outside the build directory
+# "../../_build" is the build dir of SuperBOL Studio, where autofonce
+#   is vendored in src/autofonce/ with a copy of this file and tests
+build_dir_candidates = [ "_build", "../../_build" ]
+
+# where the _autofonce/ dir should be created:
+#   * 'build': in the build directory
+#   * 'source': in the source directory
+#   * 'config': in the directory of the config file
+run_from = "build"
+
+captured_files = [
+ "_build/default/autofonce_config.dune-package"
+]
+
+[testsuites]
+# alias = "path-from-topdir"
+[testsuites.testsuite]
+file = "test/testsuite.at"
+path = [ "test/testsuite.src", "test/testsuite.inc"]
+env = "testsuite"
+[testsuites.testdir]
+file = "test/testsuite.src"
+path = [ "test/testsuite.src"]
+env = "testsuite"
+
+[envs]
+# env_name = """..."""
+# env_name = "<local-path-to-env-file"
+testsuite = """
+# 'testsuite' env content
+# Purpose it to translate AUTOFONCE_ variables to the
+# variables expected by the project testsuite
+export TESTSUITE_SRC="$AUTOFONCE_SOURCE_DIR/test/testsuite.src"
+"""
+

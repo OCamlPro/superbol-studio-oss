@@ -1,0 +1,185 @@
+
+# 2 tests are supposed to be skipped
+# 4 tests are expected to fail
+
+# TODO:
+# * add tests for escaping []
+# * add tests for AT_CAPTURE_FILE
+
+# Empty
+
+AT_SETUP([empty])
+AT_CLEANUP
+
+#######################################
+#
+#             AT_DATA
+#
+#######################################
+
+
+AT_SETUP([data])
+AT_DATA([file],[content])
+AT_CHECK([cat file], [0], [content], [])
+AT_CLEANUP
+
+
+#######################################
+#
+#             AT_ENV
+#
+#######################################
+
+
+AT_SETUP([AT_ENV in test])
+AT_ENV([VAR_EXPORT='exported var'])
+AT_CHECK([printf "${VAR_EXPORT}"], [0], [exported var], [])
+AT_ENV([VAR_EXPORT='var exported'])
+AT_ENV([VAR_INTERNAL='var internal'])
+AT_CHECK([printf "${VAR_INTERNAL}"], [0], [var internal], [])
+AT_CLEANUP
+
+
+#######################################
+#
+#             AT_CHECK
+#
+#######################################
+
+
+AT_SETUP([AT_CHECK exitcode])
+AT_CHECK([true], [0], [], [])
+AT_CHECK([false], [1], [], [])
+AT_CLEANUP
+
+
+AT_SETUP([AT_CHECK stdout])
+AT_CHECK([printf "Hello"], [0], [Hello], [])
+AT_CLEANUP
+
+
+AT_SETUP([AT_CHECK stderr])
+AT_CHECK([printf "Hello" 1>&2 ], [0], [], [Hello])
+AT_CLEANUP
+
+
+AT_SETUP([AT_CHECK run-if-pass])
+AT_CHECK([true], [0], [], [], [
+  AT_FAIL_IF([true]) # don't come here
+], [
+  AT_CHECK([true])   # come here
+])
+AT_CLEANUP
+
+
+AT_SETUP([AT_CHECK run-if-fail])
+AT_CHECK([false], [0], [], [], [
+  AT_CHECK([true])    # come here
+], [
+  AT_FAIL_IF([false]) # don't come here
+])
+AT_CLEANUP
+
+
+#######################################
+#
+#             AT_SKIP_IF
+#
+#######################################
+
+
+AT_SETUP([AT_SKIP_IF true])
+AT_SKIP_IF([true])
+AT_CHECK([false])  # SKIPPED
+AT_CLEANUP
+
+
+AT_SETUP([AT_SKIP_IF condition])
+AT_SKIP_IF([true && true])
+AT_CHECK([false])  # SKIPPED
+AT_CLEANUP
+
+
+AT_SETUP([AT_SKIP_IF false])
+AT_SKIP_IF([false])
+AT_CHECK([true])   # NOT SKIPPED
+AT_CLEANUP
+
+
+
+#######################################
+#
+#             AT_XFAIL_IF
+#
+#######################################
+
+
+AT_SETUP([AT_XFAIL_IF true])
+AT_XFAIL_IF([true])
+AT_CHECK([false])  # EXPECTED TO FAIL
+AT_CLEANUP
+
+
+AT_SETUP([AT_XFAIL_IF true ok])
+AT_XFAIL_IF([true])
+AT_CHECK([true])    # SUCCESS
+AT_CLEANUP
+
+
+AT_SETUP([AT_XFAIL_IF condition])
+AT_XFAIL_IF([true && true])
+AT_CHECK([false])  # EXPECTED TO FAIL
+AT_CLEANUP
+
+
+AT_SETUP([AT_XFAIL_IF false])
+AT_XFAIL_IF([false])
+AT_CHECK([true])   # SUCCESS
+AT_CLEANUP
+
+#######################################
+#
+#             AT_FAIL_IF
+#
+#######################################
+
+
+AT_SETUP([AT_FAIL_IF true])
+AT_XFAIL_IF([true])
+AT_FAIL_IF([true])         # EXPECTED TO FAIL
+AT_CLEANUP
+
+
+AT_SETUP([AT_FAIL_IF condition])
+AT_XFAIL_IF([true])
+AT_FAIL_IF([true && true]) # EXPECTED TO FAIL
+AT_CLEANUP
+
+
+AT_SETUP([AT_FAIL_IF false])
+AT_FAIL_IF([false])
+AT_CHECK([true])   # SUCCESS
+AT_CLEANUP
+
+
+
+
+#######################################
+#
+#             AF_TIMEOUT
+#
+#######################################
+
+
+AF_TIMEOUT([2])
+AT_SETUP([AF_TIMEOUT at toplevel])
+AT_CHECK([true])
+AT_CLEANUP
+
+
+AT_SETUP([AF_TIMEOUT in test])
+AF_TIMEOUT([0])
+AT_CHECK([true])
+AF_TIMEOUT([3])
+AT_CHECK([printf "ok"], [0], [ok])
+AT_CLEANUP

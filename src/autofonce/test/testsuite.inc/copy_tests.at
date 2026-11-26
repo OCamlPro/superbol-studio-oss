@@ -1,0 +1,203 @@
+
+#######################################
+#
+#             AT_ENV
+#
+#######################################
+
+
+AT_SETUP([AT_ENV in testsuite.at])
+AT_CHECK([printf "${VAR_EXPORT}"], [0], [Exported var], [])
+AT_CHECK([printf "${VAR_INTERNAL}"], [0], [Internal var], [])
+AT_CLEANUP
+
+#######################################
+#
+#             AF_ENV
+#
+#######################################
+
+
+AF_SETUP([AF_ENV in testsuite.at])
+AF_CHECK([printf "${VAR_EXPORT}"], [0], [Exported var], [])
+AF_CHECK([printf "${VAR_INTERNAL}"], [0], [Internal var], [])
+AF_CLEANUP
+
+
+#######################################
+#
+#             AT_COPY_ALL([true])
+#
+#######################################
+
+
+AT_COPY_ALL([true])
+
+AT_SETUP([AT_COPY_ALL(true)])
+AT_CHECK([cat simple-file.txt], [0], [This
+file
+is
+in
+simple-file.txt
+], [])
+AT_CHECK([cat dir/file-in-dir.txt], [0], [This
+file
+is
+dir/file-in-dir.txt
+], [])
+AT_CHECK([cat copy-tests.at], [1], [], [ignore])
+AT_CLEANUP
+
+
+#######################################
+#
+#             AT_COPY_ALL([false])
+#
+#######################################
+
+
+AT_COPY_ALL([false])
+
+AT_SETUP([AT_COPY_ALL(false)])
+AT_CHECK([cat simple-file.txt], [1], [], [ignore])
+AT_CHECK([cat dir/file-in-dir.txt], [1], [], [ignore])
+AT_CLEANUP
+
+
+#######################################
+#
+#             AT_LINK_ALL([true])
+#
+#######################################
+
+
+AT_LINK_ALL([true])
+
+AT_SETUP([AT_LINK_ALL(true)])
+AT_CHECK([cat simple-file.txt], [0], [This
+file
+is
+in
+simple-file.txt
+], [])
+AT_CHECK([cat dir/file-in-dir.txt], [0], [This
+file
+is
+dir/file-in-dir.txt
+], [])
+AT_CLEANUP
+
+
+#######################################
+#
+#             AT_LINK_ALL([false])
+#
+#######################################
+
+
+AT_LINK_ALL([false])
+
+AT_SETUP([AT_LINK_ALL(false)])
+AT_CHECK([cat simple-file.txt], [1], [], [ignore])
+AT_CHECK([cat dir/file-in-dir.txt], [1], [], [ignore])
+AT_CLEANUP
+
+
+
+#######################################
+#
+#             AT_COPY
+#
+#######################################
+
+
+AT_SETUP([AT_COPY simple-file.txt])
+AT_COPY([[simple-file.txt]])
+AT_CHECK([cat simple-file.txt], [0], [This
+file
+is
+in
+simple-file.txt
+], [])
+AT_CLEANUP
+
+
+AT_SETUP([AT_COPY dir])
+AT_COPY([dir])
+AT_CHECK([cat dir/file-in-dir.txt], [0], [This
+file
+is
+dir/file-in-dir.txt
+], [])
+AT_CLEANUP
+
+
+AT_SETUP([AT_COPY dir/file-in-dir.txt])
+AT_COPY([dir/file-in-dir.txt])
+AT_CHECK([cat file-in-dir.txt], [0], [This
+file
+is
+dir/file-in-dir.txt
+], [])
+AT_CLEANUP
+
+
+#######################################
+#
+#             AT_LINK
+#
+#######################################
+
+
+AT_SETUP([AT_LINK simple-file.txt])
+AT_LINK([[simple-file.txt]])
+AT_CHECK([cat simple-file.txt], [0], [This
+file
+is
+in
+simple-file.txt
+], [])
+AT_CLEANUP
+
+
+AT_SETUP([AT_LINK dir])
+AT_LINK([dir])
+AT_CHECK([cat dir/file-in-dir.txt], [0], [This
+file
+is
+dir/file-in-dir.txt
+], [])
+AT_CLEANUP
+
+
+AT_SETUP([AT_LINK dir/file-in-dir.txt])
+AT_LINK([dir/file-in-dir.txt])
+AT_CHECK([cat file-in-dir.txt], [0], [This
+file
+is
+dir/file-in-dir.txt
+], [])
+AT_CLEANUP
+
+
+#######################################
+#
+#             AT_SUBST([true])
+#
+#######################################
+
+AT_SUBST([AUTOFONCE],[HOME])
+
+AT_SETUP([AT_SUBST(AUTOFONCE,HOME)])
+AT_CHECK([printf "%s" $(pwd)], [0], [${AUTOFONCE_BUILD_DIR}/${AUTOFONCE_RUN_DIR}/${TEST_ID}], [])
+AT_CHECK([printf "%s" ${AUTOFONCE_SOURCE_DIR}], [0], [${AUTOFONCE_SOURCE_DIR}], [])
+AT_CHECK([printf "%s" ${AUTOFONCE_BUILD_DIR}], [0], [${AUTOFONCE_BUILD_DIR}], [])
+AT_CLEANUP
+
+AT_SUBST([HOME])
+
+AT_SETUP([AT_SUBST(HOME)])
+AT_CHECK([printf "%s" ${HOME}], [0], [${HOME}])
+AT_CLEANUP
+
+AT_SUBST()

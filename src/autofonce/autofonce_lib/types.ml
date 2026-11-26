@@ -31,6 +31,12 @@ type exec_args = {
   (* timeout in seconds for each check, 0 = no timeout,
      None = default (30s if a GNU [timeout] command is available, 0 otherwise) *)
   mutable arg_timeout : int option ;
+  (* CPU time limit in seconds for each process of a check (ulimit -t),
+     None or 0 = no limit *)
+  mutable arg_cpu_timeout : int option ;
+  (* warn at the end about checks that used more than this percentage
+     of one of their timeouts, 0 = no warning *)
+  mutable arg_timeout_warning : int ;
 }
 
 (* imperative context, these values are meaningless at the end of
@@ -52,6 +58,15 @@ type state = { (* variable name is `state` *)
   mutable state_ntests : int ;
   mutable state_nchecks : int ;
   mutable state_status_printed : bool ;
+  (* checks that came close to their timeout *)
+  mutable state_slow_checks : slow_check list ;
+}
+
+and slow_check = {
+  slow_check : check ;
+  slow_kind : string ; (* "timeout" or "cpu-timeout" *)
+  slow_used : float ; (* seconds *)
+  slow_limit : int ; (* seconds *)
 }
 
 and tester = { (* variable name is `ter` *)
@@ -62,6 +77,9 @@ and tester = { (* variable name is `ter` *)
   mutable tester_renvs : string list ;
   mutable tester_fail_expected : bool ;
   mutable tester_captured_files : StringSet.t ;
+  (* timeout factor set by AF_TIMEOUT, applied to [arg_timeout] and
+     [arg_cpu_timeout] *)
+  mutable tester_timeout : int option ;
   mutable tester_fail_reason :
     ( location * string * check option ) option ;
 }
@@ -70,6 +88,9 @@ and checker = { (* variable name is `cer` *)
   checker_check : check ;
   checker_tester : tester ;
   checker_pid : int ;
+  checker_timeout : int ; (* wall-clock timeout used, 0 = none *)
+  checker_cpu_timeout : int ; (* CPU timeout used, 0 = none *)
+  checker_start : float ; (* Unix.gettimeofday at start *)
 }
 
 type suites = (suite * testsuite_config) list

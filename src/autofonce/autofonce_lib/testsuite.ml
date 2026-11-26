@@ -237,6 +237,7 @@ let exec ~filter_args ~exec_args p suites =
         Runner_common.print_ntests 5 (List.rev list);
         Printf.printf "\n%!";
   end;
+  Runner_common.print_slow_checks state ;
   if state.state_args.arg_print_all then begin
     let buffer = Buffer.contents state.state_buffer in
     Terminal.printf [ Terminal.magenta ] "%s\n%!" buffer;

@@ -126,6 +126,7 @@ let log_checks ?failed_check state ter =
     | AF_DATA_COPY _
     | AF_DATA_LINK _
     | AF_ENV _
+    | AF_TIMEOUT _
     | AT_CAPTURE_FILE _
     | AT_XFAIL
     | AT_SKIP

@@ -108,6 +108,7 @@ and schedule_action r action =
   | AT_CAPTURE_FILE _
   | AT_CLEANUP _
   | AF_ENV _
+  | AF_TIMEOUT _
     ->
       Runner_common.exec_action_no_check r.running_test action;
       schedule_job r
