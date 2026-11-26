@@ -51,7 +51,7 @@ install: [
   ["sh" "-c" "./scripts/before.sh install '%{name}%'"]
 ]
 depends: [
-  "ocaml" {>= "4.14.2"}
+  "ocaml" {>= "4.14.1"}
   "dune" {>= "3.17.0"}
   "odoc" {with-doc}
   "dune" {>= "3.17.0" & < "3.19.0"}

@@ -39,6 +39,10 @@ jobs:
             ocaml-compiler: 4.14.2
             focus: js
 
+          - os: ubuntu-latest
+            ocaml-compiler: 4.14.1
+            focus: build
+
 
     runs-on: ${{ matrix.os }}
 
@@ -59,6 +63,8 @@ jobs:
 
       - name: Use OCaml ${{ matrix.ocaml-compiler }}
         uses: avsm/setup-ocaml@v3
+        env:
+          CC: gcc -std=gnu17
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
           opam-pin: false
